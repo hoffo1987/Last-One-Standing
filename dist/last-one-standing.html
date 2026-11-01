@@ -626,6 +626,38 @@ main { padding-bottom: 40px; }
 
 @media (max-width: 760px) { .toast { bottom: calc(210px + env(safe-area-inset-bottom, 0px)); } }
 .poster-card .psoft { position: absolute; top: 18px; left: 54px; font-family: var(--f-mono); font-size: 10px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; background: rgba(0,0,0,.45); border: 1px solid rgba(255,255,255,.2); border-radius: 6px; padding: 3px 7px; }
+
+/* ---------- scheda concorrente: impaginazione stabile da desktop ---------- */
+.castgrid { grid-template-columns: repeat(auto-fill, minmax(248px, 1fr)); gap: 14px; }
+.tile { grid-template-rows: auto 1fr auto; padding: 14px 14px 12px; overflow: hidden; }
+.tile .thead { padding-right: 22px; }
+.tile .thead > div { min-width: 0; flex: 1; }
+.tile .tname { width: calc(100% + 6px); max-width: calc(100% + 6px); text-overflow: ellipsis; }
+.tile .tsub { min-width: 0; }
+.tile .chips { align-content: flex-start; min-height: 26px; }
+.tile .tfoot { display: grid; gap: 8px; border-top: 1px solid var(--line); padding-top: 10px; min-width: 0; }
+.tile .gsel { display: grid; grid-template-columns: repeat(3, 1fr); width: 100%; }
+.tile .gsel button { padding: 4px 0; font-size: 12.5px; }
+.tile .tacts { display: flex; gap: 6px; align-items: center; min-width: 0; }
+.tile .tacts .tedit { flex: 1; justify-content: center; padding: 6px 10px; font-size: 13px; }
+.tile .tacts .tedit svg { width: 15px; height: 15px; }
+.tile .ord { margin-left: 0; display: flex; gap: 4px; flex: none; }
+.tile .ord button { width: 32px; height: 32px; border-radius: 8px; font-size: 13px; }
+.tile .ord button:disabled { opacity: .35; cursor: default; }
+.tile .grip { top: 10px; right: 8px; }
+/* editor laterale */
+#editBody .row { align-items: flex-start !important; }
+#editBody .field > span { min-height: 20px; display: flex; align-items: flex-end; }
+#editBody .attrgrid { grid-template-columns: 110px minmax(0, 1fr) 26px; }
+#editBody .traitpick button { font-size: 12.5px; }
+.drawer .db { padding-bottom: 32px; }
+
+.teamwrap { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 540px), 1fr)); gap: 16px; align-items: start; }
+.teamblock.card { margin: 0; padding: 14px; border-top: 4px solid var(--c); }
+.teamblock h3 i { background: var(--c); }
+.teamblock .castgrid { grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 10px; }
+.teamblock .tile { box-shadow: none; }
+#editBody .field > span { gap: 4px; }
 </style>
 
 <header class="top">
@@ -5686,10 +5718,12 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
         '<div class="tsub"><span class="teamchip" style="--c:' + esc(t.color) + '"><i></i>Squadra ' + t.team + '</span></div></div>' +
       '</div>' +
       '<div class="chips">' + traits + '</div>' +
-      '<div class="tacts">' +
+      '<div class="tfoot">' +
         '<div class="gsel" role="group" aria-label="Genere">' + ['M', 'F', 'N'].map((g) => '<button type="button" data-act="g" data-v="' + g + '" aria-pressed="' + (t.gender === g) + '">' + G3(g, 'Lui', 'Lei', 'Neutro') + '</button>').join('') + '</div>' +
-        '<button class="btn" type="button" data-act="edit">Modifica</button>' +
-        (showOrder ? '<div class="ord"><button type="button" data-act="up" aria-label="Sposta prima"' + (i === 0 ? ' disabled' : '') + '>↑</button><button type="button" data-act="down" aria-label="Sposta dopo"' + (i === S.cast.length - 1 ? ' disabled' : '') + '>↓</button></div>' : '') +
+        '<div class="tacts">' +
+          '<button class="btn sm tedit" type="button" data-act="edit"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M14 6l4 4"/></svg>Modifica</button>' +
+          (showOrder ? '<div class="ord"><button type="button" data-act="up" aria-label="Sposta prima"' + (i === 0 ? ' disabled' : '') + '>↑</button><button type="button" data-act="down" aria-label="Sposta dopo"' + (i === S.cast.length - 1 ? ' disabled' : '') + '>↓</button></div>' : '') +
+        '</div>' +
       '</div>' +
     '</article>';
   }
@@ -5700,7 +5734,7 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
     if (S.settings.view === 'team') {
       const teams = {};
       S.cast.forEach((t, i) => (teams[t.team] = teams[t.team] || []).push([t, i]));
-      $('#castList').innerHTML = Object.keys(teams).sort((a, b) => a - b).map((k) => '<div class="teamblock"><h3><i style="--c:' + teamColor(+k) + '"></i>Squadra ' + k + ' <span>' + teams[k].length + '</span></h3><div class="castgrid">' + teams[k].map(([t, i]) => tileHTML(t, i, false)).join('') + '</div></div>').join('') + '<div class="castgrid">' + add + '</div>';
+      $('#castList').innerHTML = '<div class="teamwrap">' + Object.keys(teams).sort((a, b) => a - b).map((k) => '<section class="teamblock card" style="--c:' + teamColor(+k) + '"><h3><i></i>Squadra ' + k + ' <span>' + plural(teams[k].length, 'concorrente', 'concorrenti') + '</span></h3><div class="castgrid">' + teams[k].map(([t, i]) => tileHTML(t, i, false)).join('') + '</div></section>').join('') + '</div><div class="castgrid" style="margin-top:14px">' + add + '</div>';
     } else {
       $('#castList').innerHTML = '<div class="castgrid">' + S.cast.map((t, i) => tileHTML(t, i, true)).join('') + add + '</div>';
     }

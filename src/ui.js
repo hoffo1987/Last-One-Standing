@@ -259,10 +259,12 @@
         '<div class="tsub"><span class="teamchip" style="--c:' + esc(t.color) + '"><i></i>Squadra ' + t.team + '</span></div></div>' +
       '</div>' +
       '<div class="chips">' + traits + '</div>' +
-      '<div class="tacts">' +
+      '<div class="tfoot">' +
         '<div class="gsel" role="group" aria-label="Genere">' + ['M', 'F', 'N'].map((g) => '<button type="button" data-act="g" data-v="' + g + '" aria-pressed="' + (t.gender === g) + '">' + G3(g, 'Lui', 'Lei', 'Neutro') + '</button>').join('') + '</div>' +
-        '<button class="btn" type="button" data-act="edit">Modifica</button>' +
-        (showOrder ? '<div class="ord"><button type="button" data-act="up" aria-label="Sposta prima"' + (i === 0 ? ' disabled' : '') + '>↑</button><button type="button" data-act="down" aria-label="Sposta dopo"' + (i === S.cast.length - 1 ? ' disabled' : '') + '>↓</button></div>' : '') +
+        '<div class="tacts">' +
+          '<button class="btn sm tedit" type="button" data-act="edit"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M14 6l4 4"/></svg>Modifica</button>' +
+          (showOrder ? '<div class="ord"><button type="button" data-act="up" aria-label="Sposta prima"' + (i === 0 ? ' disabled' : '') + '>↑</button><button type="button" data-act="down" aria-label="Sposta dopo"' + (i === S.cast.length - 1 ? ' disabled' : '') + '>↓</button></div>' : '') +
+        '</div>' +
       '</div>' +
     '</article>';
   }
@@ -273,7 +275,7 @@
     if (S.settings.view === 'team') {
       const teams = {};
       S.cast.forEach((t, i) => (teams[t.team] = teams[t.team] || []).push([t, i]));
-      $('#castList').innerHTML = Object.keys(teams).sort((a, b) => a - b).map((k) => '<div class="teamblock"><h3><i style="--c:' + teamColor(+k) + '"></i>Squadra ' + k + ' <span>' + teams[k].length + '</span></h3><div class="castgrid">' + teams[k].map(([t, i]) => tileHTML(t, i, false)).join('') + '</div></div>').join('') + '<div class="castgrid">' + add + '</div>';
+      $('#castList').innerHTML = '<div class="teamwrap">' + Object.keys(teams).sort((a, b) => a - b).map((k) => '<section class="teamblock card" style="--c:' + teamColor(+k) + '"><h3><i></i>Squadra ' + k + ' <span>' + plural(teams[k].length, 'concorrente', 'concorrenti') + '</span></h3><div class="castgrid">' + teams[k].map(([t, i]) => tileHTML(t, i, false)).join('') + '</div></section>').join('') + '</div><div class="castgrid" style="margin-top:14px">' + add + '</div>';
     } else {
       $('#castList').innerHTML = '<div class="castgrid">' + S.cast.map((t, i) => tileHTML(t, i, true)).join('') + add + '</div>';
     }
