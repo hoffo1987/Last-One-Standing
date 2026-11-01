@@ -54,7 +54,11 @@
   /* ---------------- Parser del formato eventi ---------------- */
   const L = (c) => c.charCodeAt(0) - 65;
   const letters = (s) => [...s].map(L);
-  const ITEMS = 'arma|cibo|med|trap';
+  const ITEMS = 'arma|cibo|med|trap|veleno|mappa|amuleto|esplosivo';
+  const LEXKEYS = 'arma|cibo|luogo|mostro|trappola|rifugio|dono|amuleto|alcol|veleno|mappa|esplosivo';
+  const LEX_RE = new RegExp('\\{(' + LEXKEYS + ')\\}', 'g');
+  const POSS_RE = /\{(arma|amuleto|veleno|mappa|esplosivo|cibo|med|trap):([A-F])\}/g;
+  const ID = (m) => [L(m)];
 
   function parseLine(line, origin) {
     const bar = line.indexOf('|');
@@ -77,27 +81,53 @@
       if ((m = tok.match(/^d:([A-F]+)$/))) { ev.dies.push(...letters(m[1])); continue; }
       if ((m = tok.match(/^al:([A-F]+)$/))) { const r = letters(m[1]); ev.fx.push({ t: 'al', r }); ev.req.push({ t: 'canAlly', r }); continue; }
       if ((m = tok.match(/^ally:([A-F]+)$/))) { ev.req.push({ t: 'ally', r: letters(m[1]) }); continue; }
-      if ((m = tok.match(/^br:([A-F])$/))) { const r = [L(m[1])]; ev.fx.push({ t: 'br', r }); ev.req.push({ t: 'hasAlly', r }); ev.tags.push('betray'); continue; }
-      if ((m = tok.match(/^w:([A-F])$/))) { ev.req.push({ t: 'has', item: 'arma', r: [L(m[1])] }); continue; }
-      if ((m = tok.match(new RegExp('^\\+(' + ITEMS + '):([A-F])$')))) { ev.fx.push({ t: 'gain', item: m[1], r: [L(m[2])] }); continue; }
-      if ((m = tok.match(new RegExp('^-(' + ITEMS + '):([A-F])$')))) { ev.fx.push({ t: 'lose', item: m[1], r: [L(m[2])] }); ev.req.push({ t: 'has', item: m[1], r: [L(m[2])] }); continue; }
-      if ((m = tok.match(/^(cibo|med|trap):([A-F])$/))) { const r = [L(m[2])]; ev.req.push({ t: 'has', item: m[1], r }); ev.fx.push({ t: 'lose', item: m[1], r }); continue; }
-      if ((m = tok.match(/^steal:([A-F])<([A-F])$/))) { ev.req.push({ t: 'has', item: 'arma', r: [L(m[2])] }); ev.fx.push({ t: 'steal', r: [L(m[1]), L(m[2])] }); continue; }
-      if ((m = tok.match(/^s:([A-F])=(\w+)$/))) { ev.fx.push({ t: 'status', r: [L(m[1])], s: m[2] }); continue; }
-      if ((m = tok.match(/^need:([A-F])=(\w+|\*)$/))) { ev.req.push({ t: 'need', r: [L(m[1])], s: m[2] }); continue; }
-      if ((m = tok.match(/^cure:([A-F])$/))) { ev.fx.push({ t: 'cure', r: [L(m[1])] }); continue; }
+      if ((m = tok.match(/^br:([A-F])$/))) { const r = ID(m[1]); ev.fx.push({ t: 'br', r }); ev.req.push({ t: 'hasAlly', r }); ev.tags.push('betray'); continue; }
+      if ((m = tok.match(/^w:([A-F])$/))) { ev.req.push({ t: 'has', item: 'arma', r: ID(m[1]) }); continue; }
+      if ((m = tok.match(/^con:([A-F])=(\w+)$/))) { ev.req.push({ t: 'has', item: m[2], r: ID(m[1]) }); continue; }
+      if ((m = tok.match(new RegExp('^\\+(' + ITEMS + '):([A-F])$')))) { ev.fx.push({ t: 'gain', item: m[1], r: ID(m[2]) }); continue; }
+      if ((m = tok.match(new RegExp('^-(' + ITEMS + '):([A-F])$')))) { ev.fx.push({ t: 'lose', item: m[1], r: ID(m[2]) }); ev.req.push({ t: 'has', item: m[1], r: ID(m[2]) }); continue; }
+      if ((m = tok.match(/^(cibo|med|trap|veleno|esplosivo):([A-F])$/))) { const r = ID(m[2]); ev.req.push({ t: 'has', item: m[1], r }); ev.fx.push({ t: 'lose', item: m[1], r }); continue; }
+      if ((m = tok.match(/^steal:([A-F])<([A-F])$/))) { ev.req.push({ t: 'has', item: 'arma', r: ID(m[2]) }); ev.fx.push({ t: 'steal', r: [L(m[1]), L(m[2])] }); continue; }
+      if ((m = tok.match(/^give:([A-F])>([A-F])=(\w+)$/))) { ev.fx.push({ t: 'give', r: [L(m[1]), L(m[2])], item: m[3] }); continue; }
+      if ((m = tok.match(/^s:([A-F])=(\w+)$/))) { ev.fx.push({ t: 'status', r: ID(m[1]), s: m[2] }); continue; }
+      if ((m = tok.match(/^need:([A-F])=(\w+|\*)$/))) { ev.req.push({ t: 'need', r: ID(m[1]), s: m[2] }); continue; }
+      if ((m = tok.match(/^cure:([A-F])$/))) { ev.fx.push({ t: 'cure', r: ID(m[1]) }); continue; }
+      // legami e conseguenze
+      if ((m = tok.match(/^hit:([A-F])>([A-F])$/))) { ev.fx.push({ t: 'hit', r: [L(m[1]), L(m[2])] }); ev.req.push({ t: 'foe', a: ID(m[1]), b: ID(m[2]) }); continue; }
+      if ((m = tok.match(/^save:([A-F])>([A-F])$/))) { ev.fx.push({ t: 'save', r: [L(m[1]), L(m[2])] }); continue; }
+      if ((m = tok.match(/^love:([A-F])([A-F])$/))) { ev.fx.push({ t: 'love', r: [L(m[1]), L(m[2])] }); ev.req.push({ t: 'canLove', r: [L(m[1]), L(m[2])] }); continue; }
+      if ((m = tok.match(/^couple:([A-F])([A-F])$/))) { ev.req.push({ t: 'couple', r: [L(m[1]), L(m[2])] }); continue; }
+      if ((m = tok.match(/^single:([A-F])$/))) { ev.req.push({ t: 'single', r: ID(m[1]) }); continue; }
+      if ((m = tok.match(/^grudge:([A-F])>([A-F])$/))) { ev.req.push({ t: 'grudge', r: [L(m[1]), L(m[2])] }); continue; }
+      if ((m = tok.match(/^owe:([A-F])>([A-F])$/))) { ev.req.push({ t: 'owe', r: [L(m[1]), L(m[2])] }); continue; }
+      if ((m = tok.match(/^forgive:([A-F])>([A-F])$/))) { ev.fx.push({ t: 'forgive', r: [L(m[1]), L(m[2])] }); ev.req.push({ t: 'grudge', r: [L(m[1]), L(m[2])] }); continue; }
+      if ((m = tok.match(/^repay:([A-F])>([A-F])$/))) { ev.fx.push({ t: 'repay', r: [L(m[1]), L(m[2])] }); ev.req.push({ t: 'owe', r: [L(m[1]), L(m[2])] }); continue; }
+      if ((m = tok.match(/^debt:([A-F])>([A-F])$/))) { ev.fx.push({ t: 'debt', r: [L(m[1]), L(m[2])] }); continue; }
+      if ((m = tok.match(/^friend:([A-F])([A-F])$/))) { ev.req.push({ t: 'friend', r: [L(m[1]), L(m[2])] }); continue; }
+      if ((m = tok.match(/^enemy:([A-F])([A-F])$/))) { ev.req.push({ t: 'enemy', r: [L(m[1]), L(m[2])] }); continue; }
+      if ((m = tok.match(/^rel:([A-F])([A-F])([+-]\d+)$/))) { ev.fx.push({ t: 'rel', r: [L(m[1]), L(m[2])], v: +m[3] }); continue; }
+      if ((m = tok.match(/^fame:([A-F])$/))) { ev.req.push({ t: 'fame', r: ID(m[1]) }); continue; }
+      if ((m = tok.match(/^feared:([A-F])$/))) { ev.req.push({ t: 'feared', r: ID(m[1]) }); continue; }
+      if ((m = tok.match(/^lost:([A-F])$/))) { ev.req.push({ t: 'lost', r: ID(m[1]) }); continue; }
+      if ((m = tok.match(/^star:([A-F])$/))) { ev.fx.push({ t: 'star', r: ID(m[1]) }); continue; }
+      if ((m = tok.match(/^traitor:([A-F])$/))) { ev.req.push({ t: 'traitor', r: ID(m[1]) }); continue; }
       throw new Error('Etichetta sconosciuta "' + tok + '" in: ' + line);
     }
     const vic = new Set(ev.dies);
     ev.kills.forEach((k) => k.v.forEach((v) => vic.add(v)));
     ev.victims = [...vic];
     ev.lethal = ev.victims.length > 0;
+    const has = (t) => ev.fx.some((f) => f.t === t);
+    const rq = (t) => ev.req.some((r) => r.t === t);
     ev.cat = ev.kills.some((k) => k.betray) ? 'betray' : ev.kills.length ? 'kill' : ev.dies.length ? 'death' :
-      ev.fx.some((f) => f.t === 'br') ? 'betray' : ev.fx.some((f) => f.t === 'al') ? 'ally' : ev.fx.some((f) => f.t === 'cure') ? 'heal' :
-      ev.fx.some((f) => f.t === 'status') ? 'hurt' : ev.fx.some((f) => f.t === 'gain' || f.t === 'steal') ? 'item' : 'none';
-    // tutte le lettere usate devono rientrare in n
+      has('br') ? 'betray' : has('love') ? 'love' : has('al') ? 'ally' : has('cure') || has('save') ? 'heal' :
+      has('status') || has('hit') ? 'hurt' : has('gain') || has('steal') || has('give') ? 'item' : 'none';
+    // perché accade: la conseguenza che l'ha reso possibile
+    ev.why = rq('grudge') ? 'vendetta' : rq('owe') ? 'debito' : rq('couple') ? 'coppia' : rq('lost') ? 'lutto' :
+      ev.req.some((r) => r.t === 'need' && r.s === 'lutto') ? 'lutto' : rq('traitor') ? 'reputazione' : rq('feared') ? 'reputazione' : rq('fame') ? 'fama' :
+      ev.req.some((r) => r.t === 'has' && /veleno|mappa|amuleto|esplosivo|trap/.test(r.item)) ? 'oggetto' : ev.req.some((r) => r.t === 'need' && r.s !== '*') ? 'condizione' : '';
     const used = new Set();
-    for (const re of [/\{([A-F])\}/g, /\{arma:([A-F])\}/g, /\[([A-F]+):/g]) {
+    for (const re of [/\{([A-F])\}/g, /\{\w+:([A-F])\}/g, /\[([A-F]+):/g]) {
       let mm; while ((mm = re.exec(text))) [...mm[1]].forEach((ch) => used.add(ch));
     }
     for (const r of ev.req.concat(ev.fx)) (r.r || []).concat(r.a || [], r.b || []).forEach((i) => used.add(String.fromCharCode(65 + i)));
@@ -111,8 +141,6 @@
     if (!src) return [];
     return src.split('\n').map((l) => l.trim()).filter((l) => l && !l.startsWith('#')).map((l) => parseLine(l, origin));
   }
-
-  /* Evento personalizzato creato dall'interfaccia → riga del formato */
   function customToLine(c) {
     const toks = [String(c.n)];
     const dies = (c.dies || []).filter((x) => x !== c.killer);
@@ -122,28 +150,34 @@
     return toks.join(' ') + ' | ' + c.text;
   }
 
-  const PHASES = ['b', 'd', 'n', 'f', 'finale', 'ds', 'fallback'];
+  const PHASES = ['b', 'd', 'n', 'f', 'finale', 'ds', 'fallback', 'sponsor', 'lovers'];
   function parseDisasters(src, origin) {
     if (!src) return [];
-    return src.split('\n').map((l) => l.trim()).filter(Boolean).map((l) => {
+    return src.split('\n').map((l) => l.trim()).filter((l) => l && !l.startsWith('#')).map((l) => {
       const p = l.split('|').map((x) => x.trim());
       if (p.length < 5) throw new Error('Disastro incompleto: ' + l);
       const st = p[5] || 'ferito';
       return { n: p[0], intro: p[1], out: parseBlock('1 d:A | ' + p[2] + '\n1 s:A=' + st + ' | ' + p[3] + '\n1 | ' + p[4], origin) };
     });
   }
+  const packsFor = (theme, adult) => (D.packs || []).filter((pk) => {
+    const okTheme = pk.theme === theme.id || (pk.theme === '*' && !theme.soft) || pk.theme === 'tutte' || (Array.isArray(pk.theme) && pk.theme.includes(theme.id));
+    return okTheme && (!pk.adult || (adult && !theme.noAdult));
+  });
   const poolCache = {};
-  function buildPools(theme, custom) {
-    const key = theme.id + '|' + JSON.stringify(custom || []);
+  function buildPools(theme, custom, adult) {
+    const key = theme.id + '|' + (adult ? 1 : 0) + '|' + JSON.stringify(custom || []);
     if (poolCache[key]) return poolCache[key];
     const src = theme.soft ? theme.pool : D.core;
     const more = (D.more || {})[theme.id] || {};
+    const packs = packsFor(theme, adult);
     const pools = {};
     for (const k of PHASES) {
       pools[k] = parseBlock(src[k], theme.soft ? theme.id : 'base');
       if (!theme.soft && D.coreExtra && D.coreExtra[k]) pools[k] = pools[k].concat(parseBlock(D.coreExtra[k], 'base'));
       if (!theme.soft && theme.extra && theme.extra[k]) pools[k] = pools[k].concat(parseBlock(theme.extra[k], theme.id));
       if (more.extra && more.extra[k]) pools[k] = pools[k].concat(parseBlock(more.extra[k], theme.id));
+      packs.forEach((pk) => { if (pk.ev && pk.ev[k]) pools[k] = pools[k].concat(parseBlock(pk.ev[k], pk.adult ? 'adult' : pk.theme === theme.id ? theme.id : 'base')); });
     }
     (custom || []).forEach((c) => {
       if (!c || !c.text) return;
@@ -154,29 +188,49 @@
     });
     pools.disasters = (theme.disasters || []).map((d) => ({ n: d.n, intro: d.intro, out: parseBlock(d.out, theme.id) }))
       .concat(parseDisasters(more.dis, theme.id));
-    const ks = Object.keys(poolCache); if (ks.length > 30) delete poolCache[ks[0]];
+    packs.forEach((pk) => { if (pk.dis) pools.disasters = pools.disasters.concat(parseDisasters(pk.dis, pk.adult ? 'adult' : theme.id).map((d) => Object.assign(d, { adult: !!pk.adult }))); });
+    pools.lex = Object.assign({}, D.lexDefault || {}, theme.lex);
+    packs.forEach((pk) => { if (pk.lex) Object.keys(pk.lex).forEach((k) => (pools.lex[k] = pk.lex[k])); });
+    const ks = Object.keys(poolCache); if (ks.length > 40) delete poolCache[ks[0]];
     poolCache[key] = pools;
     return pools;
   }
 
   function countTemplates() {
-    let events = 0, disasters = 0, outcomes = 0;
-    const cnt = (s) => (s ? s.split('\n').filter((l) => l.trim() && l.includes('|')).length : 0);
+    const cnt = (s) => (s ? s.split('\n').filter((l) => l.trim() && !l.trim().startsWith('#') && l.includes('|')).length : 0);
+    const cntDis = (s) => (s ? s.split('\n').filter((l) => l.trim() && !l.trim().startsWith('#')).length : 0);
     const perTheme = {};
-    PHASES.forEach((k) => (events += cnt(D.core[k]) + cnt((D.coreExtra || {})[k])));
-    D.themes.forEach((t) => {
-      let e = 0, d = 0;
-      const more = (D.more || {})[t.id] || {};
-      if (t.soft) PHASES.forEach((k) => (e += cnt(t.pool[k])));
-      if (!t.soft && t.extra) Object.values(t.extra).forEach((s) => (e += cnt(s)));
-      if (more.extra) Object.values(more.extra).forEach((s) => (e += cnt(s)));
-      (t.disasters || []).forEach((x) => { d += 1; outcomes += cnt(x.out); });
-      const md = more.dis ? more.dis.split('\n').filter((l) => l.trim()).length : 0;
-      d += md; outcomes += md * 3;
-      events += e; disasters += d;
-      perTheme[t.id] = { events: e, disasters: d };
+    let events = 0, disasters = 0, adultEvents = 0, adultDis = 0, outcomes = 0;
+    const seen = new Set();
+    const add = (key, n, isDis, adult) => {
+      if (seen.has(key)) return; seen.add(key);
+      if (isDis) { if (adult) adultDis += n; else disasters += n; outcomes += n * 3; }
+      else if (adult) adultEvents += n; else events += n;
+    };
+    PHASES.forEach((k) => { add('core' + k, cnt(D.core[k])); add('cx' + k, cnt((D.coreExtra || {})[k])); });
+    (D.packs || []).forEach((pk, i) => {
+      PHASES.forEach((k) => add('p' + i + k, cnt((pk.ev || {})[k]), false, pk.adult));
+      add('pd' + i, cntDis(pk.dis), true, pk.adult);
     });
-    return { events, disasters, outcomes, themes: D.themes.length, perTheme };
+    D.themes.forEach((t) => {
+      const more = (D.more || {})[t.id] || {};
+      if (t.soft) PHASES.forEach((k) => add('soft' + t.id + k, cnt(t.pool[k])));
+      if (!t.soft && t.extra) Object.keys(t.extra).forEach((k) => add('tx' + t.id + k, cnt(t.extra[k])));
+      if (more.extra) Object.keys(more.extra).forEach((k) => add('mx' + t.id + k, cnt(more.extra[k])));
+      add('td' + t.id, (t.disasters || []).length, true);
+      add('md' + t.id, cntDis(more.dis), true);
+      // conteggio per arena (quello che quella partita può usare)
+      let e = 0, d = (t.disasters || []).length + cntDis(more.dis), ea = 0, da = 0;
+      if (t.soft) PHASES.forEach((k) => (e += cnt(t.pool[k])));
+      else { PHASES.forEach((k) => (e += cnt(D.core[k]) + cnt((D.coreExtra || {})[k]))); if (t.extra) Object.values(t.extra).forEach((s) => (e += cnt(s))); }
+      if (more.extra) Object.values(more.extra).forEach((s) => (e += cnt(s)));
+      packsFor(t, true).forEach((pk) => {
+        let pe = 0; PHASES.forEach((k) => (pe += cnt((pk.ev || {})[k])));
+        if (pk.adult) { ea += pe; da += cntDis(pk.dis); } else { e += pe; d += cntDis(pk.dis); }
+      });
+      perTheme[t.id] = { events: e, disasters: d, adultEvents: ea, adultDisasters: da };
+    });
+    return { events, disasters, adultEvents, adultDisasters: adultDis, outcomes, themes: D.themes.length, perTheme };
   }
 
   /* ---------------- Grammatica ---------------- */
@@ -185,41 +239,48 @@
     const gs = group.map((t) => t.gender || 'M');
     if (gs.every((g) => g === 'F')) return o[1] !== undefined ? o[1] : o[0];
     if (gs.every((g) => g === 'N')) return o[2] !== undefined ? o[2] : 'ə';
-    if (gs.length === 1) return o[0];
     return o[0];
   }
-  const ART = /^(un'|una |uno |un |il |lo |la |l'|i |gli |le )/i;
-  function possessive(item) {
-    if (!item) return 'la sua arma';
+  const ART = /^(un'|una |uno |un |il |lo |la |l'|i |gli |le |delle |dei |degli |del |della |dell')/i;
+  function possessive(item, fallback) {
+    if (!item) return fallback || 'la sua arma';
     const s = item.name;
     const m = s.match(ART);
     const bare = m ? s.slice(m[0].length) : s;
-    const fem = m ? /^(una |un'|la |le )/i.test(m[0]) : false;
+    const a = m ? m[0].toLowerCase() : '';
+    if (/^(delle |le )/.test(a)) return 'le sue ' + bare;
+    if (/^(dei |degli |i |gli )/.test(a)) return 'i suoi ' + bare;
+    const fem = /^(una |un'|la |della |dell')/.test(a);
     return (fem ? 'la sua ' : 'il suo ') + bare;
   }
-  // preposizioni articolate: "in la" → "nella", "di il" → "del", ...
   const PREP = { in: 'ne', di: 'de', a: 'a', da: 'da', su: 'su' };
   const ARTI = { lo: 'llo', la: 'lla', "l'": "ll'", gli: 'gli', le: 'lle' };
   function artPrep(s) {
     return s.replace(/(^|[^\p{L}'])(in|di|a|da|su) (il(?= )|lo(?= )|la(?= )|i(?= )|gli(?= )|le(?= )|l'(?=\p{L}))/gu, (m, pre, p, a) => {
       const P = PREP[p];
-      const out = a === 'il' ? (P === 'ne' || P === 'de' ? P + 'l' : P + 'l') : a === 'i' ? P + 'i' : P + ARTI[a];
-      return pre + out + (a === "l'" ? '' : '');
+      return pre + (a === 'il' ? P + 'l' : a === 'i' ? P + 'i' : P + ARTI[a]);
     });
   }
   const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   const cap = (s) => s.charAt(0).toUpperCase() + s.slice(1);
+  const edFix = (s) => s.replace(/ e ((?:<b[^>]*>)?)(?=[Ee][^\s])/g, ' ed $1');
+  const nameTag = (t) => '<b class="nm" data-id="' + esc(t.id) + '" style="--c:' + esc(t.color || '#888') + '">' + esc(t.name) + '</b>';
 
   /* ---------------- Simulazione ---------------- */
   const DIFF = { bassa: 0.6, normale: 1, alta: 1.45, massacro: 2.2 };
   const BASE_P = { b: 0.3, d: 0.15, n: 0.1, f: 0.38, dis: 0.26 };
-  const STATUS_LABEL = { ferito: 'Ferito', avvelenato: 'Avvelenato', malato: 'Malato', affamato: 'Affamato' };
+  const STATUS_LABEL = { ferito: 'Ferito', avvelenato: 'Avvelenato', malato: 'Malato', affamato: 'Affamato', lutto: 'In lutto', ubriaco: 'Ubriaco', sconvolto: 'Sconvolto' };
+  const STATUS_TTL = { ubriaco: 2, lutto: 6, sconvolto: 5 };
+  const ITEM_NAME = { med: 'un kit medico', trap: 'una trappola' };
 
   function simulate(cfg) {
     const theme = D.themes.find((t) => t.id === cfg.theme) || D.themes[0];
     const seed = cfg.seed == null || cfg.seed === '' ? String(Date.now()) : String(cfg.seed);
     const rng = makeRng(seed + '|' + theme.id);
-    const pools = buildPools(theme, cfg.custom);
+    const adult = !!cfg.adult && !theme.noAdult;
+    const pools = buildPools(theme, cfg.custom, adult);
+    const LEX = pools.lex;
+    const E = Object.assign({}, D.echo || {}, theme.soft ? D.echoSoft || {} : {});
     const diff = DIFF[cfg.difficulty] || 1;
     const maxDays = Math.max(3, Math.min(60, cfg.maxDays || 20));
     const traitMap = Object.fromEntries(D.traits.map((t) => [t.id, t]));
@@ -233,10 +294,18 @@
       alive: true, zone: 0, inv: [], st: {}, kills: 0, killIds: [], allyId: null,
       deathPhase: -1, deathDay: 0, deathText: '', deathHtml: '', killerIds: [], order: 0,
       events: 0, alliancesFormed: 0, betrayals: 0, items: 0,
+      partner: null, exPartner: null, lost: null, grudges: {}, owes: {}, fame: 0, traitor: false, fed: 0,
+      revenges: 0, saves: 0, repaid: 0, amulets: 0,
     }));
     if (T.length < 2) throw new Error('Servono almeno 2 concorrenti.');
     T.forEach((t) => (t.zone = rng.int(zoneCount)));
     const byId = Object.fromEntries(T.map((t) => [t.id, t]));
+
+    // affinità reciproca (-100 … 100)
+    const AFF = new Map();
+    const akey = (a, b) => (a.id < b.id ? a.id + '|' + b.id : b.id + '|' + a.id);
+    const aff = (a, b) => AFF.get(akey(a, b)) || 0;
+    const addAff = (a, b, d) => { if (a === b) return; AFF.set(akey(a, b), Math.max(-100, Math.min(100, aff(a, b) + d))); };
 
     const alliances = new Map();
     let nextAlly = 1;
@@ -261,21 +330,22 @@
     if (cfg.teamsAllied) {
       const teams = {};
       T.forEach((t) => (teams[t.team] = teams[t.team] || []).push(t));
-      Object.values(teams).forEach((ms) => ms.length > 1 && joinAlliance(ms));
+      Object.values(teams).forEach((ms) => { if (ms.length > 1) { joinAlliance(ms); ms.forEach((a) => ms.forEach((b) => a.id < b.id && addAff(a, b, 35))); } });
     }
 
     const alive = () => T.filter((t) => t.alive);
     const phases = [];
     let day = 0, deathCounter = 0, pendingFallen = [], noDeathStreak = 0;
-    const stats = { events: 0, alliances: 0, betrayals: 0, firstBlood: null, deathsByDay: [], envDeaths: 0, killDeaths: 0, items: 0 };
+    const stats = { events: 0, alliances: 0, betrayals: 0, firstBlood: null, deathsByDay: [], envDeaths: 0, killDeaths: 0, items: 0, revenges: 0, couples: 0, debtsRepaid: 0, amulets: 0, sponsors: 0, echoes: 0 };
 
     const hasItem = (t, it) => t.inv.some((x) => x.type === it);
-    const weaponOf = (t) => t.inv.find((x) => x.type === 'arma');
-    const statusCount = (t) => Object.keys(t.st).length;
+    const itemOf = (t, it) => t.inv.find((x) => x.type === it);
+    const statusCount = (t) => Object.keys(t.st).filter((s) => s !== 'lutto').length;
     const traitSum = (t, key) => t.traits.reduce((s, id) => s + ((traitMap[id] && traitMap[id][key]) || 0), 0);
     const combat = (t) => t.attr.for + t.attr.agi + 0.5 * t.attr.int + 0.3 * t.attr.res + 0.2 * t.attr.fort +
-      (weaponOf(t) ? 4 : 0) - (t.st.ferito != null ? 3 : 0) - (t.st.malato != null ? 2 : 0) + traitSum(t, 'c');
-    const survival = (t) => 0.4 * t.attr.res + 0.3 * t.attr.fort + 0.2 * t.attr.agi + traitSum(t, 's') - 1.5 * statusCount(t);
+      (hasItem(t, 'arma') ? 4 : 0) + (hasItem(t, 'esplosivo') ? 2 : 0) - (t.st.ferito != null ? 3 : 0) - (t.st.malato != null ? 2 : 0) -
+      (t.st.ubriaco != null ? 2 : 0) - (t.st.affamato != null ? 1.5 : 0) - (t.st.sconvolto != null ? 1 : 0) + (t.st.lutto != null ? 1.5 : 0) + traitSum(t, 'c') + Math.min(3, t.kills * 0.5);
+    const survival = (t) => 0.4 * t.attr.res + 0.3 * t.attr.fort + 0.2 * t.attr.agi + traitSum(t, 's') - 1.5 * statusCount(t) + (hasItem(t, 'amuleto') ? 2 : 0);
 
     function isEnded() {
       const a = alive();
@@ -286,9 +356,10 @@
 
     function checkReq(ev, roles) {
       for (const r of ev.req) {
+        const A = roles[r.r ? r.r[0] : 0], B = r.r && r.r[1] != null ? roles[r.r[1]] : null;
         switch (r.t) {
           case 'ally': {
-            const g = roles[r.r[0]].allyId;
+            const g = A.allyId;
             if (g == null || !r.r.every((i) => roles[i].allyId === g)) return false;
             break;
           }
@@ -300,22 +371,31 @@
             const size = gids.size ? alliances.get([...gids][0]).size + ts.filter((t) => t.allyId == null).length : ts.length;
             if (size > 5) return false;
             if (cfg.teamWin && new Set(ts.map((t) => t.team)).size > 1 && cfg.teamsAllied) return false;
+            for (const a of ts) for (const b of ts) if (a !== b && (a.grudges[b.id] || aff(a, b) <= -40)) return false;
             break;
           }
-          case 'hasAlly': if (roles[r.r[0]].allyId == null) return false; break;
-          case 'has': if (!hasItem(roles[r.r[0]], r.item)) return false; break;
-          case 'need': {
-            const t = roles[r.r[0]];
-            if (r.s === '*' ? statusCount(t) === 0 : t.st[r.s] == null) return false;
-            break;
-          }
+          case 'hasAlly': if (A.allyId == null) return false; break;
+          case 'has': if (!hasItem(A, r.item)) return false; break;
+          case 'need': if (r.s === '*' ? statusCount(A) === 0 : A.st[r.s] == null) return false; break;
           case 'foe':
             for (const a of r.a) for (const b of r.b) {
-              const A = roles[a], B = roles[b];
-              if (A.allyId != null && A.allyId === B.allyId) return false;
-              if (cfg.teamWin && A.team === B.team) return false;
+              const X = roles[a], Y = roles[b];
+              if (X.allyId != null && X.allyId === Y.allyId) return false;
+              if (cfg.teamWin && X.team === Y.team) return false;
+              if (X.partner === Y.id) return false;
             }
             break;
+          case 'canLove': if (A.partner || B.partner || A.grudges[B.id] || B.grudges[A.id] || aff(A, B) < -10 || A.exPartner === B.id) return false; break;
+          case 'couple': if (A.partner !== B.id) return false; break;
+          case 'single': if (A.partner) return false; break;
+          case 'grudge': if (!A.grudges[B.id]) return false; break;
+          case 'owe': if (!A.owes[B.id]) return false; break;
+          case 'friend': if (aff(A, B) < 40) return false; break;
+          case 'enemy': if (aff(A, B) > -40 && !A.grudges[B.id] && !B.grudges[A.id]) return false; break;
+          case 'fame': if (A.fame < 3) return false; break;
+          case 'feared': if (A.kills < 3) return false; break;
+          case 'lost': if (!A.lost) return false; break;
+          case 'traitor': if (!A.traitor) return false; break;
         }
       }
       return true;
@@ -330,31 +410,54 @@
         else if (tag === 'int' || tag === 'heal') w *= 0.6 + P.attr.int / 12;
         else if (tag === 'luck') w *= 0.5 + P.attr.fort / 10;
         else if (tag === 'agg') w *= 0.7 + P.attr.for / 15;
+        else if (tag === 'mad') w *= P.st.ubriaco != null || P.st.sconvolto != null ? 2.5 : 1;
+        else if (tag === 'gift') w *= 1 + P.fame * 0.4;
+        else if (tag === 'betray') w *= (Object.keys(P.owes).length ? 0.3 : 1) * (P.partner ? 0.5 : 1);
+        else if (tag === 'drunk') w *= P.st.ubriaco != null ? 3 : 1;
       }
       for (const r of ev.req) {
         if (r.t === 'need' && (r.s === '*' ? statusCount(P) > 0 : P.st[r.s] != null)) w *= 3;
-        if (r.t === 'has' && hasItem(P, r.item)) w *= 1.6;
-        if (r.t === 'ally' && P.allyId != null) w *= 1.4;
+        else if (r.t === 'has' && hasItem(P, r.item)) w *= r.item === 'arma' || r.item === 'cibo' ? 1.6 : 3;
+        else if (r.t === 'ally' && P.allyId != null) w *= 1.4;
+        else if (r.t === 'grudge' && Object.keys(P.grudges).some((id) => byId[id].alive)) w *= 7;
+        else if (r.t === 'owe' && (Object.keys(P.owes).length || T.some((t) => t.alive && t.owes[P.id]))) w *= 4;
+        else if (r.t === 'couple' && P.partner) w *= 3.5;
+        else if (r.t === 'lost' && P.lost) w *= 3;
+        else if (r.t === 'fame' && P.fame >= 3) w *= 2;
+        else if (r.t === 'traitor' && T.some((t) => t.alive && t.traitor && t !== P)) w *= 2;
+        else if (r.t === 'feared' && T.some((t) => t.alive && t.kills >= 3 && t !== P)) w *= 2;
+        else if (r.t === 'canLove' && !P.partner) w *= 1.2;
       }
       if (ev.origin === 'custom') w *= 1.5;
-      if (ev.origin !== 'base' && ev.origin !== 'custom') w *= 1.3;
+      else if (ev.origin === 'adult') w *= 1.25;
+      else if (ev.origin !== 'base') w *= 1.3;
       return w;
     }
 
+    function relKey(P, t) {
+      let k = (t.zone === P.zone ? 0 : 1) + rng.f() * 1.3;
+      if (P.grudges[t.id]) k -= 2.2;
+      if (P.partner === t.id) k -= 1.6;
+      if (P.owes[t.id] || t.owes[P.id]) k -= 1.1;
+      if (t.grudges[P.id]) k -= 0.9;
+      const a = aff(P, t); if (a >= 40) k -= 0.7; else if (a <= -40) k -= 0.5;
+      return k;
+    }
     function assign(ev, P, un) {
       const others = [];
       un.forEach((id) => id !== P.id && byId[id].alive && others.push(byId[id]));
       if (others.length < ev.n - 1) return null;
       let best = null, bestScore = -Infinity;
-      for (let attempt = 0; attempt < 10; attempt++) {
-        const keyed = others.map((t) => [t, (t.zone === P.zone ? 0 : 1) + rng.f() * 1.3]).sort((a, b) => a[1] - b[1]);
+      for (let attempt = 0; attempt < 12; attempt++) {
+        const keyed = others.map((t) => [t, relKey(P, t)]).sort((a, b) => a[1] - b[1]);
         const group = keyed.slice(0, ev.n - 1).map((x) => x[0]);
-        const roles = rng.shuffle([P].concat(group));
+        const roles = attempt % 2 === 0 ? [P].concat(rng.shuffle(group)) : rng.shuffle([P].concat(group));
         if (!checkReq(ev, roles)) continue;
         let score = rng.f() * 6;
         for (const k of ev.kills) {
           score += 0.6 * (k.by.reduce((s, i) => s + combat(roles[i]), 0) / k.by.length - k.v.reduce((s, i) => s + combat(roles[i]), 0) / k.v.length);
           k.v.forEach((i) => (score -= 0.5 * survival(roles[i])));
+          k.by.forEach((i) => k.v.forEach((j) => { if (roles[i].grudges[roles[j].id]) score += 6; }));
         }
         ev.dies.forEach((i) => (score -= survival(roles[i])));
         if (score > bestScore) { bestScore = score; best = roles; }
@@ -362,80 +465,189 @@
       return best;
     }
 
-    function render(text, roles, lexPick) {
+    // ---------- testo ----------
+    function grudgePhrase(A, B) {
+      const g = A.grudges[B.id];
+      if (!g) return 'tutto quello che ha fatto';
+      if (g.victim && byId[g.victim]) return '{@' + g.victim + '}';
+      return { betray: 'il tradimento subito', steal: 'il furto subito', attack: 'l\'agguato subito', love: 'il cuore spezzato' }[g.why] || 'tutto quello che ha fatto';
+    }
+    function render(text, roles, lexPick, ev) {
       let s = text
+        .replace(/\{caro:([A-F])\}/g, (_, c) => {
+          const A = roles[L(c)];
+          const r = ev && ev.req.find((x) => x.t === 'grudge' && x.r[0] === L(c));
+          if (r) return grudgePhrase(A, roles[r.r[1]]);
+          const anyId = Object.keys(A.grudges)[0];
+          return anyId ? grudgePhrase(A, byId[anyId]) : 'il passato';
+        })
+        .replace(/\{(perso|partner):([A-F])\}/g, (_, k, c) => { const A = roles[L(c)]; const id = k === 'perso' ? A.lost : A.partner || A.exPartner; return id && byId[id] ? '{@' + id + '}' : 'chi non c\'è più'; })
         .replace(/\[([A-F]+):([^\]]*)\]/g, (_, ls, opts) => genderPick(letters(ls).map((i) => roles[i]), opts))
-        .replace(/\{arma:([A-F])\}/g, (_, c) => possessive(weaponOf(roles[L(c)])))
-        .replace(/\{(arma|cibo|luogo|mostro|trappola|rifugio|dono)\}/g, (_, k) => lexPick(k));
+        .replace(POSS_RE, (_, it, c) => possessive(itemOf(roles[L(c)], it), it === 'arma' ? 'la sua arma' : 'il suo bottino'))
+        .replace(LEX_RE, (_, k) => lexPick(k));
       s = cap(artPrep(s));
-      const plain = s.replace(/\{([A-F])\}/g, (_, c) => roles[L(c)].name);
-      const html = esc(s).replace(/\{([A-F])\}/g, (_, c) => {
-        const t = roles[L(c)];
-        return '<b class="nm" data-id="' + esc(t.id) + '" style="--c:' + esc(t.color || '#888') + '">' + esc(t.name) + '</b>';
-      });
-      return { plain, html };
+      const nm = (str, f) => str.replace(/\{@([^}]+)\}/g, (_, id) => f(byId[id])).replace(/\{([A-F])\}/g, (_, c) => f(roles[L(c)]));
+      return { plain: edFix(nm(s, (t) => t.name)), html: edFix(nm(esc(s), nameTag)) };
+    }
+    function echo(list, people, cls) {
+      if (!list || !list.length) return null;
+      const tpl = rng.pick(list);
+      let s = tpl.replace(/\[(\d):([^\]]*)\]/g, (_, i, o) => genderPick([people[+i]], o));
+      s = cap(artPrep(s));
+      stats.echoes++;
+      return { plain: edFix(s.replace(/\{(\d)\}/g, (_, i) => people[+i].name)), html: edFix(esc(s).replace(/\{(\d)\}/g, (_, i) => nameTag(people[+i]))), cls: cls || '' };
     }
 
-    function kill(v, killers, ev, txt) {
+    // ---------- conseguenze ----------
+    function addGrudge(X, K, why, victim) {
+      if (!X.alive || X === K) return false;
+      const had = !!X.grudges[K.id];
+      X.grudges[K.id] = { why, victim: victim ? victim.id : null, phase: phases.length };
+      addAff(X, K, why === 'kill' ? -60 : -45);
+      return !had;
+    }
+    function kill(v, killers, txt, out) {
       if (!v.alive) return;
       v.alive = false;
       v.deathPhase = phases.length; v.deathDay = day; v.order = ++deathCounter;
       v.deathText = txt.plain; v.deathHtml = txt.html;
       v.killerIds = killers.map((k) => k.id);
+      const oldAlly = v.allyId;
       leaveAlliance(v);
       pendingFallen.push(v.id);
+      stats.deathsByDay[day] = (stats.deathsByDay[day] || 0) + 1;
       if (killers.length) {
         stats.killDeaths++;
-        killers.forEach((k) => { k.kills++; k.killIds.push(v.id); });
+        killers.forEach((k) => {
+          k.kills++; k.killIds.push(v.id); k.fame += 1;
+          if (k.grudges[v.id]) {
+            const g = k.grudges[v.id]; delete k.grudges[v.id]; k.revenges++; stats.revenges++; k.fame += 2;
+            const e = g.victim && byId[g.victim] ? echo(E.revenge, [k, v, byId[g.victim]], 'good') : echo(E.revengeAny, [k, v], 'good');
+            if (e) out.push(e);
+          }
+          if (k.kills === 3) { const e = echo(E.feared, [k], 'warn'); if (e) out.push(e); }
+          if (k.partner === v.id) { k.partner = null; k.exPartner = v.id; }
+        });
         if (!stats.firstBlood) stats.firstBlood = { killers: v.killerIds.slice(), victim: v.id, day };
       } else {
         stats.envDeaths++;
         if (!stats.firstBlood) stats.firstBlood = { killers: [], victim: v.id, day };
       }
-      stats.deathsByDay[day] = (stats.deathsByDay[day] || 0) + 1;
+      // chi amava o stimava la vittima reagisce
+      let echoed = 0;
+      T.forEach((X) => {
+        if (!X.alive || killers.includes(X) || X === v) return;
+        const lover = X.partner === v.id;
+        const close = lover || aff(X, v) >= 45 || (oldAlly != null && X.allyId === oldAlly);
+        if (!close) return;
+        if (lover) { X.partner = null; X.exPartner = v.id; X.st.lutto = phases.length; }
+        else if (aff(X, v) >= 60) X.st.lutto = phases.length;
+        X.lost = v.id;
+        killers.forEach((K) => {
+          if (addGrudge(X, K, 'kill', v) && echoed < 2) { const e = echo(lover ? E.grudgeLover : E.grudgeKill, [X, K, v], 'warn'); if (e) { out.push(e); echoed++; } }
+        });
+        if (!killers.length && lover && echoed < 2) { const e = echo(E.griefOnly, [X, v], 'warn'); if (e) { out.push(e); echoed++; } }
+      });
+      if (v.partner) { const p = byId[v.partner]; if (p) { p.partner = null; p.exPartner = v.id; } v.partner = null; }
+    }
+    function giveItem(t, type, ctx, lexPick, name) {
+      const nm = name || (type === 'arma' ? lexPick('arma') : type === 'cibo' ? ctx.cibo || 'delle provviste' : ITEM_NAME[type] || lexPick(type));
+      if (type === 'arma') { const old = t.inv.findIndex((x) => x.type === 'arma'); if (old >= 0) t.inv.splice(old, 1); }
+      t.inv.push({ type, name: nm }); t.items++; stats.items++;
+      if (type === 'cibo') { t.fed = day; delete t.st.affamato; }
+      while (t.inv.length > 7) t.inv.shift();
     }
 
     function apply(ev, roles) {
       const ctx = {};
-      const lexPick = (k) => (ctx[k] != null ? ctx[k] : (ctx[k] = rng.pick(theme.lex[k])));
-      const txt = render(ev.text, roles, lexPick);
+      const lexPick = (k) => (ctx[k] != null ? ctx[k] : (ctx[k] = rng.pick(LEX[k] || ['qualcosa'])));
+      const txt = render(ev.text, roles, lexPick, ev);
+      const out = [];
       const z = ctx.luogo != null ? theme.lex.luogo.indexOf(ctx.luogo) : roles[0].zone;
-      roles.forEach((t) => { t.zone = z; t.events++; });
+      roles.forEach((t) => { t.events++; if (z >= 0) t.zone = z; });
+      // amuleti: salvano una volta da qualunque morte
+      const saved = new Set();
+      ev.victims.forEach((i) => {
+        const v = roles[i], am = itemOf(v, 'amuleto');
+        if (v.alive && am && rng.chance(0.85)) {
+          saved.add(i); v.inv.splice(v.inv.indexOf(am), 1); v.amulets++; stats.amulets++;
+          const e = echo(theme.soft ? E.amuletSoft : E.amulet, [v], 'twist');
+          if (e) out.push({ plain: e.plain.replace('§', possessive(am)), html: e.html.replace('§', esc(possessive(am))), cls: 'twist' });
+          v.st.ferito = phases.length;
+          ev.kills.forEach((k) => { if (k.v.includes(i)) k.by.forEach((b) => addGrudge(v, roles[b], 'attack')); });
+        }
+      });
       for (const k of ev.kills) {
         const killers = k.by.map((i) => roles[i]);
-        k.v.forEach((i) => kill(roles[i], killers, ev, txt));
-        if (k.betray) { stats.betrayals++; killers.forEach((t) => { t.betrayals++; leaveAlliance(t); }); }
+        k.v.forEach((i) => { if (!saved.has(i)) kill(roles[i], killers, txt, out); });
+        if (k.betray) {
+          stats.betrayals++;
+          killers.forEach((t) => { t.betrayals++; t.traitor = true; leaveAlliance(t); });
+        }
       }
-      ev.dies.forEach((i) => kill(roles[i], [], ev, txt));
+      ev.dies.forEach((i) => { if (!saved.has(i)) kill(roles[i], [], txt, out); });
       for (const f of ev.fx) {
-        const t = roles[f.r[0]];
-        if (!t.alive) continue;
+        const t = roles[f.r[0]], u = f.r[1] != null ? roles[f.r[1]] : null;
+        if (!t.alive && f.t !== 'rel') continue;
         switch (f.t) {
           case 'al': {
             const ts = f.r.map((i) => roles[i]).filter((x) => x.alive);
-            if (ts.length > 1) { joinAlliance(ts); stats.alliances++; ts.forEach((x) => x.alliancesFormed++); }
+            if (ts.length > 1) { joinAlliance(ts); stats.alliances++; ts.forEach((x) => { x.alliancesFormed++; ts.forEach((y) => x.id < y.id && addAff(x, y, 25)); }); }
             break;
           }
-          case 'br': leaveAlliance(t); t.betrayals++; stats.betrayals++; break;
-          case 'gain': {
-            const name = f.item === 'arma' ? lexPick('arma') : f.item === 'cibo' ? (ctx.cibo || 'provviste') : f.item === 'med' ? 'kit medico' : 'trappola';
-            if (f.item === 'arma') { const old = t.inv.findIndex((x) => x.type === 'arma'); if (old >= 0) t.inv.splice(old, 1); }
-            t.inv.push({ type: f.item, name }); t.items++; stats.items++;
-            if (t.inv.length > 6) t.inv.shift();
+          case 'br': {
+            const g = t.allyId != null ? [...(alliances.get(t.allyId) || [])].map((id) => byId[id]).filter((x) => x !== t && x.alive) : [];
+            leaveAlliance(t); t.betrayals++; t.traitor = true; stats.betrayals++;
+            let n = 0; g.forEach((x) => { if (addGrudge(x, t, 'betray') && n++ < 1) { const e = echo(E.betray, [x, t], 'warn'); if (e) out.push(e); } });
             break;
           }
-          case 'lose': { const i = t.inv.findIndex((x) => x.type === f.item); if (i >= 0) t.inv.splice(i, 1); break; }
+          case 'gain': giveItem(t, f.item, ctx, lexPick); break;
+          case 'lose': { const i = t.inv.findIndex((x) => x.type === f.item); if (i >= 0) t.inv.splice(i, 1); if (f.item === 'cibo') { t.fed = day; delete t.st.affamato; } break; }
           case 'steal': {
-            const B = roles[f.r[1]]; const i = B.inv.findIndex((x) => x.type === 'arma');
-            if (i >= 0) { const [it] = B.inv.splice(i, 1); const old = t.inv.findIndex((x) => x.type === 'arma'); if (old >= 0) t.inv.splice(old, 1); t.inv.push(it); t.items++; }
+            const i = u.inv.findIndex((x) => x.type === 'arma');
+            if (i >= 0) { const [it] = u.inv.splice(i, 1); giveItem(t, 'arma', ctx, lexPick, it.name); if (u.alive && addGrudge(u, t, 'steal')) { const e = echo(E.steal, [u, t], 'warn'); if (e) out.push(e); } }
             break;
           }
-          case 'status': t.st[f.s] = phases.length; break;
-          case 'cure': t.st = {}; break;
+          case 'give': {
+            if (!u.alive) break;
+            const own = itemOf(t, f.item);
+            if (own) t.inv.splice(t.inv.indexOf(own), 1);
+            giveItem(u, f.item, ctx, lexPick, own ? own.name : null);
+            u.owes[t.id] = 'dono'; addAff(t, u, 20);
+            if (rng.chance(0.6)) { const e = echo(E.debt, [u, t], ''); if (e) out.push(e); }
+            break;
+          }
+          case 'status': t.st[f.s] = phases.length; if (f.s === 'ubriaco') t.fame += 1; break;
+          case 'cure': {
+            t.st = t.st.lutto != null ? { lutto: t.st.lutto } : {};
+            const helper = roles.find((x) => x !== t && x.alive);
+            if (helper && ev.n > 1) { t.owes[helper.id] = 'cura'; addAff(t, helper, 30); helper.saves++; if (rng.chance(0.5)) { const e = echo(E.debt, [t, helper], ''); if (e) out.push(e); } }
+            break;
+          }
+          case 'hit': if (u.alive) { u.st.ferito = phases.length; if (addGrudge(u, t, 'attack') && rng.chance(0.6)) { const e = echo(E.hit, [u, t], 'warn'); if (e) out.push(e); } } break;
+          case 'save': if (u.alive) { u.owes[t.id] = 'vita'; addAff(t, u, 40); t.saves++; t.fame += 1; const e = echo(E.saved, [u, t], 'good'); if (e) out.push(e); } break;
+          case 'forgive': delete t.grudges[u.id]; addAff(t, u, 35); break;
+          case 'love': if (u.alive) {
+            t.partner = u.id; u.partner = t.id; addAff(t, u, 70); stats.couples++; t.fame += 1; u.fame += 1;
+            if (!cfg.teamWin && (t.allyId == null || u.allyId == null || t.allyId === u.allyId)) { const g = t.allyId != null ? alliances.get(t.allyId) : u.allyId != null ? alliances.get(u.allyId) : null; if (!g || g.size < 5) joinAlliance([t, u]); } const e = echo(E.couple, [t, u], 'love'); if (e) out.push(e); } break;
+          case 'repay': if (u) { delete t.owes[u.id]; addAff(t, u, 20); t.repaid++; stats.debtsRepaid++; const e = echo(E.repay, [t, u], 'good'); if (e) out.push(e); } break;
+          case 'debt': if (u) t.owes[u.id] = 'favore'; break;
+          case 'rel': if (u) addAff(t, u, f.v); break;
+          case 'star': t.fame += 2; if (t.fame >= 5 && !t.starred) { t.starred = true; const e = echo(E.star, [t], 'good'); if (e) out.push(e); } break;
         }
       }
+      // l'evento lascia il segno sui rapporti
+      if (ev.tags.includes('show')) roles.forEach((t) => { if (t.alive) { t.fame += 1; if (t.fame >= 5 && !t.starred) { t.starred = true; const e = echo(E.star, [t], 'good'); if (e) out.push(e); } } });
+      if (!ev.lethal && ev.req.some((r) => r.t === 'ally')) for (const a of roles) for (const b of roles) if (a.id < b.id) addAff(a, b, 6);
+      if (ev.lethal) {
+        roles.forEach((x) => {
+          if (x.alive && !ev.kills.some((k) => k.by.some((i) => roles[i] === x)) && rng.chance(0.35) && x.st.sconvolto == null) {
+            x.st.sconvolto = phases.length; if (out.length < 3 && rng.chance(0.5)) { const e = echo(E.shock, [x], ''); if (e) out.push(e); }
+          }
+        });
+      }
       stats.events++;
-      return { html: txt.html, plain: txt.plain, ids: roles.map((t) => t.id), deaths: ev.victims.map((i) => roles[i].id).filter((id) => !byId[id].alive), lethal: ev.lethal, origin: ev.origin, cat: ev.cat };
+      return { html: txt.html, plain: txt.plain, ids: roles.map((t) => t.id), deaths: roles.filter((t, i) => ev.victims.includes(i) && !t.alive).map((t) => t.id), lethal: ev.lethal, origin: ev.origin, cat: ev.cat, why: ev.why, echo: out.slice(0, 3) };
     }
 
     function lethalProb(kind) {
@@ -447,24 +659,45 @@
     }
 
     function snapshot() {
-      const zones = {}, allies = {}, st = {}, inv = {}, kills = {};
-      T.forEach((t) => { zones[t.id] = t.zone; allies[t.id] = t.allyId; st[t.id] = Object.keys(t.st); inv[t.id] = t.inv.map((x) => x.name); kills[t.id] = t.kills; });
-      return { alive: alive().map((t) => t.id), zones, allies, st, inv, kills };
+      const zones = {}, allies = {}, st = {}, inv = {}, kills = {}, rel = {};
+      T.forEach((t) => {
+        zones[t.id] = t.zone; allies[t.id] = t.allyId; st[t.id] = Object.keys(t.st); inv[t.id] = t.inv.map((x) => x.name); kills[t.id] = t.kills;
+        const friends = T.filter((u) => u !== t && u.alive && aff(t, u) >= 40).map((u) => u.id);
+        const enemies = T.filter((u) => u !== t && u.alive && aff(t, u) <= -40 && !t.grudges[u.id]).map((u) => u.id);
+        rel[t.id] = { p: t.partner, g: Object.keys(t.grudges).filter((id) => byId[id].alive).map((id) => [id, t.grudges[id].why, t.grudges[id].victim]), o: Object.keys(t.owes).filter((id) => byId[id].alive), f: t.fame, tr: t.traitor, fr: friends, en: enemies, lost: t.lost };
+      });
+      return { alive: alive().map((t) => t.id), zones, allies, st, inv, kills, rel };
     }
 
+    function tickStatus() {
+      alive().forEach((t) => Object.keys(STATUS_TTL).forEach((s) => { if (t.st[s] != null && phases.length - t.st[s] >= STATUS_TTL[s]) delete t.st[s]; }));
+    }
     function maybeDissolve(events) {
       const a = alive();
       if (cfg.teamWin || a.length < 2) return;
       const g = a[0].allyId;
       if (g != null && a.every((t) => t.allyId === g)) {
         a.forEach((t) => leaveAlliance(t));
-        events.push({ html: 'Rimasti soli, gli ultimi alleati si guardano con sospetto: l\'alleanza è finita.', plain: 'Rimasti soli, gli ultimi alleati si guardano con sospetto: l\'alleanza è finita.', ids: a.map((t) => t.id), deaths: [], lethal: false, note: true });
+        const s = 'Rimasti soli, gli ultimi alleati si guardano con sospetto: l\'alleanza è finita.';
+        events.push({ html: s, plain: s, ids: a.map((t) => t.id), deaths: [], lethal: false, note: true });
       }
     }
+    function sponsorDrop(events) {
+      if (!pools.sponsor.length) return;
+      const cands = alive().filter((t) => t.fame >= 3).sort((a, b) => b.fame - a.fame);
+      if (!cands.length || !rng.chance(Math.min(0.75, 0.25 + cands[0].fame * 0.06))) return;
+      const P = cands[0];
+      const opts = pools.sponsor.filter((e) => e.n === 1 && checkReq(e, [P]));
+      const ev = rng.wpick(opts, (e) => weightFor(e, P));
+      if (!ev) return;
+      const r = apply(ev, [P]); r.why = r.why || 'fama'; r.sponsor = true; events.push(r); stats.sponsors++;
+    }
 
-    function runPhase(kind, pool, title, intro) {
+    function runPhase(kind, pool, title, intro, opt) {
       const events = [];
+      tickStatus();
       maybeDissolve(events);
+      if (kind === 'd' && day >= 2) sponsorDrop(events);
       const before = alive().length;
       const order = rng.shuffle(alive());
       const un = new Set(order.map((t) => t.id));
@@ -472,7 +705,8 @@
       for (const P of order) {
         if (!un.has(P.id) || !P.alive) continue;
         let done = false;
-        const pL = lethalProb(kind);
+        let pL = lethalProb(kind);
+        if (kind === 'dis' && hasItem(P, 'mappa')) pL *= 0.35;
         for (let attempt = 0; attempt < 25 && !done; attempt++) {
           const nAlive = alive().length;
           const wantLethal = nAlive > 1 && rng.chance(pL);
@@ -482,7 +716,6 @@
           if (!ev) continue;
           const roles = assign(ev, P, un);
           if (!roles) continue;
-          // non si può far morire più gente di quanta ne resti
           if (ev.lethal && alive().length - ev.victims.length < 1) continue;
           events.push(apply(ev, roles));
           roles.forEach((t) => un.delete(t.id));
@@ -492,7 +725,23 @@
       }
       const died = before - alive().length;
       noDeathStreak = died ? 0 : noDeathStreak + 1;
-      phases.push({ kind, day, title, intro, events, snap: snapshot() });
+      phases.push(Object.assign({ kind, day, title, intro, events, snap: snapshot() }, opt || {}));
+    }
+
+    function runLovers() {
+      const [A, B] = alive();
+      const pool = pools.lovers.filter((e) => e.n === 2);
+      if (!pool.length) return false;
+      const events = [];
+      for (let k = 0; k < 10 && !isEnded(); k++) {
+        const ev = rng.wpick(pool, (e) => e.w);
+        const roles = rng.chance(0.5) ? [A, B] : [B, A];
+        if (!checkReq(ev, roles)) continue;
+        events.push(apply(ev, roles));
+      }
+      if (!isEnded()) return false;
+      phases.push({ kind: 'finale', day, title: 'L\'ultimo atto', intro: 'Restano in due, e si amano. L\'arena ha previsto anche questo.', events, snap: snapshot() });
+      return true;
     }
 
     function runFinale() {
@@ -506,10 +755,12 @@
           const A = order[i], B = order[i + 1];
           if (!A.alive || !B.alive || isEnded()) continue;
           if (cfg.teamWin && A.team === B.team) continue;
-          for (let k = 0; k < 8; k++) {
+          for (let k = 0; k < 10; k++) {
             const ev = rng.wpick(pool, (e) => weightFor(e, A));
             const roles = combat(A) + rng.f() * 8 > combat(B) + rng.f() * 8 ? [A, B] : [B, A];
-            if (!checkReq(ev, roles)) continue;
+            const save = { pa: A.partner, pb: B.partner };
+            if (A.partner === B.id) { A.partner = null; B.partner = null; }
+            if (!checkReq(ev, roles)) { A.partner = save.pa; B.partner = save.pb; continue; }
             events.push(apply(ev, roles));
             break;
           }
@@ -519,6 +770,15 @@
       phases.push({ kind: 'finale', day, title: 'Lo scontro finale', intro: theme.intro.finale, events, snap: snapshot() });
     }
 
+    function endOfDay() {
+      // la fame: chi non mangia da due giorni si indebolisce, chi ha cibo lo usa
+      alive().forEach((t) => {
+        if (day - t.fed >= 1 && hasItem(t, 'cibo')) { const i = t.inv.findIndex((x) => x.type === 'cibo'); t.inv.splice(i, 1); t.fed = day; delete t.st.affamato; }
+        else if (day - t.fed >= 2 && t.st.affamato == null) t.st.affamato = phases.length;
+      });
+      // i debiti troppo vecchi si trasformano in risentimento
+      alive().forEach((t) => Object.keys(t.owes).forEach((id) => { if (!byId[id].alive) delete t.owes[id]; }));
+    }
     function pushFallen() {
       const n = pendingFallen.length;
       const fl = theme.fallen;
@@ -526,29 +786,31 @@
       phases.push({ kind: 'fallen', day, title: (theme.labels && theme.labels.fallen) || 'I caduti', intro: text, events: [], deaths: pendingFallen.slice(), snap: snapshot() });
       pendingFallen = [];
     }
+    const loversEnd = () => { const a = alive(); return !cfg.teamWin && a.length === 2 && a[0].partner === a[1].id && runLovers(); };
 
     let feastDone = false, lastDisaster = -9;
     const usedDisasters = new Set();
     while (true) {
       day++;
       if (day === 1) runPhase('b', pools.b, theme.phase.b, theme.intro.b);
-      if (isEnded()) break;
+      if (isEnded() || loversEnd()) break;
       runPhase('d', pools.d, theme.phase.d + ' ' + day, theme.intro.d);
-      if (isEnded()) break;
+      if (isEnded() || loversEnd()) break;
       const a = alive().length;
       if (!feastDone && day >= 3 && a >= 4 && (rng.chance(0.35) || day >= 6)) {
         feastDone = true;
         runPhase('f', pools.f, theme.phase.f, theme.intro.f);
-      } else if (day >= 2 && pools.disasters.length && day - lastDisaster > 1 && rng.chance(0.3 * Math.min(1.5, diff))) {
+      } else if (day >= 2 && pools.disasters.length && day - lastDisaster > 1 && rng.chance(0.32 * Math.min(1.5, diff))) {
         let opts = pools.disasters.filter((d) => !usedDisasters.has(d.n));
         if (!opts.length) { usedDisasters.clear(); opts = pools.disasters; }
         const dz = rng.pick(opts);
         usedDisasters.add(dz.n); lastDisaster = day;
-        runPhase('dis', dz.out.concat(pools.ds), dz.n, dz.intro);
+        runPhase('dis', dz.out.concat(pools.ds), dz.n, dz.intro, { adult: !!dz.adult });
       }
-      if (isEnded()) break;
+      if (isEnded() || loversEnd()) break;
       runPhase('n', pools.n, theme.phase.n + ' ' + day, theme.intro.n);
-      if (isEnded()) break;
+      endOfDay();
+      if (isEnded() || loversEnd()) break;
       pushFallen();
       if (day >= maxDays) { runFinale(); break; }
     }
@@ -563,8 +825,10 @@
       deathPhase: t.deathPhase, deathText: t.deathText, deathHtml: t.deathHtml, rank: t.rank, order: t.order,
       events: t.events, alliancesFormed: t.alliancesFormed, betrayals: t.betrayals, items: t.items,
       inv: t.inv.map((x) => x.name), st: Object.keys(t.st),
+      fame: t.fame, revenges: t.revenges, saves: t.saves, repaid: t.repaid, amulets: t.amulets, traitor: t.traitor,
+      partner: t.partner, exPartner: t.exPartner,
     }));
-    return { version: 1, theme: theme.id, seed, days: day, phases, tributes: stripped, winners: winners.map((t) => t.id), stats };
+    return { version: 2, theme: theme.id, adult, seed, days: day, phases, tributes: stripped, winners: winners.map((t) => t.id), stats };
   }
 
   /* ---------------- Cast casuale ---------------- */
@@ -594,16 +858,18 @@
     const ev = parseLine(customToLine(c), 'custom');
     const sample = [['Aurora', 'F'], ['Bruno', 'M'], ['Chiara', 'F'], ['Dario', 'M'], ['Elena', 'F'], ['Fabio', 'M']];
     const rng = makeRng('preview');
-    const roles = sample.slice(0, ev.n).map(([name, gender], i) => ({ id: 'p' + i, name, gender, color: PALETTE[i], inv: [{ type: 'arma', name: theme.lex.arma[0] }] }));
+    const lex = buildPools(theme, [], false).lex;
+    const roles = sample.slice(0, ev.n).map(([name, gender], i) => ({ id: 'p' + i, name, gender, color: PALETTE[i], inv: [{ type: 'arma', name: lex.arma[0] }] }));
     const ctx = {};
-    const lexPick = (k) => (ctx[k] != null ? ctx[k] : (ctx[k] = rng.pick(theme.lex[k])));
+    const lexPick = (k) => (ctx[k] != null ? ctx[k] : (ctx[k] = rng.pick(lex[k] || ['qualcosa'])));
     let s = ev.text
+      .replace(/\{(caro|perso|partner):([A-F])\}/g, () => 'chi non c\'è più')
       .replace(/\[([A-F]+):([^\]]*)\]/g, (_, ls, opts) => genderPick(letters(ls).map((i) => roles[i]), opts))
-      .replace(/\{arma:([A-F])\}/g, (_, c2) => possessive(roles[L(c2)].inv[0]))
-      .replace(/\{(arma|cibo|luogo|mostro|trappola|rifugio|dono)\}/g, (_, k) => lexPick(k));
+      .replace(POSS_RE, (_, it, c2) => possessive(it === 'arma' ? roles[L(c2)].inv[0] : null, 'il suo bottino'))
+      .replace(LEX_RE, (_, k) => lexPick(k));
     s = cap(artPrep(s));
     return esc(s).replace(/\{([A-F])\}/g, (_, c2) => '<b class="nm" style="--c:' + roles[L(c2)].color + '">' + roles[L(c2)].name + '</b>');
   }
 
-  G.LOS = { simulate, parseLine, parseBlock, buildPools, makeRng, randomCast, countTemplates, previewCustom, customToLine, PALETTE, STATUS_LABEL, DIFF };
+  G.LOS = { simulate, parseLine, parseBlock, parseDisasters, buildPools, makeRng, randomCast, countTemplates, previewCustom, customToLine, PALETTE, STATUS_LABEL, DIFF };
 })(typeof window !== 'undefined' ? window : globalThis);

@@ -19,7 +19,7 @@
   --dead: #c0392b;
   --dead-soft: #f9e0dc;
   --alive: #23864f;
-  --c-kill: #d0402f; --c-death: #7d4b45; --c-betray: #b4318a; --c-ally: #2f6fc0; --c-heal: #23864f; --c-item: #b07a10; --c-hurt: #d06a1a; --c-none: #7b8292;
+  --c-kill: #d0402f; --c-death: #7d4b45; --c-betray: #b4318a; --c-ally: #2f6fc0; --c-heal: #23864f; --c-item: #b07a10; --c-hurt: #d06a1a; --c-none: #7b8292; --c-love: #d63a78;
   --focus: #2f6fd6;
   --shadow: 0 1px 2px hsl(var(--h) 30% 10% / .06), 0 10px 30px hsl(var(--h) 30% 10% / .08);
   --f-display: 'Big Shoulders Display', 'Arial Narrow', 'Roboto Condensed', sans-serif;
@@ -35,7 +35,7 @@
     --accent: hsl(var(--h) 88% 62%); --accent-ink: hsl(var(--h) 60% 7%); --accent-soft: hsl(var(--h) 40% 17%);
     --screen: hsl(var(--h) 30% 4.5%); --screen-2: hsl(var(--h) 20% 10%);
     --dead: #f2685a; --dead-soft: #3a1d1a; --alive: #59c98b;
-    --c-kill: #f2685a; --c-death: #c29a94; --c-betray: #e76fc2; --c-ally: #6aa5ff; --c-heal: #59c98b; --c-item: #e8b54a; --c-hurt: #f39a52; --c-none: #9aa3b4;
+    --c-kill: #f2685a; --c-death: #c29a94; --c-betray: #e76fc2; --c-ally: #6aa5ff; --c-heal: #59c98b; --c-item: #e8b54a; --c-hurt: #f39a52; --c-none: #9aa3b4; --c-love: #ff6fa6;
     --focus: #7aa7ff; --shadow: 0 1px 2px rgba(0,0,0,.35), 0 12px 32px rgba(0,0,0,.3);
     color-scheme: dark;
   }
@@ -46,7 +46,7 @@
   --accent: hsl(var(--h) 88% 62%); --accent-ink: hsl(var(--h) 60% 7%); --accent-soft: hsl(var(--h) 40% 17%);
   --screen: hsl(var(--h) 30% 4.5%); --screen-2: hsl(var(--h) 20% 10%);
   --dead: #f2685a; --dead-soft: #3a1d1a; --alive: #59c98b;
-  --c-kill: #f2685a; --c-death: #c29a94; --c-betray: #e76fc2; --c-ally: #6aa5ff; --c-heal: #59c98b; --c-item: #e8b54a; --c-hurt: #f39a52; --c-none: #9aa3b4;
+  --c-kill: #f2685a; --c-death: #c29a94; --c-betray: #e76fc2; --c-ally: #6aa5ff; --c-heal: #59c98b; --c-item: #e8b54a; --c-hurt: #f39a52; --c-none: #9aa3b4; --c-love: #ff6fa6;
   --focus: #7aa7ff; --shadow: 0 1px 2px rgba(0,0,0,.35), 0 12px 32px rgba(0,0,0,.3);
   color-scheme: dark;
 }
@@ -521,3 +521,32 @@ dialog::backdrop { background: hsl(var(--h) 30% 4% / .6); backdrop-filter: blur(
   *, *::before, *::after { animation: none !important; transition: none !important; }
   html { scroll-behavior: auto; }
 }
+
+/* ---------- conseguenze e legami ---------- */
+.evbody { min-width: 0; display: grid; gap: 6px; }
+.why { justify-self: start; font-family: var(--f-mono); font-size: 10px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--accent); border: 1px solid color-mix(in srgb, var(--accent) 45%, transparent); border-radius: 5px; padding: 1px 6px; }
+.echo { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; }
+.echo li { font-size: 13.5px; line-height: 1.4; color: var(--muted); padding-left: 18px; position: relative; }
+.echo li::before { content: "↳"; position: absolute; left: 2px; top: 0; color: var(--ec, var(--muted)); font-weight: 700; }
+.echo li.warn { --ec: var(--c-kill); }
+.echo li.good { --ec: var(--c-heal); }
+.echo li.love { --ec: var(--c-love); }
+.echo li.twist { --ec: var(--accent); color: var(--ink); font-weight: 600; }
+.echo .nm { font-weight: 700; }
+.adultbox { display: grid; gap: 10px; padding: 12px; border-radius: 12px; background: color-mix(in srgb, var(--dead-soft) 45%, var(--panel-2)); }
+.adultbox.off { opacity: .55; }
+.switch .sw.adult { }
+.switch input:checked + .sw.adult { background: var(--dead); }
+.tag18 { font-family: var(--f-mono); font-size: 10.5px; font-weight: 700; background: var(--dead); color: #fff; border-radius: 4px; padding: 1px 5px; margin-left: 4px; vertical-align: 1px; }
+.confirm18 { display: grid; gap: 10px; font-size: 14px; }
+.bc-18 { background: #fff; color: #c0392b; padding: 2px 7px; border-radius: 5px; font-weight: 800; }
+.rel { display: grid; gap: 6px; }
+.relrow { display: flex; gap: 8px; align-items: center; font-size: 13.5px; padding: 6px 8px; border-radius: 9px; background: var(--panel-2); min-width: 0; flex-wrap: wrap; }
+.relrow .av { --s: 26px; font-size: 10px; }
+.relrow .arrow { color: var(--muted); font-family: var(--f-mono); }
+.relrow .lbl { color: var(--muted); font-size: 12.5px; }
+.badges { display: flex; gap: 6px; flex-wrap: wrap; }
+.badge2 { font-family: var(--f-mono); font-size: 10.5px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; padding: 3px 8px; border-radius: 6px; background: var(--panel-2); color: var(--muted); }
+.badge2.hot { background: var(--dead-soft); color: var(--dead); }
+.badge2.star { background: var(--accent-soft); color: var(--accent); }
+.badge2.love { background: color-mix(in srgb, var(--c-love) 15%, transparent); color: var(--c-love); }

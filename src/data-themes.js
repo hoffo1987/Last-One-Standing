@@ -423,7 +423,7 @@
     /* ------------------------------------------------------------ */
     {
       id: 'liceo', name: 'Liceo Spietato', tag: 'Interrogazioni, gossip e alleanze da intervallo. Nessuno muore: si viene eliminati.',
-      hue: 330, glyph: '✎', soft: true,
+      hue: 330, glyph: '✎', soft: true, noAdult: true,
       labels: { kills: 'Eliminazioni', dead: 'Eliminati', fallen: 'Eliminati del giorno', killed: 'Eliminat' },
       phase: { b: 'Il primo giorno', d: 'Lezioni', n: 'Dopo scuola', f: 'La festa di fine anno' },
       intro: { b: 'Suona la campanella: tutti corrono a prendersi il banco migliore.', d: 'Prima ora: compito in classe.', n: 'La scuola si svuota, ma la chat di classe no.', f: 'Si apre la festa in Palestra: musica alta e ogni occasione è buona per un colpo basso.', finale: 'La Preside convoca gli ultimi rimasti in Aula magna per il verdetto finale.' },
@@ -505,7 +505,7 @@
         f: `
 1 | {A} balla tutta la sera senza pensare a niente.
 1 @cow | {A} decide di non andare alla festa.
-1 +arma:A | {A} scatta {arma} durante la festa.
+1 +arma:A | {A} si procura {arma} durante la festa.
 1 d:A | {A} rovescia il punch sulla Preside ed è fuori.
 2 k:A>B @agg | {A} rovina l'ingresso di {B} alla festa: {B} non si riprende.
 2 al:AB @soc | {A} e {B} ballano il lento insieme.

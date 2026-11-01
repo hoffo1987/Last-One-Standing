@@ -10,7 +10,7 @@
 1 s:A=ferito | {A} prende una gomitata in faccia nella calca, ma riesce a scappare.
 2 al:AB @soc | {A} e {B}, compagni di allenamento, corrono verso il Bosco fianco a fianco.
 2 k:A>B | {A} spinge {B} giù dalla piattaforma di partenza.
-3 | {A}, {B} e {C} si fronteggiano sopra lo stesso zaino finché un'esplosione non li fa scappare.
+3 | {A}, {B} e {C} si fronteggiano sopra lo stesso zaino finché un'esplosione non l[ABC:i/e] fa scappare.
 `,
       d: `
 1 | {A} segue il corso del Fiume sperando di trovare un riparo.

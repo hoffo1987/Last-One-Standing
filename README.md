@@ -4,13 +4,29 @@ Simulatore di battle royale, tutto in italiano. Crei il cast, scegli una delle 9
 
 ## Cosa contiene
 - **9 scenari**: Arena Classica, Reame Incantato, Stazione Orbitale, Città degli Infetti, Isola Battle Royale, Villa Maledetta, Terre Desolate, più Liceo Spietato e Ufficio Open Space (senza morti: si viene eliminati o licenziati).
-- **749 modelli di evento e 277 disastri** (con 833 esiti dei disastri), con accordo di genere automatico (lui / lei / neutro con ə) e preposizioni articolate corrette.
+- **1391 modelli di evento e 452 disastri**, più **122 eventi e 31 disastri 18+** (circa 1450 esiti di disastro in tutto), con accordo di genere automatico (lui / lei / neutro con ə) e preposizioni articolate corrette.
 - **Concorrenti** con 7 caratteristiche, fino a 3 dei 18 tratti, squadra e foto. Si riordinano trascinando le schede.
 - **Motore**: alleanze e tradimenti, oggetti (armi, cibo, medicine, trappole), stati (ferito, avvelenato, malato, affamato), pericolo crescente con i giorni, festino, disastri e scontro finale.
 - **Seme**: stesso seme e stesso cast danno la stessa partita.
 - **Diretta** con tabellone, tacche dei superstiti, mappa a zone, elenco dei caduti e riproduzione automatica.
 - **Esito** con classifica, statistiche, grafici e locandina generata.
 - Eventi personalizzati con anteprima, importazione ed esportazione in JSON, salvataggio nel browser e tema chiaro o scuro.
+
+## Il sistema delle conseguenze
+Ogni concorrente ha una memoria. Quello che succede cambia quello che succederà:
+- **Affinità** tra ogni coppia di concorrenti: sale con aiuti e alleanze, scende con attacchi e furti.
+- **Vendette**: chi perde una persona cara, un alleato o il proprio amore giura vendetta sull'assassino. La caccia diventa probabile e, se va a segno, viene raccontata ("Per Marco").
+- **Debiti**: chi viene curato, salvato o aiutato resta in debito, ed esistono eventi per saldarlo (a volte nel modo più rumoroso possibile).
+- **Coppie**: nascono amori. Se uno dei due muore, l'altro va in lutto e cerca vendetta. Se restano solo loro due, c'è un finale apposito.
+- **Tradimenti e reputazione**: chi tradisce viene ricordato come traditore, chi uccide molto diventa temuto e gli altri si coalizzano.
+- **Fama**: le imprese spettacolari attirano gli sponsor, che mandano doni da soli.
+- **Fame**: senza cibo per due giorni si diventa affamati e più deboli. Chi ha provviste le usa.
+- **Oggetti con effetti veri**: l'amuleto salva una volta dalla morte, la mappa protegge dai disastri, veleni ed esplosivi abilitano eventi propri.
+- **Stati temporanei**: ferito, malato, avvelenato, affamato, ubriaco, sconvolto, in lutto.
+Sotto ogni evento la diretta mostra le conseguenze ("↳ Walter giura vendetta su Paola") e un'etichetta con il motivo dell'evento (Vendetta, Debito, Coppia, Lutto…).
+
+## Contenuti 18+
+Un interruttore nella sezione Arena, attivo solo dopo la conferma dell'età, aggiunge eventi e disastri con violenza esplicita, linguaggio volgare, alcol e sostanze e allusioni sessuali tra adulti. Non è disponibile nel Liceo, perché i personaggi sono studenti.
 
 ## Interfaccia
 - **Home** con partita lampo (24 concorrenti casuali, arena a sorpresa) e un tabellone dimostrativo animato.
@@ -23,7 +39,9 @@ Simulatore di battle royale, tutto in italiano. Crei il cast, scegli una delle 9
 ```
 src/data-core.js     eventi di base, tratti, caratteristiche, nomi
 src/data-themes.js   i 9 scenari (lessico, testi di fase, eventi speciali)
-src/content/*.js     eventi aggiuntivi e disastri, un file per scenario
+src/content/_systems.js  sistema delle conseguenze: frasi di eco, oggetti speciali, eventi di legame
+src/content/pack-*.js    pacchetti per arena (eventi, disastri, 18+), condivisi e per adulti
+src/content/*.js         eventi aggiuntivi e disastri della versione precedente
 src/engine.js        motore di simulazione (funziona anche in Node)
 src/ui.js            interfaccia
 src/style.css        stile

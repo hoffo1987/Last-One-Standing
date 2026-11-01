@@ -31,6 +31,7 @@
     heal: sv('<path d="M9.5 3.5h5v6h6v5h-6v6h-5v-6h-6v-5h6z"/>'),
     item: sv('<rect x="5" y="7" width="14" height="14" rx="3"/><path d="M9 7V5.5a3 3 0 0 1 6 0V7M9 13h6"/>'),
     hurt: sv('<path d="M12 3s6 7 6 11a6 6 0 0 1-12 0c0-4 6-11 6-11z"/>'),
+    love: sv('<path d="M12 20s-7-4.5-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.5-7 10-7 10z" fill="currentColor" fill-opacity=".25"/>'),
     cam: sv('<path d="M4 8h3l2-2.5h6L17 8h3v11H4z"/><circle cx="12" cy="13" r="3.5"/>'),
     play: '<path d="M8 5v14l11-7z" fill="currentColor"/>',
     pause: '<path d="M7 5h4v14H7zM13 5h4v14h-4z" fill="currentColor"/>',
@@ -38,8 +39,9 @@
   const GRIP = '<svg viewBox="0 0 10 16" fill="currentColor" aria-hidden="true"><circle cx="2.5" cy="3" r="1.4"/><circle cx="7.5" cy="3" r="1.4"/><circle cx="2.5" cy="8" r="1.4"/><circle cx="7.5" cy="8" r="1.4"/><circle cx="2.5" cy="13" r="1.4"/><circle cx="7.5" cy="13" r="1.4"/></svg>';
   const CAT = {
     kill: ['Uccisione', 'Eliminazione'], death: ['Morte', 'Fuori'], betray: ['Tradimento', 'Tradimento'], ally: ['Alleanza', 'Alleanza'],
-    heal: ['Cura', 'Recupero'], item: ['Bottino', 'Asso nella manica'], hurt: ['Guaio', 'Colpo basso'], none: ['', ''],
+    heal: ['Aiuto', 'Aiuto'], item: ['Bottino', 'Asso nella manica'], hurt: ['Guaio', 'Colpo basso'], love: ['Amore', 'Amore'], none: ['', ''],
   };
+  const WHY = { vendetta: 'Vendetta', debito: 'Debito', coppia: 'Coppia', lutto: 'Lutto', fama: 'Fama', reputazione: 'Reputazione', oggetto: 'Oggetto', condizione: 'Conseguenza' };
   const KIND = { b: 'Apertura', d: 'Giorno', n: 'Notte', f: 'Evento speciale', dis: 'Disastro', fallen: 'Bilancio', finale: 'Finale' };
   const DIFFS = [
     ['bassa', 'Bassa', 'Partite lunghe, pochi morti', 1], ['normale', 'Normale', 'L\'equilibrio classico', 2],
@@ -49,7 +51,7 @@
   /* ---------------- stato ---------------- */
   const S = {
     cast: [],
-    settings: { theme: 'classico', difficulty: 'normale', seed: '', maxDays: 20, teamsAllied: true, teamWin: false, speed: 'normale', teamSize: 2, view: 'grid' },
+    settings: { theme: 'classico', difficulty: 'normale', seed: '', maxDays: 20, teamsAllied: true, teamWin: false, speed: 'normale', teamSize: 2, view: 'grid', adult: false },
     custom: [],
     run: null,
     ui: null,
@@ -182,7 +184,7 @@
   /* =============== HOME =============== */
   let homeTimer = null, demo = null, demoI = 0;
   function renderHome() {
-    $('#facts').innerHTML = [[COUNTS.events, 'modelli di evento'], [COUNTS.disasters, 'disastri diversi'], [D.themes.length, 'arene da esplorare'], [D.traits.length, 'tratti di personalità']]
+    $('#facts').innerHTML = [[COUNTS.events, 'modelli di evento, più ' + COUNTS.adultEvents + ' per adulti'], [COUNTS.disasters, 'disastri, più ' + COUNTS.adultDisasters + ' per adulti'], [D.themes.length, 'arene da esplorare'], ['∞', 'storie: vendette, debiti, amori e tradimenti si intrecciano']]
       .map(([n, l]) => '<div class="fact"><b>' + n + '</b><span>' + l + '</span></div>').join('');
     $('#arenaStrip').innerHTML = D.themes.map((t) => posterHTML(t, false, 'a')).join('');
     const r = $('#resume');
@@ -197,7 +199,7 @@
   function posterHTML(t, selectable, tag) {
     const pt = COUNTS.perTheme[t.id];
     const inner = '<span class="pcheck" aria-hidden="true">✓</span><span class="pg" aria-hidden="true">' + t.glyph + '</span>' +
-      '<span class="pmeta">' + (t.soft ? 'Senza morti · ' : '') + pt.events + ' eventi · ' + pt.disasters + ' disastri</span><b>' + esc(t.name) + '</b><small>' + esc(t.tag) + '</small>';
+      '<span class="pmeta">' + (t.soft ? 'Senza morti · ' : '') + (pt.events + (S.settings.adult ? pt.adultEvents : 0)) + ' eventi · ' + (pt.disasters + (S.settings.adult ? pt.adultDisasters : 0)) + ' disastri</span><b>' + esc(t.name) + '</b><small>' + esc(t.tag) + '</small>';
     if (tag === 'a') return '<a class="poster-card" href="#arena" data-theme="' + t.id + '" style="--ph:' + t.hue + '">' + inner + '</a>';
     return '<button type="button" class="poster-card" role="radio" aria-checked="' + !!selectable + '" data-theme="' + t.id + '" style="--ph:' + t.hue + '">' + inner + '</button>';
   }
@@ -229,7 +231,7 @@
     const themes = D.themes.map((t) => t.id);
     const theme = themes[Math.floor(Math.random() * themes.length)];
     const cast = L.randomCast(24, Math.random().toString(36), 2).map(sanitizeTribute);
-    runSim({ cast, theme, difficulty: 'normale', seed: newSeed(), maxDays: 20, teamsAllied: true, teamWin: false, custom: S.custom.slice() });
+    runSim({ cast, theme, difficulty: 'normale', seed: newSeed(), maxDays: 20, teamsAllied: true, teamWin: false, custom: S.custom.slice(), adult: !!S.settings.adult });
     toast('Partita lampo: ' + THEMES[theme].name + ' con 24 concorrenti casuali. Il tuo cast non è stato toccato.');
   }
   $('#quickPlay').addEventListener('click', quickPlay);
@@ -493,6 +495,7 @@
     $('#maxDays').value = S.settings.maxDays; $('#maxDaysOut').textContent = S.settings.maxDays;
     $('#seed').value = S.settings.seed;
     $('#teamsAllied').checked = !!S.settings.teamsAllied; $('#teamWin').checked = !!S.settings.teamWin;
+    renderAdult();
     renderPreview(); renderCustomForm(); renderCustomList(); renderStartSum();
   }
   function renderPreview() {
@@ -521,7 +524,7 @@
   }
   function renderStartSum() {
     const t = THEMES[S.settings.theme];
-    $('#startSum').innerHTML = '<b>' + S.cast.length + '</b> concorrenti · <b>' + esc(t.name) + '</b> · difficoltà <b>' + DIFFS.find((d) => d[0] === S.settings.difficulty)[1].toLowerCase() + '</b>';
+    $('#startSum').innerHTML = '<b>' + S.cast.length + '</b> concorrenti · <b>' + esc(t.name) + '</b> · difficoltà <b>' + DIFFS.find((d) => d[0] === S.settings.difficulty)[1].toLowerCase() + '</b>' + (S.settings.adult && !t.noAdult ? ' · <span class="tag18">18+</span>' : '');
     $('#startMsg').textContent = S.cast.length < 2 ? 'Servono almeno 2 concorrenti: aggiungili nella sezione Concorrenti, oppure prova una partita lampo.' : '';
     $('#btnStart').disabled = S.cast.length < 2;
   }
@@ -529,13 +532,27 @@
     const b = e.target.closest('[data-theme]'); if (!b) return;
     S.settings.theme = b.dataset.theme; save(); setHue(S.settings.theme);
     $$('#themeList [data-theme]').forEach((x) => x.setAttribute('aria-checked', x === b));
-    renderPreview(); renderStartSum(); updatePreview();
+    renderPreview(); renderStartSum(); updatePreview(); renderAdult();
   });
   $('#diffSeg').addEventListener('click', (e) => { const b = e.target.closest('button'); if (!b) return; S.settings.difficulty = b.dataset.v; save(); $$('#diffSeg button').forEach((x) => x.setAttribute('aria-checked', x === b)); renderStartSum(); });
   $('#maxDays').addEventListener('input', (e) => { S.settings.maxDays = +e.target.value; $('#maxDaysOut').textContent = e.target.value; save(); });
   $('#seed').addEventListener('input', (e) => { S.settings.seed = e.target.value.slice(0, 60); save(); });
   $('#seedNew').addEventListener('click', () => { S.settings.seed = newSeed(); $('#seed').value = S.settings.seed; save(); });
   $('#teamsAllied').addEventListener('change', (e) => { S.settings.teamsAllied = e.target.checked; save(); });
+  function renderAdult() {
+    const t = THEMES[S.settings.theme], pt = COUNTS.perTheme[t.id];
+    $('#adult').checked = !!S.settings.adult; $('#adultConfirm').hidden = true;
+    $('#adultBox').classList.toggle('off', !!t.noAdult);
+    $('#adult').disabled = !!t.noAdult;
+    $('#adultNote').textContent = t.noAdult ? 'Non disponibili nel Liceo: i personaggi sono studenti.' :
+      'Violenza esplicita, linguaggio volgare, alcol e sostanze, allusioni sessuali tra adulti. In questa arena: ' + pt.adultEvents + ' eventi e ' + pt.adultDisasters + ' disastri in più.';
+  }
+  $('#adult').addEventListener('change', (e) => {
+    if (e.target.checked) { e.target.checked = false; $('#adultConfirm').hidden = false; $('#adultYes').focus(); return; }
+    S.settings.adult = false; save(); renderArena();
+  });
+  $('#adultYes').addEventListener('click', () => { S.settings.adult = true; save(); renderArena(); toast('Contenuti 18+ attivi per le prossime partite.'); });
+  $('#adultNo').addEventListener('click', () => { $('#adultConfirm').hidden = true; });
   $('#teamWin').addEventListener('change', (e) => { S.settings.teamWin = e.target.checked; save(); if (e.target.checked && nTeams() < 2) toast('Con una sola squadra la vittoria di squadra finisce subito: dividi il cast in più squadre.'); });
 
   // eventi personalizzati
@@ -591,7 +608,7 @@
     if (S.cast.length < 2) { toast('Servono almeno 2 concorrenti.'); location.hash = '#cast'; return; }
     S.cast.forEach((t, i) => { if (!t.name.trim()) t.name = 'Concorrente ' + (i + 1); });
     S.settings.seed = seed || S.settings.seed || newSeed();
-    runSim({ cast: JSON.parse(JSON.stringify(S.cast)), theme: S.settings.theme, difficulty: S.settings.difficulty, seed: S.settings.seed, maxDays: S.settings.maxDays, teamsAllied: S.settings.teamsAllied, teamWin: S.settings.teamWin, custom: S.custom.slice() });
+    runSim({ cast: JSON.parse(JSON.stringify(S.cast)), theme: S.settings.theme, difficulty: S.settings.difficulty, seed: S.settings.seed, maxDays: S.settings.maxDays, teamsAllied: S.settings.teamsAllied, teamWin: S.settings.teamWin, custom: S.custom.slice(), adult: !!S.settings.adult });
   }
   $('#btnStart').addEventListener('click', () => startRun());
 
@@ -603,7 +620,10 @@
     const lbl = CAT[cat][theme.soft ? 1 : 0];
     const avs = '<span class="avs">' + e.ids.slice(0, 4).map((id) => avHTML(by[id], { dead: e.deaths.includes(id), btn: !plain })).join('') + '</span>';
     const chip = lbl ? '<span class="cat">' + IC[cat] + (e.deaths.length > 1 && (cat === 'kill' || cat === 'death') ? e.deaths.length + ' ' + (theme.soft ? 'fuori' : 'morti') : lbl) + '</span>' : '<span></span>';
-    return '<div class="ev' + (e.deaths.length ? ' lethal' : '') + (anim ? ' in' : '') + '" style="--cc:var(--c-' + cat + ')">' + avs + '<p>' + (plain ? e.html.replace(/<b class="nm"[^>]*>/g, '<b>') : linkify(e.html)) + '</p>' + chip + '</div>';
+    const fix = (h) => (plain ? h.replace(/<b class="nm"[^>]*>/g, '<b>') : linkify(h));
+    const why = e.sponsor ? 'Sponsor' : WHY[e.why] || '';
+    const echo = (e.echo || []).length ? '<ul class="echo">' + e.echo.map((x) => '<li class="' + (x.cls || '') + '">' + fix(x.html) + '</li>').join('') + '</ul>' : '';
+    return '<div class="ev' + (e.deaths.length ? ' lethal' : '') + (anim ? ' in' : '') + '" style="--cc:var(--c-' + cat + ')">' + avs + '<div class="evbody">' + (why ? '<span class="why">' + why + '</span>' : '') + '<p>' + fix(e.html) + '</p>' + echo + '</div>' + chip + '</div>';
   }
   function renderLive(fromRoute) {
     $('#liveEmpty').hidden = !!SIM; $('#liveBody').hidden = !SIM;
@@ -615,7 +635,7 @@
     const forward = !fromRoute && i === lastRendered + 1;
     lastRendered = i;
 
-    $('#bcArena').textContent = theme.glyph + ' ' + theme.name;
+    $('#bcArena').innerHTML = esc(theme.glyph + ' ' + theme.name) + (SIM.adult ? ' <span class="bc-18">18+</span>' : '');
     $('#bcPhase').textContent = 'Fase ' + (i + 1) + ' / ' + P.length;
     $('#bcKind').textContent = KIND[ph.kind] + (ph.day ? ' · giorno ' + ph.day : '');
     $('#phTitle').textContent = ph.title;
@@ -680,8 +700,19 @@
       ph.snap.alive.forEach((id) => { const g = ph.snap.allies[id]; if (g != null) (groups[g] = groups[g] || []).push(id); });
       const gs = Object.values(groups).filter((g) => g.length > 1);
       const solo = ph.snap.alive.filter((id) => ph.snap.allies[id] == null);
-      h = (gs.length ? gs.map((g, k) => '<div class="agroup"><h4>Alleanza ' + (k + 1) + ' · ' + g.length + '</h4><div class="row">' + g.map((id) => avHTML(BY[id], { btn: true })).join('') + '</div></div>').join('') : '<p class="help" style="margin-bottom:10px">Nessuna alleanza attiva.</p>') +
-        (solo.length ? '<div class="agroup"><h4>Da soli · ' + solo.length + '</h4><div class="row">' + solo.map((id) => avHTML(BY[id], { btn: true })).join('') + '</div></div>' : '');
+      const R = ph.snap.rel || {}, alive = new Set(ph.snap.alive);
+      const av = (id) => avHTML(BY[id], { btn: true });
+      const couples = [], seenC = new Set();
+      ph.snap.alive.forEach((id) => { const p = R[id] && R[id].p; if (p && alive.has(p) && !seenC.has(p)) { seenC.add(id); couples.push([id, p]); } });
+      const grudges = [], debts = [];
+      ph.snap.alive.forEach((id) => { const r = R[id]; if (!r) return; r.g.forEach(([t, why, v]) => alive.has(t) && grudges.push([id, t, why, v])); r.o.forEach((t) => alive.has(t) && debts.push([id, t])); });
+      const whyTxt = (why, v) => why === 'kill' && v && BY[v] ? 'per ' + esc(BY[v].name) : { betray: 'per un tradimento', steal: 'per un furto', attack: 'per un agguato', kill: 'per un lutto' }[why] || '';
+      const sec = (title, rows, empty) => '<div class="agroup"><h4>' + title + ' · ' + rows.length + '</h4>' + (rows.length ? '<div class="rel">' + rows.join('') + '</div>' : '<p class="help">' + empty + '</p>') + '</div>';
+      h = (gs.length ? gs.map((g, k) => '<div class="agroup"><h4>Alleanza ' + (k + 1) + ' · ' + g.length + '</h4><div class="row">' + g.map(av).join('') + '</div></div>').join('') : '<p class="help" style="margin-bottom:10px">Nessuna alleanza attiva.</p>') +
+        sec('Coppie', couples.map(([a, b]) => '<div class="relrow">' + av(a) + '<span class="arrow" style="color:var(--c-love)">♥</span>' + av(b) + '<span class="lbl">' + esc(BY[a].name) + ' e ' + esc(BY[b].name) + '</span></div>'), 'Ancora nessuna coppia.') +
+        sec('Vendette giurate', grudges.slice(0, 14).map(([a, b, why, v]) => '<div class="relrow">' + av(a) + '<span class="arrow">→</span>' + av(b) + '<span class="lbl">' + whyTxt(why, v) + '</span></div>'), 'Nessuno ha ancora giurato vendetta.') +
+        sec('Debiti', debts.slice(0, 10).map(([a, b]) => '<div class="relrow">' + av(a) + '<span class="lbl">deve un favore a</span>' + av(b) + '</div>'), 'Nessun debito in sospeso.') +
+        (solo.length ? '<div class="agroup"><h4>Senza alleati · ' + solo.length + '</h4><div class="row">' + solo.map(av).join('') + '</div></div>' : '');
     }
     $('#sideBody').innerHTML = h;
   }
@@ -735,10 +766,34 @@
           '<div style="flex:1;min-width:140px"><div class="sub" style="margin-bottom:6px">Condizioni</div><div class="chips">' + (st.length ? st.map((s) => '<span class="chip st">' + esc(L.STATUS_LABEL[s] || s) + '</span>').join('') : '<span class="chip dim">In forma</span>') + '</div></div>' +
           '<div style="flex:1;min-width:140px"><div class="sub" style="margin-bottom:6px">Zaino</div><div class="chips">' + (inv.length ? inv.map((x) => '<span class="chip dim">' + esc(x) + '</span>').join('') : '<span class="chip dim">Vuoto</span>') + '</div></div></div>' +
           '<div><div class="sub" style="margin-bottom:6px">Alleati</div><div class="row">' + (ally.length ? ally.map((x) => avHTML(BY[x], { btn: true })).join('') : '<span class="help">Nessuno, per ora.</span>') + '</div></div>' : '') +
+        relHTML(id, snap, dead, atRes) +
         '<div><div class="sub" style="margin-bottom:8px">La sua storia' + (atRes ? '' : ' finora') + '</div><div class="ptl">' + (hist.length ? hist.map(({ e, p }) => '<div class="it" style="--cc:var(--c-' + (e.cat || 'none') + ')"><span>' + (p.kind === 'b' ? 'Inizio' : 'G' + p.day + ' ' + (p.kind === 'n' ? 'notte' : p.kind === 'd' ? 'giorno' : KIND[p.kind].toLowerCase())) + '</span><p>' + linkify(e.html) + '</p></div>').join('') : '<p class="help">Nessun evento ancora.</p>') + '</div></div>' +
       '</div>';
     if (!$('#profDlg').open) $('#profDlg').showModal();
     $('#profDlg').scrollTop = 0;
+  }
+
+  function relHTML(id, snap, dead, atRes) {
+    const r = (snap.rel || {})[id]; if (!r) return '';
+    const alive = new Set(snap.alive), av = (x) => avHTML(BY[x], { btn: true });
+    const t = BY[id], rows = [], badges = [];
+    if (r.f >= 5) badges.push('<span class="badge2 star">Beniamin' + G3(t.gender, 'o', 'a', 'ə') + ' del pubblico</span>');
+    else if (r.f >= 3) badges.push('<span class="badge2 star">Popolare</span>');
+    if ((snap.kills[id] || 0) >= 3) badges.push('<span class="badge2 hot">Temut' + G3(t.gender, 'o', 'a', 'ə') + '</span>');
+    if (r.tr) badges.push('<span class="badge2 hot">Traditor' + G3(t.gender, 'e', 'e', 'ə') + '</span>');
+    if (r.p && BY[r.p]) badges.push('<span class="badge2 love">In coppia</span>');
+    if (!dead) {
+      if (r.p && BY[r.p]) rows.push('<div class="relrow"><span class="lbl">Ama</span>' + av(r.p) + '<span>' + esc(BY[r.p].name) + '</span></div>');
+      else if (r.lost && BY[r.lost]) rows.push('<div class="relrow"><span class="lbl">Ha perso</span>' + avHTML(BY[r.lost], { dead: true, btn: true }) + '<span>' + esc(BY[r.lost].name) + '</span></div>');
+      r.g.filter(([x]) => alive.has(x)).forEach(([x, why, v]) => rows.push('<div class="relrow"><span class="lbl">Vuole vendetta su</span>' + av(x) + '<span class="lbl">' + (why === 'kill' && v && BY[v] ? 'per ' + esc(BY[v].name) : why === 'betray' ? 'per un tradimento' : why === 'steal' ? 'per un furto' : 'per un agguato') + '</span></div>'));
+      r.o.filter((x) => alive.has(x)).forEach((x) => rows.push('<div class="relrow"><span class="lbl">Deve un favore a</span>' + av(x) + '</div>'));
+      const hunters = snap.alive.filter((x) => x !== id && snap.rel[x] && snap.rel[x].g.some(([y]) => y === id));
+      if (hunters.length) rows.push('<div class="relrow"><span class="lbl">Ricercat' + G3(t.gender, 'o', 'a', 'ə') + ' da</span>' + hunters.map(av).join('') + '</div>');
+      if (r.fr.length) rows.push('<div class="relrow"><span class="lbl">Amici</span>' + r.fr.slice(0, 6).map(av).join('') + '</div>');
+      if (r.en.length) rows.push('<div class="relrow"><span class="lbl">Rivali</span>' + r.en.slice(0, 6).map(av).join('') + '</div>');
+    }
+    if (!badges.length && !rows.length) return '';
+    return '<div><div class="sub" style="margin-bottom:8px">Legami e reputazione' + (atRes ? '' : ' adesso') + '</div>' + (badges.length ? '<div class="badges" style="margin-bottom:8px">' + badges.join('') + '</div>' : '') + (rows.length ? '<div class="rel">' + rows.join('') + '</div>' : '') + '</div>';
   }
 
   /* =============== ESITO =============== */
@@ -768,6 +823,10 @@
     if (st.firstBlood) { const v = BY[st.firstBlood.victim]; awards.push([soft ? 'Prima a uscire' : 'Primo sangue', v, st.firstBlood.killers.length ? 'per mano di ' + st.firstBlood.killers.map((k) => BY[k].name).join(', ') : 'vittima dell\'arena']); }
     const trait = maxBy((t) => t.betrayals); if (trait && trait.betrayals) awards.push(['Il voltagabbana', trait, plural(trait.betrayals, 'tradimento', 'tradimenti')]);
     const soc = maxBy((t) => t.alliancesFormed); if (soc && soc.alliancesFormed) awards.push(['Il diplomatico', soc, plural(soc.alliancesFormed, 'alleanza stretta', 'alleanze strette')]);
+    const rev = maxBy((t) => t.revenges); if (rev && rev.revenges) awards.push(['Il vendicatore', rev, plural(rev.revenges, 'vendetta compiuta', 'vendette compiute')]);
+    const fam = maxBy((t) => t.fame); if (fam && fam.fame >= 3) awards.push(['Beniamino del pubblico', fam, fam.fame + ' punti di fama']);
+    const sav = maxBy((t) => t.saves); if (sav && sav.saves) awards.push(['L\'angelo custode', sav, plural(sav.saves, 'vita salvata o curata', 'vite salvate o curate')]);
+    const lucky = maxBy((t) => t.amulets); if (lucky && lucky.amulets) awards.push(['Miracolat' + G3(lucky.gender, 'o', 'a', 'ə'), lucky, 'salvat' + G3(lucky.gender, 'o', 'a', 'ə') + ' da un portafortuna']);
     const busy = maxBy((t) => t.events); if (busy) awards.push(['Sempre in mezzo', busy, plural(busy.events, 'evento vissuto', 'eventi vissuti')]);
     const loot = maxBy((t) => t.items); if (loot && loot.items) awards.push(['Il collezionista', loot, plural(loot.items, 'oggetto trovato', 'oggetti trovati')]);
     const awardsH = '<div class="awards">' + awards.map(([a, t, d]) => '<button type="button" class="award card" data-prof="' + esc(t.id) + '">' + avHTML(t, { dead: !t.alive }) + '<span style="min-width:0"><span class="at">' + a + '</span><b>' + esc(t.name) + '</b><small>' + esc(d) + '</small></span></button>').join('') + '</div>';
@@ -793,10 +852,13 @@
     add(all.find((x) => x.e.deaths.length));
     all.filter((x) => x.e.deaths.length >= 2).slice(0, 2).forEach(add);
     all.filter((x) => x.e.cat === 'betray' && x.e.deaths.length).slice(0, 2).forEach(add);
+    all.filter((x) => x.e.why === 'vendetta' && x.e.deaths.length).slice(0, 2).forEach(add);
+    all.filter((x) => (x.e.echo || []).some((y) => y.cls === 'twist')).slice(0, 1).forEach(add);
+    all.filter((x) => x.e.cat === 'love').slice(0, 1).forEach(add);
     all.filter((x) => x.p.kind === 'dis' && x.e.deaths.length).slice(0, 1).forEach(add);
     add([...all].reverse().find((x) => x.e.deaths.length));
     hl.sort((a, b) => a.k - b.k);
-    const hlH = '<div class="highlights">' + hl.slice(0, 7).map((x) => evHTML(x.e, null, theme, false).replace('<p>', '<p><span class="sub" style="display:block;margin-bottom:2px">' + esc(x.p.title) + '</span>')).join('') + '</div>';
+    const hlH = '<div class="highlights">' + hl.slice(0, 9).map((x) => evHTML(x.e, null, theme, false).replace('<p>', '<p><span class="sub" style="display:block;margin-bottom:2px">' + esc(x.p.title) + '</span>')).join('') + '</div>';
 
     const rows = ranked.map((t) => '<tr class="' + (t.alive ? 'win' : '') + '"><td class="n">' + t.rank + '°</td><td><button type="button" class="who" data-prof="' + esc(t.id) + '">' + avHTML(t, { dead: !t.alive }) + esc(t.name) + '</button></td><td class="n">' + t.team + '</td><td class="n">' + t.kills + '</td>' +
       '<td>' + (t.alive ? '<b>' + (W.length > 1 ? 'Squadra vincitrice' : G3(t.gender, 'Vincitore', 'Vincitrice', 'Vincitorə')) + '</b>' : t.killerIds.length ? esc(t.killerIds.map((k) => BY[k].name).join(', ')) : '<span class="muted">L\'arena</span>') + '</td>' +
@@ -813,7 +875,7 @@
         '<section class="block card"><h2>Momenti salienti</h2>' + hlH + '</section>' +
         '<section class="block card"><h2>Classifica completa</h2><div class="tablewrap"><table><thead><tr><th>Pos.</th><th>Concorrente</th><th>Sq.</th><th>' + (soft ? 'Elim.' : 'Ucc.') + '</th><th>Per mano di</th><th>Giorno</th><th>Come è andata</th></tr></thead><tbody>' + rows + '</tbody></table></div></section>' +
       '</div><div>' +
-        '<section class="block card"><h2>Superstiti nel tempo</h2>' + chart + '<p class="help" style="margin-top:8px">' + st.killDeaths + ' ' + (soft ? 'eliminati da un rivale' : 'morti per mano altrui') + ', ' + st.envDeaths + ' per colpa dell\'arena · ' + st.alliances + ' alleanze · ' + st.betrayals + ' tradimenti · ' + st.events + ' eventi.</p></section>' +
+        '<section class="block card"><h2>Superstiti nel tempo</h2>' + chart + '<p class="help" style="margin-top:8px">' + st.killDeaths + ' ' + (soft ? 'eliminati da un rivale' : 'morti per mano altrui') + ', ' + st.envDeaths + ' per colpa dell\'arena · ' + st.alliances + ' alleanze · ' + st.betrayals + ' tradimenti · ' + (st.revenges || 0) + ' vendette · ' + (st.couples || 0) + ' coppie · ' + (st.debtsRepaid || 0) + ' debiti saldati · ' + (st.amulets || 0) + ' salvataggi miracolosi · ' + (st.sponsors || 0) + ' doni degli sponsor · ' + st.events + ' eventi.</p></section>' +
         '<section class="block card"><h2>' + (soft ? 'Chi ha eliminato di più' : 'Chi ha ucciso di più') + '</h2><div class="bars">' + kbars + '</div></section>' +
         '<section class="block card posterbox"><h2>Locandina</h2><img id="posterImg" alt="Locandina della partita"><p class="help" style="margin-top:8px">Tieni premuto sull\'immagine, o clic destro, per salvarla.</p></section>' +
       '</div></div>';

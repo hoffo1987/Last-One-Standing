@@ -125,6 +125,13 @@
         <label class="field" for="maxDays"><span>Durata massima · <b id="maxDaysOut"></b> giorni</span><input type="range" id="maxDays" min="5" max="40" step="1"><small class="help">Allo scadere scatta lo scontro finale.</small></label>
         <label class="switch" for="teamsAllied"><input type="checkbox" id="teamsAllied" role="switch"><span class="sw" aria-hidden="true"></span><span>Compagni di squadra alleati<small>All'inizio chi è nella stessa squadra forma un'alleanza.</small></span></label>
         <label class="switch" for="teamWin"><input type="checkbox" id="teamWin" role="switch"><span class="sw" aria-hidden="true"></span><span>Vittoria di squadra<small>Si vince quando restano solo membri della stessa squadra.</small></span></label>
+        <div class="adultbox" id="adultBox">
+          <label class="switch" for="adult"><input type="checkbox" id="adult" role="switch"><span class="sw adult" aria-hidden="true"></span><span>Contenuti 18+ <span class="tag18">18+</span><small id="adultNote">Violenza esplicita, linguaggio volgare, alcol e sostanze, allusioni sessuali tra adulti.</small></span></label>
+          <div class="confirm18" id="adultConfirm" hidden>
+            <p>Questi contenuti non sono adatti ai minori. Confermi di avere almeno 18 anni?</p>
+            <div class="row"><button class="btn danger" id="adultYes" type="button">Ho almeno 18 anni, attiva</button><button class="btn" id="adultNo" type="button">Annulla</button></div>
+          </div>
+        </div>
         <label class="field" for="seed"><span>Seme della partita</span>
           <div class="seedrow"><input type="text" id="seed" autocomplete="off" spellcheck="false"><button class="btn" id="seedNew" type="button" title="Nuovo seme casuale" aria-label="Nuovo seme casuale"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="3.5" width="17" height="17" rx="4" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="8.5" cy="8.5" r="1.6" fill="currentColor"/><circle cx="15.5" cy="15.5" r="1.6" fill="currentColor"/><circle cx="12" cy="12" r="1.6" fill="currentColor"/></svg></button></div>
           <small class="help">Stesso seme e stesso cast danno la stessa storia.</small></label>
@@ -165,7 +172,7 @@
         <div class="livefeed" id="phBody" aria-live="polite"></div>
         <aside class="sidepanel card">
           <div class="stabs" role="tablist" aria-label="Pannello laterale">
-            <button role="tab" type="button" data-s="map">Mappa</button><button role="tab" type="button" data-s="fallen">Caduti</button><button role="tab" type="button" data-s="alive">In gara</button><button role="tab" type="button" data-s="allies">Alleanze</button>
+            <button role="tab" type="button" data-s="map">Mappa</button><button role="tab" type="button" data-s="fallen">Caduti</button><button role="tab" type="button" data-s="alive">In gara</button><button role="tab" type="button" data-s="allies">Legami</button>
           </div>
           <div class="sbody" id="sideBody"></div>
         </aside>
