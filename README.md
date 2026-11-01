@@ -77,6 +77,8 @@ node tools/fuzz.js 1500         # partite con impostazioni casuali e casi limite
 ```
 Per giocare basta aprire `dist/index.html` (o `dist/last-one-standing.html`) in un browser: è un unico file con immagini incorporate, senza dipendenze a parte i caratteri di Google Fonts.
 
+**Sito pubblico con Vercel:** il file `vercel.json` dice a Vercel di eseguire `node tools/build.js` e pubblicare la cartella `docs/`. Basta importare il repository su Vercel, senza cambiare impostazioni (Framework: Other).
+
 **Sito pubblico con GitHub Pages:** la build copia la versione completa in `docs/`. Su GitHub: Settings → Pages → Source "Deploy from a branch" → ramo `main`, cartella `/docs`. L'immagine di anteprima dei link (`docs/anteprima.jpg`) e le icone sono già incluse.
 
 ## Formato degli eventi

@@ -13,6 +13,7 @@ const js = [assetsJs].concat(['data-core.js', 'data-themes.js', ...content, 'eng
 if (/<\/script/i.test(js)) throw new Error('Il JS contiene </script>');
 const html = src('shell.html').replace('/*@CSS@*/', () => src('style.css')).replace('/*@JS@*/', () => js);
 const out = path.join(__dirname, '..', 'dist', 'last-one-standing.html');
+fs.mkdirSync(path.dirname(out), { recursive: true });
 fs.writeFileSync(out, html);
 // versione completa per il web (GitHub Pages): documento intero con anteprima dei link e icone
 const head = '<!doctype html>\n<html lang="it">\n<head>\n<meta charset="utf-8">\n<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">\n' +
