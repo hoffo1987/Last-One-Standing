@@ -215,7 +215,7 @@
 2 veleno:A k:A>B @stl | {A} versa {veleno:A} nella borraccia di {B}. Effetto garantito.
 2 veleno:A s:B=avvelenato @stl | {A} cosparge di {veleno:A} il cibo di {B}, che passa la notte a pentirsi di ogni boccone.
 3 esplosivo:A k:A>BC *1.2 | {A} lancia {esplosivo:A} nel mezzo dell'accampamento di {B} e {C}. Boom.
-2 esplosivo:A d:A *0.5 | {A} inciampa mentre trasporta {esplosivo:A}. L'arena trema.
+1 esplosivo:A d:A *0.5 | {A} inciampa mentre trasporta {esplosivo:A}. L'arena trema.
 2 esplosivo:A hit:A>B | {A} fa saltare {esplosivo:A} vicino a {B}, che si salva per miracolo ma sente fischiare le orecchie per ore.
 1 need:A=affamato @mad | {A} ha così fame che prova a mangiare la corteccia di un albero. Non lo consiglia.
 1 need:A=affamato +cibo:A cure:A *2 | {A}, mort[A:o/a] di fame, trova {cibo} e non ne lascia nemmeno una briciola.
@@ -288,7 +288,7 @@
 2 couple:AB d:B | {B} beve l'ultima boccetta di veleno prima che {A} possa fermarl[B:o/a]. "Esci di qui e racconta di noi."
 2 couple:AB d:B | {A} e {B} decidono di tirare a sorte. Vince {A}. {B} sorride, ed è l'ultima volta.
 2 couple:AB d:B | {A} e {B} trovano un'uscita per una sola persona. Litigano su chi debba usarla. Vince {B}, che spinge dentro {A} e resta fuori. L'arena se l[B:o/a] prende poco dopo.
-2 couple:AB d:B @show | {B} si dichiara sconfitt[B:o/a] per amore, davanti a tutta la nazione. Gli organizzatori, commossi per quasi tre secondi, fanno comunque il loro lavoro.
+2 couple:AB d:B @show | {B} si dichiara sconfitt[B:o/a] per amore di {A}, davanti a tutta la nazione. Gli organizzatori, commossi per quasi tre secondi, fanno comunque il loro lavoro.
 `,
     },
   });

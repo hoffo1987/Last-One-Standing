@@ -56,7 +56,7 @@
 2 grudge:A>B | {A} intaglia un piccolo bastone con la faccia di {B}. Poi lo spezza.
 2 save:A>B | {A} sveglia {B} un istante prima che {mostro} entri nella grotta.
 2 k:A>B @stl | {A} entra nella grotta di {B} con la luna alle spalle. All'alba, il cannone.
-3 ally:ABC tr:A>C | {A} decide che tre sono troppi e che {C} è il terzo di troppo.
+3 ally:ABC tr:A>C | {A} guarda {B} e {C} e decide che tre sono troppi. Il terzo di troppo è {C}.
 `,
       f: `
 1 +amuleto:A | {A} apre il proprio zaino del festino: dentro c'è {amuleto} e una lettera della nonna.
@@ -92,7 +92,6 @@ La notte dei lupi | Il branco di lupi mutanti esce tutto insieme sotto la luna p
 Il gioco delle porte | In mezzo all'arena compaiono tre porte. Gli organizzatori obbligano tutti a sceglierne una. | {A} sceglie la porta sbagliata. | {A} sceglie la porta così così. | {A} sceglie la porta giusta, dietro c'è un panino.
 L'albero degli impiccati | Le liane del Bosco si animano e si stringono attorno ai colli. | {A} viene sollevat[A:o/a] da una liana e non scende più. | {A} si libera tagliando la liana, ma con il collo segnato. | {A} cammina rasoterra per tutto il giorno.
 Il diluvio | Piove per ventiquattro ore senza smettere. | {A} annega in una pozzanghera profonda due metri. | {A} si prende una polmonite. | {A} si costruisce una zattera e si gode il viaggio. | malato
-Il pubblico vota | Il pubblico può votare chi colpire con una scarica elettrica. | {A} è la persona più odiata della stagione. | {A} viene votat[A:o/a] da metà del pubblico e prende la scossa. | {A} è troppo amat[A:o/a] per essere votat[A:o/a].
 Il miele | Dagli alberi cola un miele dolcissimo che attira tutti gli orsi dell'arena. | {A} è ricopert[A:o/a] di miele quando arrivano gli orsi. | {A} si lecca le dita e si ritrova un orso in faccia. | {A} lascia il miele agli orsi e scappa.
 `,
   });

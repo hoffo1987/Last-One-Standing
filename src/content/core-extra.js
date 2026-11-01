@@ -48,7 +48,7 @@
 2 al:AB @heal | {A} trova {B} che trema di freddo e condivide la propria coperta.
 2 ally:AB br:A @betray | {A} abbandona {B} nel sonno portandosi via tutto.
 2 | {A} e {B} si scambiano una parola di conforto a distanza, senza avvicinarsi.
-3 ally:ABC tr:A>C | {A} decide che {C} non serve più all'alleanza e la notte stessa l[C:o/a] elimina.
+3 ally:ABC tr:A>C | {A} decide, d'accordo con {B}, che {C} non serve più all'alleanza, e la notte stessa l[C:o/a] elimina.
 `,
     f: `
 1 +cibo:A +med:A | {A} arriva per ultim[A:o/a] e trova ancora due zaini intatti.

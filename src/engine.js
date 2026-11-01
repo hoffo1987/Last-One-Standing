@@ -75,6 +75,8 @@
     if (!(ev.n >= 1 && ev.n <= 6)) throw new Error('Numero di concorrenti non valido in: ' + line);
     let m;
     for (let tok of head.slice(1)) {
+      const self = tok.match(/^(?:ok:|ko:)?(?:hit|save|give|owe|repay|debt|grudge|forgive|steal|k|tr):([A-F])[<>]([A-F])/) || tok.match(/^(?:ok:|ko:)?(?:love|couple|friend|enemy|rel):([A-F])([A-F])/);
+      if (self && self[1] === self[2]) throw new Error('Etichetta riferita due volte alla stessa persona "' + tok + '" in: ' + line);
       let tgt = ev;
       if (/^(ok|ko):/.test(tok)) { tgt = tok[1] === 'k' ? ev.ok : ev.ko; tok = tok.slice(3); }
       if ((m = tok.match(/^test:([A-F])=(\w+?)(\d+)?$/))) { ev.test = { r: L(m[1]), attr: m[2], dc: m[3] ? +m[3] : 11 }; continue; }
@@ -99,7 +101,7 @@
       if ((m = tok.match(new RegExp('^-(' + ITEMS + '):([A-F])$')))) { tgt.fx.push({ t: 'lose', item: m[1], r: ID(m[2]) }); ev.req.push({ t: 'has', item: m[1], r: ID(m[2]) }); continue; }
       if ((m = tok.match(/^(cibo|med|trap|veleno|esplosivo):([A-F])$/))) { const r = ID(m[2]); ev.req.push({ t: 'has', item: m[1], r }); tgt.fx.push({ t: 'lose', item: m[1], r }); continue; }
       if ((m = tok.match(/^steal:([A-F])<([A-F])$/))) { ev.req.push({ t: 'has', item: 'arma', r: ID(m[2]) }); tgt.fx.push({ t: 'steal', r: [L(m[1]), L(m[2])] }); continue; }
-      if ((m = tok.match(/^give:([A-F])>([A-F])=(\w+)$/))) { tgt.fx.push({ t: 'give', r: [L(m[1]), L(m[2])], item: m[3] }); continue; }
+      if ((m = tok.match(/^give:([A-F])>([A-F])=(\w+)$/))) { tgt.fx.push({ t: 'give', r: [L(m[1]), L(m[2])], item: m[3] }); if (tgt === ev) ev.req.push({ t: 'has', item: m[3], r: ID(m[1]) }); continue; }
       if ((m = tok.match(/^s:([A-F])=(\w+)$/))) { tgt.fx.push({ t: 'status', r: ID(m[1]), s: m[2] }); continue; }
       if ((m = tok.match(/^need:([A-F])=(\w+|\*)$/))) { ev.req.push({ t: 'need', r: ID(m[1]), s: m[2] }); continue; }
       if ((m = tok.match(/^cure:([A-F])$/))) { tgt.fx.push({ t: 'cure', r: ID(m[1]) }); continue; }
@@ -161,6 +163,9 @@
     for (const r of ev.req.concat(ev.fx)) (r.r || []).concat(r.a || [], r.b || []).forEach((i) => used.add(String.fromCharCode(65 + i)));
     ev.kills.forEach((k) => k.by.concat(k.v).forEach((i) => used.add(String.fromCharCode(65 + i))));
     ev.dies.forEach((i) => used.add(String.fromCharCode(65 + i)));
+    const named = new Set();
+    for (const re of [/\{([A-F])\}/g, /\{(?:caro|perso|partner):([A-F])\}/g]) { let mm; while ((mm = re.exec(text))) named.add(mm[1]); }
+    for (let i = 0; i < ev.n; i++) if (!named.has(String.fromCharCode(65 + i))) throw new Error('Il concorrente {' + String.fromCharCode(65 + i) + '} partecipa ma non è nominato nel testo: ' + line);
     for (const ch of used) if (L(ch) >= ev.n) throw new Error('Il testo usa {' + ch + '} ma l\'evento ha solo ' + ev.n + ' concorrenti: ' + line);
     return ev;
   }
@@ -525,7 +530,7 @@
       const g = A.grudges[B.id];
       if (!g) return 'tutto quello che ha fatto';
       if (g.victim && byId[g.victim]) return '{@' + g.victim + '}';
-      return { betray: 'il tradimento subito', steal: 'il furto subito', attack: 'l\'agguato subito', love: 'il cuore spezzato' }[g.why] || 'tutto quello che ha fatto';
+      return { betray: 'il tradimento', steal: 'il furto di ieri', attack: 'l\'agguato di ieri', love: 'il cuore spezzato' }[g.why] || 'tutto quello che è successo';
     }
     function render(text, roles, lexPick, ev) {
       let s = text
@@ -941,5 +946,22 @@
     return esc(s).replace(/\{([A-F])\}/g, (_, c2) => '<b class="nm" style="--c:' + roles[L(c2)].color + '">' + roles[L(c2)].name + '</b>');
   }
 
-  G.LOS = { simulate, parseLine, parseBlock, parseDisasters, buildPools, makeRng, randomCast, countTemplates, previewCustom, customToLine, PALETTE, STATUS_LABEL, DIFF };
+  /* Rende un testo con concorrenti fittizi tutti dello stesso genere (per i controlli automatici) */
+  function renderSample(text, themeId, gender) {
+    const theme = D.themes.find((t) => t.id === themeId) || D.themes[0];
+    const lex = Object.assign({}, D.lexDefault || {}, theme.lex);
+    (D.packs || []).forEach((pk) => { if (pk.lex && pk.theme === theme.id) Object.assign(lex, pk.lex); });
+    const names = ['Alfa', 'Beta', 'Gamma', 'Delta', 'Epsilon', 'Zeta'];
+    const roles = names.map((name, i) => ({ id: 'x' + i, name, gender, inv: ITEMS.split('|').map((type) => ({ type, name: (lex[type] || ['un oggetto'])[0] })) }));
+    const pick = (k) => (lex[k] || ['qualcosa'])[0];
+    let s = text
+      .replace(/\{(caro|perso|partner):([A-F])\}/g, (_, k, c) => names[(L(c) + 1) % 6])
+      .replace(/\[([A-F]+):([^\]]*)\]/g, (_, ls, opts) => genderPick(letters(ls).map((i) => roles[i]), opts))
+      .replace(POSS_RE, (_, it, c2) => possessive(roles[L(c2)].inv.find((x) => x.type === it), 'il suo bottino'))
+      .replace(LEX_RE, (_, k) => pick(k));
+    s = cap(artPrep(s));
+    return s.replace(/\{([A-F])\}/g, (_, c) => names[L(c)]);
+  }
+
+  G.LOS = { renderSample, simulate, parseLine, parseBlock, parseDisasters, buildPools, makeRng, randomCast, countTemplates, previewCustom, customToLine, PALETTE, STATUS_LABEL, DIFF };
 })(typeof window !== 'undefined' ? window : globalThis);

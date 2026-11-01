@@ -111,7 +111,7 @@ Il ballo di fine anno anticipato | Il ballo di fine anno viene anticipato a sorp
 2 couple:AB | {A} e {B} si mandano messaggi sulla chat aziendale pensando che nessuno li legga. L'ufficio informatico li legge tutti.
 2 couple:AB @show star:A | {A} porta a {B} il caffè con il cuore disegnato nella schiuma. Tutto l'open space sospira.
 2 couple:AB | {A} e {B} litigano perché uno dei due ha messo l'altro in copia nascosta.
-3 couple:AB hit:C>A | {C}, gelos[C:o/a], segnala {A} alle Risorse umane per "comportamento inappropriato vicino alla stampante".
+3 couple:AB hit:C>A | {C}, gelos[C:o/a] di {A} e {B}, segnala {A} alle Risorse umane per "comportamento inappropriato vicino alla stampante".
 3 couple:AB k:C>A *0.6 | {C} sabota il progetto di {A} pur di allontanarl[A:o/a] da {B}. {A} viene licenziat[A:o/a].
 2 save:A>B @heal | {A} si prende la colpa per l'errore di {B} durante la riunione.
 2 repay:A>B +med:B | {A} copre {B} durante la sua assenza: "Così siamo pari".

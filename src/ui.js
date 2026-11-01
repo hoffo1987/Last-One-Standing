@@ -1,7 +1,7 @@
 /* Last One Standing — interfaccia */
 (function () {
   'use strict';
-  const D = window.LOS_DATA, L = window.LOS;
+  const D = window.LOS_DATA, L = window.LOS, ART = window.LOS_ART;
   const $ = (s, r = document) => r.querySelector(s);
   const $$ = (s, r = document) => [...r.querySelectorAll(s)];
   const esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -79,15 +79,25 @@
       if (!raw) return false;
       const d = JSON.parse(raw);
       if (Array.isArray(d.cast)) S.cast = d.cast.map(sanitizeTribute).filter(Boolean);
-      if (d.settings) Object.assign(S.settings, d.settings);
-      if (!THEMES[S.settings.theme]) S.settings.theme = 'classico';
+      if (d.settings && typeof d.settings === 'object') sanitizeSettings(d.settings);
       if (Array.isArray(d.custom)) S.custom = d.custom.map(sanitizeCustom).filter(Boolean);
-      if (d.run && d.run.cfg) S.run = d.run;
+      if (d.run && d.run.cfg && Array.isArray(d.run.cfg.cast) && THEMES[d.run.cfg.theme]) { d.run.cfg.cast = d.run.cfg.cast.map(sanitizeTribute).filter(Boolean); d.run.cfg.custom = (d.run.cfg.custom || []).map(sanitizeCustom).filter(Boolean); S.run = d.run; }
       if (d.ui === 'light' || d.ui === 'dark') S.ui = d.ui;
       return true;
     } catch (e) { return false; }
   }
 
+  function sanitizeSettings(x) {
+    const st = S.settings;
+    if (THEMES[x.theme]) st.theme = x.theme;
+    if (L.DIFF[x.difficulty]) st.difficulty = x.difficulty;
+    if (typeof x.seed === 'string') st.seed = x.seed.slice(0, 60);
+    if (+x.maxDays >= 5 && +x.maxDays <= 40) st.maxDays = Math.round(+x.maxDays);
+    if (SPEED[x.speed]) st.speed = x.speed;
+    if ([1, 2, 3, 4].includes(+x.teamSize)) st.teamSize = +x.teamSize;
+    if (x.view === 'grid' || x.view === 'team') st.view = x.view;
+    ['teamsAllied', 'teamWin', 'adult'].forEach((k) => { if (typeof x[k] === 'boolean') st[k] = x[k]; });
+  }
   function sanitizeTribute(t, i) {
     if (!t || typeof t !== 'object') return null;
     const attr = {};
@@ -196,11 +206,12 @@
         '<a class="btn primary" href="#diretta">' + (done ? 'Rivedi la diretta' : 'Riprendi la diretta') + '</a>' + (done ? '<a class="btn" href="#esito">Vedi l\'esito</a>' : '');
     } else r.hidden = true;
     startHomeLoop();
+    renderStories();
   }
   function posterHTML(t, selectable, tag) {
     const pt = COUNTS.perTheme[t.id];
-    const inner = '<span class="pcheck" aria-hidden="true">✓</span><span class="pg" aria-hidden="true">' + t.glyph + '</span>' +
-      '<span class="pmeta">' + (t.soft ? 'Senza morti · ' : '') + (pt.events + (S.settings.adult ? pt.adultEvents : 0)) + ' eventi · ' + (pt.disasters + (S.settings.adult ? pt.adultDisasters : 0)) + ' disastri</span><b>' + esc(t.name) + '</b><small>' + esc(t.tag) + '</small>';
+    const inner = '<span class="pscene" aria-hidden="true">' + ART.scene(t.id) + '</span><span class="pcheck" aria-hidden="true">✓</span><span class="picon" aria-hidden="true">' + ART.icon(t.id, 18) + '</span>' +
+      (t.soft ? '<span class="psoft">Senza morti</span>' : '') + '<span class="pmeta">' + (pt.events + (S.settings.adult ? pt.adultEvents : 0)) + ' eventi · ' + (pt.disasters + (S.settings.adult ? pt.adultDisasters : 0)) + ' disastri</span><b>' + esc(t.name) + '</b><small>' + esc(t.tag) + '</small>';
     if (tag === 'a') return '<a class="poster-card" href="#arena" data-theme="' + t.id + '" style="--ph:' + t.hue + '">' + inner + '</a>';
     return '<button type="button" class="poster-card" role="radio" aria-checked="' + !!selectable + '" data-theme="' + t.id + '" style="--ph:' + t.hue + '">' + inner + '</button>';
   }
@@ -468,6 +479,7 @@
     S.cast = cast.slice(0, 200).map(sanitizeTribute).filter(Boolean);
     const r = d.regole || d.settings;
     if (r && typeof r === 'object') {
+      sanitizeSettings(Object.assign({}, r, { adult: S.settings.adult }));
       if (THEMES[r.theme]) S.settings.theme = r.theme;
       if (L.DIFF[r.difficulty]) S.settings.difficulty = r.difficulty;
       if (typeof r.seed === 'string') S.settings.seed = r.seed.slice(0, 60);
@@ -513,7 +525,8 @@
       sample = pick.map((e) => evHTML(e, r.tributes, t, false, true)).join('');
     } catch (e) { sample = ''; }
     $('#arenaPreview').innerHTML =
-      '<div class="apv-head"><span class="gl" aria-hidden="true">' + t.glyph + '</span><div><div class="eyebrow">' + pt.events + ' eventi · ' + pt.disasters + ' disastri' + (t.soft ? ' · nessuno muore' : '') + '</div><h2>' + esc(t.name) + '</h2></div></div>' +
+      '<div class="apv-banner" aria-hidden="true">' + ART.scene(t.id) + '</div>' +
+      '<div class="apv-head"><span class="gl" aria-hidden="true">' + ART.icon(t.id, 28) + '</span><div><div class="eyebrow">' + pt.events + ' eventi · ' + pt.disasters + ' disastri' + (t.soft ? ' · nessuno muore' : '') + '</div><h2>' + esc(t.name) + '</h2></div></div>' +
       '<p class="muted">' + esc(t.intro.b) + ' ' + esc(t.tag) + '</p>' +
       '<div class="apv-grid">' +
         '<div><h3>Luoghi</h3><ul>' + t.lex.luogo.map((x) => '<li>' + esc(strip(x)) + '</li>').join('') + '</ul></div>' +
@@ -525,7 +538,7 @@
   }
   function renderStartSum() {
     const t = THEMES[S.settings.theme];
-    $('#startSum').innerHTML = '<b>' + S.cast.length + '</b> concorrenti · <b>' + esc(t.name) + '</b> · difficoltà <b>' + DIFFS.find((d) => d[0] === S.settings.difficulty)[1].toLowerCase() + '</b>' + (S.settings.adult && !t.noAdult ? ' · <span class="tag18">18+</span>' : '');
+    $('#startSum').innerHTML = '<b>' + S.cast.length + '</b> concorrenti · <b>' + esc(t.name) + '</b> · difficoltà <b>' + (DIFFS.find((d) => d[0] === S.settings.difficulty) || DIFFS[1])[1].toLowerCase() + '</b>' + (S.settings.adult && !t.noAdult ? ' · <span class="tag18">18+</span>' : '');
     $('#startMsg').textContent = S.cast.length < 2 ? 'Servono almeno 2 concorrenti: aggiungili nella sezione Concorrenti, oppure prova una partita lampo.' : '';
     $('#btnStart').disabled = S.cast.length < 2;
   }
@@ -636,7 +649,9 @@
     const forward = !fromRoute && i === lastRendered + 1;
     lastRendered = i;
 
-    $('#bcArena').innerHTML = esc(theme.glyph + ' ' + theme.name) + (SIM.adult ? ' <span class="bc-18">18+</span>' : '');
+    $('#bcArena').innerHTML = ART.icon(theme.id, 14) + ' ' + esc(theme.name) + (SIM.adult ? ' <span class="bc-18">18+</span>' : '');
+    const bcs = $('#bcScene'); if (bcs.dataset.t !== theme.id) { bcs.innerHTML = ART.scene(theme.id); bcs.dataset.t = theme.id; }
+    if (forward && ph.kind === 'fallen' && ph.deaths.length && !reduced) { const b = $('.broadcast'); b.classList.remove('boom'); void b.offsetWidth; b.classList.add('boom'); }
     $('#bcPhase').textContent = 'Fase ' + (i + 1) + ' / ' + P.length;
     $('#bcKind').textContent = KIND[ph.kind] + (ph.day ? ' · giorno ' + ph.day : '');
     $('#phTitle').textContent = ph.title;
@@ -814,11 +829,11 @@
     let hero;
     if (W.length === 1) {
       const w = W[0];
-      hero = '<div class="winhero">' + avHTML(w, { btn: true }) + '<div style="min-width:0"><div class="eyebrow">' + theme.glyph + ' ' + esc(theme.name) + ' · ' + plural(SIM.days, 'giorno', 'giorni') + ' · ' + SIM.tributes.length + ' concorrenti</div>' +
+      hero = '<div class="winhero"><div class="wscene" aria-hidden="true">' + ART.scene(theme.id) + '</div>' + avHTML(w, { btn: true }) + '<div style="min-width:0"><div class="eyebrow">' + ART.icon(theme.id, 13) + ' ' + esc(theme.name) + ' · ' + plural(SIM.days, 'giorno', 'giorni') + ' · ' + SIM.tributes.length + ' concorrenti</div>' +
         '<h1>' + esc(w.name) + '</h1><p><b style="color:var(--screen-ink)">' + G3(w.gender, 'Ultimo', 'Ultima', 'Ultimə') + ' in piedi.</b> Squadra ' + w.team + (w.traits.length ? ' · ' + w.traits.map((x) => TRAITS[x].name).join(', ') : '') + '.</p>' +
         '<div class="wstats"><div><b>' + w.kills + '</b><span>' + (soft ? 'eliminazioni' : 'uccisioni') + '</span></div><div><b>' + w.events + '</b><span>eventi vissuti</span></div><div><b>' + w.alliancesFormed + '</b><span>alleanze</span></div><div><b>' + w.items + '</b><span>oggetti trovati</span></div></div></div></div>';
     } else if (W.length > 1) {
-      hero = '<div class="winhero" style="grid-template-columns:minmax(0,1fr)"><div><div class="eyebrow">' + theme.glyph + ' ' + esc(theme.name) + ' · ' + plural(SIM.days, 'giorno', 'giorni') + '</div><h1>Vince la squadra ' + W[0].team + '</h1><div class="teamavs">' + W.map((w) => avHTML(w, { btn: true })).join('') + '</div><p style="margin-top:12px">' + W.map((w) => esc(w.name) + ' (' + kN(w.kills) + ')').join(' · ') + '</p></div></div>';
+      hero = '<div class="winhero" style="grid-template-columns:minmax(0,1fr)"><div class="wscene" aria-hidden="true">' + ART.scene(theme.id) + '</div><div><div class="eyebrow">' + ART.icon(theme.id, 13) + ' ' + esc(theme.name) + ' · ' + plural(SIM.days, 'giorno', 'giorni') + '</div><h1>Vince la squadra ' + W[0].team + '</h1><div class="teamavs">' + W.map((w) => avHTML(w, { btn: true })).join('') + '</div><p style="margin-top:12px">' + W.map((w) => esc(w.name) + ' (' + kN(w.kills) + ')').join(' · ') + '</p></div></div>';
     } else hero = '<div class="winhero" style="grid-template-columns:minmax(0,1fr)"><div><h1>Nessun superstite</h1><p>L\'arena non ha risparmiato nessuno.</p></div></div>';
 
     const ranked = SIM.tributes.slice().sort((a, b) => a.rank - b.rank || b.kills - a.kills);
@@ -891,6 +906,7 @@
     $('#rAgain').addEventListener('click', () => { const cfg = Object.assign({}, S.run.cfg, { seed: newSeed() }); runSim(cfg); });
     $('#rCopy').addEventListener('click', () => copyText(summaryText(), 'Riepilogo copiato negli appunti.'));
     drawPoster().then((url) => { const im = $('#posterImg'); if (im && url) im.src = url; });
+    if (S.run && !S.run.celebrated && W.length) { S.run.celebrated = true; save(); setTimeout(() => ART.confetti(['hsl(' + theme.hue + ' 90% 60%)', '#ffffff', '#ff5b4b', '#ffd36b', '#59c98b']), 250); }
   }
   function summaryText() {
     const theme = THEMES[SIM.theme], W = SIM.winners.map((id) => BY[id]);
@@ -908,6 +924,8 @@
     const g = cv.getContext('2d');
     const acc = 'hsl(' + h + ' 90% 62%)', ink = '#eef0f4', mute = 'hsl(' + h + ' 10% 66%)';
     g.fillStyle = 'hsl(' + h + ' 30% 6%)'; g.fillRect(0, 0, 1080, 1350);
+    const scn = await new Promise((res) => { const im = new Image(); im.onload = () => res(im); im.onerror = () => res(null); im.src = ART.sceneDataUri(theme.id); });
+    if (scn) { g.globalAlpha = 0.55; g.drawImage(scn, -270, 300, 1620, 810); g.globalAlpha = 1; const fade = g.createLinearGradient(0, 300, 0, 1110); fade.addColorStop(0, 'hsla(' + h + ',30%,6%,1)'); fade.addColorStop(0.35, 'hsla(' + h + ',30%,6%,0.2)'); fade.addColorStop(1, 'hsla(' + h + ',30%,6%,1)'); g.fillStyle = fade; g.fillRect(0, 300, 1080, 810); }
     const rg = g.createRadialGradient(540, 560, 40, 540, 560, 760); rg.addColorStop(0, 'hsla(' + h + ',90%,55%,.45)'); rg.addColorStop(1, 'hsla(' + h + ',90%,55%,0)');
     g.fillStyle = rg; g.fillRect(0, 0, 1080, 1350);
     g.save(); g.translate(540, 560); g.fillStyle = 'hsla(' + h + ',80%,60%,.06)';
@@ -952,11 +970,25 @@
   }
 
   /* ---------------- avvio ---------------- */
+  function renderStories() {
+    if (!demo) return;
+    const evs = [];
+    demo.phases.forEach((p) => p.events.forEach((e) => { if ((e.echo || []).length && e.ids.length) evs.push({ e, p }); }));
+    const pick = [evs.find((x) => x.e.why === 'vendetta'), evs.find((x) => x.e.cat === 'love'), evs.find((x) => (x.e.echo || []).some((y) => y.cls === 'twist')) || evs.find((x) => x.e.why === 'debito') || evs.find((x) => x.e.test)].filter(Boolean);
+    while (pick.length < 3 && evs.length) { const x = evs.shift(); if (!pick.includes(x)) pick.push(x); }
+    const tributes = demo.tributes, theme = THEMES[demo.theme];
+    $('#storyGrid').innerHTML = pick.slice(0, 3).map(({ e, p }) => '<article class="story card"><div class="sub">' + esc(theme.name) + ' · ' + esc(p.title) + '</div>' + evHTML(e, tributes, theme, false, true) + '</article>').join('');
+  }
   function boot(hot) {
     const had = load();
     if (!had) { S.cast = L.randomCast(24, 'benvenuto', 2).map(sanitizeTribute); S.settings.seed = 'benvenuto-2026'; }
     if (!S.settings.seed) S.settings.seed = newSeed();
     applyUi();
+    $('#brandLogo').innerHTML = ART.logo(34, { bg: 'var(--screen)', ink: 'var(--screen-ink)', accent: 'var(--screen-accent)' });
+    $('#footLogo').innerHTML = ART.logo(40, { bg: 'var(--screen)', ink: 'var(--screen-ink)', accent: 'var(--screen-accent)' });
+    $('#heroLogo').innerHTML = ART.logo(76, { bg: 'var(--screen-2)', ink: 'var(--screen-ink)', accent: 'var(--screen-accent)' });
+    $('#heroScenes').innerHTML = ['classico', 'fantasy', 'scifi', 'zombie', 'royale', 'horror', 'wasteland', 'liceo', 'ufficio'].map((t) => ART.scene(t)).join('');
+    try { const ic = document.createElement('link'); ic.rel = 'icon'; ic.href = ART.logoDataUri('#e3b04b'); document.head.appendChild(ic); } catch (e) { /* niente */ }
     if (S.run && S.run.cfg) {
       try { SIM = L.simulate(S.run.cfg); BY = Object.fromEntries(SIM.tributes.map((t) => [t.id, t])); } catch (e) { SIM = null; S.run = null; }
     }

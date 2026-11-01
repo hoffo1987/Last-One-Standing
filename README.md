@@ -48,18 +48,24 @@ src/content/_systems.js  sistema delle conseguenze: frasi di eco, oggetti specia
 src/content/pack-*.js    pacchetti per arena (eventi, disastri, 18+), condivisi e per adulti
 src/content/*.js         eventi aggiuntivi e disastri della versione precedente
 src/engine.js        motore di simulazione (funziona anche in Node)
+src/art.js           logo, icone e illustrazioni delle arene in SVG, coriandoli
 src/ui.js            interfaccia
 src/style.css        stile
 src/shell.html       markup
 tools/build.js       crea dist/last-one-standing.html (file unico)
 tools/test-engine.js test del motore senza browser
+tools/lint-content.js controllo statico dei contenuti
+tools/fuzz.js        collaudo con partite casuali
 ```
 
 ## Comandi
 ```
-node tools/build.js            # crea il file unico in dist/
-node tools/test-engine.js 40   # 40 partite per tema, controlla le regole
+node tools/build.js             # crea il file unico in dist/last-one-standing.html
+node tools/lint-content.js      # controlla tutte le righe di evento e disastro (sintassi, partecipanti, segnaposto, grammatica di base)
+node tools/test-engine.js 40    # 40 partite per arena, metà con i contenuti 18+, controlla regole e determinismo
+node tools/fuzz.js 1500         # partite con impostazioni casuali e casi limite (2-60 concorrenti, una sola squadra, valori estremi)
 ```
+Per giocare basta aprire `dist/last-one-standing.html` in un browser: è un unico file senza dipendenze, a parte i caratteri di Google Fonts.
 
 ## Formato degli eventi
 I disastri in `src/content/` usano un formato compatto: `Nome | introduzione | morte | danno | salvezza [| stato]`.

@@ -9,7 +9,7 @@
 <header class="top">
   <div class="wrap topin">
     <a class="brand" href="#home" aria-label="Last One Standing, pagina iniziale">
-      <span class="logo" aria-hidden="true"><i></i><i></i><i></i><i class="x"></i></span>
+      <span class="logo" id="brandLogo" aria-hidden="true"></span>
       <b>Last <em>One</em> Standing</b>
     </a>
     <nav class="steps" aria-label="Passaggi">
@@ -28,8 +28,10 @@
   <!-- HOME -->
   <section class="view" id="v-home" aria-labelledby="h-home">
     <div class="homehero">
+      <div class="hh-scenes" id="heroScenes" aria-hidden="true"></div>
       <div class="wrap homegrid">
         <div class="hh-text">
+          <div class="hh-emblem" id="heroLogo" aria-hidden="true"></div>
           <div class="kicker"><span class="rec"></span> Simulatore di arena · in italiano</div>
           <h1 id="h-home">Chi resterà<br>in piedi?</h1>
           <p class="lead">Scegli i concorrenti, getta tutti in un'arena e guarda la storia scriversi da sola: alleanze, tradimenti, disastri e un solo superstite.</p>
@@ -56,6 +58,17 @@
         <div class="how"><span class="hn">3</span><h3>Guarda la diretta</h3><p>Giorno dopo giorno, con mappa, caduti e la scheda di ogni concorrente.</p></div>
         <div class="how"><span class="hn">4</span><h3>Scopri l'esito</h3><p>Podio, premi, momenti salienti, classifica e una locandina da salvare.</p></div>
       </div>
+      <section class="stories" aria-labelledby="h-stories">
+        <div class="stories-head"><div><div class="eyebrow">Il sistema delle conseguenze</div><h2 class="sec" id="h-stories">Ogni gesto ha un seguito</h2></div>
+          <p>Chi perde qualcuno giura vendetta. Chi viene salvato resta in debito. Le coppie si proteggono, i traditori vengono ricordati e il pubblico premia chi fa spettacolo. Ecco tre momenti presi da una partita vera.</p></div>
+        <div class="story-grid" id="storyGrid"></div>
+        <div class="pillars">
+          <div class="pillar"><b>10</b><span>caratteristiche, dalla forza all'empatia</span></div>
+          <div class="pillar"><b>30</b><span>tratti, dal Romantico al Vendicativo</span></div>
+          <div class="pillar"><b>2d6</b><span>prove di abilità con due esiti scritti</span></div>
+          <div class="pillar"><b>18+</b><span>contenuti per adulti, solo su conferma</span></div>
+        </div>
+      </section>
       <h2 class="sec">Le arene</h2>
       <div class="arenastrip" id="arenaStrip"></div>
     </div>
@@ -149,6 +162,7 @@
     <div id="liveEmpty" class="emptystate" hidden><h2>Nessuna partita in corso</h2><p>Scegli un'arena e avvia la simulazione, oppure lancia una partita lampo.</p><div class="row center"><a class="btn primary" href="#arena">Vai all'arena</a><button class="btn" type="button" data-quick>Partita lampo</button></div></div>
     <div id="liveBody" hidden>
       <div class="broadcast">
+        <div class="bc-scene" id="bcScene" aria-hidden="true"></div>
         <div class="bc-top">
           <span class="onair"><span class="rec"></span>IN DIRETTA</span>
           <span class="bc-arena" id="bcArena"></span>
@@ -195,6 +209,12 @@
     <div id="resBody" hidden></div>
   </section>
 </main>
+<footer class="foot">
+  <div class="wrap footin">
+    <div class="footbrand"><span id="footLogo" aria-hidden="true"></span><div><b>Last One Standing</b><span>Simulatore di arena in italiano. Le partite restano nel tuo browser.</span></div></div>
+    <nav class="footnav" aria-label="Collegamenti"><a href="#home">Inizio</a><a href="#cast">Concorrenti</a><a href="#arena">Arena</a><a href="#diretta">Diretta</a><a href="#esito">Esito</a></nav>
+  </div>
+</footer>
 
 <dialog id="ioDlg" class="modal" aria-labelledby="h-io">
   <div class="dh"><h2 id="h-io">Importa / Esporta</h2><button class="iconbtn" data-close type="button" aria-label="Chiudi">✕</button></div>
