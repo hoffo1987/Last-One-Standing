@@ -1012,3 +1012,57 @@ img.scene { object-fit: cover; object-position: center; user-select: none; }
 .badge2.hot { color: color-mix(in srgb, var(--dead) 75%, var(--ink)); }
 .badge2.love { color: color-mix(in srgb, var(--c-love) 72%, var(--ink)); }
 .echo li.quote { --ec: var(--accent-text); font-style: italic; }
+
+/* ---------- relazioni: mappa dei legami, dimensioni, promesse, storie ---------- */
+.netwrap { margin-bottom: 14px; display: grid; gap: 8px; }
+.netwrap h4 { margin: 0; }
+.net { width: 100%; max-width: 360px; justify-self: center; height: auto; display: block; }
+.net .edge { fill: none; stroke-linecap: round; opacity: .78; transition: opacity .2s; }
+.net.focus .edge { opacity: .08; }
+.net.focus .edge.on { opacity: 1; }
+.net .node { cursor: pointer; outline: none; }
+.net .node circle { stroke: var(--panel); stroke-width: 2.5; transition: r .2s; }
+.net .node text { font: 700 8.5px var(--f-mono); fill: #fff; text-anchor: middle; pointer-events: none; text-shadow: 0 1px 2px rgba(0,0,0,.6); }
+.net .node:hover circle, .net .node.on circle, .net .node:focus-visible circle { stroke: var(--ink); }
+.e-love { --ec2: #e0559a; } .e-friend { --ec2: #2f9e6a; } .e-ally { --ec2: #4f7fd6; } .e-hate { --ec2: #d94a3a; } .e-fear { --ec2: #8a5bd6; } .e-rival { --ec2: #e08a2b; } .e-plot { --ec2: #7a6a9a; }
+.net .edge { stroke: var(--ec2); }
+.net .edge.e-plot { stroke-dasharray: 3 3; }
+.mk-love { fill: #e0559a; } .mk-friend { fill: #2f9e6a; } .mk-ally { fill: #4f7fd6; } .mk-hate { fill: #d94a3a; } .mk-fear { fill: #8a5bd6; } .mk-rival { fill: #e08a2b; } .mk-plot { fill: #7a6a9a; }
+.netlegend { display: flex; flex-wrap: wrap; gap: 4px; justify-content: center; }
+.netlegend .nl { display: inline-flex; align-items: center; gap: 5px; font: 600 11.5px var(--f-sans, inherit); padding: 3px 8px; border-radius: 999px; border: 1px solid var(--line); background: var(--panel); color: var(--ink); cursor: pointer; }
+.netlegend .nl i { width: 12px; height: 3px; border-radius: 2px; background: var(--ec2); }
+.netlegend .nl.e-plot i { background: repeating-linear-gradient(90deg, var(--ec2) 0 3px, transparent 3px 5px); }
+.netlegend .nl.off { opacity: .45; text-decoration: line-through; }
+.person.c-love .plbl { color: color-mix(in srgb, var(--c-love) 75%, var(--ink)); }
+.person.c-hate .plbl, .person.c-plot .plbl { color: color-mix(in srgb, var(--c-kill) 75%, var(--ink)); }
+.person.c-friend .plbl, .person.c-ally .plbl { color: color-mix(in srgb, var(--c-heal) 75%, var(--ink)); }
+.person.c-fear .plbl { color: color-mix(in srgb, #8a5bd6 75%, var(--ink)); }
+.person.c-rival .plbl { color: color-mix(in srgb, #e08a2b 72%, var(--ink)); }
+.asym { font-family: var(--f-mono); font-size: 10px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: color-mix(in srgb, var(--c-love) 72%, var(--ink)); background: color-mix(in srgb, var(--c-love) 12%, transparent); border-radius: 5px; padding: 1px 6px; }
+.back { font-size: 12.5px; color: var(--muted); }
+.back b { color: var(--ink); font-weight: 600; }
+.dims { display: grid; grid-template-columns: repeat(auto-fill, minmax(112px, 1fr)); gap: 4px 10px; max-width: min(100%, 420px); min-width: 0; }
+.dim { display: grid; grid-template-columns: 66px minmax(0, 1fr); gap: 6px; align-items: center; font-size: 11px; color: var(--muted); }
+.dim em { font-style: normal; }
+.dim i { position: relative; height: 5px; border-radius: 3px; background: var(--panel); overflow: hidden; display: block; }
+.dim i b { position: absolute; top: 0; height: 100%; border-radius: 3px; }
+.dim.d-f i b { background: var(--c-heal); } .dim.d-r i b { background: #e08a2b; } .dim.d-p i b { background: #8a5bd6; } .dim.d-t i b { background: var(--c-love); } .dim.d-k i b { background: var(--c-ally); }
+.dim.neg i b { background: var(--c-kill); }
+.dim.d-f i::after, .dim.d-r i::after { content: ""; position: absolute; left: 50%; top: -1px; bottom: -1px; width: 1px; background: var(--line); }
+.proms { display: grid; gap: 6px; }
+.prom { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 8px; align-items: center; font-size: 13px; padding: 7px 10px; border-radius: 9px; background: var(--panel-2); }
+.prom .pk { font-family: var(--f-mono); font-size: 10.5px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--accent-text); }
+.prom .ps2 { font-family: var(--f-mono); font-size: 10.5px; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; }
+.prom.s-mantenuta .ps2 { color: color-mix(in srgb, var(--c-heal) 75%, var(--ink)); font-weight: 700; }
+.prom.s-tradita .ps2 { color: color-mix(in srgb, var(--c-kill) 75%, var(--ink)); font-weight: 700; }
+.bstories { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr)); gap: 10px; }
+.story2 { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 12px; padding: 12px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); align-items: start; }
+.story2 .s2av { display: flex; }
+.story2 .s2av .av { --s: 40px; }
+.story2 .s2av .av + .av { margin-left: -12px; }
+.story2 b { display: block; font-size: 15px; margin: 2px 0 4px; }
+.story2 ul { list-style: none; margin: 6px 0 0; padding: 0; display: grid; gap: 3px; font-size: 12.5px; font-style: italic; color: var(--muted); }
+.story2 ul b { display: inline; font-size: inherit; font-style: normal; color: var(--ink); margin: 0; }
+.story2.k-amore { border-left: 3px solid var(--c-love); } .story2.k-amicizia, .story2.k-mentore, .story2.k-pieta { border-left: 3px solid var(--c-heal); }
+.story2.k-nemesi, .story2.k-odio, .story2.k-tradimento { border-left: 3px solid var(--c-kill); } .story2.k-paura { border-left: 3px solid #8a5bd6; } .story2.k-nonCorrisposto { border-left: 3px solid #e08a2b; }
+.dday .dk-fatto .dk { color: color-mix(in srgb, var(--muted) 75%, var(--ink)); }

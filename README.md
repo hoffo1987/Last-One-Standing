@@ -69,6 +69,22 @@ Il formato degli eventi conosce tutto quello che succede nella partita, quindi o
 - `wx:buio`, `wx:abbondanza`, `wx:pericolo`, `wx:calma` (il meteo del giorno);
 - i nuovi oggetti: `+armatura:A`, `con:A=attrezzo`, `-valore:A`, `{ricordo:A}`, `{alcol}` e così via.
 
+## Relazioni
+Ogni concorrente prova qualcosa di diverso per ognuno degli altri, e non sempre è ricambiato.
+- **Sei dimensioni per ogni legame, in una sola direzione**: Fiducia, Affetto, Rispetto, Paura, Attrazione e Conoscenza. Si può amare chi non ricambia, temere chi ci rispetta, fidarsi di chi sta tramando.
+- **Ogni ricordo cambia il legame**: essere salvati, curati, derubati, feriti, traditi, risparmiati, aiutati da uno sconosciuto. Il carattere modula la reazione: il Paranoico si fida a fatica e perde la fiducia in fretta, il Clemente perdona, il Vendicativo amplifica i torti, il Codardo si spaventa di più, il Romantico si innamora prima.
+- **Etichette umane**: Amore, Ex, Cotta segreta, Bersaglio segreto, Nemesi, Vendetta, Rivale in amore, Terrore, Paura, Gratitudine, Fratelli d'armi, Amico fidato, Mentore, Da proteggere, Complice, Alleato di comodo, Rivale, Ammirazione, Senso di colpa, Odio, Diffidenza, Antipatia, Simpatia…
+- **Testimoni**: chi vede un'uccisione comincia a temere (e a volte a disprezzare o ammirare) chi l'ha commessa; la notizia si sparge, e chi uccide molto diventa temuto da tutti.
+- **Voci di corridoio**: di notte le opinioni passano da un concorrente all'altro, pesate dalla fiducia in chi parla. Chi trama racconta calunnie: a volte funzionano, a volte chi ascolta se ne accorge.
+- **Promesse**: tra chi si fida nascono giuramenti di fedeltà, di protezione, di dividere il cibo e di vendetta («se mi succede qualcosa, vendicami»). Vengono mantenute o tradite nei momenti decisivi, e chi le tradisce lo paga caro.
+- **Pietà**: chi ama, rispetta o conosce bene la vittima a volte abbassa l'arma all'ultimo; chi viene risparmiato resta in debito.
+- **Amore che cresce**: l'attrazione aumenta stando vicini, nascono cotte, triangoli, dichiarazioni (accettate o respinte), rotture quando la fiducia crolla e ritorni di fiamma.
+- **Dinamiche di gruppo**: coalizioni contro chi fa paura, chi è terrorizzato si mette sotto la protezione del più forte (con un tributo), i mentori insegnano a chi è indietro, le alleanze piene di diffidenza si spaccano in fazioni, i rancori minori si consumano col tempo, nemici sopravvissuti insieme a un disastro si riavvicinano.
+- **Ogni morte pesa in modo diverso**: lutto per chi amava, sollievo per chi odiava, liberazione per chi aveva paura, omaggio dei rivali che rispettavano, senso di colpa per chi ha ucciso qualcuno a cui teneva.
+- **Tutto è collegato**: fiducia e paura decidono alleanze, spostamenti (chi ha paura cambia zona), chi condivide il cibo, a chi credono le spie, chi il traditore sceglie come vittima (chi si fida di più) e quali eventi accadono (`trust:A>B`, `fear:A>B`, `respect:A>B`, `attract:A>B`, `rival:AB`, `ex:AB`, `close:AB`, `promise:A>B`, e gli effetti `fid:`, `ris:`, `pau:`, `amo:`, `promise:A>B=protezione`, `breakup:AB`, `reunite:AB`).
+
+Dove si vede: nella diretta, la scheda **Legami** ha la **mappa dei legami** (un grafo dei vivi colorato per tipo di legame, con le frecce per i sentimenti non ricambiati, filtrabile e interattivo). Nella scheda di ogni concorrente, "Cosa prova per gli altri" mostra etichetta, dimensioni, cosa prova l'altro in cambio e i ricordi; "Promesse" elenca quelle fatte e ricevute e come sono finite. Nell'esito, **Le storie della partita** raccontano il grande amore, l'amicizia più forte, la nemesi, il tradimento più crudele, il gesto di pietà, l'amore non corrisposto, maestro e allievo, l'odio e la paura più grandi.
+
 ## Caratteristiche, tratti e prove
 - **Prove di abilità**: molti eventi sono una sfida su una caratteristica, con due esiti scritti. Il tiro somma caratteristica, due dadi, fortuna e tratti, e sottrae le condizioni (ferito, ubriaco, affamato…). La diretta mostra "Prova di Agilità · superata 15/11". Con valori alti si supera circa l'87% delle prove, con valori bassi circa il 20%.
 - **Eventi riservati** a chi ha una caratteristica molto alta o molto bassa, o un certo tratto.
@@ -99,6 +115,8 @@ src/content/_systems.js  sistema delle conseguenze: frasi di eco, oggetti specia
 src/content/_ecology.js  ecosistema delle arene: regole, indicatori, meteo, zone e testi delle conseguenze automatiche
 src/content/_items.js    catalogo degli oggetti, obiettivi, gesti dei tratti, diario segreto e ricordi dei rapporti
 src/content/_voices.js   battute dei concorrenti e conversazioni notturne
+src/content/_relazioni.js dimensioni dei legami, etichette, effetti dei ricordi, promesse, voci di corridoio e testi delle dinamiche
+src/content/pack3-relazioni.js eventi che nascono da fiducia, paura, rispetto, attrazione, promesse ed ex
 src/content/_extras.js   meteo aggiuntivo per ogni arena
 src/content/pack2-*.js   secondo pacchetto per ogni arena, legami comuni e sopravvivenza
 src/content/pack-*.js    pacchetti per arena (eventi, disastri, 18+), condivisi e per adulti

@@ -1018,6 +1018,60 @@ img.scene { object-fit: cover; object-position: center; user-select: none; }
 .badge2.hot { color: color-mix(in srgb, var(--dead) 75%, var(--ink)); }
 .badge2.love { color: color-mix(in srgb, var(--c-love) 72%, var(--ink)); }
 .echo li.quote { --ec: var(--accent-text); font-style: italic; }
+
+/* ---------- relazioni: mappa dei legami, dimensioni, promesse, storie ---------- */
+.netwrap { margin-bottom: 14px; display: grid; gap: 8px; }
+.netwrap h4 { margin: 0; }
+.net { width: 100%; max-width: 360px; justify-self: center; height: auto; display: block; }
+.net .edge { fill: none; stroke-linecap: round; opacity: .78; transition: opacity .2s; }
+.net.focus .edge { opacity: .08; }
+.net.focus .edge.on { opacity: 1; }
+.net .node { cursor: pointer; outline: none; }
+.net .node circle { stroke: var(--panel); stroke-width: 2.5; transition: r .2s; }
+.net .node text { font: 700 8.5px var(--f-mono); fill: #fff; text-anchor: middle; pointer-events: none; text-shadow: 0 1px 2px rgba(0,0,0,.6); }
+.net .node:hover circle, .net .node.on circle, .net .node:focus-visible circle { stroke: var(--ink); }
+.e-love { --ec2: #e0559a; } .e-friend { --ec2: #2f9e6a; } .e-ally { --ec2: #4f7fd6; } .e-hate { --ec2: #d94a3a; } .e-fear { --ec2: #8a5bd6; } .e-rival { --ec2: #e08a2b; } .e-plot { --ec2: #7a6a9a; }
+.net .edge { stroke: var(--ec2); }
+.net .edge.e-plot { stroke-dasharray: 3 3; }
+.mk-love { fill: #e0559a; } .mk-friend { fill: #2f9e6a; } .mk-ally { fill: #4f7fd6; } .mk-hate { fill: #d94a3a; } .mk-fear { fill: #8a5bd6; } .mk-rival { fill: #e08a2b; } .mk-plot { fill: #7a6a9a; }
+.netlegend { display: flex; flex-wrap: wrap; gap: 4px; justify-content: center; }
+.netlegend .nl { display: inline-flex; align-items: center; gap: 5px; font: 600 11.5px var(--f-sans, inherit); padding: 3px 8px; border-radius: 999px; border: 1px solid var(--line); background: var(--panel); color: var(--ink); cursor: pointer; }
+.netlegend .nl i { width: 12px; height: 3px; border-radius: 2px; background: var(--ec2); }
+.netlegend .nl.e-plot i { background: repeating-linear-gradient(90deg, var(--ec2) 0 3px, transparent 3px 5px); }
+.netlegend .nl.off { opacity: .45; text-decoration: line-through; }
+.person.c-love .plbl { color: color-mix(in srgb, var(--c-love) 75%, var(--ink)); }
+.person.c-hate .plbl, .person.c-plot .plbl { color: color-mix(in srgb, var(--c-kill) 75%, var(--ink)); }
+.person.c-friend .plbl, .person.c-ally .plbl { color: color-mix(in srgb, var(--c-heal) 75%, var(--ink)); }
+.person.c-fear .plbl { color: color-mix(in srgb, #8a5bd6 75%, var(--ink)); }
+.person.c-rival .plbl { color: color-mix(in srgb, #e08a2b 72%, var(--ink)); }
+.asym { font-family: var(--f-mono); font-size: 10px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: color-mix(in srgb, var(--c-love) 72%, var(--ink)); background: color-mix(in srgb, var(--c-love) 12%, transparent); border-radius: 5px; padding: 1px 6px; }
+.back { font-size: 12.5px; color: var(--muted); }
+.back b { color: var(--ink); font-weight: 600; }
+.dims { display: grid; grid-template-columns: repeat(auto-fill, minmax(112px, 1fr)); gap: 4px 10px; max-width: min(100%, 420px); min-width: 0; }
+.dim { display: grid; grid-template-columns: 66px minmax(0, 1fr); gap: 6px; align-items: center; font-size: 11px; color: var(--muted); }
+.dim em { font-style: normal; }
+.dim i { position: relative; height: 5px; border-radius: 3px; background: var(--panel); overflow: hidden; display: block; }
+.dim i b { position: absolute; top: 0; height: 100%; border-radius: 3px; }
+.dim.d-f i b { background: var(--c-heal); } .dim.d-r i b { background: #e08a2b; } .dim.d-p i b { background: #8a5bd6; } .dim.d-t i b { background: var(--c-love); } .dim.d-k i b { background: var(--c-ally); }
+.dim.neg i b { background: var(--c-kill); }
+.dim.d-f i::after, .dim.d-r i::after { content: ""; position: absolute; left: 50%; top: -1px; bottom: -1px; width: 1px; background: var(--line); }
+.proms { display: grid; gap: 6px; }
+.prom { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 8px; align-items: center; font-size: 13px; padding: 7px 10px; border-radius: 9px; background: var(--panel-2); }
+.prom .pk { font-family: var(--f-mono); font-size: 10.5px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--accent-text); }
+.prom .ps2 { font-family: var(--f-mono); font-size: 10.5px; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; }
+.prom.s-mantenuta .ps2 { color: color-mix(in srgb, var(--c-heal) 75%, var(--ink)); font-weight: 700; }
+.prom.s-tradita .ps2 { color: color-mix(in srgb, var(--c-kill) 75%, var(--ink)); font-weight: 700; }
+.bstories { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr)); gap: 10px; }
+.story2 { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 12px; padding: 12px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); align-items: start; }
+.story2 .s2av { display: flex; }
+.story2 .s2av .av { --s: 40px; }
+.story2 .s2av .av + .av { margin-left: -12px; }
+.story2 b { display: block; font-size: 15px; margin: 2px 0 4px; }
+.story2 ul { list-style: none; margin: 6px 0 0; padding: 0; display: grid; gap: 3px; font-size: 12.5px; font-style: italic; color: var(--muted); }
+.story2 ul b { display: inline; font-size: inherit; font-style: normal; color: var(--ink); margin: 0; }
+.story2.k-amore { border-left: 3px solid var(--c-love); } .story2.k-amicizia, .story2.k-mentore, .story2.k-pieta { border-left: 3px solid var(--c-heal); }
+.story2.k-nemesi, .story2.k-odio, .story2.k-tradimento { border-left: 3px solid var(--c-kill); } .story2.k-paura { border-left: 3px solid #8a5bd6; } .story2.k-nonCorrisposto { border-left: 3px solid #e08a2b; }
+.dday .dk-fatto .dk { color: color-mix(in srgb, var(--muted) 75%, var(--ink)); }
 </style>
 
 <header class="top">
@@ -2792,6 +2846,141 @@ img.scene { object-fit: cover; object-position: center; user-select: none; }
   const D = G.LOS_DATA; if (!D || !D.eco) return;
   D.eco.txt.armorBreak = ['{0} incassa il colpo: {ip} si sfascia, ma ha fatto il suo dovere.', '{0} ha parato l\'ultimo colpo con {ip}, che ora è da buttare.'];
   if (D.eco.txtSoft) D.eco.txtSoft.armorBreak = ['{0} incassa l\'ennesima frecciata: {ip} non regge più.'];
+})(typeof window !== 'undefined' ? window : globalThis);
+
+;
+/* Le relazioni: dimensioni dei legami, etichette, effetti dei ricordi, promesse,
+ * voci di corridoio, pietà, rotture e ritorni, coalizioni, mentori, lutti.
+ *
+ * Ogni legame va da A verso B (può non essere ricambiato) e ha sei dimensioni:
+ * f fiducia, l affetto, r rispetto (da -100 a 100), p paura, t attrazione,
+ * k conoscenza (da 0 a 100). */
+(function (G) {
+  const D = (G.LOS_DATA = G.LOS_DATA || {});
+
+  D.bonds = {
+    dims: { f: 'Fiducia', l: 'Affetto', r: 'Rispetto', p: 'Paura', t: 'Attrazione', k: 'Conoscenza' },
+    /* etichette da A verso B, dalla più forte; c = colore nella mappa */
+    labels: {
+      amore: { n: 'Amore', c: 'love', d: 'Fanno coppia.' },
+      ex: { n: 'Ex', c: 'love', d: 'Sono stati insieme. Non lo sono più.' },
+      cotta: { n: 'Cotta segreta', c: 'love', d: 'Ne è attratto in segreto.' },
+      complotto: { n: 'Bersaglio segreto', c: 'plot', d: 'Sta tramando contro questa persona.' },
+      nemesi: { n: 'Nemesi', c: 'hate', d: 'La odia e la rispetta: è la sfida della sua vita.' },
+      vendetta: { n: 'Vendetta', c: 'hate', d: 'Ha giurato di fargliela pagare.' },
+      rivaleAmore: { n: 'Rivale in amore', c: 'hate', d: 'Amano la stessa persona.' },
+      terrore: { n: 'Terrore', c: 'fear', d: 'Ne ha una paura folle.' },
+      paura: { n: 'Paura', c: 'fear', d: 'Ne ha paura, e cerca di starle lontano.' },
+      gratitudine: { n: 'Gratitudine', c: 'friend', d: 'Le deve la vita.' },
+      fratelli: { n: 'Fratelli d\'armi', c: 'friend', d: 'Hanno combattuto e sono sopravvissuti insieme.' },
+      amico: { n: 'Amico fidato', c: 'friend', d: 'Si fida e le vuole bene.' },
+      mentore: { n: 'Mentore', c: 'friend', d: 'Ha imparato molto da questa persona.' },
+      protetto: { n: 'Da proteggere', c: 'friend', d: 'Ha promesso di proteggerla.' },
+      complice: { n: 'Complice', c: 'ally', d: 'Si fidano l\'uno dell\'altra, senza troppe smancerie.' },
+      alleatoComodo: { n: 'Alleato di comodo', c: 'ally', d: 'Sono alleati, ma non si fida.' },
+      alleato: { n: 'Alleato', c: 'ally', d: 'Fanno parte dello stesso gruppo.' },
+      rivale: { n: 'Rivale', c: 'rival', d: 'Non si piacciono, ma si rispettano.' },
+      ammirazione: { n: 'Ammirazione', c: 'rival', d: 'La rispetta moltissimo.' },
+      debito: { n: 'In debito', c: 'ally', d: 'Le deve un favore.' },
+      colpa: { n: 'Senso di colpa', c: 'plot', d: 'Le ha fatto del male, e non se lo perdona.' },
+      odio: { n: 'Odio', c: 'hate', d: 'Non la sopporta.' },
+      diffidenza: { n: 'Diffidenza', c: 'rival', d: 'Non si fida per niente.' },
+      antipatia: { n: 'Antipatia', c: 'rival', d: 'Le sta antipatica.' },
+      simpatia: { n: 'Simpatia', c: 'friend', d: 'Le sta simpatica.' },
+      conoscente: { n: 'Conoscente', c: 'none', d: 'Si conoscono, poco più.' },
+    },
+    /* quanto ogni ricordo sposta il legame di chi ricorda */
+    memfx: {
+      saved: { f: 30, l: 15, r: 10 }, cured: { f: 20, l: 12 }, shared: { f: 15, l: 10 }, denied: { f: -20, l: -10 }, robbed: { f: -40, l: -15 },
+      hit: { f: -25, l: -15, p: 18 }, killedDear: { f: -60, l: -40, p: 10 }, allied: { f: 10, l: 5 }, betrayed: { f: -80, l: -40 }, gift: { f: 15, l: 12 },
+      love: { t: 40, l: 20, f: 20 }, repaid: { f: 15 }, forgave: { l: 15 }, traded: { f: 6 }, fleeced: { f: -10, l: -8 }, warned: { f: 30, l: 15 },
+      exposed: { l: -40, f: -30 }, mediated: { f: 10, l: 10, r: 10 }, trap: { f: -30, p: 15, l: -15 }, expelled: { f: -40, l: -25 }, comforted: { l: 20, f: 15 },
+      tried: { f: -40, p: 30, l: -25 }, bullied: { p: 30, f: -30, l: -20 }, brawl: { l: -10, r: 8 }, rejected: { t: -15, l: -5 }, healedStranger: { f: 25, l: 20 },
+      letter: { t: 15, l: 10 }, jealous: { l: -25 }, nightTheft: { f: -50 }, oath: { f: 20 }, recruited: { f: 10, l: 8 },
+      sawKill: { p: 20, l: -8, r: 5 }, sawSave: { r: 8, l: 8 }, rumorBad: { f: -15, l: -10 }, rumorGood: { f: 10, l: 8 }, rumorFear: { p: 15 },
+      promise: { f: 10 }, promiseKept: { f: 35, l: 15 }, promiseBroken: { f: -60, l: -30 }, spared: { r: 25, f: 10, l: 10 }, sparedThem: { l: 10 },
+      breakup: { t: -30, l: -25, f: -15 }, reunion: { t: 30, l: 20, f: 10 }, rivalLove: { l: -20, r: 5 }, coalition: { f: 20, l: 10 }, mentor: { f: 20, l: 15, r: 20 },
+      student: { l: 15 }, fought: { f: 15, l: 10 }, submitted: { p: 20, f: 5 }, protector: { l: 8 }, liedTo: { f: -30, l: -10 }, hardship: { l: 15, f: 10 },
+      split: { f: -30, l: -20 }, guilt: { l: 5 },
+    },
+    /* nuovi ricordi, in prima persona */
+    mem: {
+      sawKill: 'L\'ho visto uccidere {2}.', sawSave: 'L\'ho visto salvare {2}.', rumorBad: 'Ho sentito cose brutte sul suo conto.', rumorGood: 'Tutti ne parlano bene.',
+      rumorFear: 'Mi hanno detto di starle alla larga.', promise: 'Ci siamo fatti una promessa.', promiseKept: 'Ha mantenuto la promessa.', promiseBroken: 'Mi aveva promesso una cosa. Non l\'ha mantenuta.',
+      spared: 'Poteva uccidermi. Non l\'ha fatto.', sparedThem: 'Ho avuto la sua vita in mano. L\'ho lasciata andare.', breakup: 'Ci siamo lasciati.', reunion: 'Siamo tornati insieme.',
+      rivalLove: 'Ci piace la stessa persona.', coalition: 'Ci siamo uniti contro {2}.', mentor: 'Mi ha insegnato come sopravvivere.', student: 'Ho insegnato tutto quello che so.',
+      fought: 'Abbiamo combattuto fianco a fianco.', submitted: 'Ho chiesto la sua protezione.', protector: 'Mi ha chiesto protezione.', liedTo: 'Mi ha raccontato una bugia.',
+      hardship: 'Siamo sopravvissuti insieme al peggio.', split: 'Per colpa sua il gruppo si è spaccato.', guilt: 'Il male che ho fatto non me lo perdono.',
+    },
+    memSoft: { sawKill: 'L\'ho visto far fuori {2}.', spared: 'Poteva farmi fuori. Non l\'ha fatto.', sparedThem: 'Potevo farla fuori. Non l\'ho fatto.', fought: 'Ci siamo coperti a vicenda.' },
+
+    promises: {
+      kinds: { fedelta: 'Fedeltà', protezione: 'Protezione', vendetta: 'Vendicarla', cibo: 'Dividere il cibo' },
+      make: {
+        fedelta: ['{0} e {1} si giurano fedeltà con una stretta di mano lunghissima.', '{0} guarda {1} negli occhi: «Io non ti tradirò. Mai». {1} ci crede.'],
+        protezione: ['{0} giura a {1} che l[1:o/a] proteggerà, costi quel che costi.', '{0} promette a {1}: «Finché ci sono io, nessuno ti tocca».'],
+        vendetta: ['{1} fa promettere a {0}: «Se mi succede qualcosa, vendicami». {0} promette.', '{0} e {1} si fanno una promessa cupa: chi resta, vendicherà l\'altro.'],
+        cibo: ['{0} promette a {1} che, finché avrà qualcosa da mangiare, lo dividerà.', '{0} e {1} si promettono di non mangiare mai da soli.'],
+      },
+      broken: {
+        fedelta: ['Aveva giurato fedeltà a {1}. Il giuramento è durato {n}.'],
+        protezione: ['{0} aveva promesso di proteggere {1}. Non c\'era, quando serviva.'],
+        cibo: ['{0} aveva promesso di dividere il cibo con {1}. Stanotte mangia da sol[0:o/a].'],
+      },
+      kept: {
+        protezione: ['Promessa mantenuta: {0} si è mess[0:o/a] tra {1} e il pericolo.'],
+        vendetta: ['Promessa mantenuta: {0} ha vendicato {1}.', '{0} sussurra il nome di {1}. La promessa è mantenuta.'],
+        cibo: ['{0} mantiene la parola: divide quel poco che ha con {1}.'],
+      },
+      trigger: ['{0} si ricorda della promessa fatta a {1}. Ora ha un nome da cercare: {2}.', 'Prima di andarsene, {1} aveva fatto promettere qualcosa a {0}. {0} non ha dimenticato: ora cerca {2}.'],
+    },
+
+    acts: {
+      gossipBad: ['{0} racconta a {1} quello che ha fatto {2}. {1} non guarderà più {2} allo stesso modo.', 'Attorno al fuoco, {0} spiega a {1} perché di {2} non ci si può fidare.', '{0} abbassa la voce: «Te lo dico solo perché sei tu: su {2} ne ho sentite di tutti i colori». {1} prende nota.', '{0} elenca a {1}, uno per uno, i torti di {2}. La lista è lunga, e {1} la ascolta tutta.'],
+      gossipGood: ['{0} parla benissimo di {2} con {1}. {1} comincia a fidarsi.', '{0} racconta a {1} di quando {2} l[0:o/a] ha aiutat[0:o/a]. {1} ascolta con attenzione.', '«Se devi fidarti di qualcuno, fidati di {2}», dice {0} a {1}. {1} ci pensa su.'],
+      gossipFear: ['{0} avverte {1}: «Stai lontano da {2}. Ho visto cosa sa fare».', '{0} racconta a {1} cosa ha visto fare a {2}. {1} non dorme tranquill[1:o/a], dopo.', '{0} disegna una croce sulla mappa di {1}: «Lì c\'è {2}. Non andarci».'],
+      gossipLie: ['{0} sussurra a {1} una storia su {2}. Non è vera, ma {1} ci crede.', '{0} inventa di sana pianta un tradimento di {2} e lo racconta a {1}. Funziona.', '{0} mostra a {1} un «indizio» contro {2}: un sasso, un nodo, una parola sentita a metà. A {1} basta.'],
+      gossipCaught: ['{0} prova a mettere {1} contro {2}, ma {1} non ci casca. E se lo segna.', '{1} ascolta la storia di {0} su {2} e sorride: «Bella. Peccato che non sia vera».'],
+      spare: ['Ma all\'ultimo {0} abbassa l\'arma: non riesce a uccidere {1}.', '{0} ha {1} in pugno. Poi l[1:o/a] lascia andare. Nessuno dei due sa bene perché.', '{0} si ferma a un passo dal colpo finale. «Vattene», dice a {1}. {1} non se lo fa ripetere.'],
+      breakup: ['{0} e {1} si lasciano. Nessuno grida: è peggio.', '{0} restituisce a {1} quello che {1} [0:gli/le] aveva regalato. È finita.', 'Dopo l\'ennesimo litigio, {0} dice a {1} che non ce la fa più. Si lasciano.'],
+      breakupJealous: ['{0} ha visto come {1} guarda {2}. Basta così: si lasciano.'],
+      reunion: ['{0} e {1} tornano insieme dopo giorni di sguardi. Il pubblico applaude.', '{0} trova {1} da sol[1:o/a] al buio. Nessuno dei due dice niente. Poi si abbracciano: sono di nuovo una coppia.'],
+      triangle: ['{0} e {1} scoprono di avere una cotta per la stessa persona: {2}. Da ora sono rivali.'],
+      coalition: ['{0} e {1} si mettono d\'accordo: insieme contro {2}. Da soli non avrebbero speranze.', '{0} e {1} hanno paura della stessa persona, {2}. La paura, a volte, unisce.'],
+      submit: ['{0} ha troppa paura di {1}: si mette sotto la sua protezione e [1:gli/le] cede {i}.', '{0} si presenta da {1} a testa bassa, con {i} come offerta. {1} accetta il tributo.'],
+      mentor: ['{0} insegna a {1} come sopravvivere: dove dormire, cosa mangiare, quando scappare.', '{0} passa la notte a insegnare a {1} tutto quello che sa. {1} prende appunti mentali.'],
+      tribute: ['{0} si ferma dove è cadut[1:o/a] {1}. Erano rivali, ma l[1:o/a] rispettava.', '{0} lascia un sasso sul punto in cui è cadut[1:o/a] {1}. È il saluto tra rivali.'],
+      split: ['{0} e {1} litigano davanti a tutto il gruppo. L\'alleanza si spacca in due.', 'Troppa diffidenza: {0} se ne va dall\'alleanza portandosi dietro chi la pensa come l[0:ui/ei], e lascia {1} con gli altri.'],
+      hardship: ['{0} e {1} hanno superato insieme il peggio di oggi. Il rancore tra loro sembra una cosa piccola.'],
+      fadeGrudge: ['{0} si accorge di non pensare più a {1} con rabbia. Il rancore si è consumato da solo.'],
+      guilt: ['{0} non riesce a guardare in faccia {1}. Quello che è successo pesa.'],
+    },
+    actsSoft: {
+      spare: ['Ma all\'ultimo {0} ci ripensa: non se la sente di far fuori {1}.', '{0} potrebbe distruggere {1} con un messaggio. Lo cancella prima di inviarlo.'],
+      tribute: ['{0} scrive due righe di saluto per {1}, che è uscit[1:o/a] dai giochi. Erano rivali, ma l[1:o/a] stimava.'],
+    },
+    diary: {
+      sawKill: ['{0} ha visto {1} uccidere {2}. Non riesce a smettere di pensarci.', '{0} rivede la scena ogni volta che chiude gli occhi: {1}, {2}, e quel rumore.'],
+      sawSave: ['{0} ha visto {1} salvare {2}. Forse non tutti, qui, sono mostri.'],
+      relief: ['{0} sente la notizia: {1} non c\'è più. Per la prima volta da giorni, dorme.', '{0} non dirà mai ad alta voce di essere content[0:o/a] che {1} sia uscit[1:o/a] di scena. Ma lo è.'],
+      fearless: ['{0} non deve più guardarsi le spalle da {1}. Si sente più legger[0:o/a].'],
+      unrequited: ['{0} guarda {1} ridere con altri. Lo sa che non è ricambiat[0:o/a]. Lo sa benissimo.'],
+      distrust: ['{0} sorride a {1}, ma non [1:gli/le] volta mai le spalle.', '{0} conta quante volte {1} ha mentito. Ha smesso di contare a cinque.'],
+      admire: ['{0} osserva {1} combattere e pensa: «Vorrei essere così».'],
+      guiltDiary: ['{0} pensa a {1} e a quello che è successo. Non riesce a perdonarsi.'],
+      promiseWeight: ['{0} ripensa alla promessa fatta a {1}. Pesa più dello zaino.'],
+      exThoughts: ['{0} vede {1} da lontano e fa finta di niente. Non [0:gli/le] riesce bene.'],
+      rumorHeard: ['{0} ha sentito dire certe cose su {1}. Non sa se crederci. Ci crede un po\'.'],
+    },
+  };
+
+  /* le voci per le nuove situazioni (unite a quelle di _voices.js dal motore) */
+  D.bonds.voice = {
+    spare: { _: ['Vattene. Prima che cambi idea.', 'Non oggi. Non tu.', 'Ti devo qualcosa. Ora siamo pari.', 'Vai. E non farti più vedere.'] },
+    promise: { _: ['Giuramelo.', 'Promesso. Su quello che ho di più caro.', 'Una promessa è una promessa.', 'Se manco alla parola, sei liber[1:o/a] di odiarmi.'] },
+    breakup: { _: ['Non è colpa tua. Cioè, un po\' sì.', 'Ci siamo voluti bene. Basta così.', 'Restiamo amici? No, eh?'] },
+  };
+  D.bonds.voiceSoft = { spare: { _: ['Per stavolta ti salvi.', 'Non ne vale la pena.', 'Mi stai simpatic[1:o/a]. Purtroppo.'] } };
 })(typeof window !== 'undefined' ? window : globalThis);
 
 ;
@@ -5948,6 +6137,97 @@ Il gas nervino | I militari rilasciano un gas per fermare gli infetti. Ferma anc
 })(typeof window !== 'undefined' ? window : globalThis);
 
 ;
+/* Relazioni: eventi che nascono da fiducia, paura, rispetto, attrazione, promesse ed ex. */
+(function (G) {
+  const D = (G.LOS_DATA = G.LOS_DATA || {}); D.packs = D.packs || [];
+  // valido in tutte le arene, anche senza morti
+  D.packs.push({
+    theme: 'tutte',
+    ev: {
+      d: `
+2 trust:A>B give:A>B=cibo @heal | {A} divide {cibo} con {B} senza nemmeno pensarci. Con chi ti fidi, non si fanno conti.
+2 trust:A>B ally:AB fid:B>A+10 | {A} affida a {B} il proprio zaino mentre va in avanscoperta. {B} non lo apre nemmeno.
+2 trust:A>B fid:A>B+5 mo:A+10 | {A} si appoggia alla spalla di {B} durante la pausa. Per un minuto, l'arena smette di esistere.
+2 distrust:A>B ally:AB @stl | {A} dorme con lo zaino sotto la testa: {B} è troppo vicino e troppo gentile.
+2 distrust:A>B rel:AB-10 | {A} controlla due volte quello che {B} [A:gli/le] porta da mangiare. Alla terza, lo butta.
+2 distrust:A>B ally:AB pau:A>B+5 | {A} nota che {B} sparisce ogni sera per un'ora. Non chiede dove va. Prende nota.
+2 fear:A>B @cow | {A} vede {B} in lontananza e cambia strada. Poi cambia anche zona.
+2 fear:A>B give:A>B=valore | {A} lascia {valore} davanti al rifugio di {B}, come un'offerta. Spera che basti.
+2 fear:A>B pau:A>B-15 mo:A+10 | {A} si costringe a guardare {B} negli occhi per un secondo intero. È una piccola vittoria.
+2 respect:A>B rel:AB+10 | {A} osserva {B} di nascosto e prende nota di come si muove. Non lo dirà mai, ma l[B:o/a] ammira.
+2 respect:A>B ris:B>A+15 @soc | {A} e {B} si incrociano e si salutano con un cenno, come fanno i rivali che si stimano.
+2 attract:A>B @mad | {A} arrossisce ogni volta che {B} parla. È imbarazzante per tutti, tranne che per {B}, che non se ne accorge.
+2 attract:A>B amo:B>A+12 @soc | {A} ride a una battuta di {B} un po' troppo forte. {B} se ne accorge, e sorride.
+2 attract:A>B single:A @show | {A} si sistema i capelli tre volte prima di passare davanti a {B}. Il pubblico se ne accorge prima di {B}.
+2 rival:AB @show star:A star:B | {A} e {B} si sfidano a chi resiste più a lungo appes[AB:i/e] a un ramo. Vincono gli sponsor, che si divertono.
+2 rival:AB ris:A>B+10 ris:B>A+10 | {A} e {B} si sfidano in una gara di abilità. Finisce in parità, e si stringono la mano controvoglia.
+2 rival:AB rel:AB+15 @soc | {A} e {B} scoprono di avere più cose in comune di quanto pensassero. È irritante, per entrambi.
+2 ex:AB @mad | {A} e {B} si incrociano e fingono di non conoscersi. Non ci crede nessuno, nemmeno loro.
+2 ex:AB reunite:AB *0.6 | {A} e {B} si parlano per la prima volta dopo la rottura. Finisce con un bacio, e con tutti che dicono «lo sapevo».
+2 ex:AB rel:AB-10 | {A} racconta a tutti la sua versione della rottura con {B}. {B} ne racconta un'altra. Nessuna delle due è vera.
+2 ex:AB fid:A>B+10 | {A} e {B} decidono di restare amici. Ci credono quasi.
+2 close:AB mo:A+10 mo:B+10 | {A} e {B} ormai si capiscono con uno sguardo. Gli altri li trovano inquietanti.
+2 close:AB promise:A>B=protezione | {A} dice a {B}, senza giri di parole, che l[B:o/a] proteggerà. {B} non risponde, ma sorride.
+2 close:AB give:A>B=ricordo | {A} regala a {B} {ricordo:A}. «Se esco solo io, voglio che ce l'abbia tu.»
+2 promise:A>B @soc fid:B>A+10 | {A} ricorda a {B} la promessa che [B:gli/le] ha fatto. «Non l'ho dimenticata.»
+2 promise:A>B mo:A-10 | {A} comincia a chiedersi se riuscirà a mantenere la promessa fatta a {B}.
+2 couple:AB breakup:AB *0.35 | {A} e {B} litigano per una sciocchezza, poi per tutto il resto. A sera non sono più una coppia.
+2 couple:AB promise:A>B=vendetta | {A} e {B} si promettono una cosa cupa: chi resta, vendicherà l'altro.
+2 couple:AB fid:A>B+15 fid:B>A+15 | {A} e {B} si raccontano il segreto più imbarazzante della loro vita. Ora si fidano davvero.
+2 trust:A>B promise:A>B=fedelta | {A} giura a {B} che non l[B:o/a] tradirà mai. Lo dice guardandol[B:o/a] negli occhi.
+2 friend:AB promise:A>B=cibo | {A} e {B} si promettono di dividere tutto quello che troveranno, fino all'ultima briciola.
+2 debt:A>B fid:B>A+10 | {B} aiuta {A} senza chiedere niente. {A} se lo segna: questo è un debito da onorare.
+3 trust:A>B distrust:A>C ally:ABC | {A} chiede a {B}, sottovoce, se si fida di {C}. {B} esita un secondo di troppo.
+3 couple:AB attract:C>A rel:BC-20 | {C} non smette di guardare {A}. {B} se ne accorge, e non dice niente. Per ora.
+3 fear:A>C trust:A>B fid:A>B+10 | {A} si nasconde dietro {B} ogni volta che passa {C}. {B} lo lascia fare.
+3 close:AB grudge:C>A rel:BC-20 @soc | {B} si mette in mezzo quando {C} punta {A}. «Prima devi passare da me.»
+3 ally:ABC distrust:A>C fid:B>C-15 | {A} confida a {B} i suoi dubbi su {C}. Da quel momento, anche {B} tiene d'occhio {C}.
+3 rival:AB fame:C ris:A>C+10 ris:B>C+10 | {A} e {B} si contendono l'attenzione di {C}, la star dell'arena. {C} si diverte moltissimo.
+`,
+      n: `
+2 trust:A>B | {A} si addormenta tranquill[A:o/a], sapendo che {B} è di guardia.
+2 distrust:A>B ally:AB | {A} finge di dormire e osserva {B} per tutta la notte.
+2 attract:A>B | {A} resta svegli[A:o/a] a guardare {B} dormire alla luce del fuoco. Si dà dell'idiota. Continua a guardare.
+2 fear:A>B s:A=sconvolto | {A} sogna {B}. Si sveglia urlando, e tutti lo sentono.
+2 ex:AB | {A} sente {B} ridere con altri, lontano. Fa più male di una ferita.
+2 close:AB mo:A+10 mo:B+10 | {A} e {B} parlano fino all'alba di quello che faranno dopo, fuori di qui.
+2 promise:A>B | {A} ripensa alla promessa fatta a {B} e si chiede se sarà all'altezza.
+2 respect:A>B | {A} si chiede cosa farebbe {B} al suo posto. È un buon modo per decidere.
+`,
+    },
+  });
+  // solo nelle arene in cui si muore
+  D.packs.push({
+    theme: '*',
+    ev: {
+      d: `
+2 distrust:A>B ally:AB tr:B>A *0.8 | {A} aveva ragione a non fidarsi di {B}. Avere ragione, però, non basta.
+2 distrust:A>B ally:AB tr:A>B *0.6 | {A} non si fida più di {B}: decide di colpire per prim[A:o/a]. Non saprà mai se aveva ragione.
+2 fear:A>B k:B>A *0.8 | {A} scappa da {B} da giorni. Oggi non scappa abbastanza.
+2 fear:A>B k:A>B *0.4 | Mess[A:o/a] all'angolo, {A} trova il coraggio della disperazione. {B} non se lo aspettava.
+2 rival:AB k:A>B *0.8 | Il duello tra {A} e {B} dura un'ora. Alla fine {A} saluta {B} con rispetto, l'ultima volta.
+2 rival:AB hit:A>B hit:B>A | {A} e {B} si affrontano alla pari. Si separano ferit[AB:i/e], ed entrambi, stranamente, sorridono.
+2 trust:A>B save:B>A | {A} si fida di {B}, e {B} non l[A:o/a] delude: arriva appena in tempo.
+2 close:AB stat:B<hp35 save:A>B | {A} non lascia {B} da sol[B:o/a] nemmeno per un minuto, finché il peggio non è passato.
+2 promise:A>B save:A>B | {A} si ricorda della promessa fatta a {B} quando il pericolo arriva. Si mette in mezzo.
+2 ex:AB hit:A>B | {A} non ha mai perdonato {B} per come è finita. Oggi glielo fa capire.
+2 ex:AB k:A>B *0.4 | Tra {A} e {B} era finita male. Oggi finisce peggio.
+2 respect:A>B save:A>B | {A} non sopporta di vedere cadere un avversario che stima: salva {B} e se ne va senza una parola.
+3 couple:AB grudge:C>A k:C>A *0.8 | {C} colpisce {A} davanti agli occhi di {B}. {B} non dimenticherà quel momento.
+3 ally:ABC trust:A>B tr:B>A rel:BC-40 *0.6 | {B} tradisce {A}, che si fidava ciecamente, proprio davanti a {C}. {C} capisce che potrebbe essere il prossimo.
+3 fear:A>C close:AB save:B>A | Quando {C} si avvicina, {B} si mette tra {A} e il pericolo.
+3 rival:AB hit:C>A save:B>A | {C} attacca {A} alle spalle. Interviene {B}, il suo rivale: «Solo io posso batterti».
+`,
+      n: `
+2 distrust:A>B ally:AB tr:A>B *0.5 | Nel buio, {A} decide che non può più dormire accanto a {B}. Risolve il problema alla radice.
+2 fear:A>B k:B>A *0.6 | {A} si era nascost[A:o/a] bene. Non abbastanza bene per {B}.
+2 couple:AB stat:A<hp30 save:B>A | {B} veglia {A} tutta la notte, sussurrando il suo nome perché non si addormenti.
+`,
+    },
+  });
+})(typeof window !== 'undefined' ? window : globalThis);
+
+;
 /* Liceo e Ufficio — terzo pacchetto: vita quotidiana, carattere, oggetti e legami. Nessuno muore. */
 (function (G) {
   const D = (G.LOS_DATA = G.LOS_DATA || {}); D.packs = D.packs || [];
@@ -6540,7 +6820,7 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
     if (!(ev.n >= 1 && ev.n <= 6)) throw new Error('Numero di concorrenti non valido in: ' + line);
     let m;
     for (let tok of head.slice(1)) {
-      const self = tok.match(/^(?:ok:|ko:)?(?:hit|save|give|owe|repay|debt|grudge|forgive|steal|k|tr|crush|plot):([A-F])[<>]([A-F])/) || tok.match(/^(?:ok:|ko:)?(?:love|couple|friend|enemy|rel):([A-F])([A-F])/);
+      const self = tok.match(/^(?:ok:|ko:)?(?:hit|save|give|owe|repay|debt|grudge|forgive|steal|k|tr|crush|plot|trust|distrust|fear|respect|attract|promise|fid|ris|pau|amo):([A-F])[<>]([A-F])/) || tok.match(/^(?:ok:|ko:)?(?:love|couple|friend|enemy|rel|rival|ex|close|breakup|reunite):([A-F])([A-F])/);
       if (self && self[1] === self[2]) throw new Error('Etichetta riferita due volte alla stessa persona "' + tok + '" in: ' + line);
       let tgt = ev;
       if (/^(ok|ko):/.test(tok)) { tgt = tok[1] === 'k' ? ev.ok : ev.ko; tok = tok.slice(3); }
@@ -6589,6 +6869,13 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
       if ((m = tok.match(/^lost:([A-F])$/))) { ev.req.push({ t: 'lost', r: ID(m[1]) }); continue; }
       if ((m = tok.match(/^star:([A-F])$/))) { tgt.fx.push({ t: 'star', r: ID(m[1]) }); continue; }
       if ((m = tok.match(/^traitor:([A-F])$/))) { ev.req.push({ t: 'traitor', r: ID(m[1]) }); continue; }
+      // i legami: requisiti (trust:A>B …) ed effetti (fid:A>B+20 …), promesse, rotture e ritorni
+      if ((m = tok.match(/^promise:([A-F])>([A-F])=(fedelta|protezione|vendetta|cibo)$/))) { tgt.fx.push({ t: 'mkpromise', r: [L(m[1]), L(m[2])], k: m[3] }); continue; }
+      if ((m = tok.match(/^(trust|distrust|fear|respect|attract|promise):([A-F])>([A-F])$/))) { ev.req.push({ t: 'b_' + m[1], r: [L(m[2]), L(m[3])] }); continue; }
+      if ((m = tok.match(/^(rival|ex|close):([A-F])([A-F])$/))) { ev.req.push({ t: 'b_' + m[1], r: [L(m[2]), L(m[3])] }); continue; }
+      if ((m = tok.match(/^(fid|ris|pau|amo):([A-F])>([A-F])([+-]\d+)$/))) { tgt.fx.push({ t: 'bondfx', r: [L(m[2]), L(m[3])], k: { fid: 'f', ris: 'r', pau: 'p', amo: 't' }[m[1]], v: +m[4] }); continue; }
+      if ((m = tok.match(/^breakup:([A-F])([A-F])$/))) { tgt.fx.push({ t: 'breakup', r: [L(m[1]), L(m[2])] }); ev.req.push({ t: 'couple', r: [L(m[1]), L(m[2])] }); continue; }
+      if ((m = tok.match(/^reunite:([A-F])([A-F])$/))) { tgt.fx.push({ t: 'reunite', r: [L(m[1]), L(m[2])] }); ev.req.push({ t: 'b_ex', r: [L(m[1]), L(m[2])] }); continue; }
       // la mente: cotta segreta, complotto, obiettivo del momento
       if ((m = tok.match(/^crush:([A-F])>([A-F])$/))) { ev.req.push({ t: 'crush', r: [L(m[1]), L(m[2])] }); ev.tags.push('love'); continue; }
       if ((m = tok.match(/^plot:([A-F])>([A-F])$/))) { ev.req.push({ t: 'plot', r: [L(m[1]), L(m[2])] }); ev.tags.push('betray'); continue; }
@@ -6627,7 +6914,7 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
     if (ev.fx.some((f) => f.item === 'cibo') || ev.req.some((r) => r.item === 'cibo')) ev.tags.push('food');
     if (ev.test) ev.tags.push('test:' + ev.test.attr);
     // perché accade: la conseguenza che l'ha reso possibile
-    ev.why = ev.test ? 'prova' : rq('crush') ? 'cotta' : rq('plot') ? 'complotto' : rq('goal') ? 'obiettivo' : rq('wx') ? 'meteo' : rq('att') || rq('trait') ? 'carattere' : rq('grudge') ? 'vendetta' : rq('owe') ? 'debito' : rq('couple') ? 'coppia' : rq('lost') ? 'lutto' :
+    ev.why = ev.test ? 'prova' : ev.req.some((r) => r.t.startsWith('b_')) || ev.fx.some((f) => /bondfx|mkpromise|breakup|reunite/.test(f.t)) ? 'legame' : rq('crush') ? 'cotta' : rq('plot') ? 'complotto' : rq('goal') ? 'obiettivo' : rq('wx') ? 'meteo' : rq('att') || rq('trait') ? 'carattere' : rq('grudge') ? 'vendetta' : rq('owe') ? 'debito' : rq('couple') ? 'coppia' : rq('lost') ? 'lutto' :
       ev.req.some((r) => r.t === 'need' && r.s === 'lutto') ? 'lutto' : rq('traitor') ? 'reputazione' : rq('feared') ? 'reputazione' : rq('fame') ? 'fama' :
       ev.req.some((r) => r.t === 'has' && /veleno|mappa|amuleto|esplosivo|trap/.test(r.item)) ? 'oggetto' : ev.req.some((r) => r.t === 'need' && r.s !== '*') ? 'condizione' : '';
     const used = new Set();
@@ -6830,7 +7117,7 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
       revenges: 0, saves: 0, repaid: 0, amulets: 0, tests: 0, testsPassed: 0,
       hp: 100, en: 90, mo: 55, food: 70, pr: 0, infected: false, infKnown: false, cause: null, hurtPh: -1, sawDeath: -1,
       foraged: 0, nursed: 0, shared: 0, trapKills: 0, trapsSet: 0, survivedBeasts: 0,
-      goal: null, thought: '', crush: null, plot: null, diary: [], mem: {}, trades: 0, crafts: 0, acts: 0, rejected: 0, planPh: -9, vigilPh: -9, guard: null,
+      goal: null, thought: '', crush: null, plot: null, diary: [], mem: {}, promises: [], hunt: null, vowed: null, spares: 0, trades: 0, crafts: 0, acts: 0, rejected: 0, planPh: -9, vigilPh: -9, guard: null,
     }));
     if (T.length < 2) throw new Error('Servono almeno 2 concorrenti.');
     T.forEach((t) => {
@@ -6847,6 +7134,35 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
     const akey = (a, b) => (a.ix < b.ix ? a.ix * 4096 + b.ix : b.ix * 4096 + a.ix);
     const aff = (a, b) => AFF.get(akey(a, b)) || 0;
     const addAff = (a, b, d) => { if (a === b) return; AFF.set(akey(a, b), Math.max(-100, Math.min(100, aff(a, b) + d))); };
+
+    /* legami direzionali a sei dimensioni (da A verso B, non sempre ricambiati):
+     * f fiducia, l affetto (in più rispetto all'affinità comune), r rispetto, p paura, t attrazione, k conoscenza */
+    const BD = D.bonds || { labels: {}, memfx: {}, mem: {}, promises: { make: {}, broken: {}, kept: {}, kinds: {} }, acts: {}, actsSoft: {}, diary: {} };
+    const BOND = new Map();
+    const bkey = (a, b) => a.ix * 4096 + b.ix;
+    const EMPTY = { f: 0, l: 0, r: 0, p: 0, t: 0, k: 0, n: {} };
+    function bond(a, b) { let x = BOND.get(bkey(a, b)); if (!x) { x = { f: 0, l: 0, r: 0, p: 0, t: 0, k: 0, n: {} }; BOND.set(bkey(a, b), x); } return x; }
+    const peek = (a, b) => BOND.get(bkey(a, b)) || EMPTY;
+    const LIM = { f: [-100, 100], l: [-100, 100], r: [-100, 100], p: [0, 100], t: [0, 100], k: [0, 100] };
+    // il carattere di chi prova il sentimento modula quanto cambia
+    function tweak(a, b, d, scale) {
+      if (!a || !b || a === b || !d) return;
+      const x = bond(a, b), sc = scale == null ? 1 : scale, tr = (id) => a.traits.includes(id);
+      for (const k in d) {
+        if (!LIM[k]) continue;
+        let v = d[k] * sc;
+        if (k === 'f') v *= v > 0 ? (tr('paranoico') ? 0.5 : tr('leale') ? 1.2 : 1) : (tr('paranoico') ? 1.4 : tr('clemente') ? 0.7 : 1);
+        if (k === 'l' && v < 0) v *= tr('vendicativo') ? 1.4 : tr('clemente') || tr('pacifista') ? 0.6 : 1;
+        if (k === 'l' && v > 0) v *= 0.8 + a.attr.emp * 0.04;
+        if (k === 'p' && v > 0) v *= Math.max(0.35, 1.35 - a.attr.cor * 0.07) * (tr('codardo') ? 1.4 : 1);
+        if (k === 't' && v > 0) v *= tr('romantico') ? 1.5 : 1;
+        if (k === 'r' && v > 0) v *= tr('stratega') || tr('cacciatore') ? 1.2 : 1;
+        x[k] = clamp(x[k] + v, LIM[k][0], LIM[k][1]);
+      }
+    }
+    const like = (a, b) => clamp(aff(a, b) + peek(a, b).l, -100, 100);
+    const trustOf = (a, b) => peek(a, b).f, fearOf = (a, b) => peek(a, b).p, respectOf = (a, b) => peek(a, b).r, attractOf = (a, b) => peek(a, b).t;
+    const tally = (a, b, key) => { const x = bond(a, b); x.n[key] = (x.n[key] || 0) + 1; };
 
     const alliances = new Map();
     let nextAlly = 1;
@@ -6943,7 +7259,7 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
             const size = gids.size ? alliances.get([...gids][0]).size + ts.filter((t) => t.allyId == null).length : ts.length;
             if (size > (ts.some((t) => hasTrait(t, 'leader')) ? 6 : 5)) return false;
             if (cfg.teamWin && new Set(ts.map((t) => t.team)).size > 1 && cfg.teamsAllied) return false;
-            for (const a of ts) for (const b of ts) if (a !== b && (a.grudges[b.id] || aff(a, b) <= -40)) return false;
+            for (const a of ts) for (const b of ts) if (a !== b && (a.grudges[b.id] || aff(a, b) <= -40 || trustOf(a, b) <= -45)) return false;
             break;
           }
           case 'hasAlly': if (A.allyId == null) return false; break;
@@ -6972,6 +7288,15 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
           case 'trait': if (!hasTrait(A, r.trait)) return false; break;
           case 'notrait': if (hasTrait(A, r.trait)) return false; break;
           case 'crush': if (A.crush !== B.id) return false; break;
+          case 'b_trust': if (trustOf(A, B) < 30) return false; break;
+          case 'b_distrust': if (trustOf(A, B) > -30) return false; break;
+          case 'b_fear': if (fearOf(A, B) < 40) return false; break;
+          case 'b_respect': if (respectOf(A, B) < 40) return false; break;
+          case 'b_attract': if (attractOf(A, B) < 30) return false; break;
+          case 'b_promise': if (!A.promises.some((q) => q.to === B.id && !q.done)) return false; break;
+          case 'b_rival': if (respectOf(A, B) < 25 || respectOf(B, A) < 25 || like(A, B) > 10 || like(B, A) > 10) return false; break;
+          case 'b_ex': if (A.exPartner !== B.id || A.partner || B.partner || !B.alive) return false; break;
+          case 'b_close': if (peek(A, B).k < 40 || like(A, B) < 30 || like(B, A) < 30) return false; break;
           case 'plot': if (A.plot !== B.id) return false; break;
           case 'goal': if (!A.goal || A.goal.k !== r.g) return false; break;
           case 'stat': { const v = A[r.k]; if (r.op === '<' ? v >= r.v : v <= r.v) return false; break; }
@@ -7030,6 +7355,7 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
         else if (r.t === 'feared' && ctxOf(P).feared) w *= 2;
         else if (r.t === 'canLove' && !P.partner) w *= 1.2;
         else if ((r.t === 'crush' && P.crush) || (r.t === 'plot' && P.plot)) w *= 4;
+        else if (r.t.startsWith('b_') && r.r[0] === 0) w *= 2.5;
         else if (r.t === 'goal' && P.goal && P.goal.k === r.g && r.r[0] === 0) w *= 3;
         else if (r.t === 'wx' && wxIs(r.w)) w *= 2.5;
         else if (r.t === 'stat' && r.r[0] === 0) { const v = P[r.k]; if (r.op === '<' ? v < r.v : v > r.v) w *= 2.5; }
@@ -7071,6 +7397,10 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
       if (t.grudges[P.id]) k -= 0.9;
       if (P.goal && P.goal.tg === t.id) k -= 1;
       if (P.crush === t.id) k -= 0.6;
+      const pb = peek(P, t);
+      if (pb.p >= 50) k += 0.7;
+      if (pb.t >= 40) k -= 0.4;
+      if (pb.k >= 40) k -= 0.3;
       const a = aff(P, t); if (a >= 40) k -= 0.7; else if (a <= -40) k -= 0.5;
       return k;
     }
@@ -7148,7 +7478,7 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
     const useFmt = (l, people, vars) => { const pool = fresh(l); const x = fmt(pool, people, vars); if (x) pool.forEach((y) => { if (x.src === y) USED.add(y); }); return x; };
     function voice(kind, speaker, others, vars) {
       if (!speaker) return null;
-      const base = (theme.soft && VS[kind]) || VO[kind] || {};
+      const base = (theme.soft && VS[kind]) || VO[kind] || (theme.soft && (BD.voiceSoft || {})[kind]) || (BD.voice || {})[kind] || {};
       const tr = speaker.traits.filter((x) => base.trait && base.trait[x] && fresh(base.trait[x]).some((y) => !USED.has(y)));
       const ar = base.arena && base.arena[theme.id];
       const people = [speaker].concat(others || []);
@@ -7167,12 +7497,15 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
       return ev;
     }
     // ricordi dei rapporti (in prima persona) e diario segreto
-    function remember(a, b, k, x) {
+    // ogni ricordo cambia il legame di chi ricorda verso l'altra persona
+    function remember(a, b, k, x, scale) {
       if (!a || !b || a === b) return;
       const l = (a.mem[b.id] = a.mem[b.id] || []);
       if (l.length && l[l.length - 1].k === k && l[l.length - 1].ph === phases.length) return;
       l.push({ ph: phases.length, k, x: x ? x.id : null });
-      if (l.length > 6) l.shift();
+      if (l.length > 8) l.shift();
+      tweak(a, b, (BD.memfx || {})[k], scale);
+      tweak(a, b, { k: 4 });
     }
     function remember1(t, html, kind) {
       if (!t || !html) return;
@@ -7326,6 +7659,37 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
         if (!killers.length && lover && echoed < 2) { const e = echo(E.griefOnly, [X, v], 'warn'); if (e) { out.push(e); echoed++; } }
       });
       if (v.partner) { const p = byId[v.partner]; if (p) { p.partner = null; p.exPartner = v.id; } v.partner = null; }
+      bondsOnDeath(v, killers, out);
+    }
+    // ogni morte pesa diversamente su ognuno: lutto, sollievo, rispetto, colpa, promesse
+    function bondsOnDeath(v, killers, out) {
+      let tributes = 0;
+      killers.forEach((K) => { if (K.alive) T.forEach((X) => { if (X.alive && X !== K && !isAlly(X, K)) tweak(X, K, { p: 2 + Math.min(10, K.kills * 2.5), r: 1 + Math.min(4, K.kills) }); }); });
+      T.forEach((X) => {
+        if (!X.alive || X === v) return;
+        const b = peek(X, v), L = like(X, v), isK = killers.includes(X);
+        // promessa di vendetta: chi l'aveva giurata ora ha un nome
+        const vow = X.promises.find((q) => q.to === v.id && q.k === 'vendetta' && !q.done);
+        if (vow && killers.length && !isK) {
+          const K = killers.find((k) => k.alive);
+          if (K) { addGrudge(X, K, 'kill', v); X.vowed = { k: K.id, v: v.id }; const e = fmt((BD.promises || {}).trigger, [X, v, K]); if (e && out.length < 3) out.push(Object.assign(e, { cls: 'warn' })); else if (e) remember1(X, e.html, 'segreto'); }
+        }
+        // promessa di protezione: era lì, e non ha fatto niente
+        if (X.promises.some((q) => q.to === v.id && q.k === 'protezione' && !q.done)) {
+          if (X.zone === v.zone && !isK) { settlePromise(X, v, 'protezione', false, null); X.mo -= 15; }
+          else X.promises.forEach((q) => { if (q.to === v.id && !q.done) q.done = 'sciolta'; });
+        }
+        X.promises.forEach((q) => { if (q.to === v.id && !q.done && q.k !== 'vendetta') q.done = 'sciolta'; });
+        if (isK) {
+          if (L >= 30 || b.k >= 50) { X.mo -= 15 * DR.mo; remember(X, v, 'guilt'); const d = fmt(BDI('guiltDiary'), [X, v]); if (d) remember1(X, d.html, 'segreto'); }
+          if (X.vowed && X.vowed.k === v.id) { const dear = byId[X.vowed.v]; settlePromise(X, dear, 'vendetta', true, out); X.vowed = null; }
+          return;
+        }
+        if (L <= -50 || X.grudges[v.id]) { X.mo += 8; if (rng.chance(0.5)) { const d = fmt(BDI('relief'), [X, v]); if (d) remember1(X, d.html, 'pensiero'); } }
+        else if (b.p >= 45) { X.mo += 6; const d = fmt(BDI('fearless'), [X, v]); if (d && rng.chance(0.6)) remember1(X, d.html, 'pensiero'); }
+        else if (b.r >= 35 && L < 40 && tributes < 1 && rng.chance(0.6)) { tributes++; const e = useFmt(BA('tribute'), [X, v]); if (e) sys2(e, [X], 'none', 'Rispetto', 1); }
+      });
+      if (v.promises) v.promises.forEach((q) => { if (!q.done) q.done = 'sciolta'; });
     }
     function giveItem(t, type, ctx, lexPick, name, q, how, from, src) {
       const nm = name || (type === 'arma' ? lexPick('arma') : type === 'cibo' ? ctx.cibo || 'delle provviste' : ITEM_NAME[type] || lexPick(type));
@@ -7370,6 +7734,18 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
           ev.kills.forEach((k) => { if (k.v.includes(i)) k.by.forEach((b) => addGrudge(v, roles[b], 'attack')); });
           return;
         }
+        // la pietà: all'ultimo, chi colpisce può non farcela
+        const atkM = ev.kills.find((k) => k.v.includes(i));
+        if (atkM && !atkM.betray && v.alive && alive().length > 2) {
+          const K = roles[atkM.by[0]];
+          if (K && K.alive && rng.chance(mercyChance(K, v))) {
+            saved.add(i); hurt(v, 18, K, 'wound'); v.owes[K.id] = 'vita'; K.spares++; stats.spared = (stats.spared || 0) + 1;
+            remember(v, K, 'spared'); remember(K, v, 'sparedThem'); tweak(K, v, { l: 8 });
+            const e = useFmt(BA('spare'), [K, v]); if (e) out.push(Object.assign(e, { cls: 'twist' }));
+            pushVoice(out, voice('spare', K, [v]));
+            return;
+          }
+        }
         // la protezione para il colpo
         const arm = itemOf(v, 'armatura');
         if (v.alive && arm && alive().length > 2 && rng.chance(0.24)) {
@@ -7396,10 +7772,13 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
       for (const k of ev.kills) {
         const killers = k.by.map((i) => roles[i]);
         const dear = {}; k.v.forEach((i) => killers.forEach((K) => { const g = K.grudges[roles[i].id]; if (g && g.victim) dear[i] = { K, x: byId[g.victim] }; }));
+        if (killers.length > 1) killers.forEach((a) => killers.forEach((b) => { if (a !== b) { remember(a, b, 'fought'); tally(a, b, 'fw'); } }));
+        if (k.betray) killers.forEach((K) => k.v.forEach((i) => settlePromise(K, roles[i], 'fedelta', false, out)));
         k.v.forEach((i) => {
           if (saved.has(i)) return;
           const v = roles[i]; const wasAlive = v.alive;
           kill(v, killers, txt, out);
+          if (wasAlive && !v.alive) witness(killers[0], 'kill', v, roles);
           if (!wasAlive || v.alive || spoke || !rng.chance(0.38)) return;
           spoke = true;
           const KA = killers[0] && killers[0].alive ? killers[0] : null;
@@ -7427,6 +7806,7 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
             const g = t.allyId != null ? [...(alliances.get(t.allyId) || [])].map((id) => byId[id]).filter((x) => x !== t && x.alive) : [];
             leaveAlliance(t); t.betrayals++; t.traitor = true; stats.betrayals++;
             t.plot = null;
+            g.forEach((x) => settlePromise(t, x, 'fedelta', false, out));
             let n = 0; g.forEach((x) => { x.mo -= 18 * DR.mo; remember(x, t, 'betrayed'); if (addGrudge(x, t, 'betray') && n++ < 1) { const e = echo(E.betray, [x, t], 'warn'); if (e) out.push(e); } });
             break;
           }
@@ -7474,7 +7854,7 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
             hurt(u, (28 + rng.int(18)) * (1 + weaponPow(t) / 12), t, 'wound'); u.mo -= 6; remember(u, t, 'hit');
             if (wpn && wpn.x === 'veleno' && u.st.avvelenato == null) { u.st.avvelenato = phases.length; u.cause = { k: 'poison', by: t.id, ph: phases.length }; }
             wear(t, out); if (addGrudge(u, t, 'attack') && rng.chance(0.6)) { const e = echo(E.hit, [u, t], 'warn'); if (e) out.push(e); } } break;
-          case 'save': if (u.alive) { u.owes[t.id] = 'vita'; addAff(t, u, 40); u.mo += 15; remember(u, t, 'saved'); if (rng.chance(0.35)) pushVoice(out, voice('saved', u, [t])); t.saves++; t.fame += 1; const e = echo(E.saved, [u, t], 'good'); if (e) out.push(e); } break;
+          case 'save': if (u.alive) { u.owes[t.id] = 'vita'; addAff(t, u, 40); u.mo += 15; remember(u, t, 'saved'); tally(u, t, 'sv'); witness(t, 'save', u, roles); settlePromise(t, u, 'protezione', true, out); if (rng.chance(0.35)) pushVoice(out, voice('saved', u, [t])); t.saves++; t.fame += 1; const e = echo(E.saved, [u, t], 'good'); if (e) out.push(e); } break;
           case 'forgive': delete t.grudges[u.id]; addAff(t, u, 35); remember(t, u, 'forgave'); break;
           case 'love': if (u.alive) {
             t.partner = u.id; u.partner = t.id; addAff(t, u, 70); stats.couples++; t.fame += 1; u.fame += 1; t.mo += 25; u.mo += 25;
@@ -7484,6 +7864,10 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
           case 'repay': if (u) { delete t.owes[u.id]; addAff(t, u, 20); t.repaid++; remember(u, t, 'repaid'); stats.debtsRepaid++; const e = echo(E.repay, [t, u], 'good'); if (e) out.push(e); } break;
           case 'debt': if (u) t.owes[u.id] = 'favore'; break;
           case 'rel': if (u) addAff(t, u, f.v); break;
+          case 'bondfx': if (u) tweak(t, u, { [f.k]: f.v }); break;
+          case 'mkpromise': if (u && u.alive) makePromise(t, u, f.k); break;
+          case 'breakup': if (u && t.partner === u.id) { t.partner = null; u.partner = null; t.exPartner = u.id; u.exPartner = t.id; remember(t, u, 'breakup'); remember(u, t, 'breakup'); t.mo -= 15; u.mo -= 15; stats.breakups = (stats.breakups || 0) + 1; } break;
+          case 'reunite': if (u && u.alive && !t.partner && !u.partner) { t.partner = u.id; u.partner = t.id; t.exPartner = null; u.exPartner = null; remember(t, u, 'reunion'); remember(u, t, 'reunion'); t.mo += 20; u.mo += 20; stats.reunions = (stats.reunions || 0) + 1; } break;
           case 'vital': t[f.k] = (t[f.k] || 0) + f.v; if (f.k === 'hp' && f.v < 0) { t.hurtPh = phases.length; t.hp = Math.max(t.hp, Math.min(8, t.hp - f.v)); } syncSt(t); break;
           case 'star': t.fame += 2; t.mo += 10; if (t.fame >= 5 && !t.starred) { t.starred = true; const e = echo(E.star, [t], 'good'); if (e) out.push(e); } break;
         }
@@ -7528,7 +7912,7 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
         const enemies = T.filter((u) => u !== t && u.alive && aff(t, u) <= -40 && !t.grudges[u.id]).map((u) => u.id);
         rel[t.id] = { p: t.partner, g: Object.keys(t.grudges).filter((id) => byId[id].alive).map((id) => [id, t.grudges[id].why, t.grudges[id].victim]), o: Object.keys(t.owes).filter((id) => byId[id].alive), f: t.fame, tr: t.traitor, fr: friends, en: enemies, lost: t.lost, top: t.alive ? relTop(t) : [] };
       });
-      return { alive: alive().map((t) => t.id), zones, allies, st, inv, kills, rel, vit, mind, closed: [...closed] };
+      return { alive: alive().map((t) => t.id), zones, allies, st, inv, kills, rel, vit, mind, closed: [...closed], edges: edges() };
     }
 
     function tickStatus() {
@@ -7656,13 +8040,16 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
         g.filter((x) => x.food < 30 && !hasItem(x, 'cibo')).forEach((h) => {
           const donor = g.filter((x) => x !== h && hasItem(x, 'cibo') && x.food >= 35).sort((a, b) => b.attr.emp - a.attr.emp)[0];
           if (!donor) return;
-          const will = donor.attr.emp / 10 + (hasTrait(donor, 'generoso') ? 0.5 : 0) + (hasTrait(donor, 'leale') ? 0.25 : 0) - (hasTrait(donor, 'avido') ? 0.7 : 0) + aff(donor, h) / 200 + (donor.partner === h.id ? 0.6 : 0) - (MOD.greed - 1) * 0.3;
+          const promised = donor.promises.some((q) => q.to === h.id && q.k === 'cibo' && !q.done);
+          const will = donor.attr.emp / 10 + (hasTrait(donor, 'generoso') ? 0.5 : 0) + (hasTrait(donor, 'leale') ? 0.25 : 0) - (hasTrait(donor, 'avido') ? 0.7 : 0) + like(donor, h) / 200 + trustOf(donor, h) / 250 + (donor.partner === h.id ? 0.6 : 0) + (promised ? 0.6 : 0) - (MOD.greed - 1) * 0.3;
           const it = itemOf(donor, 'cibo');
-          if (rng.chance(clamp(will, 0.05, 0.95))) {
+          if (rng.chance(clamp(will, 0.05, 0.97))) {
+            if (promised && rng.chance(0.5)) { const e = fmt(((BD.promises || {}).kept || {}).cibo, [donor, h]); if (e) remember1(h, e.html, 'fatto'); remember(h, donor, 'promiseKept'); }
             donor.inv.splice(donor.inv.indexOf(it), 1); h.food += 48; h.mo += 8; h.owes[donor.id] = h.owes[donor.id] || 'dono'; addAff(h, donor, 18); donor.shared++; stats.shared++;
             sys('share', [donor, h], { i: it.name }, { cat: 'heal', why: 'alleanza' }, 3);
           } else {
-            addAff(h, donor, -25); h.mo -= 8;
+            addAff(h, donor, -25); h.mo -= 8; remember(h, donor, 'denied');
+            if (promised) settlePromise(donor, h, 'cibo', false, null);
             if (aff(h, donor) <= -40) addGrudge(h, donor, 'greed');
             sys('greed', [donor, h], { i: it.name }, { cat: 'betray', why: 'alleanza' }, 3);
           }
@@ -7688,10 +8075,12 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
         syncSt(t);
       });
       // cuori, gesti e scambi: ognuno secondo la propria natura
+      bondsNight();
       hearts();
       personalActs();
       barter();
       chats();
+      gossip();
       // sonno, guarigione naturale e umore
       let watchMsg = 0;
       A.forEach((t) => {
@@ -7909,6 +8298,9 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
       if (t.hp < 45) opts.push(['curarsi', null, 4 + (45 - t.hp) / 10]);
       if (t.food < 30) opts.push(['cibo', null, 3.5 + (30 - t.food) / 10 + (hasTrait(t, 'goloso') ? 1 : 0)]);
       if (aliveId(t.partner)) opts.push(['proteggere', byId[t.partner], 2.5 + (byId[t.partner].hp < 50 ? 2 : 0) + (hasTrait(t, 'leale') ? 1 : 0)]);
+      const pr = t.promises.find((q) => q.k === 'protezione' && !q.done && aliveId(q.to)); if (pr) opts.push(['proteggere', byId[pr.to], 2.6 + (byId[pr.to].hp < 50 ? 1.5 : 0)]);
+      if (t.vowed && aliveId(t.vowed.k)) opts.push(['vendetta', byId[t.vowed.k], 4.5]);
+      if (aliveId(t.hunt) && !isAlly(t, byId[t.hunt])) opts.push(['caccia', byId[t.hunt], 2.8]);
       if (aliveId(t.crush) && !t.partner) opts.push(['cotta', byId[t.crush], 2.2 + (hasTrait(t, 'romantico') ? 1.5 : 0)]);
       if (aliveId(t.plot) && isAlly(t, byId[t.plot])) opts.push(['tradire', byId[t.plot], 3.2]);
       if (hasTrait(t, 'codardo') || t.mo < 25 || (t.hp < 50 && t.kills === 0)) opts.push(['nascondersi', null, 1.5 + (hasTrait(t, 'codardo') ? 2 : 0) + (t.mo < 25 ? 1 : 0)]);
@@ -7920,7 +8312,7 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
       let best = opts[0], bs = -1e9;
       opts.forEach((o) => { const sc = o[2] + rng.f() * noise; if (sc > bs) { bs = sc; best = o; } });
       let tg = best[1];
-      if (best[0] === 'caccia') tg = alive().filter((x) => x !== t && canFight(t, x)).sort((a, b) => combat(a) - combat(b))[0] || null;
+      if (best[0] === 'caccia' && !tg) tg = alive().filter((x) => x !== t && canFight(t, x)).sort((a, b) => combat(a) - combat(b))[0] || null;
       const same = t.goal && t.goal.k === best[0] && t.goal.tg === (tg ? tg.id : null);
       t.goal = { k: best[0], tg: tg ? tg.id : null, ph: same ? t.goal.ph : phases.length };
       if (!same || !t.thought) {
@@ -7946,6 +8338,9 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
         else if ((g.k === 'nascondersi' || g.k === 'curarsi') && rng.chance(0.55)) { z = best((i) => ZP[i][2] - ZP[i][1] + rng.f() * 0.2); if (rng.chance(0.4)) { const d = fmt(ACT('hide'), [t], { z: zoneName(z) }); if (d) remember1(t, d.html, 'mossa'); } }
         else if (t.allyId != null && rng.chance(0.6)) { const m = allyMates(t)[0]; if (m) z = m.zone; }
         else if (rng.chance(0.15)) z = rng.pick(open);
+        // la paura fa cambiare strada
+        const scary = alive().find((x) => x !== t && x.zone === (z != null ? z : t.zone) && !isAlly(t, x) && fearOf(t, x) >= 50 && !(t.goal && t.goal.tg === x.id));
+        if (scary && rng.chance(0.6)) { const safe = open.filter((i) => i !== scary.zone); if (safe.length) z = best((i) => (safe.includes(i) ? 1 : -9) + ZP[i][2] - ZP[i][1] * 0.3 + rng.f() * 0.4); }
         if (z != null && !closed.has(z)) t.zone = z;
       });
     }
@@ -7960,13 +8355,13 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
         const sore = !t.plot && t.allyId != null ? allyMates(t).find((x) => t.grudges[x.id] || aff(t, x) <= -30) : null;
         const urge = hasTrait(t, 'traditore') ? 0.6 : sore ? 0.5 : hasTrait(t, 'avido') ? 0.35 : (t.attr.emp <= 4 && t.mo < 45) ? 0.2 : hasTrait(t, 'paranoico') ? 0.15 : t.mo < 25 && !hasTrait(t, 'pacifista') ? 0.12 : alive().length <= 6 && !hasTrait(t, 'pacifista') ? 0.12 : 0;
         if (!t.plot && t.allyId != null && day >= 2 && !hasTrait(t, 'leale') && rng.chance(urge)) {
-          const m = sore || allyMates(t).sort((a, b) => b.inv.length - a.inv.length || aff(t, a) - aff(t, b))[0];
+          const m = sore || allyMates(t).filter((x) => t.partner !== x.id || like(t, x) < 0).sort((a, b) => (trustOf(b, t) + b.inv.length * 8 - like(t, b) * 0.5) - (trustOf(a, t) + a.inv.length * 8 - like(t, a) * 0.5))[0];
           if (m) { t.plot = m.id; const d = fmt(DIA('plot'), [t, m]); if (d) remember1(t, d.html, 'segreto'); }
         }
         // la cotta segreta
-        if (!t.crush && !t.partner && (hasTrait(t, 'romantico') || t.attr.car + t.attr.emp >= 13 || rng.chance(0.06))) {
-          const c = alive().filter((x) => x !== t && !x.partner && x.id !== t.exPartner && aff(t, x) >= 25 && !t.grudges[x.id]).sort((a, b) => aff(t, b) - aff(t, a))[0];
-          if (c && rng.chance(hasTrait(t, 'romantico') ? 0.55 : 0.25)) { t.crush = c.id; t.crushPh = phases.length; const d = fmt(DIA('crush'), [t, c]); if (d) remember1(t, d.html, 'segreto'); }
+        if (!t.crush && !t.partner) {
+          const c = alive().filter((x) => x !== t && !x.partner && x.id !== t.exPartner && like(t, x) >= 15 && !t.grudges[x.id] && attractOf(t, x) >= 30).sort((a, b) => attractOf(t, b) - attractOf(t, a))[0];
+          if (c && rng.chance(clamp((attractOf(t, c) - 20) / 60 + (hasTrait(t, 'romantico') ? 0.25 : 0), 0.05, 0.8))) { t.crush = c.id; t.crushPh = phases.length; const d = fmt(DIA('crush'), [t, c]); if (d) remember1(t, d.html, 'segreto'); }
         }
       });
       // la confessione
@@ -7975,12 +8370,13 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
         const u = byId[t.crush];
         if (u.partner || !rng.chance(hasTrait(t, 'romantico') ? 0.45 : 0.2 + t.attr.cor * 0.02)) return;
         if (cfg.teamWin && u.team !== t.team) return;
-        const yes = u.crush === t.id || rng.chance(clamp((aff(t, u) - 25) / 60 + (hasTrait(u, 'romantico') ? 0.2 : 0) + (t.attr.car - 5) * 0.04, 0.08, 0.85));
+        const yes = u.crush === t.id || rng.chance(clamp((attractOf(u, t) - 15) / 55 + (like(u, t) - 20) / 120 + (hasTrait(u, 'romantico') ? 0.15 : 0) + (t.attr.car - 5) * 0.03, 0.05, 0.85));
         t.crush = null;
         if (yes) {
           t.partner = u.id; u.partner = t.id; u.crush = null; addAff(t, u, 60); stats.couples++; t.mo += 25; u.mo += 25; t.fame += 1; u.fame += 1;
           remember(t, u, 'love'); remember(u, t, 'love');
           if (!cfg.teamWin && (t.allyId == null || u.allyId == null || t.allyId === u.allyId)) { const g = t.allyId != null ? alliances.get(t.allyId) : u.allyId != null ? alliances.get(u.allyId) : null; if (!g || g.size < 5) joinAlliance([t, u]); }
+          tweak(t, u, { t: 20 }); tweak(u, t, { t: 25 });
           const e = fmt(ACT('confessYes'), [t, u]); if (e) sys2(e, [t, u], 'love', 'Dichiarazione', 4);
           jealousy(t, u);
         } else {
@@ -8094,8 +8490,9 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
         if (tr('furtivo') || tr('paranoico') || t.attr.int >= 8) {
           const plotter = allyMates(t).find((x) => x.plot && aliveId(x.plot) && isAlly(x, byId[x.plot]));
           if (plotter) add(2.6, () => {
-            if (!rng.chance(0.3 + t.attr.furt * 0.03 + t.attr.int * 0.02)) return false;
-            const victim = byId[plotter.plot]; const grp = allyMates(plotter);
+            const victim = byId[plotter.plot];
+            if (!rng.chance((0.3 + t.attr.furt * 0.03 + t.attr.int * 0.02) * clamp((trustOf(victim, t) + 70) / 100, 0.3, 1.3))) return false;
+            const grp = allyMates(plotter);
             leaveAlliance(plotter); grp.forEach((x) => { addAff(x, plotter, -35); }); plotter.plot = null; plotter.traitor = true;
             addAff(victim, t, 25); remember(victim, t, 'warned'); remember(plotter, t, 'exposed'); addGrudge(plotter, t, 'betray');
             return say('spyExpose', [t, plotter, victim], {}, 'betray', traitName(tr('furtivo') ? 'furtivo' : tr('paranoico') ? 'paranoico' : '') || 'Intuito', 4);
@@ -8213,23 +8610,261 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
         t.traits.forEach((x) => { if (DIAT(x).length) add(1, 'trait:' + x, [t]); });
         add(0.8, 'calm', [t]);
         const p = rng.wpick(c, (x) => x[0]); if (!p) return;
-        const src = p[1].startsWith('trait:') ? DIAT(p[1].slice(6)) : DIA(p[1]);
-        const d = fmt(src, p[2], Object.assign({}, p[3] || {})); if (d) remember1(t, d.html, /plot|crush|rejected/.test(p[1]) ? 'segreto' : 'pensiero');
+        const src0 = p[1].startsWith('trait:') ? DIAT(p[1].slice(6)) : DIA(p[1]);
+        // nel diario non si scrive due volte la stessa pagina
+        const used = t.diaryUsed || (t.diaryUsed = new Set());
+        const src = src0.filter((x) => !used.has(x)); if (!src.length) return;
+        const d = fmt(src, p[2], Object.assign({}, p[3] || {})); if (d) used.add(d.src); if (d) remember1(t, d.html, /plot|crush|rejected/.test(p[1]) ? 'segreto' : 'pensiero');
       });
     }
 
     // i rapporti più importanti, con un'etichetta umana
+    // i rapporti più importanti: etichetta, dimensioni, e cosa prova l'altro in cambio
     function relTop(t) {
       const out = [];
       alive().forEach((x) => {
         if (x === t) return;
-        const a = aff(t, x);
-        const lbl = t.partner === x.id ? 'amore' : t.crush === x.id ? 'cotta' : t.plot === x.id ? 'complotto' : t.grudges[x.id] ? 'vendetta' : a >= 55 ? 'amico' : t.owes[x.id] ? 'debito' : isAlly(t, x) ? 'alleato' : a >= 25 ? 'simpatia' : a <= -55 ? 'nemico' : a <= -25 ? 'diffida' : t.mem[x.id] ? 'conoscente' : null;
-        if (!lbl) return;
-        const w = { amore: 200, cotta: 190, complotto: 185, vendetta: 180 }[lbl] || Math.abs(a) + (t.mem[x.id] ? 10 : 0);
-        out.push([x.id, Math.round(a), lbl, w]);
+        const lbl = labelOf(t, x); if (!lbl) return;
+        const b = peek(t, x), back = labelOf(x, t);
+        const w = (LBL_W[lbl] || 0) + Math.abs(like(t, x)) * 0.5 + b.k * 0.2 + b.p * 0.3;
+        out.push([x.id, Math.round(like(t, x)), lbl, { f: Math.round(b.f), r: Math.round(b.r), p: Math.round(b.p), t: Math.round(b.t), k: Math.round(b.k) }, back || '', w]);
       });
-      return out.sort((a, b) => b[3] - a[3]).slice(0, 8).map((x) => x.slice(0, 3));
+      return out.sort((a, b) => b[5] - a[5]).slice(0, 9).map((x) => x.slice(0, 5));
+    }
+    // la mappa dei legami: per ogni coppia, il legame più forte (e in che direzione va)
+    const EDGE_CLS = { amore: 'love', ex: 'love', cotta: 'love', complotto: 'plot', nemesi: 'hate', vendetta: 'hate', rivaleAmore: 'hate', odio: 'hate', terrore: 'fear', paura: 'fear', gratitudine: 'friend', fratelli: 'friend', mentore: 'friend', protetto: 'friend', amico: 'friend', colpa: 'plot', complice: 'ally', alleatoComodo: 'ally', alleato: 'ally', debito: 'ally', rivale: 'rival', ammirazione: 'rival', diffidenza: 'rival', antipatia: 'rival' };
+    function edges() {
+      const A = alive(), out = [];
+      for (let i = 0; i < A.length; i++) for (let j = i + 1; j < A.length; j++) {
+        const a = A[i], b = A[j], la = labelOf(a, b), lb = labelOf(b, a);
+        const sa = la && STRONG.has(la) ? LBL_W[la] : 0, sb = lb && STRONG.has(lb) ? LBL_W[lb] : 0;
+        if (!sa && !sb && !(isAlly(a, b))) continue;
+        const main = sa >= sb ? la || lb : lb || la;
+        const cls = EDGE_CLS[main] || 'ally';
+        const mutual = la && lb && EDGE_CLS[la] === EDGE_CLS[lb];
+        const w = Math.max(Math.abs(like(a, b)), Math.abs(like(b, a)), fearOf(a, b), fearOf(b, a), attractOf(a, b), attractOf(b, a));
+        out.push([a.ix, b.ix, cls, Math.round(w), mutual ? 0 : sa >= sb ? 1 : 2, la || '', lb || '']);
+      }
+      return out;
+    }
+
+    /* ---------------- le relazioni ---------------- */
+    const BA = (k) => (theme.soft && BD.actsSoft && BD.actsSoft[k]) || (BD.acts || {})[k] || [];
+    const BDI = (k) => (BD.diary || {})[k] || [];
+    const hasMem = (a, b, k) => (a.mem[b.id] || []).some((m) => m.k === k);
+    // l'etichetta umana di quello che A prova per B
+    function labelOf(a, b) {
+      const x = peek(a, b), L = like(a, b);
+      if (a.partner === b.id) return 'amore';
+      if (a.exPartner === b.id) return 'ex';
+      if (a.crush === b.id) return 'cotta';
+      if (a.plot === b.id) return 'complotto';
+      if (a.grudges[b.id]) return x.r >= 30 ? 'nemesi' : 'vendetta';
+      if (a.crush && b.crush === a.crush) return 'rivaleAmore';
+      if (x.p >= 70) return 'terrore';
+      if (a.owes[b.id] === 'vita') return 'gratitudine';
+      if ((x.n.fw || 0) >= 1 && x.f >= 35 && L >= 30) return 'fratelli';
+      if (hasMem(a, b, 'mentor')) return 'mentore';
+      if (a.promises.some((q) => q.to === b.id && q.k === 'protezione' && !q.done)) return 'protetto';
+      if (L >= 45 && x.f >= 20) return 'amico';
+      if (x.p >= 45) return 'paura';
+      if (hasMem(a, b, 'guilt')) return 'colpa';
+      if (isAlly(a, b)) return x.f >= 30 ? 'complice' : x.f < -5 ? 'alleatoComodo' : 'alleato';
+      if (a.owes[b.id]) return 'debito';
+      if (x.r >= 35 && L <= 10) return 'rivale';
+      if (x.r >= 40) return 'ammirazione';
+      if (L <= -65) return 'odio';
+      if (x.f <= -35) return 'diffidenza';
+      if (L <= -30) return 'antipatia';
+      if (L >= 25 || x.f >= 30) return 'simpatia';
+      if (x.k >= 20 || a.mem[b.id]) return 'conoscente';
+      return null;
+    }
+    const LBL_W = { amore: 300, cotta: 290, complotto: 285, nemesi: 280, vendetta: 270, ex: 260, rivaleAmore: 250, terrore: 245, gratitudine: 240, fratelli: 235, mentore: 225, protetto: 220, amico: 210, paura: 200, colpa: 195, complice: 150, alleatoComodo: 140, rivale: 135, ammirazione: 130, odio: 125, alleato: 110, debito: 105, diffidenza: 100, antipatia: 90, simpatia: 60, conoscente: 20 };
+    const STRONG = new Set(['amore', 'cotta', 'complotto', 'nemesi', 'vendetta', 'ex', 'rivaleAmore', 'terrore', 'gratitudine', 'fratelli', 'mentore', 'protetto', 'amico', 'paura', 'colpa', 'complice', 'rivale', 'ammirazione', 'odio', 'diffidenza', 'antipatia', 'alleatoComodo']);
+
+    // le promesse: fatte di notte, mantenute o tradite nei momenti decisivi
+    function makePromise(a, b, k) {
+      if (!a.alive || !b.alive || a.promises.some((q) => q.to === b.id && q.k === k && !q.done)) return false;
+      a.promises.push({ to: b.id, k, ph: phases.length, d: day });
+      remember(b, a, 'promise'); stats.promises = (stats.promises || 0) + 1;
+      return true;
+    }
+    function settlePromise(a, b, k, kept, out) {
+      const q = a.promises.find((x) => x.to === b.id && x.k === k && !x.done); if (!q) return;
+      q.done = kept ? 'mantenuta' : 'tradita'; q.endPh = phases.length;
+      if (kept) { a.promisesKept = (a.promisesKept || 0) + 1; stats.promisesKept = (stats.promisesKept || 0) + 1; if (b.alive) remember(b, a, 'promiseKept'); }
+      else { a.promisesBroken = (a.promisesBroken || 0) + 1; stats.promisesBroken = (stats.promisesBroken || 0) + 1; if (b.alive) remember(b, a, 'promiseBroken'); a.mo -= 10; }
+      const src = ((BD.promises || {})[kept ? 'kept' : 'broken'] || {})[k];
+      const days = Math.max(1, day - q.d);
+      const e = fmt(src, [a, b], { n: days === 1 ? 'un giorno' : days + ' giorni' });
+      if (e) { if (out && out.length < 3) out.push(Object.assign(e, { cls: kept ? 'good' : 'warn' })); else remember1(a, e.html, 'segreto'); }
+    }
+
+    // testimoni: chi vede un'uccisione o un salvataggio cambia idea su chi l'ha fatto
+    function witness(actor, kind, victim, roles) {
+      if (!actor || !actor.alive) return;
+      const seen = alive().filter((w) => w.zone === actor.zone && !roles.includes(w));
+      rng.shuffle(seen).slice(0, 4).forEach((w, i) => {
+        remember(w, actor, kind === 'kill' ? 'sawKill' : 'sawSave', victim, kind === 'kill' ? 1 + Math.min(1, actor.kills * 0.15) : 1);
+        if (kind === 'kill' && (hasTrait(w, 'pacifista') || w.attr.emp >= 7)) tweak(w, actor, { l: -10 });
+        if (kind === 'kill' && (hasTrait(w, 'spietato') || hasTrait(w, 'bruto'))) tweak(w, actor, { r: 10 });
+        if (i < 1 && rng.chance(0.5)) { const d = fmt(BDI(kind === 'kill' ? 'sawKill' : 'sawSave'), [w, actor, victim]); if (d) remember1(w, d.html, 'pensiero'); }
+      });
+    }
+
+    // la pietà: chi ama, rispetta o conosce bene la vittima a volte non colpisce
+    function mercyChance(K, v) {
+      const b = peek(K, v);
+      return clamp((hasTrait(K, 'clemente') || hasTrait(K, 'pacifista') ? 0.12 : 0) + Math.max(0, like(K, v) - 30) / 150 + Math.max(0, b.r - 40) / 220 + Math.max(0, b.k - 50) / 320 + (K.attr.emp - 5) * 0.015 +
+        (K.promises.some((q) => q.to === v.id && !q.done) ? 0.15 : 0) - (hasTrait(K, 'spietato') ? 0.3 : 0) - (K.grudges[v.id] ? 0.5 : 0) - (K.plot === v.id ? 0.5 : 0) - (alive().length <= 4 ? 0.1 : 0), 0, 0.55);
+    }
+
+    // le voci di corridoio: le opinioni viaggiano, e qualcuno mente
+    function gossip() {
+      let shown = 0;
+      rng.shuffle(alive()).forEach((S) => {
+        if (!rng.chance(0.3 + S.attr.car * 0.02 + (hasTrait(S, 'esibizionista') ? 0.1 : 0) + (hasTrait(S, 'solitario') ? -0.2 : 0))) return;
+        const pool = []; buddies(S).concat(zoneMates(S)).forEach((x) => { if (!pool.includes(x) && trustOf(x, S) > -25) pool.push(x); });
+        if (!pool.length) return;
+        const H = rng.pick(pool);
+        const liar = !!S.plot || hasTrait(S, 'traditore') || (hasTrait(S, 'avido') && rng.chance(0.3));
+        const opts = alive().filter((x) => x !== S && x !== H).map((T) => {
+          const L2 = like(S, T); let sc = Math.abs(L2) + (S.grudges[T.id] ? 50 : 0) + fearOf(S, T) * 0.6 + (T.traitor ? 30 : 0) + (S.plot === T.id && liar ? 60 : 0);
+          return [T, sc];
+        }).filter((x) => x[1] >= 40).sort((a, b) => b[1] - a[1]);
+        if (!opts.length) return;
+        const T = opts[0][0];
+        const w = clamp((trustOf(H, S) + 50) / 100, 0.2, 1.3);
+        let k = null;
+        if (liar && (S.plot === T.id || like(S, T) < 0) && rng.chance(0.6)) {
+          const believe = clamp(0.45 + trustOf(H, S) / 150 - (H.attr.int - 5) * 0.04 - (hasTrait(H, 'paranoico') ? 0.2 : 0) + (S.attr.car - 5) * 0.03, 0.1, 0.9);
+          if (rng.chance(believe)) { remember(H, T, 'rumorBad', null, w * 1.3); k = 'gossipLie'; }
+          else { remember(H, S, 'liedTo'); k = 'gossipCaught'; }
+        } else if (fearOf(S, T) >= 45) { remember(H, T, 'rumorFear', null, w); k = 'gossipFear'; }
+        else if (like(S, T) <= -35 || S.grudges[T.id] || T.traitor) { remember(H, T, 'rumorBad', null, w); tweak(H, T, { l: like(S, T) * 0.15 * w }); k = 'gossipBad'; }
+        else if (like(S, T) >= 35) { remember(H, T, 'rumorGood', null, w); tweak(H, T, { l: like(S, T) * 0.12 * w }); k = 'gossipGood'; }
+        if (!k) return;
+        tweak(H, S, { k: 3 }); tweak(S, H, { k: 3 });
+        stats.gossip = (stats.gossip || 0) + 1;
+        const e = useFmt(BA(k), [S, H, T]); if (!e) return;
+        if (shown < 1 && rng.chance(0.45)) { shown++; sys2(e, [S, H, T], k === 'gossipLie' || k === 'gossipCaught' ? 'betray' : 'none', 'Voci', 2, [S.id, H.id]); }
+        else { remember1(H, e.html, 'fatto'); const d = fmt(BDI('rumorHeard'), [H, T]); if (d && rng.chance(0.4)) remember1(H, d.html, 'pensiero'); }
+      });
+    }
+
+    // la notte dei legami: attrazione, triangoli, rotture, ritorni, promesse, coalizioni, protezione, mentori, spaccature
+    function bondsNight() {
+      const A = alive();
+      // col tempo la paura si attenua, se non viene alimentata
+      BOND.forEach((x) => { if (x.p > 0) x.p = Math.max(0, x.p - 2); });
+      // stare vicini fa conoscere; il tempo nello stesso gruppo costruisce fiducia
+      A.forEach((a) => zoneMates(a).forEach((b) => { tweak(a, b, { k: 2 }); if (isAlly(a, b)) tweak(a, b, { f: 4, l: 2 }); if (a.partner === b.id) tweak(a, b, { t: 2, f: 3 }); }));
+      // l'attrazione cresce piano tra chi si piace
+      A.forEach((a) => {
+        if (a.partner) return;
+        zoneMates(a).concat(allyMates(a)).forEach((b) => {
+          if (b.partner || like(a, b) < 10 || (cfg.teamWin && a.team !== b.team && cfg.teamsAllied)) return;
+          tweak(a, b, { t: Math.max(0, 3 + (b.attr.car - 5) * 0.9 + like(a, b) / 20 + (b.fame >= 3 ? 1.5 : 0)) * (0.5 + rng.f()) });
+        });
+      });
+      // triangoli: due cotte per la stessa persona
+      A.forEach((a) => A.forEach((b) => {
+        if (a.ix >= b.ix || !a.crush || a.crush !== b.crush || hasMem(a, b, 'rivalLove')) return;
+        remember(a, b, 'rivalLove'); remember(b, a, 'rivalLove');
+        const e = useFmt(BA('triangle'), [a, b, byId[a.crush]]); if (e) sys2(e, [a, b], 'love', 'Triangolo', 3);
+      }));
+      // le coppie in crisi si lasciano
+      A.forEach((a) => {
+        const b = aliveId(a.partner) ? byId[a.partner] : null; if (!b || a.ix > b.ix) return;
+        const strain = (like(a, b) < 0 ? 0.35 : 0) + (trustOf(a, b) < -25 || trustOf(b, a) < -25 ? 0.35 : 0) + (a.grudges[b.id] || b.grudges[a.id] ? 0.4 : 0) + (a.crush || b.crush ? 0.25 : 0);
+        if (!strain || !rng.chance(Math.min(0.7, strain))) return;
+        a.partner = null; b.partner = null; a.exPartner = b.id; b.exPartner = a.id; a.mo -= 15 * DR.mo; b.mo -= 15 * DR.mo;
+        remember(a, b, 'breakup'); remember(b, a, 'breakup'); stats.breakups = (stats.breakups || 0) + 1;
+        const third = a.crush && byId[a.crush] ? byId[a.crush] : b.crush && byId[b.crush] ? byId[b.crush] : null;
+        const e = third ? useFmt(BA('breakupJealous'), [third === byId[a.crush] ? b : a, third === byId[a.crush] ? a : b, third]) : useFmt(BA('breakup'), [a, b]);
+        if (e) { sys2(e, [a, b], 'betray', 'Rottura', 4); const v = voice('breakup', a, [b]); if (v) SYS[SYS.length - 1].ev.echo.push(v); }
+      });
+      // ritorni di fiamma
+      A.forEach((a) => {
+        const b = a.exPartner && aliveId(a.exPartner) ? byId[a.exPartner] : null;
+        if (!b || a.ix > b.ix || a.partner || b.partner || a.zone !== b.zone || like(a, b) < 35 || like(b, a) < 35 || !rng.chance(0.2)) return;
+        a.partner = b.id; b.partner = a.id; a.exPartner = null; b.exPartner = null; a.mo += 20; b.mo += 20;
+        remember(a, b, 'reunion'); remember(b, a, 'reunion'); stats.reunions = (stats.reunions || 0) + 1;
+        const e = useFmt(BA('reunion'), [a, b]); if (e) sys2(e, [a, b], 'love', 'Ritorno di fiamma', 4);
+      });
+      // le promesse nascono dove c'è fiducia
+      A.forEach((a) => buddies(a).forEach((b) => {
+        if (a.ix > b.ix || trustOf(a, b) < 15 || trustOf(b, a) < 5 || a.promises.some((q) => q.to === b.id && !q.done) || !rng.chance(0.2)) return;
+        const tr = (x) => hasTrait(a, x) || hasTrait(b, x);
+        const k = a.partner === b.id ? rng.pick(['protezione', 'vendetta', 'fedelta']) : tr('vendicativo') ? 'vendetta' : tr('generoso') ? 'cibo' : tr('leale') ? 'fedelta' : tr('romantico') ? 'protezione' : rng.pick(['fedelta', 'protezione', 'cibo', 'fedelta']);
+        let ok;
+        if (k === 'fedelta') ok = makePromise(a, b, 'fedelta') && makePromise(b, a, 'fedelta');
+        else if (k === 'vendetta') ok = makePromise(a, b, 'vendetta');
+        else ok = makePromise(a, b, k);
+        if (!ok) return;
+        const e = fmt(((BD.promises || {}).make || {})[k], [a, b]);
+        if (e) { sys2(e, [a, b], 'ally', 'Giuramento', 2); if (rng.chance(0.4)) { const v = voice('promise', b, [a]); if (v) SYS[SYS.length - 1].ev.echo.push(v); } }
+      }));
+      // coalizioni contro chi fa paura
+      const feared = A.filter((F) => F.kills >= 2 || A.filter((x) => fearOf(x, F) >= 45).length >= 2);
+      feared.forEach((F) => {
+        const afraid = A.filter((x) => x !== F && !isAlly(x, F) && fearOf(x, F) >= 35);
+        for (let i = 0; i < afraid.length; i++) for (let j = i + 1; j < afraid.length; j++) {
+          const a = afraid[i], b = afraid[j];
+          if (a.zone !== b.zone || isAlly(a, b) || a.grudges[b.id] || b.grudges[a.id] || like(a, b) < -20 || (cfg.teamWin && cfg.teamsAllied && a.team !== b.team) || !rng.chance(0.3)) continue;
+          if ((a.allyId != null && (alliances.get(a.allyId) || new Set()).size >= 5) || (b.allyId != null && (alliances.get(b.allyId) || new Set()).size >= 5)) continue;
+          joinAlliance([a, b]); stats.alliances++; a.alliancesFormed++; b.alliancesFormed++;
+          remember(a, b, 'coalition', F); remember(b, a, 'coalition', F); a.hunt = F.id; b.hunt = F.id; tweak(a, F, { p: -10 }); tweak(b, F, { p: -10 });
+          stats.coalitions = (stats.coalitions || 0) + 1;
+          const e = useFmt(BA('coalition'), [a, b, F]); if (e) sys2(e, [a, b], 'ally', 'Coalizione', 3);
+          return;
+        }
+      });
+      // chi ha troppa paura si mette sotto la protezione del più forte
+      A.forEach((a) => {
+        if (!a.alive || a.allyId != null || hasTrait(a, 'solitario')) return;
+        const S = A.find((x) => x !== a && fearOf(a, x) >= 60 && x.zone === a.zone && !x.grudges[a.id] && !(cfg.teamWin && x.team !== a.team) && (x.allyId == null || (alliances.get(x.allyId) || new Set()).size < 5));
+        if (!S || !rng.chance(0.3)) return;
+        const it = a.inv.filter((x) => x.type !== 'ricordo').sort((x, y) => itemScore(y) - itemScore(x))[0];
+        if (it && !hasTrait(S, 'pacifista')) { takeItem(a, it); addItem(S, Object.assign({}, it, { how: 'dono', from: a.id, d: day })); }
+        joinAlliance([S, a]); remember(a, S, 'submitted'); remember(S, a, 'protector'); tweak(a, S, { p: -15 });
+        stats.submissions = (stats.submissions || 0) + 1;
+        const e = useFmt(BA('submit'), [a, S], { i: it ? it.name : '' }) || useFmt(BA('submit').filter((x) => !x.includes('{i}')), [a, S]);
+        if (e) sys2(e, [a, S], 'ally', 'Paura', 2);
+      });
+      // i mentori insegnano a chi è rimasto indietro
+      A.forEach((a) => {
+        if (!rng.chance(0.18)) return;
+        const best = (x) => Math.max(x.attr.int, x.attr.sop);
+        const s2 = buddies(a).find((x) => best(a) - best(x) >= 3 && !hasMem(x, a, 'mentor') && like(a, x) >= 0);
+        if (!s2 || best(a) < 7) return;
+        s2.planPh = phases.length; remember(s2, a, 'mentor'); remember(a, s2, 'student');
+        stats.mentors = (stats.mentors || 0) + 1;
+        const e = useFmt(BA('mentor'), [a, s2]); if (e) sys2(e, [a, s2], 'heal', 'Mentore', 2);
+      });
+      // alleanze minate dalla diffidenza si spaccano
+      const done = new Set();
+      A.forEach((a) => {
+        if (a.allyId == null || done.has(a.allyId)) return; done.add(a.allyId);
+        const g = [a].concat(allyMates(a)); if (g.length < 3 || cfg.teamWin) return;
+        let worst = null, wv = 0;
+        g.forEach((x) => g.forEach((y) => { if (x.ix < y.ix) { const v = trustOf(x, y) + trustOf(y, x) + (x.grudges[y.id] || y.grudges[x.id] ? -80 : 0); if (v < wv) { wv = v; worst = [x, y]; } } }));
+        if (!worst || wv > -50 || !rng.chance(0.4)) return;
+        const [x, y] = worst;
+        const faction = g.filter((m) => m !== y && (m === x || like(m, x) > like(m, y)));
+        faction.forEach((m) => leaveAlliance(m));
+        if (faction.length > 1) joinAlliance(faction);
+        remember(x, y, 'split'); remember(y, x, 'split'); stats.splits = (stats.splits || 0) + 1;
+        const e = useFmt(BA('split'), [x, y]); if (e) sys2(e, [x, y], 'betray', 'Scissione', 3);
+      });
+      // i rancori minori si consumano col tempo
+      A.forEach((a) => Object.keys(a.grudges).forEach((id) => {
+        const g = a.grudges[id]; if (!aliveId(id) || g.why === 'kill' || g.why === 'betray' || phases.length - g.phase < 12) return;
+        if (!rng.chance(0.1 + (hasTrait(a, 'clemente') ? 0.2 : 0) - (hasTrait(a, 'vendicativo') ? 0.08 : 0))) return;
+        delete a.grudges[id]; tweak(a, byId[id], { l: 10 });
+        const d = useFmt(BA('fadeGrudge'), [a, byId[id]]); if (d) remember1(a, d.html, 'pensiero');
+      }));
     }
 
     function runPhase(kind, pool, title, intro, opt) {
@@ -8285,6 +8920,14 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
       events.push(...rest, ...deathsSys);
       SYS = []; ORIGIN = null;
       if (kind === 'b') alive().forEach(decideGoal);
+      if (kind === 'dis') {
+        const A2 = alive(); let hs = 0;
+        A2.forEach((a) => A2.forEach((b) => {
+          if (a.ix >= b.ix || a.zone !== b.zone || hs >= 1 || like(a, b) > -25 || a.grudges[b.id] && a.grudges[b.id].why === 'kill' || !rng.chance(0.3)) return;
+          remember(a, b, 'hardship'); remember(b, a, 'hardship'); hs++;
+          const e = useFmt(BA('hardship'), [a, b]); if (e) events.push({ html: e.html, plain: e.plain, ids: [a.id, b.id], deaths: [], lethal: false, origin: 'sys', cat: 'heal', why: 'carattere', whyTxt: 'Legame', echo: [] });
+        }));
+      }
       if (kind === 'd' || kind === 'dis' || kind === 'f') diaryNight(0.35);
       const died = before - alive().length;
       noDeathStreak = died ? 0 : noDeathStreak + 1;
@@ -8365,6 +9008,8 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
     }
     const loversEnd = () => { const a = alive(); return !cfg.teamWin && a.length === 2 && a[0].partner === a[1].id && runLovers(); };
 
+    // primi sguardi: qualcuno nota subito qualcun altro
+    T.forEach((a) => { const n = 1 + (a.traits.includes('romantico') ? 2 : 0) + (rng.chance(0.4) ? 1 : 0); for (let i = 0; i < n; i++) { const b = rng.pick(T); if (b !== a) tweak(a, b, { t: 5 + rng.int(20) + (b.attr.car - 5) * 2 }); } });
     // ognuno porta qualcosa da casa, scelto dal suo carattere
     T.forEach((t) => {
       const tr = (x) => t.traits.includes(x);
@@ -8414,8 +9059,36 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
       foraged: t.foraged, nursed: t.nursed, shared: t.shared, trapKills: t.trapKills, trapsSet: t.trapsSet, survivedBeasts: t.survivedBeasts,
       deathCause: t.alive ? null : t.deathKind || null,
       diary: t.diary, mem: t.mem, trades: t.trades, crafts: t.crafts, acts: t.acts, rejected: t.rejected,
+      promises: t.promises.map((q) => ({ to: q.to, k: q.k, d: q.d, ph: q.ph, done: q.done || null, end: q.endPh != null ? q.endPh : null })), spares: t.spares, promisesKept: t.promisesKept || 0, promisesBroken: t.promisesBroken || 0,
       bag: t.inv.map((x) => ({ t: x.type, n: x.name, h: x.how || 'trovato', q: x.q, u: x.u, m: x.um, f: x.from, d: x.d, x: x.x })),
     }));
+    // le storie di legame della partita, scelte tra tutte le coppie (anche di chi non c'è più)
+    function bondStories() {
+      const best = {};
+      const put = (k, a, b, v, note) => { if (v > 0 && (!best[k] || v > best[k].v)) best[k] = { k, a: a.id, b: b.id, v: Math.round(v), note: note || '' }; };
+      for (let i = 0; i < T.length; i++) for (let j = i + 1; j < T.length; j++) {
+        const a = T[i], b = T[j], ab = peek(a, b), ba = peek(b, a), la = like(a, b), lb = like(b, a);
+        const lovers = hasMem(a, b, 'love') || hasMem(b, a, 'love');
+        const lastAB = (a.mem[b.id] || []).filter((m) => m.k === 'breakup' || m.k === 'reunion' || m.k === 'love').slice(-1)[0];
+        const broke = lastAB && lastAB.k === 'breakup';
+        if (lovers) put('amore', a, b, ab.t + ba.t + Math.min(la, lb) + 20 - (broke ? 40 : 0), broke ? 'finito' : !a.alive && !b.alive ? 'tragico' : !a.alive || !b.alive ? 'spezzato' : 'insieme');
+        if (!lovers && la >= 30 && lb >= 30) put('amicizia', a, b, Math.min(la, lb) + Math.min(ab.f, ba.f) + (ab.n.fw || 0) * 10 + (ab.n.sv || 0) * 10 + (ba.n.sv || 0) * 10, (ab.n.fw || 0) ? 'armi' : '');
+        if ((a.grudges[b.id] || b.grudges[a.id] || hasMem(a, b, 'killedDear') || hasMem(b, a, 'killedDear')) && Math.max(ab.r, ba.r) >= 30) put('nemesi', a, b, Math.max(ab.r, ba.r) - Math.min(la, lb), '');
+        if (la <= -40 && lb <= -40) put('odio', a, b, -(la + lb), '');
+        if (hasMem(b, a, 'betrayed')) put('tradimento', a, b, Math.max(0, ba.k) + 50 + (hasMem(b, a, 'promiseBroken') ? 40 : 0), a.alive ? '' : 'pagato');
+        if (hasMem(a, b, 'betrayed')) put('tradimento', b, a, Math.max(0, ab.k) + 50 + (hasMem(a, b, 'promiseBroken') ? 40 : 0), b.alive ? '' : 'pagato');
+        if (hasMem(a, b, 'spared')) put('pieta', b, a, 60 + ab.r, '');
+        if (hasMem(b, a, 'spared')) put('pieta', a, b, 60 + ba.r, '');
+        if (ab.t >= 45 && ba.t < 15 && !lovers) put('nonCorrisposto', a, b, ab.t - ba.t, hasMem(a, b, 'rejected') ? 'respinto' : '');
+        if (ba.t >= 45 && ab.t < 15 && !lovers) put('nonCorrisposto', b, a, ba.t - ab.t, hasMem(b, a, 'rejected') ? 'respinto' : '');
+        if (hasMem(a, b, 'mentor')) put('mentore', b, a, 40 + ab.r, '');
+        if (hasMem(b, a, 'mentor')) put('mentore', a, b, 40 + ba.r, '');
+        if (ab.p >= 60) put('paura', a, b, ab.p, '');
+        if (ba.p >= 60) put('paura', b, a, ba.p, '');
+      }
+      return ['amore', 'amicizia', 'nemesi', 'tradimento', 'pieta', 'nonCorrisposto', 'mentore', 'odio', 'paura'].map((k) => best[k]).filter(Boolean);
+    }
+    stats.stories = bondStories();
     return { version: 2, theme: theme.id, adult, seed, days: day, phases, tributes: stripped, winners: winners.map((t) => t.id), stats };
   }
 
@@ -8917,7 +9590,7 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
   };
   const ATTRN = Object.fromEntries(D.attrs.map((a) => [a.id, a.name]));
   const WHY = { carattere: 'Carattere', vendetta: 'Vendetta', debito: 'Debito', coppia: 'Coppia', lutto: 'Lutto', fama: 'Fama', reputazione: 'Reputazione', oggetto: 'Oggetto', condizione: 'Conseguenza',
-    cotta: 'Cotta segreta', complotto: 'Complotto', obiettivo: 'Obiettivo', meteo: 'Meteo', conseguenza: 'Conseguenza', ferite: 'Ferite', stenti: 'Stenti', infezione: 'Infezione', tempesta: 'Tempesta', predatori: 'Pericolo notturno', trappola: 'Trappola', alleanza: 'Alleanza', cure: 'Cure', morale: 'Morale', riposo: 'Notte', esplorazione: 'Esplorazione', bottino: 'Bottino', incidente: 'Incidente' };
+    legame: 'Legame', cotta: 'Cotta segreta', complotto: 'Complotto', obiettivo: 'Obiettivo', meteo: 'Meteo', conseguenza: 'Conseguenza', ferite: 'Ferite', stenti: 'Stenti', infezione: 'Infezione', tempesta: 'Tempesta', predatori: 'Pericolo notturno', trappola: 'Trappola', alleanza: 'Alleanza', cure: 'Cure', morale: 'Morale', riposo: 'Notte', esplorazione: 'Esplorazione', bottino: 'Bottino', incidente: 'Incidente' };
   const ECO = D.eco || { arenas: {} };
   const ITM = D.items || { types: {}, how: {}, order: [] }, MND = D.mind || { goals: {}, rel: {}, mem: {} };
   const ITIC = {
@@ -8945,6 +9618,54 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
         '<div class="bmeta"><span class="btype">' + esc(ty.label) + '</span><span>' + how + '</span>' + uses + '</div><p>' + esc(ty.desc) + '</p></div></div>';
     }).join('') + '</div>';
   }
+  const BDS = D.bonds || { labels: {}, dims: {}, mem: {}, promises: { kinds: {} } };
+  const NET_CLS = [['love', 'Amore'], ['friend', 'Amicizia'], ['ally', 'Alleanza'], ['hate', 'Odio'], ['fear', 'Paura'], ['rival', 'Rivalità'], ['plot', 'Segreti']];
+  let netOff = new Set();
+  // la mappa dei legami: un grafo dei vivi, colorato per tipo di legame
+  function netHTML(ph) {
+    const ids = ph.snap.alive.slice();
+    if (ids.length < 2) return '';
+    const al = ph.snap.allies;
+    ids.sort((a, b) => ((al[a] != null ? al[a] : 999) - (al[b] != null ? al[b] : 999)) || (BY[a].team - BY[b].team));
+    const n = ids.length, R = n > 16 ? 132 : 118, C = 160, pos = {};
+    ids.forEach((id, k) => { const ang = -Math.PI / 2 + (2 * Math.PI * k) / n; pos[id] = [C + R * Math.cos(ang), C + R * Math.sin(ang)]; });
+    const T0 = SIM.tributes, L2 = BDS.labels || {};
+    const es = (ph.snap.edges || []).filter((e) => !netOff.has(e[2]));
+    const nm = (ix) => T0[ix] ? T0[ix].name : '';
+    const lines = es.map((e) => {
+      const a = T0[e[0]], b = T0[e[1]]; if (!a || !b || !pos[a.id] || !pos[b.id]) return '';
+      let [x1, y1] = pos[a.id], [x2, y2] = pos[b.id];
+      if (e[4] === 2) { [x1, y1, x2, y2] = [x2, y2, x1, y1]; }
+      const mx = (x1 + x2) / 2, my = (y1 + y2) / 2, cx = mx + (C - mx) * 0.35, cy = my + (C - my) * 0.35;
+      const sw = (1.2 + Math.min(3, e[3] / 35)).toFixed(1);
+      const tip = nm(e[0]) + ' → ' + nm(e[1]) + ': ' + ((L2[e[5]] || {}).n || 'nessun legame') + ' · ' + nm(e[1]) + ' → ' + nm(e[0]) + ': ' + ((L2[e[6]] || {}).n || 'nessun legame');
+      return '<path class="edge e-' + e[2] + '" data-a="' + esc(a.id) + '" data-b="' + esc(b.id) + '" d="M' + x1.toFixed(1) + ' ' + y1.toFixed(1) + ' Q' + cx.toFixed(1) + ' ' + cy.toFixed(1) + ' ' + x2.toFixed(1) + ' ' + y2.toFixed(1) + '" stroke-width="' + sw + '"' + (e[4] ? ' marker-end="url(#arr-' + e[2] + ')"' : '') + '><title>' + esc(tip) + '</title></path>';
+    }).join('');
+    const nodes = ids.map((id) => {
+      const t = BY[id], [x, y] = pos[id];
+      return '<g class="node" data-prof="' + esc(id) + '" tabindex="0" role="button" aria-label="' + esc(t.name) + '"><circle cx="' + x.toFixed(1) + '" cy="' + y.toFixed(1) + '" r="12" style="fill:' + esc(t.color || '#888') + '"/><text x="' + x.toFixed(1) + '" y="' + (y + 3.6).toFixed(1) + '">' + esc(initials(t.name)) + '</text><title>' + esc(t.name) + '</title></g>';
+    }).join('');
+    const marks = NET_CLS.map(([c]) => '<marker id="arr-' + c + '" viewBox="0 0 8 8" refX="15" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L8 4L0 8z" class="mk-' + c + '"/></marker>').join('');
+    const legend = '<div class="netlegend" role="group" aria-label="Mostra o nascondi i tipi di legame">' + NET_CLS.map(([c, l]) => '<button type="button" class="nl e-' + c + (netOff.has(c) ? ' off' : '') + '" data-net="' + c + '" aria-pressed="' + !netOff.has(c) + '"><i></i>' + l + '</button>').join('') + '</div>';
+    return '<div class="netwrap"><h4>Mappa dei legami</h4><svg class="net" viewBox="0 0 320 320" role="img" aria-label="Mappa dei legami tra i concorrenti in gara"><defs>' + marks + '</defs>' + lines + nodes + '</svg>' + legend +
+      '<p class="help">Le frecce indicano un sentimento non ricambiato. Passa sopra un volto per evidenziarne i legami, toccalo per aprire la scheda.</p></div>';
+  }
+  function dimsHTML(d) {
+    if (!d) return '';
+    const DN = BDS.dims || {};
+    const rows = [['f', d.f, true], ['r', d.r, true], ['p', d.p, false], ['t', d.t, false], ['k', d.k, false]].filter(([, v]) => Math.abs(v) >= 10);
+    if (!rows.length) return '';
+    return '<div class="dims">' + rows.map(([k, v, signed]) => '<span class="dim d-' + k + (v < 0 ? ' neg' : '') + '" title="' + esc(DN[k] || k) + ' ' + v + '"><em>' + esc(DN[k] || k) + '</em><i>' + (signed ? '<b style="' + (v >= 0 ? 'left:50%;width:' + v / 2 + '%' : 'left:' + (50 + v / 2) + '%;width:' + -v / 2 + '%') + '"></b>' : '<b style="left:0;width:' + v + '%"></b>') + '</i></span>').join('') + '</div>';
+  }
+  function promisesHTML(t, i) {
+    const K = (BDS.promises || {}).kinds || {};
+    const st = (q) => (q.done && q.end != null && q.end <= i ? q.done : q.done === 'sciolta' && q.end == null ? 'sciolta' : 'in corso');
+    const made = (t.promises || []).filter((q) => q.ph <= i);
+    const got = []; SIM.tributes.forEach((x) => (x.promises || []).forEach((q) => { if (q.to === t.id && q.ph <= i) got.push([x, q]); }));
+    if (!made.length && !got.length) return '';
+    const row = (who, q, dir) => { const s2 = st(q); return '<div class="prom s-' + s2.replace(' ', '') + '"><span class="pk">' + esc(K[q.k] || q.k) + '</span><span>' + (dir ? 'a ' : 'da ') + '<b>' + esc(who.name) + '</b> · G' + q.d + '</span><span class="ps2">' + s2 + '</span></div>'; };
+    return '<div><div class="sub" style="margin-bottom:8px">Promesse</div><div class="proms">' + made.map((q) => row(BY[q.to] || { name: '?' }, q, true)).join('') + got.map(([x, q]) => row(x, q, false)).join('') + '</div></div>';
+  }
   function nowHTML(t, snap, i, theme) {
     const m = (snap.mind || {})[t.id]; const v = (snap.vit || {})[t.id]; const st = snap.st[t.id] || [];
     const zone = theme.lex.luogo[snap.zones[t.id]] || '';
@@ -8964,13 +9685,19 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
   function peopleHTML(t, snap, i) {
     const top = ((snap.rel || {})[t.id] || {}).top || [];
     if (!top.length) return '';
-    const L2 = MND.rel || {}, MM = Object.assign({}, MND.mem || {}, SIM && THEMES[SIM.theme].soft ? MND.memSoft || {} : {});
-    const rows = top.map(([id, a, lbl]) => {
+    const soft2 = SIM && THEMES[SIM.theme].soft;
+    const L2 = MND.rel || {}, MM = Object.assign({}, MND.mem || {}, BDS.mem || {}, soft2 ? Object.assign({}, MND.memSoft || {}, BDS.memSoft || {}) : {});
+    const LB = BDS.labels || {};
+    const rows = top.map(([id, a, lbl, dims, back]) => {
       const mem = ((t.mem || {})[id] || []).filter((m) => m.ph <= i).slice(-3).reverse();
       const pct = Math.round((a + 100) / 2);
-      return '<div class="person l-' + esc(lbl) + '">' + avHTML(BY[id], { btn: true }) + '<div class="pbody"><div class="ptop"><b>' + esc(nmOf(id)) + '</b><span class="plbl">' + esc(L2[lbl] || lbl) + '</span></div>' +
-        '<span class="affbar" title="Affinità ' + a + '"><b style="left:' + pct + '%"></b></span>' +
-        (mem.length ? '<ul class="pmem">' + mem.map((m) => '<li>«' + fill(MM[m.k] || '', [t.id, id, m.x]) + '» <span>G' + (SIM.phases[m.ph] ? SIM.phases[m.ph].day || 1 : '') + '</span></li>').join('') + '</ul>' : '') + '</div></div>';
+      const info = LB[lbl] || { n: L2[lbl] || lbl, c: 'none', d: '' };
+      const bk = back ? (LB[back] || {}).n || back : '';
+      const asym = (lbl === 'cotta' && back !== 'cotta' && back !== 'amore') ? 'Non ricambiat' + G3(t.gender, 'o', 'a', 'ə') : '';
+      return '<div class="person c-' + esc(info.c) + '">' + avHTML(BY[id], { btn: true }) + '<div class="pbody"><div class="ptop"><b>' + esc(nmOf(id)) + '</b><span class="plbl" title="' + esc(info.d) + '">' + esc(info.n) + '</span>' + (asym ? '<span class="asym">' + asym + '</span>' : '') + '</div>' +
+        '<span class="affbar" title="Affetto ' + a + '"><b style="left:' + pct + '%"></b></span>' + dimsHTML(dims) +
+        '<span class="back">Per ' + esc(nmOf(id)) + ': <b>' + esc(bk || 'indifferenza') + '</b></span>' +
+        (mem.length ? '<ul class="pmem">' + mem.filter((m) => MM[m.k]).map((m) => '<li>«' + fill(MM[m.k] || '', [t.id, id, m.x]) + '» <span>G' + (SIM.phases[m.ph] ? SIM.phases[m.ph].day || 1 : '') + '</span></li>').join('') + '</ul>' : '') + '</div></div>';
     }).join('');
     return '<div><div class="sub" style="margin-bottom:8px">Cosa prova per gli altri</div><div class="people">' + rows + '</div></div>';
   }
@@ -9753,7 +10480,7 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
       ph.snap.alive.forEach((id) => { const r = R[id]; if (!r) return; r.g.forEach(([t, why, v]) => alive.has(t) && grudges.push([id, t, why, v])); r.o.forEach((t) => alive.has(t) && debts.push([id, t])); });
       const whyTxt = (why, v) => why === 'kill' && v && BY[v] ? 'per ' + esc(BY[v].name) : { betray: 'per un tradimento', steal: 'per un furto', attack: 'per un agguato', kill: 'per un lutto' }[why] || '';
       const sec = (title, rows, empty) => '<div class="agroup"><h4>' + title + ' · ' + rows.length + '</h4>' + (rows.length ? '<div class="rel">' + rows.join('') + '</div>' : '<p class="help">' + empty + '</p>') + '</div>';
-      h = (gs.length ? gs.map((g, k) => '<div class="agroup"><h4>Alleanza ' + (k + 1) + ' · ' + g.length + '</h4><div class="row">' + g.map(av).join('') + '</div></div>').join('') : '<p class="help" style="margin-bottom:10px">Nessuna alleanza attiva.</p>') +
+      h = netHTML(ph) + (gs.length ? gs.map((g, k) => '<div class="agroup"><h4>Alleanza ' + (k + 1) + ' · ' + g.length + '</h4><div class="row">' + g.map(av).join('') + '</div></div>').join('') : '<p class="help" style="margin-bottom:10px">Nessuna alleanza attiva.</p>') +
         sec('Coppie', couples.map(([a, b]) => '<div class="relrow">' + av(a) + '<span class="arrow" style="color:var(--c-love)">♥</span>' + av(b) + '<span class="lbl">' + esc(BY[a].name) + ' e ' + esc(BY[b].name) + '</span></div>'), 'Ancora nessuna coppia.') +
         sec('Vendette giurate', grudges.slice(0, 14).map(([a, b, why, v]) => '<div class="relrow">' + av(a) + '<span class="arrow">→</span>' + av(b) + '<span class="lbl">' + whyTxt(why, v) + '</span></div>'), 'Nessuno ha ancora giurato vendetta.') +
         sec('Debiti', debts.slice(0, 10).map(([a, b]) => '<div class="relrow">' + av(a) + '<span class="lbl">deve un favore a</span>' + av(b) + '</div>'), 'Nessun debito in sospeso.') +
@@ -9761,6 +10488,22 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
     }
     $('#sideBody').innerHTML = h;
   }
+  // mappa dei legami: filtri per tipo ed evidenziazione al passaggio
+  $('#sideBody').addEventListener('click', (e) => {
+    const b = e.target.closest('[data-net]'); if (!b || !SIM) return;
+    const c = b.dataset.net; if (netOff.has(c)) netOff.delete(c); else netOff.add(c);
+    renderSide(S.run.phase);
+  });
+  const netFocus = (id) => {
+    const svg = $('#sideBody .net'); if (!svg) return;
+    svg.classList.toggle('focus', !!id);
+    $$('.edge', svg).forEach((p) => p.classList.toggle('on', !!id && (p.dataset.a === id || p.dataset.b === id)));
+    $$('.node', svg).forEach((g) => g.classList.toggle('on', g.dataset.prof === id));
+  };
+  $('#sideBody').addEventListener('mouseover', (e) => { const g = e.target.closest('.net .node'); netFocus(g ? g.dataset.prof : null); });
+  $('#sideBody').addEventListener('focusin', (e) => { const g = e.target.closest('.net .node'); if (g) netFocus(g.dataset.prof); });
+  $('#sideBody').addEventListener('mouseleave', () => netFocus(null));
+  $('#sideBody').addEventListener('keydown', (e) => { const g = e.target.closest('.net .node'); if (g && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); openProfile(g.dataset.prof); } });
   $('.stabs').addEventListener('click', (e) => { const b = e.target.closest('button'); if (!b || !SIM) return; sideTab = b.dataset.s; renderSide(S.run.phase); });
   function go(k) { if (!SIM) return; S.run.phase = Math.max(0, Math.min(SIM.phases.length - 1, k)); renderLive(false); }
   function next() {
@@ -9817,6 +10560,7 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
           '<div><div class="sub" style="margin-bottom:6px">Alleati</div><div class="row">' + (ally.length ? ally.map((x) => avHTML(BY[x], { btn: true })).join('') : '<span class="help">Nessuno, per ora.</span>') + '</div></div>' : '') +
         relHTML(id, snap, dead, atRes) +
         (!dead ? peopleHTML(t, snap, i) : '') +
+        promisesHTML(t, dead ? t.deathPhase : i) +
         diaryHTML(t, dead ? t.deathPhase : i) +
         attrHTML(t, theme) +
         '<div><div class="sub" style="margin-bottom:8px">La sua storia' + (atRes ? '' : ' finora') + '</div><div class="ptl">' + (hist.length ? hist.map(({ e, p }) => '<div class="it" style="--cc:var(--c-' + (e.cat || 'none') + ')"><span>' + (p.kind === 'b' ? 'Inizio' : 'G' + p.day + ' ' + (p.kind === 'n' ? 'notte' : p.kind === 'd' ? 'giorno' : KIND[p.kind].toLowerCase())) + '</span><p>' + linkify(e.html) + '</p></div>').join('') : '<p class="help">Nessun evento ancora.</p>') + '</div></div>' +
@@ -9855,6 +10599,27 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
   }
 
   /* =============== ESITO =============== */
+  const STORY = {
+    amore: ['La grande storia d\'amore', { insieme: 'Hanno attraversato l\'arena insieme.', tragico: 'Non ce l\'ha fatta nessuno dei due.', spezzato: 'Uno dei due non ce l\'ha fatta.', finito: 'Si sono lasciati prima della fine.' }],
+    amicizia: ['L\'amicizia più forte', { armi: 'Hanno combattuto fianco a fianco.' }],
+    nemesi: ['La nemesi', {}], tradimento: ['Il tradimento più crudele', { pagato: 'Chi ha tradito non è arrivato alla fine.' }],
+    pieta: ['Un gesto di pietà', {}], nonCorrisposto: ['Amore non corrisposto', { respinto: 'Si è dichiarato. Risposta: no.' }],
+    mentore: ['Maestro e allievo', {}], odio: ['L\'odio più profondo', {}], paura: ['La paura più grande', {}],
+  };
+  const STORY_LINE = { amore: '{a} e {b}', amicizia: '{a} e {b}', nemesi: '{a} contro {b}', tradimento: '{a} ha tradito {b}', pieta: '{a} ha risparmiato {b}', nonCorrisposto: '{a} per {b}', mentore: '{a} ha insegnato a {b}', odio: '{a} e {b}', paura: '{a} aveva paura di {b}' };
+  function storiesHTML(st, soft) {
+    const list = (st.stories || []).filter((x) => BY[x.a] && BY[x.b]);
+    if (!list.length) return '';
+    const MM = Object.assign({}, MND.mem || {}, BDS.mem || {}, soft ? Object.assign({}, MND.memSoft || {}, BDS.memSoft || {}) : {});
+    const quotes = (a, b) => { const l = ((BY[a].mem || {})[b] || []).slice(-2).map((m) => '<li><b>' + esc(BY[a].name) + ':</b> «' + fill(MM[m.k] || '', [a, b, m.x]) + '»</li>'); return l; };
+    return '<section class="block card"><h2>Le storie della partita</h2><p class="help" style="margin-bottom:12px">I legami che hanno segnato questa partita, tra chi c\'è ancora e chi non c\'è più.</p><div class="bstories">' +
+      list.map((x) => {
+        const [title, notes] = STORY[x.k] || [x.k, {}];
+        const line = (STORY_LINE[x.k] || '{a} e {b}').replace('{a}', esc(BY[x.a].name)).replace('{b}', esc(BY[x.b].name));
+        const q = quotes(x.a, x.b).concat(quotes(x.b, x.a)).slice(0, 3);
+        return '<article class="story2 k-' + esc(x.k) + '"><div class="s2av">' + avHTML(BY[x.a], { btn: true, dead: !BY[x.a].alive }) + avHTML(BY[x.b], { btn: true, dead: !BY[x.b].alive }) + '</div><div><span class="eyebrow">' + esc(title) + '</span><b>' + line + '</b>' + (notes[x.note] ? '<p class="help">' + esc(notes[x.note]) + '</p>' : '') + (q.length ? '<ul>' + q.join('') + '</ul>' : '') + '</div></article>';
+      }).join('') + '</div></section>';
+  }
   function ecoSummary(st, theme) {
     if (!st.causes) return '';
     const m = arenaOf(theme.id).meter;
@@ -9871,6 +10636,11 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
     if (st.broken) bits.push(plural(st.broken, 'arma rotta', 'armi rotte'));
     if (st.looted) bits.push(plural(st.looted, 'oggetto razziato', 'oggetti razziati'));
     if (st.trades) bits.push(plural(st.trades, 'scambio', 'scambi'));
+    if (st.promises) bits.push(plural(st.promises, 'promessa', 'promesse') + ' (' + (st.promisesKept || 0) + ' mantenute, ' + (st.promisesBroken || 0) + ' tradite)');
+    if (st.spared) bits.push(plural(st.spared, 'vita risparmiata', 'vite risparmiate'));
+    if (st.gossip) bits.push(plural(st.gossip, 'voce di corridoio', 'voci di corridoio'));
+    if (st.breakups) bits.push(plural(st.breakups, 'rottura', 'rotture'));
+    if (st.coalitions) bits.push(plural(st.coalitions, 'coalizione', 'coalizioni'));
     const met = (st.meteo || []).map((x) => 'G' + x.day + ' ' + x.n);
     if (!c.length && !bits.length && !met.length) return '';
     return '<p class="help eco-sum">' + (c.length ? '<b>Uccisi dall\'arena:</b> ' + esc(c.join(', ')) + '. ' : '') + (bits.length ? '<b>Conseguenze:</b> ' + esc(bits.join(' · ')) + '. ' : '') + (met.length ? '<b>Meteo:</b> ' + esc(met.join(' · ')) + '.' : '') + '</p>';
@@ -9961,7 +10731,7 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
         '<section class="block card"><h2>Momenti salienti</h2>' + hlH + '</section>' +
         '<section class="block card"><h2>Classifica completa</h2><div class="tablewrap"><table><thead><tr><th>Pos.</th><th>Concorrente</th><th>Sq.</th><th>' + (soft ? 'Elim.' : 'Ucc.') + '</th><th>Per mano di</th><th>Giorno</th><th>Come è andata</th></tr></thead><tbody>' + rows + '</tbody></table></div></section>' +
       '</div><div>' +
-        '<section class="block card"><h2>Superstiti nel tempo</h2>' + chart + '<p class="help" style="margin-top:8px">' + st.killDeaths + ' ' + (soft ? 'eliminati da un rivale' : 'morti per mano altrui') + ', ' + st.envDeaths + ' per colpa dell\'arena · ' + st.alliances + ' alleanze · ' + st.betrayals + ' tradimenti · ' + (st.revenges || 0) + ' vendette · ' + (st.couples || 0) + ' coppie · ' + (st.debtsRepaid || 0) + ' debiti saldati · ' + (st.amulets || 0) + ' salvataggi miracolosi · ' + (st.sponsors || 0) + ' doni degli sponsor · ' + (st.testsPassed || 0) + ' prove superate su ' + (st.tests || 0) + ' · ' + st.events + ' eventi.</p>' + ecoSummary(st, theme) + '</section>' +
+        '<section class="block card"><h2>Superstiti nel tempo</h2>' + chart + '<p class="help" style="margin-top:8px">' + st.killDeaths + ' ' + (soft ? 'eliminati da un rivale' : 'morti per mano altrui') + ', ' + st.envDeaths + ' per colpa dell\'arena · ' + st.alliances + ' alleanze · ' + st.betrayals + ' tradimenti · ' + (st.revenges || 0) + ' vendette · ' + (st.couples || 0) + ' coppie · ' + (st.debtsRepaid || 0) + ' debiti saldati · ' + (st.amulets || 0) + ' salvataggi miracolosi · ' + (st.sponsors || 0) + ' doni degli sponsor · ' + (st.testsPassed || 0) + ' prove superate su ' + (st.tests || 0) + ' · ' + st.events + ' eventi.</p>' + ecoSummary(st, theme) + '</section>' + storiesHTML(st, soft) +
         '<section class="block card"><h2>' + (soft ? 'Chi ha eliminato di più' : 'Chi ha ucciso di più') + '</h2><div class="bars">' + kbars + '</div></section>' +
         '<section class="block card posterbox"><h2>Locandina</h2><img id="posterImg" alt="Locandina della partita"><p class="help" style="margin-top:8px">Tieni premuto sull\'immagine, o clic destro, per salvarla.</p></section>' +
       '</div></div>';

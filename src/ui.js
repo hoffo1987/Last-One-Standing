@@ -43,7 +43,7 @@
   };
   const ATTRN = Object.fromEntries(D.attrs.map((a) => [a.id, a.name]));
   const WHY = { carattere: 'Carattere', vendetta: 'Vendetta', debito: 'Debito', coppia: 'Coppia', lutto: 'Lutto', fama: 'Fama', reputazione: 'Reputazione', oggetto: 'Oggetto', condizione: 'Conseguenza',
-    cotta: 'Cotta segreta', complotto: 'Complotto', obiettivo: 'Obiettivo', meteo: 'Meteo', conseguenza: 'Conseguenza', ferite: 'Ferite', stenti: 'Stenti', infezione: 'Infezione', tempesta: 'Tempesta', predatori: 'Pericolo notturno', trappola: 'Trappola', alleanza: 'Alleanza', cure: 'Cure', morale: 'Morale', riposo: 'Notte', esplorazione: 'Esplorazione', bottino: 'Bottino', incidente: 'Incidente' };
+    legame: 'Legame', cotta: 'Cotta segreta', complotto: 'Complotto', obiettivo: 'Obiettivo', meteo: 'Meteo', conseguenza: 'Conseguenza', ferite: 'Ferite', stenti: 'Stenti', infezione: 'Infezione', tempesta: 'Tempesta', predatori: 'Pericolo notturno', trappola: 'Trappola', alleanza: 'Alleanza', cure: 'Cure', morale: 'Morale', riposo: 'Notte', esplorazione: 'Esplorazione', bottino: 'Bottino', incidente: 'Incidente' };
   const ECO = D.eco || { arenas: {} };
   const ITM = D.items || { types: {}, how: {}, order: [] }, MND = D.mind || { goals: {}, rel: {}, mem: {} };
   const ITIC = {
@@ -71,6 +71,54 @@
         '<div class="bmeta"><span class="btype">' + esc(ty.label) + '</span><span>' + how + '</span>' + uses + '</div><p>' + esc(ty.desc) + '</p></div></div>';
     }).join('') + '</div>';
   }
+  const BDS = D.bonds || { labels: {}, dims: {}, mem: {}, promises: { kinds: {} } };
+  const NET_CLS = [['love', 'Amore'], ['friend', 'Amicizia'], ['ally', 'Alleanza'], ['hate', 'Odio'], ['fear', 'Paura'], ['rival', 'Rivalità'], ['plot', 'Segreti']];
+  let netOff = new Set();
+  // la mappa dei legami: un grafo dei vivi, colorato per tipo di legame
+  function netHTML(ph) {
+    const ids = ph.snap.alive.slice();
+    if (ids.length < 2) return '';
+    const al = ph.snap.allies;
+    ids.sort((a, b) => ((al[a] != null ? al[a] : 999) - (al[b] != null ? al[b] : 999)) || (BY[a].team - BY[b].team));
+    const n = ids.length, R = n > 16 ? 132 : 118, C = 160, pos = {};
+    ids.forEach((id, k) => { const ang = -Math.PI / 2 + (2 * Math.PI * k) / n; pos[id] = [C + R * Math.cos(ang), C + R * Math.sin(ang)]; });
+    const T0 = SIM.tributes, L2 = BDS.labels || {};
+    const es = (ph.snap.edges || []).filter((e) => !netOff.has(e[2]));
+    const nm = (ix) => T0[ix] ? T0[ix].name : '';
+    const lines = es.map((e) => {
+      const a = T0[e[0]], b = T0[e[1]]; if (!a || !b || !pos[a.id] || !pos[b.id]) return '';
+      let [x1, y1] = pos[a.id], [x2, y2] = pos[b.id];
+      if (e[4] === 2) { [x1, y1, x2, y2] = [x2, y2, x1, y1]; }
+      const mx = (x1 + x2) / 2, my = (y1 + y2) / 2, cx = mx + (C - mx) * 0.35, cy = my + (C - my) * 0.35;
+      const sw = (1.2 + Math.min(3, e[3] / 35)).toFixed(1);
+      const tip = nm(e[0]) + ' → ' + nm(e[1]) + ': ' + ((L2[e[5]] || {}).n || 'nessun legame') + ' · ' + nm(e[1]) + ' → ' + nm(e[0]) + ': ' + ((L2[e[6]] || {}).n || 'nessun legame');
+      return '<path class="edge e-' + e[2] + '" data-a="' + esc(a.id) + '" data-b="' + esc(b.id) + '" d="M' + x1.toFixed(1) + ' ' + y1.toFixed(1) + ' Q' + cx.toFixed(1) + ' ' + cy.toFixed(1) + ' ' + x2.toFixed(1) + ' ' + y2.toFixed(1) + '" stroke-width="' + sw + '"' + (e[4] ? ' marker-end="url(#arr-' + e[2] + ')"' : '') + '><title>' + esc(tip) + '</title></path>';
+    }).join('');
+    const nodes = ids.map((id) => {
+      const t = BY[id], [x, y] = pos[id];
+      return '<g class="node" data-prof="' + esc(id) + '" tabindex="0" role="button" aria-label="' + esc(t.name) + '"><circle cx="' + x.toFixed(1) + '" cy="' + y.toFixed(1) + '" r="12" style="fill:' + esc(t.color || '#888') + '"/><text x="' + x.toFixed(1) + '" y="' + (y + 3.6).toFixed(1) + '">' + esc(initials(t.name)) + '</text><title>' + esc(t.name) + '</title></g>';
+    }).join('');
+    const marks = NET_CLS.map(([c]) => '<marker id="arr-' + c + '" viewBox="0 0 8 8" refX="15" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L8 4L0 8z" class="mk-' + c + '"/></marker>').join('');
+    const legend = '<div class="netlegend" role="group" aria-label="Mostra o nascondi i tipi di legame">' + NET_CLS.map(([c, l]) => '<button type="button" class="nl e-' + c + (netOff.has(c) ? ' off' : '') + '" data-net="' + c + '" aria-pressed="' + !netOff.has(c) + '"><i></i>' + l + '</button>').join('') + '</div>';
+    return '<div class="netwrap"><h4>Mappa dei legami</h4><svg class="net" viewBox="0 0 320 320" role="img" aria-label="Mappa dei legami tra i concorrenti in gara"><defs>' + marks + '</defs>' + lines + nodes + '</svg>' + legend +
+      '<p class="help">Le frecce indicano un sentimento non ricambiato. Passa sopra un volto per evidenziarne i legami, toccalo per aprire la scheda.</p></div>';
+  }
+  function dimsHTML(d) {
+    if (!d) return '';
+    const DN = BDS.dims || {};
+    const rows = [['f', d.f, true], ['r', d.r, true], ['p', d.p, false], ['t', d.t, false], ['k', d.k, false]].filter(([, v]) => Math.abs(v) >= 10);
+    if (!rows.length) return '';
+    return '<div class="dims">' + rows.map(([k, v, signed]) => '<span class="dim d-' + k + (v < 0 ? ' neg' : '') + '" title="' + esc(DN[k] || k) + ' ' + v + '"><em>' + esc(DN[k] || k) + '</em><i>' + (signed ? '<b style="' + (v >= 0 ? 'left:50%;width:' + v / 2 + '%' : 'left:' + (50 + v / 2) + '%;width:' + -v / 2 + '%') + '"></b>' : '<b style="left:0;width:' + v + '%"></b>') + '</i></span>').join('') + '</div>';
+  }
+  function promisesHTML(t, i) {
+    const K = (BDS.promises || {}).kinds || {};
+    const st = (q) => (q.done && q.end != null && q.end <= i ? q.done : q.done === 'sciolta' && q.end == null ? 'sciolta' : 'in corso');
+    const made = (t.promises || []).filter((q) => q.ph <= i);
+    const got = []; SIM.tributes.forEach((x) => (x.promises || []).forEach((q) => { if (q.to === t.id && q.ph <= i) got.push([x, q]); }));
+    if (!made.length && !got.length) return '';
+    const row = (who, q, dir) => { const s2 = st(q); return '<div class="prom s-' + s2.replace(' ', '') + '"><span class="pk">' + esc(K[q.k] || q.k) + '</span><span>' + (dir ? 'a ' : 'da ') + '<b>' + esc(who.name) + '</b> · G' + q.d + '</span><span class="ps2">' + s2 + '</span></div>'; };
+    return '<div><div class="sub" style="margin-bottom:8px">Promesse</div><div class="proms">' + made.map((q) => row(BY[q.to] || { name: '?' }, q, true)).join('') + got.map(([x, q]) => row(x, q, false)).join('') + '</div></div>';
+  }
   function nowHTML(t, snap, i, theme) {
     const m = (snap.mind || {})[t.id]; const v = (snap.vit || {})[t.id]; const st = snap.st[t.id] || [];
     const zone = theme.lex.luogo[snap.zones[t.id]] || '';
@@ -90,13 +138,19 @@
   function peopleHTML(t, snap, i) {
     const top = ((snap.rel || {})[t.id] || {}).top || [];
     if (!top.length) return '';
-    const L2 = MND.rel || {}, MM = Object.assign({}, MND.mem || {}, SIM && THEMES[SIM.theme].soft ? MND.memSoft || {} : {});
-    const rows = top.map(([id, a, lbl]) => {
+    const soft2 = SIM && THEMES[SIM.theme].soft;
+    const L2 = MND.rel || {}, MM = Object.assign({}, MND.mem || {}, BDS.mem || {}, soft2 ? Object.assign({}, MND.memSoft || {}, BDS.memSoft || {}) : {});
+    const LB = BDS.labels || {};
+    const rows = top.map(([id, a, lbl, dims, back]) => {
       const mem = ((t.mem || {})[id] || []).filter((m) => m.ph <= i).slice(-3).reverse();
       const pct = Math.round((a + 100) / 2);
-      return '<div class="person l-' + esc(lbl) + '">' + avHTML(BY[id], { btn: true }) + '<div class="pbody"><div class="ptop"><b>' + esc(nmOf(id)) + '</b><span class="plbl">' + esc(L2[lbl] || lbl) + '</span></div>' +
-        '<span class="affbar" title="Affinità ' + a + '"><b style="left:' + pct + '%"></b></span>' +
-        (mem.length ? '<ul class="pmem">' + mem.map((m) => '<li>«' + fill(MM[m.k] || '', [t.id, id, m.x]) + '» <span>G' + (SIM.phases[m.ph] ? SIM.phases[m.ph].day || 1 : '') + '</span></li>').join('') + '</ul>' : '') + '</div></div>';
+      const info = LB[lbl] || { n: L2[lbl] || lbl, c: 'none', d: '' };
+      const bk = back ? (LB[back] || {}).n || back : '';
+      const asym = (lbl === 'cotta' && back !== 'cotta' && back !== 'amore') ? 'Non ricambiat' + G3(t.gender, 'o', 'a', 'ə') : '';
+      return '<div class="person c-' + esc(info.c) + '">' + avHTML(BY[id], { btn: true }) + '<div class="pbody"><div class="ptop"><b>' + esc(nmOf(id)) + '</b><span class="plbl" title="' + esc(info.d) + '">' + esc(info.n) + '</span>' + (asym ? '<span class="asym">' + asym + '</span>' : '') + '</div>' +
+        '<span class="affbar" title="Affetto ' + a + '"><b style="left:' + pct + '%"></b></span>' + dimsHTML(dims) +
+        '<span class="back">Per ' + esc(nmOf(id)) + ': <b>' + esc(bk || 'indifferenza') + '</b></span>' +
+        (mem.length ? '<ul class="pmem">' + mem.filter((m) => MM[m.k]).map((m) => '<li>«' + fill(MM[m.k] || '', [t.id, id, m.x]) + '» <span>G' + (SIM.phases[m.ph] ? SIM.phases[m.ph].day || 1 : '') + '</span></li>').join('') + '</ul>' : '') + '</div></div>';
     }).join('');
     return '<div><div class="sub" style="margin-bottom:8px">Cosa prova per gli altri</div><div class="people">' + rows + '</div></div>';
   }
@@ -879,7 +933,7 @@
       ph.snap.alive.forEach((id) => { const r = R[id]; if (!r) return; r.g.forEach(([t, why, v]) => alive.has(t) && grudges.push([id, t, why, v])); r.o.forEach((t) => alive.has(t) && debts.push([id, t])); });
       const whyTxt = (why, v) => why === 'kill' && v && BY[v] ? 'per ' + esc(BY[v].name) : { betray: 'per un tradimento', steal: 'per un furto', attack: 'per un agguato', kill: 'per un lutto' }[why] || '';
       const sec = (title, rows, empty) => '<div class="agroup"><h4>' + title + ' · ' + rows.length + '</h4>' + (rows.length ? '<div class="rel">' + rows.join('') + '</div>' : '<p class="help">' + empty + '</p>') + '</div>';
-      h = (gs.length ? gs.map((g, k) => '<div class="agroup"><h4>Alleanza ' + (k + 1) + ' · ' + g.length + '</h4><div class="row">' + g.map(av).join('') + '</div></div>').join('') : '<p class="help" style="margin-bottom:10px">Nessuna alleanza attiva.</p>') +
+      h = netHTML(ph) + (gs.length ? gs.map((g, k) => '<div class="agroup"><h4>Alleanza ' + (k + 1) + ' · ' + g.length + '</h4><div class="row">' + g.map(av).join('') + '</div></div>').join('') : '<p class="help" style="margin-bottom:10px">Nessuna alleanza attiva.</p>') +
         sec('Coppie', couples.map(([a, b]) => '<div class="relrow">' + av(a) + '<span class="arrow" style="color:var(--c-love)">♥</span>' + av(b) + '<span class="lbl">' + esc(BY[a].name) + ' e ' + esc(BY[b].name) + '</span></div>'), 'Ancora nessuna coppia.') +
         sec('Vendette giurate', grudges.slice(0, 14).map(([a, b, why, v]) => '<div class="relrow">' + av(a) + '<span class="arrow">→</span>' + av(b) + '<span class="lbl">' + whyTxt(why, v) + '</span></div>'), 'Nessuno ha ancora giurato vendetta.') +
         sec('Debiti', debts.slice(0, 10).map(([a, b]) => '<div class="relrow">' + av(a) + '<span class="lbl">deve un favore a</span>' + av(b) + '</div>'), 'Nessun debito in sospeso.') +
@@ -887,6 +941,22 @@
     }
     $('#sideBody').innerHTML = h;
   }
+  // mappa dei legami: filtri per tipo ed evidenziazione al passaggio
+  $('#sideBody').addEventListener('click', (e) => {
+    const b = e.target.closest('[data-net]'); if (!b || !SIM) return;
+    const c = b.dataset.net; if (netOff.has(c)) netOff.delete(c); else netOff.add(c);
+    renderSide(S.run.phase);
+  });
+  const netFocus = (id) => {
+    const svg = $('#sideBody .net'); if (!svg) return;
+    svg.classList.toggle('focus', !!id);
+    $$('.edge', svg).forEach((p) => p.classList.toggle('on', !!id && (p.dataset.a === id || p.dataset.b === id)));
+    $$('.node', svg).forEach((g) => g.classList.toggle('on', g.dataset.prof === id));
+  };
+  $('#sideBody').addEventListener('mouseover', (e) => { const g = e.target.closest('.net .node'); netFocus(g ? g.dataset.prof : null); });
+  $('#sideBody').addEventListener('focusin', (e) => { const g = e.target.closest('.net .node'); if (g) netFocus(g.dataset.prof); });
+  $('#sideBody').addEventListener('mouseleave', () => netFocus(null));
+  $('#sideBody').addEventListener('keydown', (e) => { const g = e.target.closest('.net .node'); if (g && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); openProfile(g.dataset.prof); } });
   $('.stabs').addEventListener('click', (e) => { const b = e.target.closest('button'); if (!b || !SIM) return; sideTab = b.dataset.s; renderSide(S.run.phase); });
   function go(k) { if (!SIM) return; S.run.phase = Math.max(0, Math.min(SIM.phases.length - 1, k)); renderLive(false); }
   function next() {
@@ -943,6 +1013,7 @@
           '<div><div class="sub" style="margin-bottom:6px">Alleati</div><div class="row">' + (ally.length ? ally.map((x) => avHTML(BY[x], { btn: true })).join('') : '<span class="help">Nessuno, per ora.</span>') + '</div></div>' : '') +
         relHTML(id, snap, dead, atRes) +
         (!dead ? peopleHTML(t, snap, i) : '') +
+        promisesHTML(t, dead ? t.deathPhase : i) +
         diaryHTML(t, dead ? t.deathPhase : i) +
         attrHTML(t, theme) +
         '<div><div class="sub" style="margin-bottom:8px">La sua storia' + (atRes ? '' : ' finora') + '</div><div class="ptl">' + (hist.length ? hist.map(({ e, p }) => '<div class="it" style="--cc:var(--c-' + (e.cat || 'none') + ')"><span>' + (p.kind === 'b' ? 'Inizio' : 'G' + p.day + ' ' + (p.kind === 'n' ? 'notte' : p.kind === 'd' ? 'giorno' : KIND[p.kind].toLowerCase())) + '</span><p>' + linkify(e.html) + '</p></div>').join('') : '<p class="help">Nessun evento ancora.</p>') + '</div></div>' +
@@ -981,6 +1052,27 @@
   }
 
   /* =============== ESITO =============== */
+  const STORY = {
+    amore: ['La grande storia d\'amore', { insieme: 'Hanno attraversato l\'arena insieme.', tragico: 'Non ce l\'ha fatta nessuno dei due.', spezzato: 'Uno dei due non ce l\'ha fatta.', finito: 'Si sono lasciati prima della fine.' }],
+    amicizia: ['L\'amicizia più forte', { armi: 'Hanno combattuto fianco a fianco.' }],
+    nemesi: ['La nemesi', {}], tradimento: ['Il tradimento più crudele', { pagato: 'Chi ha tradito non è arrivato alla fine.' }],
+    pieta: ['Un gesto di pietà', {}], nonCorrisposto: ['Amore non corrisposto', { respinto: 'Si è dichiarato. Risposta: no.' }],
+    mentore: ['Maestro e allievo', {}], odio: ['L\'odio più profondo', {}], paura: ['La paura più grande', {}],
+  };
+  const STORY_LINE = { amore: '{a} e {b}', amicizia: '{a} e {b}', nemesi: '{a} contro {b}', tradimento: '{a} ha tradito {b}', pieta: '{a} ha risparmiato {b}', nonCorrisposto: '{a} per {b}', mentore: '{a} ha insegnato a {b}', odio: '{a} e {b}', paura: '{a} aveva paura di {b}' };
+  function storiesHTML(st, soft) {
+    const list = (st.stories || []).filter((x) => BY[x.a] && BY[x.b]);
+    if (!list.length) return '';
+    const MM = Object.assign({}, MND.mem || {}, BDS.mem || {}, soft ? Object.assign({}, MND.memSoft || {}, BDS.memSoft || {}) : {});
+    const quotes = (a, b) => { const l = ((BY[a].mem || {})[b] || []).slice(-2).map((m) => '<li><b>' + esc(BY[a].name) + ':</b> «' + fill(MM[m.k] || '', [a, b, m.x]) + '»</li>'); return l; };
+    return '<section class="block card"><h2>Le storie della partita</h2><p class="help" style="margin-bottom:12px">I legami che hanno segnato questa partita, tra chi c\'è ancora e chi non c\'è più.</p><div class="bstories">' +
+      list.map((x) => {
+        const [title, notes] = STORY[x.k] || [x.k, {}];
+        const line = (STORY_LINE[x.k] || '{a} e {b}').replace('{a}', esc(BY[x.a].name)).replace('{b}', esc(BY[x.b].name));
+        const q = quotes(x.a, x.b).concat(quotes(x.b, x.a)).slice(0, 3);
+        return '<article class="story2 k-' + esc(x.k) + '"><div class="s2av">' + avHTML(BY[x.a], { btn: true, dead: !BY[x.a].alive }) + avHTML(BY[x.b], { btn: true, dead: !BY[x.b].alive }) + '</div><div><span class="eyebrow">' + esc(title) + '</span><b>' + line + '</b>' + (notes[x.note] ? '<p class="help">' + esc(notes[x.note]) + '</p>' : '') + (q.length ? '<ul>' + q.join('') + '</ul>' : '') + '</div></article>';
+      }).join('') + '</div></section>';
+  }
   function ecoSummary(st, theme) {
     if (!st.causes) return '';
     const m = arenaOf(theme.id).meter;
@@ -997,6 +1089,11 @@
     if (st.broken) bits.push(plural(st.broken, 'arma rotta', 'armi rotte'));
     if (st.looted) bits.push(plural(st.looted, 'oggetto razziato', 'oggetti razziati'));
     if (st.trades) bits.push(plural(st.trades, 'scambio', 'scambi'));
+    if (st.promises) bits.push(plural(st.promises, 'promessa', 'promesse') + ' (' + (st.promisesKept || 0) + ' mantenute, ' + (st.promisesBroken || 0) + ' tradite)');
+    if (st.spared) bits.push(plural(st.spared, 'vita risparmiata', 'vite risparmiate'));
+    if (st.gossip) bits.push(plural(st.gossip, 'voce di corridoio', 'voci di corridoio'));
+    if (st.breakups) bits.push(plural(st.breakups, 'rottura', 'rotture'));
+    if (st.coalitions) bits.push(plural(st.coalitions, 'coalizione', 'coalizioni'));
     const met = (st.meteo || []).map((x) => 'G' + x.day + ' ' + x.n);
     if (!c.length && !bits.length && !met.length) return '';
     return '<p class="help eco-sum">' + (c.length ? '<b>Uccisi dall\'arena:</b> ' + esc(c.join(', ')) + '. ' : '') + (bits.length ? '<b>Conseguenze:</b> ' + esc(bits.join(' · ')) + '. ' : '') + (met.length ? '<b>Meteo:</b> ' + esc(met.join(' · ')) + '.' : '') + '</p>';
@@ -1087,7 +1184,7 @@
         '<section class="block card"><h2>Momenti salienti</h2>' + hlH + '</section>' +
         '<section class="block card"><h2>Classifica completa</h2><div class="tablewrap"><table><thead><tr><th>Pos.</th><th>Concorrente</th><th>Sq.</th><th>' + (soft ? 'Elim.' : 'Ucc.') + '</th><th>Per mano di</th><th>Giorno</th><th>Come è andata</th></tr></thead><tbody>' + rows + '</tbody></table></div></section>' +
       '</div><div>' +
-        '<section class="block card"><h2>Superstiti nel tempo</h2>' + chart + '<p class="help" style="margin-top:8px">' + st.killDeaths + ' ' + (soft ? 'eliminati da un rivale' : 'morti per mano altrui') + ', ' + st.envDeaths + ' per colpa dell\'arena · ' + st.alliances + ' alleanze · ' + st.betrayals + ' tradimenti · ' + (st.revenges || 0) + ' vendette · ' + (st.couples || 0) + ' coppie · ' + (st.debtsRepaid || 0) + ' debiti saldati · ' + (st.amulets || 0) + ' salvataggi miracolosi · ' + (st.sponsors || 0) + ' doni degli sponsor · ' + (st.testsPassed || 0) + ' prove superate su ' + (st.tests || 0) + ' · ' + st.events + ' eventi.</p>' + ecoSummary(st, theme) + '</section>' +
+        '<section class="block card"><h2>Superstiti nel tempo</h2>' + chart + '<p class="help" style="margin-top:8px">' + st.killDeaths + ' ' + (soft ? 'eliminati da un rivale' : 'morti per mano altrui') + ', ' + st.envDeaths + ' per colpa dell\'arena · ' + st.alliances + ' alleanze · ' + st.betrayals + ' tradimenti · ' + (st.revenges || 0) + ' vendette · ' + (st.couples || 0) + ' coppie · ' + (st.debtsRepaid || 0) + ' debiti saldati · ' + (st.amulets || 0) + ' salvataggi miracolosi · ' + (st.sponsors || 0) + ' doni degli sponsor · ' + (st.testsPassed || 0) + ' prove superate su ' + (st.tests || 0) + ' · ' + st.events + ' eventi.</p>' + ecoSummary(st, theme) + '</section>' + storiesHTML(st, soft) +
         '<section class="block card"><h2>' + (soft ? 'Chi ha eliminato di più' : 'Chi ha ucciso di più') + '</h2><div class="bars">' + kbars + '</div></section>' +
         '<section class="block card posterbox"><h2>Locandina</h2><img id="posterImg" alt="Locandina della partita"><p class="help" style="margin-top:8px">Tieni premuto sull\'immagine, o clic destro, per salvarla.</p></section>' +
       '</div></div>';
