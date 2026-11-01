@@ -1,0 +1,180 @@
+<title>Last One Standing</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="Simulatore di battle royale in italiano: crea il cast, scegli l'arena e guarda chi resta in piedi.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&family=Big+Shoulders+Display:wght@700;800;900&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>/*@CSS@*/</style>
+
+<header class="top">
+  <div class="wrap">
+    <a class="brand" href="#cast"><b>Last <i>One</i> Standing</b><span>SIMULATORE DI ARENA</span></a>
+    <nav class="tabs" aria-label="Sezioni">
+      <a href="#cast" data-tab="cast">Concorrenti <span class="n" id="tabCount"></span></a>
+      <a href="#arena" data-tab="arena">Arena</a>
+      <a href="#diretta" data-tab="diretta" id="tabLive">Diretta</a>
+      <a href="#esito" data-tab="esito" id="tabRes">Esito</a>
+    </nav>
+    <button class="iconbtn" id="themeBtn" type="button" aria-label="Cambia tema chiaro o scuro" title="Tema chiaro / scuro">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4.5"/><path d="M12 2v2.5M12 19.5V22M4.2 4.2l1.8 1.8M18 18l1.8 1.8M2 12h2.5M19.5 12H22M4.2 19.8 6 18M18 6l1.8-1.8"/></svg>
+    </button>
+  </div>
+</header>
+
+<main class="wrap">
+  <!-- CONCORRENTI -->
+  <section class="view" id="v-cast" aria-labelledby="h-cast">
+    <div class="head">
+      <div>
+        <div class="eyebrow">Passo 1 di 3</div>
+        <h1 id="h-cast">I concorrenti</h1>
+        <p>Dai un nome a ogni concorrente, scegli il genere per le frasi, la squadra e fino a tre tratti. Trascina le schede per riordinarle.</p>
+      </div>
+    </div>
+    <div class="castbar panel">
+      <div class="count" id="castCount"></div>
+      <label class="row" for="presetSize"><span class="muted" style="font-size:13px;font-weight:600">Cast casuale</span>
+        <select id="presetSize" style="width:auto">
+          <option value="12">12</option><option value="24" selected>24</option><option value="36">36</option><option value="48">48</option>
+        </select>
+      </label>
+      <label class="row" for="teamSize"><span class="muted" style="font-size:13px;font-weight:600">a squadre da</span>
+        <select id="teamSize" style="width:auto">
+          <option value="1">1</option><option value="2" selected>2</option><option value="3">3</option><option value="4">4</option>
+        </select>
+      </label>
+      <button class="btn" id="btnRandom" type="button">Genera cast</button>
+      <button class="btn" id="btnRegroup" type="button">Ricomponi squadre</button>
+      <button class="btn" id="btnIO" type="button">Importa / Esporta</button>
+      <button class="btn danger" id="btnClear" type="button">Svuota</button>
+    </div>
+    <div id="clearConfirm" hidden class="confirm" style="margin-bottom:16px">
+      Eliminare tutti i concorrenti? <button class="btn danger" id="clearYes" type="button">Elimina tutti</button> <button class="btn" id="clearNo" type="button">Annulla</button>
+    </div>
+    <div class="cast" id="castList"></div>
+    <input type="file" id="avatarFile" accept="image/*" hidden>
+    <div class="nextbar"><a class="btn primary big" href="#arena">Scegli l'arena →</a></div>
+  </section>
+
+  <!-- ARENA -->
+  <section class="view" id="v-arena" hidden aria-labelledby="h-arena">
+    <div class="head">
+      <div>
+        <div class="eyebrow">Passo 2 di 3</div>
+        <h1 id="h-arena">L'arena</h1>
+        <p id="arenaSub"></p>
+      </div>
+    </div>
+    <div class="arena-grid">
+      <div>
+        <div class="themes" id="themeList"></div>
+        <section class="custom panel" aria-labelledby="h-custom">
+          <div>
+            <h2 id="h-custom">Eventi personalizzati</h2>
+            <p class="help">Scrivi un evento: usa <code>{A}</code>, <code>{B}</code>… per i nomi e <code>[A:o/a]</code> per accordare al genere (es. <code>è stat[A:o/a] vist[A:o/a]</code>). Puoi usare anche <code>{arma}</code>, <code>{luogo}</code>, <code>{cibo}</code>, <code>{mostro}</code>.</p>
+          </div>
+          <div class="cform">
+            <label class="field" for="cPhase"><span>Fase</span>
+              <select id="cPhase"><option value="tutte">Tutte le fasi</option><option value="b">Inizio</option><option value="d">Giorno</option><option value="n">Notte</option><option value="f">Festino</option></select>
+            </label>
+            <label class="field" for="cN"><span>Concorrenti</span>
+              <select id="cN"><option>1</option><option selected>2</option><option>3</option><option>4</option></select>
+            </label>
+            <label class="field" for="cKiller"><span>Chi uccide</span>
+              <select id="cKiller"><option value="">Nessuno</option></select>
+            </label>
+            <div class="field"><span>Chi muore</span><div class="letters" id="cDies"></div></div>
+            <label class="field wide" for="cText"><span>Testo</span>
+              <input type="text" id="cText" placeholder="{A} sfida {B} a una gara di indovinelli e l[B:o/a] batte.">
+            </label>
+            <div class="wide preview" id="cPreview">L'anteprima apparirà qui mentre scrivi.</div>
+            <div class="wide row"><button class="btn primary" id="cAdd" type="button">Aggiungi evento</button><span class="help" id="cMsg"></span></div>
+          </div>
+          <div class="clist" id="cList"></div>
+        </section>
+      </div>
+      <aside class="settings panel" aria-labelledby="h-rules">
+        <h2 id="h-rules">Regole</h2>
+        <div class="field"><span>Difficoltà</span>
+          <div class="seg" id="diffSeg" role="group" aria-label="Difficoltà">
+            <button type="button" data-v="bassa">Bassa</button><button type="button" data-v="normale">Normale</button><button type="button" data-v="alta">Alta</button><button type="button" data-v="massacro">Massacro</button>
+          </div>
+        </div>
+        <label class="field" for="maxDays"><span>Durata massima: <b id="maxDaysOut"></b> giorni, poi scontro finale</span>
+          <input type="range" id="maxDays" min="5" max="40" step="1">
+        </label>
+        <label class="field" for="seed"><span>Seme della partita (stesso seme e stesso cast = stessa storia)</span>
+          <div class="seedrow"><input type="text" id="seed" autocomplete="off"><button class="btn" id="seedNew" type="button" title="Nuovo seme casuale">Nuovo</button></div>
+        </label>
+        <label class="check" for="teamsAllied"><input type="checkbox" id="teamsAllied"><span>Compagni di squadra alleati<small>All'inizio chi è nella stessa squadra forma un'alleanza.</small></span></label>
+        <label class="check" for="teamWin"><input type="checkbox" id="teamWin"><span>Vittoria di squadra<small>La partita finisce quando restano solo membri della stessa squadra.</small></span></label>
+        <div class="field"><span>Velocità della diretta</span>
+          <div class="seg" id="speedSeg" role="group" aria-label="Velocità">
+            <button type="button" data-v="lenta">Lenta</button><button type="button" data-v="normale">Normale</button><button type="button" data-v="veloce">Veloce</button>
+          </div>
+        </div>
+        <button class="btn primary big" id="btnStart" type="button">Avvia la simulazione</button>
+        <p class="help" id="startMsg"></p>
+      </aside>
+    </div>
+  </section>
+
+  <!-- DIRETTA -->
+  <section class="view" id="v-diretta" hidden aria-label="Diretta">
+    <div id="liveEmpty" class="panel empty">Nessuna partita in corso. <a href="#arena">Scegli un'arena e avvia la simulazione.</a></div>
+    <div id="liveBody" hidden>
+      <div class="board panel">
+        <div class="line1">
+          <div style="min-width:0">
+            <div class="eyebrow" id="phEyebrow"></div>
+            <h1 id="phTitle"></h1>
+            <p class="intro" id="phIntro"></p>
+          </div>
+          <div class="score">
+            <div class="eyebrow">Superstiti</div>
+            <div class="big" id="aliveBig"></div>
+          </div>
+        </div>
+        <div class="tally" id="tally" aria-hidden="true"></div>
+        <div class="controls">
+          <button class="btn" id="prevBtn" type="button" aria-label="Fase precedente">◀ Indietro</button>
+          <button class="btn primary" id="nextBtn" type="button">Avanti ▶</button>
+          <button class="btn" id="playBtn" type="button">Riproduci</button>
+          <div class="progress" id="progress" aria-label="Fasi"></div>
+          <a class="btn ghost" href="#esito" id="skipBtn">Vai all'esito</a>
+        </div>
+      </div>
+      <div class="live">
+        <div id="phBody"></div>
+        <aside class="side">
+          <div class="panel"><h3>Mappa <span class="mono" id="mapNote"></span></h3><div class="map" id="map"></div></div>
+          <div class="panel"><h3 id="feedTitle">Caduti <span class="mono" id="feedCount"></span></h3><div class="feed" id="feed"></div></div>
+          <div class="panel"><h3>In gara</h3><div class="roster" id="roster"></div></div>
+        </aside>
+      </div>
+    </div>
+  </section>
+
+  <!-- ESITO -->
+  <section class="view" id="v-esito" hidden aria-label="Esito">
+    <div id="resEmpty" class="panel empty">L'esito apparirà alla fine della diretta.</div>
+    <div id="resBody" hidden></div>
+  </section>
+</main>
+
+<dialog id="ioDlg" aria-labelledby="h-io">
+  <div class="dh"><h2 id="h-io">Importa / Esporta</h2><button class="iconbtn" id="ioClose" type="button" aria-label="Chiudi">✕</button></div>
+  <div class="db">
+    <p class="help">Il testo qui sotto contiene cast, regole ed eventi personalizzati. Copialo per salvarlo, oppure incolla un testo esportato e premi Importa.</p>
+    <textarea id="ioText" rows="12" spellcheck="false"></textarea>
+    <div class="row">
+      <button class="btn primary" id="ioCopy" type="button">Copia</button>
+      <button class="btn" id="ioImport" type="button">Importa dal testo</button>
+      <label class="btn" for="ioFile">Carica file JSON</label><input type="file" id="ioFile" accept=".json,application/json,text/plain" hidden>
+      <span class="help" id="ioMsg"></span>
+    </div>
+  </div>
+</dialog>
+<div class="toast" id="toast" hidden role="status"></div>
+
+<script>/*@JS@*/</script>

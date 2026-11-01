@@ -1,0 +1,2665 @@
+<title>Last One Standing</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="Simulatore di battle royale in italiano: crea il cast, scegli l'arena e guarda chi resta in piedi.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&family=Big+Shoulders+Display:wght@700;800;900&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>/* Layout: tabellone da diretta sportiva. Una barra di stato fissa in alto,
+   colonne che si impilano su telefono, numeri condensati e tacche di conteggio. */
+:root {
+  --bg: #e8eaee;
+  --panel: #f7f8fa;
+  --panel-2: #eef0f4;
+  --ink: #161a22;
+  --muted: #586172;
+  --line: #cdd2db;
+  --accent: #9a6a0c;
+  --accent-ink: #ffffff;
+  --accent-soft: #f1e2bf;
+  --dead: #b8362a;
+  --dead-soft: #f6d9d5;
+  --alive: #2b7d50;
+  --alive-soft: #d5ecdf;
+  --focus: #2f6fd6;
+  --shadow: 0 1px 2px rgba(22, 26, 34, .06), 0 6px 20px rgba(22, 26, 34, .06);
+  --f-display: 'Big Shoulders Display', 'Arial Narrow', 'Roboto Condensed', sans-serif;
+  --f-body: 'Barlow', 'Segoe UI', system-ui, sans-serif;
+  --f-mono: 'JetBrains Mono', ui-monospace, 'SFMono-Regular', Menlo, monospace;
+  --r: 10px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0f1218; --panel: #171b23; --panel-2: #1d222c; --ink: #e7e9ee; --muted: #9aa3b4; --line: #2a303c;
+    --accent: #e3b04b; --accent-ink: #1a1408; --accent-soft: #3a2f17; --dead: #f06a5c; --dead-soft: #3b1f1d;
+    --alive: #5cc68c; --alive-soft: #173326; --focus: #7aa7ff;
+    --shadow: 0 1px 2px rgba(0, 0, 0, .3), 0 8px 24px rgba(0, 0, 0, .25);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0f1218; --panel: #171b23; --panel-2: #1d222c; --ink: #e7e9ee; --muted: #9aa3b4; --line: #2a303c;
+  --accent: #e3b04b; --accent-ink: #1a1408; --accent-soft: #3a2f17; --dead: #f06a5c; --dead-soft: #3b1f1d;
+  --alive: #5cc68c; --alive-soft: #173326; --focus: #7aa7ff;
+  --shadow: 0 1px 2px rgba(0, 0, 0, .3), 0 8px 24px rgba(0, 0, 0, .25);
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+html, body { min-height: 100%; }
+body {
+  background: var(--bg); color: var(--ink); font-family: var(--f-body); font-size: 16px; line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--panel); }
+button, input, select, textarea { font: inherit; color: inherit; }
+:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+h1, h2, h3 { font-family: var(--f-display); font-weight: 800; letter-spacing: .01em; line-height: 1.05; text-wrap: balance; margin: 0; }
+.wrap { max-width: 1240px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+.muted { color: var(--muted); }
+.mono { font-family: var(--f-mono); font-variant-numeric: tabular-nums; }
+.eyebrow { font-family: var(--f-mono); font-size: 11.5px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
+
+/* ---------- testata ---------- */
+.top { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 20; background: var(--panel); border-bottom: 1px solid var(--line); }
+.top .wrap { display: flex; align-items: center; gap: 16px; padding-block: 10px; flex-wrap: wrap; }
+.brand { display: flex; align-items: baseline; gap: 10px; text-decoration: none; color: var(--ink); margin-right: auto; }
+.brand b { font-family: var(--f-display); font-weight: 900; font-size: 26px; letter-spacing: .02em; text-transform: uppercase; line-height: 1; }
+.brand b i { font-style: normal; color: var(--accent); }
+.brand span { font-family: var(--f-mono); font-size: 11px; color: var(--muted); letter-spacing: .08em; }
+.tabs { display: flex; gap: 2px; background: var(--panel-2); border: 1px solid var(--line); border-radius: 999px; padding: 3px; overflow-x: auto; max-width: 100%; }
+.tabs a { text-decoration: none; color: var(--muted); font-weight: 600; font-size: 14.5px; padding: 6px 14px; border-radius: 999px; white-space: nowrap; display: flex; gap: 6px; align-items: center; }
+.tabs a .n { font-family: var(--f-mono); font-size: 11px; opacity: .7; }
+.tabs a[aria-current="page"] { background: var(--ink); color: var(--panel); }
+.tabs a.off { opacity: .45; pointer-events: none; }
+.iconbtn { width: 38px; height: 38px; border-radius: 999px; border: 1px solid var(--line); background: var(--panel); cursor: pointer; display: grid; place-items: center; }
+.iconbtn svg { width: 18px; height: 18px; }
+
+/* ---------- elementi comuni ---------- */
+main { padding-block: 24px 64px; }
+.view[hidden] { display: none !important; }
+.head { display: flex; align-items: end; justify-content: space-between; gap: 16px; flex-wrap: wrap; margin-bottom: 18px; }
+.head h1 { font-size: clamp(34px, 6vw, 56px); text-transform: uppercase; }
+.head p { margin: 4px 0 0; color: var(--muted); max-width: 62ch; }
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; border: 1px solid var(--line); background: var(--panel); border-radius: 8px; padding: 8px 14px; font-weight: 600; font-size: 14.5px; cursor: pointer; white-space: nowrap; text-decoration: none; }
+.btn:hover { border-color: var(--muted); }
+.btn.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+.btn.primary:hover { filter: brightness(1.06); }
+.btn.big { font-family: var(--f-display); font-size: 22px; font-weight: 800; letter-spacing: .03em; text-transform: uppercase; padding: 12px 26px; }
+.btn.ghost { background: transparent; }
+.btn.danger { color: var(--dead); }
+.btn:disabled { opacity: .5; cursor: not-allowed; }
+.row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.panel { background: var(--panel); border: 1px solid var(--line); border-radius: var(--r); }
+.field { display: grid; gap: 6px; }
+.field > span { font-size: 13px; font-weight: 600; color: var(--muted); }
+input[type="text"], input[type="number"], select, textarea {
+  background: var(--panel-2); border: 1px solid var(--line); border-radius: 7px; padding: 7px 10px; min-width: 0; width: 100%;
+}
+textarea { font-family: var(--f-mono); font-size: 12.5px; line-height: 1.5; resize: vertical; }
+input[type="range"] { accent-color: var(--accent); width: 100%; }
+input[type="checkbox"] { accent-color: var(--accent); width: 17px; height: 17px; }
+.seg { display: inline-flex; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; background: var(--panel-2); }
+.seg button { border: 0; background: transparent; padding: 6px 12px; cursor: pointer; font-size: 14px; font-weight: 600; color: var(--muted); }
+.seg button[aria-pressed="true"] { background: var(--ink); color: var(--panel); }
+.seg.sm button { padding: 3px 9px; font-size: 12.5px; }
+.toast { position: fixed; left: 50%; bottom: calc(20px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); background: var(--ink); color: var(--panel); padding: 10px 18px; border-radius: 999px; font-weight: 600; z-index: 50; box-shadow: var(--shadow); max-width: calc(100% - 32px); text-align: center; }
+
+/* avatar */
+.av { --s: 44px; width: var(--s); height: var(--s); border-radius: 50%; flex: none; display: grid; place-items: center; background: var(--c, #888); color: #fff;
+  font-family: var(--f-display); font-weight: 800; font-size: calc(var(--s) * .42); letter-spacing: .02em; overflow: hidden; position: relative; text-shadow: 0 1px 1px rgba(0,0,0,.25); }
+.av img { width: 100%; height: 100%; object-fit: cover; }
+.av.dead { background: var(--panel-2); color: var(--muted); text-shadow: none; box-shadow: inset 0 0 0 1.5px var(--line); }
+.av.dead img { filter: grayscale(1); opacity: .45; }
+.av.dead::after { content: ""; position: absolute; inset: 0; background: linear-gradient(135deg, transparent 47%, var(--dead) 47%, var(--dead) 53%, transparent 53%); }
+.nm { font-weight: 700; color: var(--ink); box-shadow: inset 0 -3px 0 color-mix(in srgb, var(--c) 55%, transparent); }
+
+/* ---------- concorrenti ---------- */
+.castbar { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; padding: 12px; margin-bottom: 16px; }
+.castbar .count { font-family: var(--f-display); font-weight: 800; font-size: 26px; margin-right: auto; line-height: 1; }
+.castbar .count small { font-family: var(--f-body); font-weight: 500; font-size: 14px; color: var(--muted); margin-left: 6px; }
+.cast { display: grid; grid-template-columns: repeat(auto-fill, minmax(290px, 1fr)); gap: 12px; }
+.card { padding: 12px; display: grid; gap: 10px; position: relative; min-width: 0; }
+.card.dragging { opacity: .4; }
+.card.over { outline: 2px dashed var(--accent); outline-offset: 2px; }
+.card .top-row { display: flex; gap: 10px; align-items: center; min-width: 0; }
+.card .grip { cursor: grab; color: var(--muted); border: 0; background: none; padding: 2px; display: grid; place-items: center; touch-action: none; }
+.card .grip svg { width: 16px; height: 22px; }
+.card .avbtn { border: 0; background: none; padding: 0; cursor: pointer; border-radius: 50%; position: relative; }
+.card .avbtn::after { content: "Foto"; position: absolute; inset: auto 0 -2px 0; font-size: 9.5px; font-family: var(--f-mono); text-transform: uppercase; background: var(--ink); color: var(--panel); border-radius: 4px; opacity: 0; transition: opacity .15s; }
+.card .avbtn:hover::after, .card .avbtn:focus-visible::after { opacity: 1; }
+.card .nameinp { font-weight: 700; font-size: 16px; }
+.card .x { border: 0; background: none; color: var(--muted); cursor: pointer; padding: 4px; border-radius: 6px; font-size: 18px; line-height: 1; }
+.card .x:hover { color: var(--dead); }
+.card .meta { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.card .team { display: flex; align-items: center; gap: 6px; font-size: 13px; color: var(--muted); font-weight: 600; }
+.card .team input { width: 58px; padding: 3px 6px; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.chip { display: inline-flex; align-items: center; gap: 4px; background: var(--accent-soft); color: var(--ink); border-radius: 999px; padding: 2px 4px 2px 10px; font-size: 13px; font-weight: 600; }
+.chip button { border: 0; background: none; cursor: pointer; color: var(--muted); font-size: 14px; padding: 0 4px; line-height: 1; }
+.chips select { width: auto; padding: 3px 8px; font-size: 13px; border-radius: 999px; }
+details.attrs summary { cursor: pointer; font-size: 13px; color: var(--muted); font-weight: 600; list-style: none; display: flex; gap: 8px; align-items: center; }
+details.attrs summary::-webkit-details-marker { display: none; }
+details.attrs summary::before { content: "▸"; transition: transform .15s; }
+details.attrs[open] summary::before { transform: rotate(90deg); }
+.attrgrid { display: grid; grid-template-columns: 92px 1fr 22px; gap: 4px 10px; align-items: center; font-size: 13px; margin-top: 8px; }
+.attrgrid output { font-family: var(--f-mono); text-align: right; }
+.order { display: flex; gap: 2px; }
+.order button { border: 1px solid var(--line); background: var(--panel-2); border-radius: 5px; cursor: pointer; font-size: 11px; padding: 0 6px; color: var(--muted); }
+.addcard { border: 2px dashed var(--line); background: transparent; border-radius: var(--r); min-height: 140px; cursor: pointer; color: var(--muted); font-family: var(--f-display); font-size: 22px; font-weight: 800; text-transform: uppercase; }
+.addcard:hover { border-color: var(--accent); color: var(--accent); }
+.nextbar { display: flex; justify-content: flex-end; margin-top: 24px; }
+
+/* ---------- arena ---------- */
+.arena-grid { display: grid; grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr); gap: 20px; align-items: start; }
+.themes { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 10px; }
+.theme { text-align: left; cursor: pointer; padding: 14px; border-radius: var(--r); border: 1px solid var(--line); background: var(--panel); display: grid; gap: 6px; position: relative; overflow: hidden; min-width: 0; }
+.theme .gl { font-size: 30px; line-height: 1; color: hsl(var(--h) 55% 45%); }
+.theme b { font-family: var(--f-display); font-size: 22px; font-weight: 800; text-transform: uppercase; line-height: 1.05; }
+.theme small { color: var(--muted); font-size: 13.5px; line-height: 1.35; }
+.theme .soft { position: absolute; top: 10px; right: 10px; font-family: var(--f-mono); font-size: 10px; text-transform: uppercase; letter-spacing: .08em; border: 1px solid var(--line); border-radius: 4px; padding: 1px 5px; color: var(--muted); }
+.theme[aria-pressed="true"] { border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent) inset; background: var(--accent-soft); }
+.settings { padding: 18px; display: grid; gap: 16px; position: sticky; top: calc(env(safe-area-inset-top, 0px) + 76px); }
+.settings h2 { font-size: 26px; text-transform: uppercase; }
+.check { display: flex; gap: 10px; align-items: flex-start; font-size: 14.5px; cursor: pointer; }
+.check small { display: block; color: var(--muted); font-size: 13px; }
+.seedrow { display: flex; gap: 6px; }
+.seedrow input { font-family: var(--f-mono); }
+.custom { margin-top: 20px; padding: 18px; display: grid; gap: 14px; }
+.custom h2 { font-size: 26px; text-transform: uppercase; }
+.cform { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; align-items: end; }
+.cform .wide { grid-column: 1 / -1; }
+.letters { display: flex; gap: 6px; flex-wrap: wrap; }
+.letters label { display: flex; gap: 4px; align-items: center; font-family: var(--f-mono); font-size: 13px; border: 1px solid var(--line); border-radius: 6px; padding: 3px 8px; background: var(--panel-2); }
+.preview { font-size: 15px; padding: 10px 12px; border-left: 3px solid var(--accent); background: var(--panel-2); border-radius: 0 6px 6px 0; }
+.clist { display: grid; gap: 6px; }
+.citem { display: flex; gap: 10px; align-items: center; padding: 8px 10px; background: var(--panel-2); border-radius: 7px; font-size: 14px; min-width: 0; }
+.citem .tag { font-family: var(--f-mono); font-size: 11px; text-transform: uppercase; color: var(--muted); flex: none; }
+.citem span:nth-child(2) { flex: 1; min-width: 0; overflow-wrap: anywhere; }
+.help { font-size: 13px; color: var(--muted); margin: 0; }
+.help code { font-family: var(--f-mono); font-size: 12px; background: var(--panel-2); padding: 1px 4px; border-radius: 4px; }
+
+/* ---------- diretta ---------- */
+.board { padding: 16px 18px; display: grid; gap: 12px; margin-bottom: 16px; }
+.board .line1 { display: flex; gap: 16px; align-items: end; justify-content: space-between; flex-wrap: wrap; }
+.board h1 { font-size: clamp(36px, 7vw, 68px); text-transform: uppercase; }
+.board .intro { color: var(--muted); margin: 6px 0 0; max-width: 70ch; }
+.score { text-align: right; }
+.score .big { font-family: var(--f-display); font-weight: 900; font-size: clamp(40px, 7vw, 64px); line-height: .9; font-variant-numeric: tabular-nums; }
+.score .big small { font-size: .45em; color: var(--muted); font-weight: 700; }
+.tally { display: flex; flex-wrap: wrap; gap: 3px; }
+.tally i { width: 7px; height: 18px; border-radius: 2px; background: var(--alive); opacity: .85; }
+.tally i.d { background: var(--dead); opacity: 1; }
+.tally i.new { animation: tick .6s ease; }
+@keyframes tick { from { transform: scaleY(1.8); } }
+.controls { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.progress { display: flex; gap: 3px; flex: 1; min-width: 140px; }
+.progress button { flex: 1; height: 8px; border: 0; padding: 0; border-radius: 2px; background: var(--line); cursor: pointer; min-width: 3px; }
+.progress button.done { background: var(--muted); }
+.progress button.fallen { background: color-mix(in srgb, var(--dead) 60%, var(--line)); }
+.progress button.cur { background: var(--accent); }
+.live { display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: 16px; align-items: start; }
+.events { display: grid; gap: 8px; }
+.ev { display: flex; gap: 12px; align-items: center; padding: 10px 12px; background: var(--panel); border: 1px solid var(--line); border-radius: var(--r); min-width: 0; }
+.ev .avs { display: flex; flex: none; }
+.ev .avs .av { --s: 36px; border: 2px solid var(--panel); margin-left: -10px; }
+.ev .avs .av:first-child { margin-left: 0; }
+.ev p { margin: 0; min-width: 0; overflow-wrap: anywhere; }
+.ev.lethal { border-color: color-mix(in srgb, var(--dead) 45%, var(--line)); background: color-mix(in srgb, var(--dead-soft) 45%, var(--panel)); }
+.ev .skull { flex: none; margin-left: auto; font-family: var(--f-mono); font-size: 11px; color: var(--dead); border: 1px solid currentColor; border-radius: 4px; padding: 1px 5px; text-transform: uppercase; }
+.ev.note { background: var(--accent-soft); border-color: transparent; }
+.ev.in { animation: rise .35s ease both; }
+@keyframes rise { from { opacity: .001; transform: translateY(6px); } }
+.fallen-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; }
+.fcard { padding: 14px; display: grid; gap: 8px; justify-items: center; text-align: center; background: var(--panel); border: 1px solid var(--line); border-radius: var(--r); }
+.fcard .av { --s: 72px; }
+.fcard b { font-family: var(--f-display); font-size: 20px; text-transform: uppercase; }
+.fcard small { color: var(--muted); font-size: 12.5px; }
+.empty { padding: 28px; text-align: center; color: var(--muted); }
+.side { display: grid; gap: 16px; }
+.side .panel { padding: 14px; }
+.side h3 { font-size: 20px; text-transform: uppercase; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: baseline; }
+.side h3 .mono { font-size: 12px; color: var(--muted); font-weight: 400; }
+.map { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; }
+.zone { background: var(--panel-2); border-radius: 6px; padding: 6px; min-height: 74px; display: grid; align-content: start; gap: 5px; min-width: 0; }
+.zone .zn { font-size: 10.5px; font-family: var(--f-mono); text-transform: uppercase; letter-spacing: .04em; color: var(--muted); line-height: 1.2; overflow-wrap: anywhere; }
+.zone .dots { display: flex; flex-wrap: wrap; gap: 3px; }
+.zone .av { --s: 20px; font-size: 9px; }
+.zone.hot { box-shadow: inset 0 0 0 2px var(--accent); }
+.feed { display: grid; gap: 6px; max-height: 360px; overflow-y: auto; font-size: 13.5px; }
+.feed div { display: flex; gap: 8px; align-items: center; }
+.feed .av { --s: 24px; font-size: 10px; }
+.feed .d { font-family: var(--f-mono); font-size: 11px; color: var(--muted); margin-left: auto; flex: none; }
+.roster { display: flex; flex-wrap: wrap; gap: 5px; }
+.roster .av { --s: 30px; font-size: 12px; cursor: default; }
+
+/* ---------- esito ---------- */
+.hero { padding: 24px; display: grid; grid-template-columns: auto 1fr; gap: 24px; align-items: center; margin-bottom: 16px; overflow: hidden; position: relative; }
+.hero .av { --s: 132px; box-shadow: 0 0 0 4px var(--panel), 0 0 0 7px var(--accent); }
+.hero .avs { display: flex; flex-wrap: wrap; gap: 10px; }
+.hero .avs .av { --s: 84px; }
+.hero h1 { font-size: clamp(42px, 8vw, 88px); text-transform: uppercase; }
+.hero .eyebrow { color: var(--accent); font-weight: 700; }
+.hero p { margin: 8px 0 0; color: var(--muted); max-width: 60ch; }
+.tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; margin-bottom: 16px; }
+.tile { padding: 14px; }
+.tile b { display: block; font-family: var(--f-display); font-weight: 900; font-size: 40px; line-height: 1; font-variant-numeric: tabular-nums; }
+.tile span { font-size: 13px; color: var(--muted); }
+.res-grid { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); gap: 16px; align-items: start; }
+.res-grid .panel { padding: 16px; min-width: 0; }
+.res-grid h2 { font-size: 26px; text-transform: uppercase; margin-bottom: 12px; }
+.tablewrap { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; font-size: 14px; }
+th { text-align: left; font-family: var(--f-mono); font-size: 11px; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); font-weight: 500; padding: 6px 8px; border-bottom: 1px solid var(--line); white-space: nowrap; }
+td { padding: 8px; border-bottom: 1px solid var(--line); vertical-align: middle; }
+td.n { font-family: var(--f-mono); font-variant-numeric: tabular-nums; text-align: right; white-space: nowrap; }
+td .who { display: flex; gap: 8px; align-items: center; font-weight: 700; white-space: nowrap; }
+td .who .av { --s: 28px; font-size: 11px; }
+td.cause { color: var(--muted); font-size: 13px; min-width: 220px; }
+tr.win td { background: var(--accent-soft); }
+.bars { display: grid; gap: 8px; }
+.bar { display: grid; grid-template-columns: 110px 1fr 28px; gap: 8px; align-items: center; font-size: 13.5px; }
+.bar .lbl { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 600; }
+.bar .tr { height: 14px; background: var(--panel-2); border-radius: 3px; overflow: hidden; }
+.bar .tr i { display: block; height: 100%; background: var(--accent); border-radius: 3px; }
+.bar.dd .tr i { background: var(--dead); }
+.bar .v { font-family: var(--f-mono); font-size: 12px; text-align: right; }
+.poster img { width: 100%; border-radius: 8px; border: 1px solid var(--line); display: block; }
+.stack { display: grid; gap: 16px; }
+
+/* ---------- finestre ---------- */
+dialog { border: 1px solid var(--line); border-radius: 14px; background: var(--panel); color: var(--ink); padding: 0; width: min(720px, calc(100% - 32px)); box-shadow: var(--shadow); }
+dialog::backdrop { background: rgba(10, 12, 16, .55); }
+dialog .dh { display: flex; justify-content: space-between; align-items: center; padding: 16px 18px; border-bottom: 1px solid var(--line); }
+dialog .dh h2 { font-size: 26px; text-transform: uppercase; }
+dialog .db { padding: 18px; display: grid; gap: 12px; }
+.confirm { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; background: var(--dead-soft); padding: 8px 12px; border-radius: 8px; font-size: 14px; }
+
+@media (max-width: 960px) {
+  .arena-grid, .live, .res-grid { grid-template-columns: minmax(0, 1fr); }
+  .settings { position: static; }
+}
+@media (max-width: 560px) {
+  .brand span { display: none; }
+  .top .wrap { gap: 10px; }
+  .tabs { order: 3; width: 100%; }
+  .tabs a { flex: 1; justify-content: center; padding: 6px 8px; }
+  .hero { grid-template-columns: minmax(0, 1fr); justify-items: start; }
+  .hero .av { --s: 96px; }
+  .score { text-align: left; }
+  .cast { grid-template-columns: minmax(0, 1fr); }
+  .bar { grid-template-columns: 84px 1fr 24px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}
+</style>
+
+<header class="top">
+  <div class="wrap">
+    <a class="brand" href="#cast"><b>Last <i>One</i> Standing</b><span>SIMULATORE DI ARENA</span></a>
+    <nav class="tabs" aria-label="Sezioni">
+      <a href="#cast" data-tab="cast">Concorrenti <span class="n" id="tabCount"></span></a>
+      <a href="#arena" data-tab="arena">Arena</a>
+      <a href="#diretta" data-tab="diretta" id="tabLive">Diretta</a>
+      <a href="#esito" data-tab="esito" id="tabRes">Esito</a>
+    </nav>
+    <button class="iconbtn" id="themeBtn" type="button" aria-label="Cambia tema chiaro o scuro" title="Tema chiaro / scuro">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4.5"/><path d="M12 2v2.5M12 19.5V22M4.2 4.2l1.8 1.8M18 18l1.8 1.8M2 12h2.5M19.5 12H22M4.2 19.8 6 18M18 6l1.8-1.8"/></svg>
+    </button>
+  </div>
+</header>
+
+<main class="wrap">
+  <!-- CONCORRENTI -->
+  <section class="view" id="v-cast" aria-labelledby="h-cast">
+    <div class="head">
+      <div>
+        <div class="eyebrow">Passo 1 di 3</div>
+        <h1 id="h-cast">I concorrenti</h1>
+        <p>Dai un nome a ogni concorrente, scegli il genere per le frasi, la squadra e fino a tre tratti. Trascina le schede per riordinarle.</p>
+      </div>
+    </div>
+    <div class="castbar panel">
+      <div class="count" id="castCount"></div>
+      <label class="row" for="presetSize"><span class="muted" style="font-size:13px;font-weight:600">Cast casuale</span>
+        <select id="presetSize" style="width:auto">
+          <option value="12">12</option><option value="24" selected>24</option><option value="36">36</option><option value="48">48</option>
+        </select>
+      </label>
+      <label class="row" for="teamSize"><span class="muted" style="font-size:13px;font-weight:600">a squadre da</span>
+        <select id="teamSize" style="width:auto">
+          <option value="1">1</option><option value="2" selected>2</option><option value="3">3</option><option value="4">4</option>
+        </select>
+      </label>
+      <button class="btn" id="btnRandom" type="button">Genera cast</button>
+      <button class="btn" id="btnRegroup" type="button">Ricomponi squadre</button>
+      <button class="btn" id="btnIO" type="button">Importa / Esporta</button>
+      <button class="btn danger" id="btnClear" type="button">Svuota</button>
+    </div>
+    <div id="clearConfirm" hidden class="confirm" style="margin-bottom:16px">
+      Eliminare tutti i concorrenti? <button class="btn danger" id="clearYes" type="button">Elimina tutti</button> <button class="btn" id="clearNo" type="button">Annulla</button>
+    </div>
+    <div class="cast" id="castList"></div>
+    <input type="file" id="avatarFile" accept="image/*" hidden>
+    <div class="nextbar"><a class="btn primary big" href="#arena">Scegli l'arena →</a></div>
+  </section>
+
+  <!-- ARENA -->
+  <section class="view" id="v-arena" hidden aria-labelledby="h-arena">
+    <div class="head">
+      <div>
+        <div class="eyebrow">Passo 2 di 3</div>
+        <h1 id="h-arena">L'arena</h1>
+        <p id="arenaSub"></p>
+      </div>
+    </div>
+    <div class="arena-grid">
+      <div>
+        <div class="themes" id="themeList"></div>
+        <section class="custom panel" aria-labelledby="h-custom">
+          <div>
+            <h2 id="h-custom">Eventi personalizzati</h2>
+            <p class="help">Scrivi un evento: usa <code>{A}</code>, <code>{B}</code>… per i nomi e <code>[A:o/a]</code> per accordare al genere (es. <code>è stat[A:o/a] vist[A:o/a]</code>). Puoi usare anche <code>{arma}</code>, <code>{luogo}</code>, <code>{cibo}</code>, <code>{mostro}</code>.</p>
+          </div>
+          <div class="cform">
+            <label class="field" for="cPhase"><span>Fase</span>
+              <select id="cPhase"><option value="tutte">Tutte le fasi</option><option value="b">Inizio</option><option value="d">Giorno</option><option value="n">Notte</option><option value="f">Festino</option></select>
+            </label>
+            <label class="field" for="cN"><span>Concorrenti</span>
+              <select id="cN"><option>1</option><option selected>2</option><option>3</option><option>4</option></select>
+            </label>
+            <label class="field" for="cKiller"><span>Chi uccide</span>
+              <select id="cKiller"><option value="">Nessuno</option></select>
+            </label>
+            <div class="field"><span>Chi muore</span><div class="letters" id="cDies"></div></div>
+            <label class="field wide" for="cText"><span>Testo</span>
+              <input type="text" id="cText" placeholder="{A} sfida {B} a una gara di indovinelli e l[B:o/a] batte.">
+            </label>
+            <div class="wide preview" id="cPreview">L'anteprima apparirà qui mentre scrivi.</div>
+            <div class="wide row"><button class="btn primary" id="cAdd" type="button">Aggiungi evento</button><span class="help" id="cMsg"></span></div>
+          </div>
+          <div class="clist" id="cList"></div>
+        </section>
+      </div>
+      <aside class="settings panel" aria-labelledby="h-rules">
+        <h2 id="h-rules">Regole</h2>
+        <div class="field"><span>Difficoltà</span>
+          <div class="seg" id="diffSeg" role="group" aria-label="Difficoltà">
+            <button type="button" data-v="bassa">Bassa</button><button type="button" data-v="normale">Normale</button><button type="button" data-v="alta">Alta</button><button type="button" data-v="massacro">Massacro</button>
+          </div>
+        </div>
+        <label class="field" for="maxDays"><span>Durata massima: <b id="maxDaysOut"></b> giorni, poi scontro finale</span>
+          <input type="range" id="maxDays" min="5" max="40" step="1">
+        </label>
+        <label class="field" for="seed"><span>Seme della partita (stesso seme e stesso cast = stessa storia)</span>
+          <div class="seedrow"><input type="text" id="seed" autocomplete="off"><button class="btn" id="seedNew" type="button" title="Nuovo seme casuale">Nuovo</button></div>
+        </label>
+        <label class="check" for="teamsAllied"><input type="checkbox" id="teamsAllied"><span>Compagni di squadra alleati<small>All'inizio chi è nella stessa squadra forma un'alleanza.</small></span></label>
+        <label class="check" for="teamWin"><input type="checkbox" id="teamWin"><span>Vittoria di squadra<small>La partita finisce quando restano solo membri della stessa squadra.</small></span></label>
+        <div class="field"><span>Velocità della diretta</span>
+          <div class="seg" id="speedSeg" role="group" aria-label="Velocità">
+            <button type="button" data-v="lenta">Lenta</button><button type="button" data-v="normale">Normale</button><button type="button" data-v="veloce">Veloce</button>
+          </div>
+        </div>
+        <button class="btn primary big" id="btnStart" type="button">Avvia la simulazione</button>
+        <p class="help" id="startMsg"></p>
+      </aside>
+    </div>
+  </section>
+
+  <!-- DIRETTA -->
+  <section class="view" id="v-diretta" hidden aria-label="Diretta">
+    <div id="liveEmpty" class="panel empty">Nessuna partita in corso. <a href="#arena">Scegli un'arena e avvia la simulazione.</a></div>
+    <div id="liveBody" hidden>
+      <div class="board panel">
+        <div class="line1">
+          <div style="min-width:0">
+            <div class="eyebrow" id="phEyebrow"></div>
+            <h1 id="phTitle"></h1>
+            <p class="intro" id="phIntro"></p>
+          </div>
+          <div class="score">
+            <div class="eyebrow">Superstiti</div>
+            <div class="big" id="aliveBig"></div>
+          </div>
+        </div>
+        <div class="tally" id="tally" aria-hidden="true"></div>
+        <div class="controls">
+          <button class="btn" id="prevBtn" type="button" aria-label="Fase precedente">◀ Indietro</button>
+          <button class="btn primary" id="nextBtn" type="button">Avanti ▶</button>
+          <button class="btn" id="playBtn" type="button">Riproduci</button>
+          <div class="progress" id="progress" aria-label="Fasi"></div>
+          <a class="btn ghost" href="#esito" id="skipBtn">Vai all'esito</a>
+        </div>
+      </div>
+      <div class="live">
+        <div id="phBody"></div>
+        <aside class="side">
+          <div class="panel"><h3>Mappa <span class="mono" id="mapNote"></span></h3><div class="map" id="map"></div></div>
+          <div class="panel"><h3 id="feedTitle">Caduti <span class="mono" id="feedCount"></span></h3><div class="feed" id="feed"></div></div>
+          <div class="panel"><h3>In gara</h3><div class="roster" id="roster"></div></div>
+        </aside>
+      </div>
+    </div>
+  </section>
+
+  <!-- ESITO -->
+  <section class="view" id="v-esito" hidden aria-label="Esito">
+    <div id="resEmpty" class="panel empty">L'esito apparirà alla fine della diretta.</div>
+    <div id="resBody" hidden></div>
+  </section>
+</main>
+
+<dialog id="ioDlg" aria-labelledby="h-io">
+  <div class="dh"><h2 id="h-io">Importa / Esporta</h2><button class="iconbtn" id="ioClose" type="button" aria-label="Chiudi">✕</button></div>
+  <div class="db">
+    <p class="help">Il testo qui sotto contiene cast, regole ed eventi personalizzati. Copialo per salvarlo, oppure incolla un testo esportato e premi Importa.</p>
+    <textarea id="ioText" rows="12" spellcheck="false"></textarea>
+    <div class="row">
+      <button class="btn primary" id="ioCopy" type="button">Copia</button>
+      <button class="btn" id="ioImport" type="button">Importa dal testo</button>
+      <label class="btn" for="ioFile">Carica file JSON</label><input type="file" id="ioFile" accept=".json,application/json,text/plain" hidden>
+      <span class="help" id="ioMsg"></span>
+    </div>
+  </div>
+</dialog>
+<div class="toast" id="toast" hidden role="status"></div>
+
+<script>/* Last One Standing — eventi di base (italiano).
+ * Formato riga:  <n> <tag...> | <testo>
+ *  n            numero di concorrenti coinvolti (A, B, C, ...)
+ *  k:AB>CD      A e B uccidono C e D           d:AB   A e B muoiono (ambiente)
+ *  tr:A>B       A tradisce e uccide l'alleato B br:A   A abbandona la sua alleanza
+ *  al:AB        A e B si alleano               ally:AB richiede che siano alleati
+ *  w:A          A deve avere un'arma           +arma:A A ottiene {arma}
+ *  -arma:A      A perde l'arma                 steal:A<B A ruba l'arma di B
+ *  +cibo:A / cibo:A   ottiene / consuma cibo   +med:A / med:A  ottiene / usa medicine
+ *  +trap:A / trap:A   ottiene / usa trappola   s:A=ferito  imposta uno stato
+ *  need:A=ferito (o need:A=*) richiede uno stato  cure:A rimuove gli stati
+ *  @agg @soc @stl @int @heal @luck @mad @cow  indole dell'evento   *2  peso
+ * Segnaposto: {A} nome, [A:o/a/ə] accordo di genere, [AB:i/e] accordo di gruppo,
+ *  {arma} {cibo} {luogo} {mostro} {trappola} {rifugio} {dono}  lessico del tema,
+ *  {arma:A} l'arma posseduta da A con possessivo ("il suo arco").
+ */
+(function (G) {
+  const D = (G.LOS_DATA = G.LOS_DATA || {});
+
+  D.core = {
+    b: `
+1 | {A} afferra uno zaino e fugge senza voltarsi.
+1 +arma:A | {A} recupera {arma} dal mucchio dei rifornimenti.
+1 @stl | {A} si allontana di soppiatto prima che qualcuno l[A:o/a] noti.
+1 +cibo:A | {A} arraffa {cibo} e corre verso {luogo}.
+1 +med:A | {A} trova un kit medico e se lo stringe al petto.
+1 @cow | {A} scappa a mani vuote, senza nemmeno provarci.
+1 s:A=ferito | {A} inciampa nella calca e si ferisce a una gamba.
+1 +trap:A @int | {A} raccoglie corde e fili per costruire trappole.
+1 +arma:A +cibo:A @luck | {A} riempie uno zaino di provviste e ci trova dentro anche {arma}.
+1 | {A} resta paralizzat[A:o/a] dalla paura per qualche secondo, poi corre via.
+1 d:A | {A} si lancia troppo presto e finisce dritt[A:o/a] in {trappola}.
+1 @int | {A} studia il campo di battaglia da lontano prima di muoversi.
+1 +cibo:A @stl | {A} sgattaiola tra le casse e si porta via {cibo}.
+2 k:A>B +arma:A @agg | {A} strappa {arma} dalle mani di {B} e l[B:o/a] colpisce a morte.
+2 k:A>B @agg | {A} sorprende {B} alle spalle e non [B:gli/le] lascia scampo.
+2 k:A>B | {A} e {B} si contendono uno zaino: {A} ha la meglio e {B} non si rialza più.
+2 k:A>B +arma:A | {A} scaglia {arma} contro {B}, che crolla a terra.
+2 k:A>B w:A @agg | {A} trafigge {B} con {arma:A}.
+2 k:A>B k:B>A | {A} e {B} si colpiscono nello stesso istante: nessuno dei due sopravvive.
+2 al:AB @soc | {A} e {B} si scambiano uno sguardo e decidono di fuggire insieme.
+2 | {A} e {B} lottano per una borraccia, poi scappano in direzioni opposte.
+2 s:B=ferito @agg | {A} colpisce {B} con un sasso e l[B:o/a] lascia stordit[B:o/a].
+2 | {A} spinge via {B} per arrivare per prim[A:o/a] a uno zaino.
+2 @heal | {A} trascina {B} fuori dalla mischia e [B:gli/le] salva la vita.
+2 k:A>B @mad | {A} ride mentre colpisce {B} ancora e ancora.
+2 @cow | {A} si nasconde dietro una cassa mentre {B} passa lì accanto senza vederl[A:o/a].
+3 k:AB>C al:AB @agg | {A} e {B} uniscono le forze per eliminare {C}.
+3 k:A>BC @agg *0.6 | {A} fa strage: {B} e {C} cadono un[BC:o/a] dopo l'altr[BC:o/a].
+3 al:ABC @soc | {A}, {B} e {C} formano un'alleanza in mezzo al caos.
+3 k:A>B | {A} uccide {B} mentre {C} approfitta della distrazione per fuggire.
+3 | {A}, {B} e {C} arrivano insieme allo stesso zaino e se lo strappano a vicenda.
+4 k:AB>CD @agg *0.6 | {A} e {B} tendono un agguato a {C} e {D}: nessuno dei due sopravvive.
+4 al:AB al:CD | {A} e {B} si alleano, mentre poco lontano fanno lo stesso {C} e {D}.
+`,
+    d: `
+1 | {A} esplora i dintorni di {luogo} senza incontrare nessuno.
+1 +cibo:A @int | {A} trova {cibo} e fa scorta.
+1 cibo:A | {A} si concede un pasto con le provviste messe da parte.
+1 +trap:A @int | {A} prepara una trappola rudimentale.
+1 +arma:A @luck | {A} trova {arma} sotto un cumulo di detriti.
+1 | {A} si allena lanciando sassi contro un bersaglio improvvisato.
+1 @stl | {A} segue a distanza le tracce di un altro concorrente.
+1 s:A=ferito | {A} scivola su una roccia e si sloga una caviglia.
+1 s:A=avvelenato | {A} mangia qualcosa dall'aspetto strano e si sente subito male.
+1 need:A=* med:A cure:A *3 | {A} usa il kit medico e si rimette in sesto.
+1 need:A=* cure:A @heal | {A} si medica con bende improvvisate e si sente meglio.
+1 need:A=ferito d:A *2 | {A} soccombe alle ferite riportate.
+1 need:A=avvelenato d:A *2 | {A} crolla a terra: il veleno ha fatto il suo effetto.
+1 need:A=malato d:A *1.5 | {A} cede alla febbre che l[A:o/a] consumava da giorni.
+1 d:A | {A} mette un piede in fallo e finisce in {trappola}.
+1 d:A | {A} viene sorpres[A:o/a] da {mostro} e non ha scampo.
+1 s:A=ferito | {A} sfugge a {mostro}, ma non senza ferite.
+1 @cow | {A} passa la giornata nascost[A:o/a] in {rifugio}.
+1 | {A} cerca una fonte d'acqua verso {luogo}.
+1 +med:A @soc | {A} riceve {dono}: dentro c'è un kit medico.
+1 +arma:A @soc | {A} riceve {dono}: dentro c'è {arma}.
+1 +cibo:A @soc | {A} riceve {dono}: dentro c'è {cibo}.
+1 @mad | {A} parla da sol[A:o/a] per ore, ridendo a battute che sente solo [A:lui/lei/loro].
+1 | {A} chiude gli occhi e prega di poter tornare a casa.
+1 s:A=malato | {A} beve acqua stagnante e si ammala.
+1 trap:A @int | {A} piazza una trappola verso {luogo} e aspetta.
+1 @luck +cibo:A +med:A | {A} scopre un deposito dimenticato con cibo e medicine.
+1 | {A} si arrampica su un punto alto per osservare l'arena.
+1 @stl | {A} cancella le proprie tracce con cura maniacale.
+1 -arma:A w:A | {A} perde {arma:A} attraversando un tratto impervio.
+2 al:AB @soc | {A} e {B} decidono di allearsi.
+2 al:AB @heal | {A} trova {B} in difficoltà e decide di aiutarl[B:o/a]: da oggi sono alleati.
+2 ally:AB | {A} e {B} vanno a caccia insieme e dividono il bottino.
+2 ally:AB | {A} e {B} si raccontano storie di casa per farsi coraggio.
+2 ally:AB br:A @betray | {A} approfitta di una distrazione di {B} per abbandonarl[B:o/a] con tutte le provviste.
+2 tr:A>B | {A} tradisce {B} e l[B:o/a] colpisce alle spalle.
+2 k:A>B w:A @agg | {A} insegue {B} e l[B:o/a] uccide con {arma:A}.
+2 k:A>B @agg | {A} sorprende {B} verso {luogo} e non [B:gli/le] lascia scampo.
+2 k:A>B @stl | {A} tende un agguato a {B} e l[B:o/a] elimina in silenzio.
+2 k:A>B trap:A @int *2 | {B} finisce nella trappola preparata da {A}.
+2 k:A>B | {A} e {B} si affrontano in duello: {B} non sopravvive.
+2 k:A>B k:B>A *0.5 | {A} e {B} si feriscono a morte a vicenda.
+2 s:B=ferito @agg | {A} attacca {B}, che riesce a fuggire ferit[B:o/a].
+2 | {A} e {B} si incrociano, si studiano a lungo e poi se ne vanno ognuno per la propria strada.
+2 cibo:B +cibo:A @stl | {A} ruba le provviste di {B} mentre è distratt[B:o/a].
+2 steal:A<B @stl | {A} sottrae {arma:B} a {B} senza farsi vedere.
+2 need:B=* cure:B @heal | {A} medica le ferite di {B}.
+2 d:B | {A} assiste impotente mentre {B} viene trascinat[B:o/a] via da {mostro}.
+2 k:A>B @mad | {A} perde il controllo e massacra {B} senza un motivo apparente.
+2 al:AB | {A} salva {B} da {mostro}: i due stringono un patto.
+2 @cow | {A} vede {B} da lontano e cambia strada di corsa.
+2 s:A=ferito | {A} prova ad attaccare {B}, ma ha la peggio e deve ritirarsi.
+3 al:ABC @soc | {A}, {B} e {C} formano un'alleanza.
+3 k:AB>C @agg | {A} e {B} danno la caccia a {C} e l[C:o/a] raggiungono verso {luogo}.
+3 k:A>C | {A} uccide {C} mentre {B} osserva la scena da un nascondiglio.
+3 k:C>AB *0.5 | {C} elimina sia {A} che {B} con un'unica imboscata.
+3 | {A}, {B} e {C} si contendono la stessa fonte d'acqua, ma nessuno osa attaccare per prim[ABC:o/a].
+3 ally:AB k:AB>C | {A} e {B} difendono il loro accampamento da {C}, che resta a terra.
+3 ally:AB s:C=ferito | {A} e {B} respingono l'assalto di {C}.
+3 @heal need:C=* cure:C | {A} e {B} trovano {C} in fin di vita e l[C:o/a] curano.
+4 al:ABCD @soc *0.6 | {A}, {B}, {C} e {D} uniscono le forze in un'unica alleanza.
+4 k:AB>CD *0.5 | Le alleanze si scontrano: {A} e {B} hanno la meglio su {C} e {D}.
+4 k:A>B s:C=ferito | {A} uccide {B} e ferisce {C}, mentre {D} fugge.
+`,
+    n: `
+1 | {A} accende un piccolo fuoco e si scalda le mani.
+1 @stl | {A} rinuncia al fuoco per non farsi notare.
+1 | {A} non riesce a chiudere occhio.
+1 | {A} dorme profondamente in {rifugio}.
+1 @mad | {A} canta a bassa voce nel buio.
+1 | {A} piange in silenzio pensando a casa.
+1 | {A} ripensa ai volti di chi è cadut[A:o/a] prima di [A:lui/lei/loro].
+1 s:A=malato | {A} passa la notte al freddo e si prende la febbre.
+1 d:A *0.6 | {A} non sopravvive al gelo della notte.
+1 d:A | {A} viene attaccat[A:o/a] nel sonno da {mostro}.
+1 need:A=* d:A *2 | {A} non arriva all'alba: le sue condizioni erano troppo gravi.
+1 need:A=* cure:A *1.5 | {A} si riposa e al risveglio si sente meglio.
+1 +cibo:A @soc | {A} riceve {dono}: dentro c'è una cena calda.
+1 @int | {A} disegna una mappa dell'arena alla luce fioca delle stelle.
+1 cibo:A | {A} mangia quel che resta delle provviste.
+1 s:A=affamato | {A} si addormenta con lo stomaco vuoto.
+1 need:A=affamato d:A *2 | {A} muore di stenti.
+1 need:A=affamato +cibo:A cure:A *2 | {A} trova {cibo} e finalmente mangia.
+1 @luck | {A} trova un angolo riparato e passa una notte tranquilla.
+1 +trap:A @int | {A} circonda il proprio accampamento di trappole.
+1 | {A} sente dei passi nel buio e resta immobile fino all'alba.
+2 ally:AB | {A} e {B} si danno il cambio per fare la guardia.
+2 ally:AB | {A} e {B} dormono schiena contro schiena.
+2 ally:AB tr:A>B | {A} soffoca {B} nel sonno.
+2 ally:AB br:A @betray | {A} se ne va prima dell'alba, lasciando {B} da sol[B:o/a].
+2 k:A>B @stl | {A} si avvicina all'accampamento di {B} e l[B:o/a] uccide nel sonno.
+2 k:A>B @agg | {A} individua il fuoco di {B} e l[B:o/a] attacca.
+2 s:B=ferito | {A} attacca {B} al buio, ma {B} riesce a scappare.
+2 | {A} e {B} parlano tutta la notte, senza fidarsi davvero.
+2 al:AB @soc | {A} e {B} condividono un fuoco e decidono di restare insieme.
+2 @cow | {A} sente {B} piangere nel buio e decide di non attaccare.
+2 need:B=* cure:B @heal | {A} veglia su {B} per tutta la notte e ne cura le ferite.
+2 k:A>B trap:A *2 | Nel buio, {B} cammina dritt[B:o/a] nella trappola di {A}.
+2 d:AB *0.5 | {A} e {B} vengono sorpres[AB:i/e] nel sonno da {mostro}.
+3 ally:ABC | {A}, {B} e {C} si raccontano storie attorno al fuoco.
+3 k:A>BC @stl *0.5 | {A} lancia un attacco notturno: {B} e {C} non si svegliano più.
+3 ally:AB tr:A>B | {A} uccide {B} nel sonno, mentre {C} finge di dormire poco lontano.
+3 k:AB>C @agg | {A} e {B} attaccano di notte l'accampamento di {C}.
+3 | {A}, {B} e {C} si accampano a pochi metri l'uno dall'altro senza saperlo.
+4 ally:ABCD | Il gruppo di {A}, {B}, {C} e {D} passa la notte senza incidenti.
+`,
+    f: `
+1 +arma:A +cibo:A | {A} arriva per prim[A:o/a] al festino e si porta via due zaini.
+1 @cow | {A} decide di non partecipare al festino.
+1 +med:A @stl | {A} si infiltra al festino, prende un kit medico e sparisce.
+1 need:A=* cure:A *3 | {A} recupera esattamente ciò che serve per guarire.
+1 d:A | {A} cade in {trappola} piazzata attorno al banchetto.
+1 +arma:A | {A} apre il proprio zaino e ci trova {arma}.
+1 | {A} osserva il festino da lontano e aspetta che torni la calma.
+2 k:A>B @agg | {A} aspetta {B} al festino e l[B:o/a] uccide.
+2 k:A>B w:A | {A} difende il proprio zaino e abbatte {B} con {arma:A}.
+2 | {A} e {B} si contendono lo stesso zaino: {B} riesce a fuggire per un soffio.
+2 s:B=ferito +cibo:A | {A} ferisce {B} e [B:gli/le] strappa lo zaino.
+2 tr:A>B | {A} sfrutta la confusione del festino per sbarazzarsi di {B}.
+2 al:AB @soc | {A} e {B} decidono di dividersi le provviste invece di combattere.
+2 k:A>B k:B>A *0.4 | {A} e {B} si lanciano sullo stesso zaino e si uccidono a vicenda.
+3 k:A>BC *0.6 | {A} fa piazza pulita: {B} e {C} cadono attorno al banchetto.
+3 k:AB>C al:AB | {A} e {B} si coprono le spalle ed eliminano {C}.
+3 | {A}, {B} e {C} arrivano insieme, si guardano e se ne vanno ognuno con il proprio zaino.
+4 k:AB>CD *0.6 | {A} e {B} tendono un'imboscata al festino: {C} e {D} non tornano indietro.
+5 k:A>BCDE *0.25 | {A} trasforma il festino in un massacro: {B}, {C}, {D} e {E} cadono un[BCDE:o/a] dopo l'altr[BCDE:o/a].
+`,
+    finale: `
+2 k:A>B | Nello scontro finale {A} ha la meglio su {B}.
+2 k:A>B w:A | {A} affronta {B} un'ultima volta e vince con {arma:A}.
+2 k:A>B @stl | {A} sorprende {B} con un'ultima mossa astuta.
+2 k:A>B | {A} e {B} lottano fino allo stremo: alla fine resta in piedi solo {A}.
+2 k:A>B @luck | {B} scivola nel momento decisivo e {A} ne approfitta.
+2 k:A>B | {A} spinge {B} in {trappola}.
+`,
+    ds: `
+1 | {A} trova riparo appena in tempo.
+1 @luck | {A} se la cava per un soffio.
+1 s:A=ferito | {A} sopravvive, ma con brutte ferite.
+1 @stl | {A} si rifugia in {rifugio} e aspetta che passi tutto.
+1 @int | {A} aveva capito tutto in anticipo ed era già lontan[A:o/a].
+2 ally:AB | {A} e {B} si aiutano a vicenda e ne escono san[AB:i/e] e salv[AB:i/e].
+2 @heal | {A} trascina in salvo {B}.
+2 k:A>B @agg | Nel caos, {A} spinge indietro {B} per salvarsi.
+`,
+    fallback: `
+1 | {A} passa il tempo senza che accada nulla di rilevante.
+`,
+  };
+
+  /* ---------- Caratteristiche e tratti ---------- */
+  D.attrs = [
+    { id: 'for', name: 'Forza' },
+    { id: 'agi', name: 'Agilità' },
+    { id: 'int', name: 'Intelligenza' },
+    { id: 'car', name: 'Carisma' },
+    { id: 'fort', name: 'Fortuna' },
+    { id: 'res', name: 'Resistenza' },
+    { id: 'furt', name: 'Furtività' },
+  ];
+
+  // m: moltiplicatori per indole evento; c: bonus combattimento; s: bonus sopravvivenza
+  D.traits = [
+    { id: 'leale', name: 'Leale', desc: 'Difende gli alleati e non tradisce quasi mai.', m: { soc: 1.5, betray: 0.1 } },
+    { id: 'traditore', name: 'Traditore', desc: 'Stringe alleanze solo per romperle.', m: { betray: 3, soc: 1.2 } },
+    { id: 'codardo', name: 'Codardo', desc: 'Scappa invece di combattere.', m: { cow: 2.5, agg: 0.4 }, c: -2, s: 1 },
+    { id: 'spietato', name: 'Spietato', desc: 'Cerca lo scontro e non fa prigionieri.', m: { agg: 2, heal: 0.3 }, c: 2 },
+    { id: 'pacifista', name: 'Pacifista', desc: 'Evita la violenza e aiuta chi soffre.', m: { agg: 0.2, heal: 2, soc: 1.4 }, c: -2 },
+    { id: 'stratega', name: 'Stratega', desc: 'Pianifica ogni mossa.', m: { int: 2, stl: 1.2 }, c: 1, s: 1 },
+    { id: 'impulsivo', name: 'Impulsivo', desc: 'Agisce prima di pensare.', m: { agg: 1.5, int: 0.5 }, s: -1 },
+    { id: 'cacciatore', name: 'Cacciatore', desc: 'Sa seguire le tracce e procurarsi il cibo.', m: { agg: 1.4, stl: 1.3 }, c: 2 },
+    { id: 'guaritore', name: 'Guaritore', desc: 'Sa curare sé e gli altri.', m: { heal: 2.5, soc: 1.2 }, s: 1 },
+    { id: 'sopravvissuto', name: 'Sopravvissuto', desc: 'Resiste a tutto ciò che l\'arena gli scaglia contro.', m: {}, s: 3 },
+    { id: 'carismatico', name: 'Carismatico', desc: 'Conquista alleati e sponsor.', m: { soc: 2 } },
+    { id: 'paranoico', name: 'Paranoico', desc: 'Non si fida di nessuno.', m: { soc: 0.4, betray: 1.5, stl: 1.3 }, s: 1 },
+    { id: 'fortunato', name: 'Fortunato', desc: 'La sorte sembra sempre dalla sua parte.', m: { luck: 2 }, s: 2 },
+    { id: 'sfortunato', name: 'Sfortunato', desc: 'Se qualcosa può andare storto, andrà storto.', m: { luck: 0.3 }, s: -3 },
+    { id: 'furtivo', name: 'Furtivo', desc: 'Si muove senza fare rumore.', m: { stl: 2.2 }, s: 1 },
+    { id: 'bruto', name: 'Bruto', desc: 'Forza bruta, poca strategia.', m: { agg: 1.6, int: 0.6 }, c: 3 },
+    { id: 'ingegnoso', name: 'Ingegnoso', desc: 'Costruisce trappole e soluzioni.', m: { int: 2 }, c: 1 },
+    { id: 'folle', name: 'Folle', desc: 'Imprevedibile, in ogni senso.', m: { mad: 3, agg: 1.3 } },
+  ];
+
+  D.names = {
+    M: ['Bruno', 'Dario', 'Fabio', 'Ivo', 'Marco', 'Oscar', 'Rocco', 'Tommaso', 'Ugo', 'Walter', 'Enea', 'Leone', 'Nico', 'Pietro', 'Silvio', 'Vito', 'Brando', 'Cesare', 'Furio', 'Ettore', 'Lapo', 'Orlando', 'Romeo', 'Gianni', 'Luca', 'Matteo', 'Elia', 'Riccardo', 'Saverio', 'Teo', 'Aldo', 'Ivan'],
+    F: ['Aurora', 'Chiara', 'Elena', 'Giada', 'Lara', 'Nadia', 'Paola', 'Sara', 'Vera', 'Zoe', 'Alba', 'Ilaria', 'Mirta', 'Ottavia', 'Rebecca', 'Tea', 'Agata', 'Dafne', 'Emma', 'Gemma', 'Irene', 'Matilde', 'Nora', 'Priscilla', 'Sveva', 'Bianca', 'Carla', 'Livia', 'Marta', 'Noemi', 'Viola', 'Greta'],
+    N: ['Ariel', 'Sasha', 'Noa', 'Eden', 'Alex', 'Andrea', 'Sole', 'Kai'],
+  };
+})(typeof window !== 'undefined' ? window : globalThis);
+
+;
+/* Last One Standing — scenari. Ogni tema fornisce lessico, testi di fase,
+ * eventi speciali (extra) e disastri. I temi "soft" non usano gli eventi
+ * di base ma un proprio repertorio completo (pool). */
+(function (G) {
+  const D = (G.LOS_DATA = G.LOS_DATA || {});
+
+  D.themes = [
+    /* ------------------------------------------------------------ */
+    {
+      id: 'classico', name: 'Arena Classica', tag: 'Boschi, fiumi e una Cornucopia piena di armi.',
+      hue: 38, glyph: '⟁',
+      phase: { b: 'Il bagno di sangue', d: 'Giorno', n: 'Notte', f: 'Il festino' },
+      intro: { b: 'Il gong risuona: i concorrenti si lanciano verso la Cornucopia.', d: 'Il sole sorge sull\'arena.', n: 'Cala il buio e il freddo morde.', f: 'Gli organizzatori annunciano un festino alla Cornucopia: ogni zaino contiene ciò di cui un concorrente ha più bisogno.', finale: 'Gli organizzatori prosciugano il Fiume e incendiano il Bosco: tutti i superstiti vengono spinti verso la Cornucopia.' },
+      fallen: ['Nessun colpo di cannone risuona oggi.', 'Un colpo di cannone risuona nell\'arena.', '{n} colpi di cannone risuonano nell\'arena.'],
+      lex: {
+        arma: ['un coltello', 'un arco', 'una lancia', 'un\'ascia', 'un machete', 'un tridente', 'una fionda', 'una spada corta', 'un pugnale', 'una mazza'],
+        cibo: ['delle bacche', 'un coniglio', 'del pesce essiccato', 'delle gallette', 'delle radici commestibili', 'una pagnotta'],
+        luogo: ['la Cornucopia', 'il Bosco', 'il Fiume', 'le Paludi', 'le Rovine', 'l\'Altopiano'],
+        mostro: ['un branco di lupi mutanti', 'uno sciame di vespe velenose', 'un orso affamato', 'un serpente gigante'],
+        trappola: ['una mina nascosta', 'una trappola a scatto', 'un fosso pieno di spuntoni'],
+        rifugio: ['una grotta', 'un albero cavo', 'un anfratto tra le rocce'],
+        dono: ['un paracadute degli sponsor'],
+      },
+      extra: {
+        b: `
+1 | {A} resta immobile sulla piattaforma fino al gong, poi corre nel Bosco.
+1 d:A *0.5 | {A} scende dalla piattaforma prima del gong e salta in aria.
+2 k:A>B | {A} raggiunge per prim[A:o/a] la Cornucopia e colpisce {B} con il primo arco che trova.
+`,
+        d: `
+1 +arma:A | {A} recupera {arma} da un concorrente caduto.
+1 @soc | {A} sorride alle telecamere sperando di conquistare nuovi sponsor.
+1 +med:A @soc | Gli sponsor apprezzano {A}: arriva {dono} con una medicina.
+2 al:AB @soc | {A} e {B} inscenano una storia d'amore per le telecamere.
+2 k:A>B @int | {A} fa cadere un nido di vespe velenose su {B}.
+1 +cibo:A @int | {A} pesca a mani nude nel Fiume.
+`,
+        n: `
+1 | {A} guarda i volti dei caduti proiettati nel cielo.
+1 | {A} ascolta l'inno dell'arena e stringe i denti.
+`,
+      },
+      disasters: [
+        { n: 'Incendio nel Bosco', intro: 'Un muro di fiamme avanza dal Bosco: gli organizzatori vogliono spingere tutti verso il centro.', out: `
+1 d:A | {A} resta intrappolat[A:o/a] tra le fiamme.
+1 s:A=ferito | {A} riesce a fuggire, ma con gravi ustioni.
+1 | {A} si getta nel Fiume e si salva.
+2 k:A>B | {A} usa {B} come scudo contro le fiamme.
+` },
+        { n: 'Nebbia velenosa', intro: 'Una nebbia lattiginosa scende dall\'Altopiano e brucia la pelle al primo contatto.', out: `
+1 d:A | {A} non riesce a sfuggire alla nebbia.
+1 s:A=avvelenato | {A} respira la nebbia e comincia a tossire sangue.
+1 | {A} trattiene il respiro e corre fino all'aria pulita.
+` },
+        { n: 'Ibridi scatenati', intro: 'Dalle Rovine escono decine di ibridi: bestie create in laboratorio, affamate.', out: `
+1 d:A | {A} viene sbranat[A:o/a] dagli ibridi.
+1 s:A=ferito | {A} viene mors[A:o/a], ma riesce ad arrampicarsi su un albero.
+2 d:B | {A} si salva mentre gli ibridi si accaniscono su {B}.
+` },
+        { n: 'La piena', intro: 'Le chiuse a monte vengono aperte: il Fiume esonda e trascina via tutto.', out: `
+1 d:A | {A} viene travolt[A:o/a] dalla piena.
+1 w:A -arma:A | {A} si salva, ma la corrente porta via {arma:A}.
+1 | {A} si aggrappa a un tronco e resiste.
+` },
+      ],
+    },
+    /* ------------------------------------------------------------ */
+    {
+      id: 'fantasy', name: 'Reame Incantato', tag: 'Draghi, rune e foreste che sussurrano.',
+      hue: 275, glyph: '✶',
+      phase: { b: 'La battaglia dell\'Altare', d: 'Giorno', n: 'Notte', f: 'Il banchetto incantato' },
+      intro: { b: 'I campioni corrono verso l\'Altare delle armi.', d: 'L\'alba tinge di viola le guglie della Torre.', n: 'Le lune gemelle si alzano sul reame.', f: 'Un banchetto incantato appare nella radura: chi avrà il coraggio di sedersi a tavola?', finale: 'Il drago si risveglia e incendia il reame: i superstiti vengono spinti fino all\'Altare.' },
+      fallen: ['Le campane del reame tacciono stanotte.', 'Una campana rintocca: un\'anima ha lasciato il reame.', 'Le campane rintoccano {n} volte nella valle.'],
+      lex: {
+        arma: ['una spada runica', 'un bastone magico', 'un arco elfico', 'un\'ascia nanica', 'un pugnale avvelenato', 'un martello da guerra', 'una balestra', 'una lancia incantata'],
+        cibo: ['del pane elfico', 'una fiaschetta di idromele', 'dei funghi luminosi', 'delle mele dorate', 'una forma di formaggio'],
+        luogo: ['la Torre in rovina', 'la Foresta elfica', 'il Lago nebbioso', 'le Miniere', 'la Palude stregata', 'il Picco del drago'],
+        mostro: ['un troll di caverna', 'una viverna', 'uno spettro errante', 'un branco di lupi mannari'],
+        trappola: ['una runa esplosiva', 'un incantesimo di fuoco', 'una pianta carnivora'],
+        rifugio: ['una torre abbandonata', 'la tana di un tasso gigante', 'un cerchio di funghi protettivo'],
+        dono: ['un dono portato da un corvo messaggero'],
+      },
+      extra: {
+        b: `
+1 +arma:A @int | {A} pronuncia una parola antica e {arma} [A:gli/le] vola in mano.
+2 k:A>B | {A} scaglia un incantesimo contro {B}, che si dissolve in cenere.
+`,
+        d: `
+1 +med:A @int | {A} distilla una pozione curativa da erbe di palude.
+1 s:A=malato | {A} beve dal Lago nebbioso e viene colpit[A:o/a] da una maledizione.
+1 need:A=malato cure:A @int *2 | {A} spezza la maledizione con un rito improvvisato.
+2 al:AB @soc | {A} e {B} giurano fedeltà su una spada spezzata.
+2 k:A>B @mad | {A} evoca uno spirito che si rivolta contro {B}.
+1 d:A | {A} prova a domare una viverna e ne diventa la cena.
+1 @luck | {A} trova un anello che rende invisibili per qualche minuto.
+`,
+        n: `
+1 | {A} sogna una profezia che parla della propria morte.
+2 ally:AB | {A} e {B} tracciano un cerchio di protezione attorno al campo.
+1 d:A *0.6 | {A} segue un fuoco fatuo nella Palude stregata e non torna più.
+`,
+      },
+      disasters: [
+        { n: 'Il risveglio del drago', intro: 'Un ruggito scuote il Picco: il drago si è svegliato ed è affamato.', out: `
+1 d:A | {A} viene incenerit[A:o/a] dal soffio del drago.
+1 s:A=ferito | {A} sfugge agli artigli del drago, ma resta ferit[A:o/a].
+1 | {A} si nasconde nelle Miniere finché il drago non si allontana.
+2 k:A>B | {A} attira il drago verso {B} e si mette in salvo.
+` },
+        { n: 'Eclissi di sangue', intro: 'Le lune si tingono di rosso: i morti escono dalle tombe del reame.', out: `
+1 d:A | {A} viene trascinat[A:o/a] sottoterra dai non morti.
+1 +arma:A | {A} strappa {arma} a uno scheletro e si apre la strada.
+1 | {A} resta immobile finché l'eclissi non passa.
+` },
+        { n: 'La foresta si muove', intro: 'Gli alberi della Foresta elfica si sradicano e marciano contro gli intrusi.', out: `
+1 d:A | {A} viene schiacciat[A:o/a] da un albero in marcia.
+1 s:A=ferito | {A} viene frustat[A:o/a] dai rami, ma riesce a fuggire.
+1 | {A} chiede perdono agli alberi, che l[A:o/a] lasciano passare.
+` },
+        { n: 'Tempesta arcana', intro: 'Fulmini viola cadono dal cielo: la magia del reame è impazzita.', out: `
+1 d:A | {A} viene colpit[A:o/a] da un fulmine arcano.
+1 s:A=malato | {A} assorbe troppa magia e comincia a delirare.
+1 @luck +arma:A | Un fulmine colpisce {A}, che ne esce illes[A:o/a] e con {arma} tra le mani.
+` },
+      ],
+    },
+    /* ------------------------------------------------------------ */
+    {
+      id: 'scifi', name: 'Stazione Orbitale', tag: 'Ossigeno limitato, droni e un reattore instabile.',
+      hue: 190, glyph: '◎',
+      phase: { b: 'Lo sbarco', d: 'Ciclo diurno', n: 'Ciclo notturno', f: 'Il rifornimento' },
+      intro: { b: 'Le capsule si aprono nell\'Hangar centrale.', d: 'Le luci della stazione tornano al massimo.', n: 'L\'illuminazione passa in modalità risparmio.', f: 'Una navetta di rifornimento attracca all\'Hangar: dentro ci sono casse etichettate con il nome di ogni concorrente.', finale: 'Il computer di bordo sigilla tutti i moduli tranne l\'Hangar: i superstiti non hanno più dove nascondersi.' },
+      fallen: ['Nessun segnale vitale si spegne in questo ciclo.', 'Il computer di bordo registra un segnale vitale spento.', 'Il computer di bordo registra {n} segnali vitali spenti.'],
+      lex: {
+        arma: ['un fucile al plasma', 'una lama vibrante', 'una pistola laser', 'una granata EMP', 'una frusta monofilamento', 'un taser a impulsi', 'un cannone a rotaia portatile'],
+        cibo: ['delle razioni liofilizzate', 'un tubetto di gel proteico', 'delle alghe idroponiche', 'una capsula nutritiva'],
+        luogo: ['l\'Hangar', 'la Serra idroponica', 'il Reattore', 'il Ponte di comando', 'i Moduli abitativi', 'i Condotti di servizio'],
+        mostro: ['un drone di sicurezza impazzito', 'uno sciame di nanobot', 'una creatura aliena dai tentacoli', 'un androide da combattimento'],
+        trappola: ['una griglia laser', 'una camera di decompressione', 'un pavimento elettrificato'],
+        rifugio: ['una capsula di salvataggio', 'un modulo di stoccaggio', 'un condotto di ventilazione'],
+        dono: ['un drone di rifornimento'],
+      },
+      extra: {
+        b: `
+1 d:A *0.5 | {A} apre la capsula troppo presto e viene risucchiat[A:o/a] nello spazio.
+1 +arma:A @int | {A} hackera un armadietto blindato e prende {arma}.
+`,
+        d: `
+1 @int | {A} hackera le telecamere della stazione per spiare gli altri.
+1 +trap:A @int | {A} riprogramma una torretta difensiva.
+1 s:A=malato | {A} viene espost[A:o/a] alle radiazioni del Reattore.
+2 k:A>B @int | {A} apre il portellone stagno mentre {B} è nel modulo sbagliato.
+2 al:AB | {A} e {B} condividono la stessa bombola d'ossigeno.
+1 d:A | {A} finisce l'ossigeno in un condotto bloccato.
+1 @luck +med:A | {A} trova un'infermeria automatica ancora funzionante.
+`,
+        n: `
+1 | {A} guarda la Terra dall'oblò e trattiene le lacrime.
+2 k:A>B @stl | {A} spegne il supporto vitale del modulo dove dorme {B}.
+1 @mad | {A} parla per ore con l'intelligenza artificiale della stazione.
+`,
+      },
+      disasters: [
+        { n: 'Breccia nello scafo', intro: 'Un meteorite perfora lo scafo: l\'aria comincia a uscire con un sibilo.', out: `
+1 d:A | {A} viene risucchiat[A:o/a] nel vuoto.
+1 s:A=ferito | {A} resiste aggrappat[A:o/a] a un corrimano, ma si spacca un braccio.
+1 | {A} raggiunge una paratia stagna un secondo prima che si chiuda.
+2 k:A>B | {A} chiude la paratia lasciando fuori {B}.
+` },
+        { n: 'Il reattore in fusione', intro: 'Allarme rosso: il nucleo del Reattore è instabile e le radiazioni dilagano.', out: `
+1 d:A | {A} non riesce ad allontanarsi in tempo dal Reattore.
+1 s:A=malato | {A} assorbe una dose pesante di radiazioni.
+1 @int | {A} si chiude in un modulo schermato.
+` },
+        { n: 'Rivolta dei droni', intro: 'Un virus si diffonde nella rete: tutti i droni di sicurezza attaccano a vista.', out: `
+1 d:A | {A} viene crivellat[A:o/a] dai droni.
+1 +arma:A @int | {A} abbatte un drone e ne recupera {arma}.
+1 | {A} si finge mort[A:o/a] finché i droni non passano oltre.
+` },
+        { n: 'Gravità zero', intro: 'Il generatore di gravità si spegne: tutto e tutti cominciano a fluttuare.', out: `
+1 d:A | {A} sbatte contro una paratia e non si muove più.
+1 | {A} si lascia trasportare e sfrutta l'assenza di peso per nascondersi.
+2 k:A>B | {A} spinge {B} contro un tubo di scarico del plasma.
+` },
+      ],
+    },
+    /* ------------------------------------------------------------ */
+    {
+      id: 'zombie', name: 'Città degli Infetti', tag: 'Ospedali vuoti, orde affamate e radio gracchianti.',
+      hue: 95, glyph: '☣',
+      phase: { b: 'L\'evacuazione', d: 'Giorno', n: 'Notte', f: 'Il lancio dei militari' },
+      intro: { b: 'Il convoglio si ferma in piazza e le casse di rifornimenti vengono gettate a terra.', d: 'La città si sveglia nel silenzio, rotto solo dai lamenti.', n: 'Senza corrente, la città sprofonda nel buio. Gli infetti sono più attivi.', f: 'Un elicottero dell\'esercito lancia casse sul tetto dell\'Ospedale: provviste per chi riesce a raggiungerle.', finale: 'L\'esercito bombarda la periferia: chi è ancora vivo viene spinto nel centro, verso l\'ultima zona sicura.' },
+      fallen: ['All\'appello via radio non manca nessuno.', 'All\'appello via radio una voce non risponde.', 'All\'appello via radio mancano {n} voci.'],
+      lex: {
+        arma: ['una mazza chiodata', 'un fucile a pompa', 'un piede di porco', 'una motosega', 'una katana', 'una balestra', 'una pistola', 'un\'accetta'],
+        cibo: ['delle scatolette di fagioli', 'una barretta energetica', 'dell\'acqua in bottiglia', 'un sacchetto di patatine', 'una confezione di crackers'],
+        luogo: ['l\'Ospedale', 'il Centro commerciale', 'la Metropolitana', 'la Scuola', 'la Stazione di polizia', 'la Periferia'],
+        mostro: ['un\'orda di zombi', 'un infetto corridore', 'un cane infetto', 'un gigante mutato'],
+        trappola: ['una trappola esplosiva lasciata dai militari', 'un pavimento crollato', 'un reticolato elettrificato'],
+        rifugio: ['un furgone blindato', 'il tetto di un palazzo', 'un bunker antiatomico'],
+        dono: ['un lancio di rifornimenti dell\'esercito'],
+      },
+      extra: {
+        b: `
+1 s:A=malato | {A} viene graffiat[A:o/a] da un infetto nella confusione.
+2 k:A>B | {A} spinge {B} verso un gruppo di infetti per guadagnare tempo.
+`,
+        d: `
+1 s:A=malato | {A} viene mors[A:o/a] da uno zombi e nasconde la ferita a tutti.
+1 need:A=malato d:A *2.5 | {A} si trasforma: l'infezione ha vinto.
+1 need:A=malato med:A cure:A *3 | {A} si inietta l'antidoto sperimentale e la febbre scende.
+2 need:B=malato k:A>B *2 | {A} si accorge che {B} sta per trasformarsi e mette fine alle sue sofferenze.
+1 +arma:A | {A} saccheggia l'armeria della Stazione di polizia e trova {arma}.
+1 | {A} prova la radio: solo interferenze.
+2 al:AB @soc | {A} e {B} barricano insieme un negozio di ferramenta.
+`,
+        n: `
+1 | {A} sente l'orda grattare alla porta per tutta la notte.
+1 d:A | {A} esce a cercare acqua e non rientra.
+2 ally:AB | {A} e {B} si chiudono in un furgone e aspettano l'alba.
+`,
+      },
+      disasters: [
+        { n: 'La grande orda', intro: 'Migliaia di infetti attraversano la città in un\'unica marea.', out: `
+1 d:A | {A} viene sommers[A:o/a] dall'orda.
+1 s:A=malato | {A} riesce a fuggire, ma con un morso sul braccio.
+1 | {A} si arrampica su un lampione e aspetta che l'orda passi.
+2 k:A>B | {A} sgambetta {B} per rallentare gli infetti.
+` },
+        { n: 'Bombardamento', intro: 'L\'esercito sgancia bombe incendiarie per contenere il contagio.', out: `
+1 d:A | {A} viene investit[A:o/a] da un'esplosione.
+1 s:A=ferito | {A} si salva, ma un frammento [A:gli/le] squarcia una gamba.
+1 | {A} si rifugia nella Metropolitana appena in tempo.
+` },
+        { n: 'Gas nella metro', intro: 'I militari saturano i tunnel della Metropolitana di gas.', out: `
+1 d:A | {A} resta intrappolat[A:o/a] nei tunnel.
+1 s:A=avvelenato | {A} esce dai tunnel tossendo sangue.
+1 @int | {A} trova una maschera antigas in un deposito.
+` },
+        { n: 'Il mutato', intro: 'Un infetto gigantesco, alto il doppio di un uomo, inizia a cacciare.', out: `
+1 d:A | {A} viene afferrat[A:o/a] dal mutato.
+1 +arma:A | {A} trova {arma} vicino al corpo di un soldato e scappa.
+2 d:B | {A} si nasconde mentre il mutato si accanisce su {B}.
+` },
+      ],
+    },
+    /* ------------------------------------------------------------ */
+    {
+      id: 'royale', name: 'Isola Battle Royale', tag: 'Un aereo, cento casse e una zona che si stringe.',
+      hue: 210, glyph: '⌖',
+      phase: { b: 'Il lancio', d: 'Giorno', n: 'Notte', f: 'La cassa leggendaria' },
+      intro: { b: 'I giocatori saltano dall\'aereo e atterrano tra le casse.', d: 'La zona sicura si stringe ancora.', n: 'I visori notturni si accendono.', f: 'Un razzo rosso segnala una cassa leggendaria al centro dell\'isola.', finale: 'La zona sicura si riduce a un cerchio di cinquanta metri: lo scontro finale è inevitabile.' },
+      fallen: ['Il contatore dei giocatori resta invariato.', 'Il contatore scende: un giocatore è stato eliminato.', 'Il contatore scende di {n} giocatori.'],
+      lex: {
+        arma: ['un fucile d\'assalto', 'una pistola', 'un fucile da cecchino', 'un fucile a pompa', 'una granata', 'una mitraglietta', 'un coltello da combattimento', 'una balestra'],
+        cibo: ['una lattina di energy drink', 'delle barrette proteiche', 'un kit di razioni militari'],
+        luogo: ['l\'Aeroporto', 'la Base militare', 'il Villaggio costiero', 'la Centrale elettrica', 'la Fattoria', 'la Foresta'],
+        mostro: ['un drone armato', 'un elicottero da caccia', 'un cane da guardia addestrato'],
+        trappola: ['una mina claymore', 'una trappola esplosiva', 'un campo minato'],
+        rifugio: ['una casa abbandonata', 'un fienile', 'un bagno della stazione di servizio'],
+        dono: ['una cassa di rifornimenti paracadutata'],
+      },
+      extra: {
+        b: `
+1 d:A *0.5 | {A} apre il paracadute troppo tardi.
+2 k:A>B +arma:A | {A} atterra sulla stessa casa di {B}, trova {arma} per prim[A:o/a] e l[B:o/a] elimina.
+`,
+        d: `
+1 d:A | {A} resta fuori dalla zona sicura e non fa in tempo a rientrare.
+1 s:A=ferito | {A} rientra nella zona sicura all'ultimo secondo, con la salute a pezzi.
+2 k:A>B w:A @stl | {A} colpisce {B} dalla distanza con un tiro perfetto.
+2 k:A>B | {A} e {B} si incontrano nello stesso edificio: {A} spara per prim[A:o/a].
+1 +arma:A @luck | {A} trova {arma} con mirino olografico.
+1 @stl | {A} si nasconde in un cespuglio e aspetta che qualcuno passi.
+2 al:AB @soc | {A} e {B} si salutano con un'emote e decidono di fare squadra.
+`,
+        n: `
+1 | {A} ricarica tutte le armi e controlla le munizioni.
+2 k:A>B @stl | {A} segue il rumore dei passi di {B} e l[B:o/a] elimina nel buio.
+`,
+      },
+      disasters: [
+        { n: 'Zona rossa', intro: 'Una zona rossa viene bombardata a tappeto senza preavviso.', out: `
+1 d:A | {A} viene colpit[A:o/a] dal bombardamento.
+1 s:A=ferito | {A} esce dalla zona rossa con la salute a metà.
+1 | {A} si mette al riparo in un bunker.
+` },
+        { n: 'La zona si chiude', intro: 'Il cerchio si restringe a velocità doppia.', out: `
+1 d:A | {A} resta fuori dal cerchio.
+1 | {A} prende un veicolo e rientra al volo.
+2 k:A>B | {A} aspetta {B} sul bordo della zona e l[B:o/a] elimina mentre corre.
+` },
+        { n: 'Caccia del drone', intro: 'Un drone armato sorvola l\'isola e marca chiunque si muova.', out: `
+1 d:A | {A} viene individuat[A:o/a] dal drone.
+1 +arma:A @int | {A} abbatte il drone e recupera {arma} dal suo carico.
+1 @stl | {A} resta immobile finché il drone non si allontana.
+` },
+        { n: 'Tempesta tropicale', intro: 'Una tempesta improvvisa spazza l\'isola: niente visibilità, niente suoni.', out: `
+1 d:A | {A} cade da una scogliera nella tempesta.
+1 | {A} aspetta che la tempesta passi dentro un fienile.
+2 k:A>B @stl | Approfittando del rumore della pioggia, {A} si avvicina a {B} e l[B:o/a] elimina.
+` },
+      ],
+    },
+    /* ------------------------------------------------------------ */
+    {
+      id: 'horror', name: 'Villa Maledetta', tag: 'Specchi che sussurrano e porte che si chiudono da sole.',
+      hue: 350, glyph: '✝',
+      phase: { b: 'La cena', d: 'Giorno', n: 'Notte', f: 'Il ballo in maschera' },
+      intro: { b: 'Gli ospiti si avventano sulle armi appese nel salone.', d: 'Una luce grigia filtra dalle finestre sbarrate.', n: 'Le candele si spengono una dopo l\'altra.', f: 'Il padrone di casa invita tutti al ballo in maschera: sui tavoli del salone ci sono doni avvolti in carta nera.', finale: 'La villa sigilla ogni stanza tranne il salone: gli ultimi ospiti si ritrovano faccia a faccia.' },
+      fallen: ['L\'orologio a pendolo tace stanotte.', 'L\'orologio a pendolo batte un rintocco: un\'anima è stata presa.', 'L\'orologio a pendolo batte {n} rintocchi.'],
+      lex: {
+        arma: ['un candelabro d\'argento', 'un\'ascia', 'un fucile da caccia', 'un pugnale rituale', 'un crocifisso appuntito', 'un attizzatoio', 'una falce'],
+        cibo: ['del vino polveroso', 'del pane raffermo', 'una scatola di biscotti', 'un barattolo di marmellata'],
+        luogo: ['la Cantina', 'la Soffitta', 'la Cappella', 'il Cimitero', 'la Biblioteca', 'la Serra'],
+        mostro: ['uno spettro urlante', 'una bambola posseduta', 'un\'entità senza volto', 'uno stormo di corvi'],
+        trappola: ['una botola nascosta', 'un pavimento marcio', 'uno specchio maledetto'],
+        rifugio: ['un armadio a muro', 'una cripta', 'un passaggio segreto'],
+        dono: ['una busta nera infilata sotto la porta'],
+      },
+      extra: {
+        b: `
+1 | {A} nota che i ritratti alle pareti hanno gli occhi che seguono gli ospiti.
+2 k:A>B | {A} spegne le candele e nel buio colpisce {B}.
+`,
+        d: `
+1 s:A=malato | {A} si guarda allo specchio e vede il proprio riflesso sorridere.
+1 need:A=malato d:A *2 | {A} viene possedut[A:o/a] dalla presenza nella villa e si getta dalla Soffitta.
+1 need:A=malato cure:A @int *2 | {A} recita un esorcismo trovato in Biblioteca e si libera della presenza.
+1 @int | {A} scopre un diario che rivela la storia della villa.
+1 +arma:A | {A} trova {arma} dentro un baule della Soffitta.
+2 al:AB @soc | {A} e {B} promettono di non separarsi mai.
+2 d:B | {A} vede {B} sparire dietro una porta che poi si richiude da sola.
+`,
+        n: `
+1 | {A} sente una ninna nanna provenire dalle pareti.
+1 d:A | {A} segue una voce che chiama il suo nome fino alla Cantina.
+1 @mad | {A} conversa con un fantasma che nessun altro vede.
+2 ally:AB | {A} e {B} tengono una candela accesa fino all'alba.
+`,
+      },
+      disasters: [
+        { n: 'La notte dei morti', intro: 'Le tombe del Cimitero si spalancano.', out: `
+1 d:A | {A} viene trascinat[A:o/a] in una tomba aperta.
+1 s:A=ferito | {A} sfugge a mani scheletriche che [A:gli/le] lacerano le gambe.
+1 | {A} si chiude nella Cappella fino all'alba.
+` },
+        { n: 'Gli specchi', intro: 'Tutti gli specchi della villa si incrinano nello stesso istante.', out: `
+1 d:A | {A} viene risucchiat[A:o/a] dentro uno specchio.
+1 s:A=malato | {A} vede il proprio riflesso uscire dallo specchio e scappa terrorizzat[A:o/a].
+1 @int | {A} copre tutti gli specchi con dei teli.
+` },
+        { n: 'L\'incendio della Serra', intro: 'Le piante della Serra prendono fuoco e il fumo invade la villa.', out: `
+1 d:A | {A} soffoca nel fumo.
+1 | {A} esce da una finestra e aspetta nel giardino.
+2 k:A>B | {A} chiude {B} nella Serra in fiamme.
+` },
+        { n: 'La bambola', intro: 'Una bambola di porcellana compare in ogni stanza. Ride.', out: `
+1 d:A | {A} viene trovat[A:o/a] senza vita accanto alla bambola.
+1 | {A} getta la bambola nel camino. Torna intera il giorno dopo.
+1 s:A=avvelenato | {A} si punge con lo spillone della bambola.
+` },
+      ],
+    },
+    /* ------------------------------------------------------------ */
+    {
+      id: 'wasteland', name: 'Terre Desolate', tag: 'Polvere radioattiva, predoni e motori truccati.',
+      hue: 25, glyph: '☢',
+      phase: { b: 'La corsa al deposito', d: 'Giorno', n: 'Notte', f: 'Il convoglio' },
+      intro: { b: 'Il cancello del deposito si spalanca: dentro ci sono armi e taniche.', d: 'Il sole picchia sulla sabbia rovente.', n: 'Nel deserto la temperatura crolla sotto zero.', f: 'Un convoglio carico di acqua pulita attraversa l\'Autostrada spezzata.', finale: 'Una tempesta radioattiva copre tutto tranne la Diga: i superstiti convergono lì.' },
+      fallen: ['Nessun fumo nero sale all\'orizzonte.', 'Una colonna di fumo nero sale all\'orizzonte.', '{n} colonne di fumo nero salgono all\'orizzonte.'],
+      lex: {
+        arma: ['un fucile arrugginito', 'una lancia ricavata da un tubo', 'una balestra artigianale', 'una molotov', 'una catena', 'una mannaia', 'un lanciachiodi'],
+        cibo: ['una lattina ammaccata', 'della carne di lucertola', 'una tanica d\'acqua torbida', 'dei fichi d\'India'],
+        luogo: ['la Discarica', 'l\'Autostrada spezzata', 'la Raffineria', 'la Città fantasma', 'il Cratere', 'la Diga'],
+        mostro: ['una banda di predoni', 'uno scorpione gigante', 'un branco di cani mutati', 'un verme delle sabbie'],
+        trappola: ['una vecchia mina', 'una pozza di fango radioattivo', 'un cavo teso tra le rovine'],
+        rifugio: ['la carcassa di un autobus', 'una cisterna vuota', 'un bunker crollato'],
+        dono: ['un carico di rottami lanciato da un dirigibile'],
+      },
+      extra: {
+        b: `
+1 +arma:A | {A} sfonda una cassa a calci e ci trova {arma}.
+2 k:A>B @agg | {A} investe {B} con una moto truccata.
+`,
+        d: `
+1 s:A=malato | {A} attraversa il Cratere e si espone alle radiazioni.
+1 s:A=affamato | {A} cammina per ore sotto il sole senza trovare acqua.
+1 +arma:A @int | {A} assembla {arma} con pezzi della Discarica.
+1 @soc | {A} baratta un accendino con un mercante di passaggio.
+2 k:A>B | {A} sabota il veicolo di {B}, che salta in aria.
+2 al:AB | {A} e {B} si alleano per riparare un vecchio camion.
+1 d:A | {A} viene inghiottit[A:o/a] da un verme delle sabbie.
+`,
+        n: `
+1 | {A} conta le stelle per non pensare alla sete.
+2 k:A>B @stl | {A} si avvicina al falò di {B} e l[B:o/a] colpisce con una catena.
+`,
+      },
+      disasters: [
+        { n: 'Tempesta di sabbia radioattiva', intro: 'Un muro di sabbia verde avanza dall\'orizzonte.', out: `
+1 d:A | {A} viene sepolt[A:o/a] dalla sabbia.
+1 s:A=malato | {A} respira polvere radioattiva.
+1 | {A} si rintana in una cisterna vuota.
+` },
+        { n: 'Il raid dei predoni', intro: 'Una banda di predoni su moto rombanti attraversa le Terre Desolate.', out: `
+1 d:A | {A} viene catturat[A:o/a] dai predoni e non se ne sa più nulla.
+1 +arma:A | {A} ruba {arma} a un predone ubriaco.
+2 k:A>B | {A} vende la posizione di {B} ai predoni.
+` },
+        { n: 'L\'esplosione della Raffineria', intro: 'La Raffineria salta in aria in una palla di fuoco.', out: `
+1 d:A | {A} viene investit[A:o/a] dall'onda d'urto.
+1 s:A=ferito | {A} viene sbalzat[A:o/a] lontano, ma sopravvive.
+1 | {A} guarda l'esplosione da lontano, al sicuro.
+` },
+        { n: 'La siccità', intro: 'Tutte le fonti d\'acqua si prosciugano nello stesso giorno.', out: `
+1 d:A | {A} muore disidratat[A:o/a].
+1 s:A=affamato | {A} sopravvive bevendo da un radiatore.
+1 cibo:A | {A} divide in piccole sorsate l'ultima acqua che aveva.
+` },
+      ],
+    },
+    /* ------------------------------------------------------------ */
+    {
+      id: 'liceo', name: 'Liceo Spietato', tag: 'Interrogazioni, gossip e alleanze da intervallo. Nessuno muore: si viene eliminati.',
+      hue: 330, glyph: '✎', soft: true,
+      labels: { kills: 'Eliminazioni', dead: 'Eliminati', fallen: 'Eliminati del giorno', killed: 'Eliminat' },
+      phase: { b: 'Il primo giorno', d: 'Lezioni', n: 'Dopo scuola', f: 'La festa di fine anno' },
+      intro: { b: 'Suona la campanella: tutti corrono a prendersi il banco migliore.', d: 'Prima ora: compito in classe.', n: 'La scuola si svuota, ma la chat di classe no.', f: 'Si apre la festa in Palestra: musica alta e ogni occasione è buona per un colpo basso.', finale: 'La Preside convoca gli ultimi rimasti in Aula magna per il verdetto finale.' },
+      fallen: ['All\'appello del mattino non manca nessuno.', 'All\'appello del mattino manca un nome.', 'All\'appello del mattino mancano {n} nomi.'],
+      lex: {
+        arma: ['un gossip esplosivo', 'una foto imbarazzante', 'un compito copiato', 'un pallone da dodgeball', 'un registro rubato', 'un profilo falso'],
+        cibo: ['una merendina del distributore', 'un trancio di pizza della mensa', 'un caffè della macchinetta'],
+        luogo: ['la Palestra', 'la Mensa', 'la Biblioteca', 'il Laboratorio di chimica', 'il Cortile', 'l\'Aula magna'],
+        mostro: ['la Preside', 'il bidello di turno', 'un\'ispezione a sorpresa', 'la professoressa di matematica'],
+        trappola: ['un\'interrogazione a sorpresa', 'una verifica a sorpresa', 'un messaggio inviato nella chat sbagliata'],
+        rifugio: ['il bagno del secondo piano', 'l\'aula di musica', 'il ripostiglio delle scope'],
+        dono: ['un bigliettino passato sotto il banco'],
+      },
+      pool: {
+        b: `
+1 | {A} conquista l'ultimo banco vicino al termosifone.
+1 +arma:A | {A} scopre {arma} su un compagno e se lo tiene per il momento giusto.
+1 @cow | {A} si siede in prima fila sperando di passare inosservat[A:o/a].
+1 +cibo:A | {A} arriva con {cibo} e diventa subito popolare.
+1 d:A *0.6 | {A} si presenta il primo giorno con la maglietta sbagliata e non si riprenderà mai.
+2 k:A>B @agg | {A} soffia il posto a {B} davanti a tutti: {B} chiede di cambiare sezione.
+2 al:AB @soc | {A} e {B} scoprono di seguire le stesse serie tv e diventano inseparabili.
+2 | {A} e {B} litigano per lo stesso armadietto, poi fanno pace.
+2 k:A>B w:A | {A} usa {arma:A} contro {B}, che si trasferisce in un'altra scuola.
+3 al:ABC @soc | {A}, {B} e {C} fondano il gruppo più esclusivo della classe.
+3 k:AB>C | {A} e {B} escludono {C} da ogni gruppo di studio: {C} è fuori.
+2 @stl | {A} memorizza l'orario di tutti i professori, mentre {B} si perde nei corridoi.
+`,
+        d: `
+1 | {A} prende un sette in storia e passa la giornata tranquill[A:o/a].
+1 @int | {A} prepara una schedina perfetta per il compito di latino.
+1 s:A=ferito | {A} prende un due all'interrogazione di fisica.
+1 need:A=ferito d:A *2 | {A} accumula troppe insufficienze e viene bocciat[A:o/a].
+1 need:A=* cure:A @int *2 | {A} recupera tutte le insufficienze con un'interrogazione da dieci.
+1 d:A | {A} viene sorpres[A:o/a] a fumare in bagno e sospes[A:o/a].
+1 d:A | {A} incontra {mostro} nel momento peggiore e viene sospes[A:o/a].
+1 s:A=malato | {A} si prende l'influenza dal compagno di banco.
+1 need:A=malato d:A *1.5 | {A} salta troppe lezioni per malattia e perde l'anno.
+1 +arma:A @stl | {A} fotografa di nascosto la chat dei rappresentanti e ottiene {arma}.
+1 @soc | {A} organizza l'uscita di classe e tutti l[A:o/a] adorano.
+1 @cow | {A} si chiude in {rifugio} per tutta la ricreazione.
+1 +trap:A @int | {A} prepara una domanda trabocchetto per l'assemblea di istituto.
+1 +cibo:A | {A} arriva per prim[A:o/a] alla macchinetta e si accaparra {cibo}.
+1 @mad | {A} si presenta a scuola in pigiama e nessuno capisce se sia uno scherzo.
+2 al:AB @soc | {A} e {B} si mettono a studiare insieme.
+2 ally:AB | {A} e {B} si passano le risposte durante la verifica.
+2 tr:A>B | {A} fa la spia sul compito copiato di {B}: {B} viene sospes[B:o/a].
+2 ally:AB br:A @betray | {A} smette di rispondere ai messaggi di {B}.
+2 k:A>B w:A @agg | {A} diffonde {arma:A} su {B}: {B} non si fa più vedere a scuola.
+2 k:A>B @agg | {A} umilia {B} davanti a tutta la classe: {B} chiede il trasferimento.
+2 k:A>B trap:A @int *2 | {B} cade nella domanda trabocchetto di {A} e viene eliminat[B:o/a].
+2 k:A>B @stl | {A} fa sparire la giustificazione di {B}, che viene sospes[B:o/a].
+2 s:B=ferito | {A} fa notare un errore di {B} alla professoressa.
+2 steal:A<B @stl | {A} ruba {arma:B} a {B} prima che possa servirsene.
+2 need:B=* cure:B @heal | {A} presta gli appunti a {B}, che recupera.
+2 | {A} e {B} si ignorano per tutto il giorno.
+2 k:A>B k:B>A *0.4 | {A} e {B} litigano in corridoio e vengono sospes[AB:i/e] entramb[AB:i/e].
+3 al:ABC @soc | {A}, {B} e {C} creano una chat segreta.
+3 k:AB>C @agg | {A} e {B} mettono in giro una voce su {C}, che lascia la scuola.
+3 | {A}, {B} e {C} formano un gruppo per la ricerca di scienze.
+`,
+        n: `
+1 | {A} guarda serie tv fino alle tre del mattino.
+1 | {A} studia fino a tardi per la verifica di domani.
+1 @mad | {A} manda un vocale di dieci minuti nella chat di classe.
+1 d:A | {A} pubblica una storia di cui si pentirà per sempre ed esce dai giochi.
+1 s:A=affamato | {A} salta la cena per finire i compiti.
+1 need:A=* cure:A | {A} dorme dieci ore e si riprende.
+1 @stl | {A} spia i profili social di tutti i compagni.
+1 +arma:A @stl | {A} trova {arma} scorrendo vecchie foto.
+2 ally:AB | {A} e {B} fanno una videochiamata di tre ore.
+2 tr:A>B | {A} inoltra a tutta la classe i messaggi privati di {B}.
+2 k:A>B @agg | {A} crea un meme su {B} che diventa virale: {B} è fuori.
+2 al:AB @soc | {A} e {B} si ritrovano alla stessa festa e diventano amic[AB:i/he].
+2 | {A} e {B} litigano su chi abbia ragione in una discussione di storia.
+3 ally:ABC | {A}, {B} e {C} fanno un pigiama party.
+3 k:A>B | {A} scatena una lite nel gruppo e {B} ne esce distrutt[B:o/a], sotto lo sguardo di {C}.
+`,
+        f: `
+1 | {A} balla tutta la sera senza pensare a niente.
+1 @cow | {A} decide di non andare alla festa.
+1 +arma:A | {A} scatta {arma} durante la festa.
+1 d:A | {A} rovescia il punch sulla Preside ed è fuori.
+2 k:A>B @agg | {A} rovina l'ingresso di {B} alla festa: {B} non si riprende.
+2 al:AB @soc | {A} e {B} ballano il lento insieme.
+2 tr:A>B | {A} abbandona {B} per un gruppo più popolare, facendol[B:o/a] crollare.
+3 k:A>BC *0.6 | {A} rivela i segreti di {B} e {C} al microfono: entramb[BC:i/e] fuori.
+`,
+        finale: `
+2 k:A>B | La Preside decide: {A} resta, {B} no.
+2 k:A>B | All'ultima interrogazione {A} risponde meglio di {B}.
+2 k:A>B w:A | {A} gioca la sua ultima carta, {arma:A}, e {B} viene eliminat[B:o/a].
+`,
+        ds: `
+1 | {A} resta impassibile e si salva.
+1 @luck | {A} era assente quel giorno.
+1 s:A=ferito | {A} se la cava, ma con una nota sul registro.
+1 @int | {A} aveva previsto tutto.
+2 ally:AB | {A} e {B} si coprono a vicenda.
+2 k:A>B | {A} scarica tutta la colpa su {B}.
+`,
+        fallback: `
+1 | {A} passa la giornata senza farsi notare.
+`,
+      },
+      disasters: [
+        { n: 'L\'ispezione ministeriale', intro: 'Arrivano gli ispettori del ministero: ogni irregolarità verrà punita.', out: `
+1 d:A | {A} viene sorpres[A:o/a] con il telefono acceso e sospes[A:o/a].
+1 | {A} si presenta con il libro aperto alla pagina giusta.
+` },
+        { n: 'Il compito a sorpresa', intro: 'La professoressa di matematica entra sorridendo: compito in classe a sorpresa.', out: `
+1 d:A | {A} consegna il foglio in bianco ed è fuori.
+1 s:A=ferito | {A} prende quattro.
+1 @int | {A} prende dieci senza sforzo.
+` },
+        { n: 'La chat trapelata', intro: 'La chat segreta della classe finisce sul telefono della Preside.', out: `
+1 d:A | Saltano fuori i messaggi di {A}: espulsione immediata.
+1 @luck | {A} aveva sempre scritto solo adesivi.
+2 k:A>B | {A} mostra alla Preside solo i messaggi di {B}.
+` },
+      ],
+    },
+    /* ------------------------------------------------------------ */
+    {
+      id: 'ufficio', name: 'Ufficio Open Space', tag: 'Riunioni infinite, fogli Excel e licenziamenti. Nessuno muore: si viene licenziati.',
+      hue: 160, glyph: '▦', soft: true,
+      labels: { kills: 'Licenziamenti causati', dead: 'Licenziati', fallen: 'Licenziati del giorno', killed: 'Licenziat' },
+      phase: { b: 'Il lunedì mattina', d: 'Orario d\'ufficio', n: 'Straordinari', f: 'La cena aziendale' },
+      intro: { b: 'Si apre la corsa alla scrivania vicino alla finestra.', d: 'Nove in punto: le mail arrivano a raffica.', n: 'Le luci dell\'open space si abbassano, ma qualcuno resta.', f: 'L\'azienda organizza la cena aziendale: open bar e direttori di buon umore. Forse.', finale: 'Il Direttore generale convoca gli ultimi superstiti in Sala riunioni: resterà un solo posto.' },
+      fallen: ['Nessuna scrivania si svuota oggi.', 'Una scrivania viene svuotata: c\'è uno scatolone in più vicino all\'uscita.', '{n} scrivanie vengono svuotate prima di sera.'],
+      lex: {
+        arma: ['una mail in copia a tutti', 'un report pieno di errori altrui', 'una presentazione rubata', 'un badge clonato del capo', 'un foglio Excel con le prove', 'una nota spese gonfiata'],
+        cibo: ['un caffè della macchinetta', 'una ciambella della sala riunioni', 'un\'insalata in vaschetta'],
+        luogo: ['la Sala riunioni', 'l\'Open space', 'la Cucina', 'l\'Ufficio del direttore', 'la Sala stampanti', 'il Parcheggio'],
+        mostro: ['il Direttore generale', 'l\'ufficio Risorse umane', 'un consulente esterno', 'una riorganizzazione aziendale'],
+        trappola: ['una riunione che poteva essere una mail', 'una stampante inceppata', 'un aggiornamento di sistema'],
+        rifugio: ['la sala server', 'lo sgabuzzino della cancelleria', 'una call di quattro ore a telecamera spenta'],
+        dono: ['un bonus in busta paga'],
+      },
+      pool: {
+        b: `
+1 | {A} conquista la scrivania vicino alla finestra.
+1 +arma:A @stl | {A} trova {arma} nella cartella condivisa.
+1 @cow | {A} si siede nell'angolo più buio e spera di non essere vist[A:o/a].
+1 +cibo:A | {A} arriva per prim[A:o/a] alla macchinetta e si prende {cibo}.
+1 d:A *0.5 | {A} sbaglia il nome del direttore al primo saluto ed è fuori.
+2 k:A>B @agg | {A} si prende il merito del lavoro di {B} durante la prima riunione: {B} viene licenziat[B:o/a].
+2 al:AB @soc | {A} e {B} scoprono di odiare lo stesso collega e fanno squadra.
+2 | {A} e {B} si contendono l'unica sedia ergonomica.
+3 al:ABC @soc | {A}, {B} e {C} creano un gruppo per la pausa pranzo.
+3 k:AB>C | {A} e {B} fanno sparire il portatile di {C} prima della presentazione.
+`,
+        d: `
+1 | {A} risponde a quaranta mail e non succede altro.
+1 @int | {A} automatizza il proprio lavoro con una macro e nessuno se ne accorge.
+1 s:A=ferito | {A} riceve una valutazione negativa dal capo.
+1 need:A=ferito d:A *2 | {A} riceve la seconda valutazione negativa: licenziamento.
+1 need:A=* cure:A @int *2 | {A} chiude un contratto enorme e torna nelle grazie del capo.
+1 d:A | {A} viene convocat[A:o/a] da {mostro} e non torna alla scrivania.
+1 d:A | {A} rimane bloccat[A:o/a] in {trappola} e salta una scadenza decisiva.
+1 s:A=malato | {A} arriva al lavoro con l'influenza e contagia mezzo piano.
+1 need:A=malato d:A *1.5 | {A} esaurisce i giorni di malattia ed è fuori.
+1 +arma:A @stl | {A} recupera {arma} dal cestino della carta.
+1 @soc | {A} porta le paste per tutti e conquista l'ufficio.
+1 @cow | {A} si rifugia in {rifugio} per tutta la mattina.
+1 +trap:A @int | {A} prepara una riunione-trappola per il pomeriggio.
+1 @mad | {A} risponde a tutte le mail con un solo emoji.
+1 +cibo:A | {A} riceve {dono} e torna di buon umore.
+2 al:AB @soc | {A} e {B} si alleano per il nuovo progetto.
+2 ally:AB | {A} e {B} si coprono a vicenda durante la riunione.
+2 tr:A>B | {A} inoltra al capo le lamentele di {B}: {B} viene licenziat[B:o/a].
+2 ally:AB br:A @betray | {A} si fa trasferire in un altro team senza dire nulla a {B}.
+2 k:A>B w:A @agg | {A} usa {arma:A} contro {B}: per {B} arriva la lettera di licenziamento.
+2 k:A>B @agg | {A} fa notare in riunione tutti gli errori di {B}: {B} è fuori.
+2 k:A>B trap:A @int *2 | {B} cade nella riunione-trappola di {A} e non si riprende.
+2 k:A>B @stl | {A} sposta di nascosto la scadenza di {B} di una settimana prima.
+2 s:B=ferito | {A} mette {B} in copia a una mail imbarazzante.
+2 steal:A<B @stl | {A} sottrae a {B} {arma:B}.
+2 need:B=* cure:B @heal | {A} aiuta {B} a sistemare il report.
+2 | {A} e {B} fingono di lavorare per tutto il pomeriggio.
+2 k:A>B k:B>A *0.4 | {A} e {B} litigano urlando in Sala riunioni: licenziat[AB:i/e] entramb[AB:i/e].
+3 al:ABC @soc | {A}, {B} e {C} formano un sindacato segreto.
+3 k:AB>C @agg | {A} e {B} convincono il capo che {C} è inutile.
+3 | {A}, {B} e {C} restano bloccat[ABC:i/e] in ascensore per un'ora.
+`,
+        n: `
+1 | {A} resta in ufficio fino a mezzanotte.
+1 | {A} spegne il telefono e si gode la serata.
+1 @mad | {A} manda una mail di dimissioni alle due di notte, poi la annulla.
+1 d:A | {A} pubblica un post contro l'azienda ed è fuori.
+1 s:A=affamato | {A} cena con un pacchetto di crackers alla scrivania.
+1 need:A=* cure:A | {A} si prende una serata libera e torna in forma.
+1 +arma:A @stl | {A} scopre {arma} scorrendo l'archivio aziendale.
+2 ally:AB | {A} e {B} vanno all'aperitivo insieme.
+2 tr:A>B | {A} usa i messaggi privati di {B} per farl[B:o/a] licenziare.
+2 k:A>B @stl | {A} cancella di nascosto i file di {B} dal server.
+2 al:AB @soc | {A} e {B} si incontrano in palestra e fanno amicizia.
+3 ally:ABC | {A}, {B} e {C} preparano insieme la presentazione di domani.
+`,
+        f: `
+1 | {A} si gode l'open bar con moderazione.
+1 @cow | {A} salta la cena aziendale.
+1 +arma:A | {A} registra {arma} durante la cena.
+1 d:A | {A} dice al Direttore cosa pensa davvero di lui ed è fuori.
+2 k:A>B @agg | {A} fa ubriacare {B}, che dà spettacolo davanti ai capi.
+2 al:AB @soc | {A} e {B} cantano insieme al karaoke.
+3 k:A>BC *0.6 | {A} legge ad alta voce le mail di {B} e {C} durante il brindisi.
+`,
+        finale: `
+2 k:A>B | Il Direttore sceglie {A}: {B} riceve lo scatolone.
+2 k:A>B | {A} presenta numeri migliori di {B} all'ultima riunione.
+2 k:A>B w:A | {A} gioca la sua ultima carta, {arma:A}, e {B} è fuori.
+`,
+        ds: `
+1 | {A} mantiene la calma e sopravvive.
+1 @luck | {A} era in ferie.
+1 s:A=ferito | {A} si salva, ma con un richiamo scritto.
+1 @int | {A} aveva già aggiornato il curriculum.
+2 ally:AB | {A} e {B} si coprono a vicenda.
+2 k:A>B | {A} scarica tutta la responsabilità su {B}.
+`,
+        fallback: `
+1 | {A} passa la giornata davanti a un foglio Excel.
+`,
+      },
+      disasters: [
+        { n: 'La riorganizzazione', intro: 'Arriva un consulente esterno con una slide intitolata "Ottimizzazione delle risorse".', out: `
+1 d:A | Il ruolo di {A} viene eliminato dall'organigramma.
+1 | {A} viene spostat[A:o/a] in un altro team e sopravvive.
+2 k:A>B | {A} suggerisce al consulente di tagliare il ruolo di {B}.
+` },
+        { n: 'Il server è giù', intro: 'Il server aziendale si blocca durante la chiusura del trimestre.', out: `
+1 d:A | {A} perde tutto il lavoro del trimestre ed è fuori.
+1 @int | {A} aveva un backup su chiavetta.
+1 s:A=ferito | {A} recupera solo metà dei file.
+` },
+        { n: 'L\'audit', intro: 'L\'ufficio Risorse umane annuncia un audit su tutte le note spese.', out: `
+1 d:A | Saltano fuori le note spese di {A}: licenziamento immediato.
+1 @luck | {A} non ha mai chiesto un rimborso in vita sua.
+` },
+      ],
+    },
+  ];
+})(typeof window !== 'undefined' ? window : globalThis);
+
+;
+/* Last One Standing — motore di simulazione deterministico.
+ * Funziona sia nel browser (window.LOS) sia in Node (globalThis.LOS). */
+(function (G) {
+  'use strict';
+  const D = G.LOS_DATA;
+
+  /* ---------------- RNG con seme ---------------- */
+  function xmur3(str) {
+    let h = 1779033703 ^ str.length;
+    for (let i = 0; i < str.length; i++) {
+      h = Math.imul(h ^ str.charCodeAt(i), 3432918353);
+      h = (h << 13) | (h >>> 19);
+    }
+    return function () {
+      h = Math.imul(h ^ (h >>> 16), 2246822507);
+      h = Math.imul(h ^ (h >>> 13), 3266489909);
+      return (h ^= h >>> 16) >>> 0;
+    };
+  }
+  function mulberry32(a) {
+    return function () {
+      a |= 0; a = (a + 0x6d2b79f5) | 0;
+      let t = Math.imul(a ^ (a >>> 15), 1 | a);
+      t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+  function makeRng(seed) {
+    const r = mulberry32(xmur3(String(seed))());
+    return {
+      f: r,
+      int: (n) => Math.floor(r() * n),
+      pick: (a) => a[Math.floor(r() * a.length)],
+      chance: (p) => r() < p,
+      shuffle(a) {
+        const b = a.slice();
+        for (let i = b.length - 1; i > 0; i--) {
+          const j = Math.floor(r() * (i + 1));
+          [b[i], b[j]] = [b[j], b[i]];
+        }
+        return b;
+      },
+      wpick(items, wf) {
+        let tot = 0;
+        const ws = items.map((it) => { const w = Math.max(0, wf(it) || 0); tot += w; return w; });
+        if (tot <= 0) return null;
+        let x = r() * tot;
+        for (let i = 0; i < items.length; i++) { x -= ws[i]; if (x <= 0) return items[i]; }
+        return items[items.length - 1];
+      },
+    };
+  }
+
+  /* ---------------- Parser del formato eventi ---------------- */
+  const L = (c) => c.charCodeAt(0) - 65;
+  const letters = (s) => [...s].map(L);
+  const ITEMS = 'arma|cibo|med|trap';
+
+  function parseLine(line, origin) {
+    const bar = line.indexOf('|');
+    if (bar < 0) throw new Error('Manca "|" in: ' + line);
+    const head = line.slice(0, bar).trim().split(/\s+/);
+    const text = line.slice(bar + 1).trim();
+    const ev = { n: +head[0], text, kills: [], dies: [], req: [], fx: [], tags: [], w: 1, origin: origin || 'base' };
+    if (!(ev.n >= 1 && ev.n <= 6)) throw new Error('Numero di concorrenti non valido in: ' + line);
+    let m;
+    for (const tok of head.slice(1)) {
+      if (tok[0] === '@') { ev.tags.push(tok.slice(1)); continue; }
+      if (tok[0] === '*') { ev.w = parseFloat(tok.slice(1)); continue; }
+      if ((m = tok.match(/^(k|tr):([A-F]+)>([A-F]+)$/))) {
+        const k = { by: letters(m[2]), v: letters(m[3]), betray: m[1] === 'tr' };
+        ev.kills.push(k);
+        if (k.betray) { ev.req.push({ t: 'ally', r: [k.by[0], k.v[0]] }); ev.tags.push('betray'); }
+        else ev.req.push({ t: 'foe', a: k.by, b: k.v });
+        continue;
+      }
+      if ((m = tok.match(/^d:([A-F]+)$/))) { ev.dies.push(...letters(m[1])); continue; }
+      if ((m = tok.match(/^al:([A-F]+)$/))) { const r = letters(m[1]); ev.fx.push({ t: 'al', r }); ev.req.push({ t: 'canAlly', r }); continue; }
+      if ((m = tok.match(/^ally:([A-F]+)$/))) { ev.req.push({ t: 'ally', r: letters(m[1]) }); continue; }
+      if ((m = tok.match(/^br:([A-F])$/))) { const r = [L(m[1])]; ev.fx.push({ t: 'br', r }); ev.req.push({ t: 'hasAlly', r }); ev.tags.push('betray'); continue; }
+      if ((m = tok.match(/^w:([A-F])$/))) { ev.req.push({ t: 'has', item: 'arma', r: [L(m[1])] }); continue; }
+      if ((m = tok.match(new RegExp('^\\+(' + ITEMS + '):([A-F])$')))) { ev.fx.push({ t: 'gain', item: m[1], r: [L(m[2])] }); continue; }
+      if ((m = tok.match(new RegExp('^-(' + ITEMS + '):([A-F])$')))) { ev.fx.push({ t: 'lose', item: m[1], r: [L(m[2])] }); ev.req.push({ t: 'has', item: m[1], r: [L(m[2])] }); continue; }
+      if ((m = tok.match(/^(cibo|med|trap):([A-F])$/))) { const r = [L(m[2])]; ev.req.push({ t: 'has', item: m[1], r }); ev.fx.push({ t: 'lose', item: m[1], r }); continue; }
+      if ((m = tok.match(/^steal:([A-F])<([A-F])$/))) { ev.req.push({ t: 'has', item: 'arma', r: [L(m[2])] }); ev.fx.push({ t: 'steal', r: [L(m[1]), L(m[2])] }); continue; }
+      if ((m = tok.match(/^s:([A-F])=(\w+)$/))) { ev.fx.push({ t: 'status', r: [L(m[1])], s: m[2] }); continue; }
+      if ((m = tok.match(/^need:([A-F])=(\w+|\*)$/))) { ev.req.push({ t: 'need', r: [L(m[1])], s: m[2] }); continue; }
+      if ((m = tok.match(/^cure:([A-F])$/))) { ev.fx.push({ t: 'cure', r: [L(m[1])] }); continue; }
+      throw new Error('Etichetta sconosciuta "' + tok + '" in: ' + line);
+    }
+    const vic = new Set(ev.dies);
+    ev.kills.forEach((k) => k.v.forEach((v) => vic.add(v)));
+    ev.victims = [...vic];
+    ev.lethal = ev.victims.length > 0;
+    // tutte le lettere usate devono rientrare in n
+    const used = new Set();
+    for (const re of [/\{([A-F])\}/g, /\{arma:([A-F])\}/g, /\[([A-F]+):/g]) {
+      let mm; while ((mm = re.exec(text))) [...mm[1]].forEach((ch) => used.add(ch));
+    }
+    for (const r of ev.req.concat(ev.fx)) (r.r || []).concat(r.a || [], r.b || []).forEach((i) => used.add(String.fromCharCode(65 + i)));
+    ev.kills.forEach((k) => k.by.concat(k.v).forEach((i) => used.add(String.fromCharCode(65 + i))));
+    ev.dies.forEach((i) => used.add(String.fromCharCode(65 + i)));
+    for (const ch of used) if (L(ch) >= ev.n) throw new Error('Il testo usa {' + ch + '} ma l\'evento ha solo ' + ev.n + ' concorrenti: ' + line);
+    return ev;
+  }
+
+  function parseBlock(src, origin) {
+    if (!src) return [];
+    return src.split('\n').map((l) => l.trim()).filter((l) => l && !l.startsWith('#')).map((l) => parseLine(l, origin));
+  }
+
+  /* Evento personalizzato creato dall'interfaccia → riga del formato */
+  function customToLine(c) {
+    const toks = [String(c.n)];
+    const dies = (c.dies || []).filter((x) => x !== c.killer);
+    if (c.killer && dies.length) toks.push('k:' + c.killer + '>' + dies.join(''));
+    else if (dies.length) toks.push('d:' + dies.join(''));
+    toks.push('*2');
+    return toks.join(' ') + ' | ' + c.text;
+  }
+
+  const PHASES = ['b', 'd', 'n', 'f', 'finale', 'ds', 'fallback'];
+  function buildPools(theme, custom) {
+    const src = theme.soft ? theme.pool : D.core;
+    const pools = {};
+    for (const k of PHASES) {
+      pools[k] = parseBlock(src[k], theme.soft ? theme.id : 'base');
+      if (!theme.soft && theme.extra && theme.extra[k]) pools[k] = pools[k].concat(parseBlock(theme.extra[k], theme.id));
+    }
+    (custom || []).forEach((c) => {
+      if (!c || !c.text) return;
+      let ev;
+      try { ev = parseLine(customToLine(c), 'custom'); } catch (e) { return; }
+      const targets = c.phase === 'tutte' ? ['b', 'd', 'n', 'f'] : [c.phase];
+      targets.forEach((p) => pools[p] && pools[p].push(ev));
+    });
+    pools.disasters = (theme.disasters || []).map((d) => ({ n: d.n, intro: d.intro, out: parseBlock(d.out, theme.id) }));
+    return pools;
+  }
+
+  function countTemplates() {
+    let events = 0, disasters = 0;
+    const cnt = (s) => (s ? s.split('\n').filter((l) => l.trim() && l.includes('|')).length : 0);
+    PHASES.forEach((k) => (events += cnt(D.core[k])));
+    D.themes.forEach((t) => {
+      if (t.soft) PHASES.forEach((k) => (events += cnt(t.pool[k])));
+      else if (t.extra) Object.values(t.extra).forEach((s) => (events += cnt(s)));
+      (t.disasters || []).forEach((d) => { disasters += 1; events += cnt(d.out); });
+    });
+    return { events, disasters, themes: D.themes.length };
+  }
+
+  /* ---------------- Grammatica ---------------- */
+  function genderPick(group, opts) {
+    const o = opts.split('/');
+    const gs = group.map((t) => t.gender || 'M');
+    if (gs.every((g) => g === 'F')) return o[1] !== undefined ? o[1] : o[0];
+    if (gs.every((g) => g === 'N')) return o[2] !== undefined ? o[2] : 'ə';
+    if (gs.length === 1) return o[0];
+    return o[0];
+  }
+  const ART = /^(un'|una |uno |un |il |lo |la |l'|i |gli |le )/i;
+  function possessive(item) {
+    if (!item) return 'la sua arma';
+    const s = item.name;
+    const m = s.match(ART);
+    const bare = m ? s.slice(m[0].length) : s;
+    const fem = m ? /^(una |un'|la |le )/i.test(m[0]) : false;
+    return (fem ? 'la sua ' : 'il suo ') + bare;
+  }
+  // preposizioni articolate: "in la" → "nella", "di il" → "del", ...
+  const PREP = { in: 'ne', di: 'de', a: 'a', da: 'da', su: 'su' };
+  const ARTI = { lo: 'llo', la: 'lla', "l'": "ll'", gli: 'gli', le: 'lle' };
+  function artPrep(s) {
+    return s.replace(/(^|[^\p{L}'])(in|di|a|da|su) (il|lo|la|l'|i|gli|le)(?=[ \p{L}])/gu, (m, pre, p, a) => {
+      const P = PREP[p];
+      const out = a === 'il' ? (P === 'ne' || P === 'de' ? P + 'l' : P + 'l') : a === 'i' ? P + 'i' : P + ARTI[a];
+      return pre + out + (a === "l'" ? '' : '');
+    });
+  }
+  const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  const cap = (s) => s.charAt(0).toUpperCase() + s.slice(1);
+
+  /* ---------------- Simulazione ---------------- */
+  const DIFF = { bassa: 0.6, normale: 1, alta: 1.45, massacro: 2.2 };
+  const BASE_P = { b: 0.3, d: 0.15, n: 0.1, f: 0.38, dis: 0.26 };
+  const STATUS_LABEL = { ferito: 'Ferito', avvelenato: 'Avvelenato', malato: 'Malato', affamato: 'Affamato' };
+
+  function simulate(cfg) {
+    const theme = D.themes.find((t) => t.id === cfg.theme) || D.themes[0];
+    const seed = cfg.seed == null || cfg.seed === '' ? String(Date.now()) : String(cfg.seed);
+    const rng = makeRng(seed + '|' + theme.id);
+    const pools = buildPools(theme, cfg.custom);
+    const diff = DIFF[cfg.difficulty] || 1;
+    const maxDays = Math.max(3, Math.min(60, cfg.maxDays || 20));
+    const traitMap = Object.fromEntries(D.traits.map((t) => [t.id, t]));
+    const zoneCount = theme.lex.luogo.length;
+
+    const T = (cfg.cast || []).map((c, i) => ({
+      id: c.id || 't' + i, name: (c.name || 'Concorrente ' + (i + 1)).trim(), gender: c.gender || 'M',
+      team: c.team || i + 1, color: c.color, img: c.img || '',
+      traits: (c.traits || []).filter((x) => traitMap[x]),
+      attr: Object.assign({ for: 5, agi: 5, int: 5, car: 5, fort: 5, res: 5, furt: 5 }, c.attr || {}),
+      alive: true, zone: 0, inv: [], st: {}, kills: 0, killIds: [], allyId: null,
+      deathPhase: -1, deathDay: 0, deathText: '', deathHtml: '', killerIds: [], order: 0,
+      events: 0, alliancesFormed: 0, betrayals: 0, items: 0,
+    }));
+    if (T.length < 2) throw new Error('Servono almeno 2 concorrenti.');
+    T.forEach((t) => (t.zone = rng.int(zoneCount)));
+    const byId = Object.fromEntries(T.map((t) => [t.id, t]));
+
+    const alliances = new Map();
+    let nextAlly = 1;
+    function joinAlliance(ts) {
+      let gid = ts.map((t) => t.allyId).find((x) => x != null);
+      if (gid == null) { gid = nextAlly++; alliances.set(gid, new Set()); }
+      ts.forEach((t) => {
+        if (t.allyId != null && t.allyId !== gid) leaveAlliance(t);
+        t.allyId = gid; alliances.get(gid).add(t.id);
+      });
+    }
+    function leaveAlliance(t) {
+      if (t.allyId == null) return;
+      const g = alliances.get(t.allyId);
+      if (g) {
+        g.delete(t.id);
+        if (g.size === 1) { const last = byId[[...g][0]]; last.allyId = null; alliances.delete(t.allyId); }
+        else if (g.size === 0) alliances.delete(t.allyId);
+      }
+      t.allyId = null;
+    }
+    if (cfg.teamsAllied) {
+      const teams = {};
+      T.forEach((t) => (teams[t.team] = teams[t.team] || []).push(t));
+      Object.values(teams).forEach((ms) => ms.length > 1 && joinAlliance(ms));
+    }
+
+    const alive = () => T.filter((t) => t.alive);
+    const phases = [];
+    let day = 0, deathCounter = 0, pendingFallen = [], noDeathStreak = 0;
+    const stats = { events: 0, alliances: 0, betrayals: 0, firstBlood: null, deathsByDay: [], envDeaths: 0, killDeaths: 0, items: 0 };
+
+    const hasItem = (t, it) => t.inv.some((x) => x.type === it);
+    const weaponOf = (t) => t.inv.find((x) => x.type === 'arma');
+    const statusCount = (t) => Object.keys(t.st).length;
+    const traitSum = (t, key) => t.traits.reduce((s, id) => s + ((traitMap[id] && traitMap[id][key]) || 0), 0);
+    const combat = (t) => t.attr.for + t.attr.agi + 0.5 * t.attr.int + 0.3 * t.attr.res + 0.2 * t.attr.fort +
+      (weaponOf(t) ? 4 : 0) - (t.st.ferito != null ? 3 : 0) - (t.st.malato != null ? 2 : 0) + traitSum(t, 'c');
+    const survival = (t) => 0.4 * t.attr.res + 0.3 * t.attr.fort + 0.2 * t.attr.agi + traitSum(t, 's') - 1.5 * statusCount(t);
+
+    function isEnded() {
+      const a = alive();
+      if (a.length <= 1) return true;
+      if (cfg.teamWin && a.every((t) => t.team === a[0].team)) return true;
+      return false;
+    }
+
+    function checkReq(ev, roles) {
+      for (const r of ev.req) {
+        switch (r.t) {
+          case 'ally': {
+            const g = roles[r.r[0]].allyId;
+            if (g == null || !r.r.every((i) => roles[i].allyId === g)) return false;
+            break;
+          }
+          case 'canAlly': {
+            const ts = r.r.map((i) => roles[i]);
+            const gids = new Set(ts.map((t) => t.allyId).filter((x) => x != null));
+            if (gids.size > 1) return false;
+            if (gids.size === 1 && ts.every((t) => t.allyId != null)) return false;
+            const size = gids.size ? alliances.get([...gids][0]).size + ts.filter((t) => t.allyId == null).length : ts.length;
+            if (size > 5) return false;
+            if (cfg.teamWin && new Set(ts.map((t) => t.team)).size > 1 && cfg.teamsAllied) return false;
+            break;
+          }
+          case 'hasAlly': if (roles[r.r[0]].allyId == null) return false; break;
+          case 'has': if (!hasItem(roles[r.r[0]], r.item)) return false; break;
+          case 'need': {
+            const t = roles[r.r[0]];
+            if (r.s === '*' ? statusCount(t) === 0 : t.st[r.s] == null) return false;
+            break;
+          }
+          case 'foe':
+            for (const a of r.a) for (const b of r.b) {
+              const A = roles[a], B = roles[b];
+              if (A.allyId != null && A.allyId === B.allyId) return false;
+              if (cfg.teamWin && A.team === B.team) return false;
+            }
+            break;
+        }
+      }
+      return true;
+    }
+
+    function weightFor(ev, P) {
+      let w = ev.w;
+      for (const tag of ev.tags) {
+        for (const id of P.traits) { const m = traitMap[id].m[tag]; if (m != null) w *= m; }
+        if (tag === 'soc') w *= 0.6 + P.attr.car / 12;
+        else if (tag === 'stl') w *= 0.6 + P.attr.furt / 12;
+        else if (tag === 'int' || tag === 'heal') w *= 0.6 + P.attr.int / 12;
+        else if (tag === 'luck') w *= 0.5 + P.attr.fort / 10;
+        else if (tag === 'agg') w *= 0.7 + P.attr.for / 15;
+      }
+      for (const r of ev.req) {
+        if (r.t === 'need' && (r.s === '*' ? statusCount(P) > 0 : P.st[r.s] != null)) w *= 3;
+        if (r.t === 'has' && hasItem(P, r.item)) w *= 1.6;
+        if (r.t === 'ally' && P.allyId != null) w *= 1.4;
+      }
+      if (ev.origin === 'custom') w *= 1.5;
+      if (ev.origin !== 'base' && ev.origin !== 'custom') w *= 1.3;
+      return w;
+    }
+
+    function assign(ev, P, un) {
+      const others = [];
+      un.forEach((id) => id !== P.id && byId[id].alive && others.push(byId[id]));
+      if (others.length < ev.n - 1) return null;
+      let best = null, bestScore = -Infinity;
+      for (let attempt = 0; attempt < 10; attempt++) {
+        const keyed = others.map((t) => [t, (t.zone === P.zone ? 0 : 1) + rng.f() * 1.3]).sort((a, b) => a[1] - b[1]);
+        const group = keyed.slice(0, ev.n - 1).map((x) => x[0]);
+        const roles = rng.shuffle([P].concat(group));
+        if (!checkReq(ev, roles)) continue;
+        let score = rng.f() * 6;
+        for (const k of ev.kills) {
+          score += 0.6 * (k.by.reduce((s, i) => s + combat(roles[i]), 0) / k.by.length - k.v.reduce((s, i) => s + combat(roles[i]), 0) / k.v.length);
+          k.v.forEach((i) => (score -= 0.5 * survival(roles[i])));
+        }
+        ev.dies.forEach((i) => (score -= survival(roles[i])));
+        if (score > bestScore) { bestScore = score; best = roles; }
+      }
+      return best;
+    }
+
+    function render(text, roles, lexPick) {
+      let s = text
+        .replace(/\[([A-F]+):([^\]]*)\]/g, (_, ls, opts) => genderPick(letters(ls).map((i) => roles[i]), opts))
+        .replace(/\{arma:([A-F])\}/g, (_, c) => possessive(weaponOf(roles[L(c)])))
+        .replace(/\{(arma|cibo|luogo|mostro|trappola|rifugio|dono)\}/g, (_, k) => lexPick(k));
+      s = cap(artPrep(s));
+      const plain = s.replace(/\{([A-F])\}/g, (_, c) => roles[L(c)].name);
+      const html = esc(s).replace(/\{([A-F])\}/g, (_, c) => {
+        const t = roles[L(c)];
+        return '<b class="nm" data-id="' + esc(t.id) + '" style="--c:' + esc(t.color || '#888') + '">' + esc(t.name) + '</b>';
+      });
+      return { plain, html };
+    }
+
+    function kill(v, killers, ev, txt) {
+      if (!v.alive) return;
+      v.alive = false;
+      v.deathPhase = phases.length; v.deathDay = day; v.order = ++deathCounter;
+      v.deathText = txt.plain; v.deathHtml = txt.html;
+      v.killerIds = killers.map((k) => k.id);
+      leaveAlliance(v);
+      pendingFallen.push(v.id);
+      if (killers.length) {
+        stats.killDeaths++;
+        killers.forEach((k) => { k.kills++; k.killIds.push(v.id); });
+        if (!stats.firstBlood) stats.firstBlood = { killers: v.killerIds.slice(), victim: v.id, day };
+      } else {
+        stats.envDeaths++;
+        if (!stats.firstBlood) stats.firstBlood = { killers: [], victim: v.id, day };
+      }
+      stats.deathsByDay[day] = (stats.deathsByDay[day] || 0) + 1;
+    }
+
+    function apply(ev, roles) {
+      const ctx = {};
+      const lexPick = (k) => (ctx[k] != null ? ctx[k] : (ctx[k] = rng.pick(theme.lex[k])));
+      const txt = render(ev.text, roles, lexPick);
+      const z = ctx.luogo != null ? theme.lex.luogo.indexOf(ctx.luogo) : roles[0].zone;
+      roles.forEach((t) => { t.zone = z; t.events++; });
+      for (const k of ev.kills) {
+        const killers = k.by.map((i) => roles[i]);
+        k.v.forEach((i) => kill(roles[i], killers, ev, txt));
+        if (k.betray) { stats.betrayals++; killers.forEach((t) => { t.betrayals++; leaveAlliance(t); }); }
+      }
+      ev.dies.forEach((i) => kill(roles[i], [], ev, txt));
+      for (const f of ev.fx) {
+        const t = roles[f.r[0]];
+        if (!t.alive) continue;
+        switch (f.t) {
+          case 'al': {
+            const ts = f.r.map((i) => roles[i]).filter((x) => x.alive);
+            if (ts.length > 1) { joinAlliance(ts); stats.alliances++; ts.forEach((x) => x.alliancesFormed++); }
+            break;
+          }
+          case 'br': leaveAlliance(t); t.betrayals++; stats.betrayals++; break;
+          case 'gain': {
+            const name = f.item === 'arma' ? lexPick('arma') : f.item === 'cibo' ? (ctx.cibo || 'provviste') : f.item === 'med' ? 'kit medico' : 'trappola';
+            if (f.item === 'arma') { const old = t.inv.findIndex((x) => x.type === 'arma'); if (old >= 0) t.inv.splice(old, 1); }
+            t.inv.push({ type: f.item, name }); t.items++; stats.items++;
+            if (t.inv.length > 6) t.inv.shift();
+            break;
+          }
+          case 'lose': { const i = t.inv.findIndex((x) => x.type === f.item); if (i >= 0) t.inv.splice(i, 1); break; }
+          case 'steal': {
+            const B = roles[f.r[1]]; const i = B.inv.findIndex((x) => x.type === 'arma');
+            if (i >= 0) { const [it] = B.inv.splice(i, 1); const old = t.inv.findIndex((x) => x.type === 'arma'); if (old >= 0) t.inv.splice(old, 1); t.inv.push(it); t.items++; }
+            break;
+          }
+          case 'status': t.st[f.s] = phases.length; break;
+          case 'cure': t.st = {}; break;
+        }
+      }
+      stats.events++;
+      return { html: txt.html, plain: txt.plain, ids: roles.map((t) => t.id), deaths: ev.victims.map((i) => roles[i].id).filter((id) => !byId[id].alive), lethal: ev.lethal, origin: ev.origin };
+    }
+
+    function lethalProb(kind) {
+      let p = (BASE_P[kind] || 0.2) * diff;
+      if (kind !== 'b') p *= 1 + 0.1 * (day - 1);
+      if (noDeathStreak >= 3) p *= 1.7;
+      if (alive().length <= 4) p *= 1.25;
+      return Math.min(0.9, Math.max(0.03, p));
+    }
+
+    function snapshot() {
+      const zones = {}, allies = {}, st = {};
+      T.forEach((t) => { zones[t.id] = t.zone; allies[t.id] = t.allyId; st[t.id] = Object.keys(t.st); });
+      return { alive: alive().map((t) => t.id), zones, allies, st };
+    }
+
+    function maybeDissolve(events) {
+      const a = alive();
+      if (cfg.teamWin || a.length < 2) return;
+      const g = a[0].allyId;
+      if (g != null && a.every((t) => t.allyId === g)) {
+        a.forEach((t) => leaveAlliance(t));
+        events.push({ html: 'Rimasti soli, gli ultimi alleati si guardano con sospetto: l\'alleanza è finita.', plain: 'Rimasti soli, gli ultimi alleati si guardano con sospetto: l\'alleanza è finita.', ids: a.map((t) => t.id), deaths: [], lethal: false, note: true });
+      }
+    }
+
+    function runPhase(kind, pool, title, intro) {
+      const events = [];
+      maybeDissolve(events);
+      const before = alive().length;
+      const order = rng.shuffle(alive());
+      const un = new Set(order.map((t) => t.id));
+      const fallback = pools.fallback.length ? pools.fallback : parseBlock(D.core.fallback);
+      for (const P of order) {
+        if (!un.has(P.id) || !P.alive) continue;
+        let done = false;
+        const pL = lethalProb(kind);
+        for (let attempt = 0; attempt < 25 && !done; attempt++) {
+          const nAlive = alive().length;
+          const wantLethal = nAlive > 1 && rng.chance(pL);
+          const n = [...un].filter((id) => byId[id].alive).length;
+          const cand = pool.filter((e) => e.lethal === wantLethal && e.n <= n && (!e.lethal || e.victims.length < nAlive));
+          const ev = rng.wpick(cand, (e) => weightFor(e, P));
+          if (!ev) continue;
+          const roles = assign(ev, P, un);
+          if (!roles) continue;
+          // non si può far morire più gente di quanta ne resti
+          if (ev.lethal && alive().length - ev.victims.length < 1) continue;
+          events.push(apply(ev, roles));
+          roles.forEach((t) => un.delete(t.id));
+          done = true;
+        }
+        if (!done) { events.push(apply(rng.pick(fallback), [P])); un.delete(P.id); }
+      }
+      const died = before - alive().length;
+      noDeathStreak = died ? 0 : noDeathStreak + 1;
+      phases.push({ kind, day, title, intro, events, snap: snapshot() });
+    }
+
+    function runFinale() {
+      const events = [];
+      alive().forEach((t) => leaveAlliance(t));
+      const pool = pools.finale;
+      let rounds = 0;
+      while (!isEnded() && rounds++ < 40) {
+        const order = rng.shuffle(alive());
+        for (let i = 0; i + 1 < order.length; i += 2) {
+          const A = order[i], B = order[i + 1];
+          if (!A.alive || !B.alive || isEnded()) continue;
+          if (cfg.teamWin && A.team === B.team) continue;
+          for (let k = 0; k < 8; k++) {
+            const ev = rng.wpick(pool, (e) => weightFor(e, A));
+            const roles = combat(A) + rng.f() * 8 > combat(B) + rng.f() * 8 ? [A, B] : [B, A];
+            if (!checkReq(ev, roles)) continue;
+            events.push(apply(ev, roles));
+            break;
+          }
+        }
+        if (cfg.teamWin && !isEnded() && rounds > 30) break;
+      }
+      phases.push({ kind: 'finale', day, title: 'Lo scontro finale', intro: theme.intro.finale, events, snap: snapshot() });
+    }
+
+    function pushFallen() {
+      const n = pendingFallen.length;
+      const fl = theme.fallen;
+      const text = (n === 0 ? fl[0] : n === 1 ? fl[1] : fl[2]).replace('{n}', n);
+      phases.push({ kind: 'fallen', day, title: (theme.labels && theme.labels.fallen) || 'I caduti', intro: text, events: [], deaths: pendingFallen.slice(), snap: snapshot() });
+      pendingFallen = [];
+    }
+
+    let feastDone = false, lastDisaster = -9;
+    const usedDisasters = new Set();
+    while (true) {
+      day++;
+      if (day === 1) runPhase('b', pools.b, theme.phase.b, theme.intro.b);
+      if (isEnded()) break;
+      runPhase('d', pools.d, theme.phase.d + ' ' + day, theme.intro.d);
+      if (isEnded()) break;
+      const a = alive().length;
+      if (!feastDone && day >= 3 && a >= 4 && (rng.chance(0.35) || day >= 6)) {
+        feastDone = true;
+        runPhase('f', pools.f, theme.phase.f, theme.intro.f);
+      } else if (day >= 2 && pools.disasters.length && day - lastDisaster > 1 && rng.chance(0.3 * Math.min(1.5, diff))) {
+        let opts = pools.disasters.filter((d) => !usedDisasters.has(d.n));
+        if (!opts.length) { usedDisasters.clear(); opts = pools.disasters; }
+        const dz = rng.pick(opts);
+        usedDisasters.add(dz.n); lastDisaster = day;
+        runPhase('dis', dz.out.concat(pools.ds), dz.n, dz.intro);
+      }
+      if (isEnded()) break;
+      runPhase('n', pools.n, theme.phase.n + ' ' + day, theme.intro.n);
+      if (isEnded()) break;
+      pushFallen();
+      if (day >= maxDays) { runFinale(); break; }
+    }
+    if (pendingFallen.length) pushFallen();
+
+    const winners = alive();
+    const ranking = T.slice().sort((a, b) => (a.alive === b.alive ? (b.order - a.order) : a.alive ? -1 : 1));
+    ranking.forEach((t, i) => (t.rank = t.alive ? 1 : i + 1));
+    const stripped = T.map((t) => ({
+      id: t.id, name: t.name, gender: t.gender, team: t.team, color: t.color, img: t.img, traits: t.traits,
+      alive: t.alive, kills: t.kills, killIds: t.killIds, killerIds: t.killerIds, deathDay: t.deathDay,
+      deathPhase: t.deathPhase, deathText: t.deathText, deathHtml: t.deathHtml, rank: t.rank, order: t.order,
+      events: t.events, alliancesFormed: t.alliancesFormed, betrayals: t.betrayals, items: t.items,
+      inv: t.inv.map((x) => x.name), st: Object.keys(t.st),
+    }));
+    return { version: 1, theme: theme.id, seed, days: day, phases, tributes: stripped, winners: winners.map((t) => t.id), stats };
+  }
+
+  /* ---------------- Cast casuale ---------------- */
+  const PALETTE = ['#e0564b', '#e8913a', '#d9b334', '#7cb342', '#26a69a', '#29a3d6', '#5c7cfa', '#9c6ade', '#d65db1', '#8d6e63', '#78909c', '#ef7d9c'];
+  function randomCast(n, seed, teamSize) {
+    const rng = makeRng('cast|' + seed);
+    const ts = Math.max(1, teamSize || 2);
+    const pools = { M: rng.shuffle(D.names.M), F: rng.shuffle(D.names.F), N: rng.shuffle(D.names.N) };
+    const used = new Set();
+    const out = [];
+    for (let i = 0; i < n; i++) {
+      const g = rng.chance(0.06) ? 'N' : i % 2 === 0 ? 'F' : 'M';
+      let name = pools[g].find((x) => !used.has(x));
+      if (!name) name = 'Concorrente ' + (i + 1);
+      used.add(name);
+      const traits = rng.shuffle(D.traits).slice(0, rng.int(3)).map((t) => t.id);
+      const attr = {};
+      D.attrs.forEach((a) => (attr[a.id] = 2 + rng.int(8)));
+      out.push({ id: 'c' + Date.now().toString(36) + i + rng.int(1e6).toString(36), name, gender: g, team: Math.floor(i / ts) + 1, color: PALETTE[Math.floor(i / ts) % PALETTE.length], img: '', traits, attr });
+    }
+    return out;
+  }
+
+  /* ---------------- Anteprima eventi personalizzati ---------------- */
+  function previewCustom(c, themeId) {
+    const theme = D.themes.find((t) => t.id === themeId) || D.themes[0];
+    const ev = parseLine(customToLine(c), 'custom');
+    const sample = [['Aurora', 'F'], ['Bruno', 'M'], ['Chiara', 'F'], ['Dario', 'M'], ['Elena', 'F'], ['Fabio', 'M']];
+    const rng = makeRng('preview');
+    const roles = sample.slice(0, ev.n).map(([name, gender], i) => ({ id: 'p' + i, name, gender, color: PALETTE[i], inv: [{ type: 'arma', name: theme.lex.arma[0] }] }));
+    const ctx = {};
+    const lexPick = (k) => (ctx[k] != null ? ctx[k] : (ctx[k] = rng.pick(theme.lex[k])));
+    let s = ev.text
+      .replace(/\[([A-F]+):([^\]]*)\]/g, (_, ls, opts) => genderPick(letters(ls).map((i) => roles[i]), opts))
+      .replace(/\{arma:([A-F])\}/g, (_, c2) => possessive(roles[L(c2)].inv[0]))
+      .replace(/\{(arma|cibo|luogo|mostro|trappola|rifugio|dono)\}/g, (_, k) => lexPick(k));
+    s = cap(artPrep(s));
+    return esc(s).replace(/\{([A-F])\}/g, (_, c2) => '<b class="nm" style="--c:' + roles[L(c2)].color + '">' + roles[L(c2)].name + '</b>');
+  }
+
+  G.LOS = { simulate, parseLine, parseBlock, buildPools, makeRng, randomCast, countTemplates, previewCustom, customToLine, PALETTE, STATUS_LABEL, DIFF };
+})(typeof window !== 'undefined' ? window : globalThis);
+
+;
+/* Last One Standing — interfaccia */
+(function () {
+  'use strict';
+  const D = window.LOS_DATA, L = window.LOS;
+  const $ = (s, r = document) => r.querySelector(s);
+  const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+  const esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  const THEMES = Object.fromEntries(D.themes.map((t) => [t.id, t]));
+  const TRAITS = Object.fromEntries(D.traits.map((t) => [t.id, t]));
+  const KEY = 'last-one-standing:v1';
+  const SPEED = { lenta: 7000, normale: 4000, veloce: 1800 };
+  const G3 = (g, m, f, n) => (g === 'F' ? f : g === 'N' ? n : m);
+
+  /* ---------------- stato ---------------- */
+  const S = {
+    cast: [],
+    settings: { theme: 'classico', difficulty: 'normale', seed: '', maxDays: 20, teamsAllied: true, teamWin: false, speed: 'normale', teamSize: 2 },
+    custom: [],
+    run: null, // { cfg, phase }
+    ui: null,
+  };
+  let SIM = null, playTimer = null, lastRendered = -1;
+  const openAttrs = new Set();
+
+  function newSeed() {
+    const w = ['aurora', 'brace', 'cenere', 'duna', 'eco', 'falco', 'gelo', 'lampo', 'nebbia', 'ombra', 'quarzo', 'rovo', 'selce', 'tuono', 'vento', 'zolfo'];
+    return w[Math.floor(Math.random() * w.length)] + '-' + Math.floor(Math.random() * 9000 + 1000);
+  }
+  const teamColor = (team) => L.PALETTE[(Math.max(1, team) - 1) % L.PALETTE.length];
+
+  let saveTimer = null, warnedQuota = false;
+  function save() {
+    clearTimeout(saveTimer);
+    saveTimer = setTimeout(() => {
+      try { localStorage.setItem(KEY, JSON.stringify(S)); }
+      catch (e) {
+        if (!warnedQuota) { warnedQuota = true; toast('Spazio del browser esaurito: le ultime modifiche non sono state salvate. Prova a usare foto più piccole.'); }
+      }
+    }, 250);
+  }
+  function load() {
+    try {
+      const raw = localStorage.getItem(KEY);
+      if (!raw) return false;
+      const d = JSON.parse(raw);
+      if (Array.isArray(d.cast)) S.cast = d.cast.map(sanitizeTribute).filter(Boolean);
+      if (d.settings) Object.assign(S.settings, d.settings);
+      if (Array.isArray(d.custom)) S.custom = d.custom.map(sanitizeCustom).filter(Boolean);
+      if (d.run && d.run.cfg) S.run = d.run;
+      if (d.ui === 'light' || d.ui === 'dark') S.ui = d.ui;
+      return true;
+    } catch (e) { return false; }
+  }
+
+  /* ---------------- validazione dati importati ---------------- */
+  function sanitizeTribute(t, i) {
+    if (!t || typeof t !== 'object') return null;
+    const attr = {};
+    D.attrs.forEach((a) => { const v = Math.round(+((t.attr || {})[a.id])); attr[a.id] = v >= 1 && v <= 10 ? v : 5; });
+    const team = Math.max(1, Math.min(99, Math.round(+t.team) || (i || 0) + 1));
+    return {
+      id: typeof t.id === 'string' && t.id ? t.id.slice(0, 40) : 'c' + Math.random().toString(36).slice(2, 10),
+      name: String(t.name || '').slice(0, 40),
+      gender: ['M', 'F', 'N'].includes(t.gender) ? t.gender : 'M',
+      team, color: teamColor(team),
+      img: typeof t.img === 'string' && /^data:image\/(png|jpe?g|webp|gif);base64,[A-Za-z0-9+/=]+$/.test(t.img) && t.img.length < 400000 ? t.img : '',
+      traits: (Array.isArray(t.traits) ? t.traits : []).filter((x) => TRAITS[x]).slice(0, 3),
+      attr,
+    };
+  }
+  function sanitizeCustom(c) {
+    if (!c || typeof c.text !== 'string' || !c.text.trim()) return null;
+    const n = Math.max(1, Math.min(4, Math.round(+c.n) || 1));
+    const letters = 'ABCD'.slice(0, n).split('');
+    const out = {
+      id: c.id || 'e' + Math.random().toString(36).slice(2, 9),
+      phase: ['tutte', 'b', 'd', 'n', 'f'].includes(c.phase) ? c.phase : 'tutte', n,
+      text: c.text.trim().slice(0, 240),
+      dies: (Array.isArray(c.dies) ? c.dies : []).filter((x) => letters.includes(x)),
+      killer: letters.includes(c.killer) ? c.killer : '',
+    };
+    try { L.parseLine(L.customToLine(out), 'custom'); } catch (e) { return null; }
+    return out;
+  }
+
+  /* ---------------- utilità ---------------- */
+  function initials(name) {
+    const p = String(name || '?').trim().split(/\s+/).filter(Boolean);
+    return ((p[0] || '?')[0] + (p.length > 1 ? p[p.length - 1][0] : (p[0] || '')[1] || '')).toUpperCase();
+  }
+  function avHTML(t, cls) {
+    return '<span class="av ' + (cls || '') + '" style="--c:' + esc(t.color || teamColor(t.team || 1)) + '" title="' + esc(t.name) + '">' +
+      (t.img ? '<img src="' + esc(t.img) + '" alt="">' : esc(initials(t.name))) + '</span>';
+  }
+  let toastTimer;
+  function toast(msg) {
+    const el = $('#toast'); el.textContent = msg; el.hidden = false;
+    clearTimeout(toastTimer); toastTimer = setTimeout(() => (el.hidden = true), 3200);
+  }
+  function copyText(text, okMsg) {
+    const fallback = () => {
+      const ta = document.createElement('textarea'); ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+      document.body.appendChild(ta); ta.select();
+      let ok = false; try { ok = document.execCommand('copy'); } catch (e) { /* niente */ }
+      ta.remove(); toast(ok ? okMsg : 'Il browser ha bloccato la copia: seleziona il testo e copialo a mano.');
+    };
+    try {
+      if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(() => toast(okMsg), fallback);
+      else fallback();
+    } catch (e) { fallback(); }
+  }
+  const nTeams = () => new Set(S.cast.map((t) => t.team)).size;
+
+  /* ---------------- tema chiaro/scuro ---------------- */
+  function applyUi() {
+    if (S.ui) document.documentElement.dataset.theme = S.ui; else delete document.documentElement.dataset.theme;
+  }
+  $('#themeBtn').addEventListener('click', () => {
+    const cur = S.ui || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    S.ui = cur === 'dark' ? 'light' : 'dark';
+    applyUi(); save();
+  });
+
+  /* ---------------- navigazione ---------------- */
+  const VIEWS = ['cast', 'arena', 'diretta', 'esito'];
+  function route() {
+    let v = (location.hash || '').slice(1);
+    if (!VIEWS.includes(v)) v = 'cast';
+    VIEWS.forEach((x) => ($('#v-' + x).hidden = x !== v));
+    $$('.tabs a').forEach((a) => (a.dataset.tab === v ? a.setAttribute('aria-current', 'page') : a.removeAttribute('aria-current')));
+    if (v !== 'diretta') stopPlay();
+    if (v === 'diretta') renderLive(true);
+    if (v === 'esito') renderResults();
+    if (v === 'arena') renderArena();
+    window.scrollTo({ top: 0 });
+  }
+  window.addEventListener('hashchange', route);
+
+  /* =============== CONCORRENTI =============== */
+  const GRIP = '<svg viewBox="0 0 10 16" fill="currentColor"><circle cx="2.5" cy="3" r="1.4"/><circle cx="7.5" cy="3" r="1.4"/><circle cx="2.5" cy="8" r="1.4"/><circle cx="7.5" cy="8" r="1.4"/><circle cx="2.5" cy="13" r="1.4"/><circle cx="7.5" cy="13" r="1.4"/></svg>';
+
+  function cardHTML(t, i) {
+    const avg = (D.attrs.reduce((s, a) => s + t.attr[a.id], 0) / D.attrs.length).toFixed(1);
+    const traitOpts = D.traits.filter((x) => !t.traits.includes(x.id)).map((x) => '<option value="' + x.id + '" title="' + esc(x.desc) + '">' + esc(x.name) + '</option>').join('');
+    return '<article class="card panel" data-id="' + esc(t.id) + '">' +
+      '<div class="top-row">' +
+        '<button class="grip" type="button" aria-label="Trascina per riordinare" title="Trascina per riordinare">' + GRIP + '</button>' +
+        '<button class="avbtn" type="button" data-act="photo" aria-label="Carica una foto per ' + esc(t.name || 'questo concorrente') + '">' + avHTML(t) + '</button>' +
+        '<input class="nameinp" type="text" id="name-' + esc(t.id) + '" data-f="name" value="' + esc(t.name) + '" placeholder="Nome" aria-label="Nome" maxlength="40">' +
+        '<div class="order"><button type="button" data-act="up" aria-label="Sposta su"' + (i === 0 ? ' disabled' : '') + '>↑</button><button type="button" data-act="down" aria-label="Sposta giù"' + (i === S.cast.length - 1 ? ' disabled' : '') + '>↓</button></div>' +
+        '<button class="x" type="button" data-act="del" aria-label="Rimuovi ' + esc(t.name) + '" title="Rimuovi">✕</button>' +
+      '</div>' +
+      '<div class="meta">' +
+        '<div class="seg sm" role="group" aria-label="Genere">' +
+          ['M', 'F', 'N'].map((g) => '<button type="button" data-act="g" data-v="' + g + '" aria-pressed="' + (t.gender === g) + '">' + G3(g, 'Lui', 'Lei', 'Neutro') + '</button>').join('') +
+        '</div>' +
+        '<label class="team" for="team-' + esc(t.id) + '">Squadra <input type="number" min="1" max="99" id="team-' + esc(t.id) + '" data-f="team" value="' + t.team + '"></label>' +
+        (t.img ? '<button class="btn ghost" style="padding:2px 8px;font-size:12.5px" type="button" data-act="rmphoto">Togli foto</button>' : '') +
+      '</div>' +
+      '<div class="chips">' +
+        t.traits.map((id) => '<span class="chip" title="' + esc(TRAITS[id].desc) + '">' + esc(TRAITS[id].name) + '<button type="button" data-act="rmtrait" data-v="' + id + '" aria-label="Togli ' + esc(TRAITS[id].name) + '">✕</button></span>').join('') +
+        (t.traits.length < 3 ? '<select data-f="trait" id="trait-' + esc(t.id) + '" aria-label="Aggiungi tratto"><option value="">+ Tratto</option>' + traitOpts + '</select>' : '') +
+      '</div>' +
+      '<details class="attrs"' + (openAttrs.has(t.id) ? ' open' : '') + '><summary>Caratteristiche <span class="mono">media ' + avg + '</span></summary>' +
+        '<div class="attrgrid">' + D.attrs.map((a) => '<label for="a-' + esc(t.id) + '-' + a.id + '">' + a.name + '</label><input type="range" min="1" max="10" id="a-' + esc(t.id) + '-' + a.id + '" data-f="attr" data-k="' + a.id + '" value="' + t.attr[a.id] + '"><output>' + t.attr[a.id] + '</output>').join('') + '</div>' +
+        '<div class="row" style="margin-top:8px"><button class="btn" style="padding:4px 10px;font-size:13px" type="button" data-act="rattr">Valori casuali</button></div>' +
+      '</details>' +
+    '</article>';
+  }
+
+  function renderCast() {
+    $('#castList').innerHTML = S.cast.map(cardHTML).join('') + '<button class="addcard" type="button" id="addOne">+ Aggiungi concorrente</button>';
+    updateCounts();
+  }
+  function updateCounts() {
+    const n = S.cast.length;
+    $('#castCount').innerHTML = n + ' <small>' + (n === 1 ? 'concorrente' : 'concorrenti') + ' · ' + nTeams() + ' squadre</small>';
+    $('#tabCount').textContent = n;
+  }
+  function refreshCard(id) {
+    const i = S.cast.findIndex((t) => t.id === id);
+    const el = $('.card[data-id="' + CSS.escape(id) + '"]');
+    if (i < 0 || !el) return renderCast();
+    const tmp = document.createElement('div'); tmp.innerHTML = cardHTML(S.cast[i], i);
+    el.replaceWith(tmp.firstChild);
+  }
+  const findT = (el) => { const c = el.closest('.card'); return c ? S.cast.find((t) => t.id === c.dataset.id) : null; };
+
+  function addTribute() {
+    const used = new Set(S.cast.map((t) => t.name));
+    const g = S.cast.length % 2 ? 'M' : 'F';
+    const name = (D.names[g].find((x) => !used.has(x))) || 'Concorrente ' + (S.cast.length + 1);
+    const team = S.cast.length ? Math.ceil((S.cast.length + 1) / (+S.settings.teamSize || 1)) : 1;
+    const t = sanitizeTribute({ name, gender: g, team, traits: [], attr: {} });
+    D.attrs.forEach((a) => (t.attr[a.id] = 3 + Math.floor(Math.random() * 6)));
+    S.cast.push(t);
+    renderCast(); save();
+    const inp = $('#name-' + CSS.escape(t.id)); if (inp) { inp.focus(); inp.select(); }
+  }
+
+  $('#castList').addEventListener('click', (e) => {
+    if (e.target.closest('#addOne')) return addTribute();
+    const b = e.target.closest('[data-act]'); if (!b) return;
+    const t = findT(b); if (!t) return;
+    const i = S.cast.indexOf(t);
+    switch (b.dataset.act) {
+      case 'del': S.cast.splice(i, 1); renderCast(); break;
+      case 'up': if (i > 0) { [S.cast[i - 1], S.cast[i]] = [S.cast[i], S.cast[i - 1]]; renderCast(); $('.card[data-id="' + CSS.escape(t.id) + '"] [data-act="up"]')?.focus(); } break;
+      case 'down': if (i < S.cast.length - 1) { [S.cast[i + 1], S.cast[i]] = [S.cast[i], S.cast[i + 1]]; renderCast(); $('.card[data-id="' + CSS.escape(t.id) + '"] [data-act="down"]')?.focus(); } break;
+      case 'g': t.gender = b.dataset.v; refreshCard(t.id); break;
+      case 'rmtrait': t.traits = t.traits.filter((x) => x !== b.dataset.v); refreshCard(t.id); break;
+      case 'rattr': D.attrs.forEach((a) => (t.attr[a.id] = 1 + Math.floor(Math.random() * 10))); openAttrs.add(t.id); refreshCard(t.id); break;
+      case 'photo': photoTarget = t.id; $('#avatarFile').click(); return;
+      case 'rmphoto': t.img = ''; refreshCard(t.id); break;
+      default: return;
+    }
+    save();
+  });
+  $('#castList').addEventListener('input', (e) => {
+    const f = e.target.dataset.f; if (!f) return;
+    const t = findT(e.target); if (!t) return;
+    if (f === 'name') {
+      t.name = e.target.value.slice(0, 40);
+      const av = e.target.closest('.card').querySelector('.avbtn .av');
+      if (av && !t.img) av.textContent = initials(t.name);
+    } else if (f === 'team') {
+      const v = Math.round(+e.target.value);
+      if (v >= 1 && v <= 99) { t.team = v; t.color = teamColor(v); const av = e.target.closest('.card').querySelector('.avbtn .av'); if (av) av.style.setProperty('--c', t.color); updateCounts(); }
+    } else if (f === 'attr') {
+      t.attr[e.target.dataset.k] = +e.target.value;
+      e.target.nextElementSibling.textContent = e.target.value;
+      const avg = (D.attrs.reduce((s, a) => s + t.attr[a.id], 0) / D.attrs.length).toFixed(1);
+      e.target.closest('details').querySelector('summary .mono').textContent = 'media ' + avg;
+    }
+    save();
+  });
+  $('#castList').addEventListener('change', (e) => {
+    if (e.target.dataset.f !== 'trait' || !e.target.value) return;
+    const t = findT(e.target); if (!t) return;
+    if (t.traits.length < 3) t.traits.push(e.target.value);
+    refreshCard(t.id); save();
+    $('#trait-' + CSS.escape(t.id))?.focus();
+  });
+  $('#castList').addEventListener('toggle', (e) => {
+    if (!e.target.matches('details.attrs')) return;
+    const t = findT(e.target); if (!t) return;
+    e.target.open ? openAttrs.add(t.id) : openAttrs.delete(t.id);
+  }, true);
+
+  // trascinamento
+  let dragId = null;
+  $('#castList').addEventListener('pointerdown', (e) => {
+    const g = e.target.closest('.grip'); if (!g) return;
+    g.closest('.card').draggable = true;
+  });
+  $('#castList').addEventListener('dragstart', (e) => {
+    const c = e.target.closest('.card'); if (!c) return;
+    dragId = c.dataset.id; c.classList.add('dragging');
+    try { e.dataTransfer.effectAllowed = 'move'; e.dataTransfer.setData('text/plain', dragId); } catch (err) { /* niente */ }
+  });
+  $('#castList').addEventListener('dragover', (e) => {
+    const c = e.target.closest('.card'); if (!c || !dragId) return;
+    e.preventDefault();
+    $$('.card.over').forEach((x) => x !== c && x.classList.remove('over'));
+    if (c.dataset.id !== dragId) c.classList.add('over');
+  });
+  $('#castList').addEventListener('drop', (e) => {
+    const c = e.target.closest('.card'); if (!c || !dragId) return;
+    e.preventDefault();
+    const from = S.cast.findIndex((t) => t.id === dragId);
+    const [m] = S.cast.splice(from, 1);
+    let to = S.cast.findIndex((t) => t.id === c.dataset.id);
+    const rect = c.getBoundingClientRect();
+    if (e.clientX > rect.left + rect.width / 2 || e.clientY > rect.bottom - 10) to += 1;
+    S.cast.splice(to, 0, m);
+    renderCast(); save();
+  });
+  $('#castList').addEventListener('dragend', () => {
+    dragId = null;
+    $$('.card').forEach((c) => { c.draggable = false; c.classList.remove('dragging', 'over'); });
+  });
+
+  // foto
+  let photoTarget = null;
+  $('#avatarFile').addEventListener('change', (e) => {
+    const f = e.target.files[0]; e.target.value = '';
+    const t = S.cast.find((x) => x.id === photoTarget); if (!f || !t) return;
+    if (!/^image\//.test(f.type)) return toast('Il file scelto non è un\'immagine.');
+    const rd = new FileReader();
+    rd.onload = () => {
+      const img = new Image();
+      img.onload = () => {
+        const s = 128, cv = document.createElement('canvas'); cv.width = cv.height = s;
+        const k = Math.max(s / img.width, s / img.height), w = img.width * k, h = img.height * k;
+        cv.getContext('2d').drawImage(img, (s - w) / 2, (s - h) / 2, w, h);
+        t.img = cv.toDataURL('image/jpeg', 0.82);
+        refreshCard(t.id); save();
+      };
+      img.onerror = () => toast('Non riesco a leggere questa immagine.');
+      img.src = rd.result;
+    };
+    rd.readAsDataURL(f);
+  });
+
+  // barra strumenti
+  $('#btnRandom').addEventListener('click', () => {
+    S.cast = L.randomCast(+$('#presetSize').value, Math.random().toString(36), +$('#teamSize').value).map(sanitizeTribute);
+    openAttrs.clear(); renderCast(); save(); toast('Cast generato: ' + S.cast.length + ' concorrenti.');
+  });
+  $('#teamSize').addEventListener('change', (e) => { S.settings.teamSize = +e.target.value; save(); });
+  $('#btnRegroup').addEventListener('click', () => {
+    const ts = +$('#teamSize').value || 1;
+    S.cast.forEach((t, i) => { t.team = Math.floor(i / ts) + 1; t.color = teamColor(t.team); });
+    renderCast(); save(); toast('Squadre ricomposte in ordine, da ' + ts + '.');
+  });
+  $('#btnClear').addEventListener('click', () => ($('#clearConfirm').hidden = false));
+  $('#clearNo').addEventListener('click', () => ($('#clearConfirm').hidden = true));
+  $('#clearYes').addEventListener('click', () => { S.cast = []; $('#clearConfirm').hidden = true; renderCast(); save(); });
+
+  // importa / esporta
+  function exportJSON() {
+    return JSON.stringify({ app: 'last-one-standing', versione: 1, cast: S.cast, regole: S.settings, eventi: S.custom }, null, 2);
+  }
+  function importJSON(text) {
+    let d;
+    try { d = JSON.parse(text); } catch (e) { return 'Il testo non è un JSON valido.'; }
+    const cast = Array.isArray(d) ? d : d.cast;
+    if (!Array.isArray(cast) || !cast.length) return 'Non trovo un elenco di concorrenti ("cast") nel testo.';
+    S.cast = cast.slice(0, 200).map(sanitizeTribute).filter(Boolean);
+    const rules = d.regole || d.settings;
+    if (rules && typeof rules === 'object') {
+      if (THEMES[rules.theme]) S.settings.theme = rules.theme;
+      if (L.DIFF[rules.difficulty]) S.settings.difficulty = rules.difficulty;
+      if (typeof rules.seed === 'string') S.settings.seed = rules.seed.slice(0, 60);
+      if (+rules.maxDays >= 5 && +rules.maxDays <= 40) S.settings.maxDays = +rules.maxDays;
+      ['teamsAllied', 'teamWin'].forEach((k) => typeof rules[k] === 'boolean' && (S.settings[k] = rules[k]));
+    }
+    const ev = d.eventi || d.custom;
+    if (Array.isArray(ev)) S.custom = ev.slice(0, 200).map(sanitizeCustom).filter(Boolean);
+    renderCast(); save();
+    return null;
+  }
+  $('#btnIO').addEventListener('click', () => { $('#ioText').value = exportJSON(); $('#ioMsg').textContent = ''; $('#ioDlg').showModal(); });
+  $('#ioClose').addEventListener('click', () => $('#ioDlg').close());
+  $('#ioCopy').addEventListener('click', () => copyText($('#ioText').value, 'Configurazione copiata negli appunti.'));
+  $('#ioImport').addEventListener('click', () => {
+    const err = importJSON($('#ioText').value);
+    if (err) $('#ioMsg').textContent = err;
+    else { $('#ioDlg').close(); toast('Importati ' + S.cast.length + ' concorrenti.'); }
+  });
+  $('#ioFile').addEventListener('change', (e) => {
+    const f = e.target.files[0]; e.target.value = ''; if (!f) return;
+    const rd = new FileReader();
+    rd.onload = () => { $('#ioText').value = rd.result; const err = importJSON(rd.result); if (err) $('#ioMsg').textContent = err; else { $('#ioDlg').close(); toast('Importati ' + S.cast.length + ' concorrenti.'); } };
+    rd.readAsText(f);
+  });
+
+  /* =============== ARENA =============== */
+  function renderArena() {
+    const c = L.countTemplates();
+    $('#arenaSub').textContent = 'Scegli uno dei ' + c.themes + ' scenari: ognuno ha lessico, eventi e disastri propri. In tutto ' + c.events + ' modelli di evento e ' + c.disasters + ' disastri, più quelli che scrivi tu.';
+    $('#themeList').innerHTML = D.themes.map((t) =>
+      '<button type="button" class="theme" data-id="' + t.id + '" aria-pressed="' + (S.settings.theme === t.id) + '" style="--h:' + t.hue + '">' +
+      '<span class="gl" aria-hidden="true">' + t.glyph + '</span><b>' + esc(t.name) + '</b><small>' + esc(t.tag) + '</small>' +
+      (t.soft ? '<span class="soft">senza morti</span>' : '') + '</button>').join('');
+    $$('#diffSeg button').forEach((b) => b.setAttribute('aria-pressed', b.dataset.v === S.settings.difficulty));
+    $$('#speedSeg button').forEach((b) => b.setAttribute('aria-pressed', b.dataset.v === S.settings.speed));
+    $('#maxDays').value = S.settings.maxDays; $('#maxDaysOut').textContent = S.settings.maxDays;
+    $('#seed').value = S.settings.seed;
+    $('#teamsAllied').checked = !!S.settings.teamsAllied;
+    $('#teamWin').checked = !!S.settings.teamWin;
+    renderCustomForm(); renderCustomList();
+    $('#startMsg').textContent = S.cast.length < 2 ? 'Servono almeno 2 concorrenti: aggiungili nella sezione Concorrenti.' : S.cast.length + ' concorrenti pronti.';
+  }
+  $('#themeList').addEventListener('click', (e) => {
+    const b = e.target.closest('.theme'); if (!b) return;
+    S.settings.theme = b.dataset.id; save();
+    $$('#themeList .theme').forEach((x) => x.setAttribute('aria-pressed', x === b));
+    updatePreview();
+  });
+  $('#diffSeg').addEventListener('click', (e) => { const b = e.target.closest('button'); if (!b) return; S.settings.difficulty = b.dataset.v; save(); $$('#diffSeg button').forEach((x) => x.setAttribute('aria-pressed', x === b)); });
+  $('#speedSeg').addEventListener('click', (e) => { const b = e.target.closest('button'); if (!b) return; S.settings.speed = b.dataset.v; save(); $$('#speedSeg button').forEach((x) => x.setAttribute('aria-pressed', x === b)); });
+  $('#maxDays').addEventListener('input', (e) => { S.settings.maxDays = +e.target.value; $('#maxDaysOut').textContent = e.target.value; save(); });
+  $('#seed').addEventListener('input', (e) => { S.settings.seed = e.target.value.slice(0, 60); save(); });
+  $('#seedNew').addEventListener('click', () => { S.settings.seed = newSeed(); $('#seed').value = S.settings.seed; save(); });
+  $('#teamsAllied').addEventListener('change', (e) => { S.settings.teamsAllied = e.target.checked; save(); });
+  $('#teamWin').addEventListener('change', (e) => { S.settings.teamWin = e.target.checked; save(); });
+
+  // eventi personalizzati
+  const PH_LABEL = { tutte: 'Tutte', b: 'Inizio', d: 'Giorno', n: 'Notte', f: 'Festino' };
+  function renderCustomForm() {
+    const n = +$('#cN').value;
+    const ls = 'ABCD'.slice(0, n).split('');
+    const prevDies = $$('#cDies input:checked').map((x) => x.value);
+    const prevKiller = $('#cKiller').value;
+    $('#cDies').innerHTML = ls.map((l) => '<label for="cd-' + l + '"><input type="checkbox" id="cd-' + l + '" value="' + l + '"' + (prevDies.includes(l) ? ' checked' : '') + '>' + l + '</label>').join('');
+    $('#cKiller').innerHTML = '<option value="">Nessuno</option>' + ls.map((l) => '<option' + (prevKiller === l ? ' selected' : '') + '>' + l + '</option>').join('');
+    updatePreview();
+  }
+  function readCustom() {
+    return { phase: $('#cPhase').value, n: +$('#cN').value, text: $('#cText').value.trim(), dies: $$('#cDies input:checked').map((x) => x.value), killer: $('#cKiller').value };
+  }
+  function validateCustom(c) {
+    if (!c.text) return 'Scrivi il testo dell\'evento.';
+    if (!c.text.includes('{A}')) return 'Il testo deve contenere almeno {A}.';
+    const ls = 'ABCD'.slice(0, c.n);
+    for (const l of ls) if (!c.text.includes('{' + l + '}')) return 'Con ' + c.n + ' concorrenti il testo deve nominare anche {' + l + '}.';
+    if (c.killer && !c.dies.filter((x) => x !== c.killer).length) return 'Hai scelto chi uccide: indica anche chi muore.';
+    if (c.killer && c.dies.includes(c.killer)) return 'Chi uccide non può anche morire nello stesso evento.';
+    try { L.parseLine(L.customToLine(c), 'custom'); } catch (e) { return e.message; }
+    return null;
+  }
+  function updatePreview() {
+    const c = readCustom();
+    if (!c.text) { $('#cPreview').textContent = 'L\'anteprima apparirà qui mentre scrivi.'; return; }
+    try { $('#cPreview').innerHTML = L.previewCustom(c, S.settings.theme); } catch (e) { $('#cPreview').textContent = e.message; }
+  }
+  function renderCustomList() {
+    $('#cList').innerHTML = S.custom.length
+      ? S.custom.map((c) => '<div class="citem" data-id="' + esc(c.id) + '"><span class="tag">' + PH_LABEL[c.phase] + ' · ' + c.n + (c.dies.length ? ' · letale' : '') + '</span><span>' + esc(c.text) + '</span><button class="x" type="button" data-act="cdel" aria-label="Elimina evento" style="border:0;background:none;cursor:pointer;color:var(--muted)">✕</button></div>').join('')
+      : '<p class="help">Nessun evento personalizzato. Quelli che aggiungi compaiono più spesso di quelli di base.</p>';
+  }
+  $('#cN').addEventListener('change', renderCustomForm);
+  ['cText', 'cKiller', 'cPhase'].forEach((id) => $('#' + id).addEventListener('input', updatePreview));
+  $('#cDies').addEventListener('change', updatePreview);
+  $('#cAdd').addEventListener('click', () => {
+    const c = readCustom(); const err = validateCustom(c);
+    if (err) { $('#cMsg').textContent = err; return; }
+    S.custom.push(sanitizeCustom(c)); save();
+    $('#cText').value = ''; $('#cMsg').textContent = 'Evento aggiunto.';
+    renderCustomList(); updatePreview();
+  });
+  $('#cList').addEventListener('click', (e) => {
+    const b = e.target.closest('[data-act="cdel"]'); if (!b) return;
+    const id = b.closest('.citem').dataset.id;
+    S.custom = S.custom.filter((c) => c.id !== id); save(); renderCustomList();
+  });
+
+  // avvio
+  function startRun(seed) {
+    if (S.cast.length < 2) { toast('Servono almeno 2 concorrenti.'); location.hash = '#cast'; return; }
+    S.cast.forEach((t, i) => { if (!t.name.trim()) t.name = 'Concorrente ' + (i + 1); });
+    const sd = seed || S.settings.seed || newSeed();
+    S.settings.seed = sd;
+    const cfg = { cast: JSON.parse(JSON.stringify(S.cast)), theme: S.settings.theme, difficulty: S.settings.difficulty, seed: sd, maxDays: S.settings.maxDays, teamsAllied: S.settings.teamsAllied, teamWin: S.settings.teamWin, custom: S.custom.slice() };
+    try { SIM = L.simulate(cfg); } catch (e) { toast('Simulazione non riuscita: ' + e.message); return; }
+    S.run = { cfg, phase: 0 };
+    lastRendered = -1; save();
+    if (location.hash === '#diretta') renderLive(true); else location.hash = '#diretta';
+  }
+  $('#btnStart').addEventListener('click', () => startRun());
+
+  /* =============== DIRETTA =============== */
+  const KIND_LABEL = { b: 'Apertura', d: 'Giorno', n: 'Notte', f: 'Evento speciale', dis: 'Evento dell\'arena', fallen: 'Bilancio', finale: 'Finale' };
+  const tById = () => Object.fromEntries(SIM.tributes.map((t) => [t.id, t]));
+
+  function renderLive(fromRoute) {
+    const has = !!SIM;
+    $('#liveEmpty').hidden = has; $('#liveBody').hidden = !has;
+    if (!has) return;
+    const theme = THEMES[SIM.theme];
+    const P = SIM.phases, i = Math.max(0, Math.min(P.length - 1, S.run.phase || 0));
+    S.run.phase = i;
+    const ph = P[i], by = tById();
+    const total = SIM.tributes.length;
+    const forward = i === lastRendered + 1 && !fromRoute;
+    lastRendered = i;
+
+    $('#phEyebrow').textContent = theme.name + ' · ' + KIND_LABEL[ph.kind] + ' · fase ' + (i + 1) + ' di ' + P.length;
+    $('#phTitle').textContent = ph.kind === 'fallen' ? ph.title + ' · Giorno ' + ph.day : ph.title;
+    $('#phIntro').textContent = ph.intro || '';
+    const aliveN = ph.snap.alive.length;
+    $('#aliveBig').innerHTML = aliveN + '<small>/' + total + '</small>';
+    const deadNow = SIM.tributes.filter((t) => !t.alive && t.deathPhase <= i).sort((a, b) => a.order - b.order);
+    const newly = new Set(ph.events.flatMap((e) => e.deaths));
+    $('#tally').innerHTML = deadNow.map((t) => '<i class="d' + (newly.has(t.id) && forward ? ' new' : '') + '"></i>').join('') + '<i></i>'.repeat(total - deadNow.length);
+
+    let body = '';
+    if (ph.kind === 'fallen') {
+      body = ph.deaths.length
+        ? '<div class="fallen-grid">' + ph.deaths.map((id) => { const t = by[id]; return '<div class="fcard' + (forward ? ' ev in' : '') + '">' + avHTML(t, 'dead') + '<b>' + esc(t.name) + '</b><small>Squadra ' + t.team + (t.killerIds.length ? ' · per mano di ' + esc(t.killerIds.map((k) => by[k].name).join(', ')) : '') + '</small></div>'; }).join('') + '</div>'
+        : '<div class="panel empty">' + esc(ph.intro) + '</div>';
+    } else {
+      body = '<div class="events">' + ph.events.map((e, k) => {
+        const avs = e.note ? '' : '<span class="avs">' + e.ids.slice(0, 5).map((id) => avHTML(by[id], e.deaths.includes(id) ? 'dead' : '')).join('') + '</span>';
+        const badge = e.deaths.length ? '<span class="skull">' + (theme.soft ? 'Fuori' : (e.deaths.length > 1 ? e.deaths.length + ' morti' : 'Morte')) + '</span>' : '';
+        return '<div class="ev' + (e.deaths.length ? ' lethal' : '') + (e.note ? ' note' : '') + (forward ? ' in' : '') + '" style="animation-delay:' + Math.min(k * 70, 1400) + 'ms">' + avs + '<p>' + e.html + '</p>' + badge + '</div>';
+      }).join('') + '</div>';
+    }
+    $('#phBody').innerHTML = body;
+
+    // mappa
+    const zones = theme.lex.luogo.map((z) => z.replace(/^(il |lo |la |l'|i |gli |le )/i, ''));
+    const lethalZones = {};
+    ph.events.forEach((e) => e.deaths.length && e.ids.forEach((id) => (lethalZones[ph.snap.zones[id]] = 1)));
+    $('#map').innerHTML = zones.map((z, zi) => {
+      const here = ph.snap.alive.filter((id) => ph.snap.zones[id] === zi);
+      return '<div class="zone' + (lethalZones[zi] ? ' hot' : '') + '"><span class="zn">' + esc(z) + '</span><div class="dots">' + here.map((id) => avHTML(by[id])).join('') + '</div></div>';
+    }).join('');
+    $('#mapNote').textContent = Object.keys(lethalZones).length ? 'riquadro = scontri' : '';
+
+    // caduti
+    $('#feedTitle').firstChild.textContent = ((theme.labels && theme.labels.dead) || 'Caduti') + ' ';
+    $('#feedCount').textContent = deadNow.length;
+    $('#feed').innerHTML = deadNow.length ? deadNow.slice().reverse().map((t) => '<div>' + avHTML(t, 'dead') + '<span><b>' + esc(t.name) + '</b>' + (t.killerIds.length ? ' <span class="muted">da ' + esc(t.killerIds.map((k) => by[k].name).join(', ')) + '</span>' : '') + '</span><span class="d">G' + t.deathDay + '</span></div>').join('') : '<span class="muted">Ancora nessuno.</span>';
+    // in gara
+    const aliveSet = new Set(ph.snap.alive);
+    $('#roster').innerHTML = SIM.tributes.map((t) => avHTML(t, aliveSet.has(t.id) ? '' : 'dead')).join('');
+
+    // progressi
+    $('#progress').innerHTML = P.map((p, k) => '<button type="button" class="' + (k === i ? 'cur' : k < i ? 'done' : p.kind === 'fallen' ? 'fallen' : '') + '" data-k="' + k + '" aria-label="Fase ' + (k + 1) + ': ' + esc(p.title) + '" title="' + esc(p.title) + '"></button>').join('');
+    $('#prevBtn').disabled = i === 0;
+    const last = i === P.length - 1;
+    $('#nextBtn').textContent = last ? 'Vedi l\'esito →' : 'Avanti ▶';
+    $('#playBtn').textContent = playTimer ? 'Pausa' : 'Riproduci';
+    $('#playBtn').disabled = last;
+    save();
+  }
+  function go(k) {
+    if (!SIM) return;
+    S.run.phase = Math.max(0, Math.min(SIM.phases.length - 1, k));
+    renderLive(false);
+  }
+  function next() {
+    if (!SIM) return;
+    if (S.run.phase >= SIM.phases.length - 1) { stopPlay(); location.hash = '#esito'; return; }
+    go(S.run.phase + 1);
+    if (S.run.phase >= SIM.phases.length - 1) stopPlay();
+  }
+  function stopPlay() { if (playTimer) { clearInterval(playTimer); playTimer = null; } const b = $('#playBtn'); if (b) b.textContent = 'Riproduci'; }
+  $('#nextBtn').addEventListener('click', next);
+  $('#prevBtn').addEventListener('click', () => { stopPlay(); lastRendered = -2; go(S.run.phase - 1); });
+  $('#playBtn').addEventListener('click', () => {
+    if (playTimer) return stopPlay();
+    playTimer = setInterval(next, SPEED[S.settings.speed] || 4000);
+    $('#playBtn').textContent = 'Pausa';
+    next();
+  });
+  $('#progress').addEventListener('click', (e) => { const b = e.target.closest('button'); if (!b) return; stopPlay(); lastRendered = -2; go(+b.dataset.k); });
+  document.addEventListener('keydown', (e) => {
+    if ($('#v-diretta').hidden || /input|textarea|select/i.test(e.target.tagName) || $('#ioDlg').open) return;
+    if (e.key === 'ArrowRight') { e.preventDefault(); next(); }
+    if (e.key === 'ArrowLeft') { e.preventDefault(); stopPlay(); lastRendered = -2; go(S.run.phase - 1); }
+  });
+
+  /* =============== ESITO =============== */
+  function renderResults() {
+    const has = !!SIM;
+    $('#resEmpty').hidden = has; $('#resBody').hidden = !has;
+    if (!has) return;
+    const theme = THEMES[SIM.theme], by = tById(), soft = !!theme.soft;
+    const W = SIM.winners.map((id) => by[id]);
+    const kWord = soft ? 'eliminazion' : 'uccision';
+    const plural = (n, base) => n + ' ' + base + (n === 1 ? 'e' : 'i');
+    let hero;
+    if (W.length === 1) {
+      const w = W[0];
+      hero = '<div class="hero panel">' + avHTML(w) + '<div style="min-width:0"><div class="eyebrow">' + esc(theme.name) + ' · ' + SIM.days + ' giorni · ' + SIM.tributes.length + ' concorrenti</div>' +
+        '<h1>' + esc(w.name) + '</h1><p><b>' + G3(w.gender, 'Ultimo', 'Ultima', 'Ultimə') + ' in piedi</b> con ' + plural(w.kills, kWord) + '. Squadra ' + w.team + (w.traits.length ? ' · ' + w.traits.map((x) => TRAITS[x].name).join(', ') : '') + '.</p></div></div>';
+    } else if (W.length > 1) {
+      hero = '<div class="hero panel" style="grid-template-columns:minmax(0,1fr)"><div class="eyebrow">' + esc(theme.name) + ' · ' + SIM.days + ' giorni</div><h1>Vince la squadra ' + W[0].team + '</h1><div class="avs">' + W.map((w) => avHTML(w)).join('') + '</div><p>' + W.map((w) => esc(w.name) + ' (' + w.kills + ')').join(', ') + '.</p></div>';
+    } else {
+      hero = '<div class="hero panel" style="grid-template-columns:minmax(0,1fr)"><h1>Nessun superstite</h1><p>L\'arena non ha risparmiato nessuno.</p></div>';
+    }
+    const st = SIM.stats;
+    const fb = st.firstBlood ? by[st.firstBlood.victim] : null;
+    const tiles = [
+      [SIM.days, 'giorni nell\'arena'], [st.events, 'eventi raccontati'], [st.alliances, 'alleanze strette'],
+      [st.betrayals, 'tradimenti'], [st.killDeaths, soft ? 'eliminati da un rivale' : 'morti per mano altrui'], [st.envDeaths, soft ? 'eliminati dalle circostanze' : 'morti per colpa dell\'arena'],
+    ].map(([v, l]) => '<div class="tile panel"><b>' + v + '</b><span>' + l + '</span></div>').join('');
+
+    const ranked = SIM.tributes.slice().sort((a, b) => a.rank - b.rank || b.kills - a.kills);
+    const rows = ranked.map((t) => '<tr class="' + (t.alive ? 'win' : '') + '"><td class="n">' + t.rank + '°</td><td><span class="who">' + avHTML(t, t.alive ? '' : 'dead') + esc(t.name) + '</span></td><td class="n">' + t.team + '</td><td class="n">' + t.kills + '</td>' +
+      '<td>' + (t.alive ? '<b>' + (W.length > 1 ? 'Squadra vincitrice' : G3(t.gender, 'Vincitore', 'Vincitrice', 'Vincitorə')) + '</b>' : t.killerIds.length ? esc(t.killerIds.map((k) => by[k].name).join(', ')) : '<span class="muted">L\'arena</span>') + '</td>' +
+      '<td class="n">' + (t.alive ? '–' : 'G' + t.deathDay) + '</td><td class="cause">' + (t.alive ? '' : t.deathHtml) + '</td></tr>').join('');
+
+    const killers = SIM.tributes.filter((t) => t.kills > 0).sort((a, b) => b.kills - a.kills).slice(0, 8);
+    const maxK = Math.max(1, ...killers.map((t) => t.kills));
+    const kbars = killers.length ? killers.map((t) => '<div class="bar"><span class="lbl">' + esc(t.name) + '</span><span class="tr"><i style="width:' + (100 * t.kills / maxK) + '%;background:' + esc(t.color) + '"></i></span><span class="v">' + t.kills + '</span></div>').join('') : '<p class="muted">Nessuno ha eliminato un rivale.</p>';
+    const dd = []; for (let d = 1; d <= SIM.days; d++) dd.push([d, st.deathsByDay[d] || 0]);
+    const maxD = Math.max(1, ...dd.map((x) => x[1]));
+    const dbars = dd.map(([d, n]) => '<div class="bar dd"><span class="lbl">Giorno ' + d + '</span><span class="tr"><i style="width:' + (100 * n / maxD) + '%"></i></span><span class="v">' + n + '</span></div>').join('');
+
+    $('#resBody').innerHTML = hero +
+      '<div class="tiles">' + tiles + '</div>' +
+      '<div class="row" style="margin-bottom:16px">' +
+        '<button class="btn primary" type="button" id="rAgain">Rigioca con un nuovo seme</button>' +
+        '<button class="btn" type="button" id="rCopy">Copia il riepilogo</button>' +
+        '<a class="btn" href="#diretta">Rivedi la diretta</a><a class="btn" href="#cast">Modifica il cast</a>' +
+        '<span class="help mono">seme: ' + esc(SIM.seed) + '</span>' +
+      '</div>' +
+      '<div class="res-grid">' +
+        '<div class="panel"><h2>Classifica</h2>' + (fb ? '<p class="help" style="margin:-4px 0 12px">Primo sangue: ' + esc(fb.name) + (st.firstBlood.killers.length ? ', per mano di ' + esc(st.firstBlood.killers.map((k) => by[k].name).join(', ')) : ', vittima dell\'arena') + '.</p>' : '') +
+          '<div class="tablewrap"><table><thead><tr><th>Pos.</th><th>Concorrente</th><th>Sq.</th><th>' + (soft ? 'Elim.' : 'Ucc.') + '</th><th>Per mano di</th><th>Giorno</th><th>Come è andata</th></tr></thead><tbody>' + rows + '</tbody></table></div></div>' +
+        '<div class="stack">' +
+          '<div class="panel"><h2>' + (soft ? 'Chi ha eliminato di più' : 'Chi ha ucciso di più') + '</h2><div class="bars">' + kbars + '</div></div>' +
+          '<div class="panel"><h2>' + ((theme.labels && theme.labels.dead) || 'Caduti') + ' per giorno</h2><div class="bars">' + dbars + '</div></div>' +
+          '<div class="panel poster"><h2>Locandina</h2><img id="posterImg" alt="Locandina della partita"><p class="help" style="margin-top:8px">Tieni premuto sull\'immagine (o clic destro) per salvarla.</p></div>' +
+        '</div>' +
+      '</div>';
+    $('#rAgain').addEventListener('click', () => { S.settings.seed = newSeed(); startRun(S.settings.seed); });
+    $('#rCopy').addEventListener('click', () => copyText(summaryText(), 'Riepilogo copiato negli appunti.'));
+    drawPoster().then((url) => { const im = $('#posterImg'); if (im && url) im.src = url; });
+  }
+
+  function summaryText() {
+    const theme = THEMES[SIM.theme], by = tById();
+    const W = SIM.winners.map((id) => by[id]);
+    const lines = ['LAST ONE STANDING · ' + theme.name, SIM.tributes.length + ' concorrenti · ' + SIM.days + ' giorni · seme ' + SIM.seed, ''];
+    if (W.length === 1) lines.push(G3(W[0].gender, 'Ultimo', 'Ultima', 'Ultimə') + ' in piedi: ' + W[0].name + ' (' + W[0].kills + ' ' + (theme.soft ? 'eliminazioni' : 'uccisioni') + ')');
+    else if (W.length) lines.push('Vince la squadra ' + W[0].team + ': ' + W.map((w) => w.name).join(', '));
+    lines.push('', 'Classifica:');
+    SIM.tributes.slice().sort((a, b) => a.rank - b.rank).forEach((t) => lines.push(t.rank + '. ' + t.name + ' — ' + t.kills + (t.alive ? '' : ' — ' + t.deathText)));
+    return lines.join('\n');
+  }
+
+  async function drawPoster() {
+    try { if (document.fonts && document.fonts.ready) await document.fonts.ready; } catch (e) { /* niente */ }
+    const theme = THEMES[SIM.theme], by = tById();
+    const W = SIM.winners.map((id) => by[id]);
+    const cv = document.createElement('canvas'); cv.width = 1080; cv.height = 1350;
+    const g = cv.getContext('2d');
+    const gold = '#e3b04b', ink = '#e7e9ee', mute = '#9aa3b4';
+    g.fillStyle = '#0f1218'; g.fillRect(0, 0, 1080, 1350);
+    // tacche di conteggio
+    const total = SIM.tributes.length, tw = Math.min(18, 900 / total);
+    SIM.tributes.slice().sort((a, b) => (a.alive ? 1 : 0) - (b.alive ? 1 : 0) || a.order - b.order).forEach((t, i) => {
+      g.fillStyle = t.alive ? gold : '#f06a5c'; g.globalAlpha = t.alive ? 1 : 0.85;
+      g.fillRect(90 + i * tw, 1170, Math.max(3, tw - 5), 44);
+    });
+    g.globalAlpha = 1;
+    const disp = '"Big Shoulders Display", "Arial Narrow", sans-serif', mono = '"JetBrains Mono", monospace', body = 'Barlow, sans-serif';
+    g.fillStyle = mute; g.font = '500 28px ' + mono; g.textAlign = 'left';
+    g.fillText((theme.name + ' · ' + SIM.days + ' giorni · ' + total + ' concorrenti').toUpperCase(), 90, 130);
+    g.fillStyle = gold; g.font = '900 120px ' + disp;
+    const head = W.length === 1 ? G3(W[0].gender, 'ULTIMO IN PIEDI', 'ULTIMA IN PIEDI', 'ULTIMƏ IN PIEDI') : W.length ? 'SQUADRA ' + W[0].team : 'NESSUN SUPERSTITE';
+    g.fillText(head, 84, 250);
+    const loadImg = (src) => new Promise((res) => { const im = new Image(); im.onload = () => res(im); im.onerror = () => res(null); im.src = src; });
+    async function avatar(t, x, y, r) {
+      g.save(); g.beginPath(); g.arc(x, y, r, 0, Math.PI * 2); g.closePath();
+      g.fillStyle = t.color || '#888'; g.fill(); g.clip();
+      const im = t.img ? await loadImg(t.img) : null;
+      if (im) g.drawImage(im, x - r, y - r, r * 2, r * 2);
+      else { g.fillStyle = '#fff'; g.font = '800 ' + Math.round(r * 0.8) + 'px ' + disp; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText(initials(t.name), x, y + r * 0.04); }
+      g.restore(); g.textBaseline = 'alphabetic'; g.textAlign = 'left';
+    }
+    if (W.length === 1) {
+      const w = W[0];
+      g.strokeStyle = gold; g.lineWidth = 10; g.beginPath(); g.arc(540, 560, 236, 0, Math.PI * 2); g.stroke();
+      await avatar(w, 540, 560, 222);
+      g.fillStyle = ink; g.textAlign = 'center'; g.font = '900 ' + (w.name.length > 14 ? 96 : 130) + 'px ' + disp;
+      g.fillText(w.name.toUpperCase(), 540, 930);
+      g.fillStyle = mute; g.font = '500 38px ' + body;
+      g.fillText(w.kills + ' ' + (theme.soft ? (w.kills === 1 ? 'eliminazione' : 'eliminazioni') : (w.kills === 1 ? 'uccisione' : 'uccisioni')) + ' · squadra ' + w.team, 540, 995);
+    } else if (W.length) {
+      const r = Math.min(150, 420 / W.length);
+      for (let k = 0; k < W.length; k++) await avatar(W[k], 540 + (k - (W.length - 1) / 2) * (r * 2.2), 560, r);
+      g.fillStyle = ink; g.textAlign = 'center'; g.font = '800 64px ' + disp;
+      g.fillText(W.map((w) => w.name).join(' · ').toUpperCase().slice(0, 40), 540, 900);
+    }
+    g.textAlign = 'left';
+    const top = SIM.tributes.filter((t) => t.kills > 0 && !t.alive).sort((a, b) => b.kills - a.kills).slice(0, 3);
+    if (top.length) {
+      g.fillStyle = mute; g.font = '500 24px ' + mono; g.fillText('I PIÙ PERICOLOSI TRA GLI SCONFITTI', 90, 1070);
+      g.fillStyle = ink; g.font = '700 34px ' + body;
+      g.fillText(top.map((t) => t.name + ' ' + t.kills).join('   ·   '), 90, 1118);
+    }
+    g.fillStyle = mute; g.font = '500 24px ' + mono;
+    g.fillText('LAST ONE STANDING · SEME ' + String(SIM.seed).toUpperCase().slice(0, 30), 90, 1280);
+    try { return cv.toDataURL('image/png'); } catch (e) { return ''; }
+  }
+
+  /* ---------------- avvio ---------------- */
+  function boot(hot) {
+    const had = load();
+    if (!had) {
+      S.cast = L.randomCast(24, 'benvenuto', 2).map(sanitizeTribute);
+      S.settings.seed = 'benvenuto-2026';
+    }
+    if (!S.settings.seed) S.settings.seed = newSeed();
+    $('#teamSize').value = String(S.settings.teamSize || 2);
+    applyUi();
+    renderCast();
+    if (S.run && S.run.cfg) {
+      try { SIM = L.simulate(S.run.cfg); } catch (e) { SIM = null; S.run = null; }
+    } else if (!had && S.cast.length >= 2) {
+      const cfg = { cast: JSON.parse(JSON.stringify(S.cast)), theme: S.settings.theme, difficulty: S.settings.difficulty, seed: S.settings.seed, maxDays: S.settings.maxDays, teamsAllied: S.settings.teamsAllied, teamWin: S.settings.teamWin, custom: [] };
+      SIM = L.simulate(cfg); S.run = { cfg, phase: 0 };
+    }
+    if (hot && typeof hot.phase === 'number' && S.run) S.run.phase = hot.phase;
+    route();
+  }
+  const H = window.claude && window.claude.hot;
+  if (H && typeof H.snapshot === 'function') { try { H.snapshot(() => ({ phase: S.run ? S.run.phase : 0 })); } catch (e) { /* niente */ } }
+  if (H && typeof H.ready === 'function') H.ready(boot); else boot((H && H.data) || {});
+})();
+</script>
