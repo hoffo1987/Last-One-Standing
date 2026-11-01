@@ -48,7 +48,8 @@ src/content/_systems.js  sistema delle conseguenze: frasi di eco, oggetti specia
 src/content/pack-*.js    pacchetti per arena (eventi, disastri, 18+), condivisi e per adulti
 src/content/*.js         eventi aggiuntivi e disastri della versione precedente
 src/engine.js        motore di simulazione (funziona anche in Node)
-src/art.js           logo, icone e illustrazioni delle arene in SVG, coriandoli
+src/art.js           usa logo e illustrazioni da assets/ (con ripiego in SVG), icone, coriandoli
+assets/              logo, emblema, favicon e illustrazioni delle 9 arene (WebP ottimizzati, incorporati dalla build)
 src/ui.js            interfaccia
 src/style.css        stile
 src/shell.html       markup

@@ -20,7 +20,11 @@
       '<path d="M24 19 L26.5 11 L30 15.5 L32 9 L34 15.5 L37.5 11 L40 19 Z" fill="' + acc + '" stroke="' + acc + '" stroke-width="1.5" stroke-linejoin="round"/>' +
       '</svg>';
   }
+  // logo ufficiale (scritta) ed emblema, se presenti negli asset
+  function wordmark(cls) { return ASSETS.logo ? '<img class="' + (cls || 'wordmark') + '" src="' + ASSETS.logo + '" alt="Last One Standing" draggable="false">' : ''; }
+  function emblem(size) { return ASSETS.emblema ? '<img class="emblem" src="' + ASSETS.emblema + '" width="' + size + '" height="' + size + '" alt="" draggable="false">' : logo(size); }
   function logoDataUri(acc) {
+    if (ASSETS.favicon) return ASSETS.favicon;
     const svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect x="2" y="2" width="60" height="60" rx="16" fill="#14100c"/><g stroke="#fff" stroke-width="5" stroke-linecap="round" opacity=".5"><path d="M13 50 L19 44"/><path d="M20 51 L28 47"/><path d="M29 52 L37 50"/><path d="M50 51 L43 45"/></g><path d="M32 46 V22" stroke="' + acc + '" stroke-width="6" stroke-linecap="round"/><path d="M24 19 L26.5 11 L30 15.5 L32 9 L34 15.5 L37.5 11 L40 19 Z" fill="' + acc + '" stroke="' + acc + '" stroke-width="1.5" stroke-linejoin="round"/></svg>';
     return 'data:image/svg+xml,' + encodeURIComponent(svg);
   }
@@ -129,11 +133,15 @@
       '<g transform="translate(300 60)"><circle r="22" fill="#e8fff8"/><path d="M0 -14 v14 h10" stroke="#0b2b2a" stroke-width="3" fill="none" stroke-linecap="round"/></g>' +
       '<g fill="#fff" opacity=".85"><rect x="70" y="40" width="16" height="20" transform="rotate(-15 78 50)"/><rect x="200" y="28" width="14" height="18" transform="rotate(12 207 37)"/><rect x="140" y="70" width="12" height="16" transform="rotate(-30 146 78)"/></g>'; },
   };
+  const ASSETS = G.LOS_ASSETS || { arene: {} };
   function scene(themeId, cls) {
+    const img = ASSETS.arene && ASSETS.arene[themeId];
+    if (img) return '<img class="' + (cls || 'scene') + '" src="' + img + '" alt="" decoding="async" draggable="false">';
     const f = SCENES[themeId] || SCENES.classico;
     return '<svg class="' + (cls || 'scene') + '" viewBox="0 0 400 200" preserveAspectRatio="xMidYMid slice" aria-hidden="true">' + f() + '</svg>';
   }
   function sceneDataUri(themeId) {
+    if (ASSETS.arene && ASSETS.arene[themeId]) return ASSETS.arene[themeId];
     const f = SCENES[themeId] || SCENES.classico;
     return 'data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 200" preserveAspectRatio="xMidYMid slice">' + f() + '</svg>');
   }
@@ -154,5 +162,5 @@
     })();
   }
 
-  G.LOS_ART = { logo, logoDataUri, icon, scene, sceneDataUri, confetti };
+  G.LOS_ART = { logo, wordmark, emblem, assets: ASSETS, logoDataUri, icon, scene, sceneDataUri, confetti };
 })(typeof window !== 'undefined' ? window : globalThis);

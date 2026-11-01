@@ -652,3 +652,19 @@ main { padding-bottom: 40px; }
 .teamblock .castgrid { grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 10px; }
 .teamblock .tile { box-shadow: none; }
 #editBody .field > span { gap: 4px; }
+
+/* ---------- immagini ufficiali ---------- */
+img.scene { object-fit: cover; object-position: center; user-select: none; }
+.hh-scenes img.scene { position: relative; height: 100%; width: 100%; }
+.brand.has-wordmark b { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+.wordmark { height: 46px; width: auto; display: block; filter: drop-shadow(0 2px 6px rgba(0,0,0,.25)); }
+.wordmark-hero { width: min(560px, 100%); height: auto; display: block; margin: -6px 0 6px -10px; filter: drop-shadow(0 18px 40px rgba(0,0,0,.55)); }
+.hh-emblem svg, .hh-emblem img { animation: none; }
+.hh-emblem { margin-bottom: 8px; }
+.emblem { display: block; filter: drop-shadow(0 4px 10px rgba(0,0,0,.3)); }
+.poster-card::after { background: linear-gradient(180deg, rgba(0,0,0,0) 25%, rgba(0,0,0,.5) 58%, rgba(0,0,0,.9) 100%); }
+.hh-scenes { opacity: .22; grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(3, 1fr); }
+.apv-banner { height: 190px; }
+.bc-scene { opacity: .55; }
+.winhero .wscene { opacity: .5; }
+@media (max-width: 760px) { .wordmark { height: 38px; } .apv-banner { height: 120px; } .hh-scenes { grid-template-columns: 1fr; grid-template-rows: repeat(3, 1fr); } .hh-scenes img:nth-child(n+4) { display: none; } }

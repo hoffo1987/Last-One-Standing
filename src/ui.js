@@ -176,7 +176,8 @@
     $('#liveDot').hidden = !SIM;
     if (v !== 'diretta') stopPlay();
     if (v !== 'home') stopHomeLoop();
-    setHue((v === 'diretta' || v === 'esito') && SIM ? SIM.theme : S.settings.theme);
+    if (v === 'home' && ART.assets.logo) document.documentElement.style.setProperty('--h', 162);
+    else setHue((v === 'diretta' || v === 'esito') && SIM ? SIM.theme : S.settings.theme);
     if (v === 'home') renderHome();
     if (v === 'cast') renderCast();
     if (v === 'arena') renderArena();
@@ -967,7 +968,9 @@
     const top = SIM.tributes.filter((t) => t.kills > 0 && !t.alive).sort((a, b) => b.kills - a.kills).slice(0, 3);
     if (top.length) { g.fillStyle = mute; g.font = '500 23px ' + mono; g.fillText('I PIÙ PERICOLOSI TRA GLI SCONFITTI', 90, 1076); g.fillStyle = ink; g.font = '700 34px ' + body; g.fillText(top.map((t) => t.name + ' ' + t.kills).join('   ·   '), 90, 1124); }
     g.fillStyle = mute; g.font = '500 23px ' + mono;
-    g.fillText('LAST ONE STANDING · SEME ' + String(SIM.seed).toUpperCase().slice(0, 30), 90, 1282);
+    const wm = ART.assets.logo ? await loadImg(ART.assets.logo) : null;
+    if (wm) { g.drawImage(wm, 660, 1236, 330, 330 * wm.height / wm.width); g.fillText('SEME ' + String(SIM.seed).toUpperCase().slice(0, 24), 90, 1282); }
+    else g.fillText('LAST ONE STANDING · SEME ' + String(SIM.seed).toUpperCase().slice(0, 30), 90, 1282);
     try { return cv.toDataURL('image/png'); } catch (e) { return ''; }
   }
 
@@ -986,9 +989,15 @@
     if (!had) { S.cast = L.randomCast(24, 'benvenuto', 2).map(sanitizeTribute); S.settings.seed = 'benvenuto-2026'; }
     if (!S.settings.seed) S.settings.seed = newSeed();
     applyUi();
-    $('#brandLogo').innerHTML = ART.logo(34, { bg: 'var(--screen)', ink: 'var(--screen-ink)', accent: 'var(--screen-accent)' });
-    $('#footLogo').innerHTML = ART.logo(40, { bg: 'var(--screen)', ink: 'var(--screen-ink)', accent: 'var(--screen-accent)' });
-    $('#heroLogo').innerHTML = ART.logo(76, { bg: 'var(--screen-2)', ink: 'var(--screen-ink)', accent: 'var(--screen-accent)' });
+    if (ART.assets.logo) {
+      $('#brandLogo').innerHTML = ART.wordmark('wordmark'); document.querySelector('.brand').classList.add('has-wordmark');
+      $('#heroLogo').innerHTML = ART.wordmark('wordmark-hero');
+      $('#footLogo').innerHTML = ART.emblem(48);
+    } else {
+      $('#brandLogo').innerHTML = ART.logo(34, { bg: 'var(--screen)', ink: 'var(--screen-ink)', accent: 'var(--screen-accent)' });
+      $('#footLogo').innerHTML = ART.logo(40, { bg: 'var(--screen)', ink: 'var(--screen-ink)', accent: 'var(--screen-accent)' });
+      $('#heroLogo').innerHTML = ART.logo(76, { bg: 'var(--screen-2)', ink: 'var(--screen-ink)', accent: 'var(--screen-accent)' });
+    }
     $('#heroScenes').innerHTML = ['classico', 'fantasy', 'scifi', 'zombie', 'royale', 'horror', 'wasteland', 'liceo', 'ufficio'].map((t) => ART.scene(t)).join('');
     try { const ic = document.createElement('link'); ic.rel = 'icon'; ic.href = ART.logoDataUri('#e3b04b'); document.head.appendChild(ic); } catch (e) { /* niente */ }
     if (S.run && S.run.cfg) {
