@@ -16,7 +16,7 @@
   const E = (D.eco = {});
 
   E.statusLabel = {
-    grave: 'Grave', esausto: 'Esausto', disperato: 'Disperato', carico: 'Carico',
+    grave: 'Grave', esausto: 'Esausto', disperato: 'Disperato',
     assiderato: 'Assiderato', maledetto: 'Maledetto', ipossia: 'In ipossia', infetto: 'Infetto',
     terrorizzato: 'Terrorizzato', irradiato: 'Irradiato', ansia: 'In ansia', stressato: 'Sotto stress', tempesta: 'Nella tempesta',
   };
@@ -204,7 +204,6 @@
       mods: { forage: 1.5, heal: 1.2, weapon: 1, stealth: 1, fame: 1.4, sponsor: 1.1, night: 0.8, beast: 1, trap: 1.1 },
       zones: [[1, 1.1, 0.6], [1.7, 0.9, 0.4], [0.8, 0.7, 0.9], [0.7, 1.3, 0.5], [1, 1.1, 0.5], [0.6, 1.4, 0.5]],
       meter: { id: 'ansia', name: 'Ansia', st: 'ansia', desc: 'Sale nei giorni di lezione e dopo ogni eliminazione, scende con gli amici e il fine giornata. A 100 si crolla e si viene ritirati dai giochi.', gain: { b: 8, d: 9, n: -4, dis: 12, f: 4 }, alone: 4, death: 6, wound: 6, resist: ['cor', 'car'], ally: 0.6, thr: 65, dmg: 12, cure: 35, deathOn: true },
-      labels: 'soft',
       meteo: [
         { n: 'Compito di matematica', d: 'Interrogazioni a raffica: l\'ansia è nell\'aria.', fx: { pr: 6, tb: { int: 1 } } },
         { n: 'Assemblea d\'istituto', d: 'Niente lezioni, tante chiacchiere: oggi si fa politica.', fx: { fame: 1.6, tb: { car: 1 } } },
@@ -227,7 +226,6 @@
       mods: { forage: 1.6, heal: 1.2, weapon: 1, stealth: 1.1, fame: 1.3, sponsor: 1.1, night: 0.85, beast: 1, trap: 1.1 },
       zones: [[0.8, 1.3, 0.4], [1, 1, 0.5], [1.8, 0.8, 0.6], [0.7, 1.6, 0.3], [0.8, 0.9, 0.8], [0.9, 0.8, 0.7]],
       meter: { id: 'stress', name: 'Stress', st: 'stressato', desc: 'Sale con le riunioni, gli straordinari e i colleghi licenziati. Pause, caffè e alleati lo abbassano. A 100 è burnout.', gain: { b: 6, d: 8, n: 9, dis: 12, f: -6 }, alone: 3, death: 5, wound: 5, resist: ['res', 'int'], ally: 0.65, thr: 65, dmg: 12, cure: 35, deathOn: true, coffee: true },
-      labels: 'soft',
       meteo: [
         { n: 'Chiusura trimestrale', d: 'I numeri non tornano e tutti devono restare fino a tardi.', fx: { pr: 7, en: 1.3 } },
         { n: 'Server giù', d: 'Niente email, niente Excel: il caos ha il sapore della libertà.', fx: { pr: -4, stl: 1.4 } },

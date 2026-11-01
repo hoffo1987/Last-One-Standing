@@ -31,6 +31,7 @@
   --muted: hsl(var(--h) 8% 38%);
   --line: hsl(var(--h) 12% 83%);
   --accent: hsl(var(--h) 78% 37%);
+  --accent-text: hsl(var(--h) 85% 24%);
   --accent-ink: #fff;
   --accent-soft: hsl(var(--h) 75% 91%);
   --screen: hsl(var(--h) 28% 8%);
@@ -954,6 +955,21 @@ img.scene { object-fit: cover; object-position: center; user-select: none; }
 .ra-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
 .eco-sum { margin-top: 8px; }
 @media (max-width: 640px) { .vbars, .ra-grid { grid-template-columns: minmax(0, 1fr); } .vbar { grid-template-columns: 84px minmax(0, 1fr) 26px; } }
+
+/* ---------- contrasto dei testi piccoli (WCAG AA) ---------- */
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --accent-text: hsl(var(--h) 90% 72%); } }
+:root[data-theme="dark"] { --accent-text: hsl(var(--h) 90% 72%); }
+.eyebrow, .award .at, .why { color: var(--accent-text); }
+.ev .cat { color: color-mix(in srgb, var(--cc) 68%, var(--ink)); }
+.why.ok { color: color-mix(in srgb, var(--c-heal) 72%, var(--ink)); }
+.why.ko { color: color-mix(in srgb, var(--c-kill) 72%, var(--ink)); }
+.status-pill.alive { color: color-mix(in srgb, var(--alive) 70%, var(--ink)); }
+.status-pill.dead { color: color-mix(in srgb, var(--dead) 75%, var(--ink)); }
+.ev.note.meteo .meteo { color: color-mix(in srgb, #3d7fd6 70%, var(--ink)); }
+:root[data-theme="dark"] .ev.note.meteo .meteo { color: #8ab8f5; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .ev.note.meteo .meteo { color: #8ab8f5; } }
+.tag18, .bc-18 { background: #b3261e; color: #fff; }
+.bc-18 { background: #fff; color: #b3261e; }
 </style>
 
 <header class="top">
@@ -995,7 +1011,7 @@ img.scene { object-fit: cover; object-position: center; user-select: none; }
           <div class="hb-top"><span class="rec"></span> IN DIRETTA <span class="hb-day" id="hbDay">GIORNO 1</span></div>
           <div class="hb-count"><b id="hbAlive">24</b><span>/24 superstiti</span></div>
           <div class="hb-tally" id="hbTally"></div>
-          <div class="hb-line" id="hbLine"></div>
+          <div class="hb-line" id="hbLine">La diretta sta per cominciare…</div>
         </div>
       </div>
     </div>
@@ -2155,7 +2171,7 @@ img.scene { object-fit: cover; object-position: center; user-select: none; }
   const E = (D.eco = {});
 
   E.statusLabel = {
-    grave: 'Grave', esausto: 'Esausto', disperato: 'Disperato', carico: 'Carico',
+    grave: 'Grave', esausto: 'Esausto', disperato: 'Disperato',
     assiderato: 'Assiderato', maledetto: 'Maledetto', ipossia: 'In ipossia', infetto: 'Infetto',
     terrorizzato: 'Terrorizzato', irradiato: 'Irradiato', ansia: 'In ansia', stressato: 'Sotto stress', tempesta: 'Nella tempesta',
   };
@@ -2343,7 +2359,6 @@ img.scene { object-fit: cover; object-position: center; user-select: none; }
       mods: { forage: 1.5, heal: 1.2, weapon: 1, stealth: 1, fame: 1.4, sponsor: 1.1, night: 0.8, beast: 1, trap: 1.1 },
       zones: [[1, 1.1, 0.6], [1.7, 0.9, 0.4], [0.8, 0.7, 0.9], [0.7, 1.3, 0.5], [1, 1.1, 0.5], [0.6, 1.4, 0.5]],
       meter: { id: 'ansia', name: 'Ansia', st: 'ansia', desc: 'Sale nei giorni di lezione e dopo ogni eliminazione, scende con gli amici e il fine giornata. A 100 si crolla e si viene ritirati dai giochi.', gain: { b: 8, d: 9, n: -4, dis: 12, f: 4 }, alone: 4, death: 6, wound: 6, resist: ['cor', 'car'], ally: 0.6, thr: 65, dmg: 12, cure: 35, deathOn: true },
-      labels: 'soft',
       meteo: [
         { n: 'Compito di matematica', d: 'Interrogazioni a raffica: l\'ansia è nell\'aria.', fx: { pr: 6, tb: { int: 1 } } },
         { n: 'Assemblea d\'istituto', d: 'Niente lezioni, tante chiacchiere: oggi si fa politica.', fx: { fame: 1.6, tb: { car: 1 } } },
@@ -2366,7 +2381,6 @@ img.scene { object-fit: cover; object-position: center; user-select: none; }
       mods: { forage: 1.6, heal: 1.2, weapon: 1, stealth: 1.1, fame: 1.3, sponsor: 1.1, night: 0.85, beast: 1, trap: 1.1 },
       zones: [[0.8, 1.3, 0.4], [1, 1, 0.5], [1.8, 0.8, 0.6], [0.7, 1.6, 0.3], [0.8, 0.9, 0.8], [0.9, 0.8, 0.7]],
       meter: { id: 'stress', name: 'Stress', st: 'stressato', desc: 'Sale con le riunioni, gli straordinari e i colleghi licenziati. Pause, caffè e alleati lo abbassano. A 100 è burnout.', gain: { b: 6, d: 8, n: 9, dis: 12, f: -6 }, alone: 3, death: 5, wound: 5, resist: ['res', 'int'], ally: 0.65, thr: 65, dmg: 12, cure: 35, deathOn: true, coffee: true },
-      labels: 'soft',
       meteo: [
         { n: 'Chiusura trimestrale', d: 'I numeri non tornano e tutti devono restare fino a tardi.', fx: { pr: 7, en: 1.3 } },
         { n: 'Server giù', d: 'Niente email, niente Excel: il caos ha il sapore della libertà.', fx: { pr: -4, stl: 1.4 } },
@@ -5272,7 +5286,6 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
   const STATUS_TTL = { ubriaco: 2, lutto: 6, sconvolto: 5 };
   const ITEM_NAME = { med: 'un kit medico', trap: 'una trappola' };
   Object.assign(STATUS_LABEL, (D.eco && D.eco.statusLabel) || {});
-  const MANAGED = ['ferito', 'grave', 'affamato', 'esausto', 'disperato'];
   const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
 
   function simulate(cfg) {
@@ -5326,7 +5339,8 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
 
     // affinità reciproca (-100 … 100)
     const AFF = new Map();
-    const akey = (a, b) => (a.id < b.id ? a.id + '|' + b.id : b.id + '|' + a.id);
+    T.forEach((t, i) => (t.ix = i));
+    const akey = (a, b) => (a.ix < b.ix ? a.ix * 4096 + b.ix : b.ix * 4096 + a.ix);
     const aff = (a, b) => AFF.get(akey(a, b)) || 0;
     const addAff = (a, b, d) => { if (a === b) return; AFF.set(akey(a, b), Math.max(-100, Math.min(100, aff(a, b) + d))); };
 
@@ -5455,6 +5469,13 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
       ev.fx.concat(ev.ok.fx).forEach((f) => { if (f.t === 'gain' && f.r[0] === 0) g[f.item] = 1; if (f.t === 'cure' && f.r[0] === 0) g.med = 1; });
       return g;
     }
+    // contesto di P letto una volta sola per scelta: lo stato non cambia finché l'evento non viene applicato
+    let CTX = null;
+    function ctxOf(P) {
+      if (CTX && CTX.P === P) return CTX;
+      return (CTX = { P, grudge: Object.keys(P.grudges).some((id) => byId[id].alive), owe: Object.keys(P.owes).length > 0 || T.some((t) => t.alive && t.owes[P.id]),
+        traitor: T.some((t) => t.alive && t.traitor && t !== P), feared: T.some((t) => t.alive && t.kills >= 3 && t !== P) });
+    }
     function weightFor(ev, P) {
       let w = ev.w;
       for (const tag of ev.tags) {
@@ -5483,13 +5504,13 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
         else if ((r.t === 'att' || r.t === 'trait' || r.t === 'notrait') && r.r[0] != null) { const fake = [P]; w *= checkReq({ req: [Object.assign({}, r, { r: [0] })] }, fake) ? 2.5 : 1; }
         else if (r.t === 'has' && hasItem(P, r.item)) w *= r.item === 'arma' || r.item === 'cibo' ? 1.6 : 3;
         else if (r.t === 'ally' && P.allyId != null) w *= 1.4;
-        else if (r.t === 'grudge' && Object.keys(P.grudges).some((id) => byId[id].alive)) w *= 7;
-        else if (r.t === 'owe' && (Object.keys(P.owes).length || T.some((t) => t.alive && t.owes[P.id]))) w *= 4;
+        else if (r.t === 'grudge' && ctxOf(P).grudge) w *= 7;
+        else if (r.t === 'owe' && ctxOf(P).owe) w *= 4;
         else if (r.t === 'couple' && P.partner) w *= 3.5;
         else if (r.t === 'lost' && P.lost) w *= 3;
         else if (r.t === 'fame' && P.fame >= 3) w *= 2;
-        else if (r.t === 'traitor' && T.some((t) => t.alive && t.traitor && t !== P)) w *= 2;
-        else if (r.t === 'feared' && T.some((t) => t.alive && t.kills >= 3 && t !== P)) w *= 2;
+        else if (r.t === 'traitor' && ctxOf(P).traitor) w *= 2;
+        else if (r.t === 'feared' && ctxOf(P).feared) w *= 2;
         else if (r.t === 'canLove' && !P.partner) w *= 1.2;
       }
       // condizione fisica, umore, bisogni, arena e meteo spostano le scelte
@@ -5603,7 +5624,8 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
     function hurt(t, dmg, by, cause, inTick) {
       if (!t.alive) return;
       dmg *= Math.max(0.55, 1.2 - t.attr.res * 0.04) * (hasTrait(t, 'sopravvissuto') ? 0.85 : 1);
-      t.hp -= dmg; if (!inTick) t.hp = Math.max(8, t.hp);
+      const hp0 = t.hp;
+      t.hp -= dmg; if (!inTick) t.hp = Math.max(Math.min(8, hp0), t.hp);
       t.hurtPh = phases.length;
       if (by && by !== t) t.cause = { k: cause === 'trap' ? 'trap' : 'wound', by: by.id, ph: phases.length };
       else if (cause) t.cause = { k: cause, ph: phases.length, by: null };
@@ -5614,6 +5636,7 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
       t.mo -= Math.min(10, dmg / 4);
       syncSt(t);
     }
+    const capInv = (t) => { while (t.inv.length > 7) t.inv.shift(); };
     function eat(t) {
       const i = t.inv.findIndex((x) => x.type === 'cibo'); if (i < 0) return false;
       t.inv.splice(i, 1); t.food += 50; t.mo += 3;
@@ -5677,7 +5700,7 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
               if (took === 1 && out.length < 3 && rng.chance(0.4)) { const e = sysText(theme.soft ? 'lootSoft' : 'loot', [K, v], { i: it.name }); if (e) out.push(Object.assign(e, { cls: '' })); }
             }
           });
-          while (K.inv.length > 7) K.inv.shift();
+          capInv(K);
         }
       } else {
         stats.envDeaths++;
@@ -5733,6 +5756,7 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
       return out;
     }
     function apply(ev, roles) {
+      CTX = null;
       if (ev.test) ev = resolveTest(ev, roles);
       const ctx = {};
       const lexPick = (k) => (ctx[k] != null ? ctx[k] : (ctx[k] = rng.pick(LEX[k] || ['qualcosa'])));
@@ -5892,6 +5916,7 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
       }
     }
     function sponsorDrop(events) {
+      CTX = null;
       if (!pools.sponsor.length) return;
       const cands = alive().filter((t) => t.fame >= (MOD.sponsor >= 1.4 ? 2 : 3)).sort((a, b) => b.fame - a.fame);
       if (!cands.length || !rng.chance(Math.min(0.85, (0.25 + cands[0].fame * 0.06) * MOD.sponsor * wx('fame', 1)))) return;
@@ -5966,19 +5991,18 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
         // esplorazione: cibo dalla zona o bottino dei caduti
         if (!hasItem(t, 'cibo') && t.food < 65) {
           const loot = zoneLoot[t.zone];
-          if (loot && loot.length && rng.chance(0.3 + t.attr.sop * 0.03)) {
-            const { it, from } = loot.shift();
-            if (!itemOf(t, it.type) || it.type === 'cibo') {
-              t.inv.push(Object.assign({}, it)); t.items++; stats.items++; stats.looted++;
-              sys('scavenge', [t, byId[from]], { i: it.name, z: zoneName(t.zone) }, { cat: 'item', why: 'bottino', ids: [t.id] }, 2);
-              if (it.type === 'cibo' && t.food < 45) eat(t);
-            }
+          const li = loot ? loot.findIndex((x) => !itemOf(t, x.it.type) || x.it.type === 'cibo') : -1;
+          if (li >= 0 && rng.chance(0.3 + t.attr.sop * 0.03)) {
+            const { it, from } = loot.splice(li, 1)[0];
+            t.inv.push(Object.assign({}, it)); capInv(t); t.items++; stats.items++; stats.looted++;
+            sys('scavenge', [t, byId[from]], { i: it.name, z: zoneName(t.zone) }, { cat: 'item', why: 'bottino', ids: [t.id] }, 2);
+            if (it.type === 'cibo' && t.food < 45) eat(t);
           } else {
             const p = (0.08 + t.attr.sop * 0.045 + (hasTrait(t, 'cacciatore') ? 0.15 : 0) + (hasItem(t, 'mappa') ? 0.12 * MOD.map : 0)) * ZP[t.zone][0] * MOD.forage * wx('forage', 1) * (t.en < 25 ? 0.6 : 1);
             if (rng.chance(Math.min(0.92, p))) {
               const hungry = t.food < 40; t.foraged++; stats.foraged++;
               const nm = rng.pick(LEX.cibo || ['delle provviste']);
-              if (t.food < 50) t.food += 34; else { t.inv.push({ type: 'cibo', name: nm }); t.items++; }
+              if (t.food < 50) t.food += 34; else { t.inv.push({ type: 'cibo', name: nm }); capInv(t); t.items++; }
               if (hungry || rng.chance(0.15)) sys('forage', [t], {}, { cat: 'item', why: 'esplorazione' }, hungry ? 2 : 0);
             }
           }
@@ -6058,7 +6082,7 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
         else if (t.allyId != null && !hasTrait(t, 'leale')) {
           const mark = allyMates(t).find((x) => hasItem(x, 'cibo'));
           if (mark && (hasTrait(t, 'avido') || hasTrait(t, 'traditore') || t.food < 15) && rng.chance(0.6)) {
-            const it = itemOf(mark, 'cibo'); mark.inv.splice(mark.inv.indexOf(it), 1); t.inv.push(it); eat(t);
+            const it = itemOf(mark, 'cibo'); mark.inv.splice(mark.inv.indexOf(it), 1); t.inv.push(it); eat(t); capInv(t);
             leaveAlliance(t); t.traitor = true; addGrudge(mark, t, 'steal');
             sys('moraleSteal', [t, mark], { i: it.name }, { cat: 'betray', why: 'morale' }, 4);
           } else if (rng.chance(0.4)) {
@@ -6116,7 +6140,7 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
           if (rng.chance(0.08 + t.attr.res * 0.03)) { delete t.st.avvelenato; if (rng.chance(0.3)) sys('poisonCleared', [t], {}, { cat: 'heal', why: 'cure' }, 0); }
           else hurt(t, Math.max(3, 10 - t.attr.res * 0.6), null, 'poison', true);
         }
-        if (t.st.malato != null) hurt(t, Math.max(2, 6 - t.attr.res * 0.3), null, 'sick', true);
+        if (t.st.malato != null) { const c0 = t.cause; hurt(t, Math.max(2, 6 - t.attr.res * 0.3), null, 'sick', true); if (c0 && c0.by && c0.k === 'wound') t.cause = c0; }
         if (t.food <= 0) hurt(t, 9, null, 'starve', true);
         if (t.en <= 0) hurt(t, 5, null, 'exhaust', true);
         if (t.hp < 25 && t.hp > 0) {
@@ -6176,7 +6200,6 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
       if (!dying.length) return;
       const keep = alive().length - dying.length;
       if (keep < 1) { dying.sort((a, b) => b.hp - a.hp); const s2 = dying.shift(); s2.hp = 5; s2.pr = Math.min(s2.pr, 90); if (s2.infected) s2.pr = 80; syncSt(s2); }
-      if (cfg.teamWin) { /* nessuna eccezione: anche le squadre muoiono di stenti */ }
       dying.forEach((t) => {
         if (!t.alive) return;
         const c = t.cause || { k: 'wound' };
@@ -6190,7 +6213,7 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
         let people = k === 'trapKill' ? [K, t] : K ? [t, K] : [t];
         let mercy = null;
         if (c.k === 'infect') { mercy = buddies(t).find((x) => x.attr.cor >= 6); if (mercy && rng.chance(0.5)) { k = 'mercy'; people = [t, mercy]; mercy.mo -= 20; } else mercy = null; }
-        const z = t.stormZ || t.trapZ || zoneName(t.zone);
+        const z = (c.k === 'storm' && t.stormZ) || (c.k === 'trap' && t.trapZ) || zoneName(t.zone);
         const tx = sysText(k, people, { z, i: t.accItem || '', m: M ? M.name.toLowerCase() : '' }) || sysText('woundDeathAny', [t], {});
         const out = [];
         t.deathKind = c.k;
@@ -6216,12 +6239,18 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
         let done = false;
         let pL = lethalProb(kind);
         if (kind === 'dis') pL *= (hasItem(P, 'mappa') ? 0.35 : 1) * Math.max(0.5, 1.25 - P.attr.sop / 20);
+        // valori costanti finché P non ha un evento: calcolati una volta sola
+        CTX = null;
+        const nAlive = alive().length;
+        let n = 0; un.forEach((id) => { if (byId[id].alive) n++; });
+        const wc = new Map();
+        const wOf = (e) => { let w = wc.get(e); if (w === undefined) { w = weightFor(e, P); wc.set(e, w); } return w; };
+        const candL = pool.filter((e) => e.lethal && e.n <= n && e.victims.length < nAlive && !e.risky);
+        const candS = pool.filter((e) => !e.lethal && e.n <= n && (!e.risky || nAlive > 2));
         for (let attempt = 0; attempt < 25 && !done; attempt++) {
-          const nAlive = alive().length;
           const wantLethal = nAlive > 1 && rng.chance(pL);
-          const n = [...un].filter((id) => byId[id].alive).length;
-          const cand = pool.filter((e) => e.lethal === wantLethal && e.n <= n && (!e.lethal || e.victims.length < nAlive) && (!e.risky || (!wantLethal && nAlive > 2)));
-          const ev = rng.wpick(cand, (e) => weightFor(e, P));
+          const cand = wantLethal ? candL : candS;
+          const ev = rng.wpick(cand, wOf);
           if (!ev) continue;
           const roles = assign(ev, P, un);
           if (!roles) continue;
@@ -6567,7 +6596,7 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
   const ASSETS = G.LOS_ASSETS || { arene: {} };
   function scene(themeId, cls) {
     const img = ASSETS.arene && ASSETS.arene[themeId];
-    if (img) return '<img class="' + (cls || 'scene') + '" src="' + img + '" alt="" decoding="async" draggable="false">';
+    if (img) return '<img class="' + (cls || 'scene') + '" src="' + img + '" alt="" loading="lazy" decoding="async" draggable="false">';
     const f = SCENES[themeId] || SCENES.classico;
     return '<svg class="' + (cls || 'scene') + '" viewBox="0 0 400 200" preserveAspectRatio="xMidYMid slice" aria-hidden="true">' + f() + '</svg>';
   }
@@ -6905,7 +6934,10 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
   function save() {
     clearTimeout(saveTimer);
     saveTimer = setTimeout(() => {
-      try { localStorage.setItem(KEY, JSON.stringify(S)); }
+      // le foto della partita in corso sono quasi sempre quelle del cast: si salvano una volta sola
+      const imgs = Object.fromEntries(S.cast.map((t) => [t.id, t.img]));
+      const out = S.run && S.run.cfg ? Object.assign({}, S, { run: Object.assign({}, S.run, { cfg: Object.assign({}, S.run.cfg, { cast: S.run.cfg.cast.map((t) => (t.img && imgs[t.id] === t.img ? Object.assign({}, t, { img: '@cast' }) : t)) }) }) }) : S;
+      try { localStorage.setItem(KEY, JSON.stringify(out)); }
       catch (e) { if (!warnedQuota) { warnedQuota = true; toast('Lo spazio del browser è pieno: le ultime modifiche non sono state salvate. Prova con foto più piccole.'); } }
     }, 250);
   }
@@ -6917,7 +6949,10 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
       if (Array.isArray(d.cast)) S.cast = d.cast.map(sanitizeTribute).filter(Boolean);
       if (d.settings && typeof d.settings === 'object') sanitizeSettings(d.settings);
       if (Array.isArray(d.custom)) S.custom = d.custom.map(sanitizeCustom).filter(Boolean);
-      if (d.run && d.run.cfg && Array.isArray(d.run.cfg.cast) && THEMES[d.run.cfg.theme]) { d.run.cfg.cast = d.run.cfg.cast.map(sanitizeTribute).filter(Boolean); d.run.cfg.custom = (d.run.cfg.custom || []).map(sanitizeCustom).filter(Boolean); S.run = d.run; }
+      if (d.run && d.run.cfg && Array.isArray(d.run.cfg.cast) && THEMES[d.run.cfg.theme]) {
+        const imgs = Object.fromEntries((Array.isArray(d.cast) ? d.cast : []).map((t) => [t && t.id, t && t.img]));
+        d.run.cfg.cast.forEach((t) => { if (t && t.img === '@cast') t.img = imgs[t.id] || ''; });
+        d.run.cfg.cast = d.run.cfg.cast.map(sanitizeTribute).filter(Boolean); d.run.cfg.custom = (d.run.cfg.custom || []).map(sanitizeCustom).filter(Boolean); S.run = d.run; }
       if (d.ui === 'light' || d.ui === 'dark') S.ui = d.ui;
       return true;
     } catch (e) { return false; }
@@ -7032,7 +7067,7 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
   $$('dialog').forEach((d) => d.addEventListener('click', (e) => { if (e.target === d) d.close(); }));
 
   /* =============== HOME =============== */
-  let homeTimer = null, demo = null, demoI = 0;
+  let homeTimer = null, demo = null, demoI = 0, demoPending = false;
   function renderHome() {
     $('#facts').innerHTML = [[COUNTS.events, 'modelli di evento, più ' + COUNTS.adultEvents + ' per adulti'], [COUNTS.disasters, 'disastri, più ' + COUNTS.adultDisasters + ' per adulti'], [D.themes.length, 'arene da esplorare'], [D.traits.length + ' · ' + D.attrs.length, 'tratti e caratteristiche che cambiano la storia']]
       .map(([n, l]) => '<div class="fact"><b>' + n + '</b><span>' + l + '</span></div>').join('');
@@ -7063,9 +7098,16 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
   function startHomeLoop() {
     stopHomeLoop();
     if (!demo) {
-      try { demo = L.simulate({ cast: L.randomCast(24, 'vetrina', 2), theme: S.settings.theme, seed: 'vetrina', difficulty: 'alta', teamsAllied: true }); } catch (e) { demo = null; }
+      // la partita dimostrativa si calcola quando il browser è libero, per non rallentare il primo caricamento
+      if (demoPending) return;
+      demoPending = true;
+      (window.requestIdleCallback || ((f) => setTimeout(f, 120)))(() => {
+        demoPending = false;
+        try { demo = L.simulate({ cast: L.randomCast(24, 'vetrina', 2), theme: S.settings.theme, seed: 'vetrina', difficulty: 'alta', teamsAllied: true }); } catch (e) { demo = null; }
+        if (demo && curView === 'home') startHomeLoop();
+      }, { timeout: 700 });
+      return;
     }
-    if (!demo) return;
     const evs = []; demo.phases.forEach((p) => p.events.forEach((e) => evs.push({ e, p })));
     const total = demo.tributes.length;
     const draw = () => {

@@ -77,11 +77,11 @@ src/engine.js        motore di simulazione (funziona anche in Node)
 src/art.js           usa logo e illustrazioni da assets/ (con ripiego in SVG), icone, coriandoli
 assets/              logo, icona, panoramica, anteprima dei link, sagome dei concorrenti e illustrazioni delle 9 arene (ottimizzati e incorporati dalla build)
 src/anim.js          motore delle animazioni: atmosfere per arena, effetti degli eventi, transizioni, coriandoli
-docs/                versione completa per GitHub Pages
+docs/                versione per il web (Vercel o GitHub Pages): pagina leggera e immagini in docs/img con l'impronta nel nome, servite con cache lunga
 src/ui.js            interfaccia
 src/style.css        stile
 src/shell.html       markup
-tools/build.js       crea dist/last-one-standing.html (file unico)
+tools/build.js       crea dist/last-one-standing.html (file unico con immagini incorporate, per l'artifact) e docs/ (sito web)
 tools/test-engine.js test del motore senza browser
 tools/lint-content.js controllo statico dei contenuti
 tools/fuzz.js        collaudo con partite casuali

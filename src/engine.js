@@ -306,7 +306,6 @@
   const STATUS_TTL = { ubriaco: 2, lutto: 6, sconvolto: 5 };
   const ITEM_NAME = { med: 'un kit medico', trap: 'una trappola' };
   Object.assign(STATUS_LABEL, (D.eco && D.eco.statusLabel) || {});
-  const MANAGED = ['ferito', 'grave', 'affamato', 'esausto', 'disperato'];
   const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
 
   function simulate(cfg) {
@@ -360,7 +359,8 @@
 
     // affinità reciproca (-100 … 100)
     const AFF = new Map();
-    const akey = (a, b) => (a.id < b.id ? a.id + '|' + b.id : b.id + '|' + a.id);
+    T.forEach((t, i) => (t.ix = i));
+    const akey = (a, b) => (a.ix < b.ix ? a.ix * 4096 + b.ix : b.ix * 4096 + a.ix);
     const aff = (a, b) => AFF.get(akey(a, b)) || 0;
     const addAff = (a, b, d) => { if (a === b) return; AFF.set(akey(a, b), Math.max(-100, Math.min(100, aff(a, b) + d))); };
 
@@ -489,6 +489,13 @@
       ev.fx.concat(ev.ok.fx).forEach((f) => { if (f.t === 'gain' && f.r[0] === 0) g[f.item] = 1; if (f.t === 'cure' && f.r[0] === 0) g.med = 1; });
       return g;
     }
+    // contesto di P letto una volta sola per scelta: lo stato non cambia finché l'evento non viene applicato
+    let CTX = null;
+    function ctxOf(P) {
+      if (CTX && CTX.P === P) return CTX;
+      return (CTX = { P, grudge: Object.keys(P.grudges).some((id) => byId[id].alive), owe: Object.keys(P.owes).length > 0 || T.some((t) => t.alive && t.owes[P.id]),
+        traitor: T.some((t) => t.alive && t.traitor && t !== P), feared: T.some((t) => t.alive && t.kills >= 3 && t !== P) });
+    }
     function weightFor(ev, P) {
       let w = ev.w;
       for (const tag of ev.tags) {
@@ -517,13 +524,13 @@
         else if ((r.t === 'att' || r.t === 'trait' || r.t === 'notrait') && r.r[0] != null) { const fake = [P]; w *= checkReq({ req: [Object.assign({}, r, { r: [0] })] }, fake) ? 2.5 : 1; }
         else if (r.t === 'has' && hasItem(P, r.item)) w *= r.item === 'arma' || r.item === 'cibo' ? 1.6 : 3;
         else if (r.t === 'ally' && P.allyId != null) w *= 1.4;
-        else if (r.t === 'grudge' && Object.keys(P.grudges).some((id) => byId[id].alive)) w *= 7;
-        else if (r.t === 'owe' && (Object.keys(P.owes).length || T.some((t) => t.alive && t.owes[P.id]))) w *= 4;
+        else if (r.t === 'grudge' && ctxOf(P).grudge) w *= 7;
+        else if (r.t === 'owe' && ctxOf(P).owe) w *= 4;
         else if (r.t === 'couple' && P.partner) w *= 3.5;
         else if (r.t === 'lost' && P.lost) w *= 3;
         else if (r.t === 'fame' && P.fame >= 3) w *= 2;
-        else if (r.t === 'traitor' && T.some((t) => t.alive && t.traitor && t !== P)) w *= 2;
-        else if (r.t === 'feared' && T.some((t) => t.alive && t.kills >= 3 && t !== P)) w *= 2;
+        else if (r.t === 'traitor' && ctxOf(P).traitor) w *= 2;
+        else if (r.t === 'feared' && ctxOf(P).feared) w *= 2;
         else if (r.t === 'canLove' && !P.partner) w *= 1.2;
       }
       // condizione fisica, umore, bisogni, arena e meteo spostano le scelte
@@ -637,7 +644,8 @@
     function hurt(t, dmg, by, cause, inTick) {
       if (!t.alive) return;
       dmg *= Math.max(0.55, 1.2 - t.attr.res * 0.04) * (hasTrait(t, 'sopravvissuto') ? 0.85 : 1);
-      t.hp -= dmg; if (!inTick) t.hp = Math.max(8, t.hp);
+      const hp0 = t.hp;
+      t.hp -= dmg; if (!inTick) t.hp = Math.max(Math.min(8, hp0), t.hp);
       t.hurtPh = phases.length;
       if (by && by !== t) t.cause = { k: cause === 'trap' ? 'trap' : 'wound', by: by.id, ph: phases.length };
       else if (cause) t.cause = { k: cause, ph: phases.length, by: null };
@@ -648,6 +656,7 @@
       t.mo -= Math.min(10, dmg / 4);
       syncSt(t);
     }
+    const capInv = (t) => { while (t.inv.length > 7) t.inv.shift(); };
     function eat(t) {
       const i = t.inv.findIndex((x) => x.type === 'cibo'); if (i < 0) return false;
       t.inv.splice(i, 1); t.food += 50; t.mo += 3;
@@ -711,7 +720,7 @@
               if (took === 1 && out.length < 3 && rng.chance(0.4)) { const e = sysText(theme.soft ? 'lootSoft' : 'loot', [K, v], { i: it.name }); if (e) out.push(Object.assign(e, { cls: '' })); }
             }
           });
-          while (K.inv.length > 7) K.inv.shift();
+          capInv(K);
         }
       } else {
         stats.envDeaths++;
@@ -767,6 +776,7 @@
       return out;
     }
     function apply(ev, roles) {
+      CTX = null;
       if (ev.test) ev = resolveTest(ev, roles);
       const ctx = {};
       const lexPick = (k) => (ctx[k] != null ? ctx[k] : (ctx[k] = rng.pick(LEX[k] || ['qualcosa'])));
@@ -926,6 +936,7 @@
       }
     }
     function sponsorDrop(events) {
+      CTX = null;
       if (!pools.sponsor.length) return;
       const cands = alive().filter((t) => t.fame >= (MOD.sponsor >= 1.4 ? 2 : 3)).sort((a, b) => b.fame - a.fame);
       if (!cands.length || !rng.chance(Math.min(0.85, (0.25 + cands[0].fame * 0.06) * MOD.sponsor * wx('fame', 1)))) return;
@@ -1000,19 +1011,18 @@
         // esplorazione: cibo dalla zona o bottino dei caduti
         if (!hasItem(t, 'cibo') && t.food < 65) {
           const loot = zoneLoot[t.zone];
-          if (loot && loot.length && rng.chance(0.3 + t.attr.sop * 0.03)) {
-            const { it, from } = loot.shift();
-            if (!itemOf(t, it.type) || it.type === 'cibo') {
-              t.inv.push(Object.assign({}, it)); t.items++; stats.items++; stats.looted++;
-              sys('scavenge', [t, byId[from]], { i: it.name, z: zoneName(t.zone) }, { cat: 'item', why: 'bottino', ids: [t.id] }, 2);
-              if (it.type === 'cibo' && t.food < 45) eat(t);
-            }
+          const li = loot ? loot.findIndex((x) => !itemOf(t, x.it.type) || x.it.type === 'cibo') : -1;
+          if (li >= 0 && rng.chance(0.3 + t.attr.sop * 0.03)) {
+            const { it, from } = loot.splice(li, 1)[0];
+            t.inv.push(Object.assign({}, it)); capInv(t); t.items++; stats.items++; stats.looted++;
+            sys('scavenge', [t, byId[from]], { i: it.name, z: zoneName(t.zone) }, { cat: 'item', why: 'bottino', ids: [t.id] }, 2);
+            if (it.type === 'cibo' && t.food < 45) eat(t);
           } else {
             const p = (0.08 + t.attr.sop * 0.045 + (hasTrait(t, 'cacciatore') ? 0.15 : 0) + (hasItem(t, 'mappa') ? 0.12 * MOD.map : 0)) * ZP[t.zone][0] * MOD.forage * wx('forage', 1) * (t.en < 25 ? 0.6 : 1);
             if (rng.chance(Math.min(0.92, p))) {
               const hungry = t.food < 40; t.foraged++; stats.foraged++;
               const nm = rng.pick(LEX.cibo || ['delle provviste']);
-              if (t.food < 50) t.food += 34; else { t.inv.push({ type: 'cibo', name: nm }); t.items++; }
+              if (t.food < 50) t.food += 34; else { t.inv.push({ type: 'cibo', name: nm }); capInv(t); t.items++; }
               if (hungry || rng.chance(0.15)) sys('forage', [t], {}, { cat: 'item', why: 'esplorazione' }, hungry ? 2 : 0);
             }
           }
@@ -1092,7 +1102,7 @@
         else if (t.allyId != null && !hasTrait(t, 'leale')) {
           const mark = allyMates(t).find((x) => hasItem(x, 'cibo'));
           if (mark && (hasTrait(t, 'avido') || hasTrait(t, 'traditore') || t.food < 15) && rng.chance(0.6)) {
-            const it = itemOf(mark, 'cibo'); mark.inv.splice(mark.inv.indexOf(it), 1); t.inv.push(it); eat(t);
+            const it = itemOf(mark, 'cibo'); mark.inv.splice(mark.inv.indexOf(it), 1); t.inv.push(it); eat(t); capInv(t);
             leaveAlliance(t); t.traitor = true; addGrudge(mark, t, 'steal');
             sys('moraleSteal', [t, mark], { i: it.name }, { cat: 'betray', why: 'morale' }, 4);
           } else if (rng.chance(0.4)) {
@@ -1150,7 +1160,7 @@
           if (rng.chance(0.08 + t.attr.res * 0.03)) { delete t.st.avvelenato; if (rng.chance(0.3)) sys('poisonCleared', [t], {}, { cat: 'heal', why: 'cure' }, 0); }
           else hurt(t, Math.max(3, 10 - t.attr.res * 0.6), null, 'poison', true);
         }
-        if (t.st.malato != null) hurt(t, Math.max(2, 6 - t.attr.res * 0.3), null, 'sick', true);
+        if (t.st.malato != null) { const c0 = t.cause; hurt(t, Math.max(2, 6 - t.attr.res * 0.3), null, 'sick', true); if (c0 && c0.by && c0.k === 'wound') t.cause = c0; }
         if (t.food <= 0) hurt(t, 9, null, 'starve', true);
         if (t.en <= 0) hurt(t, 5, null, 'exhaust', true);
         if (t.hp < 25 && t.hp > 0) {
@@ -1210,7 +1220,6 @@
       if (!dying.length) return;
       const keep = alive().length - dying.length;
       if (keep < 1) { dying.sort((a, b) => b.hp - a.hp); const s2 = dying.shift(); s2.hp = 5; s2.pr = Math.min(s2.pr, 90); if (s2.infected) s2.pr = 80; syncSt(s2); }
-      if (cfg.teamWin) { /* nessuna eccezione: anche le squadre muoiono di stenti */ }
       dying.forEach((t) => {
         if (!t.alive) return;
         const c = t.cause || { k: 'wound' };
@@ -1224,7 +1233,7 @@
         let people = k === 'trapKill' ? [K, t] : K ? [t, K] : [t];
         let mercy = null;
         if (c.k === 'infect') { mercy = buddies(t).find((x) => x.attr.cor >= 6); if (mercy && rng.chance(0.5)) { k = 'mercy'; people = [t, mercy]; mercy.mo -= 20; } else mercy = null; }
-        const z = t.stormZ || t.trapZ || zoneName(t.zone);
+        const z = (c.k === 'storm' && t.stormZ) || (c.k === 'trap' && t.trapZ) || zoneName(t.zone);
         const tx = sysText(k, people, { z, i: t.accItem || '', m: M ? M.name.toLowerCase() : '' }) || sysText('woundDeathAny', [t], {});
         const out = [];
         t.deathKind = c.k;
@@ -1250,12 +1259,18 @@
         let done = false;
         let pL = lethalProb(kind);
         if (kind === 'dis') pL *= (hasItem(P, 'mappa') ? 0.35 : 1) * Math.max(0.5, 1.25 - P.attr.sop / 20);
+        // valori costanti finché P non ha un evento: calcolati una volta sola
+        CTX = null;
+        const nAlive = alive().length;
+        let n = 0; un.forEach((id) => { if (byId[id].alive) n++; });
+        const wc = new Map();
+        const wOf = (e) => { let w = wc.get(e); if (w === undefined) { w = weightFor(e, P); wc.set(e, w); } return w; };
+        const candL = pool.filter((e) => e.lethal && e.n <= n && e.victims.length < nAlive && !e.risky);
+        const candS = pool.filter((e) => !e.lethal && e.n <= n && (!e.risky || nAlive > 2));
         for (let attempt = 0; attempt < 25 && !done; attempt++) {
-          const nAlive = alive().length;
           const wantLethal = nAlive > 1 && rng.chance(pL);
-          const n = [...un].filter((id) => byId[id].alive).length;
-          const cand = pool.filter((e) => e.lethal === wantLethal && e.n <= n && (!e.lethal || e.victims.length < nAlive) && (!e.risky || (!wantLethal && nAlive > 2)));
-          const ev = rng.wpick(cand, (e) => weightFor(e, P));
+          const cand = wantLethal ? candL : candS;
+          const ev = rng.wpick(cand, wOf);
           if (!ev) continue;
           const roles = assign(ev, P, un);
           if (!roles) continue;

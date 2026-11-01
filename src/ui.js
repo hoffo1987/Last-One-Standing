@@ -84,7 +84,10 @@
   function save() {
     clearTimeout(saveTimer);
     saveTimer = setTimeout(() => {
-      try { localStorage.setItem(KEY, JSON.stringify(S)); }
+      // le foto della partita in corso sono quasi sempre quelle del cast: si salvano una volta sola
+      const imgs = Object.fromEntries(S.cast.map((t) => [t.id, t.img]));
+      const out = S.run && S.run.cfg ? Object.assign({}, S, { run: Object.assign({}, S.run, { cfg: Object.assign({}, S.run.cfg, { cast: S.run.cfg.cast.map((t) => (t.img && imgs[t.id] === t.img ? Object.assign({}, t, { img: '@cast' }) : t)) }) }) }) : S;
+      try { localStorage.setItem(KEY, JSON.stringify(out)); }
       catch (e) { if (!warnedQuota) { warnedQuota = true; toast('Lo spazio del browser è pieno: le ultime modifiche non sono state salvate. Prova con foto più piccole.'); } }
     }, 250);
   }
@@ -96,7 +99,10 @@
       if (Array.isArray(d.cast)) S.cast = d.cast.map(sanitizeTribute).filter(Boolean);
       if (d.settings && typeof d.settings === 'object') sanitizeSettings(d.settings);
       if (Array.isArray(d.custom)) S.custom = d.custom.map(sanitizeCustom).filter(Boolean);
-      if (d.run && d.run.cfg && Array.isArray(d.run.cfg.cast) && THEMES[d.run.cfg.theme]) { d.run.cfg.cast = d.run.cfg.cast.map(sanitizeTribute).filter(Boolean); d.run.cfg.custom = (d.run.cfg.custom || []).map(sanitizeCustom).filter(Boolean); S.run = d.run; }
+      if (d.run && d.run.cfg && Array.isArray(d.run.cfg.cast) && THEMES[d.run.cfg.theme]) {
+        const imgs = Object.fromEntries((Array.isArray(d.cast) ? d.cast : []).map((t) => [t && t.id, t && t.img]));
+        d.run.cfg.cast.forEach((t) => { if (t && t.img === '@cast') t.img = imgs[t.id] || ''; });
+        d.run.cfg.cast = d.run.cfg.cast.map(sanitizeTribute).filter(Boolean); d.run.cfg.custom = (d.run.cfg.custom || []).map(sanitizeCustom).filter(Boolean); S.run = d.run; }
       if (d.ui === 'light' || d.ui === 'dark') S.ui = d.ui;
       return true;
     } catch (e) { return false; }
@@ -211,7 +217,7 @@
   $$('dialog').forEach((d) => d.addEventListener('click', (e) => { if (e.target === d) d.close(); }));
 
   /* =============== HOME =============== */
-  let homeTimer = null, demo = null, demoI = 0;
+  let homeTimer = null, demo = null, demoI = 0, demoPending = false;
   function renderHome() {
     $('#facts').innerHTML = [[COUNTS.events, 'modelli di evento, più ' + COUNTS.adultEvents + ' per adulti'], [COUNTS.disasters, 'disastri, più ' + COUNTS.adultDisasters + ' per adulti'], [D.themes.length, 'arene da esplorare'], [D.traits.length + ' · ' + D.attrs.length, 'tratti e caratteristiche che cambiano la storia']]
       .map(([n, l]) => '<div class="fact"><b>' + n + '</b><span>' + l + '</span></div>').join('');
@@ -242,9 +248,16 @@
   function startHomeLoop() {
     stopHomeLoop();
     if (!demo) {
-      try { demo = L.simulate({ cast: L.randomCast(24, 'vetrina', 2), theme: S.settings.theme, seed: 'vetrina', difficulty: 'alta', teamsAllied: true }); } catch (e) { demo = null; }
+      // la partita dimostrativa si calcola quando il browser è libero, per non rallentare il primo caricamento
+      if (demoPending) return;
+      demoPending = true;
+      (window.requestIdleCallback || ((f) => setTimeout(f, 120)))(() => {
+        demoPending = false;
+        try { demo = L.simulate({ cast: L.randomCast(24, 'vetrina', 2), theme: S.settings.theme, seed: 'vetrina', difficulty: 'alta', teamsAllied: true }); } catch (e) { demo = null; }
+        if (demo && curView === 'home') startHomeLoop();
+      }, { timeout: 700 });
+      return;
     }
-    if (!demo) return;
     const evs = []; demo.phases.forEach((p) => p.events.forEach((e) => evs.push({ e, p })));
     const total = demo.tributes.length;
     const draw = () => {

@@ -138,7 +138,7 @@
   const ASSETS = G.LOS_ASSETS || { arene: {} };
   function scene(themeId, cls) {
     const img = ASSETS.arene && ASSETS.arene[themeId];
-    if (img) return '<img class="' + (cls || 'scene') + '" src="' + img + '" alt="" decoding="async" draggable="false">';
+    if (img) return '<img class="' + (cls || 'scene') + '" src="' + img + '" alt="" loading="lazy" decoding="async" draggable="false">';
     const f = SCENES[themeId] || SCENES.classico;
     return '<svg class="' + (cls || 'scene') + '" viewBox="0 0 400 200" preserveAspectRatio="xMidYMid slice" aria-hidden="true">' + f() + '</svg>';
   }

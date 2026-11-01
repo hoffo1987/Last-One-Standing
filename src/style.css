@@ -9,6 +9,7 @@
   --muted: hsl(var(--h) 8% 38%);
   --line: hsl(var(--h) 12% 83%);
   --accent: hsl(var(--h) 78% 37%);
+  --accent-text: hsl(var(--h) 85% 24%);
   --accent-ink: #fff;
   --accent-soft: hsl(var(--h) 75% 91%);
   --screen: hsl(var(--h) 28% 8%);
@@ -932,3 +933,18 @@ img.scene { object-fit: cover; object-position: center; user-select: none; }
 .ra-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
 .eco-sum { margin-top: 8px; }
 @media (max-width: 640px) { .vbars, .ra-grid { grid-template-columns: minmax(0, 1fr); } .vbar { grid-template-columns: 84px minmax(0, 1fr) 26px; } }
+
+/* ---------- contrasto dei testi piccoli (WCAG AA) ---------- */
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --accent-text: hsl(var(--h) 90% 72%); } }
+:root[data-theme="dark"] { --accent-text: hsl(var(--h) 90% 72%); }
+.eyebrow, .award .at, .why { color: var(--accent-text); }
+.ev .cat { color: color-mix(in srgb, var(--cc) 68%, var(--ink)); }
+.why.ok { color: color-mix(in srgb, var(--c-heal) 72%, var(--ink)); }
+.why.ko { color: color-mix(in srgb, var(--c-kill) 72%, var(--ink)); }
+.status-pill.alive { color: color-mix(in srgb, var(--alive) 70%, var(--ink)); }
+.status-pill.dead { color: color-mix(in srgb, var(--dead) 75%, var(--ink)); }
+.ev.note.meteo .meteo { color: color-mix(in srgb, #3d7fd6 70%, var(--ink)); }
+:root[data-theme="dark"] .ev.note.meteo .meteo { color: #8ab8f5; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .ev.note.meteo .meteo { color: #8ab8f5; } }
+.tag18, .bc-18 { background: #b3261e; color: #fff; }
+.bc-18 { background: #fff; color: #b3261e; }
