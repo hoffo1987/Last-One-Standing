@@ -22,7 +22,9 @@
   }
   // logo ufficiale (scritta) ed emblema, se presenti negli asset
   function wordmark(cls) { return ASSETS.logo ? '<img class="' + (cls || 'wordmark') + '" src="' + ASSETS.logo + '" alt="Last One Standing" draggable="false">' : ''; }
-  function emblem(size) { return ASSETS.emblema ? '<img class="emblem" src="' + ASSETS.emblema + '" width="' + size + '" height="' + size + '" alt="" draggable="false">' : logo(size); }
+  function emblem(size) { return ASSETS.icona ? '<img class="emblem" src="' + ASSETS.icona + '" width="' + size + '" height="' + size + '" alt="" draggable="false">' : logo(size); }
+  // sagoma per i concorrenti senza foto: scelta stabile in base all'id
+  function silhouette(id) { const s = ASSETS.sagome || []; if (!s.length) return ''; let h = 0; for (const c of String(id)) h = (h * 31 + c.charCodeAt(0)) >>> 0; return s[h % s.length]; }
   function logoDataUri(acc) {
     if (ASSETS.favicon) return ASSETS.favicon;
     const svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect x="2" y="2" width="60" height="60" rx="16" fill="#14100c"/><g stroke="#fff" stroke-width="5" stroke-linecap="round" opacity=".5"><path d="M13 50 L19 44"/><path d="M20 51 L28 47"/><path d="M29 52 L37 50"/><path d="M50 51 L43 45"/></g><path d="M32 46 V22" stroke="' + acc + '" stroke-width="6" stroke-linecap="round"/><path d="M24 19 L26.5 11 L30 15.5 L32 9 L34 15.5 L37.5 11 L40 19 Z" fill="' + acc + '" stroke="' + acc + '" stroke-width="1.5" stroke-linejoin="round"/></svg>';
@@ -162,5 +164,5 @@
     })();
   }
 
-  G.LOS_ART = { logo, wordmark, emblem, assets: ASSETS, logoDataUri, icon, scene, sceneDataUri, confetti };
+  G.LOS_ART = { logo, wordmark, emblem, silhouette, assets: ASSETS, logoDataUri, icon, scene, sceneDataUri, confetti };
 })(typeof window !== 'undefined' ? window : globalThis);

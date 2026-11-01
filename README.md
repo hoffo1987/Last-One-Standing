@@ -33,6 +33,13 @@ Sotto ogni evento la diretta mostra le conseguenze ("↳ Walter giura vendetta s
 ## Contenuti 18+
 Un interruttore nella sezione Arena, attivo solo dopo la conferma dell'età, aggiunge eventi e disastri con violenza esplicita, linguaggio volgare, alcol e sostanze e allusioni sessuali tra adulti. Non è disponibile nel Liceo, perché i personaggi sono studenti.
 
+## Animazioni
+- **Atmosfera per arena**, disegnata su canvas e diversa per ognuna: lucciole e foglie (Classica), scintille magiche e stelle cadenti (Reame), stelle in corsa e scansione laser (Stazione), spore tossiche e luci che sfarfallano (Infetti), vento, paracadute e zona che pulsa (Battle Royale), nebbia, pipistrelli e fulmini (Villa), sabbia e braci (Terre Desolate), aeroplanini e cuori (Liceo), fogli volanti (Ufficio). L'intensità cresce con il pericolo: più forte nei disastri e nel finale, più calma di notte.
+- **Effetti legati agli eventi**: fendente e scossa per le uccisioni, disturbo dell'immagine per i tradimenti, cuori per gli amori, volti che si avvicinano per le alleanze, onda verde per gli aiuti, riflesso per il bottino, dado che gira per le prove di abilità, conseguenze che compaiono una dopo l'altra.
+- **Cambi di fase**: alba, calare della notte, gong d'apertura, festino dorato, cannone per i caduti, faro per il finale; ogni arena ha il suo disastro (fuoco, onda d'urto, sirena, nube tossica, bombardamento, fulmine, tempesta di sabbia, campanella, glitch).
+- **Sezioni**: panoramica con parallasse e braci nella home, locandine che si inclinano seguendo il mouse, schede che entrano a cascata, cerimonia del vincitore con podio che sale, grafico che si disegna e coriandoli a tema con l'arena.
+- Tutto si ferma se il sistema chiede di ridurre le animazioni.
+
 ## Interfaccia
 - **Home** con partita lampo (24 concorrenti casuali, arena a sorpresa) e un tabellone dimostrativo animato.
 - **Concorrenti**: griglia o vista per squadra, nome modificabile sul posto, scheda laterale per tratti, caratteristiche e foto, elenco da incollare.
@@ -49,7 +56,9 @@ src/content/pack-*.js    pacchetti per arena (eventi, disastri, 18+), condivisi 
 src/content/*.js         eventi aggiuntivi e disastri della versione precedente
 src/engine.js        motore di simulazione (funziona anche in Node)
 src/art.js           usa logo e illustrazioni da assets/ (con ripiego in SVG), icone, coriandoli
-assets/              logo, emblema, favicon e illustrazioni delle 9 arene (WebP ottimizzati, incorporati dalla build)
+assets/              logo, icona, panoramica, anteprima dei link, sagome dei concorrenti e illustrazioni delle 9 arene (ottimizzati e incorporati dalla build)
+src/anim.js          motore delle animazioni: atmosfere per arena, effetti degli eventi, transizioni, coriandoli
+docs/                versione completa per GitHub Pages
 src/ui.js            interfaccia
 src/style.css        stile
 src/shell.html       markup
@@ -66,7 +75,9 @@ node tools/lint-content.js      # controlla tutte le righe di evento e disastro 
 node tools/test-engine.js 40    # 40 partite per arena, metà con i contenuti 18+, controlla regole e determinismo
 node tools/fuzz.js 1500         # partite con impostazioni casuali e casi limite (2-60 concorrenti, una sola squadra, valori estremi)
 ```
-Per giocare basta aprire `dist/last-one-standing.html` in un browser: è un unico file senza dipendenze, a parte i caratteri di Google Fonts.
+Per giocare basta aprire `dist/index.html` (o `dist/last-one-standing.html`) in un browser: è un unico file con immagini incorporate, senza dipendenze a parte i caratteri di Google Fonts.
+
+**Sito pubblico con GitHub Pages:** la build copia la versione completa in `docs/`. Su GitHub: Settings → Pages → Source "Deploy from a branch" → ramo `main`, cartella `/docs`. L'immagine di anteprima dei link (`docs/anteprima.jpg`) e le icone sono già incluse.
 
 ## Formato degli eventi
 I disastri in `src/content/` usano un formato compatto: `Nome | introduzione | morte | danno | salvezza [| stato]`.

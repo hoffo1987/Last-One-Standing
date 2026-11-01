@@ -1,7 +1,7 @@
 /* Last One Standing — interfaccia */
 (function () {
   'use strict';
-  const D = window.LOS_DATA, L = window.LOS, ART = window.LOS_ART;
+  const D = window.LOS_DATA, L = window.LOS, ART = window.LOS_ART, AN = window.LOS_ANIM;
   const $ = (s, r = document) => r.querySelector(s);
   const $$ = (s, r = document) => [...r.querySelectorAll(s)];
   const esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -126,12 +126,14 @@
   }
   function avHTML(t, opt) {
     opt = opt || {};
-    const inner = t.img ? '<img src="' + esc(t.img) + '" alt="">' : esc(initials(t.name));
-    const cls = 'av' + (opt.dead ? ' dead' : '');
+    const sil = !t.img && ART.assets.sagome && ART.assets.sagome.length ? silIndex(t.id) : -1;
+    const inner = t.img ? '<img src="' + esc(t.img) + '" alt="">' : sil >= 0 ? '<i class="sil sil-' + sil + '" aria-hidden="true"></i><span class="ini">' + esc(initials(t.name)) + '</span>' : esc(initials(t.name));
+    const cls = 'av' + (opt.dead ? ' dead' : '') + (sil >= 0 ? ' has-sil' : '');
     const st = 'style="--c:' + esc(t.color || teamColor(t.team || 1)) + '"';
     if (opt.btn) return '<button type="button" class="' + cls + '" ' + st + ' data-prof="' + esc(t.id) + '" title="' + esc(t.name) + '" aria-label="Scheda di ' + esc(t.name) + '">' + inner + '</button>';
     return '<span class="' + cls + '" ' + st + ' title="' + esc(t.name) + '">' + inner + '</span>';
   }
+  function silIndex(id) { let h = 0; for (const c of String(id)) h = (h * 31 + c.charCodeAt(0)) >>> 0; return h % ART.assets.sagome.length; }
   const linkify = (html) => html.replace(/<b class="nm" data-id="/g, '<button type="button" class="nm" data-prof="').replace(/<\/b>/g, '</button>');
   let toastTimer;
   function toast(msg) {
@@ -179,11 +181,11 @@
     if (v === 'home' && ART.assets.logo) document.documentElement.style.setProperty('--h', 162);
     else setHue((v === 'diretta' || v === 'esito') && SIM ? SIM.theme : S.settings.theme);
     if (v === 'home') renderHome();
-    if (v === 'cast') renderCast();
+    if (v === 'cast') { renderCast(); if (changed) { const cl = $('#castList'); cl.classList.remove('castenter'); void cl.offsetWidth; cl.classList.add('castenter'); } }
     if (v === 'arena') renderArena();
     if (v === 'diretta') renderLive(true);
     if (v === 'esito') renderResults();
-    if (changed) window.scrollTo({ top: 0, behavior: 'auto' });
+    if (changed) { window.scrollTo({ top: 0, behavior: 'auto' }); const sec = $('#v-' + v); sec.classList.remove('view-enter'); void sec.offsetWidth; sec.classList.add('view-enter'); }
   }
   window.addEventListener('hashchange', route);
   document.addEventListener('click', (e) => {
@@ -208,6 +210,11 @@
     } else r.hidden = true;
     startHomeLoop();
     renderStories();
+    $$('#facts .fact b').forEach((b) => { const n = parseInt(b.textContent, 10); if (!isNaN(n) && /^\d+$/.test(b.textContent)) AN.countTo(b, n, { from: 0, dur: 1400 }); });
+    AN.field($('.homehero'), 'brand', { cls: 'fx-hero' });
+    AN.parallax($('.homehero'), $('#heroScenes'));
+    AN.tilt($('#arenaStrip'), '.poster-card');
+    AN.reveal($$('#v-home .how, #v-home .story, #v-home .pillar, #v-home .poster-card, #v-home .stories-head'));
   }
   function posterHTML(t, selectable, tag) {
     const pt = COUNTS.perTheme[t.id];
@@ -252,7 +259,7 @@
   /* =============== CONCORRENTI =============== */
   function tileHTML(t, i, showOrder) {
     const traits = t.traits.length ? t.traits.map((id) => '<span class="chip" title="' + esc(TRAITS[id].desc) + '">' + esc(TRAITS[id].name) + '</span>').join('') : '<span class="chip dim">Nessun tratto</span>';
-    return '<article class="tile" data-id="' + esc(t.id) + '">' +
+    return '<article class="tile" data-id="' + esc(t.id) + '" style="--ti:' + Math.min(i, 24) + '">' +
       '<button class="grip" type="button" aria-label="Trascina per riordinare" title="Trascina per riordinare">' + GRIP + '</button>' +
       '<div class="thead">' +
         '<button class="avbtn" type="button" data-act="photo" aria-label="Carica una foto per ' + esc(t.name || 'questo concorrente') + '">' + avHTML(t) + '<span class="cam">' + IC.cam + '</span></button>' +
@@ -391,6 +398,7 @@
   $('#btnRandom').addEventListener('click', () => {
     S.cast = L.randomCast(+$('#presetSize').value, Math.random().toString(36), +S.settings.teamSize || 2).map(sanitizeTribute);
     renderCast(); save(); toast('Cast generato: ' + S.cast.length + ' concorrenti.');
+    const cl = $('#castList'); cl.classList.remove('castenter'); void cl.offsetWidth; cl.classList.add('castenter');
   });
   $('#teamSize').addEventListener('change', (e) => { S.settings.teamSize = +e.target.value; save(); });
   $('#btnRegroup').addEventListener('click', () => {
@@ -507,6 +515,7 @@
   function renderArena() {
     $('#arenaSub').textContent = 'Ogni arena ha luoghi, armi, pericoli e disastri propri. In tutto ' + COUNTS.events + ' modelli di evento e ' + COUNTS.disasters + ' disastri, più quelli che scrivi tu.';
     $('#themeList').innerHTML = D.themes.map((t) => posterHTML(t, S.settings.theme === t.id)).join('');
+    AN.tilt($('#themeList'), '.poster-card');
     $('#diffSeg').innerHTML = DIFFS.map(([v, n, d, k]) => '<button type="button" role="radio" data-v="' + v + '" aria-checked="' + (S.settings.difficulty === v) + '"><b>' + n + ' <span class="sk" aria-hidden="true">' + '✖'.repeat(k) + '</span></b><small>' + d + '</small></button>').join('');
     $('#maxDays').value = S.settings.maxDays; $('#maxDaysOut').textContent = S.settings.maxDays;
     $('#seed').value = S.settings.seed;
@@ -538,6 +547,8 @@
       '</div>' +
       '<div><h3 class="sub" style="margin-bottom:8px">Alcuni disastri</h3><div class="chips">' + dz.slice(0, 10).map((x) => '<span class="chip dim">' + esc(x) + '</span>').join('') + '<span class="chip dim">e altri ' + Math.max(0, dz.length - 10) + '</span></div></div>' +
       (sample ? '<div class="sample"><h3 class="sub">Un assaggio' + (S.cast.length >= 4 ? ' con il tuo cast' : '') + '</h3>' + sample + '</div>' : '');
+    AN.field($('#arenaPreview .apv-banner'), t.id, { intensity: 1.2 });
+    const ap = $('#arenaPreview'); ap.classList.remove('swap'); void ap.offsetWidth; ap.classList.add('swap');
   }
   function renderStartSum() {
     const t = THEMES[S.settings.theme];
@@ -630,17 +641,17 @@
   $('#btnStart').addEventListener('click', () => startRun());
 
   /* =============== DIRETTA =============== */
-  function evHTML(e, tributes, theme, anim, plain) {
+  function evHTML(e, tributes, theme, anim, plain, delay) {
     const by = tributes ? Object.fromEntries(tributes.map((t) => [t.id, t])) : BY;
-    if (e.note) return '<div class="ev note' + (anim ? ' in' : '') + '"><p>' + e.html + '</p></div>';
+    if (e.note) return '<div class="ev note' + (anim ? ' in' : '') + '" style="--d:' + (delay || 0) + 'ms"><p>' + e.html + '</p></div>';
     const cat = e.cat || 'none';
     const lbl = CAT[cat][theme.soft ? 1 : 0];
     const avs = '<span class="avs">' + e.ids.slice(0, 4).map((id) => avHTML(by[id], { dead: e.deaths.includes(id), btn: !plain })).join('') + '</span>';
     const chip = lbl ? '<span class="cat">' + IC[cat] + (e.deaths.length > 1 && (cat === 'kill' || cat === 'death') ? e.deaths.length + ' ' + (theme.soft ? 'fuori' : 'morti') : lbl) + '</span>' : '<span></span>';
     const fix = (h) => (plain ? h.replace(/<b class="nm"[^>]*>/g, '<b>') : linkify(h));
-    const why = e.test ? '<span title="Tiro ' + e.test.roll + ' contro soglia ' + e.test.dc + '">Prova di ' + esc(ATTRN[e.test.attr] || e.test.attr) + ' · ' + (e.test.pass ? 'superata' : 'fallita') + ' ' + e.test.roll + '/' + e.test.dc + '</span>' : e.sponsor ? 'Sponsor' : WHY[e.why] || '';
+    const why = e.test ? '<span title="Tiro ' + e.test.roll + ' contro soglia ' + e.test.dc + '">Prova di ' + esc(ATTRN[e.test.attr] || e.test.attr) + ' · <span class="dice"><span class="roll">' + e.test.roll + '</span>/' + e.test.dc + '</span> · ' + (e.test.pass ? 'superata' : 'fallita') + '</span>' : e.sponsor ? 'Sponsor' : WHY[e.why] || '';
     const echo = (e.echo || []).length ? '<ul class="echo">' + e.echo.map((x) => '<li class="' + (x.cls || '') + '">' + fix(x.html) + '</li>').join('') + '</ul>' : '';
-    return '<div class="ev' + (e.deaths.length ? ' lethal' : '') + (anim ? ' in' : '') + '" style="--cc:var(--c-' + cat + ')">' + avs + '<div class="evbody">' + (why ? '<span class="why' + (e.test ? (e.test.pass ? ' ok' : ' ko') : '') + '">' + why + '</span>' : '') + '<p>' + fix(e.html) + '</p>' + echo + '</div>' + chip + '</div>';
+    return '<div class="ev' + (e.deaths.length ? ' lethal' : '') + (anim ? ' in fx-' + cat + (e.sponsor ? ' fx-sponsor' : '') : '') + '" style="--cc:var(--c-' + cat + ');--d:' + (delay || 0) + 'ms">' + avs + '<div class="evbody">' + (why ? '<span class="why' + (e.test ? (e.test.pass ? ' ok' : ' ko') : '') + '">' + why + '</span>' : '') + '<p>' + fix(e.html) + '</p>' + echo + '</div>' + chip + '</div>';
   }
   function renderLive(fromRoute) {
     $('#liveEmpty').hidden = !!SIM; $('#liveBody').hidden = !SIM;
@@ -654,12 +665,14 @@
 
     $('#bcArena').innerHTML = ART.icon(theme.id, 14) + ' ' + esc(theme.name) + (SIM.adult ? ' <span class="bc-18">18+</span>' : '');
     const bcs = $('#bcScene'); if (bcs.dataset.t !== theme.id) { bcs.innerHTML = ART.scene(theme.id); bcs.dataset.t = theme.id; }
-    if (forward && ph.kind === 'fallen' && ph.deaths.length && !reduced) { const b = $('.broadcast'); b.classList.remove('boom'); void b.offsetWidth; b.classList.add('boom'); }
+    const prevAlive = i > 0 ? P[i - 1].snap.alive.length : total;
+    AN.field(bcs, theme.id, { intensity: AN.intensityFor(ph.kind, ph.snap.alive.length / total) });
+    AN.phaseFx($('.broadcast'), ph.kind, theme.id, forward, { deaths: ph.kind === 'fallen' ? ph.deaths.length : 0 });
     $('#bcPhase').textContent = 'Fase ' + (i + 1) + ' / ' + P.length;
     $('#bcKind').textContent = KIND[ph.kind] + (ph.day ? ' · giorno ' + ph.day : '');
-    $('#phTitle').textContent = ph.title;
+    $('#phTitle').textContent = ph.title; if (forward) AN.kinetic($('#phTitle'), ph.kind === 'dis' ? 'shake' : ph.kind === 'n' ? 'fade' : 'drop');
     $('#phIntro').textContent = ph.intro || '';
-    $('#aliveBig').textContent = ph.snap.alive.length; $('#aliveTot').textContent = '/' + total;
+    if (forward) AN.countTo($('#aliveBig'), ph.snap.alive.length, { from: prevAlive, dur: 1100 }); else $('#aliveBig').textContent = ph.snap.alive.length; $('#aliveTot').textContent = '/' + total;
     $('#aliveLbl').textContent = soft ? 'ancora in gioco' : 'superstiti';
     const deadNow = SIM.tributes.filter((t) => !t.alive && t.deathPhase <= i).sort((a, b) => a.order - b.order);
     const newly = new Set(ph.kind === 'fallen' ? [] : ph.events.flatMap((e) => e.deaths));
@@ -680,9 +693,25 @@
       $('#phBody').innerHTML = '<div class="memorial' + (forward ? ' rise' : '') + '"><h2>' + (soft ? 'Fuori dai giochi' : 'In memoria') + '</h2>' +
         (ph.deaths.length ? '<div class="memgrid">' + ph.deaths.map((id) => { const t = BY[id]; return '<button type="button" class="mem" data-prof="' + esc(id) + '">' + avHTML(t, { dead: true }) + '<b>' + esc(t.name) + '</b><small>Squadra ' + t.team + (t.killerIds.length ? '<br>per mano di ' + esc(t.killerIds.map((k) => BY[k].name).join(', ')) : '<br>vittima dell\'arena') + '</small><span class="mono">' + t.kills + ' ' + (soft ? 'elim.' : 'ucc.') + '</span></button>'; }).join('') + '</div>' : '<div class="emptyday">' + esc(ph.intro) + '</div>') + '</div>';
     } else {
-      $('#phBody').innerHTML = ph.events.map((e, k) => evHTML(e, null, theme, forward).replace('class="ev', 'style="animation-delay:' + Math.min(k * 90, 1800) + 'ms" class="ev')).join('');
+      $('#phBody').innerHTML = ph.events.map((e, k) => evHTML(e, null, theme, forward, false, Math.min(k * 90, 1800))).join('');
     }
     renderSide(i);
+    if (forward && !AN.reduced && ph.kind !== 'fallen') {
+      const cards = $$('#phBody .ev');
+      ph.events.forEach((e, k) => {
+        const c = cards[k]; if (!c) return;
+        const at = Math.min(k * 90, 1800) + 260;
+        setTimeout(() => {
+          if (!c.isConnected) return;
+          if (e.test) { const w = c.querySelector('.why'); AN.dice(w, e.test.roll, e.test.dc, e.test.pass); }
+          if (e.cat === 'love') AN.domBurst(c, 'hearts', 7);
+          else if (e.cat === 'heal') AN.domBurst(c, 'heal', 5);
+          else if (e.sponsor) AN.domBurst(c, 'stars', 6);
+          else if (e.deaths.length >= 2) AN.domBurst(c, 'skulls', 3 + e.deaths.length);
+          if ((e.echo || []).some((x) => x.cls === 'twist')) AN.domBurst(c, 'sparks', 10);
+        }, at);
+      });
+    }
 
     const last = i === P.length - 1;
     $('#prevBtn').disabled = i === 0;
@@ -909,7 +938,17 @@
     $('#rAgain').addEventListener('click', () => { const cfg = Object.assign({}, S.run.cfg, { seed: newSeed() }); runSim(cfg); });
     $('#rCopy').addEventListener('click', () => copyText(summaryText(), 'Riepilogo copiato negli appunti.'));
     drawPoster().then((url) => { const im = $('#posterImg'); if (im && url) im.src = url; });
-    if (S.run && !S.run.celebrated && W.length) { S.run.celebrated = true; save(); setTimeout(() => ART.confetti(['hsl(' + theme.hue + ' 90% 60%)', '#ffffff', '#ff5b4b', '#ffd36b', '#59c98b']), 250); }
+    const wh = $('#resBody .winhero');
+    if (wh) { AN.field(wh, theme.id, { intensity: 1.6, cls: 'fx-win' }); }
+    const first = S.run && !S.run.celebrated;
+    if (first && !AN.reduced) {
+      $('#resBody').classList.add('ceremony');
+      setTimeout(() => $('#resBody') && $('#resBody').classList.remove('ceremony'), 4000);
+      $$('#resBody .wstats b').forEach((b) => { const n = parseInt(b.textContent, 10); if (!isNaN(n)) AN.countTo(b, n, { from: 0, dur: 1600 }); });
+      const wn = $('#resBody .winhero h1'); if (wn) AN.kinetic(wn, 'rise');
+    }
+    AN.reveal($$('#resBody .block, #resBody .award'));
+    if (first && W.length) { S.run.celebrated = true; save(); setTimeout(() => AN.confetti(theme.id, theme.hue), 650); }
   }
   function summaryText() {
     const theme = THEMES[SIM.theme], W = SIM.winners.map((id) => BY[id]);
@@ -998,7 +1037,10 @@
       $('#footLogo').innerHTML = ART.logo(40, { bg: 'var(--screen)', ink: 'var(--screen-ink)', accent: 'var(--screen-accent)' });
       $('#heroLogo').innerHTML = ART.logo(76, { bg: 'var(--screen-2)', ink: 'var(--screen-ink)', accent: 'var(--screen-accent)' });
     }
-    $('#heroScenes').innerHTML = ['classico', 'fantasy', 'scifi', 'zombie', 'royale', 'horror', 'wasteland', 'liceo', 'ufficio'].map((t) => ART.scene(t)).join('');
+    if (ART.assets.panoramica) { $('#heroScenes').innerHTML = '<img class="hero-pano" src="' + ART.assets.panoramica + '" alt="" draggable="false">'; $('#heroScenes').classList.add('pano'); }
+    else $('#heroScenes').innerHTML = ['classico', 'fantasy', 'scifi', 'zombie', 'royale', 'horror', 'wasteland', 'liceo', 'ufficio'].map((t) => ART.scene(t)).join('');
+    if (ART.assets.sagome && ART.assets.sagome.length) { const st = document.createElement('style'); st.textContent = ART.assets.sagome.map((u, k) => '.sil-' + k + '{-webkit-mask-image:url(' + u + ');mask-image:url(' + u + ')}').join(''); document.head.appendChild(st); }
+    AN.ripple(document.body);
     try { const ic = document.createElement('link'); ic.rel = 'icon'; ic.href = ART.logoDataUri('#e3b04b'); document.head.appendChild(ic); } catch (e) { /* niente */ }
     if (S.run && S.run.cfg) {
       try { SIM = L.simulate(S.run.cfg); BY = Object.fromEntries(SIM.tributes.map((t) => [t.id, t])); } catch (e) { SIM = null; S.run = null; }
