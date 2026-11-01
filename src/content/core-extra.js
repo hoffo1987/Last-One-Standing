@@ -8,7 +8,7 @@
 1 +arma:A @agg | {A} si fa largo a spallate e afferra {arma}.
 1 s:A=ferito | {A} viene calpestat[A:o/a] nella calca, ma riesce a rialzarsi.
 2 k:A>B w:A | {A} colpisce {B} con {arma:A} prima ancora che possa girarsi.
-2 s:B=ferito @agg | {A} ferisce {B} di striscio e si dilegua.
+2 hit:A>B @agg | {A} ferisce {B} di striscio e si dilegua.
 2 | {A} e {B} afferrano lo stesso zaino e lo strappano in due.
 3 al:AB @soc | {A} e {B} si coprono le spalle a vicenda mentre {C} fugge.
 4 | {A}, {B}, {C} e {D} si fronteggiano in cerchio e poi scappano tutti insieme.

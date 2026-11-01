@@ -26,7 +26,7 @@
 2 crush:A>B rel:AB+15 @soc | {A} lascia a {B} l'ultima barretta energetica e dice di non avere fame. Ha fame.
 2 crush:A>B love:AB *2 | {A} e {B} si nascondono in un armadio dell'Ospedale per un'ora, stretti, mentre gli infetti passano. Quando escono, si tengono per mano.
 2 plot:A>B rel:AB+10 | {A} si offre di controllare i morsi di {B}. Lo fa con molta attenzione. Sta cercando una scusa.
-2 plot:A>B -med:B +med:A @stl | {A} sostituisce l'antivirale di {B} con una fiala d'acqua. Fa parte del piano.
+2 plot:A>B steal:A<B=med @stl @secret | {A} sostituisce l'antivirale di {B} con una fiala d'acqua. Fa parte del piano.
 2 goal:A=vendetta grudge:A>B hit:A>B | {A} lascia una scia di sangue fino al nascondiglio di {B}: gli infetti fanno il resto. {B} sopravvive, per ora. Per {caro:A}.
 2 goal:A=caccia k:A>B @agg | {A} segue {B} per tre isolati, silenzios[A:o/a] come un infetto. Più paziente di un infetto.
 2 goal:A=cibo give:B>A=cibo debt:A>B | {B} lancia a {A} una scatoletta dalla finestra di un palazzo. «Non dire a nessuno dove sono.»

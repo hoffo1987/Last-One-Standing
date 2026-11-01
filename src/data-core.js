@@ -6,6 +6,10 @@
  *  al:AB        A e B si alleano               ally:AB richiede che siano alleati
  *  w:A          A deve avere un'arma           +arma:A A ottiene {arma}
  *  -arma:A      A perde l'arma                 steal:A<B A ruba l'arma di B
+ *  -cibo:A / -med:A   perde l'oggetto, senza mangiare o curarsi
+ *  steal:A<B=cibo / =med   A ruba a B l'oggetto posseduto, con la sua storia
+ *  @secret con steal:   furto segreto, senza avvertire la vittima o creare rancore immediato
+ *  give:A>B=cibo / =med    A regala a B l'oggetto posseduto (non lo consuma)
  *  +cibo:A / cibo:A   ottiene / consuma cibo   +med:A / med:A  ottiene / usa medicine
  *  +trap:A / trap:A   ottiene / usa trappola   s:A=ferito  imposta uno stato
  *  need:A=ferito (o need:A=*) richiede uno stato  cure:A rimuove gli stati
@@ -40,9 +44,9 @@
 2 k:A>B k:B>A | {A} e {B} si colpiscono nello stesso istante: nessuno dei due sopravvive.
 2 al:AB @soc | {A} e {B} si scambiano uno sguardo e decidono di fuggire insieme.
 2 | {A} e {B} lottano per una borraccia, poi scappano in direzioni opposte.
-2 s:B=ferito @agg | {A} colpisce {B} con un sasso e l[B:o/a] lascia stordit[B:o/a].
+2 hit:A>B @agg | {A} colpisce {B} con un sasso e l[B:o/a] lascia stordit[B:o/a].
 2 | {A} spinge via {B} per arrivare per prim[A:o/a] a uno zaino.
-2 @heal | {A} trascina {B} fuori dalla mischia e [B:gli/le] salva la vita.
+2 save:A>B @heal | {A} trascina {B} fuori dalla mischia e [B:gli/le] salva la vita.
 2 k:A>B @mad | {A} ride mentre colpisce {B} ancora e ancora.
 2 @cow | {A} si nasconde dietro una cassa mentre {B} passa lì accanto senza vederl[A:o/a].
 3 k:AB>C al:AB @agg | {A} e {B} uniscono le forze per eliminare {C}.
@@ -96,14 +100,14 @@
 2 k:A>B trap:A @int *2 | {B} finisce nella trappola preparata da {A}.
 2 k:A>B | {A} e {B} si affrontano in duello: {B} non sopravvive.
 2 k:A>B k:B>A *0.5 | {A} e {B} si feriscono a morte a vicenda.
-2 s:B=ferito @agg | {A} attacca {B}, che riesce a fuggire ferit[B:o/a].
+2 hit:A>B @agg | {A} attacca {B}, che riesce a fuggire ferit[B:o/a].
 2 | {A} e {B} si incrociano, si studiano a lungo e poi se ne vanno ognuno per la propria strada.
-2 cibo:B +cibo:A @stl | {A} ruba le provviste di {B} mentre è distratt[B:o/a].
+2 steal:A<B=cibo @stl | {A} ruba le provviste di {B} mentre è distratt[B:o/a].
 2 steal:A<B @stl | {A} sottrae {arma:B} a {B} senza farsi vedere.
 2 need:B=* cure:B @heal | {A} medica le ferite di {B}.
 2 d:B | {A} assiste impotente mentre {B} viene trascinat[B:o/a] via da {mostro}.
 2 k:A>B @mad | {A} perde il controllo e massacra {B} senza un motivo apparente.
-2 al:AB | {A} salva {B} da {mostro}: i due stringono un patto.
+2 save:A>B al:AB | {A} salva {B} da {mostro}: i due stringono un patto.
 2 @cow | {A} vede {B} da lontano e cambia strada di corsa.
 2 s:A=ferito | {A} prova ad attaccare {B}, ma ha la peggio e deve ritirarsi.
 3 al:ABC @soc | {A}, {B} e {C} formano un'alleanza.
@@ -146,7 +150,7 @@
 2 ally:AB br:A @betray | {A} se ne va prima dell'alba, lasciando {B} da sol[B:o/a].
 2 k:A>B @stl | {A} si avvicina all'accampamento di {B} e l[B:o/a] uccide nel sonno.
 2 k:A>B @agg | {A} individua il fuoco di {B} e l[B:o/a] attacca.
-2 s:B=ferito | {A} attacca {B} al buio, ma {B} riesce a scappare.
+2 hit:A>B | {A} attacca {B} al buio, ma {B} riesce a scappare.
 2 | {A} e {B} parlano tutta la notte, senza fidarsi davvero.
 2 al:AB @soc | {A} e {B} condividono un fuoco e decidono di restare insieme.
 2 @cow | {A} sente {B} piangere nel buio e decide di non attaccare.
@@ -171,7 +175,7 @@
 2 k:A>B @agg | {A} aspetta {B} al festino e l[B:o/a] uccide.
 2 k:A>B w:A | {A} difende il proprio zaino e abbatte {B} con {arma:A}.
 2 | {A} e {B} si contendono lo stesso zaino: {B} riesce a fuggire per un soffio.
-2 s:B=ferito +cibo:A | {A} ferisce {B} e [B:gli/le] strappa lo zaino.
+2 hit:A>B steal:A<B=cibo | {A} ferisce {B} e [B:gli/le] strappa lo zaino.
 2 tr:A>B | {A} sfrutta la confusione del festino per sbarazzarsi di {B}.
 2 al:AB @soc | {A} e {B} decidono di dividersi le provviste invece di combattere.
 2 k:A>B k:B>A *0.4 | {A} e {B} si lanciano sullo stesso zaino e si uccidono a vicenda.
@@ -196,7 +200,7 @@
 1 @stl | {A} si rifugia in {rifugio} e aspetta che passi tutto.
 1 @int | {A} aveva capito tutto in anticipo ed era già lontan[A:o/a].
 2 ally:AB | {A} e {B} si aiutano a vicenda e ne escono san[AB:i/e] e salv[AB:i/e].
-2 @heal | {A} trascina in salvo {B}.
+2 save:A>B @heal | {A} trascina in salvo {B}.
 2 k:A>B @agg | Nel caos, {A} spinge indietro {B} per salvarsi.
 `,
     fallback: `

@@ -124,7 +124,7 @@
 2 trait:A=generoso give:A>B=med | {A} dà a {B} il proprio kit medico, anche se ne avrebbe bisogno. "Tu di più."
 2 trait:A=generoso give:A>B=cibo | {A} divide le provviste con {B} in parti perfettamente uguali, misurandole con un rametto.
 2 trait:A=avido steal:A<B @stl | {A} non riesce a trattenersi: ruba {arma:B} a {B} anche se ne ha già due.
-2 trait:A=avido cibo:B +cibo:A rel:BA-30 | {A} si mangia di nascosto la scorta di {B}. Tutta. Anche la parte ammuffita.
+2 trait:A=avido steal:A<B=cibo cibo:A rel:BA-30 | {A} si mangia di nascosto la scorta di {B}. Tutta. Anche la parte ammuffita.
 1 trait:A=esibizionista star:A @show | {A} improvvisa uno spettacolo di giocoleria con tre coltelli. Ne perde uno. Il pubblico applaude lo stesso.
 1 trait:A=esibizionista s:A=ferito @show | {A} fa una capriola per le telecamere su un terreno pieno di spine.
 1 trait:A=ubriacone s:A=ubriaco @drunk | {A} trova {alcol} in un posto in cui non dovrebbe esserci alcol. Ha un talento.

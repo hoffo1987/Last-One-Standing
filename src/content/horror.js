@@ -27,7 +27,7 @@
 2 k:A>B w:A | {A} insegue {B} nel corridoio e l[B:o/a] colpisce con {arma:A}.
 2 al:AB | {A} e {B} decidono di dormire nella stessa stanza.
 2 need:B=* cure:B @heal | {A} veglia su {B} recitando preghiere.
-2 s:B=ferito | {A} spinge {B} giù per le scale della Cantina.
+2 hit:A>B | {A} spinge {B} giù per le scale della Cantina.
 2 steal:A<B @stl | {A} si prende {arma:B} di {B} mentre è distratt[B:o/a] da un rumore.
 2 d:B | {A} vede {B} venire trascinat[B:o/a] dentro un quadro.
 3 al:ABC @soc | {A}, {B} e {C} accendono tutte le candele del salone e restano insieme.

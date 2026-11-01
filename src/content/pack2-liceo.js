@@ -22,7 +22,7 @@
 1 stat:A>mo75 star:A @show | {A} è di buon umore e lo fa sapere a tutti con un vocale di tre minuti. Va virale.
 1 stat:A>pr60 s:A=malato | L'ansia di {A} è così forte che il giorno della verifica [A:gli/le] viene la febbre. Vera, stavolta.
 1 stat:A>pr60 con:A=alcol -alcol:A pr:A-30 | {A} si scola {alcol} prima della verifica. Il cuore batte forte, ma l'ansia scende.
-1 stat:A<hp40 @heal hp:A+20 | {A} passa un pomeriggio con la nonna, che [A:gli/le] dice che è bellissim[A:o/a]. La reputazione non cambia, ma il morale sì.
+1 stat:A<hp40 @heal mo:A+20 | {A} passa un pomeriggio con la nonna, che [A:gli/le] dice che è bellissim[A:o/a]. La reputazione non cambia, ma il morale sì.
 1 stat:A<food30 +cibo:A | {A} scopre un distributore in Palestra che regala due merendine invece di una.
 1 con:A=attrezzo star:A @int | {A} usa {attrezzo:A} per prendere nove nella verifica di matematica. Il professore sospetta qualcosa, ma non trova niente.
 1 con:A=valore -valore:A +attrezzo:A | {A} compra {attrezzo} da uno di quinta con {valore}. Affare.

@@ -1339,6 +1339,10 @@ img.scene { object-fit: cover; object-position: center; user-select: none; }
  *  al:AB        A e B si alleano               ally:AB richiede che siano alleati
  *  w:A          A deve avere un'arma           +arma:A A ottiene {arma}
  *  -arma:A      A perde l'arma                 steal:A<B A ruba l'arma di B
+ *  -cibo:A / -med:A   perde l'oggetto, senza mangiare o curarsi
+ *  steal:A<B=cibo / =med   A ruba a B l'oggetto posseduto, con la sua storia
+ *  @secret con steal:   furto segreto, senza avvertire la vittima o creare rancore immediato
+ *  give:A>B=cibo / =med    A regala a B l'oggetto posseduto (non lo consuma)
  *  +cibo:A / cibo:A   ottiene / consuma cibo   +med:A / med:A  ottiene / usa medicine
  *  +trap:A / trap:A   ottiene / usa trappola   s:A=ferito  imposta uno stato
  *  need:A=ferito (o need:A=*) richiede uno stato  cure:A rimuove gli stati
@@ -1373,9 +1377,9 @@ img.scene { object-fit: cover; object-position: center; user-select: none; }
 2 k:A>B k:B>A | {A} e {B} si colpiscono nello stesso istante: nessuno dei due sopravvive.
 2 al:AB @soc | {A} e {B} si scambiano uno sguardo e decidono di fuggire insieme.
 2 | {A} e {B} lottano per una borraccia, poi scappano in direzioni opposte.
-2 s:B=ferito @agg | {A} colpisce {B} con un sasso e l[B:o/a] lascia stordit[B:o/a].
+2 hit:A>B @agg | {A} colpisce {B} con un sasso e l[B:o/a] lascia stordit[B:o/a].
 2 | {A} spinge via {B} per arrivare per prim[A:o/a] a uno zaino.
-2 @heal | {A} trascina {B} fuori dalla mischia e [B:gli/le] salva la vita.
+2 save:A>B @heal | {A} trascina {B} fuori dalla mischia e [B:gli/le] salva la vita.
 2 k:A>B @mad | {A} ride mentre colpisce {B} ancora e ancora.
 2 @cow | {A} si nasconde dietro una cassa mentre {B} passa lì accanto senza vederl[A:o/a].
 3 k:AB>C al:AB @agg | {A} e {B} uniscono le forze per eliminare {C}.
@@ -1429,14 +1433,14 @@ img.scene { object-fit: cover; object-position: center; user-select: none; }
 2 k:A>B trap:A @int *2 | {B} finisce nella trappola preparata da {A}.
 2 k:A>B | {A} e {B} si affrontano in duello: {B} non sopravvive.
 2 k:A>B k:B>A *0.5 | {A} e {B} si feriscono a morte a vicenda.
-2 s:B=ferito @agg | {A} attacca {B}, che riesce a fuggire ferit[B:o/a].
+2 hit:A>B @agg | {A} attacca {B}, che riesce a fuggire ferit[B:o/a].
 2 | {A} e {B} si incrociano, si studiano a lungo e poi se ne vanno ognuno per la propria strada.
-2 cibo:B +cibo:A @stl | {A} ruba le provviste di {B} mentre è distratt[B:o/a].
+2 steal:A<B=cibo @stl | {A} ruba le provviste di {B} mentre è distratt[B:o/a].
 2 steal:A<B @stl | {A} sottrae {arma:B} a {B} senza farsi vedere.
 2 need:B=* cure:B @heal | {A} medica le ferite di {B}.
 2 d:B | {A} assiste impotente mentre {B} viene trascinat[B:o/a] via da {mostro}.
 2 k:A>B @mad | {A} perde il controllo e massacra {B} senza un motivo apparente.
-2 al:AB | {A} salva {B} da {mostro}: i due stringono un patto.
+2 save:A>B al:AB | {A} salva {B} da {mostro}: i due stringono un patto.
 2 @cow | {A} vede {B} da lontano e cambia strada di corsa.
 2 s:A=ferito | {A} prova ad attaccare {B}, ma ha la peggio e deve ritirarsi.
 3 al:ABC @soc | {A}, {B} e {C} formano un'alleanza.
@@ -1479,7 +1483,7 @@ img.scene { object-fit: cover; object-position: center; user-select: none; }
 2 ally:AB br:A @betray | {A} se ne va prima dell'alba, lasciando {B} da sol[B:o/a].
 2 k:A>B @stl | {A} si avvicina all'accampamento di {B} e l[B:o/a] uccide nel sonno.
 2 k:A>B @agg | {A} individua il fuoco di {B} e l[B:o/a] attacca.
-2 s:B=ferito | {A} attacca {B} al buio, ma {B} riesce a scappare.
+2 hit:A>B | {A} attacca {B} al buio, ma {B} riesce a scappare.
 2 | {A} e {B} parlano tutta la notte, senza fidarsi davvero.
 2 al:AB @soc | {A} e {B} condividono un fuoco e decidono di restare insieme.
 2 @cow | {A} sente {B} piangere nel buio e decide di non attaccare.
@@ -1504,7 +1508,7 @@ img.scene { object-fit: cover; object-position: center; user-select: none; }
 2 k:A>B @agg | {A} aspetta {B} al festino e l[B:o/a] uccide.
 2 k:A>B w:A | {A} difende il proprio zaino e abbatte {B} con {arma:A}.
 2 | {A} e {B} si contendono lo stesso zaino: {B} riesce a fuggire per un soffio.
-2 s:B=ferito +cibo:A | {A} ferisce {B} e [B:gli/le] strappa lo zaino.
+2 hit:A>B steal:A<B=cibo | {A} ferisce {B} e [B:gli/le] strappa lo zaino.
 2 tr:A>B | {A} sfrutta la confusione del festino per sbarazzarsi di {B}.
 2 al:AB @soc | {A} e {B} decidono di dividersi le provviste invece di combattere.
 2 k:A>B k:B>A *0.4 | {A} e {B} si lanciano sullo stesso zaino e si uccidono a vicenda.
@@ -1529,7 +1533,7 @@ img.scene { object-fit: cover; object-position: center; user-select: none; }
 1 @stl | {A} si rifugia in {rifugio} e aspetta che passi tutto.
 1 @int | {A} aveva capito tutto in anticipo ed era già lontan[A:o/a].
 2 ally:AB | {A} e {B} si aiutano a vicenda e ne escono san[AB:i/e] e salv[AB:i/e].
-2 @heal | {A} trascina in salvo {B}.
+2 save:A>B @heal | {A} trascina in salvo {B}.
 2 k:A>B @agg | Nel caos, {A} spinge indietro {B} per salvarsi.
 `,
     fallback: `
@@ -3186,7 +3190,7 @@ img.scene { object-fit: cover; object-position: center; user-select: none; }
 2 love:AB @soc | Tra {A} e {B} scatta qualcosa davanti a un fuoco. Il pubblico trattiene il respiro.
 2 love:AB @show | {A} dichiara il proprio amore a {B} in diretta nazionale. {B} arrossisce e dice di sì.
 2 love:AB | {A} e {B} litigano per un'ora su chi debba fare la guardia, poi si baciano. Classico.
-2 love:AB @luck | {A} salva {B} da una caduta e l[B:o/a] prende al volo. Scatta la scintilla, e anche qualche costola.
+2 love:AB save:A>B @luck | {A} salva {B} da una caduta e l[B:o/a] prende al volo. Scatta la scintilla, e anche qualche costola.
 2 couple:AB | {A} e {B} incidono le loro iniziali su un albero, poi si ricordano di essere in un'arena.
 2 couple:AB +cibo:A | {A} e {B} improvvisano una cena romantica a base di {cibo}.
 2 couple:AB @show star:A | {A} canta una serenata a {B}. Gli sponsor piangono e aprono il portafoglio.
@@ -3222,7 +3226,7 @@ img.scene { object-fit: cover; object-position: center; user-select: none; }
 2 esplosivo:A hit:A>B | {A} fa saltare {esplosivo:A} vicino a {B}, che si salva per miracolo ma sente fischiare le orecchie per ore.
 1 need:A=affamato @mad | {A} ha così fame che prova a mangiare la corteccia di un albero. Non lo consiglia.
 1 need:A=affamato +cibo:A cure:A *2 | {A}, mort[A:o/a] di fame, trova {cibo} e non ne lascia nemmeno una briciola.
-2 need:A=affamato cibo:B +cibo:A rel:BA-40 @agg | Affamat[A:o/a], {A} strappa il cibo dalle mani di {B}.
+2 need:A=affamato steal:A<B=cibo rel:BA-40 @agg | Affamat[A:o/a], {A} strappa il cibo dalle mani di {B}.
 2 need:B=affamato give:A>B=cibo @heal | {A} vede {B} allo stremo e [B:gli/le] lascia metà delle proprie provviste.
 1 s:A=ubriaco @mad | {A} trova {alcol} e decide che è il momento giusto per festeggiare. Non lo è.
 1 need:A=ubriaco @show @drunk | Ubriac[A:o/a], {A} sfida a duello un albero. Vince l'albero.
@@ -3496,7 +3500,7 @@ img.scene { object-fit: cover; object-position: center; user-select: none; }
 2 al:AB @soc | {A} riconosce in {B} qualcuno del proprio quartiere e propone una tregua.
 2 ally:AB +cibo:A | {A} e {B} pescano insieme nel Fiume.
 2 k:A>B w:A | {A} ferma {B} sulla riva del Fiume e l[B:o/a] colpisce con {arma:A}.
-2 s:B=ferito @agg | {A} lancia un sasso con precisione e colpisce {B} alla tempia.
+2 hit:A>B @agg | {A} lancia un sasso con precisione e colpisce {B} alla tempia.
 2 | {A} segue {B} per ore senza trovare il coraggio di attaccare.
 2 need:B=* cure:B @heal | {A} prepara un impacco di erbe per {B}.
 3 k:A>B @agg | {A} attira {B} in un'imboscata mentre {C} fa da esca.
@@ -3560,7 +3564,7 @@ Vortice nel Fiume | Il Fiume comincia a girare su se stesso in un vortice enorme
 1 +arma:A @agg | {A} si fa largo a spallate e afferra {arma}.
 1 s:A=ferito | {A} viene calpestat[A:o/a] nella calca, ma riesce a rialzarsi.
 2 k:A>B w:A | {A} colpisce {B} con {arma:A} prima ancora che possa girarsi.
-2 s:B=ferito @agg | {A} ferisce {B} di striscio e si dilegua.
+2 hit:A>B @agg | {A} ferisce {B} di striscio e si dilegua.
 2 | {A} e {B} afferrano lo stesso zaino e lo strappano in due.
 3 al:AB @soc | {A} e {B} si coprono le spalle a vicenda mentre {C} fugge.
 4 | {A}, {B}, {C} e {D} si fronteggiano in cerchio e poi scappano tutti insieme.
@@ -3641,7 +3645,7 @@ Vortice nel Fiume | Il Fiume comincia a girare su se stesso in un vortice enorme
 2 k:A>B w:A | {A} sfida {B} a duello sul ponte della Torre e vince con {arma:A}.
 2 al:AB | {A} e {B} cavalcano insieme un grifone ferito fino alla Foresta elfica.
 2 steal:A<B @stl | {A} ruba {arma:B} a {B} usando un incantesimo di sonno.
-2 s:B=ferito @agg | {A} evoca un vento tagliente contro {B}.
+2 hit:A>B @agg | {A} evoca un vento tagliente contro {B}.
 2 need:B=* cure:B @heal | {A} canta un'antica ninna nanna elfica che guarisce {B}.
 3 k:AB>C | {A} e {B} attirano {C} nella tana di un drago addormentato.
 3 al:ABC @soc | {A}, {B} e {C} fondano una compagnia e scelgono uno stendardo.
@@ -3722,7 +3726,7 @@ L'albero antico | L'albero più antico della Foresta elfica si risveglia e recla
 2 k:A>B w:A | {A} insegue {B} nel corridoio e l[B:o/a] colpisce con {arma:A}.
 2 al:AB | {A} e {B} decidono di dormire nella stessa stanza.
 2 need:B=* cure:B @heal | {A} veglia su {B} recitando preghiere.
-2 s:B=ferito | {A} spinge {B} giù per le scale della Cantina.
+2 hit:A>B | {A} spinge {B} giù per le scale della Cantina.
 2 steal:A<B @stl | {A} si prende {arma:B} di {B} mentre è distratt[B:o/a] da un rumore.
 2 d:B | {A} vede {B} venire trascinat[B:o/a] dentro un quadro.
 3 al:ABC @soc | {A}, {B} e {C} accendono tutte le candele del salone e restano insieme.
@@ -4048,7 +4052,7 @@ La neve | Una nevicata chiude la scuola per tre giorni. | {A} si dimentica i com
 2 trait:A=generoso give:A>B=med | {A} dà a {B} il proprio kit medico, anche se ne avrebbe bisogno. "Tu di più."
 2 trait:A=generoso give:A>B=cibo | {A} divide le provviste con {B} in parti perfettamente uguali, misurandole con un rametto.
 2 trait:A=avido steal:A<B @stl | {A} non riesce a trattenersi: ruba {arma:B} a {B} anche se ne ha già due.
-2 trait:A=avido cibo:B +cibo:A rel:BA-30 | {A} si mangia di nascosto la scorta di {B}. Tutta. Anche la parte ammuffita.
+2 trait:A=avido steal:A<B=cibo cibo:A rel:BA-30 | {A} si mangia di nascosto la scorta di {B}. Tutta. Anche la parte ammuffita.
 1 trait:A=esibizionista star:A @show | {A} improvvisa uno spettacolo di giocoleria con tre coltelli. Ne perde uno. Il pubblico applaude lo stesso.
 1 trait:A=esibizionista s:A=ferito @show | {A} fa una capriola per le telecamere su un terreno pieno di spine.
 1 trait:A=ubriacone s:A=ubriaco @drunk | {A} trova {alcol} in un posto in cui non dovrebbe esserci alcol. Ha un talento.
@@ -4729,7 +4733,7 @@ La carneficina dei droni | I droni di sicurezza passano alla modalità "smembram
 2 @cow | {A} e {B} si incontrano, si spaventano a vicenda e scappano in direzioni opposte urlando.
 2 save:A>B @heal | {A} tira fuori {B} da una pozza di fango in cui stava affondando con grande dignità.
 2 k:A>B @mad | {A} sfida {B} a una gara di sguardi. {B} sbatte le palpebre per prim[B:o/a]. {A} prende la cosa molto sul serio.
-2 cibo:A give:A>B=cibo @soc | {A} baratta con {B} metà della propria scorta in cambio di una barzelletta. La barzelletta è pessima. Lo scambio resta valido.
+2 give:A>B=cibo @soc | {A} baratta con {B} metà della propria scorta in cambio di una barzelletta. La barzelletta è pessima. Lo scambio resta valido.
 2 steal:A<B @luck | {B} lascia {arma:B} incustodita per allacciarsi una scarpa. {A} passa di lì. Coincidenze.
 2 love:AB @luck | {A} cade da un albero dritt[A:o/a] addosso a {B}. Si guardano. Scatta qualcosa. Probabilmente una costola.
 2 couple:AB @mad | {A} e {B} si sposano davanti a un sasso che fa da celebrante. Il sasso non obietta.
@@ -5265,7 +5269,7 @@ La festa dell'ultimo giorno | Un gruppo di sopravvissuti organizza una festa con
 1 +armatura:A @luck | {A} afferra il primo oggetto a portata di mano: {armatura}. Non è un'arma, ma è meglio di niente.
 1 +attrezzo:A @int | {A} ignora le armi e punta dritt[A:o/a] a {attrezzo}. Gli altri ridono. Gli altri moriranno prima.
 1 +valore:A @mad | {A} riempie lo zaino di {valore}. Non si mangia, non ferisce, ma luccica.
-2 hit:A>B +cibo:A @agg | {A} strappa uno zaino a {B} con una spallata. Dentro ci sono solo {cibo}, ma è una vittoria morale.
+2 hit:A>B steal:A<B=cibo @agg | {A} strappa uno zaino a {B} con una spallata. Dentro ci sono solo {cibo}, ma è una vittoria morale.
 2 al:AB +attrezzo:B | {A} e {B} si dividono il bottino della Cornucopia: a {A} la paura, a {B} {attrezzo}. Poi corrono insieme verso il Bosco.
 2 k:A>B w:A @agg | {A} raggiunge la Cornucopia per prim[A:o/a] e la difende con {arma:A}. {B} non ci arriverà mai.
 3 al:ABC @soc | {A}, {B} e {C} si nascondono dietro la stessa roccia e decidono che, da quel momento, sono una squadra.
@@ -5285,7 +5289,7 @@ La festa dell'ultimo giorno | Un gruppo di sopravvissuti organizza una festa con
 2 crush:A>B rel:AB+15 @soc | {A} porta a {B} la parte migliore del coniglio arrosto, «per caso». {B} non capisce. Tutti gli altri sì.
 2 crush:A>B love:AB *2 | {A} trova {B} al Fiume e, dopo tre giorni di sguardi, finalmente parla. Si baciano sotto un salice. In capitale si sviene.
 2 plot:A>B rel:AB+10 | {A} si offre di fare il turno di guardia al posto di {B}. È un gesto gentile. È anche un modo per studiarl[B:o/a] mentre dorme.
-2 plot:A>B -cibo:B +cibo:A @stl | {A} sposta, un po' alla volta, le provviste di {B} nel proprio zaino. Fa parte del piano.
+2 plot:A>B steal:A<B=cibo @stl @secret | {A} sposta, un po' alla volta, le provviste di {B} nel proprio zaino. Fa parte del piano.
 2 goal:A=vendetta grudge:A>B hit:A>B | {A} segue le tracce di {B} fino al Fiume e l[B:o/a] colpisce alle spalle. Per {caro:A}. Non basta ancora.
 2 goal:A=cibo give:B>A=cibo debt:A>B | {B} vede quanto è affamat[A:o/a] {A} e [A:gli/le] lascia metà della sua cena. «Me la renderai.»
 2 goal:A=caccia k:A>B @agg | {A} ha passato la notte a seguire le impronte di {B}. All'alba, le impronte finiscono.
@@ -5596,7 +5600,7 @@ Il pianoforte maledetto | Il pianoforte suona una melodia che fa ballare chiunqu
 1 stat:A>mo75 star:A @show | {A} è di buon umore e lo fa sapere a tutti con un vocale di tre minuti. Va virale.
 1 stat:A>pr60 s:A=malato | L'ansia di {A} è così forte che il giorno della verifica [A:gli/le] viene la febbre. Vera, stavolta.
 1 stat:A>pr60 con:A=alcol -alcol:A pr:A-30 | {A} si scola {alcol} prima della verifica. Il cuore batte forte, ma l'ansia scende.
-1 stat:A<hp40 @heal hp:A+20 | {A} passa un pomeriggio con la nonna, che [A:gli/le] dice che è bellissim[A:o/a]. La reputazione non cambia, ma il morale sì.
+1 stat:A<hp40 @heal mo:A+20 | {A} passa un pomeriggio con la nonna, che [A:gli/le] dice che è bellissim[A:o/a]. La reputazione non cambia, ma il morale sì.
 1 stat:A<food30 +cibo:A | {A} scopre un distributore in Palestra che regala due merendine invece di una.
 1 con:A=attrezzo star:A @int | {A} usa {attrezzo:A} per prendere nove nella verifica di matematica. Il professore sospetta qualcosa, ma non trova niente.
 1 con:A=valore -valore:A +attrezzo:A | {A} compra {attrezzo} da uno di quinta con {valore}. Affare.
@@ -5729,7 +5733,7 @@ La pagella di metà anno | Arrivano le pagelle. Le famiglie le leggono. | {A} no
 2 crush:A>B @soc | {A} fa la guardia sulla torre per tutta la notte, puntando il binocolo verso {B} più spesso del necessario.
 2 plot:A>B tr:A>B *2 | {A} aspetta che {B} si addormenti. Poi si ricorda che il duo, dal prossimo cerchio, conta come solo.
 2 plot:A>B br:A | {A} parte di notte con il veicolo del duo. {B} si sveglia a piedi, in una zona che sta per chiudersi.
-2 couple:AB stat:B<hp40 save:A>B | {A} usa l'ultimo kit medico su {B} e resta senza. Ne valeva la pena.
+2 couple:AB stat:B<hp40 save:A>B -med:A hp:B+40 | {A} usa l'ultimo kit medico su {B} e resta senza. Ne valeva la pena.
 2 hit:A>B trait:A=sonnambulo | {A} si alza nel sonno e prende {B} per un nemico. Colpo di calcio, poi le scuse.
 `,
       f: `
@@ -6023,7 +6027,7 @@ La cena dei licenziamenti | Il Direttore invita tutti a cena: a fine serata, con
 2 crush:A>B rel:AB+15 @soc | {A} regala a {B} l'ultimo sorso della propria borraccia. Nel deserto, è una dichiarazione d'amore.
 2 crush:A>B love:AB *2 | {A} e {B} guardano il tramonto radioattivo dal tetto di un autobus. È verde e bellissimo. Si baciano.
 2 plot:A>B rel:AB+10 | {A} insegna a {B} come guidare il motore truccato. Lascia fuori un dettaglio importante sui freni.
-2 plot:A>B -cibo:B +cibo:A @stl | {A} travasa, un sorso alla volta, la borraccia di {B} nella propria. Fa parte del piano.
+2 plot:A>B steal:A<B=cibo @stl @secret | {A} travasa, un sorso alla volta, la borraccia di {B} nella propria. Fa parte del piano.
 2 goal:A=vendetta grudge:A>B hit:A>B | {A} insegue {B} con un pick-up per tre chilometri per {caro:A}. L[B:o/a] colpisce di striscio.
 2 goal:A=caccia k:A>B @agg | {A} segue le tracce di pneumatico di {B} nel deserto. Le tracce finiscono, e anche {B}.
 2 goal:A=cibo give:B>A=cibo debt:A>B | {B} lancia a {A} una lattina ammaccata. «Quando trovi acqua, ricordati di me.»
@@ -6102,7 +6106,7 @@ Il cratere che si apre | Il terreno sprofonda in un nuovo cratere radioattivo. |
 2 crush:A>B rel:AB+15 @soc | {A} lascia a {B} l'ultima barretta energetica e dice di non avere fame. Ha fame.
 2 crush:A>B love:AB *2 | {A} e {B} si nascondono in un armadio dell'Ospedale per un'ora, stretti, mentre gli infetti passano. Quando escono, si tengono per mano.
 2 plot:A>B rel:AB+10 | {A} si offre di controllare i morsi di {B}. Lo fa con molta attenzione. Sta cercando una scusa.
-2 plot:A>B -med:B +med:A @stl | {A} sostituisce l'antivirale di {B} con una fiala d'acqua. Fa parte del piano.
+2 plot:A>B steal:A<B=med @stl @secret | {A} sostituisce l'antivirale di {B} con una fiala d'acqua. Fa parte del piano.
 2 goal:A=vendetta grudge:A>B hit:A>B | {A} lascia una scia di sangue fino al nascondiglio di {B}: gli infetti fanno il resto. {B} sopravvive, per ora. Per {caro:A}.
 2 goal:A=caccia k:A>B @agg | {A} segue {B} per tre isolati, silenzios[A:o/a] come un infetto. Più paziente di un infetto.
 2 goal:A=cibo give:B>A=cibo debt:A>B | {B} lancia a {A} una scatoletta dalla finestra di un palazzo. «Non dire a nessuno dove sono.»
@@ -6376,7 +6380,7 @@ Il gas nervino | I militari rilasciano un gas per fermare gli infetti. Ferma anc
 2 k:A>B w:A @stl | {A} colpisce {B} dalla collina con {arma:A}.
 2 k:A>B @agg | {A} entra nella casa di {B} con una granata già senza sicura.
 2 k:A>B | {A} investe {B} con un'auto.
-2 s:B=ferito | {A} colpisce {B}, che riesce a curarsi dietro un muro.
+2 hit:A>B | {A} colpisce {B}, che riesce a curarsi dietro un muro.
 2 steal:A<B | {A} recupera {arma:B} dallo zaino di {B} mentre è distratt[B:o/a].
 2 need:B=* cure:B @heal | {A} rianima {B} quando sta per cadere.
 2 al:AB | {A} e {B} fanno squadra per prendere la Base militare.
@@ -6459,7 +6463,7 @@ Tempesta di sabbia | Una tempesta di sabbia avvolge l'Aeroporto. | {A} si perde 
 2 k:A>B w:A | {A} insegue {B} nei Condotti di servizio e l[B:o/a] colpisce con {arma:A}.
 2 steal:A<B @int | {A} hackera il blocco di sicurezza e si prende {arma:B} di {B}.
 2 al:AB @int | {A} e {B} uniscono le loro conoscenze per riattivare un terminale.
-2 s:B=ferito @agg | {A} spinge {B} contro una paratia elettrificata.
+2 hit:A>B @agg | {A} spinge {B} contro una paratia elettrificata.
 2 need:B=* cure:B @heal | {A} usa uno scanner medico per curare {B}.
 3 k:AB>C @int | {A} e {B} attirano {C} nella camera di decompressione.
 3 al:ABC @soc | {A}, {B} e {C} si barricano sul Ponte di comando.
@@ -6620,7 +6624,7 @@ Il Consiglio di amministrazione | Il Consiglio di amministrazione visita l'uffic
 2 k:A>B w:A | {A} affronta {B} sulla Diga e l[B:o/a] abbatte con {arma:A}.
 2 steal:A<B @stl | {A} ruba {arma:B} a {B} mentre dorme sotto il sole.
 2 al:AB | {A} e {B} si dividono una lattina e decidono di viaggiare insieme.
-2 cibo:B +cibo:A @agg | {A} minaccia {B} e si fa consegnare tutta l'acqua.
+2 steal:A<B=cibo @agg | {A} minaccia {B} e si fa consegnare tutta l'acqua.
 2 need:B=* cure:B @heal | {A} fascia le ferite di {B} con stracci puliti.
 2 s:B=ferito | {A} sperona il veicolo di {B}.
 3 k:AB>C | {A} e {B} fanno un'imboscata a {C} sull'Autostrada spezzata.
@@ -6834,7 +6838,7 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
     const head = line.slice(0, bar).trim().split(/\s+/);
     const text = line.slice(bar + 1).trim();
     const ev = { n: +head[0], text, kills: [], dies: [], req: [], fx: [], tags: [], w: 1, origin: origin || 'base', ok: { kills: [], dies: [], fx: [] }, ko: { kills: [], dies: [], fx: [] } };
-    if (!(ev.n >= 1 && ev.n <= 6)) throw new Error('Numero di concorrenti non valido in: ' + line);
+    if (!Number.isInteger(ev.n) || !(ev.n >= 1 && ev.n <= 6)) throw new Error('Numero di concorrenti non valido in: ' + line);
     let m;
     for (let tok of head.slice(1)) {
       const self = tok.match(/^(?:ok:|ko:)?(?:hit|save|give|owe|repay|debt|grudge|forgive|steal|k|tr|crush|plot|trust|distrust|fear|respect|attract|promise|fid|ris|pau|amo):([A-F])[<>]([A-F])/) || tok.match(/^(?:ok:|ko:)?(?:love|couple|friend|enemy|rel|rival|ex|close|breakup|reunite):([A-F])([A-F])/);
@@ -6845,7 +6849,7 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
       if ((m = tok.match(/^att:([A-F])([<>])(\w+?)(\d+)$/))) { ev.req.push({ t: 'att', r: ID(m[1]), op: m[2], attr: m[3], v: +m[4] }); continue; }
       if ((m = tok.match(/^(no)?trait:([A-F])=(\w+)$/))) { ev.req.push({ t: m[1] ? 'notrait' : 'trait', r: ID(m[2]), trait: m[3] }); continue; }
       if (tok[0] === '@') { ev.tags.push(tok.slice(1)); continue; }
-      if (tok[0] === '*') { ev.w = parseFloat(tok.slice(1)); continue; }
+      if (tok[0] === '*') { ev.w = Number(tok.slice(1)); if (!Number.isFinite(ev.w) || ev.w <= 0) throw new Error('Peso non valido in: ' + line); continue; }
       if ((m = tok.match(/^(k|tr):([A-F]+)>([A-F]+)$/))) {
         const k = { by: letters(m[2]), v: letters(m[3]), betray: m[1] === 'tr' };
         tgt.kills.push(k);
@@ -6861,9 +6865,25 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
       if ((m = tok.match(/^con:([A-F])=(\w+)$/))) { ev.req.push({ t: 'has', item: m[2], r: ID(m[1]) }); continue; }
       if ((m = tok.match(new RegExp('^\\+(' + ITEMS + '):([A-F])$')))) { tgt.fx.push({ t: 'gain', item: m[1], r: ID(m[2]) }); continue; }
       if ((m = tok.match(new RegExp('^-(' + ITEMS + '):([A-F])$')))) { tgt.fx.push({ t: 'lose', item: m[1], r: ID(m[2]) }); ev.req.push({ t: 'has', item: m[1], r: ID(m[2]) }); continue; }
-      if ((m = tok.match(/^(cibo|med|trap|veleno|esplosivo|alcol|valore|attrezzo|armatura):([A-F])$/))) { const r = ID(m[2]); ev.req.push({ t: 'has', item: m[1], r }); tgt.fx.push({ t: 'lose', item: m[1], r }); continue; }
-      if ((m = tok.match(/^steal:([A-F])<([A-F])$/))) { ev.req.push({ t: 'has', item: 'arma', r: ID(m[2]) }); tgt.fx.push({ t: 'steal', r: [L(m[1]), L(m[2])] }); continue; }
-      if ((m = tok.match(/^give:([A-F])>([A-F])=(\w+)$/))) { tgt.fx.push({ t: 'give', r: [L(m[1]), L(m[2])], item: m[3] }); if (tgt === ev) ev.req.push({ t: 'has', item: m[3], r: ID(m[1]) }); continue; }
+      if ((m = tok.match(/^(cibo|med|trap|veleno|esplosivo|alcol|valore|attrezzo|armatura):([A-F])$/))) {
+        const r = ID(m[2]);
+        // Un oggetto appena ricevuto può essere consumato nello stesso evento.
+        const prior = tgt === ev ? ev.fx : ev.fx.concat(tgt.fx);
+        const received = prior.some((f) => f.item === m[1] && ((f.t === 'gain' || f.t === 'steal') && f.r[0] === r[0] || f.t === 'give' && f.r[1] === r[0]));
+        if (!received) ev.req.push({ t: 'has', item: m[1], r });
+        tgt.fx.push({ t: 'consume', item: m[1], r }); continue;
+      }
+      if ((m = tok.match(new RegExp('^steal:([A-F])<([A-F])(?:=(' + ITEMS + '))?$')))) {
+        const item = m[3] || 'arma', r = [L(m[1]), L(m[2])];
+        ev.req.push({ t: 'has', item, r: [r[1]] }, { t: 'canReceive', item, r: [r[1], r[0]] });
+        tgt.fx.push({ t: 'steal', item, r }); continue;
+      }
+      if ((m = tok.match(new RegExp('^give:([A-F])>([A-F])=(' + ITEMS + ')$')))) {
+        const r = [L(m[1]), L(m[2])];
+        tgt.fx.push({ t: 'give', r, item: m[3] });
+        if (tgt === ev) ev.req.push({ t: 'has', item: m[3], r: [r[0]] }, { t: 'canReceive', item: m[3], r });
+        continue;
+      }
       if ((m = tok.match(/^s:([A-F])=(\w+)$/))) { tgt.fx.push({ t: 'status', r: ID(m[1]), s: m[2] }); continue; }
       if ((m = tok.match(/^need:([A-F])=(\w+|\*)$/))) { ev.req.push({ t: 'need', r: ID(m[1]), s: m[2] }); continue; }
       if ((m = tok.match(/^cure:([A-F])$/))) { tgt.fx.push({ t: 'cure', r: ID(m[1]) }); continue; }
@@ -6938,9 +6958,14 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
     for (const re of [/\{([A-F])\}/g, /\{\w+:([A-F])\}/g, /\[([A-F]+):/g]) {
       let mm; while ((mm = re.exec(text))) [...mm[1]].forEach((ch) => used.add(ch));
     }
-    for (const r of ev.req.concat(ev.fx)) (r.r || []).concat(r.a || [], r.b || []).forEach((i) => used.add(String.fromCharCode(65 + i)));
-    ev.kills.forEach((k) => k.by.concat(k.v).forEach((i) => used.add(String.fromCharCode(65 + i))));
-    ev.dies.forEach((i) => used.add(String.fromCharCode(65 + i)));
+    for (const r of ev.req.concat(ev.fx, ev.ok.fx, ev.ko.fx)) (r.r || []).concat(r.a || [], r.b || []).forEach((i) => used.add(String.fromCharCode(65 + i)));
+    [ev, ev.ok, ev.ko].forEach((branch) => {
+      branch.kills.forEach((k) => {
+        if (k.by.some((i) => k.v.includes(i))) throw new Error('Chi uccide non può essere la propria vittima in: ' + line);
+        k.by.concat(k.v).forEach((i) => used.add(String.fromCharCode(65 + i)));
+      });
+      branch.dies.forEach((i) => used.add(String.fromCharCode(65 + i)));
+    });
     const named = new Set();
     for (const re of [/\{([A-F])\}/g, /\{(?:caro|perso|partner):([A-F])\}/g]) { let mm; while ((mm = re.exec(text))) named.add(mm[1]); }
     for (let i = 0; i < ev.n; i++) if (!named.has(String.fromCharCode(65 + i))) throw new Error('Il concorrente {' + String.fromCharCode(65 + i) + '} partecipa ma non è nominato nel testo: ' + line);
@@ -7087,6 +7112,15 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
   const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
 
   function simulate(cfg) {
+    if (!cfg || !Array.isArray(cfg.cast) || cfg.cast.length < 2) throw new Error('Servono almeno 2 concorrenti.');
+    const castIds = new Set();
+    cfg.cast.forEach((c, i) => {
+      if (!c || typeof c !== 'object' || Array.isArray(c)) throw new Error('Concorrente non valido alla posizione ' + (i + 1) + '.');
+      const id = c.id == null || c.id === '' ? 't' + i : c.id;
+      if (typeof id !== 'string' || /[{}]/.test(id) || Object.prototype.hasOwnProperty.call(Object.prototype, id) || id === 'prototype') throw new Error('Identificativo del concorrente non valido alla posizione ' + (i + 1) + '.');
+      if (castIds.has(id)) throw new Error('Identificativo del concorrente duplicato: ' + id + '.');
+      castIds.add(id);
+    });
     const theme = D.themes.find((t) => t.id === cfg.theme) || D.themes[0];
     const seed = cfg.seed == null || cfg.seed === '' ? String(Date.now()) : String(cfg.seed);
     const rng = makeRng(seed + '|' + theme.id);
@@ -7094,7 +7128,7 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
     const pools = buildPools(theme, cfg.custom, adult);
     const LEX = pools.lex;
     const E = Object.assign({}, D.echo || {}, theme.soft ? D.echoSoft || {} : {});
-    const diff = DIFF[cfg.difficulty] || 1;
+    const diff = Object.prototype.hasOwnProperty.call(DIFF, cfg.difficulty) ? DIFF[cfg.difficulty] : 1;
     const maxDays = Math.max(3, Math.min(60, cfg.maxDays || 20));
     const traitMap = Object.fromEntries(D.traits.map((t) => [t.id, t]));
     const zoneCount = theme.lex.luogo.length;
@@ -7125,7 +7159,7 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
     const T = (cfg.cast || []).map((c, i) => ({
       id: c.id || 't' + i, name: (c.name || 'Concorrente ' + (i + 1)).trim(), gender: c.gender || 'M',
       team: c.team || i + 1, color: c.color, img: c.img || '',
-      traits: (c.traits || []).filter((x) => traitMap[x]),
+      traits: (Array.isArray(c.traits) ? c.traits : []).filter((x) => typeof x === 'string' && Object.prototype.hasOwnProperty.call(traitMap, x)),
       attr: Object.assign({ for: 5, agi: 5, int: 5, car: 5, fort: 5, res: 5, furt: 5, cor: 5, emp: 5, sop: 5 }, c.attr || {}),
       alive: true, zone: 0, inv: [], st: {}, kills: 0, killIds: [], allyId: null,
       deathPhase: -1, deathDay: 0, deathText: '', deathHtml: '', killerIds: [], order: 0,
@@ -7202,7 +7236,7 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
       t.allyId = null;
     }
     if (cfg.teamsAllied) {
-      const teams = {};
+      const teams = Object.create(null);
       T.forEach((t) => (teams[t.team] = teams[t.team] || []).push(t));
       Object.values(teams).forEach((ms) => { if (ms.length > 1) { joinAlliance(ms); ms.forEach((a) => ms.forEach((b) => a.id < b.id && addAff(a, b, 35))); } });
     }
@@ -7281,6 +7315,7 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
           }
           case 'hasAlly': if (A.allyId == null) return false; break;
           case 'has': if (!hasItem(A, r.item)) return false; break;
+          case 'canReceive': { const it = itemOf(A, r.item); if (!it || !canReceiveItem(B, it)) return false; break; }
           case 'need': if (r.s === '*' ? statusCount(A) === 0 : A.st[r.s] == null) return false; break;
           case 'foe':
             for (const a of r.a) for (const b of r.b) {
@@ -7570,6 +7605,13 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
       return it;
     }
     const itemScore = (it) => (it.q || 2) * 10 + (it.u || 0) + (it.x ? 5 : 0);
+    function canReceiveItem(t, it) {
+      if (!t || !t.alive) return false;
+      const old = itemOf(t, it.type);
+      if ((it.type === 'arma' || it.type === 'armatura') && old && itemScore(old) >= itemScore(it)) return false;
+      // capInv eliminerebbe proprio l'oggetto ricevuto da uno zaino pieno di ricordi.
+      return !(t.inv.length >= 8 && it.type !== 'ricordo' && t.inv.every((x) => x.type === 'ricordo'));
+    }
     function addItem(t, it) {
       if (it.type === 'arma' || it.type === 'armatura') {
         const old = itemOf(t, it.type);
@@ -7711,8 +7753,17 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
     function giveItem(t, type, ctx, lexPick, name, q, how, from, src) {
       const nm = name || (type === 'arma' ? lexPick('arma') : type === 'cibo' ? ctx.cibo || 'delle provviste' : ITEM_NAME[type] || lexPick(type));
       const it = src ? Object.assign({}, src, { how: how || 'trovato', from: from ? from.id : null, d: day }) : mkItem(type, nm, how, from, q);
-      addItem(t, it); t.items++; stats.items++;
+      if (!addItem(t, it)) return false;
+      t.items++; stats.items++;
       if (type === 'cibo' && t.food < 45) eat(t);
+      return true;
+    }
+    function transferItem(from, to, type, how, ctx, lexPick) {
+      const it = itemOf(from, type);
+      if (!it || from === to || !canReceiveItem(to, it)) return false;
+      if (!giveItem(to, type, ctx, lexPick, it.name, it.q, how, from, it)) return false;
+      takeItem(from, it);
+      return true;
     }
 
     function resolveTest(ev, roles) {
@@ -7828,17 +7879,20 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
             break;
           }
           case 'gain': giveItem(t, f.item, ctx, lexPick); break;
-          case 'lose': { const i = t.inv.findIndex((x) => x.type === f.item); if (i >= 0) t.inv.splice(i, 1); if (f.item === 'cibo') t.food += 40; if (f.item === 'med') t.hp = Math.max(t.hp, 70); break; }
+          case 'lose': { const it = itemOf(t, f.item); if (it) takeItem(t, it); break; }
+          case 'consume': {
+            const it = itemOf(t, f.item); if (!it) break;
+            takeItem(t, it);
+            if (f.item === 'cibo') t.food += 40;
+            if (f.item === 'med') t.hp = Math.max(t.hp, 70);
+            break;
+          }
           case 'steal': {
-            const i = u.inv.findIndex((x) => x.type === 'arma');
-            if (i >= 0) { const [it] = u.inv.splice(i, 1); giveItem(t, 'arma', ctx, lexPick, it.name, it.q, 'rubato', u, it); u.mo -= 10; remember(u, t, 'robbed'); if (u.alive && addGrudge(u, t, 'steal')) { const e = echo(E.steal, [u, t], 'warn'); if (e) out.push(e); } }
+            if (transferItem(u, t, f.item, 'rubato', ctx, lexPick) && !ev.tags.includes('secret')) { u.mo -= 10; remember(u, t, 'robbed'); if (u.alive && addGrudge(u, t, 'steal')) { const e = echo(E.steal, [u, t], 'warn'); if (e) out.push(e); } }
             break;
           }
           case 'give': {
-            if (!u.alive) break;
-            const own = itemOf(t, f.item);
-            if (own) t.inv.splice(t.inv.indexOf(own), 1);
-            giveItem(u, f.item, ctx, lexPick, own ? own.name : null, own && own.q, 'dono', t, own);
+            if (!transferItem(t, u, f.item, 'dono', ctx, lexPick)) break;
             u.owes[t.id] = 'dono'; addAff(t, u, 20); u.mo += 8; remember(u, t, 'gift');
             if (rng.chance(0.6)) { const e = echo(E.debt, [u, t], ''); if (e) out.push(e); }
             break;
@@ -9571,6 +9625,11 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
   const esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   const THEMES = Object.fromEntries(D.themes.map((t) => [t.id, t]));
   const TRAITS = Object.fromEntries(D.traits.map((t) => [t.id, t]));
+  const own = (o, k) => typeof k === 'string' && Object.prototype.hasOwnProperty.call(o, k);
+  const record = (x) => x != null && typeof x === 'object' && !Array.isArray(x);
+  const validId = (id) => typeof id === 'string' && id.length > 0 && id.length <= 40 && !/[{}]/.test(id) && !own(Object.prototype, id) && id !== 'prototype';
+  let inputSerial = 0;
+  const inputId = (prefix) => prefix + Date.now().toString(36) + (++inputSerial).toString(36) + Math.random().toString(36).slice(2, 7);
   const KEY = 'last-one-standing:v1';
   const SPEED = { lenta: 7000, normale: 3800, veloce: 1700 };
   const G3 = (g, m, f, n) => (g === 'F' ? f : g === 'N' ? n : m);
@@ -9774,52 +9833,117 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
     }, 250);
   }
   function load() {
+    load.warning = '';
     try {
       const raw = localStorage.getItem(KEY);
       if (!raw) return false;
       const d = JSON.parse(raw);
-      if (Array.isArray(d.cast)) S.cast = d.cast.map(sanitizeTribute).filter(Boolean);
-      if (d.settings && typeof d.settings === 'object') sanitizeSettings(d.settings);
-      if (Array.isArray(d.custom)) S.custom = d.custom.map(sanitizeCustom).filter(Boolean);
-      if (d.run && d.run.cfg && Array.isArray(d.run.cfg.cast) && THEMES[d.run.cfg.theme]) {
-        const imgs = Object.fromEntries((Array.isArray(d.cast) ? d.cast : []).map((t) => [t && t.id, t && t.img]));
-        d.run.cfg.cast.forEach((t) => { if (t && t.img === '@cast') t.img = imgs[t.id] || ''; });
-        d.run.cfg.cast = d.run.cfg.cast.map(sanitizeTribute).filter(Boolean); d.run.cfg.custom = (d.run.cfg.custom || []).map(sanitizeCustom).filter(Boolean); S.run = d.run; }
-      if (d.ui === 'light' || d.ui === 'dark') S.ui = d.ui;
+      if (!record(d)) return false;
+      const warnings = [];
+      const next = { cast: Array.isArray(d.cast) ? normalizeCast(d.cast) : S.cast,
+        settings: sanitizeSettings(d.settings), custom: S.custom,
+        run: null, ui: d.ui === 'light' || d.ui === 'dark' ? d.ui : S.ui };
+      if (own(d, 'custom')) {
+        // I vecchi salvataggi potevano contenere eventi accettati senza tutti i controlli.
+        // Si recuperano quelli validi; l'importazione di un nuovo file resta invece atomica.
+        next.custom = [];
+        const list = Array.isArray(d.custom) ? d.custom : [], used = new Set();
+        const reserved = new Set(list.filter((c) => record(c) && validId(c.id)).map((c) => c.id));
+        let discarded = Array.isArray(d.custom) ? 0 : 1;
+        list.forEach((c) => {
+          const out = sanitizeCustom(c);
+          if (!out || used.has(out.id)) { discarded++; return; }
+          if (c.id == null || c.id === '') while (used.has(out.id) || reserved.has(out.id)) out.id = inputId('e');
+          used.add(out.id); next.custom.push(out);
+        });
+        if (discarded) warnings.push('Cast e regole recuperati; ' + discarded + (discarded === 1 ? ' evento personalizzato non valido escluso.' : ' eventi personalizzati non validi esclusi.'));
+      }
+      if (record(d.run) && record(d.run.cfg) && Array.isArray(d.run.cfg.cast) && own(THEMES, d.run.cfg.theme)) {
+        // Una partita danneggiata non deve impedire di recuperare cast e impostazioni.
+        try {
+          const imgs = Object.fromEntries(next.cast.map((t) => [t.id, t.img]));
+          const cast = normalizeCast(d.run.cfg.cast.map((t) => record(t) && t.img === '@cast' ? Object.assign({}, t, { img: imgs[t.id] || '' }) : t));
+          const custom = d.run.cfg.custom == null ? [] : normalizeCustoms(d.run.cfg.custom);
+          if (cast.length >= 2) next.run = Object.assign({}, d.run, { cfg: Object.assign({}, d.run.cfg, { cast, custom }) });
+        } catch (e) { warnings.push('La partita salvata contiene dati non validi e non è stata ripresa.'); }
+      }
+      Object.assign(S, next);
+      load.warning = warnings.join(' ');
       return true;
-    } catch (e) { return false; }
+    } catch (e) {
+      load.warning = 'Salvataggio non caricato: ' + e.message + ' I dati conservati nel browser non sono stati modificati.';
+      return false;
+    }
   }
 
-  function sanitizeSettings(x) {
-    const st = S.settings;
-    if (THEMES[x.theme]) st.theme = x.theme;
-    if (L.DIFF[x.difficulty]) st.difficulty = x.difficulty;
+  function sanitizeSettings(x, base) {
+    const st = Object.assign({}, base || S.settings);
+    if (!record(x)) return st;
+    if (own(THEMES, x.theme)) st.theme = x.theme;
+    if (own(L.DIFF, x.difficulty)) st.difficulty = x.difficulty;
     if (typeof x.seed === 'string') st.seed = x.seed.slice(0, 60);
     if (+x.maxDays >= 5 && +x.maxDays <= 40) st.maxDays = Math.round(+x.maxDays);
-    if (SPEED[x.speed]) st.speed = x.speed;
+    if (own(SPEED, x.speed)) st.speed = x.speed;
     if ([1, 2, 3, 4].includes(+x.teamSize)) st.teamSize = +x.teamSize;
     if (x.view === 'grid' || x.view === 'team') st.view = x.view;
     ['teamsAllied', 'teamWin', 'adult'].forEach((k) => { if (typeof x[k] === 'boolean') st[k] = x[k]; });
+    return st;
   }
   function sanitizeTribute(t, i) {
-    if (!t || typeof t !== 'object') return null;
+    if (!record(t)) return null;
     const attr = {};
     D.attrs.forEach((a) => { const v = Math.round(+((t.attr || {})[a.id])); attr[a.id] = v >= 1 && v <= 10 ? v : 5; });
     const team = Math.max(1, Math.min(99, Math.round(+t.team) || (i || 0) + 1));
     return {
-      id: typeof t.id === 'string' && t.id ? t.id.slice(0, 40) : 'c' + Math.random().toString(36).slice(2, 10),
+      id: validId(t.id) ? t.id : inputId('c'),
       name: String(t.name || '').slice(0, 40), gender: ['M', 'F', 'N'].includes(t.gender) ? t.gender : 'M', team, color: teamColor(team),
       img: typeof t.img === 'string' && /^data:image\/(png|jpe?g|webp|gif);base64,[A-Za-z0-9+/=]+$/.test(t.img) && t.img.length < 400000 ? t.img : '',
-      traits: (Array.isArray(t.traits) ? t.traits : []).filter((x) => TRAITS[x]).slice(0, 3), attr,
+      traits: [...new Set((Array.isArray(t.traits) ? t.traits : []).filter((x) => own(TRAITS, x)))].slice(0, 3), attr,
     };
   }
+  function normalizeCast(cast) {
+    if (!Array.isArray(cast)) throw new Error('Il cast deve essere un elenco di concorrenti.');
+    const used = new Set();
+    cast.forEach((t, i) => {
+      if (!record(t)) throw new Error('Concorrente ' + (i + 1) + ': dati non validi.');
+      if (t.id == null || t.id === '') return;
+      if (!validId(t.id)) throw new Error('Concorrente ' + (i + 1) + ': identificativo non valido (massimo 40 caratteri, senza parentesi graffe o nomi riservati).');
+      if (used.has(t.id)) throw new Error('Identificativo duplicato nel cast: ' + t.id + '. Ogni concorrente deve averne uno diverso.');
+      used.add(t.id);
+    });
+    return cast.map((t, i) => {
+      const out = sanitizeTribute(t, i);
+      if (t.id == null || t.id === '') { while (used.has(out.id)) out.id = inputId('c'); used.add(out.id); }
+      return out;
+    });
+  }
   function sanitizeCustom(c) {
-    if (!c || typeof c.text !== 'string' || !c.text.trim()) return null;
-    const n = Math.max(1, Math.min(4, Math.round(+c.n) || 1));
-    const letters = 'ABCD'.slice(0, n).split('');
-    const out = { id: c.id || 'e' + Math.random().toString(36).slice(2, 9), phase: ['tutte', 'b', 'd', 'n', 'f'].includes(c.phase) ? c.phase : 'tutte', n, text: c.text.trim().slice(0, 240), dies: (Array.isArray(c.dies) ? c.dies : []).filter((x) => letters.includes(x)), killer: letters.includes(c.killer) ? c.killer : '' };
-    try { L.parseLine(L.customToLine(out), 'custom'); } catch (e) { return null; }
+    if (!record(c)) return null;
+    const out = { id: c.id == null || c.id === '' ? inputId('e') : c.id,
+      phase: c.phase == null ? 'tutte' : c.phase, n: c.n == null ? 1 : +c.n,
+      text: typeof c.text === 'string' ? c.text.trim() : c.text,
+      dies: c.dies == null ? [] : c.dies, killer: c.killer == null ? '' : c.killer };
+    if (!validId(out.id) || validateCustom(out)) return null;
+    out.dies = out.dies.slice();
     return out;
+  }
+  function normalizeCustoms(custom) {
+    if (!Array.isArray(custom)) throw new Error('Gli eventi personalizzati devono essere un elenco.');
+    const used = new Set();
+    // Si riservano prima gli ID presenti, così quelli nuovi non possono sostituirli.
+    custom.forEach((c, i) => {
+      if (!record(c)) throw new Error('Evento ' + (i + 1) + ': dati non validi.');
+      if (c.id == null || c.id === '') return;
+      if (!validId(c.id)) throw new Error('Evento ' + (i + 1) + ': identificativo non valido.');
+      if (used.has(c.id)) throw new Error('Identificativo duplicato negli eventi: ' + c.id + '.');
+      used.add(c.id);
+    });
+    return custom.map((c, i) => {
+      const out = sanitizeCustom(c);
+      if (!out) throw new Error('Evento ' + (i + 1) + ': ' + (validateCustom(c) || 'dati non validi.'));
+      if (c.id == null || c.id === '') { while (used.has(out.id)) out.id = inputId('e'); used.add(out.id); }
+      return out;
+    });
   }
 
   /* ---------------- utilità ---------------- */
@@ -10202,20 +10326,28 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
   const exportJSON = () => JSON.stringify({ app: 'last-one-standing', versione: 2, cast: S.cast, regole: S.settings, eventi: S.custom }, null, 2);
   function importJSON(text) {
     let d; try { d = JSON.parse(text); } catch (e) { return 'Il testo non è un JSON valido.'; }
+    if (!record(d) && !Array.isArray(d)) return 'Il JSON deve contenere una configurazione o un elenco di concorrenti.';
     const cast = Array.isArray(d) ? d : d.cast;
     if (!Array.isArray(cast) || !cast.length) return 'Non trovo un elenco di concorrenti ("cast") nel testo.';
-    S.cast = cast.slice(0, 200).map(sanitizeTribute).filter(Boolean);
-    const r = d.regole || d.settings;
-    if (r && typeof r === 'object') {
-      sanitizeSettings(Object.assign({}, r, { adult: S.settings.adult }));
-      if (THEMES[r.theme]) S.settings.theme = r.theme;
-      if (L.DIFF[r.difficulty]) S.settings.difficulty = r.difficulty;
-      if (typeof r.seed === 'string') S.settings.seed = r.seed.slice(0, 60);
-      if (+r.maxDays >= 5 && +r.maxDays <= 40) S.settings.maxDays = +r.maxDays;
-      ['teamsAllied', 'teamWin'].forEach((k) => typeof r[k] === 'boolean' && (S.settings[k] = r[k]));
-    }
-    const ev = d.eventi || d.custom;
-    if (Array.isArray(ev)) S.custom = ev.slice(0, 200).map(sanitizeCustom).filter(Boolean);
+    if (cast.length > 200) return 'Puoi importare al massimo 200 concorrenti per volta: riduci il cast nel file.';
+    let next;
+    try {
+      next = { cast: normalizeCast(cast), settings: Object.assign({}, S.settings), custom: S.custom };
+      const r = own(d, 'regole') ? d.regole : own(d, 'settings') ? d.settings : undefined;
+      if (r !== undefined) {
+        if (!record(r)) return 'Le regole devono essere un oggetto JSON.';
+        // La conferma per adulti resta una scelta esplicita nell'interfaccia.
+        next.settings = sanitizeSettings({ ...r, adult: S.settings.adult });
+      }
+      const ev = own(d, 'eventi') ? d.eventi : own(d, 'custom') ? d.custom : undefined;
+      if (ev !== undefined) {
+        if (!Array.isArray(ev)) return 'Gli eventi personalizzati devono essere un elenco.';
+        if (ev.length > 200) return 'Puoi importare al massimo 200 eventi personalizzati per volta: riduci l’elenco nel file.';
+        next.custom = normalizeCustoms(ev);
+      }
+    } catch (e) { return e.message; }
+    // Nessuna parte della configurazione cambia finché tutti gli elementi sono validi.
+    Object.assign(S, next);
     renderCast(); save(); return null;
   }
   $('#btnIO').addEventListener('click', () => { $('#ioText').value = exportJSON(); $('#ioMsg').textContent = ''; $('#ioDlg').showModal(); });
@@ -10329,11 +10461,19 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
   }
   const readCustom = () => ({ phase: $('#cPhase').value, n: +$('#cN').value, text: $('#cText').value.trim(), dies: $$('#cDies input:checked').map((x) => x.value), killer: $('#cKiller').value });
   function validateCustom(c) {
-    if (!c.text) return 'Scrivi il testo dell\'evento.';
-    for (const l of 'ABCD'.slice(0, c.n)) if (!c.text.includes('{' + l + '}')) return 'Con ' + c.n + ' concorrenti il testo deve nominare anche {' + l + '}.';
-    if (c.killer && !c.dies.filter((x) => x !== c.killer).length) return 'Hai scelto chi uccide: indica anche chi muore.';
-    if (c.killer && c.dies.includes(c.killer)) return 'Chi uccide non può morire nello stesso evento.';
-    try { L.parseLine(L.customToLine(c), 'custom'); } catch (e) { return e.message; }
+    if (!record(c) || typeof c.text !== 'string' || !c.text.trim()) return 'Scrivi il testo dell\'evento.';
+    if (c.text.trim().length > 240) return 'Il testo dell\'evento può contenere al massimo 240 caratteri.';
+    const n = c.n == null ? 1 : +c.n;
+    if (!Number.isInteger(n) || n < 1 || n > 4) return 'Scegli da 1 a 4 concorrenti per l\'evento.';
+    const phase = c.phase == null ? 'tutte' : c.phase;
+    if (!['tutte', 'b', 'd', 'n', 'f'].includes(phase)) return 'La fase dell\'evento non è valida.';
+    const letters = 'ABCD'.slice(0, n).split(''), dies = c.dies == null ? [] : c.dies, killer = c.killer == null ? '' : c.killer;
+    if (!Array.isArray(dies) || dies.some((x) => !letters.includes(x)) || new Set(dies).size !== dies.length) return 'Indica solo concorrenti presenti nell\'evento, una volta ciascuno, tra chi muore.';
+    if (killer !== '' && !letters.includes(killer)) return 'Chi uccide deve essere uno dei concorrenti dell\'evento.';
+    for (const l of letters) if (!c.text.includes('{' + l + '}')) return 'Con ' + n + ' concorrenti il testo deve nominare anche {' + l + '}.';
+    if (killer && !dies.filter((x) => x !== killer).length) return 'Hai scelto chi uccide: indica anche chi muore.';
+    if (killer && dies.includes(killer)) return 'Chi uccide non può morire nello stesso evento.';
+    try { L.parseLine(L.customToLine(Object.assign({}, c, { n, dies, killer })), 'custom'); } catch (e) { return e.message; }
     return null;
   }
   function updatePreview() {
@@ -10865,6 +11005,7 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
     if (hot && typeof hot.phase === 'number' && S.run) S.run.phase = hot.phase;
     updateCounts();
     route();
+    if (load.warning) toast(load.warning);
   }
   const H = window.claude && window.claude.hot;
   if (H && typeof H.snapshot === 'function') { try { H.snapshot(() => ({ phase: S.run ? S.run.phase : 0 })); } catch (e) { /* niente */ } }

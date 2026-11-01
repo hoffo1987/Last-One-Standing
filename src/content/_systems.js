@@ -183,7 +183,7 @@
 2 love:AB @soc | Tra {A} e {B} scatta qualcosa davanti a un fuoco. Il pubblico trattiene il respiro.
 2 love:AB @show | {A} dichiara il proprio amore a {B} in diretta nazionale. {B} arrossisce e dice di sì.
 2 love:AB | {A} e {B} litigano per un'ora su chi debba fare la guardia, poi si baciano. Classico.
-2 love:AB @luck | {A} salva {B} da una caduta e l[B:o/a] prende al volo. Scatta la scintilla, e anche qualche costola.
+2 love:AB save:A>B @luck | {A} salva {B} da una caduta e l[B:o/a] prende al volo. Scatta la scintilla, e anche qualche costola.
 2 couple:AB | {A} e {B} incidono le loro iniziali su un albero, poi si ricordano di essere in un'arena.
 2 couple:AB +cibo:A | {A} e {B} improvvisano una cena romantica a base di {cibo}.
 2 couple:AB @show star:A | {A} canta una serenata a {B}. Gli sponsor piangono e aprono il portafoglio.
@@ -219,7 +219,7 @@
 2 esplosivo:A hit:A>B | {A} fa saltare {esplosivo:A} vicino a {B}, che si salva per miracolo ma sente fischiare le orecchie per ore.
 1 need:A=affamato @mad | {A} ha così fame che prova a mangiare la corteccia di un albero. Non lo consiglia.
 1 need:A=affamato +cibo:A cure:A *2 | {A}, mort[A:o/a] di fame, trova {cibo} e non ne lascia nemmeno una briciola.
-2 need:A=affamato cibo:B +cibo:A rel:BA-40 @agg | Affamat[A:o/a], {A} strappa il cibo dalle mani di {B}.
+2 need:A=affamato steal:A<B=cibo rel:BA-40 @agg | Affamat[A:o/a], {A} strappa il cibo dalle mani di {B}.
 2 need:B=affamato give:A>B=cibo @heal | {A} vede {B} allo stremo e [B:gli/le] lascia metà delle proprie provviste.
 1 s:A=ubriaco @mad | {A} trova {alcol} e decide che è il momento giusto per festeggiare. Non lo è.
 1 need:A=ubriaco @show @drunk | Ubriac[A:o/a], {A} sfida a duello un albero. Vince l'albero.

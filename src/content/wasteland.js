@@ -27,7 +27,7 @@
 2 k:A>B w:A | {A} affronta {B} sulla Diga e l[B:o/a] abbatte con {arma:A}.
 2 steal:A<B @stl | {A} ruba {arma:B} a {B} mentre dorme sotto il sole.
 2 al:AB | {A} e {B} si dividono una lattina e decidono di viaggiare insieme.
-2 cibo:B +cibo:A @agg | {A} minaccia {B} e si fa consegnare tutta l'acqua.
+2 steal:A<B=cibo @agg | {A} minaccia {B} e si fa consegnare tutta l'acqua.
 2 need:B=* cure:B @heal | {A} fascia le ferite di {B} con stracci puliti.
 2 s:B=ferito | {A} sperona il veicolo di {B}.
 3 k:AB>C | {A} e {B} fanno un'imboscata a {C} sull'Autostrada spezzata.

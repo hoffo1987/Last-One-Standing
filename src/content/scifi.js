@@ -27,7 +27,7 @@
 2 k:A>B w:A | {A} insegue {B} nei Condotti di servizio e l[B:o/a] colpisce con {arma:A}.
 2 steal:A<B @int | {A} hackera il blocco di sicurezza e si prende {arma:B} di {B}.
 2 al:AB @int | {A} e {B} uniscono le loro conoscenze per riattivare un terminale.
-2 s:B=ferito @agg | {A} spinge {B} contro una paratia elettrificata.
+2 hit:A>B @agg | {A} spinge {B} contro una paratia elettrificata.
 2 need:B=* cure:B @heal | {A} usa uno scanner medico per curare {B}.
 3 k:AB>C @int | {A} e {B} attirano {C} nella camera di decompressione.
 3 al:ABC @soc | {A}, {B} e {C} si barricano sul Ponte di comando.

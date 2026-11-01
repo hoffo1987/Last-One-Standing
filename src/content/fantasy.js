@@ -27,7 +27,7 @@
 2 k:A>B w:A | {A} sfida {B} a duello sul ponte della Torre e vince con {arma:A}.
 2 al:AB | {A} e {B} cavalcano insieme un grifone ferito fino alla Foresta elfica.
 2 steal:A<B @stl | {A} ruba {arma:B} a {B} usando un incantesimo di sonno.
-2 s:B=ferito @agg | {A} evoca un vento tagliente contro {B}.
+2 hit:A>B @agg | {A} evoca un vento tagliente contro {B}.
 2 need:B=* cure:B @heal | {A} canta un'antica ninna nanna elfica che guarisce {B}.
 3 k:AB>C | {A} e {B} attirano {C} nella tana di un drago addormentato.
 3 al:ABC @soc | {A}, {B} e {C} fondano una compagnia e scelgono uno stendardo.

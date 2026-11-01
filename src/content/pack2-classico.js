@@ -8,7 +8,7 @@
 1 +armatura:A @luck | {A} afferra il primo oggetto a portata di mano: {armatura}. Non è un'arma, ma è meglio di niente.
 1 +attrezzo:A @int | {A} ignora le armi e punta dritt[A:o/a] a {attrezzo}. Gli altri ridono. Gli altri moriranno prima.
 1 +valore:A @mad | {A} riempie lo zaino di {valore}. Non si mangia, non ferisce, ma luccica.
-2 hit:A>B +cibo:A @agg | {A} strappa uno zaino a {B} con una spallata. Dentro ci sono solo {cibo}, ma è una vittoria morale.
+2 hit:A>B steal:A<B=cibo @agg | {A} strappa uno zaino a {B} con una spallata. Dentro ci sono solo {cibo}, ma è una vittoria morale.
 2 al:AB +attrezzo:B | {A} e {B} si dividono il bottino della Cornucopia: a {A} la paura, a {B} {attrezzo}. Poi corrono insieme verso il Bosco.
 2 k:A>B w:A @agg | {A} raggiunge la Cornucopia per prim[A:o/a] e la difende con {arma:A}. {B} non ci arriverà mai.
 3 al:ABC @soc | {A}, {B} e {C} si nascondono dietro la stessa roccia e decidono che, da quel momento, sono una squadra.
@@ -28,7 +28,7 @@
 2 crush:A>B rel:AB+15 @soc | {A} porta a {B} la parte migliore del coniglio arrosto, «per caso». {B} non capisce. Tutti gli altri sì.
 2 crush:A>B love:AB *2 | {A} trova {B} al Fiume e, dopo tre giorni di sguardi, finalmente parla. Si baciano sotto un salice. In capitale si sviene.
 2 plot:A>B rel:AB+10 | {A} si offre di fare il turno di guardia al posto di {B}. È un gesto gentile. È anche un modo per studiarl[B:o/a] mentre dorme.
-2 plot:A>B -cibo:B +cibo:A @stl | {A} sposta, un po' alla volta, le provviste di {B} nel proprio zaino. Fa parte del piano.
+2 plot:A>B steal:A<B=cibo @stl @secret | {A} sposta, un po' alla volta, le provviste di {B} nel proprio zaino. Fa parte del piano.
 2 goal:A=vendetta grudge:A>B hit:A>B | {A} segue le tracce di {B} fino al Fiume e l[B:o/a] colpisce alle spalle. Per {caro:A}. Non basta ancora.
 2 goal:A=cibo give:B>A=cibo debt:A>B | {B} vede quanto è affamat[A:o/a] {A} e [A:gli/le] lascia metà della sua cena. «Me la renderai.»
 2 goal:A=caccia k:A>B @agg | {A} ha passato la notte a seguire le impronte di {B}. All'alba, le impronte finiscono.

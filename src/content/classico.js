@@ -27,7 +27,7 @@
 2 al:AB @soc | {A} riconosce in {B} qualcuno del proprio quartiere e propone una tregua.
 2 ally:AB +cibo:A | {A} e {B} pescano insieme nel Fiume.
 2 k:A>B w:A | {A} ferma {B} sulla riva del Fiume e l[B:o/a] colpisce con {arma:A}.
-2 s:B=ferito @agg | {A} lancia un sasso con precisione e colpisce {B} alla tempia.
+2 hit:A>B @agg | {A} lancia un sasso con precisione e colpisce {B} alla tempia.
 2 | {A} segue {B} per ore senza trovare il coraggio di attaccare.
 2 need:B=* cure:B @heal | {A} prepara un impacco di erbe per {B}.
 3 k:A>B @agg | {A} attira {B} in un'imboscata mentre {C} fa da esca.

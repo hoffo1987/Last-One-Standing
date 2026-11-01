@@ -1,6 +1,6 @@
 // Test headless del motore: node tools/test-engine.js [partite per tema]
 const path = require('path');
-for (const f of ['data-core.js', 'data-themes.js', ...require('fs').readdirSync(path.join(__dirname, '..', 'src', 'content')).map((x) => 'content/' + x), 'engine.js']) require(path.join(__dirname, '..', 'src', f));
+for (const f of ['data-core.js', 'data-themes.js', ...require('fs').readdirSync(path.join(__dirname, '..', 'src', 'content')).filter((x) => x.endsWith('.js')).sort().map((x) => 'content/' + x), 'engine.js']) require(path.join(__dirname, '..', 'src', f));
 const LOS = globalThis.LOS, D = globalThis.LOS_DATA;
 const N = +process.argv[2] || 40;
 let fail = 0, games = 0;
@@ -36,7 +36,7 @@ for (const th of D.themes) {
     });
     const s = r.seed;
     const r2 = LOS.simulate({ cast, theme: th.id, seed: s, difficulty: diffs[i % 4], teamWin, teamsAllied, maxDays: 20, adult });
-    if (JSON.stringify(r2.winners) !== JSON.stringify(r.winners) || r2.phases.length !== r.phases.length) err(`${th.id}#${i}: non deterministico`);
+    if (JSON.stringify(r2) !== JSON.stringify(r)) err(`${th.id}#${i}: non deterministico (eventi, conseguenze, istantanee o risultato)`);
   }
   console.log(`  ${th.name.padEnd(22)} ${N} partite · ${(days / N).toFixed(1)} giorni medi · ${Date.now() - t0} ms`);
 }

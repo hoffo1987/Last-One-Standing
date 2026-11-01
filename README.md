@@ -4,12 +4,12 @@ Simulatore di battle royale, tutto in italiano. Crei il cast, scegli una delle 9
 
 ## Cosa contiene
 - **9 scenari**: Arena Classica, Reame Incantato, Stazione Orbitale, Città degli Infetti, Isola Battle Royale, Villa Maledetta, Terre Desolate, più Liceo Spietato e Ufficio Open Space (senza morti: si viene eliminati o licenziati).
-- **2183 modelli di evento e 529 disastri**, più **122 eventi e 31 disastri 18+** (oltre 1600 esiti di disastro in tutto): ogni arena con tema "con morti" ha circa 750 eventi e 75-85 disastri, Liceo e Ufficio circa 370 eventi e 58 disastri. Accordo di genere automatico (lui / lei / neutro con ə) e preposizioni articolate corrette.
+- **2248 modelli di evento e 529 disastri**, più **122 eventi e 31 disastri 18+** (oltre 1600 esiti di disastro in tutto): ogni arena con tema "con morti" ha oltre 800 eventi e 74-85 disastri, Liceo e Ufficio oltre 400 eventi e 58 disastri. Accordo di genere automatico (lui / lei / neutro con ə) e preposizioni articolate corrette.
 - **Voci dei concorrenti**: oltre 220 battute (ultime parole, frasi dopo un'uccisione, vendette, tradimenti, dichiarazioni, ringraziamenti, provocazioni) scelte secondo tratto, arena e situazione, più oltre 70 conversazioni notturne tra alleati, coppie, rivali e sconosciuti. Nella stessa partita una frase non si ripete finché ce ne sono altre.
-- **83 condizioni meteo** (9-10 per arena) che cambiano la giornata.
+- **83 condizioni meteo** (11 nell'Arena Classica, 9 nelle altre arene) che cambiano la giornata.
 - **Concorrenti** con 10 caratteristiche (forza, agilità, intelligenza, carisma, fortuna, resistenza, furtività, coraggio, empatia, sopravvivenza), fino a 3 dei 30 tratti, squadra e foto.
 - **Motore**: alleanze e tradimenti, oggetti (armi, cibo, medicine, trappole), stati (ferito, avvelenato, malato, affamato), pericolo crescente con i giorni, festino, disastri e scontro finale.
-- **Seme**: stesso seme e stesso cast danno la stessa partita.
+- **Seme**: stesso seme, cast completo e impostazioni danno la stessa partita, usando la stessa versione di motore e contenuti.
 - **Diretta** con tabellone, tacche dei superstiti, mappa a zone, elenco dei caduti e riproduzione automatica.
 - **Esito** con classifica, statistiche, grafici e locandina generata.
 - Eventi personalizzati con anteprima, importazione ed esportazione in JSON, salvataggio nel browser e tema chiaro o scuro.
@@ -37,7 +37,7 @@ Ogni concorrente ha cinque valori da 0 a 100, visibili nella scheda e in forma r
 
 Ogni arena ha poi le sue regole:
 - **Caratteristiche chiave**: tre caratteristiche contano di più per combattere e sopravvivere (per esempio Furtività, Agilità e Sopravvivenza in città, Coraggio ed Empatia nella villa). In prova, a parità di tutto il resto, chi le ha alte arriva in media 4°-5° su 12, chi le ha basse 8°-9°.
-- **Meteo del giorno**: 56 condizioni diverse (nebbia, tempeste solari, orde in migrazione, compiti di matematica…) che cambiano consumi, agguati, ricerca di cibo, prove e pericoli notturni.
+- **Meteo del giorno**: 83 condizioni diverse (nebbia, tempeste solari, orde in migrazione, compiti di matematica…) che cambiano consumi, agguati, ricerca di cibo, prove e pericoli notturni.
 - **Zone**: ogni luogo ha risorse, pericolo e riparo propri. Nel Battle Royale la tempesta chiude una zona al giorno e chi resta fuori perde salute. Nella Città degli Infetti un morso diventa infezione: gli alleati possono curarla con un kit medico se fatto in tempo, oppure cacciare l'infetto dal gruppo.
 - **Oggetti**: le armi hanno una qualità (★ fino a ★★★) e possono rompersi; chi uccide fruga nello zaino della vittima; gli zaini di chi muore per l'arena restano nella zona per chi passa; le trappole vengono piazzate di notte e scattano sui concorrenti di passaggio (la vittima sa chi cercare); kit medici e cure abbassano gli indicatori.
 - **Alleanze vive**: di notte gli alleati dividono il cibo (o lo negano, e nasce rancore), si medicano a vicenda, fanno i turni di guardia e respingono insieme gli assalti notturni.
@@ -139,6 +139,8 @@ tools/fuzz.js        collaudo con partite casuali
 ```
 node tools/build.js             # crea il file unico in dist/last-one-standing.html
 node tools/lint-content.js      # controlla tutte le righe di evento e disastro (sintassi, partecipanti, segnaposto, grammatica di base)
+node tools/test-consequences.js # regressioni su consumi, trasferimenti, salvataggi e formato degli eventi
+node tools/test-import.js       # importazione atomica, ID, eventi personalizzati e compatibilità dei salvataggi
 node tools/test-engine.js 40    # 40 partite per arena, metà con i contenuti 18+, controlla regole e determinismo
 node tools/fuzz.js 1500         # partite con impostazioni casuali e casi limite (2-60 concorrenti, una sola squadra, valori estremi)
 ```
@@ -154,3 +156,18 @@ I disastri in `src/content/` usano un formato compatto: `Nome | introduzione | m
 `<n> <etichette> | <testo>`. Per esempio:
 `2 k:A>B w:A @agg | {A} insegue {B} e l[B:o/a] uccide con {arma:A}.`
 La legenda completa delle etichette è in cima a `src/data-core.js`.
+
+### Consumo, perdita e trasferimento degli oggetti
+
+- `cibo:A` e `med:A` consumano un oggetto posseduto e applicano il beneficio previsto; `-cibo:A` e `-med:A` lo rimuovono soltanto. Per una cura di quantità esplicita si usa, per esempio, `-med:A hp:A+35`.
+- `steal:A<B=cibo` e `steal:A<B=med` trasferiscono l'oggetto reale di B ad A, conservandone nome e caratteristiche e aggiornando la provenienza. `steal:A<B` continua a indicare il furto di un'arma. Il furto noto lascia ricordo e rancore; `@secret` permette di rappresentare un furto clandestino senza rendere immediatamente consapevole la vittima.
+- `give:A>B=cibo` trasferisce il cibo di A a B e registra il dono. Un oggetto assente o non ricevibile non viene creato né sottratto. Si può consumare un oggetto appena ricevuto nella stessa riga: `steal:A<B=cibo cibo:A`.
+- `save:A>B` registra un salvataggio, con gratitudine, memoria e contatore; `@heal` da solo indica l'indole dell'evento e non sostituisce l'effetto. `hit:A>B` usa il sistema di danno già presente, attribuisce l'aggressione e lascia un ricordo.
+
+### Importazione e compatibilità
+
+Restano supportati il formato esportato v2, gli alias `settings`/`custom` e gli elenchi di concorrenti senza ID. Gli ID validi, le foto e il consenso 18+ già dato vengono conservati; importare un file non concede il consenso 18+.
+
+L'importazione verifica l'intera configurazione prima di sostituirla. Un errore indica l'elemento da correggere e lascia intatti i dati attuali. Gli ID duplicati o riservati, gli eventi incoerenti e gli elenchi oltre 200 elementi vengono segnalati; i testi degli eventi oltre 240 caratteri non vengono tagliati in silenzio.
+
+Le correzioni degli effetti possono cambiare gli esiti rispetto alle versioni precedenti. La ripresa attuale ricostruisce la partita dalla configurazione salvata: non è ancora un replay immutabile tra versioni diverse del motore o dei contenuti.

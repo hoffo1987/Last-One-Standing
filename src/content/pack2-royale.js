@@ -45,7 +45,7 @@
 2 crush:A>B @soc | {A} fa la guardia sulla torre per tutta la notte, puntando il binocolo verso {B} più spesso del necessario.
 2 plot:A>B tr:A>B *2 | {A} aspetta che {B} si addormenti. Poi si ricorda che il duo, dal prossimo cerchio, conta come solo.
 2 plot:A>B br:A | {A} parte di notte con il veicolo del duo. {B} si sveglia a piedi, in una zona che sta per chiudersi.
-2 couple:AB stat:B<hp40 save:A>B | {A} usa l'ultimo kit medico su {B} e resta senza. Ne valeva la pena.
+2 couple:AB stat:B<hp40 save:A>B -med:A hp:B+40 | {A} usa l'ultimo kit medico su {B} e resta senza. Ne valeva la pena.
 2 hit:A>B trait:A=sonnambulo | {A} si alza nel sonno e prende {B} per un nemico. Colpo di calcio, poi le scuse.
 `,
       f: `

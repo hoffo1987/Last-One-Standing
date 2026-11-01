@@ -28,7 +28,7 @@
 2 crush:A>B rel:AB+15 @soc | {A} regala a {B} l'ultimo sorso della propria borraccia. Nel deserto, è una dichiarazione d'amore.
 2 crush:A>B love:AB *2 | {A} e {B} guardano il tramonto radioattivo dal tetto di un autobus. È verde e bellissimo. Si baciano.
 2 plot:A>B rel:AB+10 | {A} insegna a {B} come guidare il motore truccato. Lascia fuori un dettaglio importante sui freni.
-2 plot:A>B -cibo:B +cibo:A @stl | {A} travasa, un sorso alla volta, la borraccia di {B} nella propria. Fa parte del piano.
+2 plot:A>B steal:A<B=cibo @stl @secret | {A} travasa, un sorso alla volta, la borraccia di {B} nella propria. Fa parte del piano.
 2 goal:A=vendetta grudge:A>B hit:A>B | {A} insegue {B} con un pick-up per tre chilometri per {caro:A}. L[B:o/a] colpisce di striscio.
 2 goal:A=caccia k:A>B @agg | {A} segue le tracce di pneumatico di {B} nel deserto. Le tracce finiscono, e anche {B}.
 2 goal:A=cibo give:B>A=cibo debt:A>B | {B} lancia a {A} una lattina ammaccata. «Quando trovi acqua, ricordati di me.»

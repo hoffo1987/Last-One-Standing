@@ -79,7 +79,7 @@
     const head = line.slice(0, bar).trim().split(/\s+/);
     const text = line.slice(bar + 1).trim();
     const ev = { n: +head[0], text, kills: [], dies: [], req: [], fx: [], tags: [], w: 1, origin: origin || 'base', ok: { kills: [], dies: [], fx: [] }, ko: { kills: [], dies: [], fx: [] } };
-    if (!(ev.n >= 1 && ev.n <= 6)) throw new Error('Numero di concorrenti non valido in: ' + line);
+    if (!Number.isInteger(ev.n) || !(ev.n >= 1 && ev.n <= 6)) throw new Error('Numero di concorrenti non valido in: ' + line);
     let m;
     for (let tok of head.slice(1)) {
       const self = tok.match(/^(?:ok:|ko:)?(?:hit|save|give|owe|repay|debt|grudge|forgive|steal|k|tr|crush|plot|trust|distrust|fear|respect|attract|promise|fid|ris|pau|amo):([A-F])[<>]([A-F])/) || tok.match(/^(?:ok:|ko:)?(?:love|couple|friend|enemy|rel|rival|ex|close|breakup|reunite):([A-F])([A-F])/);
@@ -90,7 +90,7 @@
       if ((m = tok.match(/^att:([A-F])([<>])(\w+?)(\d+)$/))) { ev.req.push({ t: 'att', r: ID(m[1]), op: m[2], attr: m[3], v: +m[4] }); continue; }
       if ((m = tok.match(/^(no)?trait:([A-F])=(\w+)$/))) { ev.req.push({ t: m[1] ? 'notrait' : 'trait', r: ID(m[2]), trait: m[3] }); continue; }
       if (tok[0] === '@') { ev.tags.push(tok.slice(1)); continue; }
-      if (tok[0] === '*') { ev.w = parseFloat(tok.slice(1)); continue; }
+      if (tok[0] === '*') { ev.w = Number(tok.slice(1)); if (!Number.isFinite(ev.w) || ev.w <= 0) throw new Error('Peso non valido in: ' + line); continue; }
       if ((m = tok.match(/^(k|tr):([A-F]+)>([A-F]+)$/))) {
         const k = { by: letters(m[2]), v: letters(m[3]), betray: m[1] === 'tr' };
         tgt.kills.push(k);
@@ -106,9 +106,25 @@
       if ((m = tok.match(/^con:([A-F])=(\w+)$/))) { ev.req.push({ t: 'has', item: m[2], r: ID(m[1]) }); continue; }
       if ((m = tok.match(new RegExp('^\\+(' + ITEMS + '):([A-F])$')))) { tgt.fx.push({ t: 'gain', item: m[1], r: ID(m[2]) }); continue; }
       if ((m = tok.match(new RegExp('^-(' + ITEMS + '):([A-F])$')))) { tgt.fx.push({ t: 'lose', item: m[1], r: ID(m[2]) }); ev.req.push({ t: 'has', item: m[1], r: ID(m[2]) }); continue; }
-      if ((m = tok.match(/^(cibo|med|trap|veleno|esplosivo|alcol|valore|attrezzo|armatura):([A-F])$/))) { const r = ID(m[2]); ev.req.push({ t: 'has', item: m[1], r }); tgt.fx.push({ t: 'lose', item: m[1], r }); continue; }
-      if ((m = tok.match(/^steal:([A-F])<([A-F])$/))) { ev.req.push({ t: 'has', item: 'arma', r: ID(m[2]) }); tgt.fx.push({ t: 'steal', r: [L(m[1]), L(m[2])] }); continue; }
-      if ((m = tok.match(/^give:([A-F])>([A-F])=(\w+)$/))) { tgt.fx.push({ t: 'give', r: [L(m[1]), L(m[2])], item: m[3] }); if (tgt === ev) ev.req.push({ t: 'has', item: m[3], r: ID(m[1]) }); continue; }
+      if ((m = tok.match(/^(cibo|med|trap|veleno|esplosivo|alcol|valore|attrezzo|armatura):([A-F])$/))) {
+        const r = ID(m[2]);
+        // Un oggetto appena ricevuto può essere consumato nello stesso evento.
+        const prior = tgt === ev ? ev.fx : ev.fx.concat(tgt.fx);
+        const received = prior.some((f) => f.item === m[1] && ((f.t === 'gain' || f.t === 'steal') && f.r[0] === r[0] || f.t === 'give' && f.r[1] === r[0]));
+        if (!received) ev.req.push({ t: 'has', item: m[1], r });
+        tgt.fx.push({ t: 'consume', item: m[1], r }); continue;
+      }
+      if ((m = tok.match(new RegExp('^steal:([A-F])<([A-F])(?:=(' + ITEMS + '))?$')))) {
+        const item = m[3] || 'arma', r = [L(m[1]), L(m[2])];
+        ev.req.push({ t: 'has', item, r: [r[1]] }, { t: 'canReceive', item, r: [r[1], r[0]] });
+        tgt.fx.push({ t: 'steal', item, r }); continue;
+      }
+      if ((m = tok.match(new RegExp('^give:([A-F])>([A-F])=(' + ITEMS + ')$')))) {
+        const r = [L(m[1]), L(m[2])];
+        tgt.fx.push({ t: 'give', r, item: m[3] });
+        if (tgt === ev) ev.req.push({ t: 'has', item: m[3], r: [r[0]] }, { t: 'canReceive', item: m[3], r });
+        continue;
+      }
       if ((m = tok.match(/^s:([A-F])=(\w+)$/))) { tgt.fx.push({ t: 'status', r: ID(m[1]), s: m[2] }); continue; }
       if ((m = tok.match(/^need:([A-F])=(\w+|\*)$/))) { ev.req.push({ t: 'need', r: ID(m[1]), s: m[2] }); continue; }
       if ((m = tok.match(/^cure:([A-F])$/))) { tgt.fx.push({ t: 'cure', r: ID(m[1]) }); continue; }
@@ -183,9 +199,14 @@
     for (const re of [/\{([A-F])\}/g, /\{\w+:([A-F])\}/g, /\[([A-F]+):/g]) {
       let mm; while ((mm = re.exec(text))) [...mm[1]].forEach((ch) => used.add(ch));
     }
-    for (const r of ev.req.concat(ev.fx)) (r.r || []).concat(r.a || [], r.b || []).forEach((i) => used.add(String.fromCharCode(65 + i)));
-    ev.kills.forEach((k) => k.by.concat(k.v).forEach((i) => used.add(String.fromCharCode(65 + i))));
-    ev.dies.forEach((i) => used.add(String.fromCharCode(65 + i)));
+    for (const r of ev.req.concat(ev.fx, ev.ok.fx, ev.ko.fx)) (r.r || []).concat(r.a || [], r.b || []).forEach((i) => used.add(String.fromCharCode(65 + i)));
+    [ev, ev.ok, ev.ko].forEach((branch) => {
+      branch.kills.forEach((k) => {
+        if (k.by.some((i) => k.v.includes(i))) throw new Error('Chi uccide non può essere la propria vittima in: ' + line);
+        k.by.concat(k.v).forEach((i) => used.add(String.fromCharCode(65 + i)));
+      });
+      branch.dies.forEach((i) => used.add(String.fromCharCode(65 + i)));
+    });
     const named = new Set();
     for (const re of [/\{([A-F])\}/g, /\{(?:caro|perso|partner):([A-F])\}/g]) { let mm; while ((mm = re.exec(text))) named.add(mm[1]); }
     for (let i = 0; i < ev.n; i++) if (!named.has(String.fromCharCode(65 + i))) throw new Error('Il concorrente {' + String.fromCharCode(65 + i) + '} partecipa ma non è nominato nel testo: ' + line);
@@ -332,6 +353,15 @@
   const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
 
   function simulate(cfg) {
+    if (!cfg || !Array.isArray(cfg.cast) || cfg.cast.length < 2) throw new Error('Servono almeno 2 concorrenti.');
+    const castIds = new Set();
+    cfg.cast.forEach((c, i) => {
+      if (!c || typeof c !== 'object' || Array.isArray(c)) throw new Error('Concorrente non valido alla posizione ' + (i + 1) + '.');
+      const id = c.id == null || c.id === '' ? 't' + i : c.id;
+      if (typeof id !== 'string' || /[{}]/.test(id) || Object.prototype.hasOwnProperty.call(Object.prototype, id) || id === 'prototype') throw new Error('Identificativo del concorrente non valido alla posizione ' + (i + 1) + '.');
+      if (castIds.has(id)) throw new Error('Identificativo del concorrente duplicato: ' + id + '.');
+      castIds.add(id);
+    });
     const theme = D.themes.find((t) => t.id === cfg.theme) || D.themes[0];
     const seed = cfg.seed == null || cfg.seed === '' ? String(Date.now()) : String(cfg.seed);
     const rng = makeRng(seed + '|' + theme.id);
@@ -339,7 +369,7 @@
     const pools = buildPools(theme, cfg.custom, adult);
     const LEX = pools.lex;
     const E = Object.assign({}, D.echo || {}, theme.soft ? D.echoSoft || {} : {});
-    const diff = DIFF[cfg.difficulty] || 1;
+    const diff = Object.prototype.hasOwnProperty.call(DIFF, cfg.difficulty) ? DIFF[cfg.difficulty] : 1;
     const maxDays = Math.max(3, Math.min(60, cfg.maxDays || 20));
     const traitMap = Object.fromEntries(D.traits.map((t) => [t.id, t]));
     const zoneCount = theme.lex.luogo.length;
@@ -370,7 +400,7 @@
     const T = (cfg.cast || []).map((c, i) => ({
       id: c.id || 't' + i, name: (c.name || 'Concorrente ' + (i + 1)).trim(), gender: c.gender || 'M',
       team: c.team || i + 1, color: c.color, img: c.img || '',
-      traits: (c.traits || []).filter((x) => traitMap[x]),
+      traits: (Array.isArray(c.traits) ? c.traits : []).filter((x) => typeof x === 'string' && Object.prototype.hasOwnProperty.call(traitMap, x)),
       attr: Object.assign({ for: 5, agi: 5, int: 5, car: 5, fort: 5, res: 5, furt: 5, cor: 5, emp: 5, sop: 5 }, c.attr || {}),
       alive: true, zone: 0, inv: [], st: {}, kills: 0, killIds: [], allyId: null,
       deathPhase: -1, deathDay: 0, deathText: '', deathHtml: '', killerIds: [], order: 0,
@@ -447,7 +477,7 @@
       t.allyId = null;
     }
     if (cfg.teamsAllied) {
-      const teams = {};
+      const teams = Object.create(null);
       T.forEach((t) => (teams[t.team] = teams[t.team] || []).push(t));
       Object.values(teams).forEach((ms) => { if (ms.length > 1) { joinAlliance(ms); ms.forEach((a) => ms.forEach((b) => a.id < b.id && addAff(a, b, 35))); } });
     }
@@ -526,6 +556,7 @@
           }
           case 'hasAlly': if (A.allyId == null) return false; break;
           case 'has': if (!hasItem(A, r.item)) return false; break;
+          case 'canReceive': { const it = itemOf(A, r.item); if (!it || !canReceiveItem(B, it)) return false; break; }
           case 'need': if (r.s === '*' ? statusCount(A) === 0 : A.st[r.s] == null) return false; break;
           case 'foe':
             for (const a of r.a) for (const b of r.b) {
@@ -815,6 +846,13 @@
       return it;
     }
     const itemScore = (it) => (it.q || 2) * 10 + (it.u || 0) + (it.x ? 5 : 0);
+    function canReceiveItem(t, it) {
+      if (!t || !t.alive) return false;
+      const old = itemOf(t, it.type);
+      if ((it.type === 'arma' || it.type === 'armatura') && old && itemScore(old) >= itemScore(it)) return false;
+      // capInv eliminerebbe proprio l'oggetto ricevuto da uno zaino pieno di ricordi.
+      return !(t.inv.length >= 8 && it.type !== 'ricordo' && t.inv.every((x) => x.type === 'ricordo'));
+    }
     function addItem(t, it) {
       if (it.type === 'arma' || it.type === 'armatura') {
         const old = itemOf(t, it.type);
@@ -956,8 +994,17 @@
     function giveItem(t, type, ctx, lexPick, name, q, how, from, src) {
       const nm = name || (type === 'arma' ? lexPick('arma') : type === 'cibo' ? ctx.cibo || 'delle provviste' : ITEM_NAME[type] || lexPick(type));
       const it = src ? Object.assign({}, src, { how: how || 'trovato', from: from ? from.id : null, d: day }) : mkItem(type, nm, how, from, q);
-      addItem(t, it); t.items++; stats.items++;
+      if (!addItem(t, it)) return false;
+      t.items++; stats.items++;
       if (type === 'cibo' && t.food < 45) eat(t);
+      return true;
+    }
+    function transferItem(from, to, type, how, ctx, lexPick) {
+      const it = itemOf(from, type);
+      if (!it || from === to || !canReceiveItem(to, it)) return false;
+      if (!giveItem(to, type, ctx, lexPick, it.name, it.q, how, from, it)) return false;
+      takeItem(from, it);
+      return true;
     }
 
     function resolveTest(ev, roles) {
@@ -1073,17 +1120,20 @@
             break;
           }
           case 'gain': giveItem(t, f.item, ctx, lexPick); break;
-          case 'lose': { const i = t.inv.findIndex((x) => x.type === f.item); if (i >= 0) t.inv.splice(i, 1); if (f.item === 'cibo') t.food += 40; if (f.item === 'med') t.hp = Math.max(t.hp, 70); break; }
+          case 'lose': { const it = itemOf(t, f.item); if (it) takeItem(t, it); break; }
+          case 'consume': {
+            const it = itemOf(t, f.item); if (!it) break;
+            takeItem(t, it);
+            if (f.item === 'cibo') t.food += 40;
+            if (f.item === 'med') t.hp = Math.max(t.hp, 70);
+            break;
+          }
           case 'steal': {
-            const i = u.inv.findIndex((x) => x.type === 'arma');
-            if (i >= 0) { const [it] = u.inv.splice(i, 1); giveItem(t, 'arma', ctx, lexPick, it.name, it.q, 'rubato', u, it); u.mo -= 10; remember(u, t, 'robbed'); if (u.alive && addGrudge(u, t, 'steal')) { const e = echo(E.steal, [u, t], 'warn'); if (e) out.push(e); } }
+            if (transferItem(u, t, f.item, 'rubato', ctx, lexPick) && !ev.tags.includes('secret')) { u.mo -= 10; remember(u, t, 'robbed'); if (u.alive && addGrudge(u, t, 'steal')) { const e = echo(E.steal, [u, t], 'warn'); if (e) out.push(e); } }
             break;
           }
           case 'give': {
-            if (!u.alive) break;
-            const own = itemOf(t, f.item);
-            if (own) t.inv.splice(t.inv.indexOf(own), 1);
-            giveItem(u, f.item, ctx, lexPick, own ? own.name : null, own && own.q, 'dono', t, own);
+            if (!transferItem(t, u, f.item, 'dono', ctx, lexPick)) break;
             u.owes[t.id] = 'dono'; addAff(t, u, 20); u.mo += 8; remember(u, t, 'gift');
             if (rng.chance(0.6)) { const e = echo(E.debt, [u, t], ''); if (e) out.push(e); }
             break;

@@ -38,7 +38,7 @@
 2 @cow | {A} e {B} si incontrano, si spaventano a vicenda e scappano in direzioni opposte urlando.
 2 save:A>B @heal | {A} tira fuori {B} da una pozza di fango in cui stava affondando con grande dignità.
 2 k:A>B @mad | {A} sfida {B} a una gara di sguardi. {B} sbatte le palpebre per prim[B:o/a]. {A} prende la cosa molto sul serio.
-2 cibo:A give:A>B=cibo @soc | {A} baratta con {B} metà della propria scorta in cambio di una barzelletta. La barzelletta è pessima. Lo scambio resta valido.
+2 give:A>B=cibo @soc | {A} baratta con {B} metà della propria scorta in cambio di una barzelletta. La barzelletta è pessima. Lo scambio resta valido.
 2 steal:A<B @luck | {B} lascia {arma:B} incustodita per allacciarsi una scarpa. {A} passa di lì. Coincidenze.
 2 love:AB @luck | {A} cade da un albero dritt[A:o/a] addosso a {B}. Si guardano. Scatta qualcosa. Probabilmente una costola.
 2 couple:AB @mad | {A} e {B} si sposano davanti a un sasso che fa da celebrante. Il sasso non obietta.

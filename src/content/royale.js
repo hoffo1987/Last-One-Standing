@@ -25,7 +25,7 @@
 2 k:A>B w:A @stl | {A} colpisce {B} dalla collina con {arma:A}.
 2 k:A>B @agg | {A} entra nella casa di {B} con una granata già senza sicura.
 2 k:A>B | {A} investe {B} con un'auto.
-2 s:B=ferito | {A} colpisce {B}, che riesce a curarsi dietro un muro.
+2 hit:A>B | {A} colpisce {B}, che riesce a curarsi dietro un muro.
 2 steal:A<B | {A} recupera {arma:B} dallo zaino di {B} mentre è distratt[B:o/a].
 2 need:B=* cure:B @heal | {A} rianima {B} quando sta per cadere.
 2 al:AB | {A} e {B} fanno squadra per prendere la Base militare.

@@ -7,6 +7,11 @@
   const esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   const THEMES = Object.fromEntries(D.themes.map((t) => [t.id, t]));
   const TRAITS = Object.fromEntries(D.traits.map((t) => [t.id, t]));
+  const own = (o, k) => typeof k === 'string' && Object.prototype.hasOwnProperty.call(o, k);
+  const record = (x) => x != null && typeof x === 'object' && !Array.isArray(x);
+  const validId = (id) => typeof id === 'string' && id.length > 0 && id.length <= 40 && !/[{}]/.test(id) && !own(Object.prototype, id) && id !== 'prototype';
+  let inputSerial = 0;
+  const inputId = (prefix) => prefix + Date.now().toString(36) + (++inputSerial).toString(36) + Math.random().toString(36).slice(2, 7);
   const KEY = 'last-one-standing:v1';
   const SPEED = { lenta: 7000, normale: 3800, veloce: 1700 };
   const G3 = (g, m, f, n) => (g === 'F' ? f : g === 'N' ? n : m);
@@ -210,52 +215,117 @@
     }, 250);
   }
   function load() {
+    load.warning = '';
     try {
       const raw = localStorage.getItem(KEY);
       if (!raw) return false;
       const d = JSON.parse(raw);
-      if (Array.isArray(d.cast)) S.cast = d.cast.map(sanitizeTribute).filter(Boolean);
-      if (d.settings && typeof d.settings === 'object') sanitizeSettings(d.settings);
-      if (Array.isArray(d.custom)) S.custom = d.custom.map(sanitizeCustom).filter(Boolean);
-      if (d.run && d.run.cfg && Array.isArray(d.run.cfg.cast) && THEMES[d.run.cfg.theme]) {
-        const imgs = Object.fromEntries((Array.isArray(d.cast) ? d.cast : []).map((t) => [t && t.id, t && t.img]));
-        d.run.cfg.cast.forEach((t) => { if (t && t.img === '@cast') t.img = imgs[t.id] || ''; });
-        d.run.cfg.cast = d.run.cfg.cast.map(sanitizeTribute).filter(Boolean); d.run.cfg.custom = (d.run.cfg.custom || []).map(sanitizeCustom).filter(Boolean); S.run = d.run; }
-      if (d.ui === 'light' || d.ui === 'dark') S.ui = d.ui;
+      if (!record(d)) return false;
+      const warnings = [];
+      const next = { cast: Array.isArray(d.cast) ? normalizeCast(d.cast) : S.cast,
+        settings: sanitizeSettings(d.settings), custom: S.custom,
+        run: null, ui: d.ui === 'light' || d.ui === 'dark' ? d.ui : S.ui };
+      if (own(d, 'custom')) {
+        // I vecchi salvataggi potevano contenere eventi accettati senza tutti i controlli.
+        // Si recuperano quelli validi; l'importazione di un nuovo file resta invece atomica.
+        next.custom = [];
+        const list = Array.isArray(d.custom) ? d.custom : [], used = new Set();
+        const reserved = new Set(list.filter((c) => record(c) && validId(c.id)).map((c) => c.id));
+        let discarded = Array.isArray(d.custom) ? 0 : 1;
+        list.forEach((c) => {
+          const out = sanitizeCustom(c);
+          if (!out || used.has(out.id)) { discarded++; return; }
+          if (c.id == null || c.id === '') while (used.has(out.id) || reserved.has(out.id)) out.id = inputId('e');
+          used.add(out.id); next.custom.push(out);
+        });
+        if (discarded) warnings.push('Cast e regole recuperati; ' + discarded + (discarded === 1 ? ' evento personalizzato non valido escluso.' : ' eventi personalizzati non validi esclusi.'));
+      }
+      if (record(d.run) && record(d.run.cfg) && Array.isArray(d.run.cfg.cast) && own(THEMES, d.run.cfg.theme)) {
+        // Una partita danneggiata non deve impedire di recuperare cast e impostazioni.
+        try {
+          const imgs = Object.fromEntries(next.cast.map((t) => [t.id, t.img]));
+          const cast = normalizeCast(d.run.cfg.cast.map((t) => record(t) && t.img === '@cast' ? Object.assign({}, t, { img: imgs[t.id] || '' }) : t));
+          const custom = d.run.cfg.custom == null ? [] : normalizeCustoms(d.run.cfg.custom);
+          if (cast.length >= 2) next.run = Object.assign({}, d.run, { cfg: Object.assign({}, d.run.cfg, { cast, custom }) });
+        } catch (e) { warnings.push('La partita salvata contiene dati non validi e non è stata ripresa.'); }
+      }
+      Object.assign(S, next);
+      load.warning = warnings.join(' ');
       return true;
-    } catch (e) { return false; }
+    } catch (e) {
+      load.warning = 'Salvataggio non caricato: ' + e.message + ' I dati conservati nel browser non sono stati modificati.';
+      return false;
+    }
   }
 
-  function sanitizeSettings(x) {
-    const st = S.settings;
-    if (THEMES[x.theme]) st.theme = x.theme;
-    if (L.DIFF[x.difficulty]) st.difficulty = x.difficulty;
+  function sanitizeSettings(x, base) {
+    const st = Object.assign({}, base || S.settings);
+    if (!record(x)) return st;
+    if (own(THEMES, x.theme)) st.theme = x.theme;
+    if (own(L.DIFF, x.difficulty)) st.difficulty = x.difficulty;
     if (typeof x.seed === 'string') st.seed = x.seed.slice(0, 60);
     if (+x.maxDays >= 5 && +x.maxDays <= 40) st.maxDays = Math.round(+x.maxDays);
-    if (SPEED[x.speed]) st.speed = x.speed;
+    if (own(SPEED, x.speed)) st.speed = x.speed;
     if ([1, 2, 3, 4].includes(+x.teamSize)) st.teamSize = +x.teamSize;
     if (x.view === 'grid' || x.view === 'team') st.view = x.view;
     ['teamsAllied', 'teamWin', 'adult'].forEach((k) => { if (typeof x[k] === 'boolean') st[k] = x[k]; });
+    return st;
   }
   function sanitizeTribute(t, i) {
-    if (!t || typeof t !== 'object') return null;
+    if (!record(t)) return null;
     const attr = {};
     D.attrs.forEach((a) => { const v = Math.round(+((t.attr || {})[a.id])); attr[a.id] = v >= 1 && v <= 10 ? v : 5; });
     const team = Math.max(1, Math.min(99, Math.round(+t.team) || (i || 0) + 1));
     return {
-      id: typeof t.id === 'string' && t.id ? t.id.slice(0, 40) : 'c' + Math.random().toString(36).slice(2, 10),
+      id: validId(t.id) ? t.id : inputId('c'),
       name: String(t.name || '').slice(0, 40), gender: ['M', 'F', 'N'].includes(t.gender) ? t.gender : 'M', team, color: teamColor(team),
       img: typeof t.img === 'string' && /^data:image\/(png|jpe?g|webp|gif);base64,[A-Za-z0-9+/=]+$/.test(t.img) && t.img.length < 400000 ? t.img : '',
-      traits: (Array.isArray(t.traits) ? t.traits : []).filter((x) => TRAITS[x]).slice(0, 3), attr,
+      traits: [...new Set((Array.isArray(t.traits) ? t.traits : []).filter((x) => own(TRAITS, x)))].slice(0, 3), attr,
     };
   }
+  function normalizeCast(cast) {
+    if (!Array.isArray(cast)) throw new Error('Il cast deve essere un elenco di concorrenti.');
+    const used = new Set();
+    cast.forEach((t, i) => {
+      if (!record(t)) throw new Error('Concorrente ' + (i + 1) + ': dati non validi.');
+      if (t.id == null || t.id === '') return;
+      if (!validId(t.id)) throw new Error('Concorrente ' + (i + 1) + ': identificativo non valido (massimo 40 caratteri, senza parentesi graffe o nomi riservati).');
+      if (used.has(t.id)) throw new Error('Identificativo duplicato nel cast: ' + t.id + '. Ogni concorrente deve averne uno diverso.');
+      used.add(t.id);
+    });
+    return cast.map((t, i) => {
+      const out = sanitizeTribute(t, i);
+      if (t.id == null || t.id === '') { while (used.has(out.id)) out.id = inputId('c'); used.add(out.id); }
+      return out;
+    });
+  }
   function sanitizeCustom(c) {
-    if (!c || typeof c.text !== 'string' || !c.text.trim()) return null;
-    const n = Math.max(1, Math.min(4, Math.round(+c.n) || 1));
-    const letters = 'ABCD'.slice(0, n).split('');
-    const out = { id: c.id || 'e' + Math.random().toString(36).slice(2, 9), phase: ['tutte', 'b', 'd', 'n', 'f'].includes(c.phase) ? c.phase : 'tutte', n, text: c.text.trim().slice(0, 240), dies: (Array.isArray(c.dies) ? c.dies : []).filter((x) => letters.includes(x)), killer: letters.includes(c.killer) ? c.killer : '' };
-    try { L.parseLine(L.customToLine(out), 'custom'); } catch (e) { return null; }
+    if (!record(c)) return null;
+    const out = { id: c.id == null || c.id === '' ? inputId('e') : c.id,
+      phase: c.phase == null ? 'tutte' : c.phase, n: c.n == null ? 1 : +c.n,
+      text: typeof c.text === 'string' ? c.text.trim() : c.text,
+      dies: c.dies == null ? [] : c.dies, killer: c.killer == null ? '' : c.killer };
+    if (!validId(out.id) || validateCustom(out)) return null;
+    out.dies = out.dies.slice();
     return out;
+  }
+  function normalizeCustoms(custom) {
+    if (!Array.isArray(custom)) throw new Error('Gli eventi personalizzati devono essere un elenco.');
+    const used = new Set();
+    // Si riservano prima gli ID presenti, così quelli nuovi non possono sostituirli.
+    custom.forEach((c, i) => {
+      if (!record(c)) throw new Error('Evento ' + (i + 1) + ': dati non validi.');
+      if (c.id == null || c.id === '') return;
+      if (!validId(c.id)) throw new Error('Evento ' + (i + 1) + ': identificativo non valido.');
+      if (used.has(c.id)) throw new Error('Identificativo duplicato negli eventi: ' + c.id + '.');
+      used.add(c.id);
+    });
+    return custom.map((c, i) => {
+      const out = sanitizeCustom(c);
+      if (!out) throw new Error('Evento ' + (i + 1) + ': ' + (validateCustom(c) || 'dati non validi.'));
+      if (c.id == null || c.id === '') { while (used.has(out.id)) out.id = inputId('e'); used.add(out.id); }
+      return out;
+    });
   }
 
   /* ---------------- utilità ---------------- */
@@ -638,20 +708,28 @@
   const exportJSON = () => JSON.stringify({ app: 'last-one-standing', versione: 2, cast: S.cast, regole: S.settings, eventi: S.custom }, null, 2);
   function importJSON(text) {
     let d; try { d = JSON.parse(text); } catch (e) { return 'Il testo non è un JSON valido.'; }
+    if (!record(d) && !Array.isArray(d)) return 'Il JSON deve contenere una configurazione o un elenco di concorrenti.';
     const cast = Array.isArray(d) ? d : d.cast;
     if (!Array.isArray(cast) || !cast.length) return 'Non trovo un elenco di concorrenti ("cast") nel testo.';
-    S.cast = cast.slice(0, 200).map(sanitizeTribute).filter(Boolean);
-    const r = d.regole || d.settings;
-    if (r && typeof r === 'object') {
-      sanitizeSettings(Object.assign({}, r, { adult: S.settings.adult }));
-      if (THEMES[r.theme]) S.settings.theme = r.theme;
-      if (L.DIFF[r.difficulty]) S.settings.difficulty = r.difficulty;
-      if (typeof r.seed === 'string') S.settings.seed = r.seed.slice(0, 60);
-      if (+r.maxDays >= 5 && +r.maxDays <= 40) S.settings.maxDays = +r.maxDays;
-      ['teamsAllied', 'teamWin'].forEach((k) => typeof r[k] === 'boolean' && (S.settings[k] = r[k]));
-    }
-    const ev = d.eventi || d.custom;
-    if (Array.isArray(ev)) S.custom = ev.slice(0, 200).map(sanitizeCustom).filter(Boolean);
+    if (cast.length > 200) return 'Puoi importare al massimo 200 concorrenti per volta: riduci il cast nel file.';
+    let next;
+    try {
+      next = { cast: normalizeCast(cast), settings: Object.assign({}, S.settings), custom: S.custom };
+      const r = own(d, 'regole') ? d.regole : own(d, 'settings') ? d.settings : undefined;
+      if (r !== undefined) {
+        if (!record(r)) return 'Le regole devono essere un oggetto JSON.';
+        // La conferma per adulti resta una scelta esplicita nell'interfaccia.
+        next.settings = sanitizeSettings({ ...r, adult: S.settings.adult });
+      }
+      const ev = own(d, 'eventi') ? d.eventi : own(d, 'custom') ? d.custom : undefined;
+      if (ev !== undefined) {
+        if (!Array.isArray(ev)) return 'Gli eventi personalizzati devono essere un elenco.';
+        if (ev.length > 200) return 'Puoi importare al massimo 200 eventi personalizzati per volta: riduci l’elenco nel file.';
+        next.custom = normalizeCustoms(ev);
+      }
+    } catch (e) { return e.message; }
+    // Nessuna parte della configurazione cambia finché tutti gli elementi sono validi.
+    Object.assign(S, next);
     renderCast(); save(); return null;
   }
   $('#btnIO').addEventListener('click', () => { $('#ioText').value = exportJSON(); $('#ioMsg').textContent = ''; $('#ioDlg').showModal(); });
@@ -765,11 +843,19 @@
   }
   const readCustom = () => ({ phase: $('#cPhase').value, n: +$('#cN').value, text: $('#cText').value.trim(), dies: $$('#cDies input:checked').map((x) => x.value), killer: $('#cKiller').value });
   function validateCustom(c) {
-    if (!c.text) return 'Scrivi il testo dell\'evento.';
-    for (const l of 'ABCD'.slice(0, c.n)) if (!c.text.includes('{' + l + '}')) return 'Con ' + c.n + ' concorrenti il testo deve nominare anche {' + l + '}.';
-    if (c.killer && !c.dies.filter((x) => x !== c.killer).length) return 'Hai scelto chi uccide: indica anche chi muore.';
-    if (c.killer && c.dies.includes(c.killer)) return 'Chi uccide non può morire nello stesso evento.';
-    try { L.parseLine(L.customToLine(c), 'custom'); } catch (e) { return e.message; }
+    if (!record(c) || typeof c.text !== 'string' || !c.text.trim()) return 'Scrivi il testo dell\'evento.';
+    if (c.text.trim().length > 240) return 'Il testo dell\'evento può contenere al massimo 240 caratteri.';
+    const n = c.n == null ? 1 : +c.n;
+    if (!Number.isInteger(n) || n < 1 || n > 4) return 'Scegli da 1 a 4 concorrenti per l\'evento.';
+    const phase = c.phase == null ? 'tutte' : c.phase;
+    if (!['tutte', 'b', 'd', 'n', 'f'].includes(phase)) return 'La fase dell\'evento non è valida.';
+    const letters = 'ABCD'.slice(0, n).split(''), dies = c.dies == null ? [] : c.dies, killer = c.killer == null ? '' : c.killer;
+    if (!Array.isArray(dies) || dies.some((x) => !letters.includes(x)) || new Set(dies).size !== dies.length) return 'Indica solo concorrenti presenti nell\'evento, una volta ciascuno, tra chi muore.';
+    if (killer !== '' && !letters.includes(killer)) return 'Chi uccide deve essere uno dei concorrenti dell\'evento.';
+    for (const l of letters) if (!c.text.includes('{' + l + '}')) return 'Con ' + n + ' concorrenti il testo deve nominare anche {' + l + '}.';
+    if (killer && !dies.filter((x) => x !== killer).length) return 'Hai scelto chi uccide: indica anche chi muore.';
+    if (killer && dies.includes(killer)) return 'Chi uccide non può morire nello stesso evento.';
+    try { L.parseLine(L.customToLine(Object.assign({}, c, { n, dies, killer })), 'custom'); } catch (e) { return e.message; }
     return null;
   }
   function updatePreview() {
@@ -1301,6 +1387,7 @@
     if (hot && typeof hot.phase === 'number' && S.run) S.run.phase = hot.phase;
     updateCounts();
     route();
+    if (load.warning) toast(load.warning);
   }
   const H = window.claude && window.claude.hot;
   if (H && typeof H.snapshot === 'function') { try { H.snapshot(() => ({ phase: S.run ? S.run.phase : 0 })); } catch (e) { /* niente */ } }
