@@ -60,70 +60,98 @@
   const POSS_RE = /\{(arma|amuleto|veleno|mappa|esplosivo|cibo|med|trap):([A-F])\}/g;
   const ID = (m) => [L(m)];
 
+  function catOf(ev) {
+    const has = (t) => ev.fx.some((f) => f.t === t);
+    return ev.kills.some((k) => k.betray) ? 'betray' : ev.kills.length ? 'kill' : ev.dies.length ? 'death' :
+      has('br') ? 'betray' : has('love') ? 'love' : has('al') ? 'ally' : has('cure') || has('save') ? 'heal' :
+      has('status') || has('hit') ? 'hurt' : has('gain') || has('steal') || has('give') ? 'item' : 'none';
+  }
   function parseLine(line, origin) {
     const bar = line.indexOf('|');
     if (bar < 0) throw new Error('Manca "|" in: ' + line);
     const head = line.slice(0, bar).trim().split(/\s+/);
     const text = line.slice(bar + 1).trim();
-    const ev = { n: +head[0], text, kills: [], dies: [], req: [], fx: [], tags: [], w: 1, origin: origin || 'base' };
+    const ev = { n: +head[0], text, kills: [], dies: [], req: [], fx: [], tags: [], w: 1, origin: origin || 'base', ok: { kills: [], dies: [], fx: [] }, ko: { kills: [], dies: [], fx: [] } };
     if (!(ev.n >= 1 && ev.n <= 6)) throw new Error('Numero di concorrenti non valido in: ' + line);
     let m;
-    for (const tok of head.slice(1)) {
+    for (let tok of head.slice(1)) {
+      let tgt = ev;
+      if (/^(ok|ko):/.test(tok)) { tgt = tok[1] === 'k' ? ev.ok : ev.ko; tok = tok.slice(3); }
+      if ((m = tok.match(/^test:([A-F])=(\w+?)(\d+)?$/))) { ev.test = { r: L(m[1]), attr: m[2], dc: m[3] ? +m[3] : 11 }; continue; }
+      if ((m = tok.match(/^att:([A-F])([<>])(\w+?)(\d+)$/))) { ev.req.push({ t: 'att', r: ID(m[1]), op: m[2], attr: m[3], v: +m[4] }); continue; }
+      if ((m = tok.match(/^(no)?trait:([A-F])=(\w+)$/))) { ev.req.push({ t: m[1] ? 'notrait' : 'trait', r: ID(m[2]), trait: m[3] }); continue; }
       if (tok[0] === '@') { ev.tags.push(tok.slice(1)); continue; }
       if (tok[0] === '*') { ev.w = parseFloat(tok.slice(1)); continue; }
       if ((m = tok.match(/^(k|tr):([A-F]+)>([A-F]+)$/))) {
         const k = { by: letters(m[2]), v: letters(m[3]), betray: m[1] === 'tr' };
-        ev.kills.push(k);
+        tgt.kills.push(k);
         if (k.betray) { ev.req.push({ t: 'ally', r: [k.by[0], k.v[0]] }); ev.tags.push('betray'); }
         else ev.req.push({ t: 'foe', a: k.by, b: k.v });
         continue;
       }
-      if ((m = tok.match(/^d:([A-F]+)$/))) { ev.dies.push(...letters(m[1])); continue; }
-      if ((m = tok.match(/^al:([A-F]+)$/))) { const r = letters(m[1]); ev.fx.push({ t: 'al', r }); ev.req.push({ t: 'canAlly', r }); continue; }
+      if ((m = tok.match(/^d:([A-F]+)$/))) { tgt.dies.push(...letters(m[1])); continue; }
+      if ((m = tok.match(/^al:([A-F]+)$/))) { const r = letters(m[1]); tgt.fx.push({ t: 'al', r }); ev.req.push({ t: 'canAlly', r }); continue; }
       if ((m = tok.match(/^ally:([A-F]+)$/))) { ev.req.push({ t: 'ally', r: letters(m[1]) }); continue; }
-      if ((m = tok.match(/^br:([A-F])$/))) { const r = ID(m[1]); ev.fx.push({ t: 'br', r }); ev.req.push({ t: 'hasAlly', r }); ev.tags.push('betray'); continue; }
+      if ((m = tok.match(/^br:([A-F])$/))) { const r = ID(m[1]); tgt.fx.push({ t: 'br', r }); ev.req.push({ t: 'hasAlly', r }); ev.tags.push('betray'); continue; }
       if ((m = tok.match(/^w:([A-F])$/))) { ev.req.push({ t: 'has', item: 'arma', r: ID(m[1]) }); continue; }
       if ((m = tok.match(/^con:([A-F])=(\w+)$/))) { ev.req.push({ t: 'has', item: m[2], r: ID(m[1]) }); continue; }
-      if ((m = tok.match(new RegExp('^\\+(' + ITEMS + '):([A-F])$')))) { ev.fx.push({ t: 'gain', item: m[1], r: ID(m[2]) }); continue; }
-      if ((m = tok.match(new RegExp('^-(' + ITEMS + '):([A-F])$')))) { ev.fx.push({ t: 'lose', item: m[1], r: ID(m[2]) }); ev.req.push({ t: 'has', item: m[1], r: ID(m[2]) }); continue; }
-      if ((m = tok.match(/^(cibo|med|trap|veleno|esplosivo):([A-F])$/))) { const r = ID(m[2]); ev.req.push({ t: 'has', item: m[1], r }); ev.fx.push({ t: 'lose', item: m[1], r }); continue; }
-      if ((m = tok.match(/^steal:([A-F])<([A-F])$/))) { ev.req.push({ t: 'has', item: 'arma', r: ID(m[2]) }); ev.fx.push({ t: 'steal', r: [L(m[1]), L(m[2])] }); continue; }
-      if ((m = tok.match(/^give:([A-F])>([A-F])=(\w+)$/))) { ev.fx.push({ t: 'give', r: [L(m[1]), L(m[2])], item: m[3] }); continue; }
-      if ((m = tok.match(/^s:([A-F])=(\w+)$/))) { ev.fx.push({ t: 'status', r: ID(m[1]), s: m[2] }); continue; }
+      if ((m = tok.match(new RegExp('^\\+(' + ITEMS + '):([A-F])$')))) { tgt.fx.push({ t: 'gain', item: m[1], r: ID(m[2]) }); continue; }
+      if ((m = tok.match(new RegExp('^-(' + ITEMS + '):([A-F])$')))) { tgt.fx.push({ t: 'lose', item: m[1], r: ID(m[2]) }); ev.req.push({ t: 'has', item: m[1], r: ID(m[2]) }); continue; }
+      if ((m = tok.match(/^(cibo|med|trap|veleno|esplosivo):([A-F])$/))) { const r = ID(m[2]); ev.req.push({ t: 'has', item: m[1], r }); tgt.fx.push({ t: 'lose', item: m[1], r }); continue; }
+      if ((m = tok.match(/^steal:([A-F])<([A-F])$/))) { ev.req.push({ t: 'has', item: 'arma', r: ID(m[2]) }); tgt.fx.push({ t: 'steal', r: [L(m[1]), L(m[2])] }); continue; }
+      if ((m = tok.match(/^give:([A-F])>([A-F])=(\w+)$/))) { tgt.fx.push({ t: 'give', r: [L(m[1]), L(m[2])], item: m[3] }); continue; }
+      if ((m = tok.match(/^s:([A-F])=(\w+)$/))) { tgt.fx.push({ t: 'status', r: ID(m[1]), s: m[2] }); continue; }
       if ((m = tok.match(/^need:([A-F])=(\w+|\*)$/))) { ev.req.push({ t: 'need', r: ID(m[1]), s: m[2] }); continue; }
-      if ((m = tok.match(/^cure:([A-F])$/))) { ev.fx.push({ t: 'cure', r: ID(m[1]) }); continue; }
+      if ((m = tok.match(/^cure:([A-F])$/))) { tgt.fx.push({ t: 'cure', r: ID(m[1]) }); continue; }
       // legami e conseguenze
-      if ((m = tok.match(/^hit:([A-F])>([A-F])$/))) { ev.fx.push({ t: 'hit', r: [L(m[1]), L(m[2])] }); ev.req.push({ t: 'foe', a: ID(m[1]), b: ID(m[2]) }); continue; }
-      if ((m = tok.match(/^save:([A-F])>([A-F])$/))) { ev.fx.push({ t: 'save', r: [L(m[1]), L(m[2])] }); continue; }
-      if ((m = tok.match(/^love:([A-F])([A-F])$/))) { ev.fx.push({ t: 'love', r: [L(m[1]), L(m[2])] }); ev.req.push({ t: 'canLove', r: [L(m[1]), L(m[2])] }); continue; }
+      if ((m = tok.match(/^hit:([A-F])>([A-F])$/))) { tgt.fx.push({ t: 'hit', r: [L(m[1]), L(m[2])] }); ev.req.push({ t: 'foe', a: ID(m[1]), b: ID(m[2]) }); continue; }
+      if ((m = tok.match(/^save:([A-F])>([A-F])$/))) { tgt.fx.push({ t: 'save', r: [L(m[1]), L(m[2])] }); continue; }
+      if ((m = tok.match(/^love:([A-F])([A-F])$/))) { tgt.fx.push({ t: 'love', r: [L(m[1]), L(m[2])] }); ev.req.push({ t: 'canLove', r: [L(m[1]), L(m[2])] }); continue; }
       if ((m = tok.match(/^couple:([A-F])([A-F])$/))) { ev.req.push({ t: 'couple', r: [L(m[1]), L(m[2])] }); continue; }
       if ((m = tok.match(/^single:([A-F])$/))) { ev.req.push({ t: 'single', r: ID(m[1]) }); continue; }
       if ((m = tok.match(/^grudge:([A-F])>([A-F])$/))) { ev.req.push({ t: 'grudge', r: [L(m[1]), L(m[2])] }); continue; }
       if ((m = tok.match(/^owe:([A-F])>([A-F])$/))) { ev.req.push({ t: 'owe', r: [L(m[1]), L(m[2])] }); continue; }
-      if ((m = tok.match(/^forgive:([A-F])>([A-F])$/))) { ev.fx.push({ t: 'forgive', r: [L(m[1]), L(m[2])] }); ev.req.push({ t: 'grudge', r: [L(m[1]), L(m[2])] }); continue; }
-      if ((m = tok.match(/^repay:([A-F])>([A-F])$/))) { ev.fx.push({ t: 'repay', r: [L(m[1]), L(m[2])] }); ev.req.push({ t: 'owe', r: [L(m[1]), L(m[2])] }); continue; }
-      if ((m = tok.match(/^debt:([A-F])>([A-F])$/))) { ev.fx.push({ t: 'debt', r: [L(m[1]), L(m[2])] }); continue; }
+      if ((m = tok.match(/^forgive:([A-F])>([A-F])$/))) { tgt.fx.push({ t: 'forgive', r: [L(m[1]), L(m[2])] }); ev.req.push({ t: 'grudge', r: [L(m[1]), L(m[2])] }); continue; }
+      if ((m = tok.match(/^repay:([A-F])>([A-F])$/))) { tgt.fx.push({ t: 'repay', r: [L(m[1]), L(m[2])] }); ev.req.push({ t: 'owe', r: [L(m[1]), L(m[2])] }); continue; }
+      if ((m = tok.match(/^debt:([A-F])>([A-F])$/))) { tgt.fx.push({ t: 'debt', r: [L(m[1]), L(m[2])] }); continue; }
       if ((m = tok.match(/^friend:([A-F])([A-F])$/))) { ev.req.push({ t: 'friend', r: [L(m[1]), L(m[2])] }); continue; }
       if ((m = tok.match(/^enemy:([A-F])([A-F])$/))) { ev.req.push({ t: 'enemy', r: [L(m[1]), L(m[2])] }); continue; }
-      if ((m = tok.match(/^rel:([A-F])([A-F])([+-]\d+)$/))) { ev.fx.push({ t: 'rel', r: [L(m[1]), L(m[2])], v: +m[3] }); continue; }
+      if ((m = tok.match(/^rel:([A-F])([A-F])([+-]\d+)$/))) { tgt.fx.push({ t: 'rel', r: [L(m[1]), L(m[2])], v: +m[3] }); continue; }
       if ((m = tok.match(/^fame:([A-F])$/))) { ev.req.push({ t: 'fame', r: ID(m[1]) }); continue; }
       if ((m = tok.match(/^feared:([A-F])$/))) { ev.req.push({ t: 'feared', r: ID(m[1]) }); continue; }
       if ((m = tok.match(/^lost:([A-F])$/))) { ev.req.push({ t: 'lost', r: ID(m[1]) }); continue; }
-      if ((m = tok.match(/^star:([A-F])$/))) { ev.fx.push({ t: 'star', r: ID(m[1]) }); continue; }
+      if ((m = tok.match(/^star:([A-F])$/))) { tgt.fx.push({ t: 'star', r: ID(m[1]) }); continue; }
       if ((m = tok.match(/^traitor:([A-F])$/))) { ev.req.push({ t: 'traitor', r: ID(m[1]) }); continue; }
       throw new Error('Etichetta sconosciuta "' + tok + '" in: ' + line);
+    }
+    if (ev.test) {
+      const parts = text.split(' || ');
+      if (parts.length !== 2) throw new Error('Una prova richiede due testi separati da " || ": ' + line);
+      ev.okText = parts[0]; ev.koText = parts[1];
+      if (ev.test.r >= ev.n) throw new Error('Prova su un concorrente inesistente: ' + line);
+      [ev.ok, ev.ko].forEach((b) => { const v = new Set(b.dies); b.kills.forEach((k) => k.v.forEach((x) => v.add(x))); b.victims = [...v]; });
+      ev.risky = ev.ok.victims.length > 0 || ev.ko.victims.length > 0;
+    } else if (ev.ok.fx.length || ev.ko.fx.length || ev.ok.kills.length || ev.ko.kills.length || ev.ok.dies.length || ev.ko.dies.length) {
+      throw new Error('Etichette ok:/ko: senza prova (test:) in: ' + line);
     }
     const vic = new Set(ev.dies);
     ev.kills.forEach((k) => k.v.forEach((v) => vic.add(v)));
     ev.victims = [...vic];
     ev.lethal = ev.victims.length > 0;
-    const has = (t) => ev.fx.some((f) => f.t === t);
+    ev.cat = catOf(ev);
+    const has = (t) => ev.fx.concat(ev.ok.fx, ev.ko.fx).some((f) => f.t === t);
     const rq = (t) => ev.req.some((r) => r.t === t);
-    ev.cat = ev.kills.some((k) => k.betray) ? 'betray' : ev.kills.length ? 'kill' : ev.dies.length ? 'death' :
-      has('br') ? 'betray' : has('love') ? 'love' : has('al') ? 'ally' : has('cure') || has('save') ? 'heal' :
-      has('status') || has('hit') ? 'hurt' : has('gain') || has('steal') || has('give') ? 'item' : 'none';
+    // indole implicita, letta dai tratti
+    if (has('love') || rq('couple')) ev.tags.push('love');
+    if (rq('grudge')) ev.tags.push('revenge');
+    if (has('forgive')) ev.tags.push('forgive');
+    if (has('give') || has('save')) ev.tags.push('give');
+    if (has('steal')) ev.tags.push('steal');
+    if (has('al')) ev.tags.push('ally');
+    if (ev.fx.some((f) => f.item === 'cibo') || ev.req.some((r) => r.item === 'cibo')) ev.tags.push('food');
+    if (ev.test) ev.tags.push('test:' + ev.test.attr);
     // perché accade: la conseguenza che l'ha reso possibile
-    ev.why = rq('grudge') ? 'vendetta' : rq('owe') ? 'debito' : rq('couple') ? 'coppia' : rq('lost') ? 'lutto' :
+    ev.why = ev.test ? 'prova' : rq('att') || rq('trait') ? 'carattere' : rq('grudge') ? 'vendetta' : rq('owe') ? 'debito' : rq('couple') ? 'coppia' : rq('lost') ? 'lutto' :
       ev.req.some((r) => r.t === 'need' && r.s === 'lutto') ? 'lutto' : rq('traitor') ? 'reputazione' : rq('feared') ? 'reputazione' : rq('fame') ? 'fama' :
       ev.req.some((r) => r.t === 'has' && /veleno|mappa|amuleto|esplosivo|trap/.test(r.item)) ? 'oggetto' : ev.req.some((r) => r.t === 'need' && r.s !== '*') ? 'condizione' : '';
     const used = new Set();
@@ -290,12 +318,12 @@
       id: c.id || 't' + i, name: (c.name || 'Concorrente ' + (i + 1)).trim(), gender: c.gender || 'M',
       team: c.team || i + 1, color: c.color, img: c.img || '',
       traits: (c.traits || []).filter((x) => traitMap[x]),
-      attr: Object.assign({ for: 5, agi: 5, int: 5, car: 5, fort: 5, res: 5, furt: 5 }, c.attr || {}),
+      attr: Object.assign({ for: 5, agi: 5, int: 5, car: 5, fort: 5, res: 5, furt: 5, cor: 5, emp: 5, sop: 5 }, c.attr || {}),
       alive: true, zone: 0, inv: [], st: {}, kills: 0, killIds: [], allyId: null,
       deathPhase: -1, deathDay: 0, deathText: '', deathHtml: '', killerIds: [], order: 0,
       events: 0, alliancesFormed: 0, betrayals: 0, items: 0,
       partner: null, exPartner: null, lost: null, grudges: {}, owes: {}, fame: 0, traitor: false, fed: 0,
-      revenges: 0, saves: 0, repaid: 0, amulets: 0,
+      revenges: 0, saves: 0, repaid: 0, amulets: 0, tests: 0, testsPassed: 0,
     }));
     if (T.length < 2) throw new Error('Servono almeno 2 concorrenti.');
     T.forEach((t) => (t.zone = rng.int(zoneCount)));
@@ -336,7 +364,7 @@
     const alive = () => T.filter((t) => t.alive);
     const phases = [];
     let day = 0, deathCounter = 0, pendingFallen = [], noDeathStreak = 0;
-    const stats = { events: 0, alliances: 0, betrayals: 0, firstBlood: null, deathsByDay: [], envDeaths: 0, killDeaths: 0, items: 0, revenges: 0, couples: 0, debtsRepaid: 0, amulets: 0, sponsors: 0, echoes: 0 };
+    const stats = { events: 0, alliances: 0, betrayals: 0, firstBlood: null, deathsByDay: [], envDeaths: 0, killDeaths: 0, items: 0, revenges: 0, couples: 0, debtsRepaid: 0, amulets: 0, sponsors: 0, echoes: 0, tests: 0, testsPassed: 0 };
 
     const hasItem = (t, it) => t.inv.some((x) => x.type === it);
     const itemOf = (t, it) => t.inv.find((x) => x.type === it);
@@ -345,7 +373,21 @@
     const combat = (t) => t.attr.for + t.attr.agi + 0.5 * t.attr.int + 0.3 * t.attr.res + 0.2 * t.attr.fort +
       (hasItem(t, 'arma') ? 4 : 0) + (hasItem(t, 'esplosivo') ? 2 : 0) - (t.st.ferito != null ? 3 : 0) - (t.st.malato != null ? 2 : 0) -
       (t.st.ubriaco != null ? 2 : 0) - (t.st.affamato != null ? 1.5 : 0) - (t.st.sconvolto != null ? 1 : 0) + (t.st.lutto != null ? 1.5 : 0) + traitSum(t, 'c') + Math.min(3, t.kills * 0.5);
-    const survival = (t) => 0.4 * t.attr.res + 0.3 * t.attr.fort + 0.2 * t.attr.agi + traitSum(t, 's') - 1.5 * statusCount(t) + (hasItem(t, 'amuleto') ? 2 : 0);
+    const survival = (t) => 0.4 * t.attr.res + 0.3 * t.attr.fort + 0.2 * t.attr.agi + 0.3 * t.attr.sop + 0.1 * t.attr.cor + traitSum(t, 's') - 1.5 * statusCount(t) + (hasItem(t, 'amuleto') ? 2 : 0);
+    const hasTrait = (t, id) => t.traits.includes(id);
+    // prova di abilità: caratteristica + dado + fortuna + tratti − condizioni
+    function rollTest(t, attr, dc) {
+      const base = t.attr[attr] != null ? t.attr[attr] : 5;
+      let bonus = Math.round((t.attr.fort - 5) / 3) + traitSum(t, 'tb');
+      if (hasTrait(t, 'fortunato')) bonus += 1; if (hasTrait(t, 'sfortunato')) bonus -= 2;
+      if (t.st.ferito != null) bonus -= 2; if (t.st.ubriaco != null) bonus -= 2; if (t.st.affamato != null) bonus -= 1;
+      if (t.st.sconvolto != null) bonus -= 1; if (t.st.malato != null || t.st.avvelenato != null) bonus -= 1; if (t.st.lutto != null && attr === 'for') bonus += 1;
+      if ((attr === 'int' || attr === 'sop') && hasItem(t, 'mappa')) bonus += 2;
+      if (attr === 'for' && hasItem(t, 'arma')) bonus += 1;
+      const die = 1 + rng.int(6) + rng.int(6);
+      const roll = base + die + bonus;
+      return { roll, dc, pass: roll >= dc, bonus };
+    }
 
     function isEnded() {
       const a = alive();
@@ -369,7 +411,7 @@
             if (gids.size > 1) return false;
             if (gids.size === 1 && ts.every((t) => t.allyId != null)) return false;
             const size = gids.size ? alliances.get([...gids][0]).size + ts.filter((t) => t.allyId == null).length : ts.length;
-            if (size > 5) return false;
+            if (size > (ts.some((t) => hasTrait(t, 'leader')) ? 6 : 5)) return false;
             if (cfg.teamWin && new Set(ts.map((t) => t.team)).size > 1 && cfg.teamsAllied) return false;
             for (const a of ts) for (const b of ts) if (a !== b && (a.grudges[b.id] || aff(a, b) <= -40)) return false;
             break;
@@ -396,6 +438,9 @@
           case 'feared': if (A.kills < 3) return false; break;
           case 'lost': if (!A.lost) return false; break;
           case 'traitor': if (!A.traitor) return false; break;
+          case 'att': { const v = A.attr[r.attr] != null ? A.attr[r.attr] : 5; if (r.op === '>' ? v < r.v : v > r.v) return false; break; }
+          case 'trait': if (!hasTrait(A, r.trait)) return false; break;
+          case 'notrait': if (hasTrait(A, r.trait)) return false; break;
         }
       }
       return true;
@@ -414,9 +459,19 @@
         else if (tag === 'gift') w *= 1 + P.fame * 0.4;
         else if (tag === 'betray') w *= (Object.keys(P.owes).length ? 0.3 : 1) * (P.partner ? 0.5 : 1);
         else if (tag === 'drunk') w *= P.st.ubriaco != null ? 3 : 1;
+        else if (tag === 'cow') w *= Math.max(0.2, 1.6 - P.attr.cor / 10);
+        else if (tag === 'give') w *= 0.5 + P.attr.emp / 10;
+        else if (tag === 'love') w *= 0.6 + P.attr.car / 15 + P.attr.emp / 20;
+        else if (tag === 'food') w *= 0.6 + P.attr.sop / 10;
+        else if (tag === 'show') w *= 0.6 + P.attr.car / 10;
+        else if (tag === 'steal') w *= 0.6 + P.attr.furt / 10;
+        else if (tag === 'ally') w *= 0.7 + P.attr.car / 15;
+        else if (tag.startsWith('test:')) { const a = tag.slice(5); const v = P.attr[a] != null ? P.attr[a] : 5; w *= 0.7 + Math.abs(v - 5) / 6; }
+        if (tag === 'agg') w *= 0.7 + P.attr.cor / 20;
       }
       for (const r of ev.req) {
-        if (r.t === 'need' && (r.s === '*' ? statusCount(P) > 0 : P.st[r.s] != null)) w *= 3;
+        if (r.t === 'need' && (r.s === '*' ? statusCount(P) > 0 : P.st[r.s] != null)) w *= 3 * (ev.lethal ? Math.max(0.35, 1.5 - P.attr.res / 10) : 1);
+        else if ((r.t === 'att' || r.t === 'trait' || r.t === 'notrait') && r.r[0] != null) { const fake = [P]; w *= checkReq({ req: [Object.assign({}, r, { r: [0] })] }, fake) ? 2.5 : 1; }
         else if (r.t === 'has' && hasItem(P, r.item)) w *= r.item === 'arma' || r.item === 'cibo' ? 1.6 : 3;
         else if (r.t === 'ally' && P.allyId != null) w *= 1.4;
         else if (r.t === 'grudge' && Object.keys(P.grudges).some((id) => byId[id].alive)) w *= 7;
@@ -538,10 +593,11 @@
       T.forEach((X) => {
         if (!X.alive || killers.includes(X) || X === v) return;
         const lover = X.partner === v.id;
-        const close = lover || aff(X, v) >= 45 || (oldAlly != null && X.allyId === oldAlly);
+        const thr = 45 - (X.attr.emp - 5) * 3 - (hasTrait(X, 'vendicativo') ? 15 : 0) + (hasTrait(X, 'clemente') ? 20 : 0);
+        const close = lover || aff(X, v) >= thr || (oldAlly != null && X.allyId === oldAlly && !hasTrait(X, 'clemente'));
         if (!close) return;
         if (lover) { X.partner = null; X.exPartner = v.id; X.st.lutto = phases.length; }
-        else if (aff(X, v) >= 60) X.st.lutto = phases.length;
+        else if (aff(X, v) >= 60 - (X.attr.emp - 5) * 4) X.st.lutto = phases.length;
         X.lost = v.id;
         killers.forEach((K) => {
           if (addGrudge(X, K, 'kill', v) && echoed < 2) { const e = echo(lover ? E.grudgeLover : E.grudgeKill, [X, K, v], 'warn'); if (e) { out.push(e); echoed++; } }
@@ -558,7 +614,21 @@
       while (t.inv.length > 7) t.inv.shift();
     }
 
+    function resolveTest(ev, roles) {
+      const who = roles[ev.test.r];
+      let res = rollTest(who, ev.test.attr, ev.test.dc);
+      const br = res.pass ? ev.ok : ev.ko;
+      if (br.victims.some((i) => roles[i].alive) && alive().length - br.victims.length < 1) res = Object.assign({}, res, { pass: true, forced: true });
+      const b = res.pass ? ev.ok : ev.ko;
+      const out = Object.assign({}, ev, { text: res.pass ? ev.okText : ev.koText, kills: ev.kills.concat(b.kills), dies: ev.dies.concat(b.dies), fx: ev.fx.concat(b.fx) });
+      const v = new Set(out.dies); out.kills.forEach((k) => k.v.forEach((x) => v.add(x)));
+      out.victims = [...v]; out.lethal = out.victims.length > 0; out.cat = catOf(out);
+      who.tests++; if (res.pass) who.testsPassed++; stats.tests++; if (res.pass) stats.testsPassed++;
+      out.testRes = { who: who.id, attr: ev.test.attr, roll: res.roll, dc: res.dc, pass: res.pass };
+      return out;
+    }
     function apply(ev, roles) {
+      if (ev.test) ev = resolveTest(ev, roles);
       const ctx = {};
       const lexPick = (k) => (ctx[k] != null ? ctx[k] : (ctx[k] = rng.pick(LEX[k] || ['qualcosa'])));
       const txt = render(ev.text, roles, lexPick, ev);
@@ -569,7 +639,7 @@
       const saved = new Set();
       ev.victims.forEach((i) => {
         const v = roles[i], am = itemOf(v, 'amuleto');
-        if (v.alive && am && rng.chance(0.85)) {
+        if (v.alive && am && (hasTrait(v, 'superstizioso') || rng.chance(0.85))) {
           saved.add(i); v.inv.splice(v.inv.indexOf(am), 1); v.amulets++; stats.amulets++;
           const e = echo(theme.soft ? E.amuletSoft : E.amulet, [v], 'twist');
           if (e) out.push({ plain: e.plain.replace('§', possessive(am)), html: e.html.replace('§', esc(possessive(am))), cls: 'twist' });
@@ -592,7 +662,7 @@
         switch (f.t) {
           case 'al': {
             const ts = f.r.map((i) => roles[i]).filter((x) => x.alive);
-            if (ts.length > 1) { joinAlliance(ts); stats.alliances++; ts.forEach((x) => { x.alliancesFormed++; ts.forEach((y) => x.id < y.id && addAff(x, y, 25)); }); }
+            if (ts.length > 1) { joinAlliance(ts); stats.alliances++; ts.forEach((x) => { x.alliancesFormed++; ts.forEach((y) => x.id < y.id && addAff(x, y, Math.round(25 * (0.7 + (x.attr.car + y.attr.car) / 30)))); }); }
             break;
           }
           case 'br': {
@@ -637,17 +707,17 @@
         }
       }
       // l'evento lascia il segno sui rapporti
-      if (ev.tags.includes('show')) roles.forEach((t) => { if (t.alive) { t.fame += 1; if (t.fame >= 5 && !t.starred) { t.starred = true; const e = echo(E.star, [t], 'good'); if (e) out.push(e); } } });
+      if (ev.tags.includes('show')) roles.forEach((t) => { if (t.alive) { t.fame += 1 + (hasTrait(t, 'esibizionista') ? 1 : 0) + (t.attr.car >= 8 ? 1 : 0); if (t.fame >= 5 && !t.starred) { t.starred = true; const e = echo(E.star, [t], 'good'); if (e) out.push(e); } } });
       if (!ev.lethal && ev.req.some((r) => r.t === 'ally')) for (const a of roles) for (const b of roles) if (a.id < b.id) addAff(a, b, 6);
       if (ev.lethal) {
         roles.forEach((x) => {
-          if (x.alive && !ev.kills.some((k) => k.by.some((i) => roles[i] === x)) && rng.chance(0.35) && x.st.sconvolto == null) {
+          if (x.alive && !ev.kills.some((k) => k.by.some((i) => roles[i] === x)) && rng.chance(Math.max(0.05, 0.35 * (1.5 - x.attr.cor / 10))) && x.st.sconvolto == null) {
             x.st.sconvolto = phases.length; if (out.length < 3 && rng.chance(0.5)) { const e = echo(E.shock, [x], ''); if (e) out.push(e); }
           }
         });
       }
       stats.events++;
-      return { html: txt.html, plain: txt.plain, ids: roles.map((t) => t.id), deaths: roles.filter((t, i) => ev.victims.includes(i) && !t.alive).map((t) => t.id), lethal: ev.lethal, origin: ev.origin, cat: ev.cat, why: ev.why, echo: out.slice(0, 3) };
+      return { html: txt.html, plain: txt.plain, ids: roles.map((t) => t.id), deaths: roles.filter((t, i) => ev.victims.includes(i) && !t.alive).map((t) => t.id), lethal: ev.lethal, origin: ev.origin, cat: ev.cat, why: ev.why, echo: out.slice(0, 3), test: ev.testRes || null };
     }
 
     function lethalProb(kind) {
@@ -706,12 +776,12 @@
         if (!un.has(P.id) || !P.alive) continue;
         let done = false;
         let pL = lethalProb(kind);
-        if (kind === 'dis' && hasItem(P, 'mappa')) pL *= 0.35;
+        if (kind === 'dis') pL *= (hasItem(P, 'mappa') ? 0.35 : 1) * Math.max(0.5, 1.25 - P.attr.sop / 20);
         for (let attempt = 0; attempt < 25 && !done; attempt++) {
           const nAlive = alive().length;
           const wantLethal = nAlive > 1 && rng.chance(pL);
           const n = [...un].filter((id) => byId[id].alive).length;
-          const cand = pool.filter((e) => e.lethal === wantLethal && e.n <= n && (!e.lethal || e.victims.length < nAlive));
+          const cand = pool.filter((e) => e.lethal === wantLethal && e.n <= n && (!e.lethal || e.victims.length < nAlive) && (!e.risky || (!wantLethal && nAlive > 2)));
           const ev = rng.wpick(cand, (e) => weightFor(e, P));
           if (!ev) continue;
           const roles = assign(ev, P, un);
@@ -774,7 +844,7 @@
       // la fame: chi non mangia da due giorni si indebolisce, chi ha cibo lo usa
       alive().forEach((t) => {
         if (day - t.fed >= 1 && hasItem(t, 'cibo')) { const i = t.inv.findIndex((x) => x.type === 'cibo'); t.inv.splice(i, 1); t.fed = day; delete t.st.affamato; }
-        else if (day - t.fed >= 2 && t.st.affamato == null) t.st.affamato = phases.length;
+        else if (day - t.fed >= (hasTrait(t, 'goloso') ? 1 : t.attr.sop >= 8 ? 3 : 2) && t.st.affamato == null) t.st.affamato = phases.length;
       });
       // i debiti troppo vecchi si trasformano in risentimento
       alive().forEach((t) => Object.keys(t.owes).forEach((id) => { if (!byId[id].alive) delete t.owes[id]; }));
@@ -825,7 +895,7 @@
       deathPhase: t.deathPhase, deathText: t.deathText, deathHtml: t.deathHtml, rank: t.rank, order: t.order,
       events: t.events, alliancesFormed: t.alliancesFormed, betrayals: t.betrayals, items: t.items,
       inv: t.inv.map((x) => x.name), st: Object.keys(t.st),
-      fame: t.fame, revenges: t.revenges, saves: t.saves, repaid: t.repaid, amulets: t.amulets, traitor: t.traitor,
+      fame: t.fame, revenges: t.revenges, saves: t.saves, repaid: t.repaid, amulets: t.amulets, traitor: t.traitor, attr: t.attr, tests: t.tests, testsPassed: t.testsPassed,
       partner: t.partner, exPartner: t.exPartner,
     }));
     return { version: 2, theme: theme.id, adult, seed, days: day, phases, tributes: stripped, winners: winners.map((t) => t.id), stats };

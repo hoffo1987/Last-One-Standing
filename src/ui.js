@@ -41,7 +41,8 @@
     kill: ['Uccisione', 'Eliminazione'], death: ['Morte', 'Fuori'], betray: ['Tradimento', 'Tradimento'], ally: ['Alleanza', 'Alleanza'],
     heal: ['Aiuto', 'Aiuto'], item: ['Bottino', 'Asso nella manica'], hurt: ['Guaio', 'Colpo basso'], love: ['Amore', 'Amore'], none: ['', ''],
   };
-  const WHY = { vendetta: 'Vendetta', debito: 'Debito', coppia: 'Coppia', lutto: 'Lutto', fama: 'Fama', reputazione: 'Reputazione', oggetto: 'Oggetto', condizione: 'Conseguenza' };
+  const ATTRN = Object.fromEntries(D.attrs.map((a) => [a.id, a.name]));
+  const WHY = { carattere: 'Carattere', vendetta: 'Vendetta', debito: 'Debito', coppia: 'Coppia', lutto: 'Lutto', fama: 'Fama', reputazione: 'Reputazione', oggetto: 'Oggetto', condizione: 'Conseguenza' };
   const KIND = { b: 'Apertura', d: 'Giorno', n: 'Notte', f: 'Evento speciale', dis: 'Disastro', fallen: 'Bilancio', finale: 'Finale' };
   const DIFFS = [
     ['bassa', 'Bassa', 'Partite lunghe, pochi morti', 1], ['normale', 'Normale', 'L\'equilibrio classico', 2],
@@ -184,7 +185,7 @@
   /* =============== HOME =============== */
   let homeTimer = null, demo = null, demoI = 0;
   function renderHome() {
-    $('#facts').innerHTML = [[COUNTS.events, 'modelli di evento, più ' + COUNTS.adultEvents + ' per adulti'], [COUNTS.disasters, 'disastri, più ' + COUNTS.adultDisasters + ' per adulti'], [D.themes.length, 'arene da esplorare'], ['∞', 'storie: vendette, debiti, amori e tradimenti si intrecciano']]
+    $('#facts').innerHTML = [[COUNTS.events, 'modelli di evento, più ' + COUNTS.adultEvents + ' per adulti'], [COUNTS.disasters, 'disastri, più ' + COUNTS.adultDisasters + ' per adulti'], [D.themes.length, 'arene da esplorare'], [D.traits.length + ' · ' + D.attrs.length, 'tratti e caratteristiche che cambiano la storia']]
       .map(([n, l]) => '<div class="fact"><b>' + n + '</b><span>' + l + '</span></div>').join('');
     $('#arenaStrip').innerHTML = D.themes.map((t) => posterHTML(t, false, 'a')).join('');
     const r = $('#resume');
@@ -404,7 +405,7 @@
           '<label class="field" for="e-team" style="width:110px"><span>Squadra</span><input type="number" id="e-team" min="1" max="99" value="' + t.team + '"></label>' +
         '</div>' +
         '<div class="field"><span>Tratti · ' + t.traits.length + ' di 3</span><div class="traitpick">' + D.traits.map((x) => '<button type="button" data-e="trait" data-v="' + x.id + '" aria-pressed="' + t.traits.includes(x.id) + '"' + (!t.traits.includes(x.id) && t.traits.length >= 3 ? ' disabled' : '') + ' title="' + esc(x.desc) + '">' + esc(x.name) + '</button>').join('') + '</div><p class="help traitdesc" id="traitDesc">' + (t.traits.length ? t.traits.map((x) => '<b>' + esc(TRAITS[x].name) + '</b>: ' + esc(TRAITS[x].desc)).join(' ') : 'Passa sopra un tratto per leggerne l\'effetto.') + '</p></div>' +
-        '<div class="field"><span>Caratteristiche · totale <b id="attrSum">' + sum + '</b></span><div class="attrgrid">' + D.attrs.map((a) => '<label for="ea-' + a.id + '">' + a.name + '</label><input type="range" min="1" max="10" id="ea-' + a.id + '" data-k="' + a.id + '" value="' + t.attr[a.id] + '"><output>' + t.attr[a.id] + '</output>').join('') + '</div>' +
+        '<div class="field"><span>Caratteristiche · totale <b id="attrSum">' + sum + '</b></span><div class="attrgrid">' + D.attrs.map((a) => '<label for="ea-' + a.id + '" title="' + esc((D.attrDesc || {})[a.id] || '') + '">' + a.name + '</label><input type="range" min="1" max="10" id="ea-' + a.id + '" data-k="' + a.id + '" value="' + t.attr[a.id] + '"><output>' + t.attr[a.id] + '</output>').join('') + '</div>' +
           '<div class="row" style="margin-top:6px"><button class="btn sm" type="button" data-e="rattr">Valori casuali</button><button class="btn sm" type="button" data-e="avg">Tutti a 5</button></div></div>' +
         '<div class="row" style="justify-content:space-between;border-top:1px solid var(--line);padding-top:14px"><button class="btn danger ghost" type="button" data-e="del">Elimina concorrente</button><button class="btn primary" type="button" data-close>Fatto</button></div>' +
         '<div class="confirm" id="delConfirm" hidden>Eliminare ' + esc(t.name || 'questo concorrente') + '? <button class="btn danger sm" type="button" data-e="delyes">Elimina</button></div>' +
@@ -621,9 +622,9 @@
     const avs = '<span class="avs">' + e.ids.slice(0, 4).map((id) => avHTML(by[id], { dead: e.deaths.includes(id), btn: !plain })).join('') + '</span>';
     const chip = lbl ? '<span class="cat">' + IC[cat] + (e.deaths.length > 1 && (cat === 'kill' || cat === 'death') ? e.deaths.length + ' ' + (theme.soft ? 'fuori' : 'morti') : lbl) + '</span>' : '<span></span>';
     const fix = (h) => (plain ? h.replace(/<b class="nm"[^>]*>/g, '<b>') : linkify(h));
-    const why = e.sponsor ? 'Sponsor' : WHY[e.why] || '';
+    const why = e.test ? '<span title="Tiro ' + e.test.roll + ' contro soglia ' + e.test.dc + '">Prova di ' + esc(ATTRN[e.test.attr] || e.test.attr) + ' · ' + (e.test.pass ? 'superata' : 'fallita') + ' ' + e.test.roll + '/' + e.test.dc + '</span>' : e.sponsor ? 'Sponsor' : WHY[e.why] || '';
     const echo = (e.echo || []).length ? '<ul class="echo">' + e.echo.map((x) => '<li class="' + (x.cls || '') + '">' + fix(x.html) + '</li>').join('') + '</ul>' : '';
-    return '<div class="ev' + (e.deaths.length ? ' lethal' : '') + (anim ? ' in' : '') + '" style="--cc:var(--c-' + cat + ')">' + avs + '<div class="evbody">' + (why ? '<span class="why">' + why + '</span>' : '') + '<p>' + fix(e.html) + '</p>' + echo + '</div>' + chip + '</div>';
+    return '<div class="ev' + (e.deaths.length ? ' lethal' : '') + (anim ? ' in' : '') + '" style="--cc:var(--c-' + cat + ')">' + avs + '<div class="evbody">' + (why ? '<span class="why' + (e.test ? (e.test.pass ? ' ok' : ' ko') : '') + '">' + why + '</span>' : '') + '<p>' + fix(e.html) + '</p>' + echo + '</div>' + chip + '</div>';
   }
   function renderLive(fromRoute) {
     $('#liveEmpty').hidden = !!SIM; $('#liveBody').hidden = !SIM;
@@ -767,12 +768,19 @@
           '<div style="flex:1;min-width:140px"><div class="sub" style="margin-bottom:6px">Zaino</div><div class="chips">' + (inv.length ? inv.map((x) => '<span class="chip dim">' + esc(x) + '</span>').join('') : '<span class="chip dim">Vuoto</span>') + '</div></div></div>' +
           '<div><div class="sub" style="margin-bottom:6px">Alleati</div><div class="row">' + (ally.length ? ally.map((x) => avHTML(BY[x], { btn: true })).join('') : '<span class="help">Nessuno, per ora.</span>') + '</div></div>' : '') +
         relHTML(id, snap, dead, atRes) +
+        attrHTML(t) +
         '<div><div class="sub" style="margin-bottom:8px">La sua storia' + (atRes ? '' : ' finora') + '</div><div class="ptl">' + (hist.length ? hist.map(({ e, p }) => '<div class="it" style="--cc:var(--c-' + (e.cat || 'none') + ')"><span>' + (p.kind === 'b' ? 'Inizio' : 'G' + p.day + ' ' + (p.kind === 'n' ? 'notte' : p.kind === 'd' ? 'giorno' : KIND[p.kind].toLowerCase())) + '</span><p>' + linkify(e.html) + '</p></div>').join('') : '<p class="help">Nessun evento ancora.</p>') + '</div></div>' +
       '</div>';
     if (!$('#profDlg').open) $('#profDlg').showModal();
     $('#profDlg').scrollTop = 0;
   }
 
+  function attrHTML(t) {
+    if (!t.attr) return '';
+    const tests = t.tests ? ' · prove superate ' + t.testsPassed + ' su ' + t.tests : '';
+    return '<div><div class="sub" style="margin-bottom:8px">Caratteristiche' + tests + '</div><div class="abars">' +
+      D.attrs.map((a) => { const v = t.attr[a.id] != null ? t.attr[a.id] : 5; return '<div class="abar" title="' + esc((D.attrDesc || {})[a.id] || '') + '"><span>' + a.name + '</span><i><b style="width:' + v * 10 + '%" class="' + (v >= 8 ? 'hi' : v <= 3 ? 'lo' : '') + '"></b></i><em>' + v + '</em></div>'; }).join('') + '</div></div>';
+  }
   function relHTML(id, snap, dead, atRes) {
     const r = (snap.rel || {})[id]; if (!r) return '';
     const alive = new Set(snap.alive), av = (x) => avHTML(BY[x], { btn: true });
@@ -789,7 +797,7 @@
       r.o.filter((x) => alive.has(x)).forEach((x) => rows.push('<div class="relrow"><span class="lbl">Deve un favore a</span>' + av(x) + '</div>'));
       const hunters = snap.alive.filter((x) => x !== id && snap.rel[x] && snap.rel[x].g.some(([y]) => y === id));
       if (hunters.length) rows.push('<div class="relrow"><span class="lbl">Ricercat' + G3(t.gender, 'o', 'a', 'ə') + ' da</span>' + hunters.map(av).join('') + '</div>');
-      if (r.fr.length) rows.push('<div class="relrow"><span class="lbl">Amici</span>' + r.fr.slice(0, 6).map(av).join('') + '</div>');
+      const fr = r.fr.filter((x) => x !== r.p); if (fr.length) rows.push('<div class="relrow"><span class="lbl">Amici</span>' + fr.slice(0, 6).map(av).join('') + '</div>');
       if (r.en.length) rows.push('<div class="relrow"><span class="lbl">Rivali</span>' + r.en.slice(0, 6).map(av).join('') + '</div>');
     }
     if (!badges.length && !rows.length) return '';
@@ -827,6 +835,7 @@
     const fam = maxBy((t) => t.fame); if (fam && fam.fame >= 3) awards.push(['Beniamino del pubblico', fam, fam.fame + ' punti di fama']);
     const sav = maxBy((t) => t.saves); if (sav && sav.saves) awards.push(['L\'angelo custode', sav, plural(sav.saves, 'vita salvata o curata', 'vite salvate o curate')]);
     const lucky = maxBy((t) => t.amulets); if (lucky && lucky.amulets) awards.push(['Miracolat' + G3(lucky.gender, 'o', 'a', 'ə'), lucky, 'salvat' + G3(lucky.gender, 'o', 'a', 'ə') + ' da un portafortuna']);
+    const ab = maxBy((t) => t.testsPassed * 10 - (t.tests - t.testsPassed)); if (ab && ab.testsPassed) awards.push(['Il più abile', ab, ab.testsPassed + ' prove superate su ' + ab.tests]);
     const busy = maxBy((t) => t.events); if (busy) awards.push(['Sempre in mezzo', busy, plural(busy.events, 'evento vissuto', 'eventi vissuti')]);
     const loot = maxBy((t) => t.items); if (loot && loot.items) awards.push(['Il collezionista', loot, plural(loot.items, 'oggetto trovato', 'oggetti trovati')]);
     const awardsH = '<div class="awards">' + awards.map(([a, t, d]) => '<button type="button" class="award card" data-prof="' + esc(t.id) + '">' + avHTML(t, { dead: !t.alive }) + '<span style="min-width:0"><span class="at">' + a + '</span><b>' + esc(t.name) + '</b><small>' + esc(d) + '</small></span></button>').join('') + '</div>';
@@ -875,7 +884,7 @@
         '<section class="block card"><h2>Momenti salienti</h2>' + hlH + '</section>' +
         '<section class="block card"><h2>Classifica completa</h2><div class="tablewrap"><table><thead><tr><th>Pos.</th><th>Concorrente</th><th>Sq.</th><th>' + (soft ? 'Elim.' : 'Ucc.') + '</th><th>Per mano di</th><th>Giorno</th><th>Come è andata</th></tr></thead><tbody>' + rows + '</tbody></table></div></section>' +
       '</div><div>' +
-        '<section class="block card"><h2>Superstiti nel tempo</h2>' + chart + '<p class="help" style="margin-top:8px">' + st.killDeaths + ' ' + (soft ? 'eliminati da un rivale' : 'morti per mano altrui') + ', ' + st.envDeaths + ' per colpa dell\'arena · ' + st.alliances + ' alleanze · ' + st.betrayals + ' tradimenti · ' + (st.revenges || 0) + ' vendette · ' + (st.couples || 0) + ' coppie · ' + (st.debtsRepaid || 0) + ' debiti saldati · ' + (st.amulets || 0) + ' salvataggi miracolosi · ' + (st.sponsors || 0) + ' doni degli sponsor · ' + st.events + ' eventi.</p></section>' +
+        '<section class="block card"><h2>Superstiti nel tempo</h2>' + chart + '<p class="help" style="margin-top:8px">' + st.killDeaths + ' ' + (soft ? 'eliminati da un rivale' : 'morti per mano altrui') + ', ' + st.envDeaths + ' per colpa dell\'arena · ' + st.alliances + ' alleanze · ' + st.betrayals + ' tradimenti · ' + (st.revenges || 0) + ' vendette · ' + (st.couples || 0) + ' coppie · ' + (st.debtsRepaid || 0) + ' debiti saldati · ' + (st.amulets || 0) + ' salvataggi miracolosi · ' + (st.sponsors || 0) + ' doni degli sponsor · ' + (st.testsPassed || 0) + ' prove superate su ' + (st.tests || 0) + ' · ' + st.events + ' eventi.</p></section>' +
         '<section class="block card"><h2>' + (soft ? 'Chi ha eliminato di più' : 'Chi ha ucciso di più') + '</h2><div class="bars">' + kbars + '</div></section>' +
         '<section class="block card posterbox"><h2>Locandina</h2><img id="posterImg" alt="Locandina della partita"><p class="help" style="margin-top:8px">Tieni premuto sull\'immagine, o clic destro, per salvarla.</p></section>' +
       '</div></div>';

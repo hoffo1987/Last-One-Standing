@@ -213,7 +213,17 @@
     { id: 'fort', name: 'Fortuna' },
     { id: 'res', name: 'Resistenza' },
     { id: 'furt', name: 'Furtività' },
+    { id: 'cor', name: 'Coraggio' },
+    { id: 'emp', name: 'Empatia' },
+    { id: 'sop', name: 'Sopravvivenza' },
   ];
+  D.attrDesc = {
+    for: 'Colpisce più forte e vince le prove di forza.', agi: 'Schiva, salta, scappa: conta in combattimento e nelle prove di agilità.',
+    int: 'Trappole, piani e prove di ingegno.', car: 'Stringe alleanze, conquista il pubblico e gli sponsor.',
+    fort: 'Aggiunge un bonus a ogni prova e protegge dagli incidenti.', res: 'Sopporta ferite, veleni e malattie.',
+    furt: 'Agguati, furti e fughe silenziose.', cor: 'Meno fughe e meno shock; più voglia di combattere.',
+    emp: 'Aiuta e cura gli altri, ma soffre di più per i lutti e giura vendetta più facilmente.', sop: 'Trova cibo, resiste alla fame e se la cava nei disastri.',
+  };
 
   // m: moltiplicatori per indole evento; c: bonus combattimento; s: bonus sopravvivenza
   D.traits = [
@@ -235,6 +245,18 @@
     { id: 'bruto', name: 'Bruto', desc: 'Forza bruta, poca strategia.', m: { agg: 1.6, int: 0.6 }, c: 3 },
     { id: 'ingegnoso', name: 'Ingegnoso', desc: 'Costruisce trappole e soluzioni.', m: { int: 2 }, c: 1 },
     { id: 'folle', name: 'Folle', desc: 'Imprevedibile, in ogni senso.', m: { mad: 3, agg: 1.3 } },
+    { id: 'romantico', name: 'Romantico', desc: 'Si innamora facilmente e vive per la propria coppia.', m: { love: 2.8, soc: 1.2 } },
+    { id: 'vendicativo', name: 'Vendicativo', desc: 'Non dimentica un torto: giura vendetta per poco e la insegue ovunque.', m: { revenge: 2.5, forgive: 0.2 } },
+    { id: 'clemente', name: 'Clemente', desc: 'Perdona facilmente e raramente cerca vendetta.', m: { forgive: 3.5, revenge: 0.4, agg: 0.7 } },
+    { id: 'generoso', name: 'Generoso', desc: 'Regala, salva e divide il cibo.', m: { give: 2.5, heal: 1.3 } },
+    { id: 'avido', name: 'Avido', desc: 'Ruba appena può e non regala niente.', m: { steal: 2.5, give: 0.3, betray: 1.4 } },
+    { id: 'esibizionista', name: 'Esibizionista', desc: 'Vive per le telecamere: fa spettacolo e guadagna fama in fretta.', m: { show: 2.6 } },
+    { id: 'ubriacone', name: 'Ubriacone', desc: 'Trova sempre una bottiglia, e la finisce.', m: { drunk: 3, mad: 1.3 }, c: -1 },
+    { id: 'superstizioso', name: 'Superstizioso', desc: 'Il suo portafortuna non l\'ha mai tradito: lo salva sempre.', m: { luck: 1.4 } },
+    { id: 'goloso', name: 'Goloso', desc: 'Pensa sempre al cibo e patisce la fame prima degli altri.', m: { food: 2.5 } },
+    { id: 'sonnambulo', name: 'Sonnambulo', desc: 'Di notte vaga, e combina guai.', m: { mad: 1.6 } },
+    { id: 'leader', name: 'Leader', desc: 'Raduna gli altri: alleanze più grandi e più frequenti.', m: { ally: 2, soc: 1.5 } },
+    { id: 'solitario', name: 'Solitario', desc: 'Sta meglio da solo: poche alleanze, molta furtività.', m: { ally: 0.3, soc: 0.5, stl: 1.5 }, s: 1 },
   ];
 
   D.names = {
