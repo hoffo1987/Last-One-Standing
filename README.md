@@ -141,6 +141,8 @@ node tools/build.js             # crea il file unico in dist/last-one-standing.h
 node tools/lint-content.js      # controlla tutte le righe di evento e disastro (sintassi, partecipanti, segnaposto, grammatica di base)
 node tools/test-consequences.js # regressioni su consumi, trasferimenti, salvataggi e formato degli eventi
 node tools/test-import.js       # importazione atomica, ID, eventi personalizzati e compatibilità dei salvataggi
+node tools/test-state-history.js # responsabilità dei danni differiti, valori vitali e durata delle promesse
+node tools/test-timeline.js      # statistiche e promesse nella fase corretta della diretta
 node tools/test-engine.js 40    # 40 partite per arena, metà con i contenuti 18+, controlla regole e determinismo
 node tools/fuzz.js 1500         # partite con impostazioni casuali e casi limite (2-60 concorrenti, una sola squadra, valori estremi)
 ```
@@ -163,6 +165,13 @@ La legenda completa delle etichette è in cima a `src/data-core.js`.
 - `steal:A<B=cibo` e `steal:A<B=med` trasferiscono l'oggetto reale di B ad A, conservandone nome e caratteristiche e aggiornando la provenienza. `steal:A<B` continua a indicare il furto di un'arma. Il furto noto lascia ricordo e rancore; `@secret` permette di rappresentare un furto clandestino senza rendere immediatamente consapevole la vittima.
 - `give:A>B=cibo` trasferisce il cibo di A a B e registra il dono. Un oggetto assente o non ricevibile non viene creato né sottratto. Si può consumare un oggetto appena ricevuto nella stessa riga: `steal:A<B=cibo cibo:A`.
 - `save:A>B` registra un salvataggio, con gratitudine, memoria e contatore; `@heal` da solo indica l'indole dell'evento e non sostituisce l'effetto. `hit:A>B` usa il sistema di danno già presente, attribuisce l'aggressione e lascia un ricordo.
+- `veleno:A poison:A>B` consuma il veleno di A e avvelena B attribuendo ad A il danno differito. L'attribuzione non rivela automaticamente il responsabile alla vittima. `s:B=avvelenato` rimane un avvelenamento senza responsabile (per esempio da cibo contaminato).
+
+### Danni differiti e diretta
+
+Il veleno mantiene il responsabile durante i danni periodici. Se la causa attiva di una morte è una ferita, un veleno o una trappola attribuiti a qualcuno, il credito può arrivare anche dopo la morte del responsabile: il suo contatore viene aggiornato, senza nuove azioni, consumo d'armi o raccolta del bottino. In assenza di un responsabile vivo il bottino resta nella zona.
+
+Ogni istantanea normalizza i valori vitali nell'intervallo 0–100. Le promesse concluse hanno una fase di conclusione; nella diretta statistiche delle prove, promesse e contatori del memoriale mostrano soltanto le informazioni già maturate nella fase selezionata. I titoli delle fasi future nella timeline restano visibili come prima.
 
 ### Importazione e compatibilità
 

@@ -1,7 +1,7 @@
 /* Sistema delle conseguenze: frasi di eco, lessico degli oggetti speciali e
  * eventi di base che leggono e scrivono legami (vendette, debiti, coppie, fama,
  * fame, ubriachezza, oggetti). I pacchetti (D.packs) si sommano ai repertori.
- * Nuove etichette: hit:A>B save:A>B love:AB couple:AB single:A grudge:A>B forgive:A>B
+ * Nuove etichette: hit:A>B poison:A>B save:A>B love:AB couple:AB single:A grudge:A>B forgive:A>B
  * owe:A>B repay:A>B debt:A>B give:A>B=oggetto friend:AB enemy:AB rel:AB+20 fame:A
  * feared:A lost:A traitor:A star:A con:A=oggetto. Segnaposto: {caro:A} (per chi
  * A cerca vendetta), {perso:A}, {partner:A}, {amuleto} {alcol} {veleno} {mappa} {esplosivo}. */
@@ -213,7 +213,7 @@
 1 con:A=mappa @int | Grazie a {mappa:A}, {A} trova un riparo che nessun altro conosce.
 1 con:A=mappa +cibo:A | {A} segue {mappa:A} fino a un deposito di cibo nascosto.
 2 veleno:A k:A>B @stl | {A} versa {veleno:A} nella borraccia di {B}. Effetto garantito.
-2 veleno:A s:B=avvelenato @stl | {A} cosparge di {veleno:A} il cibo di {B}, che passa la notte a pentirsi di ogni boccone.
+2 veleno:A poison:A>B @stl | {A} cosparge di {veleno:A} il cibo di {B}, che passa la notte a pentirsi di ogni boccone.
 3 esplosivo:A k:A>BC *1.2 | {A} lancia {esplosivo:A} nel mezzo dell'accampamento di {B} e {C}. Boom.
 1 esplosivo:A d:A *0.5 | {A} inciampa mentre trasporta {esplosivo:A}. L'arena trema.
 2 esplosivo:A hit:A>B | {A} fa saltare {esplosivo:A} vicino a {B}, che si salva per miracolo ma sente fischiare le orecchie per ore.

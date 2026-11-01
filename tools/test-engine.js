@@ -26,6 +26,9 @@ for (const th of D.themes) {
     // nessun morto agisce dopo la morte
     const deadAt = {};
     r.phases.forEach((p, pi) => {
+      Object.values(p.snap.vit).forEach((v) => {
+        if (v.some((x, k) => !Number.isFinite(x) || (k === 4 && x === -1 ? false : x < 0 || x > 100))) err(`${th.id}#${i}: valori vitali fuori intervallo nella fase ${pi}`);
+      });
       p.events.forEach((e) => {
         e.ids.forEach((id) => { if (deadAt[id] != null) err(`${th.id}#${i}: ${id} agisce da morto nella fase ${pi}`); });
         if (/[{}\[\]§]/.test(e.plain)) err(`${th.id}#${i}: segnaposto non risolto: ${e.plain}`);
@@ -34,6 +37,9 @@ for (const th of D.themes) {
         e.deaths.forEach((id) => (deadAt[id] = pi));
       });
     });
+    r.tributes.forEach((t) => (t.promises || []).forEach((q) => {
+      if (q.done && (!Number.isInteger(q.end) || q.end < q.ph || q.end >= r.phases.length)) err(`${th.id}#${i}: promessa conclusa senza fase valida`);
+    }));
     const s = r.seed;
     const r2 = LOS.simulate({ cast, theme: th.id, seed: s, difficulty: diffs[i % 4], teamWin, teamsAllied, maxDays: 20, adult });
     if (JSON.stringify(r2) !== JSON.stringify(r)) err(`${th.id}#${i}: non deterministico (eventi, conseguenze, istantanee o risultato)`);

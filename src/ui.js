@@ -115,13 +115,21 @@
     if (!rows.length) return '';
     return '<div class="dims">' + rows.map(([k, v, signed]) => '<span class="dim d-' + k + (v < 0 ? ' neg' : '') + '" title="' + esc(DN[k] || k) + ' ' + v + '"><em>' + esc(DN[k] || k) + '</em><i>' + (signed ? '<b style="' + (v >= 0 ? 'left:50%;width:' + v / 2 + '%' : 'left:' + (50 + v / 2) + '%;width:' + -v / 2 + '%') + '"></b>' : '<b style="left:0;width:' + v + '%"></b>') + '</i></span>').join('') + '</div>';
   }
-  function promisesHTML(t, i) {
+  function promisesHTML(t, i, atRes) {
     const K = (BDS.promises || {}).kinds || {};
-    const st = (q) => (q.done && q.end != null && q.end <= i ? q.done : q.done === 'sciolta' && q.end == null ? 'sciolta' : 'in corso');
+    const deathAt = (x) => x && Number.isInteger(x.deathPhase) && x.deathPhase >= 0 ? x.deathPhase : Infinity;
+    const st = (q, from, to) => {
+      if (!q.done) return 'in corso';
+      if (atRes) return q.done;
+      // Nei vecchi risultati mancava la fase di scioglimento. La vendetta può
+      // continuare dopo la morte del destinatario, le altre promesse no.
+      const end = q.end != null ? q.end : q.done === 'sciolta' ? Math.min(deathAt(from), q.k === 'vendetta' ? Infinity : deathAt(to)) : Infinity;
+      return end <= i ? q.done : 'in corso';
+    };
     const made = (t.promises || []).filter((q) => q.ph <= i);
     const got = []; SIM.tributes.forEach((x) => (x.promises || []).forEach((q) => { if (q.to === t.id && q.ph <= i) got.push([x, q]); }));
     if (!made.length && !got.length) return '';
-    const row = (who, q, dir) => { const s2 = st(q); return '<div class="prom s-' + s2.replace(' ', '') + '"><span class="pk">' + esc(K[q.k] || q.k) + '</span><span>' + (dir ? 'a ' : 'da ') + '<b>' + esc(who.name) + '</b> · G' + q.d + '</span><span class="ps2">' + s2 + '</span></div>'; };
+    const row = (who, q, dir) => { const s2 = st(q, dir ? t : who, dir ? who : t); return '<div class="prom s-' + s2.replace(' ', '') + '"><span class="pk">' + esc(K[q.k] || q.k) + '</span><span>' + (dir ? 'a ' : 'da ') + '<b>' + esc(who.name) + '</b> · G' + q.d + '</span><span class="ps2">' + s2 + '</span></div>'; };
     return '<div><div class="sub" style="margin-bottom:8px">Promesse</div><div class="proms">' + made.map((q) => row(BY[q.to] || { name: '?' }, q, true)).join('') + got.map(([x, q]) => row(x, q, false)).join('') + '</div></div>';
   }
   function nowHTML(t, snap, i, theme) {
@@ -948,7 +956,7 @@
     // contenuto
     if (ph.kind === 'fallen') {
       $('#phBody').innerHTML = '<div class="memorial' + (forward ? ' rise' : '') + '"><h2>' + (soft ? 'Fuori dai giochi' : 'In memoria') + '</h2>' +
-        (ph.deaths.length ? '<div class="memgrid">' + ph.deaths.map((id) => { const t = BY[id]; return '<button type="button" class="mem" data-prof="' + esc(id) + '">' + avHTML(t, { dead: true }) + '<b>' + esc(t.name) + '</b><small>Squadra ' + t.team + (t.killerIds.length ? '<br>per mano di ' + esc(t.killerIds.map((k) => BY[k].name).join(', ')) : '<br>vittima dell\'arena') + '</small><span class="mono">' + t.kills + ' ' + (soft ? 'elim.' : 'ucc.') + '</span></button>'; }).join('') + '</div>' : '<div class="emptyday">' + esc(ph.intro) + '</div>') + '</div>';
+        (ph.deaths.length ? '<div class="memgrid">' + ph.deaths.map((id) => { const t = BY[id]; return '<button type="button" class="mem" data-prof="' + esc(id) + '">' + avHTML(t, { dead: true }) + '<b>' + esc(t.name) + '</b><small>Squadra ' + t.team + (t.killerIds.length ? '<br>per mano di ' + esc(t.killerIds.map((k) => BY[k].name).join(', ')) : '<br>vittima dell\'arena') + '</small><span class="mono">' + (ph.snap.kills[t.id] || 0) + ' ' + (soft ? 'elim.' : 'ucc.') + '</span></button>'; }).join('') + '</div>' : '<div class="emptyday">' + esc(ph.intro) + '</div>') + '</div>';
     } else {
       $('#phBody').innerHTML = ph.events.map((e, k) => evHTML(e, null, theme, forward, false, Math.min(k * 90, 1800))).join('');
     }
@@ -1099,18 +1107,25 @@
           '<div><div class="sub" style="margin-bottom:6px">Alleati</div><div class="row">' + (ally.length ? ally.map((x) => avHTML(BY[x], { btn: true })).join('') : '<span class="help">Nessuno, per ora.</span>') + '</div></div>' : '') +
         relHTML(id, snap, dead, atRes) +
         (!dead ? peopleHTML(t, snap, i) : '') +
-        promisesHTML(t, dead ? t.deathPhase : i) +
+        promisesHTML(t, dead ? t.deathPhase : i, atRes) +
         diaryHTML(t, dead ? t.deathPhase : i) +
-        attrHTML(t, theme) +
+        attrHTML(t, theme, i, atRes) +
         '<div><div class="sub" style="margin-bottom:8px">La sua storia' + (atRes ? '' : ' finora') + '</div><div class="ptl">' + (hist.length ? hist.map(({ e, p }) => '<div class="it" style="--cc:var(--c-' + (e.cat || 'none') + ')"><span>' + (p.kind === 'b' ? 'Inizio' : 'G' + p.day + ' ' + (p.kind === 'n' ? 'notte' : p.kind === 'd' ? 'giorno' : KIND[p.kind].toLowerCase())) + '</span><p>' + linkify(e.html) + '</p></div>').join('') : '<p class="help">Nessun evento ancora.</p>') + '</div></div>' +
       '</div>';
     if (!$('#profDlg').open) $('#profDlg').showModal();
     $('#profDlg').scrollTop = 0;
   }
 
-  function attrHTML(t, theme) {
+  function attrHTML(t, theme, i, atRes) {
     if (!t.attr) return '';
-    const tests = t.tests ? ' · prove superate ' + t.testsPassed + ' su ' + t.tests : '';
+    let total = t.tests || 0, passed = t.testsPassed || 0;
+    if (!atRes) {
+      total = 0; passed = 0;
+      SIM.phases.slice(0, i + 1).forEach((p) => p.events.forEach((e) => {
+        if (e.test && e.test.who === t.id) { total++; if (e.test.pass) passed++; }
+      }));
+    }
+    const tests = total ? ' · prove superate ' + passed + ' su ' + total : '';
     const key = theme ? arenaOf(theme.id).key || [] : [];
     return '<div><div class="sub" style="margin-bottom:8px">Caratteristiche' + tests + (key.length ? ' · <span class="keymark">★</span> contano di più in quest\'arena' : '') + '</div><div class="abars">' +
       D.attrs.map((a) => { const v = t.attr[a.id] != null ? t.attr[a.id] : 5; return '<div class="abar' + (key.includes(a.id) ? ' key' : '') + '" title="' + esc((D.attrDesc || {})[a.id] || '') + '"><span>' + (key.includes(a.id) ? '<span class="keymark">★</span> ' : '') + a.name + '</span><i><b style="width:' + v * 10 + '%" class="' + (v >= 8 ? 'hi' : v <= 3 ? 'lo' : '') + '"></b></i><em>' + v + '</em></div>'; }).join('') + '</div></div>';

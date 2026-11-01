@@ -71,7 +71,7 @@
     const has = (t) => ev.fx.some((f) => f.t === t);
     return ev.kills.some((k) => k.betray) ? 'betray' : ev.kills.length ? 'kill' : ev.dies.length ? 'death' :
       has('br') ? 'betray' : has('love') ? 'love' : has('al') ? 'ally' : has('cure') || has('save') ? 'heal' :
-      has('status') || has('hit') ? 'hurt' : has('gain') || has('steal') || has('give') ? 'item' : 'none';
+      has('status') || has('hit') || has('poison') ? 'hurt' : has('gain') || has('steal') || has('give') ? 'item' : 'none';
   }
   function parseLine(line, origin) {
     const bar = line.indexOf('|');
@@ -82,7 +82,7 @@
     if (!Number.isInteger(ev.n) || !(ev.n >= 1 && ev.n <= 6)) throw new Error('Numero di concorrenti non valido in: ' + line);
     let m;
     for (let tok of head.slice(1)) {
-      const self = tok.match(/^(?:ok:|ko:)?(?:hit|save|give|owe|repay|debt|grudge|forgive|steal|k|tr|crush|plot|trust|distrust|fear|respect|attract|promise|fid|ris|pau|amo):([A-F])[<>]([A-F])/) || tok.match(/^(?:ok:|ko:)?(?:love|couple|friend|enemy|rel|rival|ex|close|breakup|reunite):([A-F])([A-F])/);
+      const self = tok.match(/^(?:ok:|ko:)?(?:hit|poison|save|give|owe|repay|debt|grudge|forgive|steal|k|tr|crush|plot|trust|distrust|fear|respect|attract|promise|fid|ris|pau|amo):([A-F])[<>]([A-F])/) || tok.match(/^(?:ok:|ko:)?(?:love|couple|friend|enemy|rel|rival|ex|close|breakup|reunite):([A-F])([A-F])/);
       if (self && self[1] === self[2]) throw new Error('Etichetta riferita due volte alla stessa persona "' + tok + '" in: ' + line);
       let tgt = ev;
       if (/^(ok|ko):/.test(tok)) { tgt = tok[1] === 'k' ? ev.ok : ev.ko; tok = tok.slice(3); }
@@ -130,6 +130,7 @@
       if ((m = tok.match(/^cure:([A-F])$/))) { tgt.fx.push({ t: 'cure', r: ID(m[1]) }); continue; }
       // legami e conseguenze
       if ((m = tok.match(/^hit:([A-F])>([A-F])$/))) { tgt.fx.push({ t: 'hit', r: [L(m[1]), L(m[2])] }); ev.req.push({ t: 'foe', a: ID(m[1]), b: ID(m[2]) }); continue; }
+      if ((m = tok.match(/^poison:([A-F])>([A-F])$/))) { tgt.fx.push({ t: 'poison', r: [L(m[1]), L(m[2])] }); continue; }
       if ((m = tok.match(/^save:([A-F])>([A-F])$/))) { tgt.fx.push({ t: 'save', r: [L(m[1]), L(m[2])] }); continue; }
       if ((m = tok.match(/^love:([A-F])([A-F])$/))) { tgt.fx.push({ t: 'love', r: [L(m[1]), L(m[2])] }); ev.req.push({ t: 'canLove', r: [L(m[1]), L(m[2])] }); continue; }
       if ((m = tok.match(/^couple:([A-F])([A-F])$/))) { ev.req.push({ t: 'couple', r: [L(m[1]), L(m[2])] }); continue; }
@@ -407,7 +408,7 @@
       events: 0, alliancesFormed: 0, betrayals: 0, items: 0,
       partner: null, exPartner: null, lost: null, grudges: {}, owes: {}, fame: 0, traitor: false, fed: 0,
       revenges: 0, saves: 0, repaid: 0, amulets: 0, tests: 0, testsPassed: 0,
-      hp: 100, en: 90, mo: 55, food: 70, pr: 0, infected: false, infKnown: false, cause: null, hurtPh: -1, sawDeath: -1,
+      hp: 100, en: 90, mo: 55, food: 70, pr: 0, infected: false, infKnown: false, cause: null, poisonSource: null, hurtPh: -1, sawDeath: -1,
       foraged: 0, nursed: 0, shared: 0, trapKills: 0, trapsSet: 0, survivedBeasts: 0,
       goal: null, thought: '', crush: null, plot: null, diary: [], mem: {}, promises: [], hunt: null, vowed: null, spares: 0, trades: 0, crafts: 0, acts: 0, rejected: 0, planPh: -9, vigilPh: -9, guard: null,
     }));
@@ -810,6 +811,7 @@
       const set = (k, on) => { if (on) { if (t.st[k] == null) t.st[k] = ph; } else delete t.st[k]; };
       t.hp = Math.min(100, t.hp); t.en = clamp(t.en, 0, 100); t.mo = clamp(t.mo, 0, 100); t.food = clamp(t.food, 0, 100); t.pr = clamp(t.pr, 0, 100);
       set('ferito', t.hp < 55); set('grave', t.hp < 25); set('affamato', t.food < 25); set('esausto', t.en < 22); set('disperato', t.mo < 22);
+      if (t.st.avvelenato == null) t.poisonSource = null;
       if (M) set(M.st, M.infect ? t.infected && t.pr >= M.thr : t.pr >= M.thr);
     }
     function hurt(t, dmg, by, cause, inTick) {
@@ -824,7 +826,7 @@
       t.hp -= dmg; if (!inTick) t.hp = Math.max(Math.min(8, hp0), t.hp);
       t.hurtPh = phases.length;
       if (by && by !== t) t.cause = { k: cause === 'trap' ? 'trap' : 'wound', by: by.id, ph: phases.length };
-      else if (cause) t.cause = { k: cause, ph: phases.length, by: null };
+      else if (cause && !(inTick && t.cause && t.cause.k === cause && t.cause.by)) t.cause = { k: cause, ph: phases.length, by: null };
       if (M && M.infect && !t.infected && (cause === 'wound' || cause === 'beast' || by) && rng.chance(M.infect * Math.max(0.4, 1.2 - t.attr.res * 0.05))) {
         t.infected = true; t.pr = Math.max(t.pr, 8); stats.infected++;
         sys('infect', [t], {}, { cat: 'hurt', why: 'infezione' }, 3);
@@ -900,7 +902,11 @@
       if (killers.length) {
         stats.killDeaths++;
         killers.forEach((k) => {
-          k.kills++; k.killIds.push(v.id); k.fame += 1;
+          k.kills++; k.killIds.push(v.id);
+          // Un danno già inflitto può uccidere dopo la morte del responsabile.
+          // Si aggiorna il credito, senza far agire di nuovo il concorrente morto.
+          if (!k.alive) return;
+          k.fame += 1;
           const dm = hasTrait(k, 'spietato') || hasTrait(k, 'folle') ? 6 : hasTrait(k, 'pacifista') ? -25 : -(4 + Math.max(0, k.attr.emp - 5) * 3);
           k.mo += dm < 0 ? dm * DR.mo : dm;
           if (M && M.kill) k.pr += M.kill * Math.max(0.4, 1.2 - k.attr.emp * 0.06);
@@ -932,7 +938,7 @@
           });
           // il resto dello zaino resta sul posto, per chi passerà di lì
           if (left.length) (zoneLoot[v.zone] = zoneLoot[v.zone] || []).push(...left);
-        }
+        } else if (!K && v.inv.length) (zoneLoot[v.zone] = zoneLoot[v.zone] || []).push(...v.inv.map((it) => ({ it, from: v.id })));
       } else {
         stats.envDeaths++;
         if (!stats.firstBlood) stats.firstBlood = { killers: [], victim: v.id, day };
@@ -954,7 +960,7 @@
         X.lost = v.id;
         killers.forEach((K) => {
           remember(X, K, 'killedDear', v);
-          if (addGrudge(X, K, 'kill', v) && echoed < 2) { const e = echo(lover ? E.grudgeLover : E.grudgeKill, [X, K, v], 'warn'); if (e) { out.push(e); echoed++; } }
+          if (K.alive && addGrudge(X, K, 'kill', v) && echoed < 2) { const e = echo(lover ? E.grudgeLover : E.grudgeKill, [X, K, v], 'warn'); if (e) { out.push(e); echoed++; } }
         });
         if (!killers.length && lover && echoed < 2) { const e = echo(E.griefOnly, [X, v], 'warn'); if (e) { out.push(e); echoed++; } }
       });
@@ -973,13 +979,14 @@
         if (vow && killers.length && !isK) {
           const K = killers.find((k) => k.alive);
           if (K) { addGrudge(X, K, 'kill', v); X.vowed = { k: K.id, v: v.id }; const e = fmt((BD.promises || {}).trigger, [X, v, K]); if (e && out.length < 3) out.push(Object.assign(e, { cls: 'warn' })); else if (e) remember1(X, e.html, 'segreto'); }
+          else dissolvePromise(vow);
         }
         // promessa di protezione: era lì, e non ha fatto niente
         if (X.promises.some((q) => q.to === v.id && q.k === 'protezione' && !q.done)) {
           if (X.zone === v.zone && !isK) { settlePromise(X, v, 'protezione', false, null); X.mo -= 15; }
-          else X.promises.forEach((q) => { if (q.to === v.id && !q.done) q.done = 'sciolta'; });
+          else X.promises.forEach((q) => { if (q.to === v.id) dissolvePromise(q); });
         }
-        X.promises.forEach((q) => { if (q.to === v.id && !q.done && q.k !== 'vendetta') q.done = 'sciolta'; });
+        X.promises.forEach((q) => { if (q.to === v.id && q.k !== 'vendetta') dissolvePromise(q); });
         if (isK) {
           if (L >= 30 || b.k >= 50) { X.mo -= 15 * DR.mo; remember(X, v, 'guilt'); const d = fmt(BDI('guiltDiary'), [X, v]); if (d) remember1(X, d.html, 'segreto'); }
           if (X.vowed && X.vowed.k === v.id) { const dear = byId[X.vowed.v]; settlePromise(X, dear, 'vendetta', true, out); X.vowed = null; }
@@ -989,7 +996,7 @@
         else if (b.p >= 45) { X.mo += 6; const d = fmt(BDI('fearless'), [X, v]); if (d && rng.chance(0.6)) remember1(X, d.html, 'pensiero'); }
         else if (b.r >= 35 && L < 40 && tributes < 1 && rng.chance(0.6)) { tributes++; const e = useFmt(BA('tribute'), [X, v]); if (e) sys2(e, [X], 'none', 'Rispetto', 1); }
       });
-      if (v.promises) v.promises.forEach((q) => { if (!q.done) q.done = 'sciolta'; });
+      if (v.promises) v.promises.forEach(dissolvePromise);
     }
     function giveItem(t, type, ctx, lexPick, name, q, how, from, src) {
       const nm = name || (type === 'arma' ? lexPick('arma') : type === 'cibo' ? ctx.cibo || 'delle provviste' : ITEM_NAME[type] || lexPick(type));
@@ -1125,7 +1132,7 @@
             const it = itemOf(t, f.item); if (!it) break;
             takeItem(t, it);
             if (f.item === 'cibo') t.food += 40;
-            if (f.item === 'med') t.hp = Math.max(t.hp, 70);
+            if (f.item === 'med') { t.hp = Math.max(t.hp, 70); if (t.cause && t.cause.k === 'wound' && t.st.malato == null) t.cause = null; }
             break;
           }
           case 'steal': {
@@ -1146,13 +1153,14 @@
               if (f.s === 'ubriaco') { t.fame += 1; t.en -= 8; t.mo += 8; }
               else if (f.s === 'sconvolto') { t.mo -= 15 * DR.mo; if (M && !M.infect) t.pr += 6; }
               else if (f.s === 'lutto') t.mo -= 25 * DR.mo;
-              else if (f.s === 'avvelenato' || f.s === 'malato') { t.hp -= 8; t.cause = { k: f.s === 'avvelenato' ? 'poison' : 'sick', ph: phases.length }; }
+              else if (f.s === 'avvelenato' || f.s === 'malato') { t.hp -= 8; t.cause = { k: f.s === 'avvelenato' ? 'poison' : 'sick', ph: phases.length }; if (f.s === 'avvelenato') t.poisonSource = null; }
             }
             syncSt(t);
             break;
           }
           case 'cure': {
             t.st = t.st.lutto != null ? { lutto: t.st.lutto } : {};
+            t.cause = null;
             t.hp = Math.max(t.hp, 72); t.en += 10; t.mo += 6;
             if (M && M.cure) { if (M.infect) { if (t.infected && t.pr < M.cure) { t.infected = false; t.pr = 0; stats.cured++; } } else t.pr -= M.cure; }
             syncSt(t);
@@ -1164,8 +1172,14 @@
             const wpn = itemOf(t, 'arma');
             if (rng.chance(0.25)) pushVoice(out, voice('taunt', t, [u]));
             hurt(u, (28 + rng.int(18)) * (1 + weaponPow(t) / 12), t, 'wound'); u.mo -= 6; remember(u, t, 'hit');
-            if (wpn && wpn.x === 'veleno' && u.st.avvelenato == null) { u.st.avvelenato = phases.length; u.cause = { k: 'poison', by: t.id, ph: phases.length }; }
+            if (wpn && wpn.x === 'veleno' && u.st.avvelenato == null) { u.st.avvelenato = phases.length; u.cause = u.poisonSource = { k: 'poison', by: t.id, ph: phases.length }; }
             wear(t, out); if (addGrudge(u, t, 'attack') && rng.chance(0.6)) { const e = echo(E.hit, [u, t], 'warn'); if (e) out.push(e); } } break;
+          case 'poison': if (u.alive) {
+            u.st.avvelenato = phases.length; u.hp -= 8;
+            u.cause = u.poisonSource = { k: 'poison', by: t.id, ph: phases.length };
+            // Attribuire il veleno non significa che la vittima conosca l'avvelenatore.
+            syncSt(u);
+          } break;
           case 'save': if (u.alive) { u.owes[t.id] = 'vita'; addAff(t, u, 40); u.mo += 15; remember(u, t, 'saved'); tally(u, t, 'sv'); witness(t, 'save', u, roles); settlePromise(t, u, 'protezione', true, out); if (rng.chance(0.35)) pushVoice(out, voice('saved', u, [t])); t.saves++; t.fame += 1; const e = echo(E.saved, [u, t], 'good'); if (e) out.push(e); } break;
           case 'forgive': delete t.grudges[u.id]; addAff(t, u, 35); remember(t, u, 'forgave'); break;
           case 'love': if (u.alive) {
@@ -1180,7 +1194,7 @@
           case 'mkpromise': if (u && u.alive) makePromise(t, u, f.k); break;
           case 'breakup': if (u && t.partner === u.id) { t.partner = null; u.partner = null; t.exPartner = u.id; u.exPartner = t.id; remember(t, u, 'breakup'); remember(u, t, 'breakup'); t.mo -= 15; u.mo -= 15; stats.breakups = (stats.breakups || 0) + 1; } break;
           case 'reunite': if (u && u.alive && !t.partner && !u.partner) { t.partner = u.id; u.partner = t.id; t.exPartner = null; u.exPartner = null; remember(t, u, 'reunion'); remember(u, t, 'reunion'); t.mo += 20; u.mo += 20; stats.reunions = (stats.reunions || 0) + 1; } break;
-          case 'vital': t[f.k] = (t[f.k] || 0) + f.v; if (f.k === 'hp' && f.v < 0) { t.hurtPh = phases.length; t.hp = Math.max(t.hp, Math.min(8, t.hp - f.v)); } syncSt(t); break;
+          case 'vital': t[f.k] = (t[f.k] || 0) + f.v; if (f.k === 'hp' && f.v < 0) { t.hurtPh = phases.length; t.cause = { k: 'wound', by: null, ph: phases.length }; t.hp = Math.max(t.hp, Math.min(8, t.hp - f.v)); } syncSt(t); break;
           case 'star': t.fame += 2; t.mo += 10; if (t.fame >= 5 && !t.starred) { t.starred = true; const e = echo(E.star, [t], 'good'); if (e) out.push(e); } break;
         }
       }
@@ -1217,6 +1231,7 @@
     function snapshot() {
       const zones = {}, allies = {}, st = {}, inv = {}, kills = {}, rel = {}, vit = {}, mind = {};
       T.forEach((t) => {
+        if (t.alive) syncSt(t);
         zones[t.id] = t.zone; allies[t.id] = t.allyId; st[t.id] = Object.keys(t.st); inv[t.id] = t.inv.map((x) => { const o = { t: x.type, n: x.name, h: x.how || 'trovato' }; if (x.q) o.q = x.q; if (x.u != null) { o.u = x.u; o.m = x.um; } if (x.from) o.f = x.from; if (x.d) o.d = x.d; if (x.x) o.x = x.x; return o; }); kills[t.id] = t.kills;
         if (t.alive && t.goal) mind[t.id] = { g: t.goal.k, tg: t.goal.tg, since: t.goal.ph, th: t.thought };
         if (t.alive) vit[t.id] = [Math.round(Math.max(0, t.hp)), Math.round(t.en), Math.round(t.mo), Math.round(t.food), M && (!M.infect || t.infected) ? Math.round(t.pr) : -1];
@@ -1488,7 +1503,11 @@
         if (t.food < 35 && hasItem(t, 'cibo')) eat(t);
         if (t.st.avvelenato != null) {
           if (rng.chance(0.08 + t.attr.res * 0.03)) { delete t.st.avvelenato; if (rng.chance(0.3)) sys('poisonCleared', [t], {}, { cat: 'heal', why: 'cure' }, 0); }
-          else hurt(t, Math.max(3, 10 - t.attr.res * 0.6), null, 'poison', true);
+          else {
+            const source = t.poisonSource;
+            hurt(t, Math.max(3, 10 - t.attr.res * 0.6), null, 'poison', true);
+            if (source) t.cause = source;
+          }
         }
         if (t.st.malato != null) { const c0 = t.cause; hurt(t, Math.max(2, 6 - t.attr.res * 0.3), null, 'sick', true); if (c0 && c0.by && c0.k === 'wound') t.cause = c0; }
         if (t.food <= 0) hurt(t, 9, null, 'starve', true);
@@ -1534,7 +1553,7 @@
           if (dodge >= 15) { addAff(v, owner, -15); sys('trapDodge', [owner, v], { z }, { cat: 'none', why: 'trappola' }, 2); break; }
           stats.trapHits++;
           const friendly = owner.allyId != null && owner.allyId === v.allyId;
-          hurt(v, (32 + rng.int(22)) * (tp.boom ? 1.5 : 1), owner.alive && !friendly ? owner : null, friendly ? 'wound' : 'trap', true);
+          hurt(v, (32 + rng.int(22)) * (tp.boom ? 1.5 : 1), !friendly ? owner : null, friendly ? 'wound' : 'trap', true);
           remember(v, owner, 'trap');
           v.trapZ = z;
           if (friendly) { addAff(v, owner, -30); if (v.hp > 0) sys('trapAlly', [owner, v], { z }, { cat: 'hurt', why: 'trappola' }, 3); }
@@ -1556,7 +1575,7 @@
         const c = t.cause || { k: 'wound' };
         let k = (CAUSE[c.k] || CAUSE.wound)[0];
         const why = (CAUSE[c.k] || CAUSE.wound)[1];
-        let K = c.by && byId[c.by] && byId[c.by].alive && byId[c.by] !== t && phases.length - c.ph <= 8 ? byId[c.by] : null;
+        let K = c.by && byId[c.by] && byId[c.by] !== t ? byId[c.by] : null;
         if (K && K.allyId != null && K.allyId === t.allyId) K = null;
         if (cfg.teamWin && K && K.team === t.team) K = null;
         if (k === 'woundDeath' && !K) k = 'woundDeathAny';
@@ -1571,7 +1590,7 @@
         kill(t, K ? [K] : [], tx, out);
         if (K && c.k === 'trap') { K.trapKills++; }
         stats.causes[c.k] = (stats.causes[c.k] || 0) + 1;
-        SYS.push({ pri: 9, ev: { html: tx.html, plain: tx.plain, ids: people.map((p) => p.id), deaths: [t.id], lethal: true, origin: 'sys', cat: K ? 'kill' : 'death', why, echo: out.slice(0, 3) } });
+        SYS.push({ pri: 9, ev: { html: tx.html, plain: tx.plain, ids: people.filter((p) => p === t || p.alive).map((p) => p.id), deaths: [t.id], lethal: true, origin: 'sys', cat: K ? 'kill' : 'death', why, echo: out.slice(0, 3) } });
       });
     }
 
@@ -2011,6 +2030,9 @@
       const days = Math.max(1, day - q.d);
       const e = fmt(src, [a, b], { n: days === 1 ? 'un giorno' : days + ' giorni' });
       if (e) { if (out && out.length < 3) out.push(Object.assign(e, { cls: kept ? 'good' : 'warn' })); else remember1(a, e.html, 'segreto'); }
+    }
+    function dissolvePromise(q) {
+      if (!q.done) { q.done = 'sciolta'; q.endPh = phases.length; }
     }
 
     // testimoni: chi vede un'uccisione o un salvataggio cambia idea su chi l'ha fatto

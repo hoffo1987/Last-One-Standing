@@ -12,6 +12,8 @@
  *  give:A>B=cibo / =med    A regala a B l'oggetto posseduto (non lo consuma)
  *  +cibo:A / cibo:A   ottiene / consuma cibo   +med:A / med:A  ottiene / usa medicine
  *  +trap:A / trap:A   ottiene / usa trappola   s:A=ferito  imposta uno stato
+ *  veleno:A poison:A>B   A consuma il veleno e avvelena B, conservando il responsabile
+ *  s:A=avvelenato   avvelenamento senza responsabile (cibo, ambiente, incidente)
  *  need:A=ferito (o need:A=*) richiede uno stato  cure:A rimuove gli stati
  *  @agg @soc @stl @int @heal @luck @mad @cow  indole dell'evento   *2  peso
  * Segnaposto: {A} nome, [A:o/a/ə] accordo di genere, [AB:i/e] accordo di gruppo,
