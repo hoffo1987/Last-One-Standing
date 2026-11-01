@@ -54,10 +54,17 @@
   /* ---------------- Parser del formato eventi ---------------- */
   const L = (c) => c.charCodeAt(0) - 65;
   const letters = (s) => [...s].map(L);
-  const ITEMS = 'arma|cibo|med|trap|veleno|mappa|amuleto|esplosivo';
-  const LEXKEYS = 'arma|cibo|luogo|mostro|trappola|rifugio|dono|amuleto|alcol|veleno|mappa|esplosivo';
+  const ITEMS = 'arma|cibo|med|trap|veleno|mappa|amuleto|esplosivo|armatura|attrezzo|alcol|valore|ricordo';
+  const LEXKEYS = 'arma|cibo|luogo|mostro|trappola|rifugio|dono|amuleto|alcol|veleno|mappa|esplosivo|armatura|attrezzo|valore|ricordo';
+  const VITALS = { hp: 'hp', en: 'en', mo: 'mo', food: 'food', pr: 'pr' };
+  // nomi degli oggetti nuovi (protezioni, attrezzi, merce, ricordi, alcol) per un'arena
+  function itemLex(theme) {
+    const N = (D.items && D.items.names) || {}, base = N._ || {}, own = N[theme.id] || {}, out = {};
+    ['armatura', 'attrezzo', 'valore', 'ricordo', 'alcol'].forEach((k) => { const l = own[k] || base[k]; if (l) out[k] = l; });
+    return out;
+  }
   const LEX_RE = new RegExp('\\{(' + LEXKEYS + ')\\}', 'g');
-  const POSS_RE = /\{(arma|amuleto|veleno|mappa|esplosivo|cibo|med|trap):([A-F])\}/g;
+  const POSS_RE = /\{(arma|amuleto|veleno|mappa|esplosivo|cibo|med|trap|armatura|attrezzo|alcol|valore|ricordo):([A-F])\}/g;
   const ID = (m) => [L(m)];
 
   function catOf(ev) {
@@ -75,7 +82,7 @@
     if (!(ev.n >= 1 && ev.n <= 6)) throw new Error('Numero di concorrenti non valido in: ' + line);
     let m;
     for (let tok of head.slice(1)) {
-      const self = tok.match(/^(?:ok:|ko:)?(?:hit|save|give|owe|repay|debt|grudge|forgive|steal|k|tr):([A-F])[<>]([A-F])/) || tok.match(/^(?:ok:|ko:)?(?:love|couple|friend|enemy|rel):([A-F])([A-F])/);
+      const self = tok.match(/^(?:ok:|ko:)?(?:hit|save|give|owe|repay|debt|grudge|forgive|steal|k|tr|crush|plot):([A-F])[<>]([A-F])/) || tok.match(/^(?:ok:|ko:)?(?:love|couple|friend|enemy|rel):([A-F])([A-F])/);
       if (self && self[1] === self[2]) throw new Error('Etichetta riferita due volte alla stessa persona "' + tok + '" in: ' + line);
       let tgt = ev;
       if (/^(ok|ko):/.test(tok)) { tgt = tok[1] === 'k' ? ev.ok : ev.ko; tok = tok.slice(3); }
@@ -99,7 +106,7 @@
       if ((m = tok.match(/^con:([A-F])=(\w+)$/))) { ev.req.push({ t: 'has', item: m[2], r: ID(m[1]) }); continue; }
       if ((m = tok.match(new RegExp('^\\+(' + ITEMS + '):([A-F])$')))) { tgt.fx.push({ t: 'gain', item: m[1], r: ID(m[2]) }); continue; }
       if ((m = tok.match(new RegExp('^-(' + ITEMS + '):([A-F])$')))) { tgt.fx.push({ t: 'lose', item: m[1], r: ID(m[2]) }); ev.req.push({ t: 'has', item: m[1], r: ID(m[2]) }); continue; }
-      if ((m = tok.match(/^(cibo|med|trap|veleno|esplosivo):([A-F])$/))) { const r = ID(m[2]); ev.req.push({ t: 'has', item: m[1], r }); tgt.fx.push({ t: 'lose', item: m[1], r }); continue; }
+      if ((m = tok.match(/^(cibo|med|trap|veleno|esplosivo|alcol|valore|attrezzo|armatura):([A-F])$/))) { const r = ID(m[2]); ev.req.push({ t: 'has', item: m[1], r }); tgt.fx.push({ t: 'lose', item: m[1], r }); continue; }
       if ((m = tok.match(/^steal:([A-F])<([A-F])$/))) { ev.req.push({ t: 'has', item: 'arma', r: ID(m[2]) }); tgt.fx.push({ t: 'steal', r: [L(m[1]), L(m[2])] }); continue; }
       if ((m = tok.match(/^give:([A-F])>([A-F])=(\w+)$/))) { tgt.fx.push({ t: 'give', r: [L(m[1]), L(m[2])], item: m[3] }); if (tgt === ev) ev.req.push({ t: 'has', item: m[3], r: ID(m[1]) }); continue; }
       if ((m = tok.match(/^s:([A-F])=(\w+)$/))) { tgt.fx.push({ t: 'status', r: ID(m[1]), s: m[2] }); continue; }
@@ -124,6 +131,15 @@
       if ((m = tok.match(/^lost:([A-F])$/))) { ev.req.push({ t: 'lost', r: ID(m[1]) }); continue; }
       if ((m = tok.match(/^star:([A-F])$/))) { tgt.fx.push({ t: 'star', r: ID(m[1]) }); continue; }
       if ((m = tok.match(/^traitor:([A-F])$/))) { ev.req.push({ t: 'traitor', r: ID(m[1]) }); continue; }
+      // la mente: cotta segreta, complotto, obiettivo del momento
+      if ((m = tok.match(/^crush:([A-F])>([A-F])$/))) { ev.req.push({ t: 'crush', r: [L(m[1]), L(m[2])] }); ev.tags.push('love'); continue; }
+      if ((m = tok.match(/^plot:([A-F])>([A-F])$/))) { ev.req.push({ t: 'plot', r: [L(m[1]), L(m[2])] }); ev.tags.push('betray'); continue; }
+      if ((m = tok.match(/^goal:([A-F])=(\w+)$/))) { ev.req.push({ t: 'goal', r: ID(m[1]), g: m[2] }); continue; }
+      // valori vitali: stat:A<hp40 (requisito), mo:A+10 (effetto)
+      if ((m = tok.match(/^stat:([A-F])([<>])(hp|en|mo|food|pr)(\d+)$/))) { ev.req.push({ t: 'stat', r: ID(m[1]), op: m[2], k: m[3], v: +m[4] }); continue; }
+      if ((m = tok.match(/^(hp|en|mo|food|pr):([A-F])([+-]\d+)$/))) { tgt.fx.push({ t: 'vital', r: ID(m[2]), k: m[1], v: +m[3] }); continue; }
+      // il meteo del giorno: wx:buio, wx:abbondanza, wx:pericolo, wx:calma
+      if ((m = tok.match(/^wx:(buio|abbondanza|pericolo|calma)$/))) { ev.req.push({ t: 'wx', w: m[1] }); continue; }
       throw new Error('Etichetta sconosciuta "' + tok + '" in: ' + line);
     }
     if (ev.test) {
@@ -153,7 +169,7 @@
     if (ev.fx.some((f) => f.item === 'cibo') || ev.req.some((r) => r.item === 'cibo')) ev.tags.push('food');
     if (ev.test) ev.tags.push('test:' + ev.test.attr);
     // perché accade: la conseguenza che l'ha reso possibile
-    ev.why = ev.test ? 'prova' : rq('att') || rq('trait') ? 'carattere' : rq('grudge') ? 'vendetta' : rq('owe') ? 'debito' : rq('couple') ? 'coppia' : rq('lost') ? 'lutto' :
+    ev.why = ev.test ? 'prova' : rq('crush') ? 'cotta' : rq('plot') ? 'complotto' : rq('goal') ? 'obiettivo' : rq('wx') ? 'meteo' : rq('att') || rq('trait') ? 'carattere' : rq('grudge') ? 'vendetta' : rq('owe') ? 'debito' : rq('couple') ? 'coppia' : rq('lost') ? 'lutto' :
       ev.req.some((r) => r.t === 'need' && r.s === 'lutto') ? 'lutto' : rq('traitor') ? 'reputazione' : rq('feared') ? 'reputazione' : rq('fame') ? 'fama' :
       ev.req.some((r) => r.t === 'has' && /veleno|mappa|amuleto|esplosivo|trap/.test(r.item)) ? 'oggetto' : ev.req.some((r) => r.t === 'need' && r.s !== '*') ? 'condizione' : '';
     const used = new Set();
@@ -222,7 +238,7 @@
     pools.disasters = (theme.disasters || []).map((d) => ({ n: d.n, intro: d.intro, out: parseBlock(d.out, theme.id) }))
       .concat(parseDisasters(more.dis, theme.id));
     packs.forEach((pk) => { if (pk.dis) pools.disasters = pools.disasters.concat(parseDisasters(pk.dis, pk.adult ? 'adult' : theme.id).map((d) => Object.assign(d, { adult: !!pk.adult }))); });
-    pools.lex = Object.assign({}, D.lexDefault || {}, theme.lex);
+    pools.lex = Object.assign({}, D.lexDefault || {}, itemLex(theme), theme.lex);
     packs.forEach((pk) => { if (pk.lex) Object.keys(pk.lex).forEach((k) => (pools.lex[k] = pk.lex[k])); });
     const ks = Object.keys(poolCache); if (ks.length > 40) delete poolCache[ks[0]];
     poolCache[key] = pools;
@@ -338,7 +354,8 @@
     // oggetti e mente dei concorrenti
     const IT = D.items || { types: {}, names: {}, how: {} };
     const MIND = D.mind || { goals: {}, acts: {}, actsSoft: {}, diary: { trait: {} }, diarySoft: { trait: {} }, mem: {} };
-    let ORIGIN = null;
+    let ORIGIN = null, CURKIND = '';
+    const VO = D.voice || {}, VS = D.voiceSoft || {}, CH = D.chats || {};
     const ACT = (k) => (theme.soft && MIND.actsSoft && MIND.actsSoft[k]) || (MIND.acts || {})[k] || [];
     const DIA = (k) => (theme.soft && MIND.diarySoft && MIND.diarySoft[k]) || (MIND.diary || {})[k] || [];
     const DIAT = (tr) => (theme.soft && MIND.diarySoft && MIND.diarySoft.trait && MIND.diarySoft.trait[tr]) || ((MIND.diary || {}).trait || {})[tr] || [];
@@ -444,6 +461,13 @@
       return false;
     }
 
+    function wxIs(w) {
+      const f = W.fx || {};
+      if (w === 'buio') return (f.stl || 1) >= 1.3;
+      if (w === 'abbondanza') return (f.forage || 1) >= 1.4;
+      if (w === 'pericolo') return (f.lethal || 1) >= 1.1 || (f.beast || 1) >= 1.5 || (f.pr || 0) >= 6;
+      return !W.n || (!(f.lethal > 1) && !(f.beast > 1) && !((f.pr || 0) > 0));
+    }
     function checkReq(ev, roles) {
       for (const r of ev.req) {
         const A = roles[r.r ? r.r[0] : 0], B = r.r && r.r[1] != null ? roles[r.r[1]] : null;
@@ -489,6 +513,11 @@
           case 'att': { const v = A.attr[r.attr] != null ? A.attr[r.attr] : 5; if (r.op === '>' ? v < r.v : v > r.v) return false; break; }
           case 'trait': if (!hasTrait(A, r.trait)) return false; break;
           case 'notrait': if (hasTrait(A, r.trait)) return false; break;
+          case 'crush': if (A.crush !== B.id) return false; break;
+          case 'plot': if (A.plot !== B.id) return false; break;
+          case 'goal': if (!A.goal || A.goal.k !== r.g) return false; break;
+          case 'stat': { const v = A[r.k]; if (r.op === '<' ? v >= r.v : v <= r.v) return false; break; }
+          case 'wx': if (!wxIs(r.w)) return false; break;
         }
       }
       return true;
@@ -542,6 +571,10 @@
         else if (r.t === 'traitor' && ctxOf(P).traitor) w *= 2;
         else if (r.t === 'feared' && ctxOf(P).feared) w *= 2;
         else if (r.t === 'canLove' && !P.partner) w *= 1.2;
+        else if ((r.t === 'crush' && P.crush) || (r.t === 'plot' && P.plot)) w *= 4;
+        else if (r.t === 'goal' && P.goal && P.goal.k === r.g && r.r[0] === 0) w *= 3;
+        else if (r.t === 'wx' && wxIs(r.w)) w *= 2.5;
+        else if (r.t === 'stat' && r.r[0] === 0) { const v = P[r.k]; if (r.op === '<' ? v < r.v : v > r.v) w *= 2.5; }
       }
       // condizione fisica, umore, bisogni, arena e meteo spostano le scelte
       const tg = (x) => ev.tags.includes(x);
@@ -642,14 +675,33 @@
     function fmt(src, people, vars) {
       const fits = (x) => { let mx = -1; x.replace(/[{\[](\d)[}:]/g, (_, d) => { mx = Math.max(mx, +d); }); return mx < people.length && !/\{(i|ip|j|k|z|n)\}/.test(x.replace(/\{(i|ip|j|k|z|n)\}/g, (m, v) => (vars && vars[v] != null && vars[v] !== '' ? '' : m))); };
       const list = (Array.isArray(src) ? src : []).filter(fits); if (!list.length) return null;
-      let s = rng.pick(list);
+      let s = rng.pick(list); const src0 = s;
       s = s.replace(/\[(\d):([^\]]*)\]/g, (_, i, o) => genderPick([people[+i]], o))
         .replace(/\{(i|ip|j|k|z|m|n|d)\}/g, (_, x) => (vars && vars[x] != null ? vars[x] : ''))
         .replace(LEX_RE, (_, k2) => (k2 === 'luogo' && vars && vars.z ? vars.z : rng.pick(LEX[k2] || ['qualcosa'])));
       s = cap(artPrep(s));
-      return { plain: edFix(s.replace(/\{(\d)\}/g, (_, i) => people[+i].name)), html: edFix(esc(s).replace(/\{(\d)\}/g, (_, i) => nameTag(people[+i]))) };
+      return { src: src0, plain: edFix(s.replace(/\{(\d)\}/g, (_, i) => people[+i].name)), html: edFix(esc(s).replace(/\{(\d)\}/g, (_, i) => nameTag(people[+i]))) };
     }
     const sysText = (k, people, vars) => fmt(TX(k), people, vars);
+    // le voci: una battuta di chi parla, scelta da tratti, arena e situazione
+    const USED = new Set();
+    // sceglie tra le frasi non ancora usate in questa partita (se ne restano)
+    const fresh = (l) => { const f = (l || []).filter((x) => !USED.has(x)); return f.length ? f : l || []; };
+    const useFmt = (l, people, vars) => { const pool = fresh(l); const x = fmt(pool, people, vars); if (x) pool.forEach((y) => { if (x.src === y) USED.add(y); }); return x; };
+    function voice(kind, speaker, others, vars) {
+      if (!speaker) return null;
+      const base = (theme.soft && VS[kind]) || VO[kind] || {};
+      const tr = speaker.traits.filter((x) => base.trait && base.trait[x] && fresh(base.trait[x]).some((y) => !USED.has(y)));
+      const ar = base.arena && base.arena[theme.id];
+      const people = [speaker].concat(others || []);
+      let x = null;
+      if (tr.length && rng.chance(0.55)) x = useFmt(base.trait[rng.pick(tr)], people, vars);
+      if (!x && ar && ar.some((y) => !USED.has(y)) && rng.chance(0.45)) x = useFmt(ar, people, vars);
+      if (!x) x = useFmt(base._ || [], people, vars);
+      if (!x) return null;
+      return { plain: speaker.name + ': «' + x.plain + '»', html: nameTag(speaker) + ': «' + x.html + '»', cls: 'quote' };
+    }
+    const pushVoice = (out, v) => { if (v && out.length < 3) out.push(v); };
     function sys(k, people, vars, o, pri) {
       const tx = sysText(k, people, vars); if (!tx) return null;
       const ev = Object.assign({ html: tx.html, plain: tx.plain, ids: people.map((p) => p.id), deaths: [], lethal: false, origin: 'sys', cat: 'none', why: 'conseguenza', echo: [] }, o || {});
@@ -882,9 +934,22 @@
           const e = sysText(K ? 'tough' : 'toughEnv', K ? [v, K] : [v]); if (e) out.push(Object.assign(e, { cls: 'twist' }));
         }
       });
+      let spoke = false;
       for (const k of ev.kills) {
         const killers = k.by.map((i) => roles[i]);
-        k.v.forEach((i) => { if (!saved.has(i)) kill(roles[i], killers, txt, out); });
+        const dear = {}; k.v.forEach((i) => killers.forEach((K) => { const g = K.grudges[roles[i].id]; if (g && g.victim) dear[i] = { K, x: byId[g.victim] }; }));
+        k.v.forEach((i) => {
+          if (saved.has(i)) return;
+          const v = roles[i]; const wasAlive = v.alive;
+          kill(v, killers, txt, out);
+          if (!wasAlive || v.alive || spoke || !rng.chance(0.38)) return;
+          spoke = true;
+          const KA = killers[0] && killers[0].alive ? killers[0] : null;
+          if (dear[i] && dear[i].K.alive) pushVoice(out, voice('revenge', dear[i].K, [v, dear[i].x]));
+          else if (k.betray && KA) pushVoice(out, voice('betray', KA, [v]));
+          else if (KA && rng.chance(0.5)) pushVoice(out, voice('kill', KA, [v]));
+          else pushVoice(out, voice('last', v, [killers[0], v.exPartner && byId[v.exPartner] ? byId[v.exPartner] : undefined].filter(Boolean)));
+        });
         if (k.betray) {
           stats.betrayals++;
           killers.forEach((t) => { t.betrayals++; t.traitor = true; t.plot = null; leaveAlliance(t); });
@@ -897,7 +962,7 @@
         switch (f.t) {
           case 'al': {
             const ts = f.r.map((i) => roles[i]).filter((x) => x.alive);
-            if (ts.length > 1) { joinAlliance(ts); stats.alliances++; ts.forEach((x) => { x.alliancesFormed++; x.mo += 10; ts.forEach((y) => remember(x, y, 'allied')); ts.forEach((y) => x.id < y.id && addAff(x, y, Math.round(25 * (0.7 + (x.attr.car + y.attr.car) / 30)))); }); }
+            if (ts.length > 1) { joinAlliance(ts); stats.alliances++; if (rng.chance(0.22)) pushVoice(out, voice('ally', ts[0], [ts[1]])); ts.forEach((x) => { x.alliancesFormed++; x.mo += 10; ts.forEach((y) => remember(x, y, 'allied')); ts.forEach((y) => x.id < y.id && addAff(x, y, Math.round(25 * (0.7 + (x.attr.car + y.attr.car) / 30)))); }); }
             break;
           }
           case 'br': {
@@ -947,18 +1012,21 @@
           }
           case 'hit': if (u.alive) {
             const wpn = itemOf(t, 'arma');
+            if (rng.chance(0.25)) pushVoice(out, voice('taunt', t, [u]));
             hurt(u, (28 + rng.int(18)) * (1 + weaponPow(t) / 12), t, 'wound'); u.mo -= 6; remember(u, t, 'hit');
             if (wpn && wpn.x === 'veleno' && u.st.avvelenato == null) { u.st.avvelenato = phases.length; u.cause = { k: 'poison', by: t.id, ph: phases.length }; }
             wear(t, out); if (addGrudge(u, t, 'attack') && rng.chance(0.6)) { const e = echo(E.hit, [u, t], 'warn'); if (e) out.push(e); } } break;
-          case 'save': if (u.alive) { u.owes[t.id] = 'vita'; addAff(t, u, 40); u.mo += 15; remember(u, t, 'saved'); t.saves++; t.fame += 1; const e = echo(E.saved, [u, t], 'good'); if (e) out.push(e); } break;
+          case 'save': if (u.alive) { u.owes[t.id] = 'vita'; addAff(t, u, 40); u.mo += 15; remember(u, t, 'saved'); if (rng.chance(0.35)) pushVoice(out, voice('saved', u, [t])); t.saves++; t.fame += 1; const e = echo(E.saved, [u, t], 'good'); if (e) out.push(e); } break;
           case 'forgive': delete t.grudges[u.id]; addAff(t, u, 35); remember(t, u, 'forgave'); break;
           case 'love': if (u.alive) {
             t.partner = u.id; u.partner = t.id; addAff(t, u, 70); stats.couples++; t.fame += 1; u.fame += 1; t.mo += 25; u.mo += 25;
             remember(t, u, 'love'); remember(u, t, 'love'); if (t.crush === u.id) t.crush = null; if (u.crush === t.id) u.crush = null; jealousy(t, u);
+            if (rng.chance(0.5)) pushVoice(out, voice('love', rng.chance(0.5) ? t : u, [rng.chance(0.5) ? u : t]));
             if (!cfg.teamWin && (t.allyId == null || u.allyId == null || t.allyId === u.allyId)) { const g = t.allyId != null ? alliances.get(t.allyId) : u.allyId != null ? alliances.get(u.allyId) : null; if (!g || g.size < 5) joinAlliance([t, u]); } const e = echo(E.couple, [t, u], 'love'); if (e) out.push(e); } break;
           case 'repay': if (u) { delete t.owes[u.id]; addAff(t, u, 20); t.repaid++; remember(u, t, 'repaid'); stats.debtsRepaid++; const e = echo(E.repay, [t, u], 'good'); if (e) out.push(e); } break;
           case 'debt': if (u) t.owes[u.id] = 'favore'; break;
           case 'rel': if (u) addAff(t, u, f.v); break;
+          case 'vital': t[f.k] = (t[f.k] || 0) + f.v; if (f.k === 'hp' && f.v < 0) { t.hurtPh = phases.length; t.hp = Math.max(t.hp, Math.min(8, t.hp - f.v)); } syncSt(t); break;
           case 'star': t.fame += 2; t.mo += 10; if (t.fame >= 5 && !t.starred) { t.starred = true; const e = echo(E.star, [t], 'good'); if (e) out.push(e); } break;
         }
       }
@@ -973,6 +1041,10 @@
             x.st.sconvolto = phases.length; if (out.length < 3 && rng.chance(0.5)) { const e = echo(E.shock, [x], ''); if (e) out.push(e); }
           }
         });
+      }
+      if (!ev.lethal && ev.n === 1 && roles[0].alive && out.length < 3) {
+        if (CURKIND === 'dis' && rng.chance(0.22)) pushVoice(out, voice('disaster', roles[0]));
+        else if (CURKIND === 'f' && rng.chance(0.15)) pushVoice(out, voice('feast', roles[0]));
       }
       stats.events++;
       return { html: txt.html, plain: txt.plain, ids: roles.map((t) => t.id), deaths: roles.filter((t, i) => ev.victims.includes(i) && !t.alive).map((t) => t.id), lethal: ev.lethal, origin: ev.origin, cat: ev.cat, why: ev.why, echo: out.slice(0, 3), test: ev.testRes || null };
@@ -1025,6 +1097,7 @@
       if (!ev) return;
       ORIGIN = 'sponsor';
       const r = apply(ev, [P]); r.why = r.why || 'fama'; r.sponsor = true; events.push(r); stats.sponsors++; P.mo += 15;
+      if (rng.chance(0.3)) { r.echo = r.echo || []; pushVoice(r.echo, voice('sponsor', P)); }
       // nella cassa c'è spesso anche qualcosa di utile, scelto in base ai bisogni
       if (rng.chance(0.45)) {
         const need = P.hp < 55 ? 'med' : P.food < 40 ? 'cibo' : !hasItem(P, 'armatura') ? 'armatura' : !hasItem(P, 'attrezzo') ? 'attrezzo' : 'valore';
@@ -1160,6 +1233,7 @@
       hearts();
       personalActs();
       barter();
+      chats();
       // sonno, guarigione naturale e umore
       let watchMsg = 0;
       A.forEach((t) => {
@@ -1424,8 +1498,11 @@
         if (t.plot && (!aliveId(t.plot) || !isAlly(t, byId[t.plot]))) t.plot = null;
         if (t.crush && (!aliveId(t.crush) || t.partner || aff(t, byId[t.crush]) < 0)) t.crush = null;
         // il complotto: chi tradisce per natura, o per disperazione
-        if (!t.plot && t.allyId != null && day >= 2 && !hasTrait(t, 'leale') && (hasTrait(t, 'traditore') ? rng.chance(0.6) : hasTrait(t, 'avido') || (t.attr.emp <= 3 && t.mo < 40) ? rng.chance(0.25) : t.mo < 25 && !hasTrait(t, 'pacifista') ? rng.chance(0.12) : false)) {
-          const m = allyMates(t).sort((a, b) => b.inv.length - a.inv.length || aff(t, a) - aff(t, b))[0];
+        // rancore verso un alleato: il complotto più naturale di tutti
+        const sore = !t.plot && t.allyId != null ? allyMates(t).find((x) => t.grudges[x.id] || aff(t, x) <= -30) : null;
+        const urge = hasTrait(t, 'traditore') ? 0.6 : sore ? 0.5 : hasTrait(t, 'avido') ? 0.35 : (t.attr.emp <= 4 && t.mo < 45) ? 0.2 : hasTrait(t, 'paranoico') ? 0.15 : t.mo < 25 && !hasTrait(t, 'pacifista') ? 0.12 : alive().length <= 6 && !hasTrait(t, 'pacifista') ? 0.12 : 0;
+        if (!t.plot && t.allyId != null && day >= 2 && !hasTrait(t, 'leale') && rng.chance(urge)) {
+          const m = sore || allyMates(t).sort((a, b) => b.inv.length - a.inv.length || aff(t, a) - aff(t, b))[0];
           if (m) { t.plot = m.id; const d = fmt(DIA('plot'), [t, m]); if (d) remember1(t, d.html, 'segreto'); }
         }
         // la cotta segreta
@@ -1609,6 +1686,23 @@
       });
     }
 
+    // le conversazioni della notte, secondo il rapporto tra i due
+    function chats() {
+      const pairs = [];
+      alive().forEach((a) => zoneMates(a).forEach((b) => { if (a.ix < b.ix) pairs.push([a, b]); }));
+      rng.shuffle(pairs).slice(0, 2 + (rng.chance(0.4) ? 1 : 0)).forEach(([a, b]) => {
+        if (!rng.chance(0.6)) return;
+        const kind = a.partner === b.id ? 'coppia' : isAlly(a, b) ? 'alleati' : aff(a, b) <= -30 || a.grudges[b.id] || b.grudges[a.id] ? 'rivali' : 'sconosciuti';
+        const ar = CH.arena && CH.arena[theme.id] ? CH.arena[theme.id].filter((x) => !USED.has(x[0])) : [];
+        const list = (rng.chance(0.4) && ar.length ? ar : (CH[kind] || []).filter((x) => !USED.has(x[0]))) || [];
+        if (!list.length) return;
+        const pair = rng.pick(list); USED.add(pair[0]);
+        const [l1, l2] = pair;
+        const x1 = fmt([l1], [a, b]), x2 = fmt([l2], [a, b]); if (!x1 || !x2) return;
+        addAff(a, b, kind === 'rivali' ? -4 : 3);
+        sys2({ plain: a.name + ': «' + x1.plain + '» ' + b.name + ': «' + x2.plain + '»', html: nameTag(a) + ': «' + x1.html + '»<br>' + nameTag(b) + ': «' + x2.html + '»' }, [a, b], kind === 'coppia' ? 'love' : kind === 'alleati' ? 'ally' : kind === 'rivali' ? 'hurt' : 'none', 'Dialogo', 1);
+      });
+    }
     // gli scambi della notte: chi ha fame compra da chi ne ha
     function barter() {
       alive().forEach((b) => {
@@ -1683,7 +1777,7 @@
     function runPhase(kind, pool, title, intro, opt) {
       const events = pendingNotes.splice(0);
       SYS = [];
-      ORIGIN = kind === 'f' ? 'festino' : null;
+      ORIGIN = kind === 'f' ? 'festino' : null; CURKIND = kind;
       tickStatus();
       if (kind === 'd') moveByGoals();
       maybeDissolve(events);
@@ -1910,7 +2004,7 @@
   /* Rende un testo con concorrenti fittizi tutti dello stesso genere (per i controlli automatici) */
   function renderSample(text, themeId, gender) {
     const theme = D.themes.find((t) => t.id === themeId) || D.themes[0];
-    const lex = Object.assign({}, D.lexDefault || {}, theme.lex);
+    const lex = Object.assign({}, D.lexDefault || {}, itemLex(theme), theme.lex);
     (D.packs || []).forEach((pk) => { if (pk.lex && pk.theme === theme.id) Object.assign(lex, pk.lex); });
     const names = ['Alfa', 'Beta', 'Gamma', 'Delta', 'Epsilon', 'Zeta'];
     const roles = names.map((name, i) => ({ id: 'x' + i, name, gender, inv: ITEMS.split('|').map((type) => ({ type, name: (lex[type] || ['un oggetto'])[0] })) }));

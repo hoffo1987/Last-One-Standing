@@ -4,7 +4,9 @@ Simulatore di battle royale, tutto in italiano. Crei il cast, scegli una delle 9
 
 ## Cosa contiene
 - **9 scenari**: Arena Classica, Reame Incantato, Stazione Orbitale, Città degli Infetti, Isola Battle Royale, Villa Maledetta, Terre Desolate, più Liceo Spietato e Ufficio Open Space (senza morti: si viene eliminati o licenziati).
-- **1391 modelli di evento e 452 disastri**, più **122 eventi e 31 disastri 18+** (circa 1450 esiti di disastro in tutto), con accordo di genere automatico (lui / lei / neutro con ə) e preposizioni articolate corrette.
+- **2183 modelli di evento e 529 disastri**, più **122 eventi e 31 disastri 18+** (oltre 1600 esiti di disastro in tutto): ogni arena con tema "con morti" ha circa 750 eventi e 75-85 disastri, Liceo e Ufficio circa 370 eventi e 58 disastri. Accordo di genere automatico (lui / lei / neutro con ə) e preposizioni articolate corrette.
+- **Voci dei concorrenti**: oltre 220 battute (ultime parole, frasi dopo un'uccisione, vendette, tradimenti, dichiarazioni, ringraziamenti, provocazioni) scelte secondo tratto, arena e situazione, più oltre 70 conversazioni notturne tra alleati, coppie, rivali e sconosciuti. Nella stessa partita una frase non si ripete finché ce ne sono altre.
+- **83 condizioni meteo** (9-10 per arena) che cambiano la giornata.
 - **Concorrenti** con 10 caratteristiche (forza, agilità, intelligenza, carisma, fortuna, resistenza, furtività, coraggio, empatia, sopravvivenza), fino a 3 dei 30 tratti, squadra e foto.
 - **Motore**: alleanze e tradimenti, oggetti (armi, cibo, medicine, trappole), stati (ferito, avvelenato, malato, affamato), pericolo crescente con i giorni, festino, disastri e scontro finale.
 - **Seme**: stesso seme e stesso cast danno la stessa partita.
@@ -60,6 +62,13 @@ Tredici tipi di oggetto, con nomi diversi in ogni arena: armi, protezioni, cure,
 - **Rapporti umani**: nella scheda, "Cosa prova per gli altri" mostra per ogni persona un'etichetta (Amore, Cotta segreta, Vendetta, Amico fidato, Alleato, In debito, Diffidenza, Nemico…), l'affinità e i ricordi in prima persona: «Mi ha salvato la vita», «Mi ha negato il cibo», «Ha ucciso Lapo».
 - **Diario segreto**: ogni notte (e a volte di giorno) ognuno scrive una pagina: pensieri, paure, segreti e anche i fatti che la diretta non ha mostrato. Nella lista "In gara" un'etichetta "diario" segnala chi ha una pagina nuova.
 
+## Eventi che leggono la storia
+Il formato degli eventi conosce tutto quello che succede nella partita, quindi ogni evento nasce da qualcosa e lascia qualcosa:
+- `crush:A>B` (A ha una cotta segreta per B), `plot:A>B` (A sta tramando contro B), `goal:A=vendetta` (l'obiettivo del momento);
+- `stat:A<hp40`, `stat:A>mo75`, `stat:B>pr60` (salute, energia, morale, sazietà, indicatore dell'arena) e i relativi effetti `hp:A-20`, `mo:A+15`, `pr:A-30`;
+- `wx:buio`, `wx:abbondanza`, `wx:pericolo`, `wx:calma` (il meteo del giorno);
+- i nuovi oggetti: `+armatura:A`, `con:A=attrezzo`, `-valore:A`, `{ricordo:A}`, `{alcol}` e così via.
+
 ## Caratteristiche, tratti e prove
 - **Prove di abilità**: molti eventi sono una sfida su una caratteristica, con due esiti scritti. Il tiro somma caratteristica, due dadi, fortuna e tratti, e sottrae le condizioni (ferito, ubriaco, affamato…). La diretta mostra "Prova di Agilità · superata 15/11". Con valori alti si supera circa l'87% delle prove, con valori bassi circa il 20%.
 - **Eventi riservati** a chi ha una caratteristica molto alta o molto bassa, o un certo tratto.
@@ -89,6 +98,9 @@ src/data-themes.js   i 9 scenari (lessico, testi di fase, eventi speciali)
 src/content/_systems.js  sistema delle conseguenze: frasi di eco, oggetti speciali, eventi di legame
 src/content/_ecology.js  ecosistema delle arene: regole, indicatori, meteo, zone e testi delle conseguenze automatiche
 src/content/_items.js    catalogo degli oggetti, obiettivi, gesti dei tratti, diario segreto e ricordi dei rapporti
+src/content/_voices.js   battute dei concorrenti e conversazioni notturne
+src/content/_extras.js   meteo aggiuntivo per ogni arena
+src/content/pack2-*.js   secondo pacchetto per ogni arena, legami comuni e sopravvivenza
 src/content/pack-*.js    pacchetti per arena (eventi, disastri, 18+), condivisi e per adulti
 src/content/*.js         eventi aggiuntivi e disastri della versione precedente
 src/engine.js        motore di simulazione (funziona anche in Node)

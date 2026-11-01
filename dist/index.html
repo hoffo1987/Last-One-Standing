@@ -1033,6 +1033,7 @@ img.scene { object-fit: cover; object-position: center; user-select: none; }
 .badge2.star { color: var(--accent-text); }
 .badge2.hot { color: color-mix(in srgb, var(--dead) 75%, var(--ink)); }
 .badge2.love { color: color-mix(in srgb, var(--c-love) 72%, var(--ink)); }
+.echo li.quote { --ec: var(--accent-text); font-style: italic; }
 </style>
 
 <header class="top">
@@ -2552,6 +2553,58 @@ img.scene { object-fit: cover; object-position: center; user-select: none; }
 })(typeof window !== 'undefined' ? window : globalThis);
 
 ;
+/* Meteo aggiuntivo per ogni arena: più varietà da un giorno all'altro. */
+(function (G) {
+  const D = G.LOS_DATA; if (!D || !D.eco) return;
+  const add = (id, list) => { const a = D.eco.arenas[id]; if (a) a.meteo = (a.meteo || []).concat(list); };
+  add('classico', [
+    { n: 'Temporale estivo', d: 'Lampi sul Bosco e tuoni che coprono ogni passo.', fx: { stl: 1.4, lethal: 1.1, en: 1.15 } },
+    { n: 'Vento caldo dal sud', d: 'Un vento secco asciuga il Fiume e la pazienza di tutti.', fx: { food: 1.25, tb: { cor: -1 } } },
+    { n: 'Sciame di lucciole', d: 'La notte si accende di lucciole: è bellissimo, e si vede tutto.', fx: { stl: 0.75, pr: -4 } },
+  ]);
+  add('fantasy', [
+    { n: 'Eclissi di sangue', d: 'La luna diventa rossa e la magia oscura si fa più forte.', fx: { pr: 6, lethal: 1.15, beast: 1.4 } },
+    { n: 'Giorno della fiera', d: 'Mercanti fatati montano bancarelle ai margini della Foresta.', fx: { forage: 1.6, fame: 1.3 } },
+    { n: 'Pioggia di petali', d: 'Petali profumati cadono dal cielo e calmano gli animi.', fx: { pr: -5, tb: { emp: 1 } } },
+  ]);
+  add('scifi', [
+    { n: 'Allineamento planetario', d: 'I pianeti vicini si allineano e la stazione vibra.', fx: { lethal: 1.1, tb: { agi: -1 } } },
+    { n: 'Sole artificiale', d: 'I pannelli della Serra lavorano al massimo: cibo e ossigeno per tutti.', fx: { forage: 1.5, pr: -5 } },
+    { n: 'Silenzio radio', d: 'Le comunicazioni sono interrotte: nessuno sa dove sono gli altri.', fx: { stl: 1.5, fame: 0.7 } },
+  ]);
+  add('zombie', [
+    { n: 'Nebbia del porto', d: 'Una nebbia densa sale dal mare e nasconde vivi e morti.', fx: { stl: 1.5, beast: 1.3 } },
+    { n: 'Trasmissione radio', d: 'Una radio annuncia un rifugio sicuro. Forse è vero.', fx: { pr: -3, fame: 1.3, tb: { car: 1 } } },
+    { n: 'Notte dei lamenti', d: 'L\'orda geme tutta la notte. Nessuno dorme.', fx: { en: 1.3, beast: 1.5 } },
+  ]);
+  add('royale', [
+    { n: 'Evento a tempo', d: 'Per un giorno, le armi d\'oro sono ovunque.', fx: { lethal: 1.2, forage: 1.2 } },
+    { n: 'Nebbia sull\'isola', d: 'La nebbia copre l\'isola: i cecchini restano a mani vuote.', fx: { stl: 1.5, lethal: 0.9 } },
+    { n: 'Diretta speciale', d: 'Il torneo viene trasmesso in prima serata: tutti vogliono farsi notare.', fx: { fame: 1.8, tb: { car: 1 } } },
+  ]);
+  add('horror', [
+    { n: 'Notte di Ognissanti', d: 'I morti escono dalle tombe del Cimitero per una notte.', fx: { pr: 7, beast: 1.8, lethal: 1.15 } },
+    { n: 'Mattina di sole', d: 'Il sole entra dalle finestre e la villa, per qualche ora, è solo una casa.', fx: { pr: -7, heal: 1.2 } },
+    { n: 'Sussurri nei muri', d: 'I muri parlano. Dicono cose vere.', fx: { pr: 5, tb: { int: -1 } } },
+  ]);
+  add('wasteland', [
+    { n: 'Aurora radioattiva', d: 'Il cielo si accende di verde e di viola. Bellissimo e letale.', fx: { pr: 8, stl: 0.8 } },
+    { n: 'Vento fresco', d: 'Un raro vento fresco porta via la polvere per un giorno.', fx: { en: 0.8, pr: -3 } },
+    { n: 'Gara dei motori', d: 'I predoni organizzano una gara: tutti guardano, nessuno spara. Quasi.', fx: { fame: 1.5, lethal: 0.9 } },
+  ]);
+  add('liceo', [
+    { n: 'Giornata dello sport', d: 'Tutta la scuola in Palestra: chi corre, chi si nasconde in infermeria.', fx: { en: 1.3, tb: { agi: 1 } } },
+    { n: 'Settimana dello studente', d: 'Attività alternative e pochissime lezioni: il paradiso.', fx: { pr: -6, fame: 1.3 } },
+    { n: 'Consegna delle pagelle', d: 'Le famiglie leggono i voti. Tensione in tutte le chat.', fx: { pr: 8, lethal: 1.1 } },
+  ]);
+  add('ufficio', [
+    { n: 'Lunedì di inventario', d: 'Si conta tutto: penne, risme, persone.', fx: { pr: 6, en: 1.2 } },
+    { n: 'Ponte festivo', d: 'Mezzo ufficio è in ferie: chi resta, comanda.', fx: { pr: -5, stl: 1.3 } },
+    { n: 'Valutazione annuale', d: 'Oggi si decidono i premi. E i licenziamenti.', fx: { pr: 8, lethal: 1.15, tb: { car: 1 } } },
+  ]);
+})(typeof window !== 'undefined' ? window : globalThis);
+
+;
 /* Oggetti, carattere e vita interiore dei concorrenti.
  *
  * - D.items: catalogo dei tipi di oggetto (cosa fanno, come si chiamano in
@@ -3052,6 +3105,175 @@ img.scene { object-fit: cover; object-position: center; user-select: none; }
 `,
     },
   });
+})(typeof window !== 'undefined' ? window : globalThis);
+
+;
+/* Le voci dei concorrenti: battute brevi che compaiono sotto gli eventi
+ * («Marco: …») e conversazioni notturne tra alleati, coppie e rivali.
+ * Ogni situazione ha frasi comuni, frasi per tratto e frasi per arena.
+ * {0} chi parla, {1} l'altra persona, {2} una terza (per le vendette),
+ * [0:o/a] accordo, lessico dell'arena ({arma}, {cibo}, {mostro}…). */
+(function (G) {
+  const D = (G.LOS_DATA = G.LOS_DATA || {});
+
+  D.voice = {
+    kill: {
+      _: ['Niente di personale.', 'Mi dispiace. Davvero.', 'Uno in meno.', 'Dovevi correre più veloce.', 'Te l\'avevo detto di stare lontano.', 'Non guardarmi così.', 'Era tu o io.', 'Scusa. Cioè, no.', 'Qualcuno doveva farlo.', 'Ricordati di me, lassù.'],
+      trait: {
+        spietato: ['Il prossimo.', 'Troppo facile.', 'Ne voglio ancora.', 'Silenzio, finalmente.'],
+        esibizionista: ['Avete visto? Rallentatela al replay!', 'Questa va nel trailer.', 'Applausi, grazie, grazie.'],
+        folle: ['Ops.', 'Era vivo? Ah, era vivo.', 'Ahahah! No, aspetta. Ahahah!'],
+        bruto: ['Più grosso è, più rumore fa.', 'Ecco fatto.'],
+        stratega: ['Esattamente come previsto.', 'Fase due completata.'],
+        cacciatore: ['Le tracce non mentono mai.', 'Ti ho seguito per due giorni. Ne valeva la pena.'],
+        codardo: ['Non volevo! Cioè, sì, ma non volevo!', 'Mi ha spaventato lui!'],
+        pacifista: ['Perdonami. Ti prego, perdonami.', 'Non doveva andare così.'],
+        sopravvissuto: ['Io resto in piedi. Sempre.'],
+        impulsivo: ['Ho pensato dopo. Come sempre.'],
+        avido: ['E ora, vediamo cosa c\'è nel tuo zaino.'],
+        superstizioso: ['Lo dicevano le stelle.'],
+      },
+      arena: {
+        classico: ['Il cannone suonerà per te.', 'Che il Bosco ti accolga.'],
+        fantasy: ['Che le rune ti siano lievi.', 'Il drago ringrazia per la cena.'],
+        scifi: ['Disconnesso.', 'Fine della trasmissione.', 'Ti ho tolto l\'ossigeno per farti un favore.'],
+        zombie: ['Meglio così che diventare uno di loro.', 'Almeno non ti rialzerai. Spero.'],
+        royale: ['GG.', 'Eliminato. Prossimo cerchio.', 'Rimani pure a guardare dagli spalti.'],
+        horror: ['Ora fai parte della villa.', 'Saluta i fantasmi da parte mia.'],
+        wasteland: ['Il deserto si prende tutto.', 'I tuoi stivali sono miei.'],
+      },
+    },
+    last: {
+      _: ['Dite a mia madre che... no, non ditele niente.', 'Proprio adesso che stavo vincendo.', 'Che giornata.', 'Avevo ancora un panino nello zaino.', 'Non è giusto.', 'Ci vediamo dall\'altra parte.', 'Almeno sono durat[0:o/a] più di qualcuno.', 'Lo sapevo che non dovevo uscire oggi.', 'Ditemi che almeno ero in favore di telecamera.', 'Mi è sempre piaciuto il mare.'],
+      trait: {
+        esibizionista: ['Fatemi un primo piano, almeno.', 'Che uscita di scena, però.'],
+        romantico: ['Dite a {2} che l\'ho amat[2:o/a] davvero.', 'Avrei voluto un ultimo bacio.'],
+        vendicativo: ['Tornerò a perseguitarti, {1}.', 'Non finisce qui, {1}.'],
+        folle: ['Finalmente, un po\' di silenzio!', 'Ahah. Ah. Oh.'],
+        codardo: ['Lo sapevo. Lo sapevo!'],
+        sfortunato: ['Ovviamente. Ovviamente a me.'],
+        clemente: ['Ti perdono, {1}. Più o meno.'],
+        goloso: ['Il panino... qualcuno finisca il mio panino.'],
+        superstizioso: ['Lo sapevo che era un brutto segno.'],
+        traditore: ['Bella mossa, {1}. L\'avrei fatta anch\'io.'],
+      },
+      arena: {
+        zombie: ['Se mi rialzo, non prendetela sul personale.', 'Mirate alla testa, eh.'],
+        royale: ['Lag! Era lag!', 'Ma ero in zona sicura!'],
+        horror: ['Le voci... adesso le sento chiaramente.', 'Non lasciatemi qui al buio.'],
+        fantasy: ['Seppellitemi sotto un albero che parla.'],
+        scifi: ['Spedite il mio corpo nello spazio. Con stile.'],
+        wasteland: ['Bevetevi la mia acqua. Non sprecatela.'],
+        classico: ['Ditelo al mio distretto. Ditegli che ci ho provato.'],
+      },
+    },
+    revenge: { _: ['Questo è per {2}.', '{2} ti saluta.', 'Hai finito di contare, {1}. Per {2}.', 'Me l\'ero giurato. Per {2}.', 'Guardami negli occhi, {1}. Per {2}.'] },
+    betray: { _: ['È stato un piacere. Davvero.', 'Non c\'è niente di personale nell\'arena.', 'Pensavi davvero che saremmo usciti in due?', 'Mi dispiace, ma solo un po\'.', 'Le alleanze finiscono. Io no.'], trait: { traditore: ['Te l\'avevo detto, il primo giorno: non fidarti di me.', 'Era scritto dal primo momento.'] } },
+    ally: {
+      _: ['Ti copro le spalle. Tu coprile a me.', 'Fino alla fine. O quasi.', 'Insieme si mangia meglio.', 'Allora è deciso: si dorme a turno.', 'Patto?', 'Se tradisci, ti trovo.'],
+      trait: { leader: ['Da ora si fa a modo mio. E si sopravvive.'], paranoico: ['Va bene. Ma dormi lontano da me.'], leale: ['Hai la mia parola. E io la mantengo.'] },
+      arena: { royale: ['Duo? Duo.', 'Tu prendi i rifornimenti, io copro.'], zombie: ['Se ti mordono, ti sparo. Se mi mordono, mi spari. D\'accordo?'], horror: ['Mai dormire da soli. Mai.'], fantasy: ['Che il giuramento sia sigillato dal sangue. Poco, per favore.'] },
+    },
+    love: {
+      _: ['Non avevo previsto te.', 'Se usciamo di qui, ti porto a cena. Una vera.', 'Sei l\'unica cosa buona di questo posto.', 'Promettimi che non morirai stupidamente.', 'Ti ho visto il primo giorno e ho pensato: problemi.', 'Restiamo in due. Poi si vedrà.'],
+      trait: { romantico: ['Ti ho scritto tre poesie. Te le leggo stanotte.', 'Ti amavo già prima di conoscerti.'], esibizionista: ['Baciami. No, girati, c\'è la telecamera.'], paranoico: ['Se è un trucco, è il trucco più bello del mondo.'] },
+      arena: { zombie: ['Se mi trasformo, sarai il mio unico pasto. Romantico, no?'], horror: ['Anche se la villa ci divide, ti ritrovo.'], royale: ['Ti lascio l\'ultima cassa. Questo è amore.'] },
+    },
+    saved: { _: ['Te ne devo una. Anzi, tante.', 'Perché l\'hai fatto?', 'Non lo dimenticherò.', 'Ok. Ok. Respiro.', 'Mi hai salvato la vita. Che imbarazzo.'] },
+    taunt: {
+      _: ['Tutto qui?', 'Ritenta, sarai più fortunat[1:o/a].', 'La prossima volta mirerò meglio.', 'Questo è solo un assaggio.', 'Corri, {1}, corri.', 'Ci rivediamo presto.'],
+      trait: { bruto: ['Ti piego in due.'], esibizionista: ['Sorridi, {1}, ti stanno riprendendo mentre perdi.'], spietato: ['La prossima volta non mi fermo.'], impulsivo: ['Non so perché l\'ho fatto. Ma lo rifarei.'] },
+      arena: { royale: ['Sei rimasto senza scudo, eh?'], fantasy: ['Il tuo incantesimo era scaduto.'], wasteland: ['Benvenuto nel deserto.'] },
+    },
+    sponsor: { _: ['Grazie, grazie, vi amo tutti!', 'Lo sapevo che mi volevate bene.', 'Mamma, se mi guardi: hanno mandato un regalo!', 'Ringrazio gli sponsor e anche il mio parrucchiere.'], trait: { esibizionista: ['Il pubblico ha parlato. E ha buon gusto.'], avido: ['Solo questo? Ne voglio un altro.'] } },
+    disaster: {
+      _: ['Non oggi.', 'Sono ancora qui!', 'Ma chi le progetta queste cose?', 'Ok. Ok. Respiro.', 'Mai più. Mai più!'],
+      arena: {
+        classico: ['Il prossimo che mi parla di natura incontaminata, lo mordo.'], fantasy: ['La magia mi odia. Personalmente.'], scifi: ['Chi ha progettato questa stazione? Lo voglio conoscere.'],
+        zombie: ['Ne ho visti troppi oggi. Troppi.'], royale: ['Bug. È sicuramente un bug.'], horror: ['La villa ride. Lo sento.'], wasteland: ['Il deserto non perdona. Ma oggi si è distratto.'],
+      },
+    },
+    feast: { _: ['Prendo e scappo. Prendo e scappo.', 'È una trappola. Vado lo stesso.', 'C\'è il mio nome sopra, lo giuro.'] },
+  };
+
+  /* versioni senza sangue per il Liceo e l'Ufficio */
+  D.voiceSoft = {
+    kill: { _: ['Niente di personale, eh.', 'Ci vediamo a ricreazione. Ah, no.', 'Scusa, era necessario.', 'Saluti alla tua carriera.', 'Bye bye.', 'Lo dico con affetto: addio.'], arena: { liceo: ['Ti scrivo su WhatsApp. Forse.', 'Era una questione di media.'], ufficio: ['Ti mando un\'email di aggiornamento.', 'Restructuring. Nulla di personale.', 'Come da mia precedente email.'] } },
+    last: { _: ['Non è finita qui.', 'Me ne ricorderò.', 'Va bene, vado. Ma con stile.', 'Almeno ho la giornata libera.'], arena: { liceo: ['Mia madre non deve saperlo.', 'Lo dico alla preside!'], ufficio: ['Ho ancora tre settimane di ferie da smaltire!', 'E il mio TFR?'] } },
+    revenge: { _: ['Questo è per {2}.', 'Ti ricordi di {2}? Io sì.'] },
+    taunt: { _: ['Tutto qui?', 'Che figura.', 'Bel tentativo.', 'Ci rivediamo in corridoio.'], arena: { ufficio: ['Mettiamolo a verbale.'], liceo: ['Screenshot fatto.'] } },
+    disaster: { _: ['Non oggi.', 'Ce l\'ho fatta. Credo.', 'Mai più.'], arena: { liceo: ['La preside ce l\'ha con me.'], ufficio: ['Lo metto nel report del trimestre.'] } },
+    feast: { _: ['Prendo un pezzo di torta e scappo.', 'Gratis? Arrivo.'] },
+  };
+
+  /* conversazioni notturne: due battute, secondo il rapporto */
+  D.chats = {
+    alleati: [
+      ['Domani dove andiamo?', 'Dove non c\'è nessuno. Cioè, da nessuna parte.'],
+      ['Secondo te ci tradiremo?', 'Sì. Ma non stasera.'],
+      ['Fai tu il primo turno?', 'Faccio io il primo e anche il secondo, tanto non dormo.'],
+      ['Hai ancora da mangiare?', 'Ho una cosa che sembrava {cibo} due giorni fa.'],
+      ['Se resto indietro, non aspettarmi.', 'Non dirlo neanche per scherzo.'],
+      ['Chi pensi che vinca?', 'Uno di noi due. Ovviamente.'],
+    ],
+    coppia: [
+      ['Raccontami una cosa bella.', 'Tu. Fine della cosa bella.'],
+      ['Quando usciamo, che facciamo?', 'Dormiamo. Per una settimana.'],
+      ['Hai paura?', 'Solo di perderti. E di {mostro}. Soprattutto di {mostro}.'],
+      ['Promettimi che non farai l\'eroe.', 'Prometto. Più o meno.'],
+    ],
+    rivali: [
+      ['Ti tengo d\'occhio.', 'Anch\'io. Guarda che occhi.'],
+      ['Questa zona è mia.', 'Mettici una bandierina, allora.'],
+      ['La prossima volta non mi scappi.', 'La prossima volta porta qualcuno che sappia mirare.'],
+      ['Dormi bene stanotte.', 'Detto da te suona come una minaccia.'],
+    ],
+    sconosciuti: [
+      ['Tregua per stanotte?', 'Tregua. Ma tieni le mani dove posso vederle.'],
+      ['Da dove vieni?', 'Da un posto dove si dormiva in un letto.'],
+      ['Ti va di dividere il fuoco?', 'Il fuoco sì. Il cibo no.'],
+      ['Hai visto passare qualcuno?', 'Solo te. E non mi sei piaciut[0:o/a].'],
+    ],
+    arena: {
+      classico: [['Senti anche tu il cannone?', 'Lo sento sempre. Anche quando non suona.'], ['Domani attraversiamo il Fiume?', 'Domani attraversiamo il Fiume. Se il Fiume è d\'accordo.']],
+      fantasy: [['Quell\'albero ci sta ascoltando.', 'Allora parla piano, che è permaloso.'], ['Sai leggere le rune?', 'So leggere i menu. È un inizio.']],
+      scifi: [['Quanto ossigeno ti resta?', 'Abbastanza per lamentarmi fino a domani.'], ['Hai sentito quel rumore nei condotti?', 'Era il mio stomaco. Spero.']],
+      zombie: [['Hai controllato se hai morsi?', 'Due volte. Controlla tu le mie spalle.'], ['Quanti colpi ti restano?', 'Tre. Più uno per me, se serve.']],
+      royale: [['La zona si stringe verso nord.', 'Allora noi andiamo a sud. Per principio.'], ['Hai visto dove è caduta la cassa?', 'Sì. Anche altri dieci, però.']],
+      horror: [['Anche tu senti il pianoforte?', 'Non c\'è nessun pianoforte nella villa.'], ['Chi ha spostato la sedia?', 'Non lo chiedere. Non lo chiedere mai.']],
+      wasteland: [['Quanta acqua ci resta?', 'Mezza tanica e tanta speranza.'], ['Senti i motori?', 'Predoni. Spegni il fuoco. Subito.']],
+      liceo: [['Hai fatto i compiti?', 'Ho fatto un\'alleanza. È uguale.'], ['Chi uscirà domani?', 'Chi ha parlato male di noi, spero.']],
+      ufficio: [['Hai visto la mail delle 23?', 'L\'ho vista. Ho finto di non vederla.'], ['Ti fermi anche stasera?', 'Mi fermo da tre anni. Che differenza fa.']],
+    },
+  };
+})(typeof window !== 'undefined' ? window : globalThis);
+
+/* più battute e conversazioni, per non sentire mai due volte la stessa frase */
+(function (G) {
+  const D = G.LOS_DATA; if (!D || !D.voice) return;
+  const more = (o, k, l) => { o[k] = (o[k] || []).concat(l); };
+  more(D.voice.kill, '_', ['Non me ne vanto. Ma neanche mi dispiace.', 'Dovevi restare a casa.', 'Un giorno racconterò questa storia. Non oggi.', 'Spero che ne sia valsa la pena. Per me.', 'Chiudi gli occhi. Ecco.']);
+  more(D.voice.last, '_', ['Ho lasciato il gas acceso, a casa.', 'Ma io ero simpatic[0:o/a]!', 'Almeno esco di scena da protagonista.', 'Questa non la metto nel curriculum.', 'Salutatemi il mio gatto.', 'Era il mio giorno fortunato, secondo l\'oroscopo.']);
+  more(D.voice.taunt, '_', ['Vuoi la rivincita? Mettiti in fila.', 'Ti è piaciuto? Ne ho ancora.', 'Questa te la ricorderai.', 'Sei più lent[1:o/a] di come pensavo.']);
+  more(D.voice.saved, '_', ['Chiedimi qualunque cosa. Quasi qualunque.', 'Perché proprio io?', 'Adesso siamo legati, lo sai?']);
+  more(D.voice.ally, '_', ['Io guardo a destra, tu a sinistra.', 'Se ci separiamo, ci troviamo al tramonto.', 'D\'accordo. Ma il cibo si divide a metà esatta.']);
+  more(D.voice.love, '_', ['Non dirlo a nessuno. Anzi, dillo a tutti.', 'Quando tutto questo finisce, cucino io.', 'Ti avrei trovato anche fuori di qui.']);
+  more(D.voice.disaster, '_', ['Che qualcuno spenga tutto questo!', 'Lo sapevo che oggi andava storto.', 'Sono viv[0:o/a]! Sono... sì, viv[0:o/a].']);
+  const C = D.chats;
+  more(C, 'alleati', [['Hai dormito?', 'Due ore. Le ho contate.'], ['Mi fido di te, sai?', 'Non dirlo ad alta voce. Porta sfortuna.'], ['Quanto manca alla fine?', 'Meno di ieri, più di domani.'], ['Se vinco io, ti dedico la vittoria.', 'Se vinco io, ti dedico il tuo funerale. Scherzo. Più o meno.'], ['Chi ci segue da stamattina?', 'Nessuno. Spero. Dormi con un occhio aperto.'], ['Hai un piano?', 'Ho mezzo piano. L\'altra metà la improvviso.']]);
+  more(C, 'coppia', [['Ti ricordi il primo giorno?', 'Mi hai guardato come si guarda un nemico.'], ['Ho paura di perderti.', 'Allora non perdermi di vista.'], ['Cosa ti manca di più di casa?', 'Prima ti avrei detto il letto. Adesso niente: sei qui.'], ['Se domani va male...', 'Domani non va male. Dormi.']]);
+  more(C, 'rivali', [['Sento ancora il tuo odore da qui.', 'È l\'odore della vittoria. Abituati.'], ['Hai fame?', 'Non abbastanza da accettare qualcosa da te.'], ['Prima o poi ci troveremo da soli.', 'Lo spero. Così la smettiamo con le chiacchiere.'], ['Hai paura di me?', 'Ho paura per te. È diverso.']]);
+  more(C, 'sconosciuti', [['Non ci conosciamo, vero?', 'Ancora no. E forse è meglio così.'], ['Hai visto chi ha vinto ieri sera?', 'Ho visto chi ha perso. Bastava quello.'], ['Bel fuoco.', 'Grazie. Non è in vendita.'], ['Posso sedermi qui?', 'Puoi. Ma se russi, ti sposto.']]);
+  const A = C.arena || (C.arena = {});
+  more(A, 'classico', [['Quanto pesa il tuo zaino?', 'Meno di ieri. Mi preoccupa.'], ['Che fine ha fatto il festino?', 'È finito com\'era iniziato: male.']]);
+  more(A, 'fantasy', [['Hai visto il drago, oggi?', 'L\'ho sentito. È bastato.'], ['Credi alle profezie?', 'Credo a quelle che mi fanno vincere.']]);
+  more(A, 'scifi', [['Guarda la Terra da qui.', 'È piccola. Come le nostre possibilità.'], ['Chi ha programmato questa stazione?', 'Qualcuno che ci odiava. Molto.']]);
+  more(A, 'zombie', [['Ti ricordi com\'era la città prima?', 'Rumorosa. Ora è solo rumorosa in un altro modo.'], ['Hai sentito? Qualcuno chiede aiuto.', 'Sì. È una trappola. È sempre una trappola.']]);
+  more(A, 'royale', [['Hai visto la classifica?', 'Siamo nella top ten. Non dirlo, porta male.'], ['Quante munizioni hai?', 'Abbastanza per vincere, se nessuno sbaglia. Cioè, no.']]);
+  more(A, 'horror', [['Hai chiuso la porta?', 'Sì. Ma non è la porta che mi preoccupa.'], ['Chi ha suonato il campanello?', 'Nessuno. Non c\'è un campanello.']]);
+  more(A, 'wasteland', [['Hai mai visto il mare?', 'In foto. Era blu, credo.'], ['Domani si va verso la Diga?', 'Domani si va dove c\'è acqua. Cioè, verso la Diga.']]);
+  more(A, 'liceo', [['Hai visto chi c\'era in Mensa?', 'Sì. E ho visto con chi parlava.'], ['Domani c\'è la verifica?', 'Domani c\'è la verifica e la mia fine.']]);
+  more(A, 'ufficio', [['Ti hanno chiamato dalle risorse umane?', 'Due volte. Non ho risposto.'], ['Il Direttore ti ha salutato oggi?', 'Sì. Mi preoccupa moltissimo.']]);
 })(typeof window !== 'undefined' ? window : globalThis);
 
 ;
@@ -4843,6 +5065,1009 @@ La festa dell'ultimo giorno | Un gruppo di sopravvissuti organizza una festa con
 })(typeof window !== 'undefined' ? window : globalThis);
 
 ;
+/* Arena Classica — secondo pacchetto: eventi legati a mente, oggetti, meteo e condizione fisica. */
+(function (G) {
+  const D = (G.LOS_DATA = G.LOS_DATA || {}); D.packs = D.packs || [];
+  D.packs.push({
+    theme: 'classico',
+    ev: {
+      b: `
+1 +armatura:A @luck | {A} afferra il primo oggetto a portata di mano: {armatura}. Non è un'arma, ma è meglio di niente.
+1 +attrezzo:A @int | {A} ignora le armi e punta dritt[A:o/a] a {attrezzo}. Gli altri ridono. Gli altri moriranno prima.
+1 +valore:A @mad | {A} riempie lo zaino di {valore}. Non si mangia, non ferisce, ma luccica.
+2 hit:A>B +cibo:A @agg | {A} strappa uno zaino a {B} con una spallata. Dentro ci sono solo {cibo}, ma è una vittoria morale.
+2 al:AB +attrezzo:B | {A} e {B} si dividono il bottino della Cornucopia: a {A} la paura, a {B} {attrezzo}. Poi corrono insieme verso il Bosco.
+2 k:A>B w:A @agg | {A} raggiunge la Cornucopia per prim[A:o/a] e la difende con {arma:A}. {B} non ci arriverà mai.
+3 al:ABC @soc | {A}, {B} e {C} si nascondono dietro la stessa roccia e decidono che, da quel momento, sono una squadra.
+1 test:A=agi12 ok:+arma:A ko:s:A=ferito | {A} si lancia tra due concorrenti e ne esce con {arma} in mano. || {A} si lancia tra due concorrenti e ne esce con un taglio sul braccio e niente in mano.
+`,
+      d: `
+1 stat:A<food30 +cibo:A @food | {A} è così affamat[A:o/a] che insegue un coniglio per mezzo Bosco. Lo prende. Piange un po'.
+1 stat:A<hp45 @heal hp:A+20 | {A} si ferma al Fiume e si lava le ferite con l'acqua gelida. Brucia, ma funziona.
+1 stat:A>mo75 @show star:A | {A} è di ottimo umore e canta per tutta la mattina. Il pubblico in capitale impara il ritornello.
+1 stat:A<mo25 s:A=sconvolto | {A} si siede su un sasso e non si muove per ore. Qualcosa, dentro, si è rotto.
+1 con:A=attrezzo +cibo:A @int | {A} usa {attrezzo:A} per costruire una nassa nel Fiume. A sera è piena di pesci.
+1 con:A=ricordo mo:A+15 | {A} guarda {ricordo:A} e ritrova la forza di alzarsi.
+1 con:A=valore -valore:A +med:A | {A} lascia {valore} su un altare improvvisato. Il giorno dopo, al suo posto, c'è {med:A}. Gli sponsor hanno senso dell'umorismo.
+1 wx:buio @stl | {A} sfrutta la nebbia per attraversare la radura che nessuno osa attraversare di giorno.
+1 wx:abbondanza +cibo:A @food | {A} raccoglie tante bacche che le infila anche nelle tasche, nelle scarpe e nel cappuccio.
+1 wx:pericolo s:A=ferito | Il tempo è infame: {A} scivola su una roccia bagnata e si apre il ginocchio.
+2 crush:A>B rel:AB+15 @soc | {A} porta a {B} la parte migliore del coniglio arrosto, «per caso». {B} non capisce. Tutti gli altri sì.
+2 crush:A>B love:AB *2 | {A} trova {B} al Fiume e, dopo tre giorni di sguardi, finalmente parla. Si baciano sotto un salice. In capitale si sviene.
+2 plot:A>B rel:AB+10 | {A} si offre di fare il turno di guardia al posto di {B}. È un gesto gentile. È anche un modo per studiarl[B:o/a] mentre dorme.
+2 plot:A>B -cibo:B +cibo:A @stl | {A} sposta, un po' alla volta, le provviste di {B} nel proprio zaino. Fa parte del piano.
+2 goal:A=vendetta grudge:A>B hit:A>B | {A} segue le tracce di {B} fino al Fiume e l[B:o/a] colpisce alle spalle. Per {caro:A}. Non basta ancora.
+2 goal:A=cibo give:B>A=cibo debt:A>B | {B} vede quanto è affamat[A:o/a] {A} e [A:gli/le] lascia metà della sua cena. «Me la renderai.»
+2 goal:A=caccia k:A>B @agg | {A} ha passato la notte a seguire le impronte di {B}. All'alba, le impronte finiscono.
+2 con:A=armatura hit:B>A | {B} colpisce {A} con tutta la forza che ha, ma {armatura:A} regge. {A} sorride. {B} no.
+2 con:A=alcol give:A>B=alcol rel:AB+20 | {A} divide {alcol} con {B} attorno al fuoco. Per una sera, l'arena sembra lontana.
+2 test:A=sop12 ok:+cibo:A ok:+cibo:B ko:s:A=avvelenato | {A} giura di riconoscere i funghi buoni e ne raccoglie per sé e per {B}. Ha ragione. || {A} giura di riconoscere i funghi buoni. {B} ha il buon senso di non assaggiarli. {A} no.
+3 plot:A>B ally:ABC rel:AC+20 | {A} prende da parte {C} e [C:gli/le] racconta, sottovoce, cosa pensa davvero di {B}. {C} ascolta. {C} non dice niente.
+1 trait:A=solitario @stl | {A} trova una radura dove non c'è nessuno e, per la prima volta da giorni, sorride.
+1 trait:A=cacciatore +cibo:A | {A} segue una pista di sangue per un'ora. In fondo c'è un cervo ferito. Stasera si mangia bene.
+2 trait:A=generoso stat:B<food30 give:A>B=cibo | {A} vede {B} frugare tra le foglie e gli lancia {cibo} senza dire una parola.
+`,
+      n: `
+1 stat:A<hp30 @heal s:A=sconvolto | {A} passa la notte stringendo la ferita con le mani e contando le stelle per non svenire.
+1 stat:A<en25 s:A=ferito | {A} è così stanc[A:o/a] che si addormenta in piedi e cade da un tronco. Si sveglia con un bernoccolo.
+1 con:A=ricordo | {A} si addormenta con {ricordo:A} sotto la guancia.
+1 wx:buio @mad | Nella nebbia, {A} sente dei passi intorno al rifugio per tutta la notte. Al mattino non c'è nessuna impronta.
+1 wx:pericolo pr:A+15 | Il gelo della notte entra nelle ossa di {A}, che non trova un riparo decente.
+2 crush:A>B @soc | {A} resta svegli[A:o/a] tutta la notte per fare la guardia a {B}. {B} non lo saprà mai.
+2 crush:A>B rel:AB-10 @mad | {A} prova a dire a {B} quello che prova, ma escono solo parole sul meteo. Molte parole sul meteo.
+2 plot:A>B tr:A>B *2 | {A} aspettava solo il buio. {B} si fidava. Sono due cose che, nell'arena, non vanno d'accordo.
+2 plot:A>B br:A | {A} sparisce prima dell'alba con metà delle provviste del gruppo. {B} si sveglia e capisce tutto.
+2 couple:AB con:A=ricordo give:A>B=ricordo | {A} regala a {B} {ricordo:A}. «Così, se succede qualcosa, avrai un pezzo di casa mia.»
+2 couple:AB stat:B<hp40 save:A>B | {A} porta {B}, che sanguina, fino alla grotta più vicina sulle spalle. Arriva all'alba, sfinit[A:o/a], ma arriva.
+2 owe:A>B repay:A>B rel:AB+10 | {A} sveglia {B} un attimo prima che {mostro} raggiunga il loro rifugio. Debito saldato.
+2 grudge:A>B forgive:A>B trait:A=clemente | {A} guarda {B} dormire a pochi metri e decide che basta così. Non l[B:o/a] perdona: l[B:o/a] lascia andare.
+2 goal:A=nascondersi @cow | {A} si nasconde nel tronco cavo dove si era già nascost[B:o/a] {B}. Nessuno dei due si muove fino all'alba.
+2 hit:A>B @mad trait:A=sonnambulo | {A} cammina nel sonno, inciampa su {B} e [B:gli/le] sferra un calcio. Si scusa al mattino. {B} non ride.
+3 couple:AB crush:C>A | {C} guarda {A} e {B} dormire abbracciati e capisce che non avrà mai una possibilità.
+`,
+      f: `
+1 con:A=valore -valore:A +arma:A | Al festino, {A} baratta {valore} con un concorrente di passaggio: in cambio ottiene {arma}.
+2 crush:A>B save:A>B | Al festino, {A} si butta davanti a {B} per salvarl[B:o/a] da una freccia. {B} l[A:o/a] guarda in un modo nuovo.
+2 plot:A>B k:A>B *2 | Al festino, nella confusione, {A} si libera di {B}. Nessuno vede niente. Era proprio il piano.
+`,
+      sponsor: `
+1 +armatura:A @gift | Arriva un paracadute per {A}: dentro c'è {armatura}. Il messaggio dice: «Stai attent[A:o/a]».
+1 +attrezzo:A @gift | Gli sponsor mandano a {A} {attrezzo} e un biglietto: «Usalo bene».
+1 +ricordo:A mo:A+20 @gift | Gli sponsor mandano a {A} un pacchetto da casa: dentro c'è {ricordo}. {A} si commuove in diretta nazionale.
+`,
+      finale: `
+2 k:A>B | Sul tetto della Cornucopia, {A} e {B} si guardano per un minuto intero. Poi {A} si muove per prim[A:o/a].
+2 k:A>B con:A=armatura | {B} colpisce per prim[B:o/a], ma {armatura:A} para il colpo. {A} non ne dà un secondo a {B}.
+2 k:A>B | {A} e {B} lottano nel Fiume fino all'ultimo respiro. Riemerge solo {A}.
+`,
+    },
+    dis: `
+Il gelo improvviso | In piena estate, una gelata coperta di brina cala sull'arena in pochi minuti. | {A} si addormenta all'aperto e non si sveglia più. | {A} perde la sensibilità di due dita, ma non la vita. | {A} accende un fuoco appena in tempo e ci si siede sopra, quasi. | ferito
+La migrazione dei cinghiali | Un branco di cinghiali mutanti attraversa il Bosco, travolgendo tutto. | {A} viene travolt[A:o/a] dal branco. | {A} viene caricat[A:o/a] e scaraventat[A:o/a] contro un albero. | {A} si arrampica su una quercia e guarda passare cento cinghiali arrabbiati. | ferito
+Il fiume impazzito | Gli organizzatori aprono una diga: il Fiume diventa un torrente furioso. | {A} viene trascinat[A:o/a] via dalla corrente. | {A} si aggrappa a un ramo e perde lo zaino. | {A} è sull'Altopiano e guarda il disastro da lontano, con un panino. | affamato
+La nebbia acida | Una nebbia gialla sale dalle Paludi e brucia gli occhi. | {A} respira troppa nebbia e non si rialza. | {A} tossisce sangue per ore. | {A} si copre la faccia con un panno bagnato e cammina controvento. | malato
+La pioggia di aghi | Dagli alberi cadono milioni di aghi di pino affilati come rasoi. | {A} non trova riparo in tempo. | {A} si ritrova con la schiena trasformata in un puntaspilli. | {A} si infila sotto una roccia e aspetta. | ferito
+Il terremoto | La terra trema: si aprono crepacci in tutta l'arena. | {A} cade in un crepaccio. | {A} resta incastrat[A:o/a] per mezza giornata. | {A} salta da una parte all'altra del crepaccio come in un film. | ferito
+Gli scoiattoli assassini | Gli strateghi liberano scoiattoli geneticamente modificati con i denti di un lupo. | {A} sottovaluta uno scoiattolo. È l'ultimo errore. | {A} viene mors[A:o/a] in quattordici punti diversi. | {A} lancia agli scoiattoli tutte le sue noccioline e scappa. | avvelenato
+Il miele velenoso | Gli alveari del Bosco producono un miele dolcissimo e mortale. | {A} non resiste e ne mangia un barattolo intero. | {A} ne assaggia un dito e vede i colori per due giorni. | {A} lo annusa, sospetta e lo regala a nessuno. | avvelenato
+La frana dell'Altopiano | Metà dell'Altopiano scivola a valle in un boato. | {A} viene sepolt[A:o/a] dalla frana. | {A} viene colpit[A:o/a] da un masso grande come un cane. | {A} corre nella direzione opposta a tutti gli altri, e ha ragione. | ferito
+La notte senza fine | Gli organizzatori spengono il sole: è notte per un giorno intero. | {A} si perde nel buio e cade in una gola. | {A} va a sbattere contro ogni albero del Bosco. | {A} conta i passi e torna al proprio rifugio a memoria. | sconvolto
+`,
+  });
+})(typeof window !== 'undefined' ? window : globalThis);
+
+;
+/* Reame Incantato — secondo pacchetto. */
+(function (G) {
+  const D = (G.LOS_DATA = G.LOS_DATA || {}); D.packs = D.packs || [];
+  D.packs.push({
+    theme: 'fantasy',
+    ev: {
+      b: `
+1 +armatura:A @luck | Dall'Altare, {A} afferra {armatura}. Sulla fodera c'è ricamato il nome di un eroe morto. Non è di buon auspicio.
+1 +attrezzo:A @int | {A} ignora le spade e prende {attrezzo}. Un vecchio gufo sull'Altare annuisce approvando.
+2 al:AB +amuleto:A | {A} e {B} toccano insieme lo stesso amuleto sull'Altare: si accende, e decidono che è un segno.
+2 k:A>B @agg | {A} pronuncia la prima parola magica che [A:gli/le] viene in mente. Funziona. Purtroppo per {B}.
+1 test:A=fort12 ok:+amuleto:A ko:pr:A+25 | {A} apre uno scrigno sull'Altare: dentro c'è {amuleto}. || {A} apre uno scrigno sull'Altare: ne esce un fumo nero che [A:gli/le] entra nel naso. Brutto segno.
+`,
+      d: `
+1 stat:A>pr50 @mad | {A} parla con la propria ombra. L'ombra, ormai, risponde a tono.
+1 stat:A>pr60 con:A=amuleto pr:A-30 | {A} stringe {amuleto:A} e recita una formula: il nero nelle vene si ritira, per ora.
+1 stat:A<hp45 @heal hp:A+25 | {A} beve da una fonte che brilla di luce azzurra. Le ferite si richiudono, con un rumore di campanelli.
+1 stat:A<food30 +cibo:A | {A} segue un profumo di pane appena sfornato fino a una casetta di marzapane. Nessuno in casa. Per fortuna.
+1 con:A=attrezzo +mappa:A @int | {A} usa {attrezzo:A} per leggere le stelle di giorno. Ne ricava {mappa}.
+1 con:A=valore -valore:A +med:A | {A} paga un folletto con {valore}. Il folletto, in cambio, [A:gli/le] dà {med:A} e un consiglio pessimo.
+1 con:A=ricordo mo:A+15 pr:A-10 | {A} tiene stretto {ricordo:A} mentre attraversa la Palude stregata. Le voci, stavolta, tacciono.
+1 wx:buio @stl | Nella nebbia degli elfi, {A} attraversa la Foresta senza che un solo ramo scricchioli.
+1 wx:abbondanza +cibo:A | {A} trova un albero di mele d'oro. Non ne mangia una sola: ne mangia diciotto.
+1 wx:pericolo s:A=ferito | Una pioggia di cenere del drago coglie {A} allo scoperto. Le bruciature durano giorni.
+1 trait:A=superstizioso +amuleto:A | {A} trova un quadrifoglio con cinque foglie. Lo intreccia in un braccialetto. Ora è {amuleto}.
+1 trait:A=ingegnoso con:A=attrezzo +trap:A | {A} incanta {attrezzo:A} perché scatti quando qualcuno ci passa vicino. Ora è una trappola.
+2 crush:A>B @soc rel:AB+15 | {A} intreccia una corona di fiori di luna e la lascia vicino al giaciglio di {B}. Le fate ridacchiano.
+2 crush:A>B love:AB *2 | Una fata, stanca di aspettare, spinge {A} tra le braccia di {B}. Funziona. Le fate sono sempre stanche di aspettare.
+2 plot:A>B rel:AB+10 | {A} insegna a {B} un incantesimo di protezione. Uno sbagliato, apposta.
+2 plot:A>B -amuleto:B +amuleto:A @stl | {A} scambia l'amuleto di {B} con un sasso dipinto. {B} non se ne accorge. Ancora.
+2 goal:A=vendetta grudge:A>B hit:A>B | {A} lancia una maledizione contro {B} per {caro:A}. Lo colpisce di striscio. La prossima volta mirerà meglio.
+2 goal:A=caccia k:A>B @agg | {A} chiede a un corvo dove si trovi {B}. Il corvo glielo dice. I corvi non sono mai neutrali.
+2 con:A=armatura hit:B>A | {B} scaglia un dardo incantato contro {A}, ma {armatura:A} lo assorbe con un ronzio.
+2 con:A=alcol give:A>B=alcol rel:AB+20 | {A} offre a {B} un sorso di {alcol}. Diventano amici per la pelle in esattamente un sorso.
+2 test:A=int13 ok:+amuleto:A ok:rel:AB+15 ko:hit:B>A | {A} risolve l'indovinello della sfinge al posto di {B}. La sfinge regala a entrambi un amuleto, e {B} ringrazia. || {A} sbaglia l'indovinello della sfinge. La sfinge scaglia {B} contro {A}. Letteralmente.
+2 owe:A>B repay:A>B +cibo:B | {A} lascia a {B} un cestino di pane elfico: è il modo degli elfi per dire «siamo pari».
+2 enemy:AB stat:A>pr50 hit:A>B | La corruzione rende {A} irascibile: vede {B} e l[B:o/a] attacca senza una parola.
+3 plot:A>B ally:ABC rel:AC+20 | {A} legge a {C} un futuro inventato nelle foglie di tè: nel futuro, {B} tradisce tutti. {C} ci crede.
+`,
+      n: `
+1 stat:A>pr60 pr:A+10 s:A=sconvolto | {A} sogna di trasformarsi in pietra. Al risveglio, ha un piede un po' più freddo dell'altro.
+1 con:A=amuleto mo:A+10 | {A} dorme con {amuleto:A} stretto al petto. Per la prima volta, nessun incubo.
+1 wx:pericolo s:A=ferito | Nella notte senza luna, qualcosa morde {A} alla caviglia e sparisce nel buio.
+2 crush:A>B @soc | {A} veglia {B} tutta la notte con una lucciola in un barattolo, perché non abbia paura del buio.
+2 plot:A>B tr:A>B *2 | {A} aspetta che {B} si addormenti sotto le stelle. Le stelle guardano, e non dicono niente.
+2 couple:AB pr:A-15 pr:B-15 | {A} e {B} danzano sotto la luna piena. Per un'ora la maledizione dell'arena non li tocca.
+2 couple:AB stat:B<hp40 save:A>B | {A} canta a {B} una ninna nanna elfica per tutta la notte. Al mattino le ferite sono quasi chiuse.
+2 grudge:A>B forgive:A>B trait:A=clemente | {A} accende una candela per {caro:A} e, nella stessa notte, decide di lasciar andare la rabbia verso {B}.
+2 hit:A>B trait:A=sonnambulo | {A} cammina nel sonno recitando incantesimi a caso. Uno colpisce {B}.
+`,
+      f: `
+2 crush:A>B save:A>B | Al banchetto incantato, {A} assaggia il calice destinato a {B}. Era avvelenato. {A} sopravvive per miracolo, e {B} non lo dimenticherà.
+2 plot:A>B k:A>B *2 | Al banchetto, {A} versa qualcosa nel calice di {B}. Era nel piano dall'inizio.
+1 con:A=valore -valore:A +armatura:A | Al banchetto, {A} paga un nano con {valore} e ottiene {armatura}.
+`,
+      sponsor: `
+1 +armatura:A @gift | Un falco reale porta a {A} {armatura}, avvolta in seta.
+1 +amuleto:A @gift | Gli sponsor mandano a {A} {amuleto} e un biglietto: «Non toglierlo mai».
+1 +ricordo:A mo:A+20 @gift | Un piccolo drago consegna a {A} un pacchetto da casa: {ricordo}.
+`,
+      finale: `
+2 k:A>B | Sul Picco del drago, {A} e {B} si affrontano mentre il drago guarda incuriosito. Alla fine il drago applaude. Solo uno dei due può sentirlo.
+2 k:A>B con:A=amuleto | {B} lancia l'ultima maledizione, ma {amuleto:A} la rimbalza indietro. {A} non deve fare altro.
+`,
+    },
+    dis: `
+La notte delle streghe | Tre streghe sorvolano l'arena lanciando maledizioni a caso. | {A} viene trasformat[A:o/a] in un rospo, e un airone passa di lì. | {A} si ritrova con le orecchie da asino per un giorno intero. | {A} offre alle streghe un dolcetto e viene lasciat[A:o/a] in pace. | sconvolto
+Il risveglio del golem | Le statue della Torre si animano e cominciano a camminare. | {A} viene schiacciat[A:o/a] da un golem distratto. | {A} viene pres[A:o/a] a calci da una statua di un re. | {A} si finge una statua anche l[A:ui/ei], e funziona. | ferito
+La pioggia di stelle | Dal cielo cadono stelle vere, calde e luminose. | {A} viene colpit[A:o/a] da una stella cadente. | {A} esprime un desiderio e intanto si brucia le mani. | {A} raccoglie una stella spenta e la usa come lanterna. | ferito
+Il canto delle sirene | Dal Lago nebbioso sale un canto irresistibile. | {A} cammina nel Lago fino a sparire. | {A} si tuffa, ma una radice l[A:o/a] trattiene. | {A} si tappa le orecchie con il muschio e canta più forte. | sconvolto
+La marea di funghi | I funghi luminosi crescono ovunque, e liberano spore allucinogene. | {A} respira le spore e cammina giù dal Picco. | {A} parla per ore con un fungo, che ha opinioni molto forti. | {A} si avvolge un panno sulla faccia e attraversa la nebbia. | malato
+Lo specchio delle anime | Uno specchio gigante appare nella Foresta e mostra a ognuno la propria paura. | {A} guarda troppo a lungo e non torna più. | {A} piange per un'ora davanti al proprio riflesso. | {A} fa le linguacce allo specchio, che si offende e sparisce. | sconvolto
+Il mercante di anime | Un mercante incappucciato offre a tutti un desiderio, in cambio di qualcosa. | {A} accetta. Il prezzo era la vita. | {A} accetta e perde la voce per un giorno. | {A} rifiuta con educazione e se ne va con un biscotto omaggio. | sconvolto
+Le radici affamate | Gli alberi della Foresta allungano le radici in cerca di cibo. | {A} viene trascinat[A:o/a] sottoterra. | {A} perde uno stivale e un po' di pelle. | {A} si arrampica sull'albero stesso, l'unico posto dove le radici non arrivano. | ferito
+`,
+  });
+})(typeof window !== 'undefined' ? window : globalThis);
+
+;
+/* Villa Maledetta — secondo pacchetto. */
+(function (G) {
+  const D = (G.LOS_DATA = G.LOS_DATA || {}); D.packs = D.packs || [];
+  D.packs.push({
+    theme: 'horror',
+    ev: {
+      b: `
+1 +armatura:A @luck | Durante la cena, {A} si nasconde dietro {armatura}. Il primo coltello rimbalza.
+1 +attrezzo:A @int | {A} ruba {attrezzo} dal tavolo apparecchiato. Il maggiordomo fantasma alza un sopracciglio.
+2 al:AB @soc | Le luci si spengono durante la cena: {A} e {B} si stringono la mano sotto il tavolo. Quando le luci tornano, sono alleati.
+2 k:A>B @agg | Le candele si spengono di colpo. Quando si riaccendono, il posto di {B} è vuoto e {A} si pulisce le mani.
+1 test:A=cor12 ok:+amuleto:A ko:pr:A+30 | {A} apre l'armadio della sala da pranzo. Dentro c'è {amuleto}. || {A} apre l'armadio della sala da pranzo. Dentro c'è qualcosa che {A} non dimenticherà mai.
+`,
+      d: `
+1 stat:A>pr50 @mad | {A} conta le porte del corridoio a voce alta. Ogni volta ne conta una in più.
+1 stat:A>pr60 con:A=amuleto pr:A-30 | {A} stringe {amuleto:A} e recita la preghiera della nonna. I sussurri tacciono.
+1 stat:A<hp45 @heal hp:A+20 | {A} trova un cassetto pieno di bende nella Serra. Sono vecchie di un secolo, ma pulite.
+1 stat:A<food30 +cibo:A | {A} trova un pasto caldo servito in una stanza vuota. Lo mangia lo stesso. Non chiede a chi era destinato.
+1 stat:A>mo75 star:A | {A} ride in faccia a un fantasma. Il fantasma è così offeso che se ne va. Il pubblico adora.
+1 con:A=attrezzo +mappa:A @int | {A} usa {attrezzo:A} per trovare i passaggi segreti della villa. Ne disegna una mappa.
+1 con:A=valore -valore:A pr:A-25 | {A} lascia {valore} sul pianoforte, come offerta. Il pianoforte suona una nota, soddisfatto.
+1 con:A=ricordo mo:A+15 pr:A-15 | {A} stringe {ricordo:A}. Per un attimo, la villa sembra solo una casa.
+1 wx:buio @stl | Durante il temporale, {A} si muove tra i corridoi senza che neppure i fantasmi l[A:o/a] notino.
+1 wx:pericolo s:A=sconvolto | Le candele si accendono da sole intorno a {A} formando un cerchio. {A} non si muove per un'ora.
+1 trait:A=superstizioso +amuleto:A pr:A-15 | {A} sparge sale su ogni soglia della stanza e appende uno spicchio d'aglio sulla porta. Dorme tranquill[A:o/a].
+1 trait:A=ingegnoso con:A=attrezzo +trap:A | {A} collega {attrezzo:A} al lampadario: chi entra nella Biblioteca riceve un lampadario in testa.
+2 crush:A>B rel:AB+15 @soc | {A} lascia a {B} una rosa nera trovata nella Serra. Non sa che nella villa una rosa nera significa «sei il prossimo». {B} lo sa.
+2 crush:A>B love:AB *2 | {A} e {B} restano chiusi nella Cappella durante il temporale. Il fantasma del prete li sposa per sbaglio.
+2 plot:A>B rel:AB+10 | {A} accompagna {B} in Cantina «per sicurezza». Prende nota di dove sono le chiavi.
+2 plot:A>B -amuleto:B +amuleto:A @stl | {A} scambia il portafortuna di {B} con un oggetto qualsiasi. La villa ne approfitterà.
+2 goal:A=vendetta grudge:A>B hit:A>B | {A} chiude {B} nella Soffitta per {caro:A}. L[B:o/a] fa uscire solo all'alba, mezz[B:o/a] pazz[B:o/a].
+2 goal:A=caccia k:A>B @agg | {A} segue {B} nei passaggi segreti. In fondo al passaggio, {B} non trova l'uscita.
+2 con:A=armatura hit:B>A | {B} colpisce {A} con un candelabro, ma {armatura:A} rimbomba come una campana.
+2 con:A=alcol give:A>B=alcol rel:AB+20 pr:B-10 | {A} e {B} si scolano {alcol} della cantina. I fantasmi, per una sera, sembrano simpatici.
+2 test:A=cor13 ok:save:A>B ko:pr:A+25 | {A} entra nello specchio per riportare indietro {B}. Ci riesce. || {A} entra nello specchio per riportare indietro {B}, ma scappa a metà. Ci penserà per sempre.
+2 owe:A>B repay:A>B rel:AB+10 | {A} tira {B} fuori dalla vasca della Serra prima che le mani dall'acqua l[B:o/a] trascinino giù. Debito saldato.
+3 plot:A>B ally:ABC rel:AC+20 | {A} racconta a {C} che {B} parla con i fantasmi di notte. È vero. Ma {A} lo racconta nel modo peggiore.
+`,
+      n: `
+1 stat:A>pr60 pr:A+10 s:A=sconvolto | {A} sente bussare dall'interno dell'armadio. Tutta la notte. Al mattino l'armadio è vuoto.
+1 stat:A<en25 s:A=ferito | {A} crolla dal sonno su una sedia a dondolo. La sedia continua a dondolare. Da sola.
+1 con:A=ricordo | {A} si addormenta stringendo {ricordo:A}, l'unica cosa nella villa che non sussurra.
+1 wx:buio @mad | Nel buio, {A} sente il proprio nome sussurrato da dieci voci diverse.
+2 crush:A>B @soc | {A} veglia {B} tutta la notte con una candela. Quando la candela si spegne da sola, non la riaccende.
+2 plot:A>B tr:A>B *2 | {A} accompagna {B} in Cantina «a prendere da bere». Torna da sol[A:o/a].
+2 plot:A>B br:A | {A} se ne va nella notte chiudendo a chiave la porta del gruppo dall'esterno. {B} trova la porta chiusa all'alba.
+2 couple:AB pr:A-15 pr:B-15 | {A} e {B} si raccontano storie buffe per coprire i rumori della villa. Funziona fino all'alba.
+2 couple:AB stat:B<hp40 save:A>B | {A} porta {B} fuori dalla Soffitta in braccio, mentre le bambole si girano a guardare.
+2 hit:A>B trait:A=sonnambulo | {A} cammina nel sonno con un candelabro in mano. {B} si sveglia con un bernoccolo e un sospetto.
+`,
+      f: `
+2 crush:A>B save:A>B | Al ballo in maschera, {A} riconosce {B} sotto la maschera e l[B:o/a] trascina via un attimo prima che il lampadario cada.
+2 plot:A>B k:A>B *2 | Al ballo in maschera, {A} balla con {B} fino al balcone. Il balcone non ha ringhiera.
+1 con:A=valore -valore:A +amuleto:A | Al ballo, {A} paga un indovino fantasma con {valore} e ottiene {amuleto}.
+`,
+      sponsor: `
+1 +amuleto:A @gift | Gli sponsor mandano a {A} {amuleto}, benedetto da tre preti diversi. Per sicurezza.
+1 +attrezzo:A @gift | Un pacco per {A} appare sul tavolo della cena: dentro c'è {attrezzo}.
+1 +ricordo:A mo:A+20 pr:A-15 @gift | Gli sponsor mandano a {A} una lettera da casa e {ricordo}. Per un attimo la villa tace.
+`,
+      finale: `
+2 k:A>B | Nella sala da ballo, mentre le candele si spengono una a una, {A} e {B} si affrontano. Quando si spegne l'ultima, resta solo il respiro di {A}.
+2 k:A>B stat:B>pr60 | {B} è stat[B:o/a] consumat[B:o/a] dal terrore: attacca {A} gridando nomi che nessuno conosce. {A} non ha scelta.
+`,
+    },
+    dis: `
+La notte dei ritratti | I ritratti della villa scendono dalle cornici. | {A} viene trascinat[A:o/a] dentro un ritratto. | {A} viene graffiat[A:o/a] da una nobildonna dipinta. | {A} gira tutti i ritratti verso il muro. | ferito
+L'allagamento della Cantina | La Cantina si riempie di un'acqua nera e gelida. | {A} viene trascinat[A:o/a] sul fondo. | {A} esce dall'acqua con una febbre altissima. | {A} sale le scale tre gradini alla volta. | malato
+La danza delle bambole | Le bambole della Soffitta prendono vita e cantano una filastrocca. | {A} ascolta la filastrocca fino alla fine. | {A} viene mors[A:o/a] da una bambola di porcellana. | {A} chiude la Soffitta a chiave e butta via la chiave. | sconvolto
+La campana della Cappella | La campana suona tredici colpi. A ogni colpo, qualcuno sparisce. | {A} sparisce al tredicesimo colpo. | {A} sparisce per un'ora e ricompare in giardino, senza ricordi. | {A} si tappa le orecchie e conta fino a quattordici. | sconvolto
+La nebbia del Cimitero | Dal Cimitero sale una nebbia che parla. | {A} segue la voce nella nebbia. | {A} ne esce con i capelli bianchi. | {A} resta in casa e chiude le finestre. | sconvolto
+Il banchetto dei morti | La tavola si apparecchia da sola per cento ospiti invisibili. | {A} si siede al banchetto e non si rialza più. | {A} assaggia un piatto e sta male per giorni. | {A} rifiuta educatamente e se ne va. | avvelenato
+Le pareti che si stringono | I corridoi della villa si restringono lentamente. | {A} resta schiacciat[A:o/a] tra due pareti. | {A} si sloga una spalla per uscire. | {A} trova una finestra e salta fuori. | ferito
+Il pianoforte maledetto | Il pianoforte suona una melodia che fa ballare chiunque la senta. | {A} balla fino a crollare. | {A} balla per sei ore e si rompe una caviglia. | {A} chiude il coperchio del pianoforte con un tonfo. | ferito
+`,
+  });
+})(typeof window !== 'undefined' ? window : globalThis);
+
+;
+/* Legami, oggetti e pensieri: eventi validi in tutte le arene (senza violenza). */
+(function (G) {
+  const D = (G.LOS_DATA = G.LOS_DATA || {}); D.packs = D.packs || [];
+  D.packs.push({
+    theme: 'tutte',
+    ev: {
+      d: `
+1 con:A=ricordo stat:A<mo30 mo:A+20 | {A} rilegge {ricordo:A} per la decima volta. Alla decima, finalmente, sorride.
+1 con:A=valore stat:A<food30 -valore:A +cibo:A | {A} cede {valore} pur di mangiare qualcosa. Non è mai stato così felice di fare un pessimo affare.
+1 con:A=attrezzo @int +mappa:A | Con {attrezzo:A} e un po' di pazienza, {A} si costruisce {mappa}.
+1 con:A=alcol stat:A<mo25 -alcol:A s:A=ubriaco mo:A+15 | {A} affoga i dispiaceri in {alcol}. I dispiaceri, a quanto pare, sanno nuotare.
+1 con:A=armatura @show star:A | {A} si mette in posa con {armatura:A} per le telecamere. Sembra un eroe da copertina.
+1 stat:A>mo80 @soc | {A} è di umore così buono che saluta perfino i nemici. Alcuni ricambiano, confusi.
+1 stat:A<en20 s:A=ferito | {A} è così stanc[A:o/a] che inciampa sui propri piedi. Due volte.
+1 stat:A<food25 @food | Lo stomaco di {A} brontola così forte che si sente in tutta la zona.
+1 goal:A=nascondersi @cow | {A} passa la giornata immobile nel nascondiglio migliore che abbia mai trovato.
+1 goal:A=reclutare @soc | {A} fa il giro di tutta la zona presentandosi a chiunque. Qualcuno se l[A:o/a] ricorderà.
+1 goal:A=spettacolo star:A | {A} recita un monologo improvvisato davanti alla telecamera più vicina. Gli sponsor prendono nota.
+1 goal:A=curarsi @heal hp:A+15 | {A} passa la giornata a riposare in un angolo tranquillo. Non è eroico, ma funziona.
+1 wx:calma mo:A+10 | Una giornata tranquilla: {A} ne approfitta per riposare e pensare a casa.
+2 crush:A>B @soc rel:AB+10 | {A} ride a ogni battuta di {B}. Anche a quelle che non fanno ridere.
+2 crush:A>B @mad | {A} prova tre volte a parlare con {B}. Alla terza, riesce a dire «ciao». È un inizio.
+2 crush:A>B single:B love:AB *1.5 | {A} smette di girarci intorno e dice tutto a {B}, d'un fiato. {B} risponde con un abbraccio.
+2 crush:A>B rel:AB-10 s:A=sconvolto | {A} scopre per caso che {B} l[A:o/a] considera «come [A:un fratello/una sorella/una persona di famiglia]». Pomeriggio disastroso.
+2 plot:A>B rel:AB+15 | {A} è più gentile del solito con {B}. Molto più gentile del solito. Troppo.
+2 plot:A>B @stl | {A} osserva {B} a lungo, prendendo nota di ogni abitudine. {B} pensa che sia simpatia.
+2 couple:AB give:A>B=cibo | {A} lascia a {B} la parte migliore di {cibo}, e finge di non avere fame.
+2 couple:AB rel:AB+10 mo:A+10 mo:B+10 | {A} e {B} passano la giornata a inventare il nome del loro futuro cane. Vince «Rambo».
+2 couple:AB rel:AB-20 | {A} e {B} litigano per chi ha finito {cibo}. È la loro prima litigata, e la ricorderanno.
+2 friend:AB give:A>B=ricordo | {A} regala a {B} {ricordo:A}. «Custodiscilo tu. Mi fido.»
+2 friend:AB mo:A+10 mo:B+10 | {A} e {B} si raccontano gli aneddoti più imbarazzanti della loro vita. Ridono fino alle lacrime.
+2 enemy:AB rel:AB-10 | {A} e {B} si incrociano e si guardano in cagnesco per un minuto intero. Nessuno dei due cede.
+2 enemy:AB forgive:A>B grudge:A>B @soc | {A} e {B} si ritrovano bloccat[AB:i/e] nello stesso posto per ore. Finiscono per parlare. {A} decide di lasciar perdere.
+2 owe:A>B repay:A>B give:A>B=valore | {A} paga il suo debito cedendo {valore} a {B}. Ora sono pari.
+2 owe:A>B rel:AB-10 | {B} ricorda a {A}, davanti a tutti, che [B:gli/le] deve un favore. {A} arrossisce.
+2 debt:A>B give:B>A=attrezzo | {B} presta a {A} {attrezzo:B}. «Me lo restituisci, sì?» Il prestito diventa un debito.
+2 lost:A rel:AB+15 @heal | {B} trova {A} che piange {perso:A} e resta in silenzio accanto a l[A:ui/ei] per un'ora.
+2 traitor:B rel:AB-15 | {A} ricorda a tutti, ad alta voce, cosa ha fatto {B} l'ultima volta che si è fidat[B:o/a] di qualcuno.
+2 fame:A rel:AB+10 @soc | {B} chiede a {A} un autografo. In piena arena. {A} lo fa volentieri.
+2 test:A=car12 ok:al:AB ko:rel:AB-10 | {A} propone a {B} di unire le forze. {B} accetta con un sorriso. || {A} propone a {B} di unire le forze. {B} fa finta di non aver sentito.
+2 test:A=emp12 ok:rel:AB+25 ko:rel:AB-5 | {A} capisce che {B} sta per crollare e trova le parole giuste. || {A} prova a consolare {B}, ma dice esattamente la cosa sbagliata.
+3 couple:BC trait:A=romantico s:A=sconvolto | {A} vede {B} e {C} insieme e sente qualcosa spezzarsi. Fa finta di niente, male.
+3 al:ABC @soc | {A}, {B} e {C} si ritrovano attorno allo stesso fuoco. Nessuno se ne va. Così nasce un gruppo.
+3 ally:ABC plot:A>B rel:AC+15 | {A} sussurra a {C} che {B} nasconde qualcosa. {C} comincia a tenere d'occhio {B}.
+`,
+      n: `
+1 con:A=ricordo mo:A+10 | {A} si addormenta stringendo {ricordo:A}, come faceva da bambin[A:o/a] con un peluche.
+1 stat:A<mo25 @mad | {A} parla da sol[A:o/a] per mezz'ora. Si dà anche dei buoni consigli. Non li seguirà.
+1 stat:A>mo80 | {A} fischietta prima di dormire. Gli altri non capiscono come ci riesca.
+1 goal:A=vendetta | {A} non dorme: ripassa a mente ogni passo del piano.
+2 crush:A>B | {A} si addormenta pensando a {B} e si sveglia pensando a {B}. In mezzo, sogna {B}.
+2 couple:AB pr:A-10 pr:B-10 | {A} e {B} si raccontano storie fino a tardi. Le paure, per una notte, aspettano fuori.
+2 plot:A>B | Mentre {B} dorme, {A} ripassa il piano. Manca poco.
+2 friend:AB mo:A+5 mo:B+5 | {A} e {B} si danno il cambio di guardia e si lasciano un biglietto spiritoso a ogni turno.
+2 enemy:AB s:A=sconvolto | {A} non riesce a dormire sapendo che {B} è a pochi metri.
+`,
+      sponsor: `
+1 +ricordo:A mo:A+20 @gift | Gli sponsor mandano a {A} {ricordo}. Arriva con un biglietto scritto a mano da qualcuno di casa.
+1 +valore:A @gift | Gli sponsor mandano a {A} {valore}. «Spendilo bene.»
+1 +attrezzo:A @gift | Gli sponsor mandano a {A} {attrezzo}. Sul pacco c'è scritto «Per chi pensa».
+1 +alcol:A @gift | Gli sponsor mandano a {A} {alcol}. Il messaggio dice: «Per i momenti difficili. O per festeggiare».
+`,
+    },
+  });
+})(typeof window !== 'undefined' ? window : globalThis);
+
+;
+/* Liceo Spietato — secondo pacchetto: popolarità, cotte, complotti da corridoio. Nessuno muore. */
+(function (G) {
+  const D = (G.LOS_DATA = G.LOS_DATA || {}); D.packs = D.packs || [];
+  D.packs.push({
+    theme: 'liceo',
+    ev: {
+      b: `
+1 +attrezzo:A @int | Il primo giorno, {A} si procura {attrezzo}. È già un passo avanti a tutti.
+1 +armatura:A @luck | {A} arriva con {armatura}. Nessuno riuscirà a scalfirl[A:o/a] per almeno una settimana.
+1 +valore:A | {A} si presenta con {valore} nello zaino. In questo liceo, è come avere un lingotto d'oro.
+1 @show star:A | {A} entra in classe in ritardo, con gli occhiali da sole e una canzone in testa. Tutti ne parlano a pranzo.
+1 s:A=sconvolto | {A} scopre di essere in classe con la persona che l[A:o/a] ha bullizzat[A:o/a] alle medie.
+2 al:AB @soc | {A} e {B} si siedono allo stesso banco per caso. Dopo un'ora si passano già i bigliettini.
+2 k:A>B @agg | Il primo giorno, {A} rovescia il caffè della macchinetta sulla camicia di {B}. {B} chiede di cambiare scuola.
+2 hit:A>B | {A} chiama {B} con il soprannome delle elementari davanti a tutti. Il soprannome resta.
+2 crush:A>B rel:AB+10 | {A} vede {B} entrare in classe e dimentica il proprio nome per un istante.
+3 al:ABC @soc | {A}, {B} e {C} scoprono di avere la stessa playlist preferita. È deciso: sono un gruppo.
+1 test:A=car12 ok:star:A ko:s:A=ferito | {A} si presenta alla classe con una battuta. Ridono tutti. || {A} si presenta alla classe con una battuta. Silenzio. Tossisce qualcuno.
+`,
+      d: `
+1 stat:A<mo25 s:A=sconvolto | {A} passa la ricreazione chius[A:o/a] in bagno a scorrere i commenti cattivi.
+1 stat:A>mo75 star:A @show | {A} è di buon umore e lo fa sapere a tutti con un vocale di tre minuti. Va virale.
+1 stat:A>pr60 s:A=malato | L'ansia di {A} è così forte che il giorno della verifica [A:gli/le] viene la febbre. Vera, stavolta.
+1 stat:A>pr60 con:A=alcol -alcol:A pr:A-30 | {A} si scola {alcol} prima della verifica. Il cuore batte forte, ma l'ansia scende.
+1 stat:A<hp40 @heal hp:A+20 | {A} passa un pomeriggio con la nonna, che [A:gli/le] dice che è bellissim[A:o/a]. La reputazione non cambia, ma il morale sì.
+1 stat:A<food30 +cibo:A | {A} scopre un distributore in Palestra che regala due merendine invece di una.
+1 con:A=attrezzo star:A @int | {A} usa {attrezzo:A} per prendere nove nella verifica di matematica. Il professore sospetta qualcosa, ma non trova niente.
+1 con:A=valore -valore:A +attrezzo:A | {A} compra {attrezzo} da uno di quinta con {valore}. Affare.
+1 con:A=ricordo mo:A+15 | {A} sfoglia {ricordo:A} durante l'ora di religione. [A:Gli/Le] viene da sorridere.
+1 wx:buio @stl | Approfittando del caos, {A} entra in sala professori e legge in anteprima le domande della verifica.
+1 wx:abbondanza +cibo:A | Alla gita, {A} riempie lo zaino di panini dell'autogrill. Ne avanza per tutta la settimana.
+1 wx:pericolo s:A=ferito | La settimana dei colloqui: la madre di {A} incontra il professore di storia. Disastro.
+1 trait:A=esibizionista star:A | {A} fa un balletto in corridoio durante il cambio dell'ora. Lo filmano tutti.
+1 trait:A=stratega +attrezzo:A | {A} organizza un sistema di bigliettini con tre livelli di sicurezza. È {attrezzo}, praticamente.
+1 trait:A=superstizioso +amuleto:A | {A} porta {amuleto} a ogni verifica. Ha sempre preso sei. Non cambia niente, ma non si sa mai.
+1 trait:A=ubriacone s:A=ubriaco | {A} beve tre energy drink prima della prima ora. Parla velocissimo fino all'ora di pranzo.
+1 att:A>int8 star:A | {A} corregge il professore di fisica alla lavagna. Ha ragione. La classe applaude, il professore meno.
+1 att:A<int3 s:A=ferito | {A} confonde Garibaldi con Gandalf all'interrogazione di storia. Lo sa tutto il liceo entro sera.
+2 crush:A>B rel:AB+15 @soc | {A} lascia nell'armadietto di {B} un biglietto anonimo con un cuore disegnato male.
+2 crush:A>B love:AB *2 | {A} e {B} restano chius[AB:i/e] in biblioteca per una verifica di recupero. Alla fine si mettono insieme. La verifica, meno bene.
+2 crush:A>B s:A=sconvolto | {A} vede {B} parlare con qualcun altro in cortile e passa il pomeriggio a scrivere poesie tristi.
+2 plot:A>B rel:AB+10 | {A} aiuta {B} con i compiti di latino. Ne approfitta per fotografare il suo diario.
+2 plot:A>B -attrezzo:B +attrezzo:A @stl | {A} fa sparire {attrezzo:B} dallo zaino di {B} il giorno prima della verifica. Fa parte del piano.
+2 plot:A>B k:A>B *2 | {A} manda alla preside lo screenshot che {B} non doveva mai mandare. {B} è fuori.
+2 goal:A=vendetta grudge:A>B hit:A>B | Per {caro:A}, {A} crea un gruppo su {B} e ci invita mezza scuola. {B} lo scopre la sera stessa.
+2 goal:A=vendetta grudge:A>B k:A>B *2 | {A} aspettava solo il momento giusto: durante l'assemblea, legge ad alta voce i messaggi di {B}. Per {caro:A}.
+2 goal:A=reclutare al:AB @soc | {A} invita {B} a pranzo al tavolo dei popolari. {B} accetta. È nato un gruppo.
+2 goal:A=spettacolo star:A hit:A>B | {A} fa una parodia di {B} durante l'intervallo. Ridono tutti, tranne {B}.
+2 goal:A=cibo give:B>A=cibo debt:A>B | {B} divide il trancio di pizza con {A}, che non aveva soldi. «Me lo offri domani.»
+2 con:A=armatura hit:B>A | {B} prova a far girare un pettegolezzo su {A}, ma {armatura:A} regge: nessuno ci crede.
+2 con:A=valore give:A>B=valore rel:AB+20 | {A} regala a {B} {valore}. {B} diventa amic[B:o/a] di {A} con una velocità sospetta.
+2 owe:A>B repay:A>B rel:AB+10 | {A} copre {B} con il professore: «Era in bagno con me». Debito saldato.
+2 enemy:AB hit:A>B | {A} e {B} si contendono l'ultimo posto in pullman per la gita. Vince {A}, ma la guerra è appena cominciata.
+2 enemy:AB k:A>B *0.7 | {A} fa notare in assemblea che il voto di condotta di {B} è un mistero. Il mistero finisce: {B} è sospes[B:o/a].
+2 couple:AB star:A star:B | {A} e {B} si presentano alla festa d'istituto vestit[AB:i/e] uguali. Sono la coppia dell'anno.
+2 couple:AB rel:AB-25 | {A} e {B} litigano in diretta nella chat di classe. Duecento persone leggono. Nessuno interviene.
+2 friend:AB give:A>B=attrezzo | {A} presta a {B} {attrezzo:A} per la verifica. Una vera amicizia.
+2 traitor:B rel:AB-20 | {A} scrive sulla lavagna «non fidatevi di {B}». Il bidello lo cancella, ma lo hanno visto tutti.
+2 test:A=car13 ok:al:AB ko:hit:B>A | {A} prova a convincere {B} a fare gruppo per il progetto di scienze. Accetta. || {A} prova a convincere {B} a fare gruppo per il progetto di scienze. {B} ride e lo racconta a tutti.
+3 plot:A>B ally:ABC rel:AC+20 | {A} confida a {C} che {B} parla male di tutti alle spalle. Non è vero. {C} però smette di salutarl[B:o/a].
+3 hit:A>B hit:B>C @agg | La catena di gossip della mattina: {A} sparla di {B}, {B} se la prende con {C}, {C} non sa neanche di cosa si parli.
+3 k:A>B rel:AC+15 | {A} e {C} organizzano uno scherzo a {B} che va troppo bene: {B} chiede il trasferimento.
+`,
+      n: `
+1 stat:A>pr60 pr:A+10 | {A} ripassa fino alle tre di notte e sogna di sbagliare la data della Rivoluzione francese.
+1 stat:A<en25 s:A=ferito | {A} si addormenta durante la videochiamata di gruppo. Tutti fanno lo screenshot.
+1 con:A=ricordo | {A} si addormenta con {ricordo:A} sul cuscino.
+1 wx:pericolo s:A=sconvolto | La chat di classe esplode a mezzanotte. {A} legge tutto fino alle quattro.
+1 @mad | {A} scrive trecento messaggi in un gruppo dove è l'unic[A:o/a] membro.
+2 crush:A>B @soc | {A} resta online tutta la notte sperando che {B} scriva. {B} scrive alle due: «Hai i compiti di inglese?»
+2 crush:A>B rel:AB+10 | {A} mette like a una foto di {B} di tre anni fa. Panico. Toglie il like. Troppo tardi: {B} l'ha visto.
+2 plot:A>B br:A | {A} esce dal gruppo di WhatsApp senza salutare e si porta via tutte le risposte della verifica. {B} capisce tutto alle sette del mattino.
+2 plot:A>B tr:A>B *2 | {A} inoltra alla preside la chat privata del gruppo, con {B} in bella vista. {B} è fuori dai giochi.
+2 couple:AB pr:A-15 pr:B-15 | {A} e {B} si mandano vocali fino all'alba. L'ansia, per una notte, scende.
+2 couple:AB stat:B<hp40 save:A>B | {A} scrive un post lunghissimo per difendere {B}. Funziona: il giorno dopo nessuno ride più.
+2 owe:A>B repay:A>B | {A} manda a {B} le soluzioni dei compiti di matematica alle sei del mattino. Debito saldato.
+2 grudge:A>B forgive:A>B trait:A=clemente | {A} scrive a {B} un messaggio lunghissimo per fare pace. Poi lo cancella e manda solo «ciao». Basta così.
+`,
+      f: `
+2 crush:A>B love:AB *3 | Alla festa di fine anno, {A} chiede a {B} di ballare il lento. {B} dice di sì. Si mettono insieme davanti a tutti.
+2 crush:A>B s:A=sconvolto | Alla festa di fine anno, {A} vede {B} ballare il lento con un'altra persona. Se ne va prima della torta.
+2 plot:A>B k:A>B *2 | Alla festa di fine anno, {A} fa partire sul proiettore le foto più imbarazzanti di {B}. {B} esce dalla festa e dai giochi.
+1 con:A=valore -valore:A star:A | Alla festa, {A} offre {valore} al DJ per una dedica a se stess[A:o/a]. Funziona.
+`,
+      sponsor: `
+1 +attrezzo:A @gift | Una mano anonima infila nello zaino di {A} {attrezzo}.
+1 +valore:A @gift | {A} trova {valore} nel proprio armadietto, con un biglietto: «Da un ammiratore».
+1 +ricordo:A mo:A+20 @gift | La sorella maggiore di {A} [A:gli/le] lascia {ricordo} e un biglietto: «Spaccali tutti».
+`,
+      finale: `
+2 k:A>B | Nell'Aula magna, davanti alla preside, {A} e {B} si giocano la popolarità con l'ultimo discorso. Il liceo sceglie {A}.
+2 k:A>B con:A=attrezzo | All'ultima interrogazione, {A} ha {attrezzo:A}. {B} no. Fine della partita.
+`,
+    },
+    dis: `
+L'ispezione del ministero | Gli ispettori del ministero entrano nelle classi senza preavviso. | {A} viene sorpres[A:o/a] a copiare e sospes[A:o/a]. | {A} balbetta per tutta l'interrogazione davanti agli ispettori. | {A} risponde a tutto con un sorriso perfetto. | sconvolto
+Il compito a sorpresa | Tutte le classi fanno un compito a sorpresa nello stesso giorno. | {A} consegna il foglio bianco e perde l'anno. | {A} prende quattro e mezzo. | {A} aveva studiato per sbaglio proprio quel capitolo. | ferito
+L'influenza di gennaio | Mezza scuola si ammala nella stessa settimana. | {A} resta a casa troppi giorni e viene esclus[A:o/a] dai giochi. | {A} viene a scuola con la febbre e contagia mezzo banco. | {A} si lava le mani ogni dieci minuti, e funziona. | malato
+La chat della classe trapelata | Tutti i messaggi della chat di classe finiscono online. | {A} aveva scritto le cose peggiori, e si ritira dai giochi. | {A} ha scritto una cosa imbarazzante, ma solo una. | {A} non scrive mai in chat, e ne esce pulit[A:o/a]. | sconvolto
+Lo sciopero dei professori | Niente lezioni per tre giorni, ma tante verifiche dopo. | {A} si dimentica di rientrare e viene bocciat[A:o/a]. | {A} rientra senza aver studiato niente. | {A} ha studiato durante lo sciopero, e ora è avanti a tutti. | affamato
+L'assemblea che degenera | L'assemblea d'istituto finisce in una rissa di cori. | {A} viene sospes[A:o/a] per aver lanciato un astuccio. | {A} viene filmat[A:o/a] mentre canta stonando. | {A} era in bagno durante tutta l'assemblea. | ferito
+La gita disastrosa | La gita finisce con il pullman in panne in autostrada. | {A} si perde all'autogrill e non torna più in classe. | {A} dorme sul pullman e si sveglia con la faccia disegnata. | {A} trova un passaggio con i genitori di un amico. | sconvolto
+La festa clandestina | Una festa clandestina in Palestra viene scoperta dalla preside. | {A} viene trovat[A:o/a] sotto il tavolo del buffet. Sospensione. | {A} riesce a scappare, ma lascia la scarpa. Tutti sanno di chi è. | {A} non era stat[A:o/a] invitat[A:o/a]. Per una volta, è un bene. | sconvolto
+Il blackout del registro elettronico | Il registro elettronico va in tilt e tutti i voti si mescolano. | {A} si ritrova con la media di un altro, e non è una buona media. | {A} perde il nove più importante dell'anno. | {A} si ritrova un otto inspiegabile, e non fa domande. | ferito
+La pagella di metà anno | Arrivano le pagelle. Le famiglie le leggono. | {A} non supera lo scrutinio e lascia i giochi. | {A} viene mess[A:o/a] in punizione per una settimana. | {A} ha una pagella perfetta, e la incornicia. | sconvolto
+`,
+  });
+})(typeof window !== 'undefined' ? window : globalThis);
+
+;
+/* Isola Battle Royale — secondo pacchetto. */
+(function (G) {
+  const D = (G.LOS_DATA = G.LOS_DATA || {}); D.packs = D.packs || [];
+  D.packs.push({
+    theme: 'royale',
+    ev: {
+      b: `
+1 +armatura:A @luck | {A} atterra su un tetto e trova subito {armatura}. Lo stream esplode di emoji.
+1 +attrezzo:A @int | {A} salta in un punto deserto e trova {attrezzo}. Strategia o fortuna? Il pubblico vota «fortuna».
+2 al:AB @soc | {A} e {B} atterrano sullo stesso tetto, si puntano le armi, si guardano e scoppiano a ridere. Duo formato.
+2 k:A>B @agg | {A} e {B} atterrano sulla stessa cassa. Solo uno dei due si rialza.
+1 test:A=agi12 ok:+arma:A ko:s:A=ferito | {A} apre il paracadute all'ultimo secondo e atterra accanto a un'arma leggendaria. || {A} apre il paracadute all'ultimo secondo. Troppo all'ultimo.
+`,
+      d: `
+1 stat:A<hp45 con:A=med -med:A hp:A+40 | {A} si ferma dietro una roccia per curarsi. Animazione lunghissima, ma nessuno l[A:o/a] interrompe.
+1 stat:A<food30 +cibo:A | {A} apre un frigorifero del Villaggio costiero. Dentro c'è una pizza surgelata. La mangia surgelata.
+1 stat:A>mo75 @show star:A | {A} fa un balletto sopra una cassa appena aperta. Il pubblico l[A:o/a] adora, i nemici se l[A:o/a] segnano.
+1 stat:A<mo25 s:A=sconvolto | {A} guarda la tempesta avvicinarsi e si chiede se ne valga la pena. Lo stream mette un filtro triste.
+1 con:A=attrezzo +mappa:A @int | {A} fa volare {attrezzo:A} sopra l'isola e disegna la mappa delle prossime zone sicure.
+1 con:A=valore -valore:A +armatura:A | {A} spende {valore} al distributore automatico della Base militare. Esce {armatura}.
+1 con:A=ricordo mo:A+15 | {A} guarda {ricordo:A} mentre ricarica. Si ricorda perché sta giocando.
+1 wx:buio @stl | Sotto la pioggia tropicale, {A} si avvicina a una squadra intera senza che nessuno l[A:o/a] senta.
+1 wx:abbondanza +cibo:A +armatura:A | Una cassa leggendaria cade a due passi da {A}: razioni e {armatura}. Il cielo esiste ancora.
+1 wx:pericolo s:A=ferito | La tempesta accelera e {A} la attraversa di corsa. Arriva in zona sicura con mezza vita.
+1 trait:A=esibizionista star:A | {A} gioca un\'intera fase solo con il coltello, per lo spettacolo. Funziona. Non dovrebbe funzionare.
+1 trait:A=ingegnoso con:A=attrezzo +trap:A | {A} piazza una trappola esplosiva dentro una cassa dei rifornimenti. Chi la apre avrà una sorpresa.
+2 crush:A>B rel:AB+15 @soc | {A} lascia a {B} l'ultimo kit medico della cassa e fa finta di non averne bisogno.
+2 crush:A>B love:AB *2 | {A} e {B} si ritrovano nello stesso fienile durante la tempesta. Nessuno dei due spara. Uno dei due bacia l'altro.
+2 plot:A>B rel:AB+10 | {A} copre {B} durante la cura. Copre benissimo. Studia anche dove tiene le munizioni.
+2 plot:A>B -armatura:B +armatura:A @stl | {A} scambia la protezione di {B} con una rotta, mentre {B} guarda la mappa.
+2 goal:A=vendetta grudge:A>B hit:A>B | {A} riconosce {B} dalla skin e [B:gli/le] spara senza pensarci. Per {caro:A}. L[B:o/a] manca di poco.
+2 goal:A=caccia k:A>B @agg | {A} segue i passi di {B} col binocolo per mezza isola. Poi preme il grilletto.
+1 goal:A=spettacolo star:A @show | {A} si arrampica sull'antenna più alta dell'isola e si fa inquadrare. Il pubblico impazzisce.
+2 con:A=armatura hit:B>A | {B} colpisce {A} con un fucile a pompa, ma {armatura:A} incassa tutto. Lo stream urla.
+2 con:A=alcol give:A>B=alcol rel:AB+20 | {A} e {B} si dividono {alcol} su un tetto, aspettando il prossimo cerchio. Tregua da bar.
+2 test:A=agi13 ok:save:A>B ko:s:A=ferito | {A} trascina {B} dentro la zona sicura un secondo prima che la tempesta si chiuda. || {A} prova a trascinare {B} dentro la zona sicura. Ci riesce, ma la tempesta l[A:o/a] morde.
+2 owe:A>B repay:A>B rel:AB+10 | {A} rianima {B}, abbattut[B:o/a] dietro una roccia. Debito saldato.
+2 enemy:AB hit:A>B | {A} e {B} si incrociano alla Centrale elettrica. Si sparano per dieci minuti e non si colpiscono quasi mai.
+3 plot:A>B ally:ABC rel:AC+20 | {A} dice a {C} che {B} ha nascosto la cassa leggendaria. Non è vero. {C} però ora guarda {B} in un altro modo.
+`,
+      n: `
+1 stat:A<en25 s:A=ferito | {A} si addormenta in un cespuglio. Un cespuglio a fuoco, si scoprirà.
+1 con:A=ricordo | {A} guarda {ricordo:A} prima di dormire. Domani l'isola sarà più piccola.
+1 wx:pericolo s:A=sconvolto | Di notte la tempesta si sente arrivare: un ronzio che non si ferma. {A} non chiude occhio.
+2 crush:A>B @soc | {A} fa la guardia sulla torre per tutta la notte, puntando il binocolo verso {B} più spesso del necessario.
+2 plot:A>B tr:A>B *2 | {A} aspetta che {B} si addormenti. Poi si ricorda che il duo, dal prossimo cerchio, conta come solo.
+2 plot:A>B br:A | {A} parte di notte con il veicolo del duo. {B} si sveglia a piedi, in una zona che sta per chiudersi.
+2 couple:AB stat:B<hp40 save:A>B | {A} usa l'ultimo kit medico su {B} e resta senza. Ne valeva la pena.
+2 hit:A>B trait:A=sonnambulo | {A} si alza nel sonno e prende {B} per un nemico. Colpo di calcio, poi le scuse.
+`,
+      f: `
+2 crush:A>B save:A>B | Alla cassa leggendaria, {A} si mette tra {B} e un cecchino. Lo stream crea un nuovo hashtag.
+2 plot:A>B k:A>B *2 | Alla cassa leggendaria, {A} si libera di {B} mentre tutti guardano la cassa. Era il piano.
+1 con:A=valore -valore:A +arma:A | Alla cassa leggendaria, {A} scambia {valore} con un'arma di livello oro.
+`,
+      sponsor: `
+1 +armatura:A @gift | Un drone degli sponsor lascia cadere {armatura} per {A}. Con un adesivo: «Sei il nostro preferito».
+1 +attrezzo:A @gift | Gli sponsor regalano a {A} {attrezzo} e cinque minuti di celebrità.
+1 +ricordo:A mo:A+20 @gift | Gli sponsor mandano a {A} un videomessaggio della famiglia e {ricordo}.
+`,
+      finale: `
+2 k:A>B | Ultimo cerchio, grande come un campo da tennis. {A} e {B} si guardano. Il resto è un clip da dieci milioni di visualizzazioni.
+2 k:A>B con:A=armatura | {B} spara per prim[B:o/a], ma {armatura:A} regge l'ultimo colpo. {A} vince la partita.
+`,
+    },
+    dis: `
+Il bombardamento a tappeto | Una zona rossa compare sulla mappa: arrivano le bombe. | {A} era al centro della zona rossa. | {A} viene sbalzat[A:o/a] da un'esplosione. | {A} vede l'avviso e corre fuori in tempo. | ferito
+L'elicottero da caccia | Un elicottero degli organizzatori sorvola l'isola sparando a caso. | {A} viene inquadrat[A:o/a] dal mirino. | {A} prende un colpo di striscio. | {A} si sdraia sotto un'auto finché l'elicottero non passa. | ferito
+Lo tsunami | Un'onda gigante si abbatte sul Villaggio costiero. | {A} viene trascinat[A:o/a] in mare. | {A} viene sbattut[A:o/a] contro un muro. | {A} è già sulla collina, a guardare. | ferito
+I lupi bionici | Branchi di lupi con occhi rossi escono dalla Foresta. | {A} viene circondat[A:o/a]. | {A} viene mors[A:o/a] mentre scappa. | {A} si chiude in un silos. | ferito
+La zona tossica | Una nube verde copre la Fattoria. | {A} respira troppa nube. | {A} tossisce per ore. | {A} indossa una maschera antigas presa a un soldato. | malato
+Il crollo del ponte | Il ponte principale dell'isola crolla mentre tutti lo attraversano. | {A} cade con il ponte. | {A} si aggrappa ai cavi e risale ferit[A:o/a]. | {A} aveva scelto di nuotare. | ferito
+La pioggia di casse | Cento casse cadono dal cielo in un minuto. | {A} viene colpit[A:o/a] da una cassa. | {A} viene sfiorat[A:o/a] e perde un dente. | {A} raccoglie tre casse senza un graffio. | ferito
+Il blackout del server | L'arena «laggha»: per qualche minuto tutto si muove a scatti. | {A} si teletrasporta dentro un muro. | {A} cade da un tetto per un errore di calcolo. | {A} resta immobile finché tutto torna normale. | sconvolto
+`,
+  });
+})(typeof window !== 'undefined' ? window : globalThis);
+
+;
+/* Stazione Orbitale — secondo pacchetto. */
+(function (G) {
+  const D = (G.LOS_DATA = G.LOS_DATA || {}); D.packs = D.packs || [];
+  D.packs.push({
+    theme: 'scifi',
+    ev: {
+      b: `
+1 +armatura:A @luck | {A} si infila {armatura} trovata nell'Hangar. È di due taglie più grande, ma il pericolo non guarda le taglie.
+1 +attrezzo:A @int | {A} stacca {attrezzo} da una parete e lo stringe come un tesoro. In una stazione spaziale, lo è.
+2 al:AB +attrezzo:B | {A} e {B} si chiudono insieme nella stessa capsula durante lo sbarco. Quando si riapre, sono una squadra.
+2 k:A>B @agg | {A} apre il portellone sbagliato al momento giusto. Per {B}, è il momento sbagliato.
+1 test:A=int12 ok:+mappa:A ko:pr:A+25 | {A} hackera il primo terminale che trova e scarica la planimetria della stazione. || {A} prova ad hackerare un terminale e disattiva per sbaglio il proprio ricircolatore.
+`,
+      d: `
+1 stat:A>pr50 con:A=attrezzo pr:A-35 | {A} usa {attrezzo:A} per riparare un ricircolatore. L'aria torna respirabile, e ha un buon odore di plastica.
+1 stat:A>pr60 s:A=sconvolto | {A} sente le pareti respirare. Sono i ventilatori. Non importa: {A} trema lo stesso.
+1 stat:A<hp45 con:A=med -med:A hp:A+40 | {A} si inietta {med:A}. I nanobot medici [A:gli/le] ricuciono la pelle in tre secondi e un prurito di tre ore.
+1 stat:A<food30 +cibo:A | {A} trova un distributore automatico ancora acceso. Inserisce un bottone come moneta. Funziona.
+1 stat:A>mo75 @show star:A | {A} galleggia a gravità zero facendo capriole per le telecamere. Gli sponsor adorano le capriole.
+1 con:A=valore -valore:A +armatura:A | {A} paga un droide di servizio con {valore}. Il droide [A:gli/le] consegna {armatura} e un sorriso pixelato.
+1 con:A=ricordo mo:A+15 | {A} proietta sul casco {ricordo:A}. Per un minuto è di nuovo sulla Terra.
+1 wx:buio @stl | Approfittando del blackout, {A} attraversa il Ponte di comando senza che nessuna telecamera l[A:o/a] veda.
+1 wx:abbondanza +cibo:A | {A} trova una delle casse cadute dalla navetta cargo. Dentro ci sono razioni per una settimana.
+1 wx:pericolo s:A=ferito | Una pioggia di micrometeoriti buca il modulo dove dorme {A}. Ne esce con un buco nella tuta e uno nella spalla.
+1 trait:A=ingegnoso con:A=attrezzo +trap:A | {A} riprogramma un drone di pulizia perché insegua chiunque entri nel suo modulo. È una trappola, tecnicamente.
+2 crush:A>B rel:AB+15 @soc | {A} regola la temperatura del modulo di {B} sui suoi gradi preferiti. Non glielo dice.
+2 crush:A>B love:AB *2 | Il ricircolatore si blocca e {A} e {B} restano chiusi in un condotto con l'ossigeno per due. Bastano dieci minuti per capirsi.
+2 plot:A>B rel:AB+10 | {A} aiuta {B} a sistemare la tuta. Ne approfitta per memorizzare il codice del suo zaino.
+2 plot:A>B -mappa:B +mappa:A @stl | {A} copia la planimetria di {B} e la cancella dal suo dispositivo. Un piccolo dettaglio del piano.
+2 goal:A=vendetta grudge:A>B hit:A>B | {A} chiude {B} in una camera di decompressione per {caro:A}. La riapre dopo un minuto. Il prossimo sarà più lungo.
+2 goal:A=caccia k:A>B @agg | {A} rintraccia {B} dal segnale della sua tuta. Il segnale si spegne dieci minuti dopo.
+2 goal:A=cibo give:B>A=cibo debt:A>B | {B} passa a {A} un tubetto di gel proteico attraverso una grata. «Ricordatelo.»
+2 con:A=armatura hit:B>A | {B} spara a {A} con un taser, ma {armatura:A} scarica tutto a terra.
+2 con:A=alcol give:A>B=alcol rel:AB+20 | {A} e {B} brindano con {alcol} guardando la Terra dall'oblò. Fa meno paura, così.
+2 test:A=int13 ok:pr:A-30 ok:pr:B-30 ko:pr:A+20 | {A} ricalibra il ricircolatore del modulo che divide con {B}. Tornano a respirare entrambi. || {A} ricalibra il ricircolatore del modulo che divide con {B}. Adesso soffia aria calda e polvere.
+2 owe:A>B repay:A>B rel:AB+10 | {A} sblocca la porta del modulo dove {B} è rimast[B:o/a] chius[B:o/a]. Debito saldato.
+3 plot:A>B ally:ABC rel:AC+20 | {A} mostra a {C} una registrazione manomessa in cui {B} sembra parlare male di l[C:ui/ei]. {C} si convince.
+`,
+      n: `
+1 stat:A>pr60 pr:A+10 | {A} passa il ciclo notturno a respirare in un sacchetto. L'aria è poca, il panico tanto.
+1 stat:A<en25 s:A=ferito | {A} si addormenta in un condotto e la gravità torna di colpo. Atterraggio di faccia.
+1 con:A=ricordo | {A} si addormenta guardando {ricordo:A} alla luce del monitor.
+1 wx:buio @mad | Nel buio della stazione, {A} vede occhi rossi nel condotto. Sono i led di un drone. Forse.
+2 crush:A>B @soc | {A} resta svegli[A:o/a] per controllare che l'ossigeno di {B} non scenda. Ogni ora. Senza dirglielo.
+2 plot:A>B tr:A>B *2 | {A} apre il portellone mentre {B} dorme accanto. Il vuoto fa il resto.
+2 plot:A>B br:A | {A} si chiude in una capsula di salvataggio con metà delle razioni del gruppo. {B} trova il biglietto: «Scusa».
+2 couple:AB pr:A-15 pr:B-15 | {A} e {B} dividono la stessa bombola d'ossigeno, un respiro a testa, fino all'alba.
+2 couple:AB stat:B<hp40 save:A>B | {A} trascina {B} fino all'infermeria automatica e la tiene accesa a pugni per tutta la notte.
+2 hit:A>B trait:A=sonnambulo | {A} cammina nel sonno a gravità zero e prende a calci {B} senza volerlo. Due volte.
+`,
+      f: `
+2 crush:A>B save:A>B | Al rifornimento, {A} spinge {B} fuori dalla traiettoria di una cassa che cade. La cassa pesa una tonnellata. Il gesto di più.
+2 plot:A>B k:A>B *2 | Al rifornimento, {A} sabota la cassa di {B}. Quando {B} la apre, è l'ultima cosa che apre.
+1 con:A=valore -valore:A +attrezzo:A | Al rifornimento, {A} paga un droide con {valore} e ottiene {attrezzo}.
+`,
+      sponsor: `
+1 +armatura:A @gift | Una capsula di consegna aggancia la stazione: dentro, per {A}, c'è {armatura}.
+1 +attrezzo:A @gift | Gli sponsor teletrasportano a {A} {attrezzo}. Il teletrasporto è ancora in beta: arriva tiepido.
+1 +ricordo:A mo:A+20 @gift | Gli sponsor mandano a {A} un messaggio olografico da casa e {ricordo}.
+`,
+      finale: `
+2 k:A>B | Sul Ponte di comando, {A} e {B} si contendono l'ultima bombola d'ossigeno. Respira solo {A}.
+2 k:A>B con:A=armatura | {B} spara l'ultima carica, ma {armatura:A} regge. {A} si avvicina lentamente.
+`,
+    },
+    dis: `
+La falla nello scafo | Un modulo intero si apre verso lo spazio. | {A} viene risucchiat[A:o/a] nel vuoto. | {A} si aggrappa a una maniglia e perde lo zaino. | {A} chiude il portellone con un piede, appena in tempo. | affamato
+L'intelligenza artificiale ribelle | Il computer di bordo decide che gli esseri umani sono un errore di sistema. | {A} entra in un ascensore. L'ascensore non si ferma più. | {A} viene colpit[A:o/a] da un braccio robotico impazzito. | {A} chiede gentilmente al computer di smettere. Funziona, chissà perché. | ferito
+Lo sciame di nanobot | Nanobot difettosi si diffondono nei condotti mangiando tutto quello che trovano. | {A} viene smontat[A:o/a] atomo per atomo. | {A} perde i capelli, le sopracciglia e un'unghia. | {A} si chiude in una cella frigorifera finché i nanobot non si spengono. | ferito
+La gravità invertita | La gravità della stazione si inverte all'improvviso. | {A} cade verso il soffitto del Reattore. | {A} si rompe un polso atterrando sul soffitto. | {A} si aggrappa a un tubo e aspetta che passi. | ferito
+Il reattore in surriscaldamento | Il Reattore va in sovraccarico: le temperature salgono. | {A} si avvicina troppo al nucleo. | {A} si ustiona le mani su un portellone rovente. | {A} si rifugia nella Serra, che resta fresca. | malato
+L'invasione di spore | Una pianta aliena della Serra libera spore in tutta la stazione. | {A} respira le spore e si addormenta per sempre. | {A} tossisce verde per un giorno intero. | {A} si infila il casco e aspetta che il filtro faccia il suo lavoro. | malato
+L'asteroide | Un asteroide si schianta contro i Moduli abitativi. | {A} era nel modulo sbagliato. | {A} viene sbalzat[A:o/a] contro una parete. | {A} sente l'allarme e corre nel modulo opposto. | ferito
+Il blackout totale | La stazione si spegne: niente luce, niente aria, niente gravità. | {A} si perde nel buio e finisce l'ossigeno. | {A} sbatte contro tutto quello che esiste. | {A} trova una torcia a manovella e gira la manovella per sei ore. | sconvolto
+`,
+  });
+})(typeof window !== 'undefined' ? window : globalThis);
+
+;
+/* Sopravvivenza: eventi per le arene in cui si muore, legati a ferite, fame, stanchezza, oggetti e mente. */
+(function (G) {
+  const D = (G.LOS_DATA = G.LOS_DATA || {}); D.packs = D.packs || [];
+  D.packs.push({
+    theme: '*',
+    ev: {
+      d: `
+1 stat:A<hp30 d:A *0.5 | {A} ignora le proprie ferite troppo a lungo. Si siede per riprendere fiato e non si rialza.
+1 stat:A<hp35 con:A=med -med:A hp:A+35 | {A} si ricuce da sol[A:o/a] con {med:A}, mordendo un bastone per non urlare.
+1 stat:A<food20 d:A *0.4 | {A} mangia qualcosa che nessuno sano di mente mangerebbe. Ha troppa fame per essere sano di mente.
+1 stat:A<en20 hp:A-15 | {A} è così stanc[A:o/a] che cade in un fossato. Ci resta un'ora prima di trovare la forza di uscire.
+1 con:A=armatura stat:A<hp50 hp:A+10 | {A} rinforza {armatura:A} con quello che trova. Si sente un po' più al sicuro.
+1 con:A=esplosivo s:A=ferito @mad | {A} prova a capire come funziona {esplosivo:A}. Lo capisce, purtroppo, nel modo più rumoroso.
+1 con:A=veleno con:A=cibo @int | {A} avvelena le proprie scorte di {cibo} e le lascia in bella vista. Poi aspetta.
+1 goal:A=caccia @agg | {A} passa la giornata a cercare tracce. Ne trova tante. Sceglie le più fresche.
+1 wx:pericolo stat:A<hp40 d:A *0.5 | Ferit[A:o/a] e sfinit[A:o/a], {A} non regge il tempo di oggi.
+2 goal:A=caccia stat:B<hp40 k:A>B @agg *1.5 | {A} sente l'odore del sangue di {B} e ne segue le tracce. {B} non riesce più a scappare.
+2 goal:A=vendetta grudge:A>B k:A>B *2 | {A} ha passato giorni a cercare {B}. Quando l[B:o/a] trova, non dice niente. Per {caro:A}.
+2 goal:A=proteggere couple:AB save:A>B | {A} si mette davanti a {B} quando arriva il pericolo. Ne esce con un graffio e un sorriso.
+2 stat:B<hp30 save:A>B @heal | {A} trova {B} quasi svenut[B:o/a] e l[B:o/a] porta al riparo. {B} non lo dimenticherà.
+2 stat:B<hp30 k:A>B @agg | {A} trova {B} ferit[B:o/a] e indifes[B:o/a]. Non è un momento di pietà.
+2 stat:A<food25 steal:A<B @stl | La fame rende {A} audace: sfila {arma:B} a {B} per scambiarla con del cibo.
+2 con:A=armatura k:B>A *0.4 | {B} trova l'unico punto scoperto di {armatura:A}. {A} non se l'aspettava.
+2 con:A=attrezzo save:A>B @int | {A} usa {attrezzo:A} per tirare fuori {B} da un pozzo. {B} non ha parole.
+2 crush:A>B save:A>B @heal | {A} si butta senza pensarci per salvare {B}. Solo dopo si chiede cosa stesse facendo.
+2 plot:A>B tr:A>B *1.5 | {A} aveva un piano, e il piano finiva con {B} a terra. Ora il piano è finito.
+2 plot:A>B stat:B<hp40 tr:A>B *2 | {A} aspettava che {B} fosse debole. {B} è debole. {A} non aspetta più.
+2 couple:AB stat:B<hp30 d:B *0.6 | {B} muore tra le braccia di {A}, che non riesce a fermare il sangue.
+3 plot:A>B ally:ABC k:A>B rel:AC-30 *1.2 | {A} colpisce {B} alle spalle davanti a {C}. {C} non dimenticherà quello che ha visto.
+3 grudge:A>C couple:BC hit:A>C *1.5 | {A} non sopporta di vedere {C} con {B}: l[C:o/a] aspetta dietro un albero e l[C:o/a] colpisce.
+`,
+      n: `
+1 stat:A<hp30 d:A *0.5 | Durante la notte, le ferite di {A} si riaprono. All'alba suona il cannone.
+1 stat:A<en20 s:A=ferito | {A} si addormenta di guardia e si sveglia con qualcosa che [A:gli/le] rosicchia lo stivale.
+1 con:A=trap +trap:A @int | {A} smonta la propria trappola e la rimonta più cattiva. Non dorme, ma ne vale la pena.
+2 goal:A=vendetta grudge:A>B hit:A>B @stl | {A} si avvicina al giaciglio di {B} nel buio. Un ramo si spezza: {B} si sveglia appena in tempo, ferit[B:o/a].
+2 couple:AB stat:A<hp30 save:B>A | {B} veglia {A} tutta la notte, premendo sulla ferita. All'alba, {A} è ancora lì.
+2 plot:A>B -arma:B +arma:A @stl | Nel sonno, {A} sfila {arma:B} a {B}. Domani {B} sarà disarmat[B:o/a]. Fa parte del piano.
+2 wx:buio k:A>B @stl *1.3 | Nel buio più totale, {A} trova {B} grazie al rumore del suo respiro.
+`,
+    },
+  });
+})(typeof window !== 'undefined' ? window : globalThis);
+
+;
+/* Ufficio Open Space — secondo pacchetto: carriera, stress, complotti da riunione. Nessuno muore: si viene licenziati. */
+(function (G) {
+  const D = (G.LOS_DATA = G.LOS_DATA || {}); D.packs = D.packs || [];
+  D.packs.push({
+    theme: 'ufficio',
+    ev: {
+      b: `
+1 +attrezzo:A @int | Il lunedì mattina, {A} si procura {attrezzo}. Da quel momento, lavora la metà e rende il doppio.
+1 +armatura:A @luck | {A} conquista {armatura}. Nessuno riuscirà a disturbarl[A:o/a] per giorni.
+1 +valore:A | {A} trova {valore} nel cassetto della scrivania nuova. Il precedente occupante non tornerà a reclamarlo.
+1 @show star:A | {A} si presenta alla prima riunione con le slide più belle mai viste. Nessuno ascolta cosa dice, ma tutti applaudono.
+2 al:AB @soc | {A} e {B} scoprono di odiare la stessa persona del terzo piano. Nasce un'alleanza solidissima.
+2 k:A>B @agg | {A} si prende il merito del progetto di {B} davanti al Direttore. {B} svuota la scrivania prima di pranzo.
+2 hit:A>B | {A} mette {B} in copia a una mail molto imbarazzante. Il danno è fatto.
+2 crush:A>B rel:AB+10 | {A} incrocia {B} alla macchinetta del caffè e dimentica completamente il motivo per cui era lì.
+3 al:ABC @soc | {A}, {B} e {C} si ritrovano a pranzo allo stesso tavolo e fondano un gruppo di lamentele. Il più potente dell'azienda.
+1 test:A=int12 ok:star:A ko:s:A=ferito | {A} presenta il piano trimestrale con un grafico a torta perfetto. || {A} presenta il piano trimestrale, ma il proiettore mostra la sua cronologia di ricerca.
+`,
+      d: `
+1 stat:A<mo25 s:A=sconvolto | {A} guarda fuori dalla finestra per un'ora intera. Il cursore lampeggia sul foglio bianco.
+1 stat:A>mo75 star:A @show | {A} è così di buon umore che porta i cornetti a tutto il piano. Il Direttore se lo segna.
+1 stat:A>pr60 s:A=malato | Lo stress di {A} è tale che [A:gli/le] viene una dermatite a forma di grafico Excel.
+1 stat:A>pr60 con:A=alcol -alcol:A pr:A-30 | {A} si concede {alcol} alle tre del pomeriggio, nascost[A:o/a] in sala stampanti. Lo stress scende.
+1 stat:A<hp40 @heal hp:A+20 | {A} riceve un complimento sincero dal Direttore. La reputazione risale di colpo.
+1 stat:A<food30 +cibo:A | {A} scopre una riunione con il buffet al piano di sopra. Si autoinvita. Nessuno chiede chi sia.
+1 con:A=attrezzo star:A @int | {A} usa {attrezzo:A} per chiudere in dieci minuti un report da tre giorni. Il capo pensa che sia un genio.
+1 con:A=valore -valore:A +attrezzo:A | {A} baratta {valore} con l'informatico in cambio di {attrezzo}.
+1 con:A=ricordo mo:A+15 | {A} sposta {ricordo:A} al centro della scrivania. La giornata migliora un po'.
+1 wx:buio @stl | Con il server giù, {A} esce alle tre del pomeriggio e nessuno se ne accorge.
+1 wx:abbondanza +cibo:A | C'è una torta in cucina. {A} ne prende quattro fette e le nasconde nel cassetto.
+1 wx:pericolo s:A=ferito | La chiusura trimestrale travolge {A}, che si ritrova a lavorare fino alle undici di sera.
+1 trait:A=esibizionista star:A | {A} risponde a ogni domanda in riunione con un aneddoto su di sé. Il Direttore, incredibilmente, apprezza.
+1 trait:A=stratega +attrezzo:A | {A} costruisce un foglio Excel che prevede chi sarà licenziato. È {attrezzo}, di fatto.
+1 trait:A=goloso +cibo:A | {A} sa a che ora arrivano i dolci della pasticceria per il compleanno del Direttore. È sempre lì un minuto prima.
+1 att:A>int8 star:A | {A} trova l'errore nella formula che costava all'azienda un milione all'anno. Diventa leggenda.
+1 att:A<int3 s:A=ferito | {A} risponde «a tutti» con un messaggio destinato a una sola persona. Era un messaggio sul Direttore.
+2 crush:A>B rel:AB+15 @soc | {A} lascia un caffè sulla scrivania di {B} ogni mattina. Senza zucchero, come piace a {B}. Ha studiato.
+2 crush:A>B love:AB *2 | {A} e {B} restano bloccat[AB:i/e] in ascensore per un'ora. Quando le porte si aprono, si tengono per mano.
+2 crush:A>B s:A=sconvolto | {A} scopre che {B} ha messo «mi piace» alla foto di qualcun altro della contabilità. Pomeriggio rovinato.
+2 plot:A>B rel:AB+10 | {A} invita {B} a pranzo e ascolta con attenzione. Prende appunti mentali su tutto quello che {B} dice del Direttore.
+2 plot:A>B -attrezzo:B +attrezzo:A @stl | {A} si fa prestare {attrezzo:B} da {B} e «si dimentica» di restituirlo. Fa parte del piano.
+2 plot:A>B k:A>B *2 | {A} inoltra al Direttore la chat in cui {B} lo chiama «il dinosauro». {B} viene licenziat[B:o/a] entro sera.
+2 goal:A=vendetta grudge:A>B hit:A>B | Per {caro:A}, {A} programma per {B} una riunione alle 18:55 del venerdì. Ogni venerdì.
+2 goal:A=vendetta grudge:A>B k:A>B *2 | {A} aspettava solo il momento giusto: nel colloquio annuale di {B}, porta le prove. Per {caro:A}. {B} viene licenziat[B:o/a].
+2 goal:A=reclutare al:AB @soc | {A} invita {B} al pranzo del giovedì. Da quel giorno sono inseparabili, almeno in pausa.
+2 goal:A=spettacolo star:A hit:A>B | {A} presenta come propria un'idea di {B} durante il meeting. Applausi. {B} non applaude.
+2 goal:A=cibo give:B>A=cibo debt:A>B | {B} divide il pranzo con {A}, che l'ha dimenticato a casa. «Me lo offri tu venerdì.»
+2 con:A=armatura hit:B>A | {B} prova a scaricare un errore su {A}, ma {armatura:A} regge: nessuno ci crede.
+2 con:A=valore give:A>B=valore rel:AB+20 | {A} regala a {B} {valore}. {B} diventa alleat[B:o/a] di {A} senza neanche saperlo.
+2 owe:A>B repay:A>B rel:AB+10 | {A} copre {B} in riunione: «Era in call con un cliente». Debito saldato.
+2 enemy:AB hit:A>B | {A} e {B} si contendono la sala riunioni migliore. Vince {A}. {B} si segna la data.
+2 enemy:AB k:A>B *0.7 | {A} fa notare al Direttore che {B} timbra alle 9:00 ma arriva alle 9:40. {B} viene licenziat[B:o/a].
+2 couple:AB star:A star:B | {A} e {B} si presentano alla cena aziendale mano nella mano. Ufficio sconvolto, risorse umane in allarme.
+2 couple:AB rel:AB-25 | {A} e {B} litigano in una mail con trenta persone in copia. È la mail più letta dell'anno.
+2 friend:AB give:A>B=attrezzo | {A} passa a {B} {attrezzo:A} prima della revisione di bilancio.
+2 traitor:B rel:AB-20 | {A} scrive alla lavagna della sala riunioni «chi tradisce in ufficio tradisce sempre», guardando {B}.
+2 test:A=car13 ok:al:AB ko:hit:B>A | {A} propone a {B} di lavorare insieme al nuovo progetto. {B} accetta. || {A} propone a {B} di lavorare insieme al nuovo progetto. {B} inoltra la proposta al capo, con un commento.
+3 plot:A>B ally:ABC rel:AC+20 | {A} confida a {C} che {B} vuole prendersi il suo posto. Non è vero. {C} però comincia a chiudere la porta quando passa {B}.
+3 hit:A>B hit:B>C @agg | La catena della mail sbagliata: {A} risponde male a {B}, {B} risponde peggio a {C}, {C} risponde a tutti.
+3 k:A>B rel:AC+15 | {A} e {C} montano un caso contro {B} con tre slide. {B} viene licenziat[B:o/a] entro venerdì.
+`,
+      n: `
+1 stat:A>pr60 pr:A+10 | {A} risponde a una mail alle tre di notte. Poi a un'altra. Poi non dorme più.
+1 stat:A<en25 s:A=ferito | {A} si addormenta durante la call delle 18 con la telecamera accesa. Russa. Il cliente ride.
+1 con:A=ricordo | {A} si addormenta in ufficio con {ricordo:A} accanto alla tastiera.
+1 wx:pericolo s:A=sconvolto | La chiusura trimestrale non finisce mai. {A} vede l'alba dalla finestra dell'ufficio.
+1 @mad | {A} passa gli straordinari a dare un nome a ogni pianta dell'ufficio. Le piante sono più simpatiche dei colleghi.
+2 crush:A>B @soc | {A} resta in ufficio fino a tardi solo perché c'è anche {B}. Non lavora un minuto.
+2 crush:A>B rel:AB+10 | {A} scrive una mail di tre righe a {B} e la rilegge quaranta volte prima di inviarla.
+2 plot:A>B br:A | {A} lascia il gruppo di lavoro con tutti i file del progetto. {B} se ne accorge lunedì.
+2 plot:A>B tr:A>B *2 | {A} manda al Direttore il foglio delle ore di {B}, con le pause evidenziate in giallo. {B} è fuori.
+2 couple:AB pr:A-15 pr:B-15 | {A} e {B} ordinano sushi in ufficio a mezzanotte. Lo stress, per un'ora, sparisce.
+2 couple:AB stat:B<hp40 save:A>B | {A} riscrive di notte il report sbagliato di {B} e lo rimanda con il suo nome. {B} è salv[B:o/a].
+2 owe:A>B repay:A>B | {A} sistema la presentazione di {B} prima della riunione delle nove. Debito saldato.
+2 grudge:A>B forgive:A>B trait:A=clemente | {A} cancella la mail di fuoco già scritta per {B} e manda solo: «Ne parliamo domani». Basta così.
+`,
+      f: `
+2 crush:A>B love:AB *3 | Alla cena aziendale, {A} invita {B} a ballare. {B} accetta. Il karaoke, da quel momento, ha una coppia.
+2 crush:A>B s:A=sconvolto | Alla cena aziendale, {A} vede {B} ridere con qualcuno del marketing. Se ne va prima del dolce.
+2 plot:A>B k:A>B *2 | Alla cena aziendale, {A} fa ubriacare {B} e poi l[B:o/a] spinge al microfono vicino al Direttore. {B} dice tutto. {B} è fuori.
+1 con:A=valore -valore:A star:A | Alla cena aziendale, {A} paga {valore} per sedersi accanto al Direttore. Ne vale la pena.
+`,
+      sponsor: `
+1 +attrezzo:A @gift | L'ufficio IT lascia sulla scrivania di {A} {attrezzo}. Con un biglietto: «Non dire niente a nessuno».
+1 +valore:A @gift | {A} vince {valore} alla lotteria aziendale.
+1 +ricordo:A mo:A+20 @gift | Arriva per {A} un pacco da casa: {ricordo} e un messaggio: «Sei bravissim[A:o/a]».
+`,
+      finale: `
+2 k:A>B | Nell'Ufficio del direttore, {A} e {B} presentano la propria proposta finale. Il Direttore promuove {A}.
+2 k:A>B con:A=attrezzo | All'ultima riunione, {A} ha {attrezzo:A}. {B} ha solo slide. Vince {A}.
+`,
+    },
+    dis: `
+La riorganizzazione | L'azienda annuncia una «riorganizzazione delle risorse». | {A} scopre di essere una risorsa riorganizzata, e non è una buona notizia. | {A} viene spostat[A:o/a] nell'ufficio senza finestre. | {A} viene promoss[A:o/a] per sbaglio. | sconvolto
+L'audit esterno | Arrivano i revisori dei conti. | {A} non riesce a giustificare le spese di rappresentanza. Licenziat[A:o/a]. | {A} passa tre giorni a cercare scontrini. | {A} ha tutto in ordine, in tre cartelle diverse. | ferito
+Il virus informatico | Un virus cancella metà dei file aziendali. | {A} aveva salvato tutto solo sul desktop. Fuori. | {A} perde il lavoro di una settimana. | {A} aveva un backup. Anzi, tre. | ferito
+L'influenza d'ufficio | Una brutta influenza gira tra le scrivanie. | {A} resta a casa troppo a lungo e il suo posto viene assegnato a un altro. | {A} lavora con la febbre e contagia mezzo piano. | {A} lavora da casa per tutta la settimana. | malato
+Il team building | L'azienda organizza un team building in montagna. | {A} cade dal ponte tibetano e decide di non tornare in ufficio. | {A} si rompe una caviglia durante il rafting. | {A} si fa venire un raffreddore strategico e resta in ufficio. | ferito
+La mail del Direttore | Il Direttore manda a tutti una mail che inizia con «Mi dispiace dovervi comunicare...». | {A} legge la mail fino in fondo e capisce di essere in lista. | {A} ha un attacco di panico prima di arrivare alla fine. | {A} non legge le mail del venerdì. | sconvolto
+Il trasloco in coworking | L'azienda si trasferisce in un coworking con le scrivanie in comune. | {A} non trova mai una scrivania libera e smette di presentarsi. | {A} lavora per tre giorni sedut[A:o/a] su un pouf. | {A} arriva alle sette e conquista la scrivania vicino alla finestra. | ferito
+La fusione aziendale | L'azienda viene comprata da una multinazionale. | {A} non sopravvive al primo colloquio con i nuovi capi. | {A} deve rifare tutti i report in inglese. | {A} parla tre lingue e diventa indispensabile. | sconvolto
+Il guasto dell'aria condizionata | L'aria condizionata si rompe ad agosto. | {A} sviene durante la riunione e chiede le dimissioni dall'ospedale. | {A} lavora per giorni con un ventilatore da tavolo. | {A} lavora in smart working dal mare. | malato
+La cena dei licenziamenti | Il Direttore invita tutti a cena: a fine serata, consegna delle buste. | {A} apre la busta: è una lettera di licenziamento. | {A} apre la busta: è un trasferimento in un'altra città. | {A} apre la busta: è un buono pasto. | sconvolto
+`,
+  });
+})(typeof window !== 'undefined' ? window : globalThis);
+
+;
+/* Terre Desolate — secondo pacchetto. */
+(function (G) {
+  const D = (G.LOS_DATA = G.LOS_DATA || {}); D.packs = D.packs || [];
+  D.packs.push({
+    theme: 'wasteland',
+    ev: {
+      b: `
+1 +armatura:A @luck | Al deposito, {A} afferra {armatura}. Puzza di benzina, ma ferma i proiettili.
+1 +attrezzo:A @int | {A} prende {attrezzo} invece di un'arma. Nel deserto, chi ripara vive più a lungo.
+2 al:AB @soc | {A} e {B} si contendono una tanica d'acqua, poi decidono che si beve meglio in due.
+2 k:A>B @agg | {A} investe {B} con un carrello della spesa truccato con un motore da tosaerba.
+1 test:A=sop12 ok:+cibo:A ko:food:A-25 | {A} riconosce una cassa di razioni intatte sotto la sabbia. || {A} scava per un'ora sotto la sabbia. Trova solo uno scorpione arrabbiato e più sete.
+`,
+      d: `
+1 stat:A>pr50 con:A=med -med:A pr:A-45 | {A} si inietta un antiradiazioni scaduto da vent'anni. Funziona a metà. Meglio di niente.
+1 stat:A>pr60 s:A=malato | {A} vomita verde dietro una carcassa d'auto e scopre di avere un neo nuovo. Che brilla.
+1 stat:A<hp45 @heal hp:A+20 | {A} si cuce una ferita con un filo di nylon e un ago da pesca.
+1 stat:A<food30 +cibo:A | {A} trova un distributore abbandonato con un'ultima lattina dentro. La scuote, la apre: è ancora frizzante.
+1 stat:A<food20 hp:A-15 | {A} beve da una pozzanghera perché non ce la fa più. La pozzanghera era di un colore che non esiste in natura.
+1 con:A=attrezzo +cibo:A @int | {A} usa {attrezzo:A} per filtrare l'acqua di un tombino. Ne esce acqua bevibile e un tappo di bottiglia.
+1 con:A=valore -valore:A +med:A | {A} baratta {valore} con un mercante di passaggio. Ottiene {med:A} e un'occhiata di compassione.
+1 con:A=ricordo mo:A+15 | {A} pulisce {ricordo:A} dalla sabbia, con cura. È l'unica cosa pulita nel raggio di cento chilometri.
+1 wx:buio @stl | Nella tempesta di sabbia, {A} attraversa l'accampamento dei predoni senza farsi vedere.
+1 wx:abbondanza +cibo:A | {A} incrocia una carovana di mercanti di buon umore: ne esce con una borsa di cibo e un cappello.
+1 wx:pericolo s:A=ferito | Il caldo di oggi spacca la pelle delle mani di {A}, che fatica a stringere qualunque cosa.
+1 trait:A=ingegnoso con:A=attrezzo +trap:A | {A} costruisce una trappola con una molla di materasso e una latta. Non è bella, ma è cattiva.
+1 trait:A=avido +valore:A | {A} scava sotto un vecchio casinò e trova {valore}. Non lo dirà a nessuno.
+2 crush:A>B rel:AB+15 @soc | {A} regala a {B} l'ultimo sorso della propria borraccia. Nel deserto, è una dichiarazione d'amore.
+2 crush:A>B love:AB *2 | {A} e {B} guardano il tramonto radioattivo dal tetto di un autobus. È verde e bellissimo. Si baciano.
+2 plot:A>B rel:AB+10 | {A} insegna a {B} come guidare il motore truccato. Lascia fuori un dettaglio importante sui freni.
+2 plot:A>B -cibo:B +cibo:A @stl | {A} travasa, un sorso alla volta, la borraccia di {B} nella propria. Fa parte del piano.
+2 goal:A=vendetta grudge:A>B hit:A>B | {A} insegue {B} con un pick-up per tre chilometri per {caro:A}. L[B:o/a] colpisce di striscio.
+2 goal:A=caccia k:A>B @agg | {A} segue le tracce di pneumatico di {B} nel deserto. Le tracce finiscono, e anche {B}.
+2 goal:A=cibo give:B>A=cibo debt:A>B | {B} lancia a {A} una lattina ammaccata. «Quando trovi acqua, ricordati di me.»
+2 con:A=armatura hit:B>A | {B} colpisce {A} con una spranga, ma {armatura:A} fa un rumore di campana e regge.
+2 con:A=alcol give:A>B=alcol rel:AB+20 | {A} e {B} si passano {alcol} attorno a un fuoco di copertoni. Non sono amici. Stasera, quasi.
+2 steal:A<B @stl trait:A=avido | {A} sfila {arma:B} dalla cintura di {B} mentre [B:gli/le] offre da bere.
+2 owe:A>B repay:A>B rel:AB+10 | {A} tira fuori {B} dalle sabbie mobili con una catena da moto. Debito saldato.
+3 plot:A>B ally:ABC rel:AC+20 | {A} dice a {C} di aver visto {B} contare le razioni del gruppo di notte. {C} comincia a contare quelle di {B}.
+`,
+      n: `
+1 stat:A>pr60 pr:A+10 | {A} non riesce a dormire: le proprie mani brillano leggermente al buio.
+1 stat:A<en25 s:A=ferito | {A} si addormenta su un'auto e scivola giù dal cofano. Il cofano era in pendenza. L'atterraggio, sui sassi.
+1 con:A=ricordo | {A} si addormenta con {ricordo:A} sotto la testa, a mo' di cuscino.
+1 wx:pericolo s:A=sconvolto | Tutta la notte, motori lontani. {A} spegne il fuoco e trema fino all'alba.
+2 crush:A>B @soc | {A} copre {B} con la propria giacca mentre dorme. Il deserto, di notte, è gelido.
+2 plot:A>B tr:A>B *2 | {A} aspetta che {B} si addormenti vicino al fuoco di copertoni. Il fuoco si spegne. Anche {B}.
+2 plot:A>B br:A | {A} se ne va con la moto e l'acqua del gruppo. {B} si sveglia e vede solo una scia di polvere.
+2 couple:AB pr:A-10 pr:B-10 | {A} e {B} dormono abbracciati dentro una cisterna vuota. Per una notte, il mondo sta fuori.
+2 couple:AB stat:B<hp40 save:A>B | {A} porta {B} sulle spalle fino al bunker crollato, sotto la luna.
+2 hit:A>B trait:A=sonnambulo | {A} cammina nel sonno e, convint[A:o/a] che {B} sia un predone, [B:gli/le] tira una padella.
+`,
+      f: `
+2 crush:A>B save:A>B | Al convoglio, {A} tira {B} giù da un camion un attimo prima che esploda.
+2 plot:A>B k:A>B *2 | All'assalto del convoglio, {A} spinge {B} sotto le ruote del camion. Era il piano dall'inizio.
+1 con:A=valore -valore:A +armatura:A | Al convoglio, {A} paga un predone pentito con {valore} e ottiene {armatura}.
+`,
+      sponsor: `
+1 +armatura:A @gift | Un drone degli sponsor lascia cadere per {A} {armatura} e una bottiglia d'acqua.
+1 +attrezzo:A @gift | Gli sponsor mandano a {A} {attrezzo}, con le istruzioni in sette lingue.
+1 +ricordo:A mo:A+20 @gift | Gli sponsor mandano a {A} una vecchia fotografia di casa e {ricordo}.
+`,
+      finale: `
+2 k:A>B | Sulla Diga, con il sole che spacca le pietre, {A} e {B} si affrontano con quello che resta. Resta in piedi {A}.
+2 k:A>B stat:B>pr60 | {B} è consumat[B:o/a] dalle radiazioni: attacca {A} con le ultime forze. {A} ne ha di più.
+`,
+    },
+    dis: `
+La tempesta di vetro | Il vento solleva milioni di schegge di vetro fuso. | {A} viene sorpres[A:o/a] allo scoperto. | {A} si ritrova con la schiena piena di schegge. | {A} si nasconde in un tubo di cemento. | ferito
+L'esplosione della Raffineria | La Raffineria salta in aria con un boato che si sente a cento chilometri. | {A} era troppo vicin[A:o/a]. | {A} viene ustionat[A:o/a] dall'onda di calore. | {A} si butta dietro un muro di sacchi di sabbia. | ferito
+La pioggia acida | Dal cielo cade una pioggia che corrode il metallo. | {A} non trova riparo. | {A} si ritrova la pelle piena di piccole ustioni. | {A} si infila sotto un camion ribaltato. | ferito
+I vermi delle dune | Vermi giganti emergono dalla sabbia. | {A} viene inghiottit[A:o/a] da un verme. | {A} viene sbalzat[A:o/a] in aria da una duna che esplode. | {A} resta immobile finché i vermi non se ne vanno. | ferito
+Il crollo della Diga | La Diga cede: un muro d'acqua attraversa il deserto. | {A} viene travolt[A:o/a] dall'acqua. | {A} viene trascinat[A:o/a] per un chilometro e beve molta acqua sporca. | {A} sale sulla carcassa di un aereo. | malato
+L'invasione dei predoni | Una banda di predoni attraversa l'arena bruciando tutto. | {A} viene catturat[A:o/a] e non torna. | {A} viene derubat[A:o/a] e picchiat[A:o/a]. | {A} si finge mort[A:o/a] e i predoni passano oltre. | ferito
+La siccità | Per un giorno intero non si trova una goccia d'acqua. | {A} crolla disidratat[A:o/a]. | {A} si trascina per ore con la lingua gonfia. | {A} aveva una tanica nascosta sotto la sabbia. | affamato
+Il cratere che si apre | Il terreno sprofonda in un nuovo cratere radioattivo. | {A} cade nel cratere. | {A} si ferma sul bordo, ma respira polvere velenosa. | {A} sente il terreno tremare e si allontana di corsa. | malato
+`,
+  });
+})(typeof window !== 'undefined' ? window : globalThis);
+
+;
+/* Città degli Infetti — secondo pacchetto. */
+(function (G) {
+  const D = (G.LOS_DATA = G.LOS_DATA || {}); D.packs = D.packs || [];
+  D.packs.push({
+    theme: 'zombie',
+    ev: {
+      b: `
+1 +armatura:A @luck | Durante l'evacuazione, {A} trova {armatura} su una barella abbandonata e non fa domande.
+1 +attrezzo:A @int | {A} raccoglie {attrezzo} da una macchina della polizia. Sarà più utile di qualunque pistola.
+2 al:AB @soc | {A} e {B} si chiudono nello stesso furgone mentre l'orda passa. Quando l'orda se ne va, si danno la mano.
+2 k:A>B @agg | {A} spinge {B} verso l'orda per guadagnare tre secondi. Tre secondi bastano.
+1 test:A=furt12 ok:+cibo:A ko:s:A=ferito | {A} attraversa il supermercato in punta di piedi e ne esce con lo zaino pieno. || {A} urta uno scaffale di barattoli. Il resto è una corsa con un morso alla caviglia.
+`,
+      d: `
+1 stat:A>pr40 s:A=sconvolto | {A} si guarda il morso allo specchio di un bagno. Poi si guarda gli occhi. Poi smette di guardarsi.
+1 stat:A>pr30 con:A=med -med:A pr:A-60 | {A} si inietta l'ultimo antivirale dell'Ospedale. Il nero nelle vene si ritira. Per stavolta.
+1 stat:A<hp45 @heal hp:A+20 | {A} si chiude in una farmacia e si medica con quello che trova. Metà delle scatole sono vitamine.
+1 stat:A<food30 +cibo:A | {A} apre una lattina senza etichetta. Sono pesche sciroppate. È il giorno più bello della sua vita.
+1 con:A=attrezzo +cibo:A @int | {A} usa {attrezzo:A} per forzare la serranda di un alimentari. Dentro è tutto intatto.
+1 con:A=valore -valore:A +med:A | {A} baratta {valore} con un vecchio barricato in un negozio. Il vecchio [A:gli/le] dà {med:A} e un consiglio: «Mira alla testa».
+1 con:A=ricordo mo:A+15 | {A} accarezza {ricordo:A}. Fuori l'orda geme, ma dentro di l[A:ui/ei] c'è silenzio.
+1 wx:buio @stl | Nel blackout, {A} attraversa tre isolati in mezzo agli infetti senza farsi notare.
+1 wx:abbondanza +cibo:A | {A} trova una delle casse lanciate dai militari. Dentro c'è perfino della cioccolata.
+1 wx:pericolo s:A=ferito | L'orda in migrazione passa a due strade da {A}, che si ferisce scavalcando un cancello per scappare.
+1 trait:A=ingegnoso con:A=attrezzo +trap:A | {A} fa una trappola con un allarme d'auto e dei barattoli: gli infetti ci vanno a sbattere, e chiunque altro pure.
+2 crush:A>B rel:AB+15 @soc | {A} lascia a {B} l'ultima barretta energetica e dice di non avere fame. Ha fame.
+2 crush:A>B love:AB *2 | {A} e {B} si nascondono in un armadio dell'Ospedale per un'ora, stretti, mentre gli infetti passano. Quando escono, si tengono per mano.
+2 plot:A>B rel:AB+10 | {A} si offre di controllare i morsi di {B}. Lo fa con molta attenzione. Sta cercando una scusa.
+2 plot:A>B -med:B +med:A @stl | {A} sostituisce l'antivirale di {B} con una fiala d'acqua. Fa parte del piano.
+2 goal:A=vendetta grudge:A>B hit:A>B | {A} lascia una scia di sangue fino al nascondiglio di {B}: gli infetti fanno il resto. {B} sopravvive, per ora. Per {caro:A}.
+2 goal:A=caccia k:A>B @agg | {A} segue {B} per tre isolati, silenzios[A:o/a] come un infetto. Più paziente di un infetto.
+2 goal:A=cibo give:B>A=cibo debt:A>B | {B} lancia a {A} una scatoletta dalla finestra di un palazzo. «Non dire a nessuno dove sono.»
+2 con:A=armatura hit:B>A | {B} colpisce {A} con una mazza da baseball, ma {armatura:A} attutisce il colpo.
+2 con:A=alcol give:A>B=alcol rel:AB+20 | {A} e {B} si scolano {alcol} sul tetto di un palazzo, guardando la città bruciare. È quasi romantico.
+2 stat:B>pr60 hit:A>B @agg | {A} vede le vene nere di {B} e l[B:o/a] colpisce prima che sia troppo tardi. Forse è già troppo tardi.
+2 stat:B>pr60 save:A>B @heal | {A} vede le vene nere di {B} e invece di scappare l[B:o/a] trascina fino all'Ospedale.
+2 owe:A>B repay:A>B rel:AB+10 | {A} copre la ritirata di {B} sparando gli ultimi colpi. Debito saldato.
+3 plot:A>B ally:ABC rel:AC+20 | {A} dice a {C} di aver visto un morso sul braccio di {B}. Non è vero. {C} però ci crede.
+`,
+      n: `
+1 stat:A>pr50 pr:A+10 | {A} ha la febbre e sogna di avere fame. Si sveglia affamat[A:o/a] davvero, e non di cibo.
+1 stat:A<en25 s:A=ferito | {A} si addormenta di guardia e si sveglia con un infetto che [A:gli/le] mastica lo stivale. Lo stivale si salva, il piede meno.
+1 con:A=ricordo | {A} parla sottovoce con {ricordo:A} per non sentire i lamenti in strada.
+1 wx:pericolo s:A=sconvolto | Tutta la notte, l'orda graffia la porta del rifugio di {A}. Al mattino la porta regge. {A} un po' meno.
+2 crush:A>B @soc | {A} fa la guardia sul tetto tutta la notte perché {B} possa dormire. Al mattino finge di essersi appena svegliat[A:o/a].
+2 plot:A>B tr:A>B *2 | {A} apre la porta del rifugio mentre {B} dorme. Gli infetti entrano. {A} esce dall'altra parte.
+2 plot:A>B br:A | {A} se ne va prima dell'alba con le chiavi del furgone. {B} sente il motore allontanarsi.
+2 couple:AB stat:B>pr60 | {A} controlla il morso di {B} ogni ora. Non dice niente. [B:Gli/Le] stringe solo la mano più forte.
+2 couple:AB stat:B<hp40 save:A>B | {A} ricuce {B} con ago e filo da cucito, alla luce di un accendino.
+2 hit:A>B trait:A=sonnambulo | {A} cammina nel sonno gemendo come un infetto. {B} si spaventa e l[A:o/a] colpisce con una padella.
+`,
+      f: `
+2 crush:A>B save:A>B | Al lancio dei militari, {A} tira {B} fuori da una folla di infetti per il colletto.
+2 plot:A>B k:A>B *2 | Al lancio dei militari, {A} sgambetta {B} in mezzo agli infetti. Faceva parte del piano.
+1 con:A=valore -valore:A +arma:A | Al lancio dei militari, {A} paga un soldato con {valore} e riceve {arma}.
+`,
+      sponsor: `
+1 +armatura:A @gift | Un drone militare lascia cadere per {A} {armatura}.
+1 +med:A @gift | Gli sponsor mandano a {A} un antivirale sperimentale. L'etichetta dice «forse».
+1 +ricordo:A mo:A+20 @gift | Gli sponsor mandano a {A} un vecchio messaggio vocale da casa e {ricordo}.
+`,
+      finale: `
+2 k:A>B | Sul tetto dell'Ospedale, con l'orda che sale le scale, {A} e {B} hanno un solo elicottero e un solo posto. Sale {A}.
+2 k:A>B stat:B>pr50 | {B} sta per trasformarsi, e lo sa. {A} lo sa anche. Lo fa in fretta.
+`,
+    },
+    dis: `
+L'orda gigante | Centomila infetti invadono la città da nord. | {A} viene travolt[A:o/a] dall'orda. | {A} viene mors[A:o/a] mentre si arrampica su un lampione. | {A} si cosparge di sangue di infetto e cammina in mezzo a loro. | ferito
+Il bombardamento | I militari decidono di bombardare la Periferia. | {A} era in Periferia. | {A} viene sbalzat[A:o/a] da un'esplosione. | {A} sente gli aerei arrivare e corre nella Metropolitana. | ferito
+Il mutante | Un infetto enorme, grosso come un furgone, sfonda le pareti della Scuola. | {A} si trova sulla sua strada. | {A} viene lanciat[A:o/a] contro un muro. | {A} si nasconde in un armadietto e trattiene il respiro. | ferito
+L'acqua contaminata | L'acquedotto è contaminato: chi beve si ammala. | {A} beve dal rubinetto senza pensarci. | {A} ne beve un sorso e passa la notte con la febbre. | {A} beve solo acqua in bottiglia, per principio. | malato
+L'incendio dei palazzi | Un incendio si propaga da un palazzo all'altro. | {A} resta intrappolat[A:o/a] all'ultimo piano. | {A} salta da una finestra e atterra su un'auto. | {A} è già in strada e guarda le fiamme da lontano. | ferito
+Gli infetti corridori | Una nuova varietà di infetti, velocissimi, esce dalla Metropolitana. | {A} non corre abbastanza veloce. | {A} viene raggiunt[A:o/a] e graffiat[A:o/a]. | {A} sale su un tetto e lascia che passino. | ferito
+La sirena dei militari | Gli altoparlanti annunciano un'evacuazione falsa: tutti verso la piazza. | {A} va in piazza. In piazza ci sono solo infetti. | {A} capisce l'inganno all'ultimo e scappa ferit[A:o/a]. | {A} non crede mai agli altoparlanti. | sconvolto
+Il gas nervino | I militari rilasciano un gas per fermare gli infetti. Ferma anche i vivi. | {A} respira il gas. | {A} tossisce per ore e trema. | {A} indossa una maschera antigas trovata giorni prima. | malato
+`,
+  });
+})(typeof window !== 'undefined' ? window : globalThis);
+
+;
+/* Liceo e Ufficio — terzo pacchetto: vita quotidiana, carattere, oggetti e legami. Nessuno muore. */
+(function (G) {
+  const D = (G.LOS_DATA = G.LOS_DATA || {}); D.packs = D.packs || [];
+  D.packs.push({
+    theme: 'liceo',
+    ev: {
+      d: `
+1 @int +attrezzo:A | {A} trova sotto il banco {attrezzo}, dimenticato da qualcuno della classe accanto.
+1 @luck star:A | {A} viene interrogat[A:o/a] proprio sull'unico argomento che ha studiato. Nove.
+1 @mad | {A} passa l'ora di storia dell'arte a disegnare baffi su tutti i ritratti del libro.
+1 @show star:A | {A} si presenta con un taglio di capelli nuovo. Entro mezzogiorno, tre persone lo copiano.
+1 @cow | {A} si chiude in biblioteca per tutto l'intervallo, dietro l'enciclopedia più grossa.
+1 s:A=ferito | {A} inciampa sulle scale davanti a tutta la scuola. Qualcuno ha filmato.
+1 s:A=sconvolto | {A} scopre di essere stat[A:o/a] esclus[A:o/a] dal gruppo della gita.
+1 +cibo:A @food | {A} vince la gara a chi mangia più cornetti in ricreazione. Il premio è un altro cornetto.
+1 trait:A=leader star:A | {A} si candida come rappresentante d'istituto e fa un discorso così bello che piange anche il bidello.
+1 trait:A=paranoico @stl | {A} cambia password a tutti i profili per la terza volta questa settimana.
+1 trait:A=pacifista @soc | {A} organizza un sit-in nel cortile contro le verifiche a sorpresa. Partecipano in tre, ma con convinzione.
+1 trait:A=furtivo +valore:A | {A} si intrufola nell'ufficio del vicepreside e ne esce con {valore}.
+1 trait:A=fortunato star:A | {A} sbaglia tutte le risposte del quiz, ma il professore conta male e [A:gli/le] dà otto.
+1 trait:A=sfortunato s:A=ferito | {A} si siede sulla gomma da masticare per il terzo giorno di fila.
+1 att:A>car8 @soc star:A | {A} entra in mensa e mezza scuola si gira a salutarl[A:o/a].
+1 att:A<car3 s:A=sconvolto | {A} prova a raccontare una barzelletta a pranzo. Non ride nessuno. Neanche l[A:ui/ei].
+2 al:AB @soc | {A} e {B} vengono mess[AB:i/e] in coppia per il progetto di chimica. Fanno esplodere un becher e diventano inseparabili.
+2 hit:A>B @agg | {A} fa notare ad alta voce che {B} ha la stessa felpa da tre giorni. Ride tutta la fila.
+2 k:A>B @agg | {A} dice alla professoressa che {B} ha copiato la verifica da l[A:ui/ei]. {B} viene esclus[B:o/a] dai giochi.
+2 k:A>B @stl | {A} fa sparire l'autorizzazione per la gita di {B}. {B} resta a scuola, e fuori dai giochi.
+2 save:A>B @heal | {A} difende {B} da un gruppo di quinta che l[B:o/a] prendeva in giro. Da oggi {B} ha un debito.
+2 give:A>B=cibo @heal | {A} divide la merenda con {B}, che non aveva soldi per il distributore.
+2 love:AB @soc | {A} e {B} si scambiano le cuffiette durante l'ora buca. Ascoltano la stessa canzone. Si capiscono.
+2 couple:AB star:A | {A} dedica a {B} una canzone alla radio della scuola. Tutti sanno per chi era.
+2 steal:A<B @stl | {A} prende in prestito {arma:B} a {B} e non glielo restituisce.
+2 rel:AB+20 @soc | {A} e {B} scoprono di tifare per la stessa squadra. Da quel momento parlano solo di quello.
+2 rel:AB-20 | {A} e {B} si contendono lo stesso posto in prima fila durante l'assemblea.
+2 trait:A=avido steal:A<B | {A} vende a {B} le risposte del compito per una cifra assurda, poi gliele ruba di nuovo.
+2 trait:A=vendicativo grudge:A>B hit:A>B | {A} si ricorda di cosa ha fatto {B} il primo giorno. Durante la gita, si vendica a modo suo.
+2 trait:A=generoso give:A>B=valore | {A} regala a {B} {valore}, senza un motivo. {B} sospetta qualcosa. Non c'è niente da sospettare.
+2 test:A=int13 ok:star:A ok:rel:AB+10 ko:hit:B>A | {A} risolve alla lavagna il problema che {B} non riusciva a capire. || {A} prova a risolvere il problema al posto di {B} alla lavagna e sbaglia. {B} ride.
+2 test:A=furt12 ok:-valore:B ok:+valore:A ko:hit:B>A | {A} sfila {valore} dallo zaino di {B} senza farsi vedere. || {A} prova a sfilare qualcosa dallo zaino di {B}. {B} se ne accorge e lo urla in corridoio.
+3 al:ABC @soc | {A}, {B} e {C} formano una band per la festa d'istituto. Suonano malissimo, ma insieme.
+3 hit:A>C rel:AB+15 | {A} e {B} prendono in giro {C} per tutta l'ora di educazione fisica.
+`,
+      n: `
+1 @mad | {A} guarda tutorial di trucco alle due di notte. Domani sarà irriconoscibile.
+1 s:A=sconvolto | {A} riceve un messaggio anonimo a mezzanotte: «So cosa hai fatto». Non sa cosa ha fatto.
+1 @int star:A | {A} finisce la tesina alle quattro di notte. È bellissima.
+2 al:AB @soc | {A} e {B} passano la notte in videochiamata a studiare. Studiano poco, parlano tanto.
+2 hit:A>B | {A} pubblica a mezzanotte una foto di {B} venuta malissimo. Settanta like in un'ora.
+2 k:A>B @agg | {A} manda alla madre di {B} lo screenshot sbagliato. {B} viene ritirat[B:o/a] dai giochi.
+`,
+    },
+  });
+  D.packs.push({
+    theme: 'ufficio',
+    ev: {
+      d: `
+1 @int +attrezzo:A | {A} eredita dalla scrivania del collega in pensione {attrezzo}. È oro.
+1 @luck star:A | {A} sbaglia la riunione, entra in quella del consiglio di amministrazione e fa una domanda intelligente. Promozione sfiorata.
+1 @mad | {A} passa due ore a scegliere il carattere giusto per una slide. Sceglie Comic Sans.
+1 @show star:A | {A} si presenta in ufficio vestit[A:o/a] come per un matrimonio. Nessuno sa perché, ma funziona.
+1 @cow | {A} passa la giornata in bagno a rispondere alle mail dal telefono.
+1 s:A=ferito | {A} rovescia il caffè sulla tastiera del Direttore. Il Direttore non è contento.
+1 s:A=sconvolto | {A} scopre di non essere stat[A:o/a] invitat[A:o/a] all'aperitivo del venerdì.
+1 +cibo:A @food | {A} vince la gara di chi trova per prim[A:o/a] la torta in cucina. Il premio è la torta.
+1 trait:A=leader star:A | {A} prende in mano una riunione caotica e la chiude in dieci minuti. Il Direttore l[A:o/a] nota.
+1 trait:A=paranoico @stl | {A} scollega la webcam con il nastro adesivo, poi anche il microfono, poi anche il mouse.
+1 trait:A=pacifista @soc | {A} organizza una pausa caffè collettiva per rasserenare l'ufficio. Partecipano tutti, tranne il Direttore.
+1 trait:A=furtivo +valore:A | {A} si intrufola nell'Ufficio del direttore e ne esce con {valore}.
+1 trait:A=fortunato star:A | {A} invia per sbaglio il report sbagliato, ma era quello che il cliente voleva.
+1 trait:A=sfortunato s:A=ferito | {A} resta chius[A:o/a] fuori dall'ufficio senza badge per tutta la mattina.
+1 att:A>car8 @soc star:A | {A} entra in riunione e tutti si girano ad ascoltarl[A:o/a] prima ancora che parli.
+1 att:A<car3 s:A=sconvolto | {A} prova a fare una battuta in riunione. Silenzio. Qualcuno tossisce.
+2 al:AB @soc | {A} e {B} lavorano insieme a una presentazione impossibile. La finiscono alle due di notte, ed è perfetta. Ora sono alleati.
+2 hit:A>B @agg | {A} fa notare in riunione che {B} ha sbagliato tutte le cifre del report. Davanti al cliente.
+2 k:A>B @agg | {A} dice al Direttore che {B} cerca un altro lavoro. È vero. {B} viene licenziat[B:o/a] prima di trovarlo.
+2 k:A>B @stl | {A} cancella dal calendario di {B} la riunione più importante dell'anno. {B} non si presenta e viene licenziat[B:o/a].
+2 save:A>B @heal | {A} si prende la colpa dell'errore di {B} davanti al Direttore. Ora {B} ha un debito enorme.
+2 give:A>B=cibo @heal | {A} porta a {B} metà del suo pranzo, vedendol[B:o/a] mangiare un cracker da sol[B:o/a].
+2 love:AB @soc | {A} e {B} scoprono di prendere lo stesso treno ogni mattina. Da quel giorno siedono vicini.
+2 couple:AB star:A | {A} dedica a {B} un intero slide deck, a tema «perché sei la persona migliore dell'ufficio».
+2 steal:A<B @stl | {A} prende in prestito {arma:B} di {B} e se lo dimentica nel cassetto.
+2 rel:AB+20 @soc | {A} e {B} scoprono di odiare entrambi le riunioni del lunedì. Diventano amici in cinque minuti.
+2 rel:AB-20 | {A} e {B} si contendono l'ultima capsula di caffè buono.
+2 trait:A=avido steal:A<B | {A} si fa prestare da {B} {arma:B} «per cinque minuti». Sono passati tre giorni.
+2 trait:A=vendicativo grudge:A>B hit:A>B | {A} non ha dimenticato cosa ha fatto {B} in riunione. Oggi inoltra al capo una vecchia mail di {B}.
+2 trait:A=generoso give:A>B=valore | {A} regala a {B} {valore}. {B} non sa se ringraziare o preoccuparsi.
+2 test:A=int13 ok:star:A ok:rel:AB+10 ko:hit:B>A | {A} sistema in un'ora il foglio di calcolo che {B} non capiva. || {A} prova a sistemare il foglio di calcolo di {B} e cancella tre mesi di dati.
+2 test:A=furt12 ok:-valore:B ok:+valore:A ko:hit:B>A | {A} sfila {valore} dal cassetto di {B} senza farsi vedere. || {A} prova a frugare nel cassetto di {B}. {B} lo scopre e manda una mail a tutti.
+3 al:ABC @soc | {A}, {B} e {C} creano una chat segreta per commentare le riunioni. Diventa il centro del potere dell'ufficio.
+3 hit:A>C rel:AB+15 | {A} e {B} imitano {C} per tutta la pausa pranzo.
+`,
+      n: `
+1 @mad | {A} riorganizza tutte le cartelle del computer alle due di notte. Per colore.
+1 s:A=sconvolto | {A} riceve una mail del Direttore alle 23:58 con oggetto «Domani passi da me». Non dorme.
+1 @int star:A | {A} finisce il progetto alle quattro di notte. È geniale.
+2 al:AB @soc | {A} e {B} si fermano in ufficio fino a tardi e ordinano la pizza. Lavorano poco, parlano tanto.
+2 hit:A>B | {A} programma un'email che parte alle 3 di notte per far sembrare {B} pigr[B:o/a].
+2 k:A>B @agg | {A} inoltra al Direttore la mail in cui {B} lo chiama per nome e cognome, con molti aggettivi. {B} è fuori.
+`,
+    },
+  });
+})(typeof window !== 'undefined' ? window : globalThis);
+
+;
 /* Isola Battle Royale — eventi aggiuntivi e disastri. */
 (function (G) {
   const D = (G.LOS_DATA = G.LOS_DATA || {}); D.more = D.more || {};
@@ -5303,10 +6528,17 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
   /* ---------------- Parser del formato eventi ---------------- */
   const L = (c) => c.charCodeAt(0) - 65;
   const letters = (s) => [...s].map(L);
-  const ITEMS = 'arma|cibo|med|trap|veleno|mappa|amuleto|esplosivo';
-  const LEXKEYS = 'arma|cibo|luogo|mostro|trappola|rifugio|dono|amuleto|alcol|veleno|mappa|esplosivo';
+  const ITEMS = 'arma|cibo|med|trap|veleno|mappa|amuleto|esplosivo|armatura|attrezzo|alcol|valore|ricordo';
+  const LEXKEYS = 'arma|cibo|luogo|mostro|trappola|rifugio|dono|amuleto|alcol|veleno|mappa|esplosivo|armatura|attrezzo|valore|ricordo';
+  const VITALS = { hp: 'hp', en: 'en', mo: 'mo', food: 'food', pr: 'pr' };
+  // nomi degli oggetti nuovi (protezioni, attrezzi, merce, ricordi, alcol) per un'arena
+  function itemLex(theme) {
+    const N = (D.items && D.items.names) || {}, base = N._ || {}, own = N[theme.id] || {}, out = {};
+    ['armatura', 'attrezzo', 'valore', 'ricordo', 'alcol'].forEach((k) => { const l = own[k] || base[k]; if (l) out[k] = l; });
+    return out;
+  }
   const LEX_RE = new RegExp('\\{(' + LEXKEYS + ')\\}', 'g');
-  const POSS_RE = /\{(arma|amuleto|veleno|mappa|esplosivo|cibo|med|trap):([A-F])\}/g;
+  const POSS_RE = /\{(arma|amuleto|veleno|mappa|esplosivo|cibo|med|trap|armatura|attrezzo|alcol|valore|ricordo):([A-F])\}/g;
   const ID = (m) => [L(m)];
 
   function catOf(ev) {
@@ -5324,7 +6556,7 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
     if (!(ev.n >= 1 && ev.n <= 6)) throw new Error('Numero di concorrenti non valido in: ' + line);
     let m;
     for (let tok of head.slice(1)) {
-      const self = tok.match(/^(?:ok:|ko:)?(?:hit|save|give|owe|repay|debt|grudge|forgive|steal|k|tr):([A-F])[<>]([A-F])/) || tok.match(/^(?:ok:|ko:)?(?:love|couple|friend|enemy|rel):([A-F])([A-F])/);
+      const self = tok.match(/^(?:ok:|ko:)?(?:hit|save|give|owe|repay|debt|grudge|forgive|steal|k|tr|crush|plot):([A-F])[<>]([A-F])/) || tok.match(/^(?:ok:|ko:)?(?:love|couple|friend|enemy|rel):([A-F])([A-F])/);
       if (self && self[1] === self[2]) throw new Error('Etichetta riferita due volte alla stessa persona "' + tok + '" in: ' + line);
       let tgt = ev;
       if (/^(ok|ko):/.test(tok)) { tgt = tok[1] === 'k' ? ev.ok : ev.ko; tok = tok.slice(3); }
@@ -5348,7 +6580,7 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
       if ((m = tok.match(/^con:([A-F])=(\w+)$/))) { ev.req.push({ t: 'has', item: m[2], r: ID(m[1]) }); continue; }
       if ((m = tok.match(new RegExp('^\\+(' + ITEMS + '):([A-F])$')))) { tgt.fx.push({ t: 'gain', item: m[1], r: ID(m[2]) }); continue; }
       if ((m = tok.match(new RegExp('^-(' + ITEMS + '):([A-F])$')))) { tgt.fx.push({ t: 'lose', item: m[1], r: ID(m[2]) }); ev.req.push({ t: 'has', item: m[1], r: ID(m[2]) }); continue; }
-      if ((m = tok.match(/^(cibo|med|trap|veleno|esplosivo):([A-F])$/))) { const r = ID(m[2]); ev.req.push({ t: 'has', item: m[1], r }); tgt.fx.push({ t: 'lose', item: m[1], r }); continue; }
+      if ((m = tok.match(/^(cibo|med|trap|veleno|esplosivo|alcol|valore|attrezzo|armatura):([A-F])$/))) { const r = ID(m[2]); ev.req.push({ t: 'has', item: m[1], r }); tgt.fx.push({ t: 'lose', item: m[1], r }); continue; }
       if ((m = tok.match(/^steal:([A-F])<([A-F])$/))) { ev.req.push({ t: 'has', item: 'arma', r: ID(m[2]) }); tgt.fx.push({ t: 'steal', r: [L(m[1]), L(m[2])] }); continue; }
       if ((m = tok.match(/^give:([A-F])>([A-F])=(\w+)$/))) { tgt.fx.push({ t: 'give', r: [L(m[1]), L(m[2])], item: m[3] }); if (tgt === ev) ev.req.push({ t: 'has', item: m[3], r: ID(m[1]) }); continue; }
       if ((m = tok.match(/^s:([A-F])=(\w+)$/))) { tgt.fx.push({ t: 'status', r: ID(m[1]), s: m[2] }); continue; }
@@ -5373,6 +6605,15 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
       if ((m = tok.match(/^lost:([A-F])$/))) { ev.req.push({ t: 'lost', r: ID(m[1]) }); continue; }
       if ((m = tok.match(/^star:([A-F])$/))) { tgt.fx.push({ t: 'star', r: ID(m[1]) }); continue; }
       if ((m = tok.match(/^traitor:([A-F])$/))) { ev.req.push({ t: 'traitor', r: ID(m[1]) }); continue; }
+      // la mente: cotta segreta, complotto, obiettivo del momento
+      if ((m = tok.match(/^crush:([A-F])>([A-F])$/))) { ev.req.push({ t: 'crush', r: [L(m[1]), L(m[2])] }); ev.tags.push('love'); continue; }
+      if ((m = tok.match(/^plot:([A-F])>([A-F])$/))) { ev.req.push({ t: 'plot', r: [L(m[1]), L(m[2])] }); ev.tags.push('betray'); continue; }
+      if ((m = tok.match(/^goal:([A-F])=(\w+)$/))) { ev.req.push({ t: 'goal', r: ID(m[1]), g: m[2] }); continue; }
+      // valori vitali: stat:A<hp40 (requisito), mo:A+10 (effetto)
+      if ((m = tok.match(/^stat:([A-F])([<>])(hp|en|mo|food|pr)(\d+)$/))) { ev.req.push({ t: 'stat', r: ID(m[1]), op: m[2], k: m[3], v: +m[4] }); continue; }
+      if ((m = tok.match(/^(hp|en|mo|food|pr):([A-F])([+-]\d+)$/))) { tgt.fx.push({ t: 'vital', r: ID(m[2]), k: m[1], v: +m[3] }); continue; }
+      // il meteo del giorno: wx:buio, wx:abbondanza, wx:pericolo, wx:calma
+      if ((m = tok.match(/^wx:(buio|abbondanza|pericolo|calma)$/))) { ev.req.push({ t: 'wx', w: m[1] }); continue; }
       throw new Error('Etichetta sconosciuta "' + tok + '" in: ' + line);
     }
     if (ev.test) {
@@ -5402,7 +6643,7 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
     if (ev.fx.some((f) => f.item === 'cibo') || ev.req.some((r) => r.item === 'cibo')) ev.tags.push('food');
     if (ev.test) ev.tags.push('test:' + ev.test.attr);
     // perché accade: la conseguenza che l'ha reso possibile
-    ev.why = ev.test ? 'prova' : rq('att') || rq('trait') ? 'carattere' : rq('grudge') ? 'vendetta' : rq('owe') ? 'debito' : rq('couple') ? 'coppia' : rq('lost') ? 'lutto' :
+    ev.why = ev.test ? 'prova' : rq('crush') ? 'cotta' : rq('plot') ? 'complotto' : rq('goal') ? 'obiettivo' : rq('wx') ? 'meteo' : rq('att') || rq('trait') ? 'carattere' : rq('grudge') ? 'vendetta' : rq('owe') ? 'debito' : rq('couple') ? 'coppia' : rq('lost') ? 'lutto' :
       ev.req.some((r) => r.t === 'need' && r.s === 'lutto') ? 'lutto' : rq('traitor') ? 'reputazione' : rq('feared') ? 'reputazione' : rq('fame') ? 'fama' :
       ev.req.some((r) => r.t === 'has' && /veleno|mappa|amuleto|esplosivo|trap/.test(r.item)) ? 'oggetto' : ev.req.some((r) => r.t === 'need' && r.s !== '*') ? 'condizione' : '';
     const used = new Set();
@@ -5471,7 +6712,7 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
     pools.disasters = (theme.disasters || []).map((d) => ({ n: d.n, intro: d.intro, out: parseBlock(d.out, theme.id) }))
       .concat(parseDisasters(more.dis, theme.id));
     packs.forEach((pk) => { if (pk.dis) pools.disasters = pools.disasters.concat(parseDisasters(pk.dis, pk.adult ? 'adult' : theme.id).map((d) => Object.assign(d, { adult: !!pk.adult }))); });
-    pools.lex = Object.assign({}, D.lexDefault || {}, theme.lex);
+    pools.lex = Object.assign({}, D.lexDefault || {}, itemLex(theme), theme.lex);
     packs.forEach((pk) => { if (pk.lex) Object.keys(pk.lex).forEach((k) => (pools.lex[k] = pk.lex[k])); });
     const ks = Object.keys(poolCache); if (ks.length > 40) delete poolCache[ks[0]];
     poolCache[key] = pools;
@@ -5587,7 +6828,8 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
     // oggetti e mente dei concorrenti
     const IT = D.items || { types: {}, names: {}, how: {} };
     const MIND = D.mind || { goals: {}, acts: {}, actsSoft: {}, diary: { trait: {} }, diarySoft: { trait: {} }, mem: {} };
-    let ORIGIN = null;
+    let ORIGIN = null, CURKIND = '';
+    const VO = D.voice || {}, VS = D.voiceSoft || {}, CH = D.chats || {};
     const ACT = (k) => (theme.soft && MIND.actsSoft && MIND.actsSoft[k]) || (MIND.acts || {})[k] || [];
     const DIA = (k) => (theme.soft && MIND.diarySoft && MIND.diarySoft[k]) || (MIND.diary || {})[k] || [];
     const DIAT = (tr) => (theme.soft && MIND.diarySoft && MIND.diarySoft.trait && MIND.diarySoft.trait[tr]) || ((MIND.diary || {}).trait || {})[tr] || [];
@@ -5693,6 +6935,13 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
       return false;
     }
 
+    function wxIs(w) {
+      const f = W.fx || {};
+      if (w === 'buio') return (f.stl || 1) >= 1.3;
+      if (w === 'abbondanza') return (f.forage || 1) >= 1.4;
+      if (w === 'pericolo') return (f.lethal || 1) >= 1.1 || (f.beast || 1) >= 1.5 || (f.pr || 0) >= 6;
+      return !W.n || (!(f.lethal > 1) && !(f.beast > 1) && !((f.pr || 0) > 0));
+    }
     function checkReq(ev, roles) {
       for (const r of ev.req) {
         const A = roles[r.r ? r.r[0] : 0], B = r.r && r.r[1] != null ? roles[r.r[1]] : null;
@@ -5738,6 +6987,11 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
           case 'att': { const v = A.attr[r.attr] != null ? A.attr[r.attr] : 5; if (r.op === '>' ? v < r.v : v > r.v) return false; break; }
           case 'trait': if (!hasTrait(A, r.trait)) return false; break;
           case 'notrait': if (hasTrait(A, r.trait)) return false; break;
+          case 'crush': if (A.crush !== B.id) return false; break;
+          case 'plot': if (A.plot !== B.id) return false; break;
+          case 'goal': if (!A.goal || A.goal.k !== r.g) return false; break;
+          case 'stat': { const v = A[r.k]; if (r.op === '<' ? v >= r.v : v <= r.v) return false; break; }
+          case 'wx': if (!wxIs(r.w)) return false; break;
         }
       }
       return true;
@@ -5791,6 +7045,10 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
         else if (r.t === 'traitor' && ctxOf(P).traitor) w *= 2;
         else if (r.t === 'feared' && ctxOf(P).feared) w *= 2;
         else if (r.t === 'canLove' && !P.partner) w *= 1.2;
+        else if ((r.t === 'crush' && P.crush) || (r.t === 'plot' && P.plot)) w *= 4;
+        else if (r.t === 'goal' && P.goal && P.goal.k === r.g && r.r[0] === 0) w *= 3;
+        else if (r.t === 'wx' && wxIs(r.w)) w *= 2.5;
+        else if (r.t === 'stat' && r.r[0] === 0) { const v = P[r.k]; if (r.op === '<' ? v < r.v : v > r.v) w *= 2.5; }
       }
       // condizione fisica, umore, bisogni, arena e meteo spostano le scelte
       const tg = (x) => ev.tags.includes(x);
@@ -5891,14 +7149,33 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
     function fmt(src, people, vars) {
       const fits = (x) => { let mx = -1; x.replace(/[{\[](\d)[}:]/g, (_, d) => { mx = Math.max(mx, +d); }); return mx < people.length && !/\{(i|ip|j|k|z|n)\}/.test(x.replace(/\{(i|ip|j|k|z|n)\}/g, (m, v) => (vars && vars[v] != null && vars[v] !== '' ? '' : m))); };
       const list = (Array.isArray(src) ? src : []).filter(fits); if (!list.length) return null;
-      let s = rng.pick(list);
+      let s = rng.pick(list); const src0 = s;
       s = s.replace(/\[(\d):([^\]]*)\]/g, (_, i, o) => genderPick([people[+i]], o))
         .replace(/\{(i|ip|j|k|z|m|n|d)\}/g, (_, x) => (vars && vars[x] != null ? vars[x] : ''))
         .replace(LEX_RE, (_, k2) => (k2 === 'luogo' && vars && vars.z ? vars.z : rng.pick(LEX[k2] || ['qualcosa'])));
       s = cap(artPrep(s));
-      return { plain: edFix(s.replace(/\{(\d)\}/g, (_, i) => people[+i].name)), html: edFix(esc(s).replace(/\{(\d)\}/g, (_, i) => nameTag(people[+i]))) };
+      return { src: src0, plain: edFix(s.replace(/\{(\d)\}/g, (_, i) => people[+i].name)), html: edFix(esc(s).replace(/\{(\d)\}/g, (_, i) => nameTag(people[+i]))) };
     }
     const sysText = (k, people, vars) => fmt(TX(k), people, vars);
+    // le voci: una battuta di chi parla, scelta da tratti, arena e situazione
+    const USED = new Set();
+    // sceglie tra le frasi non ancora usate in questa partita (se ne restano)
+    const fresh = (l) => { const f = (l || []).filter((x) => !USED.has(x)); return f.length ? f : l || []; };
+    const useFmt = (l, people, vars) => { const pool = fresh(l); const x = fmt(pool, people, vars); if (x) pool.forEach((y) => { if (x.src === y) USED.add(y); }); return x; };
+    function voice(kind, speaker, others, vars) {
+      if (!speaker) return null;
+      const base = (theme.soft && VS[kind]) || VO[kind] || {};
+      const tr = speaker.traits.filter((x) => base.trait && base.trait[x] && fresh(base.trait[x]).some((y) => !USED.has(y)));
+      const ar = base.arena && base.arena[theme.id];
+      const people = [speaker].concat(others || []);
+      let x = null;
+      if (tr.length && rng.chance(0.55)) x = useFmt(base.trait[rng.pick(tr)], people, vars);
+      if (!x && ar && ar.some((y) => !USED.has(y)) && rng.chance(0.45)) x = useFmt(ar, people, vars);
+      if (!x) x = useFmt(base._ || [], people, vars);
+      if (!x) return null;
+      return { plain: speaker.name + ': «' + x.plain + '»', html: nameTag(speaker) + ': «' + x.html + '»', cls: 'quote' };
+    }
+    const pushVoice = (out, v) => { if (v && out.length < 3) out.push(v); };
     function sys(k, people, vars, o, pri) {
       const tx = sysText(k, people, vars); if (!tx) return null;
       const ev = Object.assign({ html: tx.html, plain: tx.plain, ids: people.map((p) => p.id), deaths: [], lethal: false, origin: 'sys', cat: 'none', why: 'conseguenza', echo: [] }, o || {});
@@ -6131,9 +7408,22 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
           const e = sysText(K ? 'tough' : 'toughEnv', K ? [v, K] : [v]); if (e) out.push(Object.assign(e, { cls: 'twist' }));
         }
       });
+      let spoke = false;
       for (const k of ev.kills) {
         const killers = k.by.map((i) => roles[i]);
-        k.v.forEach((i) => { if (!saved.has(i)) kill(roles[i], killers, txt, out); });
+        const dear = {}; k.v.forEach((i) => killers.forEach((K) => { const g = K.grudges[roles[i].id]; if (g && g.victim) dear[i] = { K, x: byId[g.victim] }; }));
+        k.v.forEach((i) => {
+          if (saved.has(i)) return;
+          const v = roles[i]; const wasAlive = v.alive;
+          kill(v, killers, txt, out);
+          if (!wasAlive || v.alive || spoke || !rng.chance(0.38)) return;
+          spoke = true;
+          const KA = killers[0] && killers[0].alive ? killers[0] : null;
+          if (dear[i] && dear[i].K.alive) pushVoice(out, voice('revenge', dear[i].K, [v, dear[i].x]));
+          else if (k.betray && KA) pushVoice(out, voice('betray', KA, [v]));
+          else if (KA && rng.chance(0.5)) pushVoice(out, voice('kill', KA, [v]));
+          else pushVoice(out, voice('last', v, [killers[0], v.exPartner && byId[v.exPartner] ? byId[v.exPartner] : undefined].filter(Boolean)));
+        });
         if (k.betray) {
           stats.betrayals++;
           killers.forEach((t) => { t.betrayals++; t.traitor = true; t.plot = null; leaveAlliance(t); });
@@ -6146,7 +7436,7 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
         switch (f.t) {
           case 'al': {
             const ts = f.r.map((i) => roles[i]).filter((x) => x.alive);
-            if (ts.length > 1) { joinAlliance(ts); stats.alliances++; ts.forEach((x) => { x.alliancesFormed++; x.mo += 10; ts.forEach((y) => remember(x, y, 'allied')); ts.forEach((y) => x.id < y.id && addAff(x, y, Math.round(25 * (0.7 + (x.attr.car + y.attr.car) / 30)))); }); }
+            if (ts.length > 1) { joinAlliance(ts); stats.alliances++; if (rng.chance(0.22)) pushVoice(out, voice('ally', ts[0], [ts[1]])); ts.forEach((x) => { x.alliancesFormed++; x.mo += 10; ts.forEach((y) => remember(x, y, 'allied')); ts.forEach((y) => x.id < y.id && addAff(x, y, Math.round(25 * (0.7 + (x.attr.car + y.attr.car) / 30)))); }); }
             break;
           }
           case 'br': {
@@ -6196,18 +7486,21 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
           }
           case 'hit': if (u.alive) {
             const wpn = itemOf(t, 'arma');
+            if (rng.chance(0.25)) pushVoice(out, voice('taunt', t, [u]));
             hurt(u, (28 + rng.int(18)) * (1 + weaponPow(t) / 12), t, 'wound'); u.mo -= 6; remember(u, t, 'hit');
             if (wpn && wpn.x === 'veleno' && u.st.avvelenato == null) { u.st.avvelenato = phases.length; u.cause = { k: 'poison', by: t.id, ph: phases.length }; }
             wear(t, out); if (addGrudge(u, t, 'attack') && rng.chance(0.6)) { const e = echo(E.hit, [u, t], 'warn'); if (e) out.push(e); } } break;
-          case 'save': if (u.alive) { u.owes[t.id] = 'vita'; addAff(t, u, 40); u.mo += 15; remember(u, t, 'saved'); t.saves++; t.fame += 1; const e = echo(E.saved, [u, t], 'good'); if (e) out.push(e); } break;
+          case 'save': if (u.alive) { u.owes[t.id] = 'vita'; addAff(t, u, 40); u.mo += 15; remember(u, t, 'saved'); if (rng.chance(0.35)) pushVoice(out, voice('saved', u, [t])); t.saves++; t.fame += 1; const e = echo(E.saved, [u, t], 'good'); if (e) out.push(e); } break;
           case 'forgive': delete t.grudges[u.id]; addAff(t, u, 35); remember(t, u, 'forgave'); break;
           case 'love': if (u.alive) {
             t.partner = u.id; u.partner = t.id; addAff(t, u, 70); stats.couples++; t.fame += 1; u.fame += 1; t.mo += 25; u.mo += 25;
             remember(t, u, 'love'); remember(u, t, 'love'); if (t.crush === u.id) t.crush = null; if (u.crush === t.id) u.crush = null; jealousy(t, u);
+            if (rng.chance(0.5)) pushVoice(out, voice('love', rng.chance(0.5) ? t : u, [rng.chance(0.5) ? u : t]));
             if (!cfg.teamWin && (t.allyId == null || u.allyId == null || t.allyId === u.allyId)) { const g = t.allyId != null ? alliances.get(t.allyId) : u.allyId != null ? alliances.get(u.allyId) : null; if (!g || g.size < 5) joinAlliance([t, u]); } const e = echo(E.couple, [t, u], 'love'); if (e) out.push(e); } break;
           case 'repay': if (u) { delete t.owes[u.id]; addAff(t, u, 20); t.repaid++; remember(u, t, 'repaid'); stats.debtsRepaid++; const e = echo(E.repay, [t, u], 'good'); if (e) out.push(e); } break;
           case 'debt': if (u) t.owes[u.id] = 'favore'; break;
           case 'rel': if (u) addAff(t, u, f.v); break;
+          case 'vital': t[f.k] = (t[f.k] || 0) + f.v; if (f.k === 'hp' && f.v < 0) { t.hurtPh = phases.length; t.hp = Math.max(t.hp, Math.min(8, t.hp - f.v)); } syncSt(t); break;
           case 'star': t.fame += 2; t.mo += 10; if (t.fame >= 5 && !t.starred) { t.starred = true; const e = echo(E.star, [t], 'good'); if (e) out.push(e); } break;
         }
       }
@@ -6222,6 +7515,10 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
             x.st.sconvolto = phases.length; if (out.length < 3 && rng.chance(0.5)) { const e = echo(E.shock, [x], ''); if (e) out.push(e); }
           }
         });
+      }
+      if (!ev.lethal && ev.n === 1 && roles[0].alive && out.length < 3) {
+        if (CURKIND === 'dis' && rng.chance(0.22)) pushVoice(out, voice('disaster', roles[0]));
+        else if (CURKIND === 'f' && rng.chance(0.15)) pushVoice(out, voice('feast', roles[0]));
       }
       stats.events++;
       return { html: txt.html, plain: txt.plain, ids: roles.map((t) => t.id), deaths: roles.filter((t, i) => ev.victims.includes(i) && !t.alive).map((t) => t.id), lethal: ev.lethal, origin: ev.origin, cat: ev.cat, why: ev.why, echo: out.slice(0, 3), test: ev.testRes || null };
@@ -6274,6 +7571,7 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
       if (!ev) return;
       ORIGIN = 'sponsor';
       const r = apply(ev, [P]); r.why = r.why || 'fama'; r.sponsor = true; events.push(r); stats.sponsors++; P.mo += 15;
+      if (rng.chance(0.3)) { r.echo = r.echo || []; pushVoice(r.echo, voice('sponsor', P)); }
       // nella cassa c'è spesso anche qualcosa di utile, scelto in base ai bisogni
       if (rng.chance(0.45)) {
         const need = P.hp < 55 ? 'med' : P.food < 40 ? 'cibo' : !hasItem(P, 'armatura') ? 'armatura' : !hasItem(P, 'attrezzo') ? 'attrezzo' : 'valore';
@@ -6409,6 +7707,7 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
       hearts();
       personalActs();
       barter();
+      chats();
       // sonno, guarigione naturale e umore
       let watchMsg = 0;
       A.forEach((t) => {
@@ -6673,8 +7972,11 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
         if (t.plot && (!aliveId(t.plot) || !isAlly(t, byId[t.plot]))) t.plot = null;
         if (t.crush && (!aliveId(t.crush) || t.partner || aff(t, byId[t.crush]) < 0)) t.crush = null;
         // il complotto: chi tradisce per natura, o per disperazione
-        if (!t.plot && t.allyId != null && day >= 2 && !hasTrait(t, 'leale') && (hasTrait(t, 'traditore') ? rng.chance(0.6) : hasTrait(t, 'avido') || (t.attr.emp <= 3 && t.mo < 40) ? rng.chance(0.25) : t.mo < 25 && !hasTrait(t, 'pacifista') ? rng.chance(0.12) : false)) {
-          const m = allyMates(t).sort((a, b) => b.inv.length - a.inv.length || aff(t, a) - aff(t, b))[0];
+        // rancore verso un alleato: il complotto più naturale di tutti
+        const sore = !t.plot && t.allyId != null ? allyMates(t).find((x) => t.grudges[x.id] || aff(t, x) <= -30) : null;
+        const urge = hasTrait(t, 'traditore') ? 0.6 : sore ? 0.5 : hasTrait(t, 'avido') ? 0.35 : (t.attr.emp <= 4 && t.mo < 45) ? 0.2 : hasTrait(t, 'paranoico') ? 0.15 : t.mo < 25 && !hasTrait(t, 'pacifista') ? 0.12 : alive().length <= 6 && !hasTrait(t, 'pacifista') ? 0.12 : 0;
+        if (!t.plot && t.allyId != null && day >= 2 && !hasTrait(t, 'leale') && rng.chance(urge)) {
+          const m = sore || allyMates(t).sort((a, b) => b.inv.length - a.inv.length || aff(t, a) - aff(t, b))[0];
           if (m) { t.plot = m.id; const d = fmt(DIA('plot'), [t, m]); if (d) remember1(t, d.html, 'segreto'); }
         }
         // la cotta segreta
@@ -6858,6 +8160,23 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
       });
     }
 
+    // le conversazioni della notte, secondo il rapporto tra i due
+    function chats() {
+      const pairs = [];
+      alive().forEach((a) => zoneMates(a).forEach((b) => { if (a.ix < b.ix) pairs.push([a, b]); }));
+      rng.shuffle(pairs).slice(0, 2 + (rng.chance(0.4) ? 1 : 0)).forEach(([a, b]) => {
+        if (!rng.chance(0.6)) return;
+        const kind = a.partner === b.id ? 'coppia' : isAlly(a, b) ? 'alleati' : aff(a, b) <= -30 || a.grudges[b.id] || b.grudges[a.id] ? 'rivali' : 'sconosciuti';
+        const ar = CH.arena && CH.arena[theme.id] ? CH.arena[theme.id].filter((x) => !USED.has(x[0])) : [];
+        const list = (rng.chance(0.4) && ar.length ? ar : (CH[kind] || []).filter((x) => !USED.has(x[0]))) || [];
+        if (!list.length) return;
+        const pair = rng.pick(list); USED.add(pair[0]);
+        const [l1, l2] = pair;
+        const x1 = fmt([l1], [a, b]), x2 = fmt([l2], [a, b]); if (!x1 || !x2) return;
+        addAff(a, b, kind === 'rivali' ? -4 : 3);
+        sys2({ plain: a.name + ': «' + x1.plain + '» ' + b.name + ': «' + x2.plain + '»', html: nameTag(a) + ': «' + x1.html + '»<br>' + nameTag(b) + ': «' + x2.html + '»' }, [a, b], kind === 'coppia' ? 'love' : kind === 'alleati' ? 'ally' : kind === 'rivali' ? 'hurt' : 'none', 'Dialogo', 1);
+      });
+    }
     // gli scambi della notte: chi ha fame compra da chi ne ha
     function barter() {
       alive().forEach((b) => {
@@ -6932,7 +8251,7 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
     function runPhase(kind, pool, title, intro, opt) {
       const events = pendingNotes.splice(0);
       SYS = [];
-      ORIGIN = kind === 'f' ? 'festino' : null;
+      ORIGIN = kind === 'f' ? 'festino' : null; CURKIND = kind;
       tickStatus();
       if (kind === 'd') moveByGoals();
       maybeDissolve(events);
@@ -7159,7 +8478,7 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
   /* Rende un testo con concorrenti fittizi tutti dello stesso genere (per i controlli automatici) */
   function renderSample(text, themeId, gender) {
     const theme = D.themes.find((t) => t.id === themeId) || D.themes[0];
-    const lex = Object.assign({}, D.lexDefault || {}, theme.lex);
+    const lex = Object.assign({}, D.lexDefault || {}, itemLex(theme), theme.lex);
     (D.packs || []).forEach((pk) => { if (pk.lex && pk.theme === theme.id) Object.assign(lex, pk.lex); });
     const names = ['Alfa', 'Beta', 'Gamma', 'Delta', 'Epsilon', 'Zeta'];
     const roles = names.map((name, i) => ({ id: 'x' + i, name, gender, inv: ITEMS.split('|').map((type) => ({ type, name: (lex[type] || ['un oggetto'])[0] })) }));
@@ -7614,7 +8933,7 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
   };
   const ATTRN = Object.fromEntries(D.attrs.map((a) => [a.id, a.name]));
   const WHY = { carattere: 'Carattere', vendetta: 'Vendetta', debito: 'Debito', coppia: 'Coppia', lutto: 'Lutto', fama: 'Fama', reputazione: 'Reputazione', oggetto: 'Oggetto', condizione: 'Conseguenza',
-    conseguenza: 'Conseguenza', ferite: 'Ferite', stenti: 'Stenti', infezione: 'Infezione', tempesta: 'Tempesta', predatori: 'Pericolo notturno', trappola: 'Trappola', alleanza: 'Alleanza', cure: 'Cure', morale: 'Morale', riposo: 'Notte', esplorazione: 'Esplorazione', bottino: 'Bottino', incidente: 'Incidente' };
+    cotta: 'Cotta segreta', complotto: 'Complotto', obiettivo: 'Obiettivo', meteo: 'Meteo', conseguenza: 'Conseguenza', ferite: 'Ferite', stenti: 'Stenti', infezione: 'Infezione', tempesta: 'Tempesta', predatori: 'Pericolo notturno', trappola: 'Trappola', alleanza: 'Alleanza', cure: 'Cure', morale: 'Morale', riposo: 'Notte', esplorazione: 'Esplorazione', bottino: 'Bottino', incidente: 'Incidente' };
   const ECO = D.eco || { arenas: {} };
   const ITM = D.items || { types: {}, how: {}, order: [] }, MND = D.mind || { goals: {}, rel: {}, mem: {} };
   const ITIC = {

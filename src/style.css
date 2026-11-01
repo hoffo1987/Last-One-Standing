@@ -1011,3 +1011,4 @@ img.scene { object-fit: cover; object-position: center; user-select: none; }
 .badge2.star { color: var(--accent-text); }
 .badge2.hot { color: color-mix(in srgb, var(--dead) 75%, var(--ink)); }
 .badge2.love { color: color-mix(in srgb, var(--c-love) 72%, var(--ink)); }
+.echo li.quote { --ec: var(--accent-text); font-style: italic; }
