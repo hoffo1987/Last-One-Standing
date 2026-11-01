@@ -280,6 +280,11 @@
     $$('#viewSeg button').forEach((b) => b.setAttribute('aria-pressed', b.dataset.v === S.settings.view));
     $('#teamSize').value = String(S.settings.teamSize || 2);
     const add = '<button class="addtile" type="button" id="addOne"><span>+ Aggiungi concorrente</span></button>';
+    if (!S.cast.length) {
+      $('#castList').innerHTML = '<div class="castempty card"><div class="ce-art" aria-hidden="true">' + (ART.assets.sagome || []).slice(0, 3).map((u, k) => '<i class="sil sil-' + k + '"></i>').join('') + '</div><h2>Ancora nessun concorrente</h2><p>Genera un cast casuale, incolla un elenco di nomi oppure aggiungili uno alla volta.</p>' +
+        '<div class="row center"><button class="btn primary lg" type="button" data-empty="gen">Genera ' + $('#presetSize').value + ' concorrenti</button><button class="btn lg" type="button" data-empty="bulk">Incolla un elenco</button><button class="btn lg" type="button" data-empty="add">Aggiungi a mano</button></div></div>';
+      updateCounts(); return;
+    }
     if (S.settings.view === 'team') {
       const teams = {};
       S.cast.forEach((t, i) => (teams[t.team] = teams[t.team] || []).push([t, i]));
@@ -324,6 +329,8 @@
   }
   $('#btnAdd').addEventListener('click', () => addTribute(true));
   $('#castList').addEventListener('click', (e) => {
+    const em = e.target.closest('[data-empty]');
+    if (em) { if (em.dataset.empty === 'gen') $('#btnRandom').click(); else if (em.dataset.empty === 'bulk') $('#btnBulk').click(); else addTribute(true); return; }
     if (e.target.closest('#addOne')) return addTribute(false);
     const b = e.target.closest('[data-act]'); if (!b) return;
     const t = findT(b); if (!t) return;

@@ -708,8 +708,9 @@ img.scene { object-fit: cover; object-position: center; user-select: none; }
 .reveal.revealed { transform: none; }
 
 /* cambio sezione */
-.view-enter { animation: viewIn .5s cubic-bezier(.2,.7,.3,1) both; }
+.view-enter { animation: viewFade .45s ease both; }
 @keyframes viewIn { from { opacity: .001; transform: translateY(12px); } }
+@keyframes viewFade { from { opacity: .001; } }
 
 /* bottoni: onda al tocco e riflesso */
 .btn, .pbtn { position: relative; overflow: hidden; }
@@ -886,3 +887,11 @@ img.scene { object-fit: cover; object-position: center; user-select: none; }
 }
 [hidden] { display: none !important; }
 .av .ini { font-size: clamp(9px, calc(var(--s) * .2), 15px); }
+
+.castempty { padding: 40px 20px; display: grid; gap: 12px; justify-items: center; text-align: center; }
+.castempty h2 { font-size: 34px; text-transform: uppercase; }
+.castempty p { color: var(--muted); max-width: 52ch; }
+.castempty .row { margin-top: 6px; }
+.ce-art { display: flex; gap: 10px; margin-bottom: 4px; }
+.ce-art .sil { position: relative; display: block; width: 72px; height: 72px; border-radius: 50%; background: var(--accent); -webkit-mask-size: cover; mask-size: cover; opacity: .9; }
+.ce-art .sil:nth-child(2) { transform: translateY(-8px); }

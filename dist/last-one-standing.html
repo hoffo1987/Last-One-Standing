@@ -714,8 +714,9 @@ img.scene { object-fit: cover; object-position: center; user-select: none; }
 .reveal.revealed { transform: none; }
 
 /* cambio sezione */
-.view-enter { animation: viewIn .5s cubic-bezier(.2,.7,.3,1) both; }
+.view-enter { animation: viewFade .45s ease both; }
 @keyframes viewIn { from { opacity: .001; transform: translateY(12px); } }
+@keyframes viewFade { from { opacity: .001; } }
 
 /* bottoni: onda al tocco e riflesso */
 .btn, .pbtn { position: relative; overflow: hidden; }
@@ -892,6 +893,14 @@ img.scene { object-fit: cover; object-position: center; user-select: none; }
 }
 [hidden] { display: none !important; }
 .av .ini { font-size: clamp(9px, calc(var(--s) * .2), 15px); }
+
+.castempty { padding: 40px 20px; display: grid; gap: 12px; justify-items: center; text-align: center; }
+.castempty h2 { font-size: 34px; text-transform: uppercase; }
+.castempty p { color: var(--muted); max-width: 52ch; }
+.castempty .row { margin-top: 6px; }
+.ce-art { display: flex; gap: 10px; margin-bottom: 4px; }
+.ce-art .sil { position: relative; display: block; width: 72px; height: 72px; border-radius: 50%; background: var(--accent); -webkit-mask-size: cover; mask-size: cover; opacity: .9; }
+.ce-art .sil:nth-child(2) { transform: translateY(-8px); }
 </style>
 
 <header class="top">
@@ -6207,6 +6216,11 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
     $$('#viewSeg button').forEach((b) => b.setAttribute('aria-pressed', b.dataset.v === S.settings.view));
     $('#teamSize').value = String(S.settings.teamSize || 2);
     const add = '<button class="addtile" type="button" id="addOne"><span>+ Aggiungi concorrente</span></button>';
+    if (!S.cast.length) {
+      $('#castList').innerHTML = '<div class="castempty card"><div class="ce-art" aria-hidden="true">' + (ART.assets.sagome || []).slice(0, 3).map((u, k) => '<i class="sil sil-' + k + '"></i>').join('') + '</div><h2>Ancora nessun concorrente</h2><p>Genera un cast casuale, incolla un elenco di nomi oppure aggiungili uno alla volta.</p>' +
+        '<div class="row center"><button class="btn primary lg" type="button" data-empty="gen">Genera ' + $('#presetSize').value + ' concorrenti</button><button class="btn lg" type="button" data-empty="bulk">Incolla un elenco</button><button class="btn lg" type="button" data-empty="add">Aggiungi a mano</button></div></div>';
+      updateCounts(); return;
+    }
     if (S.settings.view === 'team') {
       const teams = {};
       S.cast.forEach((t, i) => (teams[t.team] = teams[t.team] || []).push([t, i]));
@@ -6251,6 +6265,8 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
   }
   $('#btnAdd').addEventListener('click', () => addTribute(true));
   $('#castList').addEventListener('click', (e) => {
+    const em = e.target.closest('[data-empty]');
+    if (em) { if (em.dataset.empty === 'gen') $('#btnRandom').click(); else if (em.dataset.empty === 'bulk') $('#btnBulk').click(); else addTribute(true); return; }
     if (e.target.closest('#addOne')) return addTribute(false);
     const b = e.target.closest('[data-act]'); if (!b) return;
     const t = findT(b); if (!t) return;
