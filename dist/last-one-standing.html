@@ -901,6 +901,43 @@ img.scene { object-fit: cover; object-position: center; user-select: none; }
 .ce-art { display: flex; gap: 10px; margin-bottom: 4px; }
 .ce-art .sil { position: relative; display: block; width: 72px; height: 72px; border-radius: 50%; background: var(--accent); -webkit-mask-size: cover; mask-size: cover; opacity: .9; }
 .ce-art .sil:nth-child(2) { transform: translateY(-8px); }
+
+/* ---------- ecosistema: condizione fisica, zone, regole, meteo ---------- */
+.prow .pn, .prow .ps { display: block; }
+.vmini { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 3px; margin-top: 4px; max-width: 150px; }
+.vmini i { height: 4px; border-radius: 2px; background: var(--panel-2); overflow: hidden; display: block; }
+.vmini i b { display: block; height: 100%; border-radius: 2px; background: var(--vc, var(--accent)); }
+.vmini i.hp, .vbar.hp { --vc: #3fb27f; } .vmini i.en, .vbar.en { --vc: #e0b23c; } .vmini i.mo, .vbar.mo { --vc: #5c9cf0; } .vbar.food { --vc: #d9823b; } .vbar.pr { --vc: #a46ae0; }
+.vmini i.low b { background: var(--dead); }
+.prow:hover .vmini i { background: var(--panel); }
+.vbars { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px 14px; }
+.vbar { display: grid; grid-template-columns: 96px minmax(0, 1fr) 26px; gap: 8px; align-items: center; font-size: 13px; }
+.vbar span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.vbar i { height: 8px; background: var(--panel-2); border-radius: 4px; overflow: hidden; display: block; }
+.vbar i b { display: block; height: 100%; background: var(--vc); border-radius: 4px; transition: width .6s ease; }
+.vbar em { font-style: normal; font-family: var(--f-mono); font-size: 12px; color: var(--muted); text-align: right; }
+.vbar.bad em, .vbar.bad span { color: var(--dead); font-weight: 700; }
+.vbar.bad:not(.pr) i b { background: var(--dead); }
+.abar.key span { font-weight: 700; }
+.keymark { color: var(--accent); }
+.zone .zprops { display: flex; flex-wrap: wrap; gap: 2px 8px; font-size: 10px; color: var(--muted); font-family: var(--f-mono); margin-top: auto; }
+.zone .zprops > span { display: inline-flex; align-items: center; gap: 3px; white-space: nowrap; }
+.zl { font-size: 8px; letter-spacing: 1px; color: var(--ink); font-weight: 400; }
+.zl span { opacity: .25; }
+.ztag { color: #8a5bd6; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; }
+.zone.closed { background: repeating-linear-gradient(135deg, color-mix(in srgb, #8a5bd6 18%, var(--panel-2)) 0 8px, var(--panel-2) 8px 16px); }
+.ev.note.meteo { background: color-mix(in srgb, #5c9cf0 12%, var(--panel)); border-left-color: #5c9cf0; }
+.ev.note.meteo .meteo { color: #3d7fd6; }
+:root[data-theme="dark"] .ev.note.meteo .meteo { color: #8ab8f5; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .ev.note.meteo .meteo { color: #8ab8f5; } }
+.rules-arena { border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; display: grid; gap: 10px; background: color-mix(in srgb, var(--accent-soft) 45%, transparent); }
+.rules-arena .ra-head { display: grid; gap: 2px; }
+.rules-arena h3 { font-size: 18px; margin: 0; }
+.rules-arena p { margin: 0; }
+.rules-arena h4 { font-family: var(--f-mono); font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); font-weight: 500; margin: 0 0 6px; }
+.ra-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.eco-sum { margin-top: 8px; }
+@media (max-width: 640px) { .vbars, .ra-grid { grid-template-columns: minmax(0, 1fr); } .vbar { grid-template-columns: 84px minmax(0, 1fr) 26px; } }
 </style>
 
 <header class="top">
@@ -2081,6 +2118,344 @@ img.scene { object-fit: cover; object-position: center; user-select: none; }
       ],
     },
   ];
+})(typeof window !== 'undefined' ? window : globalThis);
+
+;
+/* Ecosistema delle arene: condizione fisica dei concorrenti, regole, meteo,
+ * zone e testi delle conseguenze automatiche.
+ *
+ * Ogni concorrente ha quattro valori (0-100): Salute, Energia, Morale e
+ * Sazietà, più un indicatore proprio dell'arena (Freddo, Corruzione, Ossigeno,
+ * Infezione, Terrore, Radiazioni, Ansia, Stress). Ferite, veleni, fame,
+ * stanchezza, meteo, zone, trappole e legami li fanno salire e scendere; i
+ * valori a loro volta cambiano combattimenti, prove, scelte e sopravvivenza.
+ *
+ * Segnaposto dei testi: {0} {1} {2} concorrenti, [0:o/a] accordo,
+ * {i} oggetto, {z} zona, {m} nome dell'indicatore, {cibo} {arma} {mostro}
+ * {rifugio} {trappola} {luogo} dal lessico dell'arena. */
+(function (G) {
+  const D = (G.LOS_DATA = G.LOS_DATA || {});
+
+  const E = (D.eco = {});
+
+  E.statusLabel = {
+    grave: 'Grave', esausto: 'Esausto', disperato: 'Disperato', carico: 'Carico',
+    assiderato: 'Assiderato', maledetto: 'Maledetto', ipossia: 'In ipossia', infetto: 'Infetto',
+    terrorizzato: 'Terrorizzato', irradiato: 'Irradiato', ansia: 'In ansia', stressato: 'Sotto stress', tempesta: 'Nella tempesta',
+  };
+  E.labels = { hp: 'Salute', en: 'Energia', mo: 'Morale', food: 'Sazietà' };
+  E.labelsSoft = { hp: 'Reputazione', en: 'Energie', mo: 'Morale', food: 'Sazietà' };
+  E.attrNames = { for: 'Forza', agi: 'Agilità', int: 'Intelligenza', car: 'Carisma', fort: 'Fortuna', res: 'Resistenza', furt: 'Furtività', cor: 'Coraggio', emp: 'Empatia', sop: 'Sopravvivenza' };
+
+  /* Regole per arena.
+   * key: caratteristiche che qui contano di più (peso decrescente)
+   * drain: consumo di cibo, energia e morale; mods: moltiplicatori di sistema
+   * zones: [risorse, pericolo, riparo] per ogni luogo, nell'ordine del lessico
+   * meter: indicatore dell'arena (gain per fase, resist, sollievo, soglia, danno) */
+  E.arenas = {
+    classico: {
+      rule: 'Natura selvaggia',
+      desc: 'Si vive di caccia e di ripari. Di giorno il sole scotta, di notte il freddo morde chi dorme all\'aperto. La Cornucopia è ricca e letale, l\'Altopiano è gelido.',
+      key: ['sop', 'furt', 'agi'],
+      drain: { food: 1, en: 1, mo: 1 },
+      mods: { forage: 1.1, heal: 1, weapon: 1, stealth: 1.1, fame: 1, sponsor: 1, night: 1, beast: 1, trap: 1.15 },
+      zones: [[1.5, 1.6, 0.2], [1.2, 0.9, 0.8], [1.4, 0.9, 0.5], [0.8, 1.2, 0.4], [0.7, 1, 0.9], [0.5, 1.1, 0.3]],
+      meter: { id: 'freddo', name: 'Freddo', st: 'assiderato', desc: 'Sale la notte, soprattutto per chi dorme da solo e senza riparo. Scende col sole.', gain: { b: 0, d: -14, n: 16, dis: 4, f: -6 }, alone: 8, resist: ['res', 'sop'], ally: 0.6, thr: 60, dmg: 14, cure: 0, death: true },
+      meteo: [
+        { n: 'Cielo limpido', d: 'Una giornata tersa: si vede lontano, e si viene visti da lontano.', fx: { stl: 0.75, forage: 1.15 } },
+        { n: 'Pioggia battente', d: 'Il fango rallenta tutti e cancella le tracce. Le trappole si inceppano.', fx: { en: 1.3, stl: 1.3, trap: 0.6, tb: { agi: -1 } } },
+        { n: 'Nebbia fitta', d: 'Non si vede a tre passi: perfetto per gli agguati.', fx: { stl: 1.6, lethal: 1.1, tb: { furt: 1 } } },
+        { n: 'Ondata di caldo', d: 'Il sole picchia: si suda, si beve, si sviene.', fx: { food: 1.4, en: 1.35, tb: { res: -1 } } },
+        { n: 'Gelata notturna', d: 'La temperatura crolla dopo il tramonto: chi non ha un riparo rischia grosso.', fx: { pr: 12, en: 1.15 } },
+        { n: 'Vento forte', d: 'Gli alberi scricchiolano e gli archi mancano il bersaglio.', fx: { tb: { agi: -1 }, forage: 0.85 } },
+        { n: 'Luna piena', d: 'Nella notte chiara i predatori si fanno coraggio.', fx: { beast: 1.8, stl: 0.8 } },
+        { n: 'Stagione delle bacche', d: 'Il Bosco è carico di frutti: oggi non muore di fame nessuno.', fx: { forage: 1.7, food: 0.8 } },
+      ],
+      txt: {
+        meterUp: ['{0} batte i denti per tutta la notte: le dita non rispondono più.', 'Il freddo entra nelle ossa di {0}, che si rannicchia contro una roccia senza riuscire a scaldarsi.', '{0} si sveglia con le labbra viola. Non è un buon segno.', '{0} prova ad accendere un fuoco con le mani che tremano. Il fuoco non collabora.', 'La brina ricopre lo zaino di {0}, e anche {0}.'],
+        meterDeath: ['{0} si addormenta all\'aperto, sotto la brina. Al mattino non si sveglia.', 'Il freddo dell\'Altopiano si prende {0} in silenzio, durante la notte.'],
+        forage: ['{0} piazza un laccio vicino al Fiume e torna con {cibo}.', '{0} passa ore a frugare nel sottobosco e trova {cibo}.', '{0} pesca a mani nude come un orso. Funziona, incredibilmente: {cibo} per cena.'],
+      },
+    },
+    fantasy: {
+      rule: 'Magia antica',
+      desc: 'Le rune premiano chi studia e chi ha fortuna; i portafortuna qui sono veri incantesimi. Ma la magia ha un prezzo: chi uccide e chi vaga nella Palude stregata si carica di Corruzione.',
+      key: ['int', 'fort', 'cor'],
+      drain: { food: 0.9, en: 1, mo: 1 },
+      mods: { forage: 1.1, heal: 1.25, weapon: 0.95, stealth: 1, fame: 1.1, sponsor: 1, night: 1.1, beast: 1.3, trap: 1, amulet: 0.95 },
+      zones: [[1.2, 1.3, 0.8], [1.5, 0.8, 0.7], [1.1, 1, 0.3], [0.8, 1.4, 0.9], [0.9, 1.6, 0.4], [0.6, 1.7, 0.5]],
+      meter: { id: 'corruzione', name: 'Corruzione', st: 'maledetto', desc: 'Cresce di notte, con le ferite e soprattutto uccidendo. Portafortuna, Intelligenza ed Empatia la tengono lontana; le cure la purificano.', gain: { b: 2, d: 2, n: 7, dis: 6, f: 2 }, kill: 14, wound: 6, resist: ['int', 'emp'], ally: 0.85, amulet: 0.5, thr: 65, dmg: 16, cure: 45, death: true, zoneMult: true },
+      meteo: [
+        { n: 'Congiunzione astrale', d: 'Le stelle si allineano: ogni magia è più forte, nel bene e nel male.', fx: { heal: 1.4, pr: 4, tb: { int: 1 } } },
+        { n: 'Nebbia degli elfi', d: 'Una foschia argentata confonde i sensi.', fx: { stl: 1.5, tb: { furt: 1 } } },
+        { n: 'Pioggia di cenere', d: 'Il drago si è svegliato nervoso. Il cielo è grigio.', fx: { lethal: 1.15, forage: 0.7, en: 1.2 } },
+        { n: 'Notte senza luna', d: 'Le creature del bosco escono a caccia.', fx: { beast: 2, pr: 3 } },
+        { n: 'Festa dei folletti', d: 'Funghi e idromele ovunque: tutti mangiano, nessuno è lucido.', fx: { forage: 1.8, tb: { int: -1 } } },
+        { n: 'Vento delle rune', d: 'Le rune sui sassi brillano e sussurrano consigli a chi sa leggerle.', fx: { tb: { int: 2 }, pr: -3 } },
+      ],
+      txt: {
+        meterUp: ['Le vene di {0} si colorano di nero. {0} finge che sia normale.', '{0} sente voci in una lingua che non conosce. Le capisce benissimo.', 'Un segno a forma di occhio compare sul palmo di {0}. Non va via.', 'L\'ombra di {0} arriva un secondo dopo di l[0:ui/ei]. Poi due.', '{0} parla nel sonno in una lingua morta. Gli alberi rispondono.'],
+        meterDeath: ['La maledizione finisce il suo lavoro: {0} si trasforma lentamente in pietra.', '{0} segue una luce nella Palude stregata. La luce non era amichevole.', '{0} viene reclamat[0:o/a] dalla corruzione: resta solo una statua di sale.'],
+        forage: ['{0} segue un cerbiatto luminoso fino a un albero carico di frutti magici: {cibo}.', '{0} baratta un indovinello con un folletto e ottiene {cibo}.', '{0} trova {cibo} in un cerchio di funghi. Non chiede spiegazioni.'],
+        cure: ['{1} recita una formula di purificazione su {0}: il nero nelle vene si ritira.'],
+      },
+    },
+    scifi: {
+      rule: 'Ossigeno e tecnologia',
+      desc: 'Sulla stazione si respira solo dove i ricircolatori funzionano. Chi è intelligente ripara, scansiona, trova bombole e kit; chi spreca energie finisce in ipossia. I kit medici qui fanno miracoli.',
+      key: ['int', 'res', 'agi'],
+      drain: { food: 0.85, en: 1.15, mo: 1 },
+      mods: { forage: 0.85, heal: 1.4, weapon: 1.1, stealth: 0.95, fame: 1, sponsor: 1, night: 0.95, beast: 0.9, trap: 1.2, map: 1.4 },
+      zones: [[1.3, 1.2, 0.6], [1.6, 0.8, 0.5], [0.6, 1.8, 0.3], [1.1, 1.3, 0.7], [1.2, 0.8, 1], [0.7, 1.2, 0.9]],
+      meter: { id: 'ossigeno', name: 'Debito d\'ossigeno', st: 'ipossia', desc: 'Sale a ogni fase, di più per chi è stanco o nel Reattore. Intelligenza e alleati aiutano a trovare bombole e riparare i ricircolatori.', gain: { b: 6, d: 7, n: 5, dis: 12, f: 3 }, resist: ['int', 'res'], ally: 0.75, thr: 65, dmg: 18, cure: 35, death: true, refill: true, zoneMult: true },
+      meteo: [
+        { n: 'Tempesta solare', d: 'Radiazioni dalla stella vicina: l\'elettronica impazzisce.', fx: { pr: 6, lethal: 1.15, tb: { int: -1 } } },
+        { n: 'Gravità instabile', d: 'La gravità artificiale va e viene. Si cade verso l\'alto.', fx: { tb: { agi: -2 }, en: 1.2 } },
+        { n: 'Manutenzione automatica', d: 'I droni riparano i ricircolatori: oggi si respira.', fx: { pr: -6, heal: 1.2 } },
+        { n: 'Blackout', d: 'Luci spente e porte bloccate: si combatte al buio.', fx: { stl: 1.7, tb: { furt: 1 } } },
+        { n: 'Pioggia di micrometeoriti', d: 'Lo scafo trema. Qualche modulo perde pressione.', fx: { pr: 8, lethal: 1.1 } },
+        { n: 'Rifornimento in orbita', d: 'Una navetta cargo ha lasciato casse ovunque.', fx: { forage: 1.6 } },
+      ],
+      txt: {
+        meterUp: ['{0} respira a fatica: l\'indicatore della tuta lampeggia rosso.', '{0} sbadiglia in continuazione e vede doppio. L\'aria è troppo sottile.', 'Le labbra di {0} diventano blu. Il ricircolatore della sua zona tossisce e muore.', '{0} conta i respiri per risparmiarli. Ne conta troppi.', 'Il casco di {0} si appanna dall\'interno: brutto segno.'],
+        meterDeath: ['{0} resta senza ossigeno in un condotto di servizio, a due metri da una bombola piena.', 'L\'allarme della tuta di {0} suona per un\'ora. Poi smette.'],
+        forage: ['{0} forza un distributore automatico e ne ricava {cibo}.', '{0} scansiona un magazzino e trova {cibo} dietro un pannello.', '{0} smonta un drone di servizio: dentro c\'è {cibo}. Non chiedetevi perché.'],
+        refill: ['{0} ripara un ricircolatore con un fermacapelli e una preghiera. Si torna a respirare.', '{0} trova una bombola d\'ossigeno in un armadietto e la usa tutta.', '{0} e {1} riattivano insieme il ricircolatore dei Moduli abitativi.'],
+      },
+    },
+    zombie: {
+      rule: 'Contagio',
+      desc: 'Ogni ferita può essere un morso. L\'infezione cresce fase dopo fase: un kit medico la ferma solo se presa in tempo, altrimenti ci si trasforma. Gli alleati se ne accorgono, e non tutti reagiscono con gentilezza. Di notte, chi è solo è una preda.',
+      key: ['furt', 'agi', 'sop'],
+      drain: { food: 1.1, en: 1.1, mo: 1.1 },
+      mods: { forage: 1, heal: 0.9, weapon: 1.05, stealth: 1.25, fame: 0.9, sponsor: 0.9, night: 1.25, beast: 1.6, trap: 1, nightAlone: 1 },
+      zones: [[1.4, 1.3, 0.6], [1.6, 1.2, 0.7], [0.6, 1.6, 0.5], [1, 1, 0.8], [1.1, 0.9, 1], [0.8, 0.9, 0.6]],
+      meter: { id: 'infezione', name: 'Infezione', st: 'infetto', desc: 'Parte solo con un morso o una ferita infetta. Poi cresce a ogni fase: sopra 60 si vede, a 100 ci si trasforma. Un kit medico la cura solo se è sotto 75.', gain: { b: 20, d: 20, n: 22, dis: 20, f: 20 }, resist: ['res'], ally: 1, thr: 60, cure: 75, death: true, infect: 0.3 },
+      meteo: [
+        { n: 'Orda in migrazione', d: 'Migliaia di infetti attraversano la città. Meglio non fare rumore.', fx: { lethal: 1.25, beast: 1.6, stl: 1.3 } },
+        { n: 'Pioggia acida', d: 'L\'acqua brucia e copre l\'odore dei vivi.', fx: { en: 1.2, beast: 0.7 } },
+        { n: 'Silenzio inquietante', d: 'Non si sente un lamento. Nessuno sa se sia un buon segno.', fx: { stl: 1.2 } },
+        { n: 'Lancio di provviste', d: 'Un aereo militare sgancia casse sui tetti.', fx: { forage: 1.7 } },
+        { n: 'Blackout cittadino', d: 'La rete elettrica cede: buio totale.', fx: { beast: 1.8, stl: 1.5 } },
+        { n: 'Caldo afoso', d: 'Il caldo accelera tutto: la fame, la sete, la decomposizione.', fx: { food: 1.35, en: 1.2 } },
+      ],
+      txt: {
+        infect: ['{0} si accorge di un morso sul braccio. Lo copre con la manica e non lo dice a nessuno.', 'La ferita di {0} si gonfia e diventa scura. {0} conosce quel colore.', '{0} ha la febbre alta e gli occhi lucidi. Dice che è solo stanchezza.'],
+        meterUp: ['{0} suda freddo e trema. Il morso è diventato nero.', '{0} ha fame. Non di {cibo}.'],
+        meterDeath: ['{0} smette di rispondere al proprio nome. Quando riapre gli occhi, non è più {0}.', 'La febbre di {0} si spegne all\'improvviso. Dopo un minuto, {0} si rialza. Non è una buona notizia.'],
+        expel: ['{1} vede il morso di {0} e l[0:o/a] caccia dal gruppo: «Niente di personale.»', '{1} punta {arma} contro {0}: «Fuori. Adesso.» Il gruppo non obietta.'],
+        cure: ['{1} trova un antivirale nella borsa e lo inietta a {0} appena in tempo.', '{1} incide il morso di {0} e lo disinfetta con l\'alcol. Urla, ma funziona.'],
+        mercy: ['{1} resta accanto a {0} fino alla fine, poi fa quello che va fatto. Non ne parlerà mai.'],
+        forage: ['{0} svuota la dispensa di un appartamento abbandonato: {cibo}.', '{0} trova {cibo} nel bagagliaio di un\'auto della polizia.', '{0} ruba {cibo} dalla vetrina rotta di un minimarket, scavalcando con eleganza tre infetti.'],
+      },
+    },
+    royale: {
+      rule: 'La zona si stringe',
+      desc: 'Ogni giorno la tempesta inghiotte un\'altra area dell\'isola: chi resta fuori dalla zona sicura perde salute. Il pubblico decide molto: Carisma e fama portano casse degli sponsor. Armi migliori, ma si rompono.',
+      key: ['agi', 'car', 'for'],
+      drain: { food: 0.8, en: 1.05, mo: 0.9 },
+      mods: { forage: 1.25, heal: 1.1, weapon: 1.25, stealth: 0.95, fame: 1.6, sponsor: 1.6, night: 0.9, beast: 0.6, trap: 1, storm: 1 },
+      zones: [[1.5, 1.4, 0.6], [1.6, 1.6, 0.7], [1.1, 0.9, 0.7], [1, 1.1, 0.6], [1.1, 0.8, 0.6], [0.9, 0.9, 0.5]],
+      meter: null,
+      meteo: [
+        { n: 'Cassa leggendaria', d: 'Un aereo sgancia una cassa d\'oro: tutti la vedono, tutti la vogliono.', fx: { lethal: 1.2, forage: 1.3 } },
+        { n: 'Pioggia tropicale', d: 'Rumore di pioggia sui tetti: perfetto per avvicinarsi senza essere sentiti.', fx: { stl: 1.5, tb: { agi: -1 } } },
+        { n: 'Visibilità perfetta', d: 'I cecchini festeggiano.', fx: { stl: 0.7, lethal: 1.1 } },
+        { n: 'Doppia fama', d: 'Gli spettatori sono il doppio: ogni gesto vale il doppio.', fx: { fame: 2 } },
+        { n: 'Tempesta accelerata', d: 'La zona si stringe più in fretta del previsto.', fx: { storm: 1.6, en: 1.2 } },
+        { n: 'Tramonto dorato', d: 'Una luce perfetta per le inquadrature: tutti si mettono in posa.', fx: { fame: 1.5, tb: { car: 1 } } },
+      ],
+      txt: {
+        stormClose: ['La zona si restringe: {z} finisce nella tempesta.', 'Un avviso rimbomba sull\'isola: {z} non è più zona sicura.'],
+        storm: ['{0} resta fuori dalla zona mentre la tempesta avanza su {z}: la barra della salute scende a vista d\'occhio.', '{0} corre verso la zona sicura, ma la tempesta è più veloce.', '{0} si attarda a raccogliere bottino a {z}. La tempesta non aspetta nessuno.'],
+        stormDeath: ['{0} non raggiunge la zona sicura in tempo: la tempesta lo inghiotte a pochi metri dal bordo.', 'La tempesta su {z} si porta via {0}, che stava ancora finendo di fare l\'inventario.'],
+        stormEscape: ['{0} attraversa la tempesta di corsa e rientra nella zona sicura con un salto.'],
+        forage: ['{0} apre una cassa di rifornimento e ci trova {cibo}.', '{0} trova {cibo} in un frigorifero del Villaggio costiero.', '{0} apre tre armadietti di fila: vuoto, vuoto, {cibo}.'],
+        weaponBreak: ['L\'arma di {0} si inceppa nel momento peggiore: {ip} è da buttare.', '{0} resta a secco: {ip} ha finito le munizioni e diventa un fermacarte.'],
+      },
+    },
+    horror: {
+      rule: 'Il terrore',
+      desc: 'La villa si nutre di paura. Il Terrore sale al buio, quando si è soli e quando si vede morire qualcuno; il Coraggio lo tiene a bada, e i portafortuna qui funzionano davvero. Regola dei film: chi si separa dal gruppo non torna.',
+      key: ['cor', 'emp', 'fort'],
+      drain: { food: 0.85, en: 1.05, mo: 1.4 },
+      mods: { forage: 0.85, heal: 0.9, weapon: 0.9, stealth: 1.2, fame: 1, sponsor: 0.9, night: 1.3, beast: 1.5, trap: 1, nightAlone: 1.6, amulet: 0.95 },
+      zones: [[0.9, 1.4, 0.4], [0.7, 1.4, 0.6], [0.8, 0.8, 0.9], [0.5, 1.6, 0.3], [1, 1.1, 0.6], [1.3, 1, 0.5]],
+      meter: { id: 'terrore', name: 'Terrore', st: 'terrorizzato', desc: 'Sale di notte, da soli e dopo ogni morte vista da vicino. Coraggio, compagnia e portafortuna lo abbassano.', gain: { b: 6, d: -6, n: 15, dis: 10, f: 2 }, alone: 10, death: 14, resist: ['cor', 'sop'], ally: 0.55, amulet: 0.5, thr: 60, dmg: 15, cure: 30, deathOn: true, zoneMult: true },
+      meteo: [
+        { n: 'Temporale', d: 'Tuoni, lampi e la corrente che salta ogni dieci minuti.', fx: { pr: 6, stl: 1.4 } },
+        { n: 'Notte delle candele', d: 'Le candele si accendono da sole in ogni stanza. Nessuno le ha accese.', fx: { pr: 4, beast: 1.4 } },
+        { n: 'Silenzio assoluto', d: 'Gli orologi della villa si fermano tutti insieme.', fx: { pr: 5, tb: { cor: -1 } } },
+        { n: 'Alba rossa', d: 'Il sole sorge color sangue: di giorno, almeno, gli spiriti dormono.', fx: { pr: -6, heal: 1.2 } },
+        { n: 'Luna nuova', d: 'Il buio è totale. Qualcosa cammina nei corridoi.', fx: { beast: 2, lethal: 1.15 } },
+        { n: 'Visita del notaio', d: 'Un notaio spettrale legge il testamento: c\'è cibo in dispensa per tutti.', fx: { forage: 1.6 } },
+      ],
+      txt: {
+        meterUp: ['{0} vede una figura nello specchio che non si muove insieme a l[0:ui/ei]. Non dorme più.', '{0} sente qualcuno chiamare il suo nome dalla Cantina. Con la voce di sua madre.', '{0} conta le porte del corridoio: ieri erano sette. Oggi sono otto.', '{0} trova un ritratto di sé nella Biblioteca. Dipinto nel 1802.', 'Il carillon in Soffitta suona da solo. {0} è l\'unic[0:o/a] a sentirlo.', '{0} giura di aver visto la propria tomba nel Cimitero. Con la data di domani.'],
+        meterDeath: ['{0} vede qualcosa in fondo al corridoio. Nessuno sa cosa: {0} non è più tornat[0:o/a].', 'Il cuore di {0} si ferma di colpo durante la notte. Sul viso, un\'espressione che nessuno vuole ricordare.', '{0} entra nella Soffitta per controllare un rumore. La porta si chiude da sola.'],
+        aloneNight: ['{0} dorme da sol[0:o/a]. Prima regola dei film dell\'orrore: mai dormire da soli.'],
+        forage: ['{0} trova {cibo} nella dispensa. È ancora caldo, il che non è affatto rassicurante.', '{0} scopre {cibo} su una tavola apparecchiata per uno. Mangia guardandosi alle spalle.'],
+      },
+    },
+    wasteland: {
+      rule: 'Radiazioni e sete',
+      desc: 'Acqua e cibo valgono più delle armi: la sete corre veloce e ogni giorno all\'aperto accumula Radiazioni, soprattutto nel Cratere e alla Raffineria. Resistenza e Sopravvivenza contano più della Forza; i furti sono all\'ordine del giorno.',
+      key: ['sop', 'res', 'for'],
+      drain: { food: 1.35, en: 1.1, mo: 1 },
+      mods: { forage: 0.75, heal: 0.85, weapon: 1.1, stealth: 1, fame: 0.9, sponsor: 0.85, night: 1.05, beast: 1.2, trap: 1.2, greed: 1.5 },
+      zones: [[1.2, 1.1, 0.7], [0.7, 1, 0.4], [0.8, 1.4, 0.6], [1.1, 1, 0.9], [0.5, 1.8, 0.2], [1.3, 0.9, 0.6]],
+      meter: { id: 'radiazioni', name: 'Radiazioni', st: 'irradiato', desc: 'Si accumulano di giorno, soprattutto nelle zone contaminate. Non scendono da sole: servono kit medici o cure. Resistenza le rallenta.', gain: { b: 4, d: 8, n: 2, dis: 10, f: 3 }, resist: ['res', 'sop'], ally: 1, thr: 60, dmg: 13, cure: 45, death: true, zoneMult: true, noDecay: true },
+      meteo: [
+        { n: 'Tempesta di sabbia radioattiva', d: 'La polvere verde entra ovunque, anche nei denti.', fx: { pr: 10, stl: 1.4, en: 1.25 } },
+        { n: 'Calura assassina', d: 'Cinquantadue gradi all\'ombra. Non c\'è ombra.', fx: { food: 1.5, en: 1.3, tb: { res: -1 } } },
+        { n: 'Pioggia rara', d: 'Piove acqua quasi pulita: tutti corrono fuori con le bocche aperte.', fx: { food: 0.6, forage: 1.4, pr: 3 } },
+        { n: 'Carovana di mercanti', d: 'Una carovana attraversa la zona: si baratta di tutto.', fx: { forage: 1.6 } },
+        { n: 'Notte gelida del deserto', d: 'Di giorno si cuoce, di notte si gela.', fx: { en: 1.25 } },
+        { n: 'Raid dei predoni', d: 'Motori truccati all\'orizzonte: i predoni sono in caccia.', fx: { beast: 1.9, lethal: 1.15 } },
+      ],
+      txt: {
+        meterUp: ['A {0} cadono i capelli a ciocche. Il contatore Geiger ride.', '{0} vomita verde e decide di non guardare.', 'La pelle di {0} brilla leggermente al buio. Utile per leggere, meno per vivere.', 'A {0} spunta un\'unghia in più. Non è una buona notizia.', 'Il contatore Geiger di {0} non smette di gracchiare. {0} lo prende a calci.'],
+        meterDeath: ['Le radiazioni consumano {0} dall\'interno: si spegne in una carcassa d\'auto, stringendo una tanica vuota.', '{0} ha passato troppo tempo nel Cratere. Il Cratere ha vinto.'],
+        forage: ['{0} filtra l\'acqua di una pozzanghera con un calzino e trova perfino {cibo}.', '{0} scava sotto un distributore abbandonato e trova {cibo}.', '{0} caccia una lucertola grossa come un cane. Stasera si mangia {cibo}.'],
+      },
+    },
+    liceo: {
+      rule: 'Popolarità e ansia',
+      desc: 'Qui non si muore: si crolla. La Reputazione scende con umiliazioni e figuracce, l\'Ansia sale con verifiche, gossip e solitudine. Carisma e Coraggio sono le armi vere; gli amici fanno da scudo.',
+      key: ['car', 'cor', 'int'],
+      drain: { food: 0.7, en: 1.1, mo: 1.2 },
+      mods: { forage: 1.5, heal: 1.2, weapon: 1, stealth: 1, fame: 1.4, sponsor: 1.1, night: 0.8, beast: 1, trap: 1.1 },
+      zones: [[1, 1.1, 0.6], [1.7, 0.9, 0.4], [0.8, 0.7, 0.9], [0.7, 1.3, 0.5], [1, 1.1, 0.5], [0.6, 1.4, 0.5]],
+      meter: { id: 'ansia', name: 'Ansia', st: 'ansia', desc: 'Sale nei giorni di lezione e dopo ogni eliminazione, scende con gli amici e il fine giornata. A 100 si crolla e si viene ritirati dai giochi.', gain: { b: 8, d: 9, n: -4, dis: 12, f: 4 }, alone: 4, death: 6, wound: 6, resist: ['cor', 'car'], ally: 0.6, thr: 65, dmg: 12, cure: 35, deathOn: true },
+      labels: 'soft',
+      meteo: [
+        { n: 'Compito di matematica', d: 'Interrogazioni a raffica: l\'ansia è nell\'aria.', fx: { pr: 6, tb: { int: 1 } } },
+        { n: 'Assemblea d\'istituto', d: 'Niente lezioni, tante chiacchiere: oggi si fa politica.', fx: { fame: 1.6, tb: { car: 1 } } },
+        { n: 'Gita scolastica', d: 'Pullman, panini e alleanze nate in ultima fila.', fx: { forage: 1.5, pr: -4 } },
+        { n: 'Ondata di influenza', d: 'Mezza classe è a casa con la febbre.', fx: { en: 1.35, heal: 0.8 } },
+        { n: 'Settimana dei colloqui', d: 'I genitori sono a scuola. Ogni segreto rischia di uscire.', fx: { pr: 8, lethal: 1.1 } },
+        { n: 'Venerdì prima del ponte', d: 'Nessuno ascolta, tutti pianificano.', fx: { pr: -6, stl: 1.3 } },
+      ],
+      txt: {
+        meterUp: ['{0} ripassa tutta la notte e sogna di presentarsi in classe senza pantaloni.', '{0} controlla la chat di classe quarantadue volte in un\'ora.', '{0} ha un tic all\'occhio da quando è uscito il gossip.', '{0} rilegge il proprio ultimo messaggio vocale quindici volte, vergognandosi ogni volta di più.', '{0} sogna la professoressa di matematica. Tutte le notti.'],
+        meterDeath: ['{0} ha una crisi d\'ansia in corridoio e chiede di essere ritirat[0:o/a] dai giochi.', '{0} non regge più: si chiude in bagno e da lì manda le dimissioni dai giochi via messaggio.'],
+        forage: ['{0} vince la lotteria del distributore: {cibo} gratis.', '{0} si fa offrire {cibo} con un sorriso ben piazzato.', '{0} scopre l\'ora esatta in cui in Mensa avanzano {cibo}.'],
+      },
+    },
+    ufficio: {
+      rule: 'Stress e burnout',
+      desc: 'Qui non si muore: ci si licenzia. Lo Stress cresce con le riunioni e gli straordinari, scende con le pause caffè e i colleghi fidati. Carisma e Intelligenza fanno carriera; senza energie si fanno errori.',
+      key: ['int', 'car', 'res'],
+      drain: { food: 0.7, en: 1.2, mo: 1.15 },
+      mods: { forage: 1.6, heal: 1.2, weapon: 1, stealth: 1.1, fame: 1.3, sponsor: 1.1, night: 0.85, beast: 1, trap: 1.1 },
+      zones: [[0.8, 1.3, 0.4], [1, 1, 0.5], [1.8, 0.8, 0.6], [0.7, 1.6, 0.3], [0.8, 0.9, 0.8], [0.9, 0.8, 0.7]],
+      meter: { id: 'stress', name: 'Stress', st: 'stressato', desc: 'Sale con le riunioni, gli straordinari e i colleghi licenziati. Pause, caffè e alleati lo abbassano. A 100 è burnout.', gain: { b: 6, d: 8, n: 9, dis: 12, f: -6 }, alone: 3, death: 5, wound: 5, resist: ['res', 'int'], ally: 0.65, thr: 65, dmg: 12, cure: 35, deathOn: true, coffee: true },
+      labels: 'soft',
+      meteo: [
+        { n: 'Chiusura trimestrale', d: 'I numeri non tornano e tutti devono restare fino a tardi.', fx: { pr: 7, en: 1.3 } },
+        { n: 'Server giù', d: 'Niente email, niente Excel: il caos ha il sapore della libertà.', fx: { pr: -4, stl: 1.4 } },
+        { n: 'Venerdì casual', d: 'Bermuda in ufficio e guardie abbassate.', fx: { pr: -5, tb: { car: 1 } } },
+        { n: 'Visita del CEO', d: 'Il capo dei capi passa per i corridoi: tutti fingono di lavorare.', fx: { fame: 1.7, pr: 5 } },
+        { n: 'Riscaldamento rotto', d: 'Diciassette gradi e giacche addosso.', fx: { en: 1.25, tb: { res: -1 } } },
+        { n: 'Torta di compleanno in cucina', d: 'Qualcuno compie gli anni: zuccheri per tutti.', fx: { forage: 1.8, pr: -3 } },
+      ],
+      txt: {
+        meterUp: ['{0} risponde alle email alle quattro di notte. In maiuscolo.', 'A {0} trema l\'occhio sinistro ogni volta che sente la parola «sinergia».', '{0} ha quindici schede aperte e non ricorda a cosa servisse nessuna.', '{0} sente la suoneria di Teams anche sotto la doccia.', '{0} risponde «come da mia precedente email» a una persona che gli chiedeva l\'ora.'],
+        meterDeath: ['{0} manda le dimissioni alle tre di notte, con un PowerPoint di trenta slide sul perché.', '{0} va in burnout durante una call e chiude il portatile per sempre. Direzione: una baita in montagna.'],
+        forage: ['{0} intercetta il carrello degli avanzi del catering: {cibo}.', '{0} scopre che nel frigo comune c\'è {cibo} senza nome. Ora ce l\'ha.', '{0} si autoinvita a una riunione solo per {cibo}.'],
+        refill: ['{0} si concede una pausa caffè di quaranta minuti. Lo stress scende, la produttività pure.'],
+      },
+    },
+  };
+
+  /* Testi comuni: valgono per tutte le arene, salvo quelli specifici sopra. */
+  E.txt = {
+    forage: ['{0} passa ore a cercare da mangiare e torna con {cibo}.', '{0} trova {cibo} dove nessuno aveva pensato di guardare.', '{0} ha una fame tale che trova {cibo} col solo olfatto.'],
+    starveDeath: ['{0} non mangia da giorni: si addormenta e non si sveglia più.', 'La fame consuma {0} un poco alla volta, finché non resta niente.', '{0} muore di stenti con lo zaino vuoto, sognando {cibo}.'],
+    woundDeath: ['{0} non sopravvive alla ferita che [0:gli/le] aveva inflitto {1}.', 'La ferita lasciata da {1} non si chiude: {0} muore dissanguat[0:o/a] nella notte.', '{0} trascina la ferita ricevuta da {1} per ore, poi si siede e non si rialza più.'],
+    woundDeathAny: ['{0} perde troppo sangue e si spegne in silenzio.', 'Le ferite di {0} si infettano: senza cure, non c\'è niente da fare.', '{0} si appoggia a un albero per riposare. Non si rialzerà.'],
+    poisonDeath: ['{0} non riesce a smaltire il veleno: muore tra i crampi.', 'Il veleno fa effetto lentamente, ma lo fa: {0} non arriva all\'alba.'],
+    sickDeath: ['La febbre si porta via {0} durante la notte.', '{0} è troppo debole per combattere la malattia.'],
+    exhaustDeath: ['{0} crolla per lo sfinimento e non si rialza.'],
+    beastHit: ['{0} dorme da sol[0:o/a] ed è sorpres[0:o/a] da {mostro}: si salva, ma con un brutto squarcio.', '{mostro} trova {0} nel sonno. {0} scappa, lasciando sul terreno un bel po\' di sangue.', '{0} è troppo stanc[0:o/a] per accorgersi di {mostro} finché non è troppo tardi. Sopravvive, a stento.'],
+    beastDeath: ['{0} è sorpres[0:o/a] nel sonno da {mostro}. Non c\'è niente da fare.', '{mostro} trova {0} da sol[0:o/a] nella notte. Il cannone suona all\'alba.'],
+    beastFend: ['{mostro} attacca il gruppo di {0} nella notte, ma i turni di guardia funzionano: lo respingono.'],
+    share: ['{0} divide {i} con {1}, che non mangiava da giorni.', '{0} vede {1} allo stremo e [1:gli/le] lascia metà delle proprie provviste.', '{0} cucina {i} per tutta l\'alleanza. {1} quasi piange.'],
+    greed: ['{0} mangia {i} da sol[0:o/a] mentre {1}, affamat[1:o/a], guarda. {1} se lo segna.', '{0} nasconde {i} allo sguardo dell\'alleanza. {1} se ne accorge.', '{1} chiede un boccone a {0}. {0} finge di non sentire.'],
+    nurse: ['{0} passa la notte a medicare le ferite di {1}.', '{0} improvvisa una sutura sulle ferite di {1}. Non è bella, ma tiene.', '{0} veglia su {1} tutta la notte, cambiando le bende ogni ora.'],
+    nurseMed: ['{0} usa {i} per ricucire {1}.', '{0} sacrifica {i} per salvare {1}.'],
+    selfMed: ['{0} si medica da sol[0:o/a] con {i} e stringe i denti.', '{0} si ricuce con {i}, mordendo un pezzo di legno.'],
+    trapSet: ['{0} nasconde {i} a {z} e se ne va fischiettando.', '{0} piazza {i} sul sentiero di {z}. Ora basta aspettare.'],
+    trapHit: ['{1} finisce nella trappola che {0} aveva nascosto a {z}.', 'La trappola di {0} scatta sulla gamba di {1}, a {z}. Il rumore si sente lontano.'],
+    trapKill: ['{1} finisce nella trappola che {0} aveva nascosto a {z}, e non ne esce viv[1:o/a].', 'La trappola di {0} a {z} fa il suo lavoro: {1} non ne esce.'],
+    trapDodge: ['{1} nota la trappola di {0} a {z} appena in tempo, la disinnesca e capisce chi cercare.', '{1} scavalca la trappola di {0} a {z} senza nemmeno accorgersene. Fortuna sfacciata.'],
+    trapAlly: ['{1} finisce nella trappola piazzata da {0}, alleat[0:o/a] suo. Discussione accesa.'],
+    weaponBreak: ['{0} colpisce ancora, e {ip} si spezza. Peccato, era il pezzo forte.', '{0} colpisce così forte che {ip} va in pezzi.', 'Proprio sul più bello, {ip} si rompe tra le mani di {0}.'],
+    loot: ['{0} fruga nello zaino di {1}: trova {i}.', '{0} non perde tempo: prende {i} dal corpo di {1}.'],
+    lootSoft: ['{0} eredita {i} da {1}.'],
+    scavenge: ['{0} trova lo zaino di {1} abbandonato a {z} e ci recupera {i}.', '{0} recupera {i} a {z}: roba di {1}, che ormai non ne ha più bisogno.'],
+    watch: ['{0} e {1} fanno i turni di guardia: dormono poco, ma dormono.', '{0} resta di guardia perché {1} possa dormire.'],
+    exhausted: ['{0} si addormenta in piedi. Non è il posto giusto per farlo.', '{0} è così stanc[0:o/a] che cammina in cerchio per un\'ora.', 'Gli occhi di {0} si chiudono da soli: niente sonno da due giorni.'],
+    moraleLeave: ['{0} non ce la fa più: lascia l\'alleanza senza dire una parola.', '{0} se ne va all\'alba. «Meglio sol[0:o/a] che con voi», scrive sulla sabbia.'],
+    moraleSteal: ['{0}, disperat[0:o/a] e affamat[0:o/a], ruba {i} dallo zaino di {1} mentre dorme.'],
+    comfort: ['{0} resta accanto a {1} tutta la notte. Domani andrà meglio.', '{0} racconta a {1} una storia buffa finché non torna a sorridere.'],
+    remorse: ['{0} non riesce a togliersi dalla testa la faccia di {1}.', '{0} si siede e trema per un\'ora dopo aver ucciso {1}. Non era così che se l[0:o/a] immaginava.', '{0} si lava le mani tre volte. Non bastano.'],
+    bloodlust: ['{0} ha preso gusto alla caccia. Gli sponsor applaudono, gli altri tremano.'],
+    accident: ['{0}, ubriac[0:o/a], gioca con {i}. Il resto è prevedibile.', '{0} usa {i} per accendere il fuoco. Il fuoco si accende, eccome.'],
+    accidentDeath: ['{0}, ubriac[0:o/a], gioca con {i}. Il cannone suona poco dopo.'],
+    tough: ['Ma {0} non è mort[0:o/a]: si trascina via con una ferita orribile. Senza cure non durerà, e {1} lo sa.', 'Colpo di scena: {0} respira ancora. A fatica, ma respira, e ha visto bene la faccia di {1}.', '{1} se ne va convint[1:o/a] di aver finito il lavoro. Non l\'ha finito: {0} è viv[0:o/a], per ora.'],
+    toughEnv: ['Ma {0} non è mort[0:o/a]: tossisce, si rialza e si trascina via. Ridott[0:o/a] malissimo.', 'Incredibile: {0} sopravvive, anche se non è chiaro per quanto.'],
+    woundSick: ['La ferita di {0} si è infettata: febbre alta e brividi.', 'Senza bende pulite, la ferita di {0} comincia a puzzare. Pessimo segno.', '{0} ha la febbre: la ferita non sta guarendo.'],
+    poisonCleared: ['{0} suda il veleno per tutta la notte, e al mattino sta meglio.'],
+    healed: ['Le ferite di {0} si stanno chiudendo: il riposo ha fatto il suo.'],
+    grave: ['{0} è ridott[0:o/a] male: senza cure non arriverà lontano.', '{0} perde sangue a ogni passo e lascia una scia che chiunque può seguire.'],
+    meterUp: ['{0} sta sempre peggio: {m} alle stelle.'],
+    meterDeath: ['{0} non regge più: {m} se l[0:o/a] porta via.'],
+    meterCure: ['{1} si prende cura di {0}: {m} cala.'],
+    refill: ['{0} trova il modo di riprendersi.'],
+    meteo: '<b class="meteo">{n}.</b> {d}',
+  };
+
+  /* Arene soft (si viene eliminati, non si muore): testi senza sangue. */
+  E.txtSoft = {
+    starveDeath: ['{0} salta pranzo per quattro giorni di fila, sviene in corridoio e viene mandat[0:o/a] a casa.'],
+    woundDeath: ['{0} non si riprende dall\'umiliazione inflitta da {1} e si ritira dai giochi.', 'Il colpo basso di {1} lascia il segno: {0} getta la spugna.'],
+    woundDeathAny: ['La reputazione di {0} è a pezzi: si ritira dai giochi con un post lunghissimo.', '{0} non regge più gli sguardi e si dà malat[0:o/a] fino alla fine dei giochi.'],
+    poisonDeath: ['{0} non smaltisce il pettegolezzo velenoso e lascia i giochi.'],
+    sickDeath: ['{0} prende un\'influenza tremenda e resta a casa fino alla fine dei giochi.'],
+    exhaustDeath: ['{0} si addormenta sulla scrivania e nessuno ha il coraggio di svegliarl[0:o/a]. Fuori dai giochi.'],
+    beastHit: ['{0} viene beccat[0:o/a] da {mostro} dove non dovrebbe essere: richiamo ufficiale.', '{mostro} sorprende {0} da sol[0:o/a] e [0:gli/le] fa una ramanzina che lascia il segno.'],
+    beastDeath: ['{mostro} sorprende {0} per l\'ennesima volta: provvedimento immediato, fuori dai giochi.'],
+    beastFend: ['{mostro} passa a controllare il gruppo di {0}, ma si coprono a vicenda e la fanno franca.'],
+    share: ['{0} divide {i} con {1}, che non mangiava dalla colazione.', '{0} offre {i} a {1}. Amicizia sigillata.'],
+    greed: ['{0} mangia {i} davanti a {1} senza offrirne un pezzo. {1} se lo segna.'],
+    nurse: ['{0} passa la serata a consolare {1} al telefono.', '{0} difende {1} nella chat di gruppo: la reputazione di {1} risale.'],
+    nurseMed: ['{0} usa {i} per rimettere in sesto {1}.'],
+    selfMed: ['{0} si prende una pausa con {i} e torna come nuov[0:o/a].'],
+    trapSet: ['{0} prepara {i} per chiunque passi da {z}.'],
+    trapHit: ['{1} cade nel tranello che {0} aveva preparato a {z}.'],
+    trapKill: ['{1} cade nel tranello che {0} aveva preparato a {z}: è la goccia che fa traboccare il vaso. Fuori dai giochi.'],
+    trapDodge: ['{1} fiuta il tranello di {0} a {z} e lo evita con stile.'],
+    trapAlly: ['{1} cade nel tranello preparato da {0}, alleat[0:o/a] suo. Litigio epico.'],
+    weaponBreak: ['{0} ha usato troppe volte {ip}: ormai non fa più effetto su nessuno.'],
+    loot: ['{0} si prende {i} che era di {1}.'],
+    scavenge: ['{0} recupera {i} a {z}: roba di {1}, che non ne avrà più bisogno.'],
+    watch: ['{0} e {1} si coprono a vicenda in chat: nessuno li coglie impreparati.'],
+    exhausted: ['{0} si addormenta con la faccia sulla tastiera.', '{0} ha dormito tre ore in due giorni e risponde a monosillabi.'],
+    moraleLeave: ['{0} esce dal gruppo senza salutare e silenzia tutte le notifiche.'],
+    moraleSteal: ['{0}, a pezzi, si prende {i} dalla borsa di {1} senza chiedere.'],
+    comfort: ['{0} sta al telefono con {1} fino a tardi. Domani andrà meglio.'],
+    remorse: ['{0} si sente in colpa per aver fatto fuori {1}. Un po\'.'],
+    bloodlust: ['{0} ci ha preso gusto: ora tutti abbassano la voce quando passa.'],
+    accident: ['{0} si distrae e combina un disastro con {i}. Figuraccia.'],
+    accidentDeath: ['{0} combina un disastro con {i} davanti a tutti: fuori dai giochi per manifesta incapacità.'],
+    tough: ['Ma {0} non molla: incassa il colpo di {1} e resta in gioco, anche se a pezzi.'],
+    toughEnv: ['Ma {0} resiste, per un pelo. La reputazione però è a terra.'],
+    woundSick: ['{0} non si riprende dalla figuraccia: ci pensa giorno e notte e si ammala di nervoso.'],
+    poisonCleared: ['{0} smaltisce il pettegolezzo: ormai non interessa più a nessuno.'],
+    healed: ['La reputazione di {0} si sta riprendendo.'],
+    grave: ['La reputazione di {0} è ai minimi: un altro passo falso e sarà fuori.'],
+  };
 })(typeof window !== 'undefined' ? window : globalThis);
 
 ;
@@ -4871,7 +5246,7 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
   }
   const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   const cap = (s) => s.charAt(0).toUpperCase() + s.slice(1);
-  const edFix = (s) => s.replace(/ e ((?:<b[^>]*>)?)(?=[Ee][^\s])/g, ' ed $1');
+  const edFix = (s) => s.replace(/ e ((?:<b[^>]*>)?)(?=[Ee][^\s])/g, ' ed $1').replace(/(^|[ («])a ((?:<b[^>]*>)?)(?=[AÀ][^\s'’])/g, '$1ad $2');
   const nameTag = (t) => '<b class="nm" data-id="' + esc(t.id) + '" style="--c:' + esc(t.color || '#888') + '">' + esc(t.name) + '</b>';
 
   /* ---------------- Simulazione ---------------- */
@@ -4880,6 +5255,9 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
   const STATUS_LABEL = { ferito: 'Ferito', avvelenato: 'Avvelenato', malato: 'Malato', affamato: 'Affamato', lutto: 'In lutto', ubriaco: 'Ubriaco', sconvolto: 'Sconvolto' };
   const STATUS_TTL = { ubriaco: 2, lutto: 6, sconvolto: 5 };
   const ITEM_NAME = { med: 'un kit medico', trap: 'una trappola' };
+  Object.assign(STATUS_LABEL, (D.eco && D.eco.statusLabel) || {});
+  const MANAGED = ['ferito', 'grave', 'affamato', 'esausto', 'disperato'];
+  const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
 
   function simulate(cfg) {
     const theme = D.themes.find((t) => t.id === cfg.theme) || D.themes[0];
@@ -4893,6 +5271,21 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
     const maxDays = Math.max(3, Math.min(60, cfg.maxDays || 20));
     const traitMap = Object.fromEntries(D.traits.map((t) => [t.id, t]));
     const zoneCount = theme.lex.luogo.length;
+    // ecosistema dell'arena: regole, indicatore, zone e meteo
+    const ECO = D.eco || { arenas: {}, txt: {} };
+    const R = ECO.arenas[theme.id] || ECO.arenas.classico || { key: [], drain: {}, mods: {}, zones: [], meteo: [], meter: null };
+    const M = R.meter || null;
+    const MOD = Object.assign({ forage: 1, heal: 1, weapon: 1, stealth: 1, fame: 1, sponsor: 1, night: 1, beast: 1, trap: 1, amulet: 0.85, map: 1, greed: 1, nightAlone: 0 }, R.mods);
+    const DR = Object.assign({ food: 1, en: 1, mo: 1 }, R.drain);
+    const ZP = theme.lex.luogo.map((_, i) => (R.zones && R.zones[i]) || [1, 1, 0.5]);
+    const KEYW = [1, 0.7, 0.5];
+    const keyBonus = (t) => (R.key || []).reduce((s, a, i) => s + ((t.attr[a] != null ? t.attr[a] : 5) - 5) * KEYW[i], 0);
+    let W = { n: '', d: '', fx: {} };
+    const wx = (k, d) => (W.fx && W.fx[k] != null ? W.fx[k] : d);
+    const TX = (k) => (R.txt && R.txt[k]) || (theme.soft && ECO.txtSoft && ECO.txtSoft[k]) || (ECO.txt && ECO.txt[k]) || [];
+    const closed = new Set(); // zone inghiottite dalla tempesta (Battle Royale)
+    const traps = []; const zoneLoot = {};
+    let SYS = []; let pendingNotes = [];
 
     const T = (cfg.cast || []).map((c, i) => ({
       id: c.id || 't' + i, name: (c.name || 'Concorrente ' + (i + 1)).trim(), gender: c.gender || 'M',
@@ -4904,9 +5297,15 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
       events: 0, alliancesFormed: 0, betrayals: 0, items: 0,
       partner: null, exPartner: null, lost: null, grudges: {}, owes: {}, fame: 0, traitor: false, fed: 0,
       revenges: 0, saves: 0, repaid: 0, amulets: 0, tests: 0, testsPassed: 0,
+      hp: 100, en: 90, mo: 55, food: 70, pr: 0, infected: false, infKnown: false, cause: null, hurtPh: -1, sawDeath: -1,
+      foraged: 0, nursed: 0, shared: 0, trapKills: 0, trapsSet: 0, survivedBeasts: 0,
     }));
     if (T.length < 2) throw new Error('Servono almeno 2 concorrenti.');
-    T.forEach((t) => (t.zone = rng.int(zoneCount)));
+    T.forEach((t) => {
+      t.zone = rng.int(zoneCount);
+      t.food = clamp(64 + t.attr.sop * 2, 0, 100);
+      t.mo = clamp(50 + (t.attr.car - 5) * 2 + (t.attr.cor - 5) * 2 + (t.traits.includes('leader') ? 5 : 0) + (t.traits.includes('paranoico') ? -6 : 0), 20, 85);
+    });
     const byId = Object.fromEntries(T.map((t) => [t.id, t]));
 
     // affinità reciproca (-100 … 100)
@@ -4944,26 +5343,35 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
     const alive = () => T.filter((t) => t.alive);
     const phases = [];
     let day = 0, deathCounter = 0, pendingFallen = [], noDeathStreak = 0;
-    const stats = { events: 0, alliances: 0, betrayals: 0, firstBlood: null, deathsByDay: [], envDeaths: 0, killDeaths: 0, items: 0, revenges: 0, couples: 0, debtsRepaid: 0, amulets: 0, sponsors: 0, echoes: 0, tests: 0, testsPassed: 0 };
+    const stats = { events: 0, alliances: 0, betrayals: 0, firstBlood: null, deathsByDay: [], envDeaths: 0, killDeaths: 0, items: 0, revenges: 0, couples: 0, debtsRepaid: 0, amulets: 0, sponsors: 0, echoes: 0, tests: 0, testsPassed: 0,
+      causes: {}, shared: 0, nursed: 0, foraged: 0, trapsSet: 0, trapHits: 0, beasts: 0, infected: 0, cured: 0, broken: 0, looted: 0, meteo: [], expelled: 0 };
 
     const hasItem = (t, it) => t.inv.some((x) => x.type === it);
     const itemOf = (t, it) => t.inv.find((x) => x.type === it);
-    const statusCount = (t) => Object.keys(t.st).filter((s) => s !== 'lutto').length;
+    const statusCount = (t) => Object.keys(t.st).filter((s) => s !== 'lutto' && s !== 'grave').length;
     const traitSum = (t, key) => t.traits.reduce((s, id) => s + ((traitMap[id] && traitMap[id][key]) || 0), 0);
-    const combat = (t) => t.attr.for + t.attr.agi + 0.5 * t.attr.int + 0.3 * t.attr.res + 0.2 * t.attr.fort +
-      (hasItem(t, 'arma') ? 4 : 0) + (hasItem(t, 'esplosivo') ? 2 : 0) - (t.st.ferito != null ? 3 : 0) - (t.st.malato != null ? 2 : 0) -
-      (t.st.ubriaco != null ? 2 : 0) - (t.st.affamato != null ? 1.5 : 0) - (t.st.sconvolto != null ? 1 : 0) + (t.st.lutto != null ? 1.5 : 0) + traitSum(t, 'c') + Math.min(3, t.kills * 0.5);
-    const survival = (t) => 0.4 * t.attr.res + 0.3 * t.attr.fort + 0.2 * t.attr.agi + 0.3 * t.attr.sop + 0.1 * t.attr.cor + traitSum(t, 's') - 1.5 * statusCount(t) + (hasItem(t, 'amuleto') ? 2 : 0);
     const hasTrait = (t, id) => t.traits.includes(id);
+    const weaponPow = (t) => { const w = itemOf(t, 'arma'); return w ? (2.2 + (w.q || 2) * 0.9) * MOD.weapon : 0; };
+    const meterBad = (t) => !!(M && t.st[M.st] != null);
+    // combattimento: caratteristiche, arma (e sua qualità), condizione fisica, umore, tratti, arena
+    const combat = (t) => t.attr.for + t.attr.agi + 0.5 * t.attr.int + 0.3 * t.attr.res + 0.2 * t.attr.fort +
+      weaponPow(t) + (hasItem(t, 'esplosivo') ? 2 : 0) - Math.min(5, (100 - t.hp) / 18) - (t.st.malato != null ? 2 : 0) -
+      (t.st.ubriaco != null ? 2 : 0) - (t.st.affamato != null ? 1.5 : 0) - (t.st.sconvolto != null ? 1 : 0) - (t.st.esausto != null ? 2 : 0) -
+      (t.st.disperato != null ? 1 : 0) - (meterBad(t) ? 1.5 : 0) + (t.mo >= 80 ? 1 : 0) + (t.st.lutto != null ? 1.5 : 0) + traitSum(t, 'c') + Math.min(3, t.kills * 0.5) + 0.15 * keyBonus(t);
+    // sopravvivenza: resistenza, salute, energie, morale, indicatore e caratteristiche chiave dell'arena, riparo della zona
+    const survival = (t) => 0.4 * t.attr.res + 0.3 * t.attr.fort + 0.2 * t.attr.agi + 0.3 * t.attr.sop + 0.1 * t.attr.cor + traitSum(t, 's') - 1.2 * statusCount(t) +
+      (hasItem(t, 'amuleto') ? 2 : 0) + (t.hp - 70) / 15 + (t.en - 60) / 40 + (t.mo - 50) / 50 - t.pr / 40 + 0.3 * keyBonus(t) + (ZP[t.zone][2] - 0.5);
     // prova di abilità: caratteristica + dado + fortuna + tratti − condizioni
     function rollTest(t, attr, dc) {
       const base = t.attr[attr] != null ? t.attr[attr] : 5;
       let bonus = Math.round((t.attr.fort - 5) / 3) + traitSum(t, 'tb');
       if (hasTrait(t, 'fortunato')) bonus += 1; if (hasTrait(t, 'sfortunato')) bonus -= 2;
-      if (t.st.ferito != null) bonus -= 2; if (t.st.ubriaco != null) bonus -= 2; if (t.st.affamato != null) bonus -= 1;
+      if (t.hp < 55) bonus -= 1; if (t.hp < 30) bonus -= 1; if (t.st.ubriaco != null) bonus -= 2; if (t.st.affamato != null) bonus -= 1;
       if (t.st.sconvolto != null) bonus -= 1; if (t.st.malato != null || t.st.avvelenato != null) bonus -= 1; if (t.st.lutto != null && attr === 'for') bonus += 1;
+      if (t.st.esausto != null) bonus -= 1; if (t.st.disperato != null) bonus -= 1; if (t.mo >= 80) bonus += 1; if (meterBad(t)) bonus -= 1;
       if ((attr === 'int' || attr === 'sop') && hasItem(t, 'mappa')) bonus += 2;
       if (attr === 'for' && hasItem(t, 'arma')) bonus += 1;
+      const tb = wx('tb', null); if (tb && tb[attr]) bonus += tb[attr];
       const die = 1 + rng.int(6) + rng.int(6);
       const roll = base + die + bonus;
       return { roll, dc, pass: roll >= dc, bonus };
@@ -5026,6 +5434,11 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
       return true;
     }
 
+    function gains0(ev) {
+      const g = {};
+      ev.fx.concat(ev.ok.fx).forEach((f) => { if (f.t === 'gain' && f.r[0] === 0) g[f.item] = 1; if (f.t === 'cure' && f.r[0] === 0) g.med = 1; });
+      return g;
+    }
     function weightFor(ev, P) {
       let w = ev.w;
       for (const tag of ev.tags) {
@@ -5063,6 +5476,20 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
         else if (r.t === 'feared' && T.some((t) => t.alive && t.kills >= 3 && t !== P)) w *= 2;
         else if (r.t === 'canLove' && !P.partner) w *= 1.2;
       }
+      // condizione fisica, umore, bisogni, arena e meteo spostano le scelte
+      const tg = (x) => ev.tags.includes(x);
+      if (tg('agg')) w *= (0.35 + 0.0065 * P.hp) * (P.en < 25 ? 0.6 : 1) * (P.mo >= 80 ? 1.2 : 1);
+      if (tg('cow')) w *= (P.hp < 50 ? 1.8 : 1) * (P.mo < 30 ? 1.5 : 1);
+      if (tg('heal')) w *= P.hp < 55 ? 2.2 : 1;
+      if (tg('food')) w *= P.food < 35 ? 2.4 : P.food > 80 ? 0.6 : 1;
+      if (tg('stl')) w *= MOD.stealth * wx('stl', 1);
+      if (tg('show') || tg('gift')) w *= MOD.fame * wx('fame', 1);
+      if (tg('betray') || tg('steal')) w *= (P.mo < 25 ? 1.8 : 1) * (P.food < 20 ? 1.5 : 1) * (tg('steal') ? MOD.greed : 1);
+      if ((tg('soc') || tg('ally')) && P.mo < 30 && !hasTrait(P, 'solitario')) w *= 1.3;
+      const g0 = ev.g0 || (ev.g0 = gains0(ev));
+      if (g0.cibo && P.food < 40) w *= 1.8;
+      if (g0.med && P.hp < 55) w *= 2;
+      if (g0.arma && !hasItem(P, 'arma')) w *= 1.3;
       if (ev.origin === 'custom') w *= 1.5;
       else if (ev.origin === 'adult') w *= 1.25;
       else if (ev.origin !== 'base') w *= 1.3;
@@ -5105,7 +5532,7 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
       const g = A.grudges[B.id];
       if (!g) return 'tutto quello che ha fatto';
       if (g.victim && byId[g.victim]) return '{@' + g.victim + '}';
-      return { betray: 'il tradimento', steal: 'il furto di ieri', attack: 'l\'agguato di ieri', love: 'il cuore spezzato' }[g.why] || 'tutto quello che è successo';
+      return { betray: 'il tradimento', steal: 'il furto di ieri', attack: 'l\'agguato di ieri', love: 'il cuore spezzato', greed: 'il cibo negato' }[g.why] || 'tutto quello che è successo';
     }
     function render(text, roles, lexPick, ev) {
       let s = text
@@ -5133,6 +5560,51 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
       return { plain: edFix(s.replace(/\{(\d)\}/g, (_, i) => people[+i].name)), html: edFix(esc(s).replace(/\{(\d)\}/g, (_, i) => nameTag(people[+i]))), cls: cls || '' };
     }
 
+    // ---------- ecosistema: testi e valori vitali ----------
+    function sysText(k, people, vars) {
+      const fits = (x) => { let mx = -1; x.replace(/[{\[](\d)[}:]/g, (_, d) => { mx = Math.max(mx, +d); }); return mx < people.length; };
+      const list = (Array.isArray(TX(k)) ? TX(k) : []).filter(fits); if (!list.length) return null;
+      let s = rng.pick(list);
+      s = s.replace(/\[(\d):([^\]]*)\]/g, (_, i, o) => genderPick([people[+i]], o))
+        .replace(/\{(i|ip|z|m|n|d)\}/g, (_, x) => (vars && vars[x] != null ? vars[x] : ''))
+        .replace(LEX_RE, (_, k2) => (k2 === 'luogo' && vars && vars.z ? vars.z : rng.pick(LEX[k2] || ['qualcosa'])));
+      s = cap(artPrep(s));
+      return { plain: edFix(s.replace(/\{(\d)\}/g, (_, i) => people[+i].name)), html: edFix(esc(s).replace(/\{(\d)\}/g, (_, i) => nameTag(people[+i]))) };
+    }
+    function sys(k, people, vars, o, pri) {
+      const tx = sysText(k, people, vars); if (!tx) return null;
+      const ev = Object.assign({ html: tx.html, plain: tx.plain, ids: people.map((p) => p.id), deaths: [], lethal: false, origin: 'sys', cat: 'none', why: 'conseguenza', echo: [] }, o || {});
+      SYS.push({ pri: pri || 1, ev });
+      return ev;
+    }
+    function syncSt(t) {
+      const ph = phases.length;
+      const set = (k, on) => { if (on) { if (t.st[k] == null) t.st[k] = ph; } else delete t.st[k]; };
+      t.hp = Math.min(100, t.hp); t.en = clamp(t.en, 0, 100); t.mo = clamp(t.mo, 0, 100); t.food = clamp(t.food, 0, 100); t.pr = clamp(t.pr, 0, 100);
+      set('ferito', t.hp < 55); set('grave', t.hp < 25); set('affamato', t.food < 25); set('esausto', t.en < 22); set('disperato', t.mo < 22);
+      if (M) set(M.st, M.infect ? t.infected && t.pr >= M.thr : t.pr >= M.thr);
+    }
+    function hurt(t, dmg, by, cause, inTick) {
+      if (!t.alive) return;
+      dmg *= Math.max(0.55, 1.2 - t.attr.res * 0.04) * (hasTrait(t, 'sopravvissuto') ? 0.85 : 1);
+      t.hp -= dmg; if (!inTick) t.hp = Math.max(8, t.hp);
+      t.hurtPh = phases.length;
+      if (by && by !== t) t.cause = { k: cause === 'trap' ? 'trap' : 'wound', by: by.id, ph: phases.length };
+      else if (cause) t.cause = { k: cause, ph: phases.length, by: null };
+      if (M && M.infect && !t.infected && (cause === 'wound' || cause === 'beast' || by) && rng.chance(M.infect * Math.max(0.4, 1.2 - t.attr.res * 0.05))) {
+        t.infected = true; t.pr = Math.max(t.pr, 8); stats.infected++;
+        sys('infect', [t], {}, { cat: 'hurt', why: 'infezione' }, 3);
+      }
+      t.mo -= Math.min(10, dmg / 4);
+      syncSt(t);
+    }
+    function eat(t) {
+      const i = t.inv.findIndex((x) => x.type === 'cibo'); if (i < 0) return false;
+      t.inv.splice(i, 1); t.food += 50; t.mo += 3;
+      if (M && M.coffee) t.pr -= 12;
+      syncSt(t); return true;
+    }
+
     // ---------- conseguenze ----------
     function addGrudge(X, K, why, victim) {
       if (!X.alive || X === K) return false;
@@ -5144,6 +5616,7 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
     function kill(v, killers, txt, out) {
       if (!v.alive) return;
       v.alive = false;
+      if (!v.deathKind) v.deathKind = killers.length ? 'kill' : 'event';
       v.deathPhase = phases.length; v.deathDay = day; v.order = ++deathCounter;
       v.deathText = txt.plain; v.deathHtml = txt.html;
       v.killerIds = killers.map((k) => k.id);
@@ -5155,6 +5628,17 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
         stats.killDeaths++;
         killers.forEach((k) => {
           k.kills++; k.killIds.push(v.id); k.fame += 1;
+          const dm = hasTrait(k, 'spietato') || hasTrait(k, 'folle') ? 6 : hasTrait(k, 'pacifista') ? -25 : -(4 + Math.max(0, k.attr.emp - 5) * 3);
+          k.mo += dm < 0 ? dm * DR.mo : dm;
+          if (M && M.kill) k.pr += M.kill * Math.max(0.4, 1.2 - k.attr.emp * 0.06);
+          if (dm <= -15 && out.length < 3 && rng.chance(0.5)) { const e = sysText('remorse', [k, v]); if (e) out.push(Object.assign(e, { cls: '' })); }
+          else if (dm > 0 && k.kills === 2 && out.length < 3 && rng.chance(0.5)) { const e = sysText('bloodlust', [k]); if (e) out.push(Object.assign(e, { cls: 'warn' })); }
+          const w = itemOf(k, 'arma');
+          if (w && rng.chance(0.07 * MOD.weapon)) {
+            k.inv.splice(k.inv.indexOf(w), 1); stats.broken++;
+            const e = sysText('weaponBreak', [k], { i: w.name, ip: possessive(w) }); if (e && out.length < 3) out.push(Object.assign(e, { cls: '' }));
+          }
+          syncSt(k);
           if (k.grudges[v.id]) {
             const g = k.grudges[v.id]; delete k.grudges[v.id]; k.revenges++; stats.revenges++; k.fame += 2;
             const e = g.victim && byId[g.victim] ? echo(E.revenge, [k, v, byId[g.victim]], 'good') : echo(E.revengeAny, [k, v], 'good');
@@ -5164,10 +5648,27 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
           if (k.partner === v.id) { k.partner = null; k.exPartner = v.id; }
         });
         if (!stats.firstBlood) stats.firstBlood = { killers: v.killerIds.slice(), victim: v.id, day };
+        // il bottino: chi uccide fruga nello zaino della vittima
+        const K = killers.find((k) => k.alive);
+        if (K && v.inv.length) {
+          let took = 0;
+          v.inv.slice().forEach((it) => {
+            if (took >= 2) return;
+            const mine = itemOf(K, it.type);
+            if (it.type === 'arma' ? !mine || (it.q || 2) > (mine.q || 2) : !mine || it.type === 'cibo') {
+              if (it.type === 'arma' && mine) K.inv.splice(K.inv.indexOf(mine), 1);
+              K.inv.push(Object.assign({}, it)); took++; stats.looted++;
+              if (took === 1 && out.length < 3 && rng.chance(0.4)) { const e = sysText(theme.soft ? 'lootSoft' : 'loot', [K, v], { i: it.name }); if (e) out.push(Object.assign(e, { cls: '' })); }
+            }
+          });
+          while (K.inv.length > 7) K.inv.shift();
+        }
       } else {
         stats.envDeaths++;
         if (!stats.firstBlood) stats.firstBlood = { killers: [], victim: v.id, day };
+        if (v.inv.length) (zoneLoot[v.zone] = zoneLoot[v.zone] || []).push(...v.inv.map((it) => ({ it, from: v.id })));
       }
+      T.forEach((X) => { if (X.alive && X.zone === v.zone) X.sawDeath = phases.length; });
       // chi amava o stimava la vittima reagisce
       let echoed = 0;
       T.forEach((X) => {
@@ -5176,8 +5677,10 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
         const thr = 45 - (X.attr.emp - 5) * 3 - (hasTrait(X, 'vendicativo') ? 15 : 0) + (hasTrait(X, 'clemente') ? 20 : 0);
         const close = lover || aff(X, v) >= thr || (oldAlly != null && X.allyId === oldAlly && !hasTrait(X, 'clemente'));
         if (!close) return;
-        if (lover) { X.partner = null; X.exPartner = v.id; X.st.lutto = phases.length; }
-        else if (aff(X, v) >= 60 - (X.attr.emp - 5) * 4) X.st.lutto = phases.length;
+        if (lover) { X.partner = null; X.exPartner = v.id; X.st.lutto = phases.length; X.mo -= 35 * DR.mo; }
+        else if (aff(X, v) >= 60 - (X.attr.emp - 5) * 4) { X.st.lutto = phases.length; X.mo -= 20 * DR.mo; }
+        else X.mo -= 8 * DR.mo;
+        syncSt(X);
         X.lost = v.id;
         killers.forEach((K) => {
           if (addGrudge(X, K, 'kill', v) && echoed < 2) { const e = echo(lover ? E.grudgeLover : E.grudgeKill, [X, K, v], 'warn'); if (e) { out.push(e); echoed++; } }
@@ -5186,11 +5689,16 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
       });
       if (v.partner) { const p = byId[v.partner]; if (p) { p.partner = null; p.exPartner = v.id; } v.partner = null; }
     }
-    function giveItem(t, type, ctx, lexPick, name) {
+    function giveItem(t, type, ctx, lexPick, name, q) {
       const nm = name || (type === 'arma' ? lexPick('arma') : type === 'cibo' ? ctx.cibo || 'delle provviste' : ITEM_NAME[type] || lexPick(type));
-      if (type === 'arma') { const old = t.inv.findIndex((x) => x.type === 'arma'); if (old >= 0) t.inv.splice(old, 1); }
-      t.inv.push({ type, name: nm }); t.items++; stats.items++;
-      if (type === 'cibo') { t.fed = day; delete t.st.affamato; }
+      const it = { type, name: nm };
+      if (type === 'arma') {
+        it.q = q || clamp(Math.round(0.7 + rng.f() * 2.2 * MOD.weapon), 1, 3);
+        const old = itemOf(t, 'arma');
+        if (old) { if ((old.q || 2) > it.q && !name) { it.q = old.q; it.name = old.name; } t.inv.splice(t.inv.indexOf(old), 1); }
+      }
+      t.inv.push(it); t.items++; stats.items++;
+      if (type === 'cibo' && t.food < 45) eat(t);
       while (t.inv.length > 7) t.inv.shift();
     }
 
@@ -5204,6 +5712,7 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
       const v = new Set(out.dies); out.kills.forEach((k) => k.v.forEach((x) => v.add(x)));
       out.victims = [...v]; out.lethal = out.victims.length > 0; out.cat = catOf(out);
       who.tests++; if (res.pass) who.testsPassed++; stats.tests++; if (res.pass) stats.testsPassed++;
+      who.mo += res.pass ? 4 : -4;
       out.testRes = { who: who.id, attr: ev.test.attr, roll: res.roll, dc: res.dc, pass: res.pass };
       return out;
     }
@@ -5223,8 +5732,22 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
           saved.add(i); v.inv.splice(v.inv.indexOf(am), 1); v.amulets++; stats.amulets++;
           const e = echo(theme.soft ? E.amuletSoft : E.amulet, [v], 'twist');
           if (e) out.push({ plain: e.plain.replace('§', possessive(am)), html: e.html.replace('§', esc(possessive(am))), cls: 'twist' });
-          v.st.ferito = phases.length;
+          const atk = ev.kills.find((k) => k.v.includes(i));
+          hurt(v, 30, atk ? roles[atk.by[0]] : null, 'wound');
           ev.kills.forEach((k) => { if (k.v.includes(i)) k.by.forEach((b) => addGrudge(v, roles[b], 'attack')); });
+          return;
+        }
+        // la tempra: chi è in forma e resistente a volte sopravvive al colpo, ma ridotto malissimo
+        const tough = 0.03 + (v.attr.res - 5) * 0.022 + (v.attr.fort - 5) * 0.01 + (hasTrait(v, 'sopravvissuto') ? 0.08 : 0) + (v.mo >= 80 ? 0.03 : 0);
+        if (v.alive && v.hp >= 60 && alive().length > 2 && rng.chance(Math.max(0, tough))) {
+          saved.add(i);
+          const atk = ev.kills.find((k) => k.v.includes(i));
+          const K = atk ? roles[atk.by[0]] : null;
+          v.hp = 9 + rng.int(10); v.hurtPh = phases.length; v.cause = K ? { k: 'wound', by: K.id, ph: phases.length } : { k: 'wound', ph: phases.length, by: null };
+          if (K) { addGrudge(v, K, 'attack'); K.fame += 1; }
+          if (M && M.infect && !v.infected && rng.chance(M.infect)) { v.infected = true; v.pr = 10; stats.infected++; }
+          syncSt(v); stats.tough = (stats.tough || 0) + 1;
+          const e = sysText(K ? 'tough' : 'toughEnv', K ? [v, K] : [v]); if (e) out.push(Object.assign(e, { cls: 'twist' }));
         }
       });
       for (const k of ev.kills) {
@@ -5242,53 +5765,70 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
         switch (f.t) {
           case 'al': {
             const ts = f.r.map((i) => roles[i]).filter((x) => x.alive);
-            if (ts.length > 1) { joinAlliance(ts); stats.alliances++; ts.forEach((x) => { x.alliancesFormed++; ts.forEach((y) => x.id < y.id && addAff(x, y, Math.round(25 * (0.7 + (x.attr.car + y.attr.car) / 30)))); }); }
+            if (ts.length > 1) { joinAlliance(ts); stats.alliances++; ts.forEach((x) => { x.alliancesFormed++; x.mo += 10; ts.forEach((y) => x.id < y.id && addAff(x, y, Math.round(25 * (0.7 + (x.attr.car + y.attr.car) / 30)))); }); }
             break;
           }
           case 'br': {
             const g = t.allyId != null ? [...(alliances.get(t.allyId) || [])].map((id) => byId[id]).filter((x) => x !== t && x.alive) : [];
             leaveAlliance(t); t.betrayals++; t.traitor = true; stats.betrayals++;
-            let n = 0; g.forEach((x) => { if (addGrudge(x, t, 'betray') && n++ < 1) { const e = echo(E.betray, [x, t], 'warn'); if (e) out.push(e); } });
+            let n = 0; g.forEach((x) => { x.mo -= 18 * DR.mo; if (addGrudge(x, t, 'betray') && n++ < 1) { const e = echo(E.betray, [x, t], 'warn'); if (e) out.push(e); } });
             break;
           }
           case 'gain': giveItem(t, f.item, ctx, lexPick); break;
-          case 'lose': { const i = t.inv.findIndex((x) => x.type === f.item); if (i >= 0) t.inv.splice(i, 1); if (f.item === 'cibo') { t.fed = day; delete t.st.affamato; } break; }
+          case 'lose': { const i = t.inv.findIndex((x) => x.type === f.item); if (i >= 0) t.inv.splice(i, 1); if (f.item === 'cibo') t.food += 40; if (f.item === 'med') t.hp = Math.max(t.hp, 70); break; }
           case 'steal': {
             const i = u.inv.findIndex((x) => x.type === 'arma');
-            if (i >= 0) { const [it] = u.inv.splice(i, 1); giveItem(t, 'arma', ctx, lexPick, it.name); if (u.alive && addGrudge(u, t, 'steal')) { const e = echo(E.steal, [u, t], 'warn'); if (e) out.push(e); } }
+            if (i >= 0) { const [it] = u.inv.splice(i, 1); giveItem(t, 'arma', ctx, lexPick, it.name, it.q); u.mo -= 10; if (u.alive && addGrudge(u, t, 'steal')) { const e = echo(E.steal, [u, t], 'warn'); if (e) out.push(e); } }
             break;
           }
           case 'give': {
             if (!u.alive) break;
             const own = itemOf(t, f.item);
             if (own) t.inv.splice(t.inv.indexOf(own), 1);
-            giveItem(u, f.item, ctx, lexPick, own ? own.name : null);
-            u.owes[t.id] = 'dono'; addAff(t, u, 20);
+            giveItem(u, f.item, ctx, lexPick, own ? own.name : null, own && own.q);
+            u.owes[t.id] = 'dono'; addAff(t, u, 20); u.mo += 8;
             if (rng.chance(0.6)) { const e = echo(E.debt, [u, t], ''); if (e) out.push(e); }
             break;
           }
-          case 'status': t.st[f.s] = phases.length; if (f.s === 'ubriaco') t.fame += 1; break;
+          case 'status': {
+            if (f.s === 'ferito') { hurt(t, 30 + rng.int(18), null, 'wound'); t.hp = Math.min(t.hp, 46); }
+            else if (f.s === 'affamato') t.food = Math.min(t.food, 18);
+            else {
+              t.st[f.s] = phases.length;
+              if (f.s === 'ubriaco') { t.fame += 1; t.en -= 8; t.mo += 8; }
+              else if (f.s === 'sconvolto') { t.mo -= 15 * DR.mo; if (M && !M.infect) t.pr += 6; }
+              else if (f.s === 'lutto') t.mo -= 25 * DR.mo;
+              else if (f.s === 'avvelenato' || f.s === 'malato') { t.hp -= 8; t.cause = { k: f.s === 'avvelenato' ? 'poison' : 'sick', ph: phases.length }; }
+            }
+            syncSt(t);
+            break;
+          }
           case 'cure': {
             t.st = t.st.lutto != null ? { lutto: t.st.lutto } : {};
+            t.hp = Math.max(t.hp, 72); t.en += 10; t.mo += 6;
+            if (M && M.cure) { if (M.infect) { if (t.infected && t.pr < M.cure) { t.infected = false; t.pr = 0; stats.cured++; } } else t.pr -= M.cure; }
+            syncSt(t);
             const helper = roles.find((x) => x !== t && x.alive);
             if (helper && ev.n > 1) { t.owes[helper.id] = 'cura'; addAff(t, helper, 30); helper.saves++; if (rng.chance(0.5)) { const e = echo(E.debt, [t, helper], ''); if (e) out.push(e); } }
             break;
           }
-          case 'hit': if (u.alive) { u.st.ferito = phases.length; if (addGrudge(u, t, 'attack') && rng.chance(0.6)) { const e = echo(E.hit, [u, t], 'warn'); if (e) out.push(e); } } break;
-          case 'save': if (u.alive) { u.owes[t.id] = 'vita'; addAff(t, u, 40); t.saves++; t.fame += 1; const e = echo(E.saved, [u, t], 'good'); if (e) out.push(e); } break;
+          case 'hit': if (u.alive) { hurt(u, (28 + rng.int(18)) * (1 + weaponPow(t) / 12), t, 'wound'); u.mo -= 6; if (addGrudge(u, t, 'attack') && rng.chance(0.6)) { const e = echo(E.hit, [u, t], 'warn'); if (e) out.push(e); } } break;
+          case 'save': if (u.alive) { u.owes[t.id] = 'vita'; addAff(t, u, 40); u.mo += 15; t.saves++; t.fame += 1; const e = echo(E.saved, [u, t], 'good'); if (e) out.push(e); } break;
           case 'forgive': delete t.grudges[u.id]; addAff(t, u, 35); break;
           case 'love': if (u.alive) {
-            t.partner = u.id; u.partner = t.id; addAff(t, u, 70); stats.couples++; t.fame += 1; u.fame += 1;
+            t.partner = u.id; u.partner = t.id; addAff(t, u, 70); stats.couples++; t.fame += 1; u.fame += 1; t.mo += 25; u.mo += 25;
             if (!cfg.teamWin && (t.allyId == null || u.allyId == null || t.allyId === u.allyId)) { const g = t.allyId != null ? alliances.get(t.allyId) : u.allyId != null ? alliances.get(u.allyId) : null; if (!g || g.size < 5) joinAlliance([t, u]); } const e = echo(E.couple, [t, u], 'love'); if (e) out.push(e); } break;
           case 'repay': if (u) { delete t.owes[u.id]; addAff(t, u, 20); t.repaid++; stats.debtsRepaid++; const e = echo(E.repay, [t, u], 'good'); if (e) out.push(e); } break;
           case 'debt': if (u) t.owes[u.id] = 'favore'; break;
           case 'rel': if (u) addAff(t, u, f.v); break;
-          case 'star': t.fame += 2; if (t.fame >= 5 && !t.starred) { t.starred = true; const e = echo(E.star, [t], 'good'); if (e) out.push(e); } break;
+          case 'star': t.fame += 2; t.mo += 10; if (t.fame >= 5 && !t.starred) { t.starred = true; const e = echo(E.star, [t], 'good'); if (e) out.push(e); } break;
         }
       }
       // l'evento lascia il segno sui rapporti
       if (ev.tags.includes('show')) roles.forEach((t) => { if (t.alive) { t.fame += 1 + (hasTrait(t, 'esibizionista') ? 1 : 0) + (t.attr.car >= 8 ? 1 : 0); if (t.fame >= 5 && !t.starred) { t.starred = true; const e = echo(E.star, [t], 'good'); if (e) out.push(e); } } });
       if (!ev.lethal && ev.req.some((r) => r.t === 'ally')) for (const a of roles) for (const b of roles) if (a.id < b.id) addAff(a, b, 6);
+      if (ev.lethal) roles.forEach((x) => { if (x.alive && !ev.kills.some((k) => k.by.some((i) => roles[i] === x))) { x.mo -= 6 * Math.max(0.3, 1.4 - x.attr.cor / 10) * DR.mo; x.sawDeath = phases.length; } });
+      roles.forEach((x) => x.alive && syncSt(x));
       if (ev.lethal) {
         roles.forEach((x) => {
           if (x.alive && !ev.kills.some((k) => k.by.some((i) => roles[i] === x)) && rng.chance(Math.max(0.05, 0.35 * (1.5 - x.attr.cor / 10))) && x.st.sconvolto == null) {
@@ -5305,18 +5845,21 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
       if (kind !== 'b') p *= 1 + 0.1 * (day - 1);
       if (noDeathStreak >= 3) p *= 1.7;
       if (alive().length <= 4) p *= 1.25;
+      if (kind === 'n') p *= MOD.night;
+      p *= wx('lethal', 1);
       return Math.min(0.9, Math.max(0.03, p));
     }
 
     function snapshot() {
-      const zones = {}, allies = {}, st = {}, inv = {}, kills = {}, rel = {};
+      const zones = {}, allies = {}, st = {}, inv = {}, kills = {}, rel = {}, vit = {};
       T.forEach((t) => {
-        zones[t.id] = t.zone; allies[t.id] = t.allyId; st[t.id] = Object.keys(t.st); inv[t.id] = t.inv.map((x) => x.name); kills[t.id] = t.kills;
+        zones[t.id] = t.zone; allies[t.id] = t.allyId; st[t.id] = Object.keys(t.st); inv[t.id] = t.inv.map((x) => x.name + (x.type === 'arma' && x.q ? ['', ' ★', ' ★★', ' ★★★'][x.q] : '')); kills[t.id] = t.kills;
+        if (t.alive) vit[t.id] = [Math.round(Math.max(0, t.hp)), Math.round(t.en), Math.round(t.mo), Math.round(t.food), M && (!M.infect || t.infected) ? Math.round(t.pr) : -1];
         const friends = T.filter((u) => u !== t && u.alive && aff(t, u) >= 40).map((u) => u.id);
         const enemies = T.filter((u) => u !== t && u.alive && aff(t, u) <= -40 && !t.grudges[u.id]).map((u) => u.id);
         rel[t.id] = { p: t.partner, g: Object.keys(t.grudges).filter((id) => byId[id].alive).map((id) => [id, t.grudges[id].why, t.grudges[id].victim]), o: Object.keys(t.owes).filter((id) => byId[id].alive), f: t.fame, tr: t.traitor, fr: friends, en: enemies, lost: t.lost };
       });
-      return { alive: alive().map((t) => t.id), zones, allies, st, inv, kills, rel };
+      return { alive: alive().map((t) => t.id), zones, allies, st, inv, kills, rel, vit, closed: [...closed] };
     }
 
     function tickStatus() {
@@ -5334,17 +5877,317 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
     }
     function sponsorDrop(events) {
       if (!pools.sponsor.length) return;
-      const cands = alive().filter((t) => t.fame >= 3).sort((a, b) => b.fame - a.fame);
-      if (!cands.length || !rng.chance(Math.min(0.75, 0.25 + cands[0].fame * 0.06))) return;
+      const cands = alive().filter((t) => t.fame >= (MOD.sponsor >= 1.4 ? 2 : 3)).sort((a, b) => b.fame - a.fame);
+      if (!cands.length || !rng.chance(Math.min(0.85, (0.25 + cands[0].fame * 0.06) * MOD.sponsor * wx('fame', 1)))) return;
       const P = cands[0];
       const opts = pools.sponsor.filter((e) => e.n === 1 && checkReq(e, [P]));
       const ev = rng.wpick(opts, (e) => weightFor(e, P));
       if (!ev) return;
-      const r = apply(ev, [P]); r.why = r.why || 'fama'; r.sponsor = true; events.push(r); stats.sponsors++;
+      const r = apply(ev, [P]); r.why = r.why || 'fama'; r.sponsor = true; events.push(r); stats.sponsors++; P.mo += 15; syncSt(P);
+    }
+
+    /* ---------- ecosistema: conseguenze automatiche ---------- */
+    const allyMates = (t) => (t.allyId != null ? [...(alliances.get(t.allyId) || [])].map((id) => byId[id]).filter((x) => x && x !== t && x.alive) : []);
+    const buddies = (t) => { const a = allyMates(t); if (t.partner && byId[t.partner] && byId[t.partner].alive && !a.includes(byId[t.partner])) a.push(byId[t.partner]); return a; };
+    const zoneName = (z) => theme.lex.luogo[z] || theme.lex.luogo[0];
+    const d6 = () => 2 + rng.int(6) + rng.int(6);
+
+    function meterTick(t, kind) {
+      if (!M || (M.infect && !t.infected)) return;
+      let g = M.gain[kind] || 0;
+      if (g > 0) {
+        if (M.alone && kind !== 'd' && !buddies(t).length) g += M.alone * (hasTrait(t, 'solitario') ? 0.3 : 1);
+        if (M.wound && t.hurtPh === phases.length) g += M.wound;
+        if (M.death && t.sawDeath === phases.length) g += M.death;
+        if (M.zoneMult) g *= ZP[t.zone][1];
+        if (M.id === 'freddo') g *= 1.25 - ZP[t.zone][2] * 0.5;
+        if (!M.infect) {
+          const r = M.resist.reduce((s2, a) => s2 + (t.attr[a] != null ? t.attr[a] : 5), 0) / M.resist.length;
+          g *= Math.max(0.35, 1.3 - r * 0.07);
+          if (buddies(t).length) g *= M.ally;
+          if (M.amulet && hasItem(t, 'amuleto')) g *= M.amulet;
+          if (hasTrait(t, 'superstizioso') && theme.id === 'horror') g *= 1.2;
+        } else g *= Math.max(0.6, 1.25 - t.attr.res * 0.05);
+      }
+      if (!M.infect) g += wx('pr', 0) * 0.6;
+      if (M.noDecay && g < 0) g = 0;
+      const was = t.pr;
+      t.pr = clamp(t.pr + g, 0, 100);
+      if (!M.infect && was < M.thr && t.pr >= M.thr) sys('meterUp', [t], { m: M.name.toLowerCase() }, { cat: 'hurt', why: 'arena' }, 1);
+      if (t.pr >= 100 && !M.infect) hurt(t, M.dmg, null, 'meter', true);
+    }
+
+    // l'infezione: si scopre, si cura, si viene cacciati, ci si trasforma
+    function infectionTick(t) {
+      if (!M || !M.infect || !t.infected) return;
+      if (t.pr >= 28 && t.pr < M.cure && hasItem(t, 'med')) {
+        const it = itemOf(t, 'med'); t.inv.splice(t.inv.indexOf(it), 1); t.infected = false; t.pr = 0; stats.cured++;
+        sys('selfMed', [t], { i: it.name }, { cat: 'heal', why: 'infezione' }, 3); return;
+      }
+      if (t.pr >= M.thr && !t.infKnown) {
+        t.infKnown = true;
+        const mates = buddies(t);
+        const doc = mates.find((x) => hasItem(x, 'med'));
+        if (doc && t.pr < M.cure) {
+          const it = itemOf(doc, 'med'); doc.inv.splice(doc.inv.indexOf(it), 1); t.infected = false; t.pr = 0; stats.cured++;
+          t.owes[doc.id] = 'cura'; addAff(t, doc, 30); doc.saves++; t.mo += 10;
+          sys('cure', [t, doc], {}, { cat: 'heal', why: 'infezione' }, 4); return;
+        }
+        const judge = allyMates(t).find((x) => x.partner !== t.id && (hasTrait(x, 'paranoico') || x.attr.emp <= 4 || rng.chance(0.4)));
+        if (judge && !hasTrait(judge, 'leale')) {
+          leaveAlliance(t); addAff(t, judge, -35); t.mo -= 25; stats.expelled++;
+          sys('expel', [t, judge], {}, { cat: 'betray', why: 'infezione' }, 4);
+        }
+      }
+      if (t.pr >= 100) { t.cause = { k: 'infect', ph: phases.length }; t.hp = 0; }
+    }
+
+    // la notte: si mangia, si cerca cibo, si divide, si cura, si dorme, si piazzano trappole
+    function nightEnd() {
+      const A = alive();
+      A.forEach((t) => {
+        while (t.food < 60 && hasItem(t, 'cibo')) eat(t);
+        // esplorazione: cibo dalla zona o bottino dei caduti
+        if (!hasItem(t, 'cibo') && t.food < 65) {
+          const loot = zoneLoot[t.zone];
+          if (loot && loot.length && rng.chance(0.3 + t.attr.sop * 0.03)) {
+            const { it, from } = loot.shift();
+            if (!itemOf(t, it.type) || it.type === 'cibo') {
+              t.inv.push(Object.assign({}, it)); t.items++; stats.items++; stats.looted++;
+              sys('scavenge', [t, byId[from]], { i: it.name, z: zoneName(t.zone) }, { cat: 'item', why: 'bottino', ids: [t.id] }, 2);
+              if (it.type === 'cibo' && t.food < 45) eat(t);
+            }
+          } else {
+            const p = (0.08 + t.attr.sop * 0.045 + (hasTrait(t, 'cacciatore') ? 0.15 : 0) + (hasItem(t, 'mappa') ? 0.12 * MOD.map : 0)) * ZP[t.zone][0] * MOD.forage * wx('forage', 1) * (t.en < 25 ? 0.6 : 1);
+            if (rng.chance(Math.min(0.92, p))) {
+              const hungry = t.food < 40; t.foraged++; stats.foraged++;
+              const nm = rng.pick(LEX.cibo || ['delle provviste']);
+              if (t.food < 50) t.food += 34; else { t.inv.push({ type: 'cibo', name: nm }); t.items++; }
+              if (hungry || rng.chance(0.15)) sys('forage', [t], {}, { cat: 'item', why: 'esplorazione' }, hungry ? 2 : 0);
+            }
+          }
+        }
+      });
+      // le alleanze dividono il cibo, oppure litigano
+      const seenG = new Set();
+      A.forEach((t) => {
+        if (t.allyId == null || seenG.has(t.allyId)) return; seenG.add(t.allyId);
+        const g = [t].concat(allyMates(t));
+        g.filter((x) => x.food < 30 && !hasItem(x, 'cibo')).forEach((h) => {
+          const donor = g.filter((x) => x !== h && hasItem(x, 'cibo') && x.food >= 35).sort((a, b) => b.attr.emp - a.attr.emp)[0];
+          if (!donor) return;
+          const will = donor.attr.emp / 10 + (hasTrait(donor, 'generoso') ? 0.5 : 0) + (hasTrait(donor, 'leale') ? 0.25 : 0) - (hasTrait(donor, 'avido') ? 0.7 : 0) + aff(donor, h) / 200 + (donor.partner === h.id ? 0.6 : 0) - (MOD.greed - 1) * 0.3;
+          const it = itemOf(donor, 'cibo');
+          if (rng.chance(clamp(will, 0.05, 0.95))) {
+            donor.inv.splice(donor.inv.indexOf(it), 1); h.food += 48; h.mo += 8; h.owes[donor.id] = h.owes[donor.id] || 'dono'; addAff(h, donor, 18); donor.shared++; stats.shared++;
+            sys('share', [donor, h], { i: it.name }, { cat: 'heal', why: 'alleanza' }, 3);
+          } else {
+            addAff(h, donor, -25); h.mo -= 8;
+            if (aff(h, donor) <= -40) addGrudge(h, donor, 'greed');
+            sys('greed', [donor, h], { i: it.name }, { cat: 'betray', why: 'alleanza' }, 3);
+          }
+          syncSt(h);
+        });
+      });
+      // cure: alleati e partner medicano i feriti
+      A.forEach((t) => {
+        if (!t.alive || t.hp >= 50) return;
+        const mates = buddies(t);
+        const doc = mates.find((x) => hasItem(x, 'med')) || mates.find((x) => hasTrait(x, 'guaritore') || (x.attr.int >= 7 && x.attr.emp >= 6) || x.partner === t.id);
+        if (doc && (hasItem(doc, 'med') || rng.chance(0.55 + doc.attr.emp * 0.03))) {
+          const it = itemOf(doc, 'med');
+          if (it) { doc.inv.splice(doc.inv.indexOf(it), 1); t.hp += 45 * MOD.heal; delete t.st.avvelenato; }
+          else t.hp += (16 + doc.attr.int * 1.5 + (hasTrait(doc, 'guaritore') ? 12 : 0)) * MOD.heal * wx('heal', 1);
+          t.owes[doc.id] = t.owes[doc.id] || 'cura'; addAff(t, doc, 16); doc.saves++; doc.nursed++; stats.nursed++; t.mo += 6;
+          if (M && M.cure && !M.infect && it) t.pr -= M.cure * 0.6;
+          sys(it ? 'nurseMed' : 'nurse', [doc, t], { i: it ? it.name : '' }, { cat: 'heal', why: 'cure' }, 3);
+        } else if (hasItem(t, 'med') && t.hp < 45) {
+          const it2 = itemOf(t, 'med'); t.inv.splice(t.inv.indexOf(it2), 1); t.hp += 40 * MOD.heal; delete t.st.avvelenato;
+          sys('selfMed', [t], { i: it2.name }, { cat: 'heal', why: 'cure' }, 2);
+        }
+        syncSt(t);
+      });
+      // sonno, guarigione naturale e umore
+      let watchMsg = 0;
+      A.forEach((t) => {
+        if (!t.alive) return;
+        const mates = buddies(t), alone = !mates.length;
+        let rest = 12 + t.attr.res * 1.1 + (t.allyId != null ? 10 : 0) + (t.partner ? 6 : 0) + ZP[t.zone][2] * 12 - (hasTrait(t, 'sonnambulo') ? 10 : 0) - (meterBad(t) ? 8 : 0) - (t.st.lutto != null ? 6 : 0);
+        if (alone && MOD.nightAlone) rest -= 10 * MOD.nightAlone;
+        t.en += rest / Math.max(0.8, wx('en', 1));
+        if (t.allyId != null && !watchMsg && rng.chance(0.12)) { const m = allyMates(t)[0]; if (m) { watchMsg++; sys('watch', [t, m], {}, { cat: 'ally', why: 'riposo' }, 0); } }
+        if (t.food >= 25 && t.en >= 20 && t.st.avvelenato == null) {
+          const wasF = t.hp < 55;
+          const helpers = mates.some((x) => hasTrait(x, 'guaritore')) ? 6 : 0;
+          t.hp += (2 + t.attr.res * 0.7 + (hasTrait(t, 'guaritore') ? 5 : 0) + helpers) * MOD.heal * wx('heal', 1);
+          if (wasF && t.hp >= 55 && rng.chance(0.25)) sys('healed', [t], {}, { cat: 'heal', why: 'riposo' }, 0);
+        }
+        if (t.st.malato != null && rng.chance(0.12 + t.attr.res * 0.04)) delete t.st.malato;
+        // una ferita lasciata senza cure si infetta
+        else if (t.hp < 45 && t.st.malato == null && rng.chance(Math.max(0.04, 0.3 - t.attr.res * 0.025) / MOD.heal)) {
+          t.st.malato = phases.length; t.cause = { k: t.cause && t.cause.by ? 'wound' : 'sick', by: t.cause ? t.cause.by : null, ph: t.cause && t.cause.by ? t.cause.ph : phases.length };
+          sys('woundSick', [t], {}, { cat: 'hurt', why: 'ferite' }, 2);
+        }
+        let dm = (t.allyId != null ? 4 : 0) + (t.partner ? 6 : 0) + (mates.some((x) => hasTrait(x, 'leader')) ? 3 : 0) + (t.fame >= 3 ? 2 : 0) +
+          (alone ? (hasTrait(t, 'solitario') ? 2 : -3) : 0) - (t.food < 25 ? 6 : 0) - (t.hp < 40 ? 6 : 0) - (meterBad(t) ? 5 : 0);
+        if (dm < 0) dm *= DR.mo;
+        t.mo += dm + (58 - t.mo) * 0.08;
+        syncSt(t);
+      });
+      // il morale a pezzi: conforto, furti tra alleati, abbandoni
+      A.forEach((t) => {
+        if (!t.alive || t.mo >= 24) return;
+        const p = t.partner && byId[t.partner] && byId[t.partner].alive ? byId[t.partner] : null;
+        if (p && rng.chance(0.7)) { t.mo += 22; addAff(t, p, 8); sys('comfort', [p, t], {}, { cat: 'love', why: 'morale' }, 2); }
+        else if (t.allyId != null && !hasTrait(t, 'leale')) {
+          const mark = allyMates(t).find((x) => hasItem(x, 'cibo'));
+          if (mark && (hasTrait(t, 'avido') || hasTrait(t, 'traditore') || t.food < 15) && rng.chance(0.6)) {
+            const it = itemOf(mark, 'cibo'); mark.inv.splice(mark.inv.indexOf(it), 1); t.inv.push(it); eat(t);
+            leaveAlliance(t); t.traitor = true; addGrudge(mark, t, 'steal');
+            sys('moraleSteal', [t, mark], { i: it.name }, { cat: 'betray', why: 'morale' }, 4);
+          } else if (rng.chance(0.4)) {
+            const m = allyMates(t); leaveAlliance(t); m.forEach((x) => addAff(x, t, -12));
+            sys('moraleLeave', [t], {}, { cat: 'none', why: 'morale' }, 3);
+          }
+        }
+        syncSt(t);
+      });
+      // ossigeno e pause caffè: chi sa arrangiarsi si rimette in sesto
+      if (M && (M.refill || M.coffee)) A.forEach((t) => {
+        if (!t.alive || t.pr < 40) return;
+        const p = 0.2 + t.attr.int * 0.05 + (hasItem(t, 'mappa') ? 0.15 * MOD.map : 0) + (t.allyId != null ? 0.1 : 0);
+        if (rng.chance(p)) {
+          const was = t.pr; t.pr -= 32 + rng.int(20); const m = allyMates(t)[0];
+          if (was >= M.thr || rng.chance(0.3)) { const k = TX('refill').length ? 'refill' : null; if (k) sys(k, m && rng.chance(0.4) ? [t, m] : [t], {}, { cat: 'heal', why: 'arena' }, 1); }
+          syncSt(t);
+        }
+      });
+      // trappole: chi le ha e sa usarle le piazza
+      A.forEach((t) => {
+        const tr = itemOf(t, 'trap');
+        if (!tr || !t.alive) return;
+        if ((t.attr.int >= 6 || hasTrait(t, 'ingegnoso') || hasTrait(t, 'cacciatore') || rng.chance(0.3)) && rng.chance(0.55)) {
+          t.inv.splice(t.inv.indexOf(tr), 1); traps.push({ owner: t.id, zone: t.zone, ph: phases.length, name: tr.name }); t.trapsSet++; stats.trapsSet++;
+          if (rng.chance(0.45)) sys('trapSet', [t], { i: tr.name, z: zoneName(t.zone) }, { cat: 'item', why: 'trappola' }, 1);
+        }
+      });
+      // la notte porta predatori, soprattutto per chi dorme solo e stanco
+      let attacks = 0;
+      rng.shuffle(alive()).forEach((t) => {
+        if (attacks >= 2 || !LEX.mostro) return;
+        const alone = !buddies(t).length;
+        const p = 0.035 * MOD.beast * wx('beast', 1) * ZP[t.zone][1] * (alone ? 1.6 * (MOD.nightAlone ? 1 + MOD.nightAlone * 0.5 : 1) : 0.45) * (t.en < 30 ? 1.5 : 1) * (hasTrait(t, 'furtivo') ? 0.6 : 1) * Math.sqrt(diff);
+        if (!rng.chance(p)) return;
+        attacks++; stats.beasts++;
+        const def = Math.max(t.attr.furt, t.attr.agi, t.attr.cor) + d6() + (hasItem(t, 'arma') ? 2 : 0) + (alone ? 0 : 3) + (t.st.esausto != null ? -2 : 0);
+        if (def >= 14) { t.survivedBeasts++; if (!alone) { allyMates(t).forEach((x) => addAff(t, x, 6)); sys('beastFend', [t], {}, { cat: 'ally', why: 'predatori' }, 2); } return; }
+        hurt(t, 22 + rng.int(18), null, 'beast', true);
+        if (t.hp > 0) sys('beastHit', [t], {}, { cat: 'hurt', why: 'predatori' }, 3);
+      });
+      if (alive().length > 1 && day > 1 && rng.chance(0.2)) { const ex = alive().find((t) => t.en < 15); if (ex) sys('exhausted', [ex], {}, { cat: 'hurt', why: 'riposo' }, 0); }
+      alive().forEach((t) => Object.keys(t.owes).forEach((id) => { if (!byId[id].alive) delete t.owes[id]; }));
+    }
+
+    // a ogni fase: consumi, veleni, emorragie, indicatore dell'arena, tempesta, trappole
+    function phaseTick(kind) {
+      const A = alive();
+      A.forEach((t) => {
+        const fm = DR.food * wx('food', 1) * (hasTrait(t, 'goloso') ? 1.4 : 1) * (t.attr.sop >= 8 ? 0.75 : t.attr.sop <= 3 ? 1.2 : 1);
+        t.food -= ({ b: 5, d: 10, n: 8, dis: 10, f: 2 }[kind] || 7) * fm;
+        t.en -= ({ b: 12, d: 15, n: 10, dis: 15, f: 10 }[kind] || 12) * DR.en * wx('en', 1) * (t.st.ubriaco != null ? 1.3 : 1);
+        if (t.food < 35 && hasItem(t, 'cibo')) eat(t);
+        if (t.st.avvelenato != null) {
+          if (rng.chance(0.08 + t.attr.res * 0.03)) { delete t.st.avvelenato; if (rng.chance(0.3)) sys('poisonCleared', [t], {}, { cat: 'heal', why: 'cure' }, 0); }
+          else hurt(t, Math.max(3, 10 - t.attr.res * 0.6), null, 'poison', true);
+        }
+        if (t.st.malato != null) hurt(t, Math.max(2, 6 - t.attr.res * 0.3), null, 'sick', true);
+        if (t.food <= 0) hurt(t, 9, null, 'starve', true);
+        if (t.en <= 0) hurt(t, 5, null, 'exhaust', true);
+        if (t.hp < 25 && t.hp > 0) {
+          const it = itemOf(t, 'med');
+          if (it) { t.inv.splice(t.inv.indexOf(it), 1); t.hp += 40 * MOD.heal; delete t.st.avvelenato; sys('selfMed', [t], { i: it.name }, { cat: 'heal', why: 'cure' }, 2); }
+          else { const c = t.cause; t.hp -= Math.max(2, 7 - t.attr.res * 0.4); if (t.hp < 15 && rng.chance(0.3)) sys('grave', [t], {}, { cat: 'hurt', why: 'ferite' }, 1); t.cause = c; }
+        }
+        meterTick(t, kind);
+        infectionTick(t);
+        const ex = itemOf(t, 'esplosivo');
+        if (ex && t.st.ubriaco != null && rng.chance(0.15)) {
+          t.inv.splice(t.inv.indexOf(ex), 1); hurt(t, 38, null, 'accident', true); t.accItem = ex.name;
+          if (t.hp > 0) sys('accident', [t], { i: ex.name }, { cat: 'hurt', why: 'incidente' }, 2);
+        }
+        syncSt(t);
+      });
+      // la tempesta del Battle Royale
+      if (closed.size) {
+        let msgs = 0;
+        alive().forEach((t) => {
+          if (!closed.has(t.zone)) return;
+          const z = zoneName(t.zone);
+          const esc2 = 0.3 + t.attr.agi * 0.05 + t.en / 260 + (hasItem(t, 'mappa') ? 0.2 : 0);
+          if (rng.chance(esc2)) { if (msgs < 1 && rng.chance(0.25)) { msgs++; sys('stormEscape', [t], { z }, { cat: 'none', why: 'tempesta' }, 0); } }
+          else { hurt(t, (14 + rng.int(14)) * wx('storm', 1), null, 'storm', true); t.stormZ = z; if (t.hp > 0 && msgs < 2) { msgs++; sys('storm', [t], { z }, { cat: 'hurt', why: 'tempesta' }, 2); } }
+          const open = [...Array(zoneCount).keys()].filter((i) => !closed.has(i));
+          t.zone = rng.pick(open);
+        });
+      }
+      // le trappole scattano
+      for (let k = traps.length - 1; k >= 0; k--) {
+        const tp = traps[k], owner = byId[tp.owner];
+        if (phases.length - tp.ph > 9) { traps.splice(k, 1); continue; }
+        if (tp.ph >= phases.length) continue;
+        const here = rng.shuffle(alive().filter((x) => x.zone === tp.zone && x.id !== tp.owner));
+        for (const v of here) {
+          if (!rng.chance(0.16 * MOD.trap * wx('trap', 1))) continue;
+          traps.splice(k, 1);
+          const z = zoneName(tp.zone);
+          const dodge = Math.max(v.attr.furt, v.attr.int, v.attr.agi) + d6() + (hasTrait(v, 'fortunato') ? 1 : 0) + (hasTrait(v, 'paranoico') ? 1 : 0);
+          if (dodge >= 15) { addAff(v, owner, -15); sys('trapDodge', [owner, v], { z }, { cat: 'none', why: 'trappola' }, 2); break; }
+          stats.trapHits++;
+          const friendly = owner.allyId != null && owner.allyId === v.allyId;
+          hurt(v, 32 + rng.int(22), owner.alive && !friendly ? owner : null, friendly ? 'wound' : 'trap', true);
+          v.trapZ = z;
+          if (friendly) { addAff(v, owner, -30); if (v.hp > 0) sys('trapAlly', [owner, v], { z }, { cat: 'hurt', why: 'trappola' }, 3); }
+          else { if (owner.alive) { v.cause = { k: 'trap', by: owner.id, ph: phases.length }; addGrudge(v, owner, 'attack'); } if (v.hp > 0) sys('trapHit', [owner, v], { z }, { cat: 'hurt', why: 'trappola' }, 3); }
+          break;
+        }
+      }
+    }
+
+    // chi è sceso a zero muore, e la sua morte ha un colpevole se c'è
+    const CAUSE = { wound: ['woundDeath', 'ferite'], poison: ['poisonDeath', 'ferite'], sick: ['sickDeath', 'ferite'], starve: ['starveDeath', 'stenti'], exhaust: ['exhaustDeath', 'stenti'], meter: ['meterDeath', 'arena'], infect: ['meterDeath', 'infezione'], storm: ['stormDeath', 'tempesta'], beast: ['beastDeath', 'predatori'], trap: ['trapKill', 'trappola'], accident: ['accidentDeath', 'incidente'] };
+    function resolveVitals() {
+      let dying = alive().filter((t) => t.hp <= 0);
+      if (!dying.length) return;
+      const keep = alive().length - dying.length;
+      if (keep < 1) { dying.sort((a, b) => b.hp - a.hp); const s2 = dying.shift(); s2.hp = 5; s2.pr = Math.min(s2.pr, 90); if (s2.infected) s2.pr = 80; syncSt(s2); }
+      if (cfg.teamWin) { /* nessuna eccezione: anche le squadre muoiono di stenti */ }
+      dying.forEach((t) => {
+        if (!t.alive) return;
+        const c = t.cause || { k: 'wound' };
+        let k = (CAUSE[c.k] || CAUSE.wound)[0];
+        const why = (CAUSE[c.k] || CAUSE.wound)[1];
+        let K = c.by && byId[c.by] && byId[c.by].alive && byId[c.by] !== t && phases.length - c.ph <= 8 ? byId[c.by] : null;
+        if (K && K.allyId != null && K.allyId === t.allyId) K = null;
+        if (cfg.teamWin && K && K.team === t.team) K = null;
+        if (k === 'woundDeath' && !K) k = 'woundDeathAny';
+        if (k === 'trapKill' && !K) k = 'woundDeathAny';
+        let people = k === 'trapKill' ? [K, t] : K ? [t, K] : [t];
+        let mercy = null;
+        if (c.k === 'infect') { mercy = buddies(t).find((x) => x.attr.cor >= 6); if (mercy && rng.chance(0.5)) { k = 'mercy'; people = [t, mercy]; mercy.mo -= 20; } else mercy = null; }
+        const z = t.stormZ || t.trapZ || zoneName(t.zone);
+        const tx = sysText(k, people, { z, i: t.accItem || '', m: M ? M.name.toLowerCase() : '' }) || sysText('woundDeathAny', [t], {});
+        const out = [];
+        t.deathKind = c.k;
+        kill(t, K ? [K] : [], tx, out);
+        if (K && c.k === 'trap') { K.trapKills++; }
+        stats.causes[c.k] = (stats.causes[c.k] || 0) + 1;
+        SYS.push({ pri: 9, ev: { html: tx.html, plain: tx.plain, ids: people.map((p) => p.id), deaths: [t.id], lethal: true, origin: 'sys', cat: K ? 'kill' : 'death', why, echo: out.slice(0, 3) } });
+      });
     }
 
     function runPhase(kind, pool, title, intro, opt) {
-      const events = [];
+      const events = pendingNotes.splice(0);
+      SYS = [];
       tickStatus();
       maybeDissolve(events);
       if (kind === 'd' && day >= 2) sponsorDrop(events);
@@ -5373,9 +6216,19 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
         }
         if (!done) { events.push(apply(rng.pick(fallback), [P])); un.delete(P.id); }
       }
+      // conseguenze automatiche della fase
+      if (kind === 'n') nightEnd();
+      phaseTick(kind);
+      resolveVitals();
+      const deathsSys = SYS.filter((x) => x.ev.deaths.length).map((x) => x.ev);
+      const capN = kind === 'n' ? 5 : kind === 'b' ? 1 : 3;
+      const sysDead = new Set(deathsSys.flatMap((e) => e.deaths));
+      const rest = SYS.filter((x) => !x.ev.deaths.length && x.ev.ids.every((id) => byId[id].alive || sysDead.has(id))).map((x) => [x, x.pri + rng.f()]).sort((a, b) => b[1] - a[1]).slice(0, capN).map((x) => x[0].ev);
+      events.push(...rest, ...deathsSys);
+      SYS = [];
       const died = before - alive().length;
       noDeathStreak = died ? 0 : noDeathStreak + 1;
-      phases.push(Object.assign({ kind, day, title, intro, events, snap: snapshot() }, opt || {}));
+      phases.push(Object.assign({ kind, day, title, intro, events, snap: snapshot(), meteo: W.n ? { n: W.n, d: W.d } : null }, opt || {}));
     }
 
     function runLovers() {
@@ -5420,14 +6273,28 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
       phases.push({ kind: 'finale', day, title: 'Lo scontro finale', intro: theme.intro.finale, events, snap: snapshot() });
     }
 
-    function endOfDay() {
-      // la fame: chi non mangia da due giorni si indebolisce, chi ha cibo lo usa
-      alive().forEach((t) => {
-        if (day - t.fed >= 1 && hasItem(t, 'cibo')) { const i = t.inv.findIndex((x) => x.type === 'cibo'); t.inv.splice(i, 1); t.fed = day; delete t.st.affamato; }
-        else if (day - t.fed >= (hasTrait(t, 'goloso') ? 1 : t.attr.sop >= 8 ? 3 : 2) && t.st.affamato == null) t.st.affamato = phases.length;
-      });
-      // i debiti troppo vecchi si trasformano in risentimento
-      alive().forEach((t) => Object.keys(t.owes).forEach((id) => { if (!byId[id].alive) delete t.owes[id]; }));
+    // il meteo del giorno e, nel Battle Royale, la zona che si stringe
+    function newDay() {
+      const list = R.meteo || [];
+      if (list.length) {
+        const calm = { n: '', d: '', fx: {} };
+        const pick = rng.chance(day === 1 ? 0.35 : 0.72) ? rng.pick(list.filter((m) => m.n !== W.n)) : calm;
+        W = pick || calm;
+        if (W.n) {
+          stats.meteo.push({ day, n: W.n });
+          const html = ((ECO.txt && ECO.txt.meteo) || '<b>{n}.</b> {d}').replace('{n}', esc(W.n)).replace('{d}', esc(W.d));
+          pendingNotes.push({ html, plain: W.n + '. ' + W.d, ids: [], deaths: [], lethal: false, note: true, meteo: true });
+        }
+      }
+      if (MOD.storm && day >= 2) {
+        const open = [...Array(zoneCount).keys()].filter((i) => !closed.has(i));
+        const n = wx('storm', 1) > 1.3 ? 2 : 1;
+        for (let k = 0; k < n && open.length > 2; k++) {
+          const z = open.splice(rng.int(open.length), 1)[0]; closed.add(z);
+          const tx = sysText('stormClose', [], { z: zoneName(z) });
+          if (tx) pendingNotes.push({ html: tx.html, plain: tx.plain, ids: [], deaths: [], lethal: false, note: true });
+        }
+      }
     }
     function pushFallen() {
       const n = pendingFallen.length;
@@ -5442,6 +6309,7 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
     const usedDisasters = new Set();
     while (true) {
       day++;
+      newDay();
       if (day === 1) runPhase('b', pools.b, theme.phase.b, theme.intro.b);
       if (isEnded() || loversEnd()) break;
       runPhase('d', pools.d, theme.phase.d + ' ' + day, theme.intro.d);
@@ -5459,7 +6327,6 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
       }
       if (isEnded() || loversEnd()) break;
       runPhase('n', pools.n, theme.phase.n + ' ' + day, theme.intro.n);
-      endOfDay();
       if (isEnded() || loversEnd()) break;
       pushFallen();
       if (day >= maxDays) { runFinale(); break; }
@@ -5477,6 +6344,8 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
       inv: t.inv.map((x) => x.name), st: Object.keys(t.st),
       fame: t.fame, revenges: t.revenges, saves: t.saves, repaid: t.repaid, amulets: t.amulets, traitor: t.traitor, attr: t.attr, tests: t.tests, testsPassed: t.testsPassed,
       partner: t.partner, exPartner: t.exPartner,
+      foraged: t.foraged, nursed: t.nursed, shared: t.shared, trapKills: t.trapKills, trapsSet: t.trapsSet, survivedBeasts: t.survivedBeasts,
+      deathCause: t.alive ? null : t.deathKind || null,
     }));
     return { version: 2, theme: theme.id, adult, seed, days: day, phases, tributes: stripped, winners: winners.map((t) => t.id), stats };
   }
@@ -5978,7 +6847,22 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
     heal: ['Aiuto', 'Aiuto'], item: ['Bottino', 'Asso nella manica'], hurt: ['Guaio', 'Colpo basso'], love: ['Amore', 'Amore'], none: ['', ''],
   };
   const ATTRN = Object.fromEntries(D.attrs.map((a) => [a.id, a.name]));
-  const WHY = { carattere: 'Carattere', vendetta: 'Vendetta', debito: 'Debito', coppia: 'Coppia', lutto: 'Lutto', fama: 'Fama', reputazione: 'Reputazione', oggetto: 'Oggetto', condizione: 'Conseguenza' };
+  const WHY = { carattere: 'Carattere', vendetta: 'Vendetta', debito: 'Debito', coppia: 'Coppia', lutto: 'Lutto', fama: 'Fama', reputazione: 'Reputazione', oggetto: 'Oggetto', condizione: 'Conseguenza',
+    conseguenza: 'Conseguenza', ferite: 'Ferite', stenti: 'Stenti', infezione: 'Infezione', tempesta: 'Tempesta', predatori: 'Pericolo notturno', trappola: 'Trappola', alleanza: 'Alleanza', cure: 'Cure', morale: 'Morale', riposo: 'Notte', esplorazione: 'Esplorazione', bottino: 'Bottino', incidente: 'Incidente' };
+  const ECO = D.eco || { arenas: {} };
+  const arenaOf = (id) => ECO.arenas[id] || {};
+  const vitLabels = (th) => (th && th.soft ? ECO.labelsSoft : ECO.labels) || { hp: 'Salute', en: 'Energia', mo: 'Morale', food: 'Sazietà' };
+  const whyLabel = (e, theme) => (e.why === 'arena' && arenaOf(theme.id).meter ? arenaOf(theme.id).meter.name : WHY[e.why] || '');
+  const CAUSE_TXT = { wound: 'ferite', starve: 'fame', exhaust: 'sfinimento', poison: 'veleno', sick: 'malattia', infect: 'infezione', storm: 'tempesta', beast: 'aggressione notturna', trap: 'trappola', accident: 'incidente' };
+  const causeTxt = (t, theme) => (t.deathCause === 'meter' && arenaOf(theme.id).meter ? arenaOf(theme.id).meter.name.toLowerCase() : CAUSE_TXT[t.deathCause] || '');
+  function vbars(v, theme, full) {
+    if (!v) return '';
+    const lb = vitLabels(theme), m = arenaOf(theme.id).meter;
+    const rows = [['hp', lb.hp, v[0]], ['en', lb.en, v[1]], ['mo', lb.mo, v[2]], ['food', lb.food, v[3]]];
+    if (m && v[4] >= 0) rows.push(['pr', m.name, v[4]]);
+    if (!full) return '<span class="vmini" aria-hidden="true">' + rows.slice(0, 3).map(([k, , x]) => '<i class="' + k + (x < 25 ? ' low' : '') + '"><b style="width:' + x + '%"></b></i>').join('') + '</span>';
+    return '<div class="vbars">' + rows.map(([k, n, x]) => { const bad = k === 'pr' ? x >= (m.thr || 60) : x < 25; return '<div class="vbar ' + k + (bad ? ' bad' : '') + '"><span>' + esc(n) + '</span><i><b style="width:' + x + '%"></b></i><em>' + x + '</em></div>'; }).join('') + '</div>';
+  }
   const KIND = { b: 'Apertura', d: 'Giorno', n: 'Notte', f: 'Evento speciale', dis: 'Disastro', fallen: 'Bilancio', finale: 'Finale' };
   const DIFFS = [
     ['bassa', 'Bassa', 'Partite lunghe, pochi morti', 1], ['normale', 'Normale', 'L\'equilibrio classico', 2],
@@ -6488,10 +7372,20 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
         '<div><h3>' + (t.soft ? 'Armi improprie' : 'Armi') + '</h3><ul>' + t.lex.arma.slice(0, 6).map((x) => '<li>' + esc(strip(x)) + '</li>').join('') + '</ul></div>' +
         '<div><h3>Pericoli</h3><ul>' + t.lex.mostro.map((x) => '<li>' + esc(strip(x)) + '</li>').join('') + '</ul></div>' +
       '</div>' +
+      rulesHTML(t) +
       '<div><h3 class="sub" style="margin-bottom:8px">Alcuni disastri</h3><div class="chips">' + dz.slice(0, 10).map((x) => '<span class="chip dim">' + esc(x) + '</span>').join('') + '<span class="chip dim">e altri ' + Math.max(0, dz.length - 10) + '</span></div></div>' +
       (sample ? '<div class="sample"><h3 class="sub">Un assaggio' + (S.cast.length >= 4 ? ' con il tuo cast' : '') + '</h3>' + sample + '</div>' : '');
     AN.field($('#arenaPreview .apv-banner'), t.id, { intensity: 1.2 });
     const ap = $('#arenaPreview'); ap.classList.remove('swap'); void ap.offsetWidth; ap.classList.add('swap');
+  }
+  function rulesHTML(t) {
+    const A = arenaOf(t.id); if (!A.rule) return '';
+    const m = A.meter, lb = vitLabels(t);
+    return '<div class="rules-arena"><div class="ra-head"><span class="eyebrow">Regole dell\'arena</span><h3>' + esc(A.rule) + '</h3></div><p>' + esc(A.desc) + '</p>' +
+      '<div class="ra-grid"><div><h4>Contano di più</h4><div class="chips">' + (A.key || []).map((k, i) => '<span class="chip' + (i === 0 ? ' st' : '') + '">' + esc(ECO.attrNames[k] || k) + '</span>').join('') + '</div></div>' +
+      '<div><h4>Da tenere d\'occhio</h4><div class="chips"><span class="chip dim">' + esc(lb.hp) + '</span><span class="chip dim">' + esc(lb.en) + '</span><span class="chip dim">' + esc(lb.mo) + '</span><span class="chip dim">' + esc(lb.food) + '</span>' + (m ? '<span class="chip st" title="' + esc(m.desc) + '">' + esc(m.name) + '</span>' : '') + '</div></div></div>' +
+      (m ? '<p class="help"><b>' + esc(m.name) + ':</b> ' + esc(m.desc) + '</p>' : '') +
+      ((A.meteo || []).length ? '<div><h4>Meteo possibile</h4><div class="chips">' + A.meteo.map((x) => '<span class="chip dim" title="' + esc(x.d) + '">' + esc(x.n) + '</span>').join('') + '</div></div>' : '') + '</div>';
   }
   function renderStartSum() {
     const t = THEMES[S.settings.theme];
@@ -6586,13 +7480,13 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
   /* =============== DIRETTA =============== */
   function evHTML(e, tributes, theme, anim, plain, delay) {
     const by = tributes ? Object.fromEntries(tributes.map((t) => [t.id, t])) : BY;
-    if (e.note) return '<div class="ev note' + (anim ? ' in' : '') + '" style="--d:' + (delay || 0) + 'ms"><p>' + e.html + '</p></div>';
+    if (e.note) return '<div class="ev note' + (e.meteo ? ' meteo' : '') + (anim ? ' in' : '') + '" style="--d:' + (delay || 0) + 'ms"><p>' + e.html + '</p></div>';
     const cat = e.cat || 'none';
     const lbl = CAT[cat][theme.soft ? 1 : 0];
     const avs = '<span class="avs">' + e.ids.slice(0, 4).map((id) => avHTML(by[id], { dead: e.deaths.includes(id), btn: !plain })).join('') + '</span>';
     const chip = lbl ? '<span class="cat">' + IC[cat] + (e.deaths.length > 1 && (cat === 'kill' || cat === 'death') ? e.deaths.length + ' ' + (theme.soft ? 'fuori' : 'morti') : lbl) + '</span>' : '<span></span>';
     const fix = (h) => (plain ? h.replace(/<b class="nm"[^>]*>/g, '<b>') : linkify(h));
-    const why = e.test ? '<span title="Tiro ' + e.test.roll + ' contro soglia ' + e.test.dc + '">Prova di ' + esc(ATTRN[e.test.attr] || e.test.attr) + ' · <span class="dice"><span class="roll">' + e.test.roll + '</span>/' + e.test.dc + '</span> · ' + (e.test.pass ? 'superata' : 'fallita') + '</span>' : e.sponsor ? 'Sponsor' : WHY[e.why] || '';
+    const why = e.test ? '<span title="Tiro ' + e.test.roll + ' contro soglia ' + e.test.dc + '">Prova di ' + esc(ATTRN[e.test.attr] || e.test.attr) + ' · <span class="dice"><span class="roll">' + e.test.roll + '</span>/' + e.test.dc + '</span> · ' + (e.test.pass ? 'superata' : 'fallita') + '</span>' : e.sponsor ? 'Sponsor' : whyLabel(e, theme);
     const echo = (e.echo || []).length ? '<ul class="echo">' + e.echo.map((x) => '<li class="' + (x.cls || '') + '">' + fix(x.html) + '</li>').join('') + '</ul>' : '';
     return '<div class="ev' + (e.deaths.length ? ' lethal' : '') + (anim ? ' in fx-' + cat + (e.sponsor ? ' fx-sponsor' : '') : '') + '" style="--cc:var(--c-' + cat + ');--d:' + (delay || 0) + 'ms">' + avs + '<div class="evbody">' + (why ? '<span class="why' + (e.test ? (e.test.pass ? ' ok' : ' ko') : '') + '">' + why + '</span>' : '') + '<p>' + fix(e.html) + '</p>' + echo + '</div>' + chip + '</div>';
   }
@@ -6612,7 +7506,7 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
     AN.field(bcs, theme.id, { intensity: AN.intensityFor(ph.kind, ph.snap.alive.length / total) });
     AN.phaseFx($('.broadcast'), ph.kind, theme.id, forward, { deaths: ph.kind === 'fallen' ? ph.deaths.length : 0 });
     $('#bcPhase').textContent = 'Fase ' + (i + 1) + ' / ' + P.length;
-    $('#bcKind').textContent = KIND[ph.kind] + (ph.day ? ' · giorno ' + ph.day : '');
+    $('#bcKind').textContent = KIND[ph.kind] + (ph.day ? ' · giorno ' + ph.day : '') + (ph.meteo && ph.meteo.n ? ' · ' + ph.meteo.n : '');
     $('#phTitle').textContent = ph.title; if (forward) AN.kinetic($('#phTitle'), ph.kind === 'dis' ? 'shake' : ph.kind === 'n' ? 'fade' : 'drop');
     $('#phIntro').textContent = ph.intro || '';
     if (forward) AN.countTo($('#aliveBig'), ph.snap.alive.length, { from: prevAlive, dur: 1100 }); else $('#aliveBig').textContent = ph.snap.alive.length; $('#aliveTot').textContent = '/' + total;
@@ -6672,19 +7566,23 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
       const zones = theme.lex.luogo.map((z) => z.replace(/^(il |lo |la |l'|i |gli |le )/i, ''));
       const hot = {};
       ph.events.forEach((e) => e.deaths.length && e.ids.forEach((id) => (hot[ph.snap.zones[id]] = 1)));
+      const ZP = arenaOf(theme.id).zones || [], shut = new Set(ph.snap.closed || []);
+      const dots = (v) => { const n = v >= 1.35 ? 3 : v >= 0.95 ? 2 : 1; return '<b class="zl" aria-label="' + ['bassa', 'media', 'alta'][n - 1] + '">' + '●'.repeat(n) + '<span>' + '●'.repeat(3 - n) + '</span></b>'; };
       h = '<div class="map">' + zones.map((z, zi) => {
         const here = ph.snap.alive.filter((id) => ph.snap.zones[id] === zi);
-        return '<div class="zone' + (hot[zi] ? ' hot' : '') + '"><span class="zn"><span>' + esc(z) + '</span></span><div class="dots">' + here.map((id) => avHTML(BY[id], { btn: true })).join('') + '</div></div>';
-      }).join('') + '</div><p class="help" style="margin-top:10px">Tocca un volto per aprire la scheda del concorrente.</p>';
+        const p = ZP[zi] || [1, 1, 0.5];
+        return '<div class="zone' + (hot[zi] ? ' hot' : '') + (shut.has(zi) ? ' closed' : '') + '"><span class="zn"><span>' + esc(z) + '</span></span><div class="dots">' + here.map((id) => avHTML(BY[id], { btn: true })).join('') + '</div>' +
+          '<span class="zprops" title="Risorse e pericolo della zona"><span>risorse ' + dots(p[0]) + '</span><span>pericolo ' + dots(p[1]) + '</span>' + (shut.has(zi) ? '<span class="ztag">tempesta</span>' : '') + '</span></div>';
+      }).join('') + '</div><p class="help" style="margin-top:10px">Le zone ricche danno più cibo, quelle pericolose più agguati' + (shut.size ? '; in grigio quelle inghiottite dalla tempesta' : '') + '. Tocca un volto per aprire la scheda.</p>';
     } else if (sideTab === 'fallen') {
       const dead = SIM.tributes.filter((t) => !t.alive && t.deathPhase <= i).sort((a, b) => b.order - a.order);
-      h = dead.length ? '<div class="plist">' + dead.map((t) => '<button type="button" class="prow" data-prof="' + esc(t.id) + '">' + avHTML(t, { dead: true }) + '<span style="min-width:0"><span class="pn">' + esc(t.name) + '</span><span class="ps">' + (t.killerIds.length ? 'per mano di ' + esc(t.killerIds.map((k) => BY[k].name).join(', ')) : 'vittima dell\'arena') + '</span></span><span class="pk">G' + t.deathDay + '</span></button>').join('') + '</div>' : '<p class="help">Ancora nessuno.</p>';
+      h = dead.length ? '<div class="plist">' + dead.map((t) => '<button type="button" class="prow" data-prof="' + esc(t.id) + '">' + avHTML(t, { dead: true }) + '<span style="min-width:0"><span class="pn">' + esc(t.name) + '</span><span class="ps">' + (t.killerIds.length ? 'per mano di ' + esc(t.killerIds.map((k) => BY[k].name).join(', ')) + (causeTxt(t, theme) ? ' · ' + causeTxt(t, theme) : '') : causeTxt(t, theme) ? 'per ' + causeTxt(t, theme) : 'vittima dell\'arena') + '</span></span><span class="pk">G' + t.deathDay + '</span></button>').join('') + '</div>' : '<p class="help">Ancora nessuno.</p>';
     } else if (sideTab === 'alive') {
       const al = SIM.tributes.filter((t) => aliveSet.has(t.id)).sort((a, b) => (ph.snap.kills[b.id] || 0) - (ph.snap.kills[a.id] || 0));
       h = '<div class="plist">' + al.map((t) => {
         const st = ph.snap.st[t.id] || [], inv = ph.snap.inv[t.id] || [];
         const sub = [st.length ? st.map((s) => L.STATUS_LABEL[s] || s).join(', ') : 'in forma', inv.length ? plural(inv.length, 'oggetto', 'oggetti') : ''].filter(Boolean).join(' · ');
-        return '<button type="button" class="prow" data-prof="' + esc(t.id) + '">' + avHTML(t) + '<span style="min-width:0"><span class="pn">' + esc(t.name) + '</span><span class="ps">' + esc(sub) + '</span></span><span class="pk">' + (ph.snap.kills[t.id] || 0) + (soft ? ' elim.' : ' ucc.') + '</span></button>';
+        return '<button type="button" class="prow" data-prof="' + esc(t.id) + '">' + avHTML(t) + '<span style="min-width:0"><span class="pn">' + esc(t.name) + '</span><span class="ps">' + esc(sub) + '</span>' + vbars((ph.snap.vit || {})[t.id], theme, false) + '</span><span class="pk">' + (ph.snap.kills[t.id] || 0) + (soft ? ' elim.' : ' ucc.') + '</span></button>';
       }).join('') + '</div>';
     } else {
       const groups = {};
@@ -6753,23 +7651,26 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
           '<div class="chips">' + (t.traits.length ? t.traits.map((x) => '<span class="chip" title="' + esc(TRAITS[x].desc) + '">' + esc(TRAITS[x].name) + '</span>').join('') : '<span class="chip dim">Nessun tratto</span>') + '</div></div></div>' +
         '<div class="pstats"><div><b>' + kills + '</b><span>' + (soft ? 'eliminazioni' : 'uccisioni') + '</span></div><div><b>' + hist.length + '</b><span>eventi vissuti</span></div><div><b>' + (dead ? t.deathDay : SIM.phases[i].day || 1) + '</b><span>' + (dead ? 'giorno dell\'uscita' : 'giorni in gara') + '</span></div></div>' +
         (dead ? '<div><div class="sub" style="margin-bottom:6px">Come è andata</div><div class="ev lethal" style="--cc:var(--c-kill);grid-template-columns:minmax(0,1fr)"><p>' + linkify(t.deathHtml) + '</p></div></div>' : '') +
+        (!dead && snap.vit && snap.vit[id] ? '<div><div class="sub" style="margin-bottom:8px">Condizione fisica</div>' + vbars(snap.vit[id], theme, true) + '</div>' : '') +
+        (dead && t.deathCause && causeTxt(t, theme) ? '<p class="help">Causa: ' + esc(causeTxt(t, theme)) + (t.killerIds.length ? ', per mano di ' + esc(t.killerIds.map((k) => BY[k].name).join(', ')) : '') + '.</p>' : '') +
         (!dead ? '<div class="row" style="gap:16px;align-items:flex-start">' +
           '<div style="flex:1;min-width:140px"><div class="sub" style="margin-bottom:6px">Condizioni</div><div class="chips">' + (st.length ? st.map((s) => '<span class="chip st">' + esc(L.STATUS_LABEL[s] || s) + '</span>').join('') : '<span class="chip dim">In forma</span>') + '</div></div>' +
           '<div style="flex:1;min-width:140px"><div class="sub" style="margin-bottom:6px">Zaino</div><div class="chips">' + (inv.length ? inv.map((x) => '<span class="chip dim">' + esc(x) + '</span>').join('') : '<span class="chip dim">Vuoto</span>') + '</div></div></div>' +
           '<div><div class="sub" style="margin-bottom:6px">Alleati</div><div class="row">' + (ally.length ? ally.map((x) => avHTML(BY[x], { btn: true })).join('') : '<span class="help">Nessuno, per ora.</span>') + '</div></div>' : '') +
         relHTML(id, snap, dead, atRes) +
-        attrHTML(t) +
+        attrHTML(t, theme) +
         '<div><div class="sub" style="margin-bottom:8px">La sua storia' + (atRes ? '' : ' finora') + '</div><div class="ptl">' + (hist.length ? hist.map(({ e, p }) => '<div class="it" style="--cc:var(--c-' + (e.cat || 'none') + ')"><span>' + (p.kind === 'b' ? 'Inizio' : 'G' + p.day + ' ' + (p.kind === 'n' ? 'notte' : p.kind === 'd' ? 'giorno' : KIND[p.kind].toLowerCase())) + '</span><p>' + linkify(e.html) + '</p></div>').join('') : '<p class="help">Nessun evento ancora.</p>') + '</div></div>' +
       '</div>';
     if (!$('#profDlg').open) $('#profDlg').showModal();
     $('#profDlg').scrollTop = 0;
   }
 
-  function attrHTML(t) {
+  function attrHTML(t, theme) {
     if (!t.attr) return '';
     const tests = t.tests ? ' · prove superate ' + t.testsPassed + ' su ' + t.tests : '';
-    return '<div><div class="sub" style="margin-bottom:8px">Caratteristiche' + tests + '</div><div class="abars">' +
-      D.attrs.map((a) => { const v = t.attr[a.id] != null ? t.attr[a.id] : 5; return '<div class="abar" title="' + esc((D.attrDesc || {})[a.id] || '') + '"><span>' + a.name + '</span><i><b style="width:' + v * 10 + '%" class="' + (v >= 8 ? 'hi' : v <= 3 ? 'lo' : '') + '"></b></i><em>' + v + '</em></div>'; }).join('') + '</div></div>';
+    const key = theme ? arenaOf(theme.id).key || [] : [];
+    return '<div><div class="sub" style="margin-bottom:8px">Caratteristiche' + tests + (key.length ? ' · <span class="keymark">★</span> contano di più in quest\'arena' : '') + '</div><div class="abars">' +
+      D.attrs.map((a) => { const v = t.attr[a.id] != null ? t.attr[a.id] : 5; return '<div class="abar' + (key.includes(a.id) ? ' key' : '') + '" title="' + esc((D.attrDesc || {})[a.id] || '') + '"><span>' + (key.includes(a.id) ? '<span class="keymark">★</span> ' : '') + a.name + '</span><i><b style="width:' + v * 10 + '%" class="' + (v >= 8 ? 'hi' : v <= 3 ? 'lo' : '') + '"></b></i><em>' + v + '</em></div>'; }).join('') + '</div></div>';
   }
   function relHTML(id, snap, dead, atRes) {
     const r = (snap.rel || {})[id]; if (!r) return '';
@@ -6795,6 +7696,25 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
   }
 
   /* =============== ESITO =============== */
+  function ecoSummary(st, theme) {
+    if (!st.causes) return '';
+    const m = arenaOf(theme.id).meter;
+    const lbl = { wound: 'per le ferite', starve: 'di fame', exhaust: 'di sfinimento', poison: 'di veleno', sick: 'di malattia', infect: 'trasformati', storm: 'nella tempesta', beast: 'aggrediti nella notte', trap: 'in trappola', accident: 'per incidente', meter: m ? 'per ' + m.name.toLowerCase() : 'per l\'arena' };
+    const c = Object.entries(st.causes).filter(([k]) => lbl[k]).map(([k, v]) => v + ' ' + lbl[k]);
+    const bits = [];
+    if (st.shared) bits.push(plural(st.shared, 'pasto condiviso', 'pasti condivisi'));
+    if (st.nursed) bits.push(plural(st.nursed, 'ferito curato', 'feriti curati'));
+    if (st.foraged) bits.push(plural(st.foraged, 'ricerca di cibo riuscita', 'ricerche di cibo riuscite'));
+    if (st.trapsSet) bits.push(plural(st.trapsSet, 'trappola piazzata', 'trappole piazzate') + ' (' + (st.trapHits || 0) + ' scattate)');
+    if (st.beasts) bits.push(plural(st.beasts, 'aggressione notturna', 'aggressioni notturne'));
+    if (st.infected) bits.push(st.infected + ' contagiati, ' + (st.cured || 0) + ' curati in tempo');
+    if (st.tough) bits.push(plural(st.tough, 'sopravvissuto per un soffio', 'sopravvissuti per un soffio'));
+    if (st.broken) bits.push(plural(st.broken, 'arma rotta', 'armi rotte'));
+    if (st.looted) bits.push(plural(st.looted, 'oggetto razziato', 'oggetti razziati'));
+    const met = (st.meteo || []).map((x) => 'G' + x.day + ' ' + x.n);
+    if (!c.length && !bits.length && !met.length) return '';
+    return '<p class="help eco-sum">' + (c.length ? '<b>Uccisi dall\'arena:</b> ' + esc(c.join(', ')) + '. ' : '') + (bits.length ? '<b>Conseguenze:</b> ' + esc(bits.join(' · ')) + '. ' : '') + (met.length ? '<b>Meteo:</b> ' + esc(met.join(' · ')) + '.' : '') + '</p>';
+  }
   function renderResults() {
     $('#resEmpty').hidden = !!SIM; $('#resBody').hidden = !SIM;
     if (!SIM) return;
@@ -6826,6 +7746,9 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
     const sav = maxBy((t) => t.saves); if (sav && sav.saves) awards.push(['L\'angelo custode', sav, plural(sav.saves, 'vita salvata o curata', 'vite salvate o curate')]);
     const lucky = maxBy((t) => t.amulets); if (lucky && lucky.amulets) awards.push(['Miracolat' + G3(lucky.gender, 'o', 'a', 'ə'), lucky, 'salvat' + G3(lucky.gender, 'o', 'a', 'ə') + ' da un portafortuna']);
     const ab = maxBy((t) => t.testsPassed * 10 - (t.tests - t.testsPassed)); if (ab && ab.testsPassed) awards.push(['Il più abile', ab, ab.testsPassed + ' prove superate su ' + ab.tests]);
+    const hunter = maxBy((t) => t.foraged || 0); if (hunter && hunter.foraged >= 2) awards.push([soft ? 'Lo scroccone' : 'Il cacciatore', hunter, plural(hunter.foraged, 'pasto procurato', 'pasti procurati')]);
+    const nurse = maxBy((t) => t.nursed || 0); if (nurse && nurse.nursed) awards.push([soft ? 'La spalla' : 'L\'infermiere', nurse, plural(nurse.nursed, 'compagno rimesso in sesto', 'compagni rimessi in sesto')]);
+    const trapper = maxBy((t) => (t.trapKills || 0) * 3 + (t.trapsSet || 0)); if (trapper && trapper.trapsSet) awards.push(['Il trappolaio', trapper, plural(trapper.trapsSet, 'trappola piazzata', 'trappole piazzate') + (trapper.trapKills ? ', ' + trapper.trapKills + ' a segno' : '')]);
     const busy = maxBy((t) => t.events); if (busy) awards.push(['Sempre in mezzo', busy, plural(busy.events, 'evento vissuto', 'eventi vissuti')]);
     const loot = maxBy((t) => t.items); if (loot && loot.items) awards.push(['Il collezionista', loot, plural(loot.items, 'oggetto trovato', 'oggetti trovati')]);
     const awardsH = '<div class="awards">' + awards.map(([a, t, d]) => '<button type="button" class="award card" data-prof="' + esc(t.id) + '">' + avHTML(t, { dead: !t.alive }) + '<span style="min-width:0"><span class="at">' + a + '</span><b>' + esc(t.name) + '</b><small>' + esc(d) + '</small></span></button>').join('') + '</div>';
@@ -6874,7 +7797,7 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
         '<section class="block card"><h2>Momenti salienti</h2>' + hlH + '</section>' +
         '<section class="block card"><h2>Classifica completa</h2><div class="tablewrap"><table><thead><tr><th>Pos.</th><th>Concorrente</th><th>Sq.</th><th>' + (soft ? 'Elim.' : 'Ucc.') + '</th><th>Per mano di</th><th>Giorno</th><th>Come è andata</th></tr></thead><tbody>' + rows + '</tbody></table></div></section>' +
       '</div><div>' +
-        '<section class="block card"><h2>Superstiti nel tempo</h2>' + chart + '<p class="help" style="margin-top:8px">' + st.killDeaths + ' ' + (soft ? 'eliminati da un rivale' : 'morti per mano altrui') + ', ' + st.envDeaths + ' per colpa dell\'arena · ' + st.alliances + ' alleanze · ' + st.betrayals + ' tradimenti · ' + (st.revenges || 0) + ' vendette · ' + (st.couples || 0) + ' coppie · ' + (st.debtsRepaid || 0) + ' debiti saldati · ' + (st.amulets || 0) + ' salvataggi miracolosi · ' + (st.sponsors || 0) + ' doni degli sponsor · ' + (st.testsPassed || 0) + ' prove superate su ' + (st.tests || 0) + ' · ' + st.events + ' eventi.</p></section>' +
+        '<section class="block card"><h2>Superstiti nel tempo</h2>' + chart + '<p class="help" style="margin-top:8px">' + st.killDeaths + ' ' + (soft ? 'eliminati da un rivale' : 'morti per mano altrui') + ', ' + st.envDeaths + ' per colpa dell\'arena · ' + st.alliances + ' alleanze · ' + st.betrayals + ' tradimenti · ' + (st.revenges || 0) + ' vendette · ' + (st.couples || 0) + ' coppie · ' + (st.debtsRepaid || 0) + ' debiti saldati · ' + (st.amulets || 0) + ' salvataggi miracolosi · ' + (st.sponsors || 0) + ' doni degli sponsor · ' + (st.testsPassed || 0) + ' prove superate su ' + (st.tests || 0) + ' · ' + st.events + ' eventi.</p>' + ecoSummary(st, theme) + '</section>' +
         '<section class="block card"><h2>' + (soft ? 'Chi ha eliminato di più' : 'Chi ha ucciso di più') + '</h2><div class="bars">' + kbars + '</div></section>' +
         '<section class="block card posterbox"><h2>Locandina</h2><img id="posterImg" alt="Locandina della partita"><p class="help" style="margin-top:8px">Tieni premuto sull\'immagine, o clic destro, per salvarla.</p></section>' +
       '</div></div>';

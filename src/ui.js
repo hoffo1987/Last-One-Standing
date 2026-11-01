@@ -42,7 +42,22 @@
     heal: ['Aiuto', 'Aiuto'], item: ['Bottino', 'Asso nella manica'], hurt: ['Guaio', 'Colpo basso'], love: ['Amore', 'Amore'], none: ['', ''],
   };
   const ATTRN = Object.fromEntries(D.attrs.map((a) => [a.id, a.name]));
-  const WHY = { carattere: 'Carattere', vendetta: 'Vendetta', debito: 'Debito', coppia: 'Coppia', lutto: 'Lutto', fama: 'Fama', reputazione: 'Reputazione', oggetto: 'Oggetto', condizione: 'Conseguenza' };
+  const WHY = { carattere: 'Carattere', vendetta: 'Vendetta', debito: 'Debito', coppia: 'Coppia', lutto: 'Lutto', fama: 'Fama', reputazione: 'Reputazione', oggetto: 'Oggetto', condizione: 'Conseguenza',
+    conseguenza: 'Conseguenza', ferite: 'Ferite', stenti: 'Stenti', infezione: 'Infezione', tempesta: 'Tempesta', predatori: 'Pericolo notturno', trappola: 'Trappola', alleanza: 'Alleanza', cure: 'Cure', morale: 'Morale', riposo: 'Notte', esplorazione: 'Esplorazione', bottino: 'Bottino', incidente: 'Incidente' };
+  const ECO = D.eco || { arenas: {} };
+  const arenaOf = (id) => ECO.arenas[id] || {};
+  const vitLabels = (th) => (th && th.soft ? ECO.labelsSoft : ECO.labels) || { hp: 'Salute', en: 'Energia', mo: 'Morale', food: 'Sazietà' };
+  const whyLabel = (e, theme) => (e.why === 'arena' && arenaOf(theme.id).meter ? arenaOf(theme.id).meter.name : WHY[e.why] || '');
+  const CAUSE_TXT = { wound: 'ferite', starve: 'fame', exhaust: 'sfinimento', poison: 'veleno', sick: 'malattia', infect: 'infezione', storm: 'tempesta', beast: 'aggressione notturna', trap: 'trappola', accident: 'incidente' };
+  const causeTxt = (t, theme) => (t.deathCause === 'meter' && arenaOf(theme.id).meter ? arenaOf(theme.id).meter.name.toLowerCase() : CAUSE_TXT[t.deathCause] || '');
+  function vbars(v, theme, full) {
+    if (!v) return '';
+    const lb = vitLabels(theme), m = arenaOf(theme.id).meter;
+    const rows = [['hp', lb.hp, v[0]], ['en', lb.en, v[1]], ['mo', lb.mo, v[2]], ['food', lb.food, v[3]]];
+    if (m && v[4] >= 0) rows.push(['pr', m.name, v[4]]);
+    if (!full) return '<span class="vmini" aria-hidden="true">' + rows.slice(0, 3).map(([k, , x]) => '<i class="' + k + (x < 25 ? ' low' : '') + '"><b style="width:' + x + '%"></b></i>').join('') + '</span>';
+    return '<div class="vbars">' + rows.map(([k, n, x]) => { const bad = k === 'pr' ? x >= (m.thr || 60) : x < 25; return '<div class="vbar ' + k + (bad ? ' bad' : '') + '"><span>' + esc(n) + '</span><i><b style="width:' + x + '%"></b></i><em>' + x + '</em></div>'; }).join('') + '</div>';
+  }
   const KIND = { b: 'Apertura', d: 'Giorno', n: 'Notte', f: 'Evento speciale', dis: 'Disastro', fallen: 'Bilancio', finale: 'Finale' };
   const DIFFS = [
     ['bassa', 'Bassa', 'Partite lunghe, pochi morti', 1], ['normale', 'Normale', 'L\'equilibrio classico', 2],
@@ -552,10 +567,20 @@
         '<div><h3>' + (t.soft ? 'Armi improprie' : 'Armi') + '</h3><ul>' + t.lex.arma.slice(0, 6).map((x) => '<li>' + esc(strip(x)) + '</li>').join('') + '</ul></div>' +
         '<div><h3>Pericoli</h3><ul>' + t.lex.mostro.map((x) => '<li>' + esc(strip(x)) + '</li>').join('') + '</ul></div>' +
       '</div>' +
+      rulesHTML(t) +
       '<div><h3 class="sub" style="margin-bottom:8px">Alcuni disastri</h3><div class="chips">' + dz.slice(0, 10).map((x) => '<span class="chip dim">' + esc(x) + '</span>').join('') + '<span class="chip dim">e altri ' + Math.max(0, dz.length - 10) + '</span></div></div>' +
       (sample ? '<div class="sample"><h3 class="sub">Un assaggio' + (S.cast.length >= 4 ? ' con il tuo cast' : '') + '</h3>' + sample + '</div>' : '');
     AN.field($('#arenaPreview .apv-banner'), t.id, { intensity: 1.2 });
     const ap = $('#arenaPreview'); ap.classList.remove('swap'); void ap.offsetWidth; ap.classList.add('swap');
+  }
+  function rulesHTML(t) {
+    const A = arenaOf(t.id); if (!A.rule) return '';
+    const m = A.meter, lb = vitLabels(t);
+    return '<div class="rules-arena"><div class="ra-head"><span class="eyebrow">Regole dell\'arena</span><h3>' + esc(A.rule) + '</h3></div><p>' + esc(A.desc) + '</p>' +
+      '<div class="ra-grid"><div><h4>Contano di più</h4><div class="chips">' + (A.key || []).map((k, i) => '<span class="chip' + (i === 0 ? ' st' : '') + '">' + esc(ECO.attrNames[k] || k) + '</span>').join('') + '</div></div>' +
+      '<div><h4>Da tenere d\'occhio</h4><div class="chips"><span class="chip dim">' + esc(lb.hp) + '</span><span class="chip dim">' + esc(lb.en) + '</span><span class="chip dim">' + esc(lb.mo) + '</span><span class="chip dim">' + esc(lb.food) + '</span>' + (m ? '<span class="chip st" title="' + esc(m.desc) + '">' + esc(m.name) + '</span>' : '') + '</div></div></div>' +
+      (m ? '<p class="help"><b>' + esc(m.name) + ':</b> ' + esc(m.desc) + '</p>' : '') +
+      ((A.meteo || []).length ? '<div><h4>Meteo possibile</h4><div class="chips">' + A.meteo.map((x) => '<span class="chip dim" title="' + esc(x.d) + '">' + esc(x.n) + '</span>').join('') + '</div></div>' : '') + '</div>';
   }
   function renderStartSum() {
     const t = THEMES[S.settings.theme];
@@ -650,13 +675,13 @@
   /* =============== DIRETTA =============== */
   function evHTML(e, tributes, theme, anim, plain, delay) {
     const by = tributes ? Object.fromEntries(tributes.map((t) => [t.id, t])) : BY;
-    if (e.note) return '<div class="ev note' + (anim ? ' in' : '') + '" style="--d:' + (delay || 0) + 'ms"><p>' + e.html + '</p></div>';
+    if (e.note) return '<div class="ev note' + (e.meteo ? ' meteo' : '') + (anim ? ' in' : '') + '" style="--d:' + (delay || 0) + 'ms"><p>' + e.html + '</p></div>';
     const cat = e.cat || 'none';
     const lbl = CAT[cat][theme.soft ? 1 : 0];
     const avs = '<span class="avs">' + e.ids.slice(0, 4).map((id) => avHTML(by[id], { dead: e.deaths.includes(id), btn: !plain })).join('') + '</span>';
     const chip = lbl ? '<span class="cat">' + IC[cat] + (e.deaths.length > 1 && (cat === 'kill' || cat === 'death') ? e.deaths.length + ' ' + (theme.soft ? 'fuori' : 'morti') : lbl) + '</span>' : '<span></span>';
     const fix = (h) => (plain ? h.replace(/<b class="nm"[^>]*>/g, '<b>') : linkify(h));
-    const why = e.test ? '<span title="Tiro ' + e.test.roll + ' contro soglia ' + e.test.dc + '">Prova di ' + esc(ATTRN[e.test.attr] || e.test.attr) + ' · <span class="dice"><span class="roll">' + e.test.roll + '</span>/' + e.test.dc + '</span> · ' + (e.test.pass ? 'superata' : 'fallita') + '</span>' : e.sponsor ? 'Sponsor' : WHY[e.why] || '';
+    const why = e.test ? '<span title="Tiro ' + e.test.roll + ' contro soglia ' + e.test.dc + '">Prova di ' + esc(ATTRN[e.test.attr] || e.test.attr) + ' · <span class="dice"><span class="roll">' + e.test.roll + '</span>/' + e.test.dc + '</span> · ' + (e.test.pass ? 'superata' : 'fallita') + '</span>' : e.sponsor ? 'Sponsor' : whyLabel(e, theme);
     const echo = (e.echo || []).length ? '<ul class="echo">' + e.echo.map((x) => '<li class="' + (x.cls || '') + '">' + fix(x.html) + '</li>').join('') + '</ul>' : '';
     return '<div class="ev' + (e.deaths.length ? ' lethal' : '') + (anim ? ' in fx-' + cat + (e.sponsor ? ' fx-sponsor' : '') : '') + '" style="--cc:var(--c-' + cat + ');--d:' + (delay || 0) + 'ms">' + avs + '<div class="evbody">' + (why ? '<span class="why' + (e.test ? (e.test.pass ? ' ok' : ' ko') : '') + '">' + why + '</span>' : '') + '<p>' + fix(e.html) + '</p>' + echo + '</div>' + chip + '</div>';
   }
@@ -676,7 +701,7 @@
     AN.field(bcs, theme.id, { intensity: AN.intensityFor(ph.kind, ph.snap.alive.length / total) });
     AN.phaseFx($('.broadcast'), ph.kind, theme.id, forward, { deaths: ph.kind === 'fallen' ? ph.deaths.length : 0 });
     $('#bcPhase').textContent = 'Fase ' + (i + 1) + ' / ' + P.length;
-    $('#bcKind').textContent = KIND[ph.kind] + (ph.day ? ' · giorno ' + ph.day : '');
+    $('#bcKind').textContent = KIND[ph.kind] + (ph.day ? ' · giorno ' + ph.day : '') + (ph.meteo && ph.meteo.n ? ' · ' + ph.meteo.n : '');
     $('#phTitle').textContent = ph.title; if (forward) AN.kinetic($('#phTitle'), ph.kind === 'dis' ? 'shake' : ph.kind === 'n' ? 'fade' : 'drop');
     $('#phIntro').textContent = ph.intro || '';
     if (forward) AN.countTo($('#aliveBig'), ph.snap.alive.length, { from: prevAlive, dur: 1100 }); else $('#aliveBig').textContent = ph.snap.alive.length; $('#aliveTot').textContent = '/' + total;
@@ -736,19 +761,23 @@
       const zones = theme.lex.luogo.map((z) => z.replace(/^(il |lo |la |l'|i |gli |le )/i, ''));
       const hot = {};
       ph.events.forEach((e) => e.deaths.length && e.ids.forEach((id) => (hot[ph.snap.zones[id]] = 1)));
+      const ZP = arenaOf(theme.id).zones || [], shut = new Set(ph.snap.closed || []);
+      const dots = (v) => { const n = v >= 1.35 ? 3 : v >= 0.95 ? 2 : 1; return '<b class="zl" aria-label="' + ['bassa', 'media', 'alta'][n - 1] + '">' + '●'.repeat(n) + '<span>' + '●'.repeat(3 - n) + '</span></b>'; };
       h = '<div class="map">' + zones.map((z, zi) => {
         const here = ph.snap.alive.filter((id) => ph.snap.zones[id] === zi);
-        return '<div class="zone' + (hot[zi] ? ' hot' : '') + '"><span class="zn"><span>' + esc(z) + '</span></span><div class="dots">' + here.map((id) => avHTML(BY[id], { btn: true })).join('') + '</div></div>';
-      }).join('') + '</div><p class="help" style="margin-top:10px">Tocca un volto per aprire la scheda del concorrente.</p>';
+        const p = ZP[zi] || [1, 1, 0.5];
+        return '<div class="zone' + (hot[zi] ? ' hot' : '') + (shut.has(zi) ? ' closed' : '') + '"><span class="zn"><span>' + esc(z) + '</span></span><div class="dots">' + here.map((id) => avHTML(BY[id], { btn: true })).join('') + '</div>' +
+          '<span class="zprops" title="Risorse e pericolo della zona"><span>risorse ' + dots(p[0]) + '</span><span>pericolo ' + dots(p[1]) + '</span>' + (shut.has(zi) ? '<span class="ztag">tempesta</span>' : '') + '</span></div>';
+      }).join('') + '</div><p class="help" style="margin-top:10px">Le zone ricche danno più cibo, quelle pericolose più agguati' + (shut.size ? '; in grigio quelle inghiottite dalla tempesta' : '') + '. Tocca un volto per aprire la scheda.</p>';
     } else if (sideTab === 'fallen') {
       const dead = SIM.tributes.filter((t) => !t.alive && t.deathPhase <= i).sort((a, b) => b.order - a.order);
-      h = dead.length ? '<div class="plist">' + dead.map((t) => '<button type="button" class="prow" data-prof="' + esc(t.id) + '">' + avHTML(t, { dead: true }) + '<span style="min-width:0"><span class="pn">' + esc(t.name) + '</span><span class="ps">' + (t.killerIds.length ? 'per mano di ' + esc(t.killerIds.map((k) => BY[k].name).join(', ')) : 'vittima dell\'arena') + '</span></span><span class="pk">G' + t.deathDay + '</span></button>').join('') + '</div>' : '<p class="help">Ancora nessuno.</p>';
+      h = dead.length ? '<div class="plist">' + dead.map((t) => '<button type="button" class="prow" data-prof="' + esc(t.id) + '">' + avHTML(t, { dead: true }) + '<span style="min-width:0"><span class="pn">' + esc(t.name) + '</span><span class="ps">' + (t.killerIds.length ? 'per mano di ' + esc(t.killerIds.map((k) => BY[k].name).join(', ')) + (causeTxt(t, theme) ? ' · ' + causeTxt(t, theme) : '') : causeTxt(t, theme) ? 'per ' + causeTxt(t, theme) : 'vittima dell\'arena') + '</span></span><span class="pk">G' + t.deathDay + '</span></button>').join('') + '</div>' : '<p class="help">Ancora nessuno.</p>';
     } else if (sideTab === 'alive') {
       const al = SIM.tributes.filter((t) => aliveSet.has(t.id)).sort((a, b) => (ph.snap.kills[b.id] || 0) - (ph.snap.kills[a.id] || 0));
       h = '<div class="plist">' + al.map((t) => {
         const st = ph.snap.st[t.id] || [], inv = ph.snap.inv[t.id] || [];
         const sub = [st.length ? st.map((s) => L.STATUS_LABEL[s] || s).join(', ') : 'in forma', inv.length ? plural(inv.length, 'oggetto', 'oggetti') : ''].filter(Boolean).join(' · ');
-        return '<button type="button" class="prow" data-prof="' + esc(t.id) + '">' + avHTML(t) + '<span style="min-width:0"><span class="pn">' + esc(t.name) + '</span><span class="ps">' + esc(sub) + '</span></span><span class="pk">' + (ph.snap.kills[t.id] || 0) + (soft ? ' elim.' : ' ucc.') + '</span></button>';
+        return '<button type="button" class="prow" data-prof="' + esc(t.id) + '">' + avHTML(t) + '<span style="min-width:0"><span class="pn">' + esc(t.name) + '</span><span class="ps">' + esc(sub) + '</span>' + vbars((ph.snap.vit || {})[t.id], theme, false) + '</span><span class="pk">' + (ph.snap.kills[t.id] || 0) + (soft ? ' elim.' : ' ucc.') + '</span></button>';
       }).join('') + '</div>';
     } else {
       const groups = {};
@@ -817,23 +846,26 @@
           '<div class="chips">' + (t.traits.length ? t.traits.map((x) => '<span class="chip" title="' + esc(TRAITS[x].desc) + '">' + esc(TRAITS[x].name) + '</span>').join('') : '<span class="chip dim">Nessun tratto</span>') + '</div></div></div>' +
         '<div class="pstats"><div><b>' + kills + '</b><span>' + (soft ? 'eliminazioni' : 'uccisioni') + '</span></div><div><b>' + hist.length + '</b><span>eventi vissuti</span></div><div><b>' + (dead ? t.deathDay : SIM.phases[i].day || 1) + '</b><span>' + (dead ? 'giorno dell\'uscita' : 'giorni in gara') + '</span></div></div>' +
         (dead ? '<div><div class="sub" style="margin-bottom:6px">Come è andata</div><div class="ev lethal" style="--cc:var(--c-kill);grid-template-columns:minmax(0,1fr)"><p>' + linkify(t.deathHtml) + '</p></div></div>' : '') +
+        (!dead && snap.vit && snap.vit[id] ? '<div><div class="sub" style="margin-bottom:8px">Condizione fisica</div>' + vbars(snap.vit[id], theme, true) + '</div>' : '') +
+        (dead && t.deathCause && causeTxt(t, theme) ? '<p class="help">Causa: ' + esc(causeTxt(t, theme)) + (t.killerIds.length ? ', per mano di ' + esc(t.killerIds.map((k) => BY[k].name).join(', ')) : '') + '.</p>' : '') +
         (!dead ? '<div class="row" style="gap:16px;align-items:flex-start">' +
           '<div style="flex:1;min-width:140px"><div class="sub" style="margin-bottom:6px">Condizioni</div><div class="chips">' + (st.length ? st.map((s) => '<span class="chip st">' + esc(L.STATUS_LABEL[s] || s) + '</span>').join('') : '<span class="chip dim">In forma</span>') + '</div></div>' +
           '<div style="flex:1;min-width:140px"><div class="sub" style="margin-bottom:6px">Zaino</div><div class="chips">' + (inv.length ? inv.map((x) => '<span class="chip dim">' + esc(x) + '</span>').join('') : '<span class="chip dim">Vuoto</span>') + '</div></div></div>' +
           '<div><div class="sub" style="margin-bottom:6px">Alleati</div><div class="row">' + (ally.length ? ally.map((x) => avHTML(BY[x], { btn: true })).join('') : '<span class="help">Nessuno, per ora.</span>') + '</div></div>' : '') +
         relHTML(id, snap, dead, atRes) +
-        attrHTML(t) +
+        attrHTML(t, theme) +
         '<div><div class="sub" style="margin-bottom:8px">La sua storia' + (atRes ? '' : ' finora') + '</div><div class="ptl">' + (hist.length ? hist.map(({ e, p }) => '<div class="it" style="--cc:var(--c-' + (e.cat || 'none') + ')"><span>' + (p.kind === 'b' ? 'Inizio' : 'G' + p.day + ' ' + (p.kind === 'n' ? 'notte' : p.kind === 'd' ? 'giorno' : KIND[p.kind].toLowerCase())) + '</span><p>' + linkify(e.html) + '</p></div>').join('') : '<p class="help">Nessun evento ancora.</p>') + '</div></div>' +
       '</div>';
     if (!$('#profDlg').open) $('#profDlg').showModal();
     $('#profDlg').scrollTop = 0;
   }
 
-  function attrHTML(t) {
+  function attrHTML(t, theme) {
     if (!t.attr) return '';
     const tests = t.tests ? ' · prove superate ' + t.testsPassed + ' su ' + t.tests : '';
-    return '<div><div class="sub" style="margin-bottom:8px">Caratteristiche' + tests + '</div><div class="abars">' +
-      D.attrs.map((a) => { const v = t.attr[a.id] != null ? t.attr[a.id] : 5; return '<div class="abar" title="' + esc((D.attrDesc || {})[a.id] || '') + '"><span>' + a.name + '</span><i><b style="width:' + v * 10 + '%" class="' + (v >= 8 ? 'hi' : v <= 3 ? 'lo' : '') + '"></b></i><em>' + v + '</em></div>'; }).join('') + '</div></div>';
+    const key = theme ? arenaOf(theme.id).key || [] : [];
+    return '<div><div class="sub" style="margin-bottom:8px">Caratteristiche' + tests + (key.length ? ' · <span class="keymark">★</span> contano di più in quest\'arena' : '') + '</div><div class="abars">' +
+      D.attrs.map((a) => { const v = t.attr[a.id] != null ? t.attr[a.id] : 5; return '<div class="abar' + (key.includes(a.id) ? ' key' : '') + '" title="' + esc((D.attrDesc || {})[a.id] || '') + '"><span>' + (key.includes(a.id) ? '<span class="keymark">★</span> ' : '') + a.name + '</span><i><b style="width:' + v * 10 + '%" class="' + (v >= 8 ? 'hi' : v <= 3 ? 'lo' : '') + '"></b></i><em>' + v + '</em></div>'; }).join('') + '</div></div>';
   }
   function relHTML(id, snap, dead, atRes) {
     const r = (snap.rel || {})[id]; if (!r) return '';
@@ -859,6 +891,25 @@
   }
 
   /* =============== ESITO =============== */
+  function ecoSummary(st, theme) {
+    if (!st.causes) return '';
+    const m = arenaOf(theme.id).meter;
+    const lbl = { wound: 'per le ferite', starve: 'di fame', exhaust: 'di sfinimento', poison: 'di veleno', sick: 'di malattia', infect: 'trasformati', storm: 'nella tempesta', beast: 'aggrediti nella notte', trap: 'in trappola', accident: 'per incidente', meter: m ? 'per ' + m.name.toLowerCase() : 'per l\'arena' };
+    const c = Object.entries(st.causes).filter(([k]) => lbl[k]).map(([k, v]) => v + ' ' + lbl[k]);
+    const bits = [];
+    if (st.shared) bits.push(plural(st.shared, 'pasto condiviso', 'pasti condivisi'));
+    if (st.nursed) bits.push(plural(st.nursed, 'ferito curato', 'feriti curati'));
+    if (st.foraged) bits.push(plural(st.foraged, 'ricerca di cibo riuscita', 'ricerche di cibo riuscite'));
+    if (st.trapsSet) bits.push(plural(st.trapsSet, 'trappola piazzata', 'trappole piazzate') + ' (' + (st.trapHits || 0) + ' scattate)');
+    if (st.beasts) bits.push(plural(st.beasts, 'aggressione notturna', 'aggressioni notturne'));
+    if (st.infected) bits.push(st.infected + ' contagiati, ' + (st.cured || 0) + ' curati in tempo');
+    if (st.tough) bits.push(plural(st.tough, 'sopravvissuto per un soffio', 'sopravvissuti per un soffio'));
+    if (st.broken) bits.push(plural(st.broken, 'arma rotta', 'armi rotte'));
+    if (st.looted) bits.push(plural(st.looted, 'oggetto razziato', 'oggetti razziati'));
+    const met = (st.meteo || []).map((x) => 'G' + x.day + ' ' + x.n);
+    if (!c.length && !bits.length && !met.length) return '';
+    return '<p class="help eco-sum">' + (c.length ? '<b>Uccisi dall\'arena:</b> ' + esc(c.join(', ')) + '. ' : '') + (bits.length ? '<b>Conseguenze:</b> ' + esc(bits.join(' · ')) + '. ' : '') + (met.length ? '<b>Meteo:</b> ' + esc(met.join(' · ')) + '.' : '') + '</p>';
+  }
   function renderResults() {
     $('#resEmpty').hidden = !!SIM; $('#resBody').hidden = !SIM;
     if (!SIM) return;
@@ -890,6 +941,9 @@
     const sav = maxBy((t) => t.saves); if (sav && sav.saves) awards.push(['L\'angelo custode', sav, plural(sav.saves, 'vita salvata o curata', 'vite salvate o curate')]);
     const lucky = maxBy((t) => t.amulets); if (lucky && lucky.amulets) awards.push(['Miracolat' + G3(lucky.gender, 'o', 'a', 'ə'), lucky, 'salvat' + G3(lucky.gender, 'o', 'a', 'ə') + ' da un portafortuna']);
     const ab = maxBy((t) => t.testsPassed * 10 - (t.tests - t.testsPassed)); if (ab && ab.testsPassed) awards.push(['Il più abile', ab, ab.testsPassed + ' prove superate su ' + ab.tests]);
+    const hunter = maxBy((t) => t.foraged || 0); if (hunter && hunter.foraged >= 2) awards.push([soft ? 'Lo scroccone' : 'Il cacciatore', hunter, plural(hunter.foraged, 'pasto procurato', 'pasti procurati')]);
+    const nurse = maxBy((t) => t.nursed || 0); if (nurse && nurse.nursed) awards.push([soft ? 'La spalla' : 'L\'infermiere', nurse, plural(nurse.nursed, 'compagno rimesso in sesto', 'compagni rimessi in sesto')]);
+    const trapper = maxBy((t) => (t.trapKills || 0) * 3 + (t.trapsSet || 0)); if (trapper && trapper.trapsSet) awards.push(['Il trappolaio', trapper, plural(trapper.trapsSet, 'trappola piazzata', 'trappole piazzate') + (trapper.trapKills ? ', ' + trapper.trapKills + ' a segno' : '')]);
     const busy = maxBy((t) => t.events); if (busy) awards.push(['Sempre in mezzo', busy, plural(busy.events, 'evento vissuto', 'eventi vissuti')]);
     const loot = maxBy((t) => t.items); if (loot && loot.items) awards.push(['Il collezionista', loot, plural(loot.items, 'oggetto trovato', 'oggetti trovati')]);
     const awardsH = '<div class="awards">' + awards.map(([a, t, d]) => '<button type="button" class="award card" data-prof="' + esc(t.id) + '">' + avHTML(t, { dead: !t.alive }) + '<span style="min-width:0"><span class="at">' + a + '</span><b>' + esc(t.name) + '</b><small>' + esc(d) + '</small></span></button>').join('') + '</div>';
@@ -938,7 +992,7 @@
         '<section class="block card"><h2>Momenti salienti</h2>' + hlH + '</section>' +
         '<section class="block card"><h2>Classifica completa</h2><div class="tablewrap"><table><thead><tr><th>Pos.</th><th>Concorrente</th><th>Sq.</th><th>' + (soft ? 'Elim.' : 'Ucc.') + '</th><th>Per mano di</th><th>Giorno</th><th>Come è andata</th></tr></thead><tbody>' + rows + '</tbody></table></div></section>' +
       '</div><div>' +
-        '<section class="block card"><h2>Superstiti nel tempo</h2>' + chart + '<p class="help" style="margin-top:8px">' + st.killDeaths + ' ' + (soft ? 'eliminati da un rivale' : 'morti per mano altrui') + ', ' + st.envDeaths + ' per colpa dell\'arena · ' + st.alliances + ' alleanze · ' + st.betrayals + ' tradimenti · ' + (st.revenges || 0) + ' vendette · ' + (st.couples || 0) + ' coppie · ' + (st.debtsRepaid || 0) + ' debiti saldati · ' + (st.amulets || 0) + ' salvataggi miracolosi · ' + (st.sponsors || 0) + ' doni degli sponsor · ' + (st.testsPassed || 0) + ' prove superate su ' + (st.tests || 0) + ' · ' + st.events + ' eventi.</p></section>' +
+        '<section class="block card"><h2>Superstiti nel tempo</h2>' + chart + '<p class="help" style="margin-top:8px">' + st.killDeaths + ' ' + (soft ? 'eliminati da un rivale' : 'morti per mano altrui') + ', ' + st.envDeaths + ' per colpa dell\'arena · ' + st.alliances + ' alleanze · ' + st.betrayals + ' tradimenti · ' + (st.revenges || 0) + ' vendette · ' + (st.couples || 0) + ' coppie · ' + (st.debtsRepaid || 0) + ' debiti saldati · ' + (st.amulets || 0) + ' salvataggi miracolosi · ' + (st.sponsors || 0) + ' doni degli sponsor · ' + (st.testsPassed || 0) + ' prove superate su ' + (st.tests || 0) + ' · ' + st.events + ' eventi.</p>' + ecoSummary(st, theme) + '</section>' +
         '<section class="block card"><h2>' + (soft ? 'Chi ha eliminato di più' : 'Chi ha ucciso di più') + '</h2><div class="bars">' + kbars + '</div></section>' +
         '<section class="block card posterbox"><h2>Locandina</h2><img id="posterImg" alt="Locandina della partita"><p class="help" style="margin-top:8px">Tieni premuto sull\'immagine, o clic destro, per salvarla.</p></section>' +
       '</div></div>';

@@ -20,10 +20,28 @@ Ogni concorrente ha una memoria. Quello che succede cambia quello che succederà
 - **Coppie**: nascono amori. Se uno dei due muore, l'altro va in lutto e cerca vendetta. Se restano solo loro due, c'è un finale apposito.
 - **Tradimenti e reputazione**: chi tradisce viene ricordato come traditore, chi uccide molto diventa temuto e gli altri si coalizzano.
 - **Fama**: le imprese spettacolari attirano gli sponsor, che mandano doni da soli.
-- **Fame**: senza cibo per due giorni si diventa affamati e più deboli. Chi ha provviste le usa.
+- **Fame**: la sazietà cala a ogni fase; chi ha provviste le mangia, chi non ne ha le cerca di notte (meglio con Sopravvivenza alta, una mappa e una zona ricca), e chi resta a zero si indebolisce fino a morire di stenti.
 - **Oggetti con effetti veri**: l'amuleto salva una volta dalla morte, la mappa protegge dai disastri, veleni ed esplosivi abilitano eventi propri.
 - **Stati temporanei**: ferito, malato, avvelenato, affamato, ubriaco, sconvolto, in lutto.
 Sotto ogni evento la diretta mostra le conseguenze ("↳ Walter giura vendetta su Paola") e un'etichetta con il motivo dell'evento (Vendetta, Debito, Coppia, Lutto…).
+
+## Condizione fisica ed ecosistema dell'arena
+Ogni concorrente ha cinque valori da 0 a 100, visibili nella scheda e in forma ridotta nella lista "In gara":
+- **Salute**: scende con attacchi, ferite, veleni, malattie, fame, predatori, trappole e indicatore dell'arena. Sotto 25 si sanguina a ogni fase. A zero si muore, e se la ferita era di qualcuno l'uccisione va a lui, con tutte le vendette che ne seguono. Una ferita senza cure può infettarsi.
+- **Energia**: cala con l'attività e si recupera dormendo, meglio in alleanza (turni di guardia), con il partner o in una zona riparata. Chi è esausto combatte e ragiona peggio, e di notte è una preda.
+- **Morale**: sale con amori, alleanze, salvataggi, sponsor e prove superate; scende con lutti, tradimenti, ferite, fame e solitudine. Chi è carico ha un bonus, chi è disperato può abbandonare l'alleanza o rubare il cibo agli alleati, a meno che il partner non lo consoli. Uccidere pesa sul morale di chi ha Empatia alta o è Pacifista, e galvanizza Spietati e Folli.
+- **Sazietà**: vedi Fame.
+- **Indicatore dell'arena**: Freddo (Arena Classica), Corruzione (Reame Incantato), Debito d'ossigeno (Stazione Orbitale), Infezione (Città degli Infetti), Terrore (Villa Maledetta), Radiazioni (Terre Desolate), Ansia (Liceo), Stress (Ufficio). Ognuno sale e scende con regole proprie (notte, solitudine, ferite, morti viste da vicino, zone contaminate, uccisioni) e ha le sue difese (caratteristiche, alleati, portafortuna, cure).
+
+Ogni arena ha poi le sue regole:
+- **Caratteristiche chiave**: tre caratteristiche contano di più per combattere e sopravvivere (per esempio Furtività, Agilità e Sopravvivenza in città, Coraggio ed Empatia nella villa). In prova, a parità di tutto il resto, chi le ha alte arriva in media 4°-5° su 12, chi le ha basse 8°-9°.
+- **Meteo del giorno**: 56 condizioni diverse (nebbia, tempeste solari, orde in migrazione, compiti di matematica…) che cambiano consumi, agguati, ricerca di cibo, prove e pericoli notturni.
+- **Zone**: ogni luogo ha risorse, pericolo e riparo propri. Nel Battle Royale la tempesta chiude una zona al giorno e chi resta fuori perde salute. Nella Città degli Infetti un morso diventa infezione: gli alleati possono curarla con un kit medico se fatto in tempo, oppure cacciare l'infetto dal gruppo.
+- **Oggetti**: le armi hanno una qualità (★ fino a ★★★) e possono rompersi; chi uccide fruga nello zaino della vittima; gli zaini di chi muore per l'arena restano nella zona per chi passa; le trappole vengono piazzate di notte e scattano sui concorrenti di passaggio (la vittima sa chi cercare); kit medici e cure abbassano gli indicatori.
+- **Alleanze vive**: di notte gli alleati dividono il cibo (o lo negano, e nasce rancore), si medicano a vicenda, fanno i turni di guardia e respingono insieme gli assalti notturni.
+- **La tempra**: chi è in salute e resistente a volte sopravvive a un colpo mortale, ridotto malissimo, e da lì la storia può andare in molti modi.
+
+Le scelte degli eventi tengono conto di tutto questo: chi è ferito evita gli scontri e cerca cure, chi ha fame cerca cibo, chi è disperato tradisce più volentieri, le vittime più probabili sono i più deboli e stanchi. Nell'esito trovi le cause di morte, le conseguenze e il meteo di ogni giorno.
 
 ## Caratteristiche, tratti e prove
 - **Prove di abilità**: molti eventi sono una sfida su una caratteristica, con due esiti scritti. Il tiro somma caratteristica, due dadi, fortuna e tratti, e sottrae le condizioni (ferito, ubriaco, affamato…). La diretta mostra "Prova di Agilità · superata 15/11". Con valori alti si supera circa l'87% delle prove, con valori bassi circa il 20%.
@@ -52,6 +70,7 @@ Un interruttore nella sezione Arena, attivo solo dopo la conferma dell'età, agg
 src/data-core.js     eventi di base, tratti, caratteristiche, nomi
 src/data-themes.js   i 9 scenari (lessico, testi di fase, eventi speciali)
 src/content/_systems.js  sistema delle conseguenze: frasi di eco, oggetti speciali, eventi di legame
+src/content/_ecology.js  ecosistema delle arene: regole, indicatori, meteo, zone e testi delle conseguenze automatiche
 src/content/pack-*.js    pacchetti per arena (eventi, disastri, 18+), condivisi e per adulti
 src/content/*.js         eventi aggiuntivi e disastri della versione precedente
 src/engine.js        motore di simulazione (funziona anche in Node)
