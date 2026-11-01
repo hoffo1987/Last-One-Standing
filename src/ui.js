@@ -45,6 +45,70 @@
   const WHY = { carattere: 'Carattere', vendetta: 'Vendetta', debito: 'Debito', coppia: 'Coppia', lutto: 'Lutto', fama: 'Fama', reputazione: 'Reputazione', oggetto: 'Oggetto', condizione: 'Conseguenza',
     conseguenza: 'Conseguenza', ferite: 'Ferite', stenti: 'Stenti', infezione: 'Infezione', tempesta: 'Tempesta', predatori: 'Pericolo notturno', trappola: 'Trappola', alleanza: 'Alleanza', cure: 'Cure', morale: 'Morale', riposo: 'Notte', esplorazione: 'Esplorazione', bottino: 'Bottino', incidente: 'Incidente' };
   const ECO = D.eco || { arenas: {} };
+  const ITM = D.items || { types: {}, how: {}, order: [] }, MND = D.mind || { goals: {}, rel: {}, mem: {} };
+  const ITIC = {
+    arma: sv('<path d="M14.5 3.5 20.5 9.5 10 20l-4.5 1 1-4.5z"/><path d="m4 20 3-3"/>'), armatura: sv('<path d="M12 3 4.5 6v6c0 4.5 3.2 7.6 7.5 9 4.3-1.4 7.5-4.5 7.5-9V6z"/>'),
+    med: sv('<rect x="4" y="7" width="16" height="13" rx="2"/><path d="M9 7V5h6v2M12 10.5v6M9 13.5h6"/>'), cibo: sv('<path d="M12 6c-4 0-7 3-7 7s3 7 7 7 7-3 7-7-3-7-7-7z"/><path d="M12 6c0-2 1-3 3-3"/>'),
+    attrezzo: sv('<path d="M14.5 6.5a4 4 0 0 0-5.3 5.3L3.5 17.5l3 3 5.7-5.7a4 4 0 0 0 5.3-5.3l-2.5 2.5-2.5-.5-.5-2.5z"/>'), mappa: sv('<path d="m3 6 6-2 6 2 6-2v14l-6 2-6-2-6 2z"/><path d="M9 4v14M15 6v14"/>'),
+    trap: sv('<path d="M3 17h18M5 17l2-7 2 7 2-7 2 7 2-7 2 7 2-7"/>'), esplosivo: sv('<circle cx="11" cy="14" r="6"/><path d="m15 9 3-3M18 6l2-1M18 6l1 2"/>'),
+    veleno: sv('<path d="M9 3h6M10 3v5l-4 8a3 3 0 0 0 2.7 4.3h6.6A3 3 0 0 0 18 16l-4-8V3"/><path d="M8 14h8"/>'), amuleto: sv('<path d="M8 3h8l-4 5z"/><circle cx="12" cy="15" r="6"/><path d="m12 12 1 2.2 2.4.3-1.8 1.6.5 2.4-2.1-1.2-2.1 1.2.5-2.4-1.8-1.6 2.4-.3z"/>'),
+    alcol: sv('<path d="M10 3h4M10.5 3v4L8 10v10h8V10l-2.5-3V3"/><path d="M8 14h8"/>'), valore: sv('<circle cx="12" cy="12" r="8"/><path d="M14.5 9.5c-.5-1-1.5-1.5-2.5-1.5-1.5 0-2.5.8-2.5 2s1 1.6 2.5 2 2.5.8 2.5 2-1 2-2.5 2c-1 0-2-.5-2.5-1.5M12 6.5V8M12 16v1.5"/>'),
+    ricordo: sv('<rect x="5" y="4" width="14" height="16" rx="1.5"/><path d="M9 4v4l1.5-1 1.5 1V4M8.5 13h7M8.5 16h5"/>'),
+  };
+  const nmOf = (id) => (BY[id] ? BY[id].name : 'qualcuno');
+  const fill = (tpl, ids) => tpl.replace(/\{(\d)\}/g, (_, k) => esc(nmOf(ids[+k])));
+  function goalLabel(m) { const g = (MND.goals || {})[m.g]; return g ? g.label.replace('{1}', m.tg ? nmOf(m.tg) : '') : ''; }
+  function bagHTML(items, theme) {
+    if (!items.length) return '<p class="help">Zaino vuoto.</p>';
+    const order = ITM.order || [];
+    return '<div class="bag">' + items.slice().sort((a, b) => order.indexOf(a.t) - order.indexOf(b.t)).map((it) => {
+      const ty = (ITM.types || {})[it.t] || { label: it.t, desc: '' };
+      const how = ((ITM.how || {})[it.h] || 'Trovato').replace('{1}', esc(nmOf(it.f))) + (it.d ? ' · G' + it.d : '');
+      const stars = it.q ? '<span class="stars" title="Qualità">' + '★'.repeat(it.q) + '<i>' + '★'.repeat(3 - it.q) + '</i></span>' : '';
+      const uses = it.u != null && it.m ? '<span class="uses" title="Usura: ' + it.u + ' su ' + it.m + '"><b style="width:' + Math.round((it.u / it.m) * 100) + '%"></b></span>' : '';
+      const tag = it.x === 'veleno' ? '<span class="itag bad">Avvelenata</span>' : it.x === 'bomba' ? '<span class="itag bad">Esplosiva</span>' : '';
+      return '<div class="bitem t-' + esc(it.t) + '"><span class="bic">' + (ITIC[it.t] || ITIC.valore) + '</span><div class="bbody"><div class="btop"><b>' + esc(it.n) + '</b>' + stars + tag + '</div>' +
+        '<div class="bmeta"><span class="btype">' + esc(ty.label) + '</span><span>' + how + '</span>' + uses + '</div><p>' + esc(ty.desc) + '</p></div></div>';
+    }).join('') + '</div>';
+  }
+  function nowHTML(t, snap, i, theme) {
+    const m = (snap.mind || {})[t.id]; const v = (snap.vit || {})[t.id]; const st = snap.st[t.id] || [];
+    const zone = theme.lex.luogo[snap.zones[t.id]] || '';
+    const bits = [];
+    if (v) { if (v[0] < 25) bits.push('ridott' + G3(t.gender, 'o', 'a', 'ə') + ' male'); else if (v[0] < 55) bits.push('ferit' + G3(t.gender, 'o', 'a', 'ə')); if (v[3] < 25) bits.push('affamat' + G3(t.gender, 'o', 'a', 'ə')); if (v[1] < 22) bits.push('sfinit' + G3(t.gender, 'o', 'a', 'ə')); if (v[2] < 22) bits.push('a pezzi'); else if (v[2] >= 80) bits.push('carichissim' + G3(t.gender, 'o', 'a', 'ə')); }
+    if (st.includes('ubriaco')) bits.push('ubriac' + G3(t.gender, 'o', 'a', 'ə'));
+    const allies = snap.allies[t.id] != null ? snap.alive.filter((x) => x !== t.id && snap.allies[x] === snap.allies[t.id]).length : 0;
+    const where = zone ? zone.replace(/^(il |lo |la |l'|i |gli |le )/i, (a) => a.toLowerCase()) : '';
+    const lead = (where ? 'A ' + where : 'In gara') + (bits.length ? ', ' + bits.join(', ') : '') + (allies ? ', con ' + plural(allies, 'alleato', 'alleati') : ', da sol' + G3(t.gender, 'o', 'a', 'ə')) + '.';
+    const g = m ? (MND.goals || {})[m.g] : null;
+    return '<div class="nowcard"><div class="sub">Adesso</div><p class="nowlead">' + esc(fixA(lead)) + '</p>' +
+      (m && g ? '<div class="goal' + (g.secret ? ' secret' : '') + '"><span class="glbl">Obiettivo</span><b>' + esc(goalLabel(m)) + '</b>' + (g.secret ? '<span class="gsec" title="Gli altri concorrenti non lo sanno">segreto</span>' : '') + (m.since != null && m.since < i ? '<span class="gsince">da G' + (SIM.phases[m.since] ? SIM.phases[m.since].day || 1 : 1) + '</span>' : '') + '</div>' : '') +
+      (m && m.th ? '<blockquote class="thought">' + linkify(m.th) + '</blockquote>' : '') + '</div>';
+  }
+  // «a il Fiume» → «al Fiume» per i testi composti qui
+  function fixA(s) { return s.replace(/^A (il|lo|la|i|gli|le|l') ?/, (m, a) => ({ il: 'Al ', lo: 'Allo ', la: 'Alla ', i: 'Ai ', gli: 'Agli ', le: 'Alle ', "l'": "All'" }[a])); }
+  function peopleHTML(t, snap, i) {
+    const top = ((snap.rel || {})[t.id] || {}).top || [];
+    if (!top.length) return '';
+    const L2 = MND.rel || {}, MM = Object.assign({}, MND.mem || {}, SIM && THEMES[SIM.theme].soft ? MND.memSoft || {} : {});
+    const rows = top.map(([id, a, lbl]) => {
+      const mem = ((t.mem || {})[id] || []).filter((m) => m.ph <= i).slice(-3).reverse();
+      const pct = Math.round((a + 100) / 2);
+      return '<div class="person l-' + esc(lbl) + '">' + avHTML(BY[id], { btn: true }) + '<div class="pbody"><div class="ptop"><b>' + esc(nmOf(id)) + '</b><span class="plbl">' + esc(L2[lbl] || lbl) + '</span></div>' +
+        '<span class="affbar" title="Affinità ' + a + '"><b style="left:' + pct + '%"></b></span>' +
+        (mem.length ? '<ul class="pmem">' + mem.map((m) => '<li>«' + fill(MM[m.k] || '', [t.id, id, m.x]) + '» <span>G' + (SIM.phases[m.ph] ? SIM.phases[m.ph].day || 1 : '') + '</span></li>').join('') + '</ul>' : '') + '</div></div>';
+    }).join('');
+    return '<div><div class="sub" style="margin-bottom:8px">Cosa prova per gli altri</div><div class="people">' + rows + '</div></div>';
+  }
+  function diaryHTML(t, i) {
+    const all = (t.diary || []).filter((d) => d.ph <= i);
+    if (!all.length) return '<div><div class="sub" style="margin-bottom:6px">Diario segreto</div><p class="help">Ancora nessuna pagina.</p></div>';
+    const K = { segreto: 'Segreto', pensiero: 'Pensiero', fatto: 'Fuori onda', mossa: 'Mossa' };
+    const days = {}; all.forEach((d) => (days[d.d] = days[d.d] || []).push(d));
+    const ds = Object.keys(days).map(Number).sort((a, b) => b - a);
+    return '<div><div class="sub" style="margin-bottom:6px">Diario segreto · ' + plural(all.length, 'pagina', 'pagine') + '</div><p class="help" style="margin-bottom:8px">Quello che la diretta non mostra: pensieri, segreti e fatti fuori onda.</p><div class="diary">' +
+      ds.map((d) => '<div class="dday"><span class="dd">G' + (d || 1) + '</span><div>' + days[d].slice().reverse().map((x) => '<p class="dk-' + esc(x.k) + '"><span class="dk">' + (K[x.k] || '') + '</span>' + linkify(x.h) + '</p>').join('') + '</div></div>').join('') + '</div></div>';
+  }
   const arenaOf = (id) => ECO.arenas[id] || {};
   const vitLabels = (th) => (th && th.soft ? ECO.labelsSoft : ECO.labels) || { hp: 'Salute', en: 'Energia', mo: 'Morale', food: 'Sazietà' };
   const whyLabel = (e, theme) => (e.why === 'arena' && arenaOf(theme.id).meter ? arenaOf(theme.id).meter.name : WHY[e.why] || '');
@@ -580,11 +644,19 @@
         '<div><h3>' + (t.soft ? 'Armi improprie' : 'Armi') + '</h3><ul>' + t.lex.arma.slice(0, 6).map((x) => '<li>' + esc(strip(x)) + '</li>').join('') + '</ul></div>' +
         '<div><h3>Pericoli</h3><ul>' + t.lex.mostro.map((x) => '<li>' + esc(strip(x)) + '</li>').join('') + '</ul></div>' +
       '</div>' +
-      rulesHTML(t) +
+      rulesHTML(t) + itemsHTML(t) +
       '<div><h3 class="sub" style="margin-bottom:8px">Alcuni disastri</h3><div class="chips">' + dz.slice(0, 10).map((x) => '<span class="chip dim">' + esc(x) + '</span>').join('') + '<span class="chip dim">e altri ' + Math.max(0, dz.length - 10) + '</span></div></div>' +
       (sample ? '<div class="sample"><h3 class="sub">Un assaggio' + (S.cast.length >= 4 ? ' con il tuo cast' : '') + '</h3>' + sample + '</div>' : '');
     AN.field($('#arenaPreview .apv-banner'), t.id, { intensity: 1.2 });
     const ap = $('#arenaPreview'); ap.classList.remove('swap'); void ap.offsetWidth; ap.classList.add('swap');
+  }
+  function itemsHTML(t) {
+    const names = Object.assign({}, (ITM.names || {})._ || {}, (ITM.names || {})[t.id] || {});
+    const lex = Object.assign({}, D.lexDefault || {}, t.lex || {});
+    (D.packs || []).forEach((pk) => { if (pk.lex && (pk.theme === t.id)) Object.assign(lex, pk.lex); });
+    const ex = (k) => (names[k] || (k === 'med' ? ['un kit medico'] : k === 'trap' ? ['una trappola'] : lex[k]) || []).slice(0, 2).map((x) => x.replace(/^(il |lo |la |l'|i |gli |le |un |uno |una |un'|delle |dei |degli |del |della |dell')/i, '')).join(', ');
+    return '<details class="items-arena"><summary><span class="eyebrow">Zaino</span><b>Gli oggetti e a cosa servono</b><span class="help">' + (ITM.order || []).length + ' tipi</span></summary><div class="ia-grid">' +
+      (ITM.order || []).map((k) => { const ty = ITM.types[k]; return '<div class="ia"><span class="bic">' + (ITIC[k] || '') + '</span><div><b>' + esc(ty.label) + '</b>' + (ex(k) ? '<span class="iaex">' + esc(ex(k)) + '</span>' : '') + '<p>' + esc(ty.desc) + '</p></div></div>'; }).join('') + '</div></details>';
   }
   function rulesHTML(t) {
     const A = arenaOf(t.id); if (!A.rule) return '';
@@ -694,7 +766,7 @@
     const avs = '<span class="avs">' + e.ids.slice(0, 4).map((id) => avHTML(by[id], { dead: e.deaths.includes(id), btn: !plain })).join('') + '</span>';
     const chip = lbl ? '<span class="cat">' + IC[cat] + (e.deaths.length > 1 && (cat === 'kill' || cat === 'death') ? e.deaths.length + ' ' + (theme.soft ? 'fuori' : 'morti') : lbl) + '</span>' : '<span></span>';
     const fix = (h) => (plain ? h.replace(/<b class="nm"[^>]*>/g, '<b>') : linkify(h));
-    const why = e.test ? '<span title="Tiro ' + e.test.roll + ' contro soglia ' + e.test.dc + '">Prova di ' + esc(ATTRN[e.test.attr] || e.test.attr) + ' · <span class="dice"><span class="roll">' + e.test.roll + '</span>/' + e.test.dc + '</span> · ' + (e.test.pass ? 'superata' : 'fallita') + '</span>' : e.sponsor ? 'Sponsor' : whyLabel(e, theme);
+    const why = e.test ? '<span title="Tiro ' + e.test.roll + ' contro soglia ' + e.test.dc + '">Prova di ' + esc(ATTRN[e.test.attr] || e.test.attr) + ' · <span class="dice"><span class="roll">' + e.test.roll + '</span>/' + e.test.dc + '</span> · ' + (e.test.pass ? 'superata' : 'fallita') + '</span>' : e.sponsor ? 'Sponsor' : e.whyTxt ? esc(e.whyTxt) : whyLabel(e, theme);
     const echo = (e.echo || []).length ? '<ul class="echo">' + e.echo.map((x) => '<li class="' + (x.cls || '') + '">' + fix(x.html) + '</li>').join('') + '</ul>' : '';
     return '<div class="ev' + (e.deaths.length ? ' lethal' : '') + (anim ? ' in fx-' + cat + (e.sponsor ? ' fx-sponsor' : '') : '') + '" style="--cc:var(--c-' + cat + ');--d:' + (delay || 0) + 'ms">' + avs + '<div class="evbody">' + (why ? '<span class="why' + (e.test ? (e.test.pass ? ' ok' : ' ko') : '') + '">' + why + '</span>' : '') + '<p>' + fix(e.html) + '</p>' + echo + '</div>' + chip + '</div>';
   }
@@ -789,8 +861,10 @@
       const al = SIM.tributes.filter((t) => aliveSet.has(t.id)).sort((a, b) => (ph.snap.kills[b.id] || 0) - (ph.snap.kills[a.id] || 0));
       h = '<div class="plist">' + al.map((t) => {
         const st = ph.snap.st[t.id] || [], inv = ph.snap.inv[t.id] || [];
-        const sub = [st.length ? st.map((s) => L.STATUS_LABEL[s] || s).join(', ') : 'in forma', inv.length ? plural(inv.length, 'oggetto', 'oggetti') : ''].filter(Boolean).join(' · ');
-        return '<button type="button" class="prow" data-prof="' + esc(t.id) + '">' + avHTML(t) + '<span style="min-width:0"><span class="pn">' + esc(t.name) + '</span><span class="ps">' + esc(sub) + '</span>' + vbars((ph.snap.vit || {})[t.id], theme, false) + '</span><span class="pk">' + (ph.snap.kills[t.id] || 0) + (soft ? ' elim.' : ' ucc.') + '</span></button>';
+        const m = (ph.snap.mind || {})[t.id], g = m && (MND.goals || {})[m.g];
+        const sub = [st.length ? st.map((s) => L.STATUS_LABEL[s] || s).join(', ') : 'in forma', g && !g.secret && m.g !== 'sopravvivere' ? goalLabel(m) : '', inv.length ? plural(inv.length, 'oggetto', 'oggetti') : ''].filter(Boolean).join(' · ');
+        const fresh = (t.diary || []).some((d) => d.ph === i);
+        return '<button type="button" class="prow" data-prof="' + esc(t.id) + '">' + avHTML(t) + '<span style="min-width:0"><span class="pn">' + esc(t.name) + (fresh ? '<span class="newdiary" title="Nuova pagina nel diario segreto">diario</span>' : '') + '</span><span class="ps">' + esc(sub) + '</span>' + vbars((ph.snap.vit || {})[t.id], theme, false) + '</span><span class="pk">' + (ph.snap.kills[t.id] || 0) + (soft ? ' elim.' : ' ucc.') + '</span></button>';
       }).join('') + '</div>';
     } else {
       const groups = {};
@@ -859,13 +933,17 @@
           '<div class="chips">' + (t.traits.length ? t.traits.map((x) => '<span class="chip" title="' + esc(TRAITS[x].desc) + '">' + esc(TRAITS[x].name) + '</span>').join('') : '<span class="chip dim">Nessun tratto</span>') + '</div></div></div>' +
         '<div class="pstats"><div><b>' + kills + '</b><span>' + (soft ? 'eliminazioni' : 'uccisioni') + '</span></div><div><b>' + hist.length + '</b><span>eventi vissuti</span></div><div><b>' + (dead ? t.deathDay : SIM.phases[i].day || 1) + '</b><span>' + (dead ? 'giorno dell\'uscita' : 'giorni in gara') + '</span></div></div>' +
         (dead ? '<div><div class="sub" style="margin-bottom:6px">Come è andata</div><div class="ev lethal" style="--cc:var(--c-kill);grid-template-columns:minmax(0,1fr)"><p>' + linkify(t.deathHtml) + '</p></div></div>' : '') +
+        (!dead ? nowHTML(t, snap, i, theme) : '') +
         (!dead && snap.vit && snap.vit[id] ? '<div><div class="sub" style="margin-bottom:8px">Condizione fisica</div>' + vbars(snap.vit[id], theme, true) + '</div>' : '') +
         (dead && t.deathCause && causeTxt(t, theme) ? '<p class="help">Causa: ' + esc(causeTxt(t, theme)) + (t.killerIds.length ? ', per mano di ' + esc(t.killerIds.map((k) => BY[k].name).join(', ')) : '') + '.</p>' : '') +
         (!dead ? '<div class="row" style="gap:16px;align-items:flex-start">' +
           '<div style="flex:1;min-width:140px"><div class="sub" style="margin-bottom:6px">Condizioni</div><div class="chips">' + (st.length ? st.map((s) => '<span class="chip st">' + esc(L.STATUS_LABEL[s] || s) + '</span>').join('') : '<span class="chip dim">In forma</span>') + '</div></div>' +
-          '<div style="flex:1;min-width:140px"><div class="sub" style="margin-bottom:6px">Zaino</div><div class="chips">' + (inv.length ? inv.map((x) => '<span class="chip dim">' + esc(x) + '</span>').join('') : '<span class="chip dim">Vuoto</span>') + '</div></div></div>' +
+          '</div>' +
+          '<div><div class="sub" style="margin-bottom:8px">Zaino · ' + plural(inv.length, 'oggetto', 'oggetti') + '</div>' + bagHTML(inv, theme) + '</div>' +
           '<div><div class="sub" style="margin-bottom:6px">Alleati</div><div class="row">' + (ally.length ? ally.map((x) => avHTML(BY[x], { btn: true })).join('') : '<span class="help">Nessuno, per ora.</span>') + '</div></div>' : '') +
         relHTML(id, snap, dead, atRes) +
+        (!dead ? peopleHTML(t, snap, i) : '') +
+        diaryHTML(t, dead ? t.deathPhase : i) +
         attrHTML(t, theme) +
         '<div><div class="sub" style="margin-bottom:8px">La sua storia' + (atRes ? '' : ' finora') + '</div><div class="ptl">' + (hist.length ? hist.map(({ e, p }) => '<div class="it" style="--cc:var(--c-' + (e.cat || 'none') + ')"><span>' + (p.kind === 'b' ? 'Inizio' : 'G' + p.day + ' ' + (p.kind === 'n' ? 'notte' : p.kind === 'd' ? 'giorno' : KIND[p.kind].toLowerCase())) + '</span><p>' + linkify(e.html) + '</p></div>').join('') : '<p class="help">Nessun evento ancora.</p>') + '</div></div>' +
       '</div>';
@@ -896,8 +974,7 @@
       r.o.filter((x) => alive.has(x)).forEach((x) => rows.push('<div class="relrow"><span class="lbl">Deve un favore a</span>' + av(x) + '</div>'));
       const hunters = snap.alive.filter((x) => x !== id && snap.rel[x] && snap.rel[x].g.some(([y]) => y === id));
       if (hunters.length) rows.push('<div class="relrow"><span class="lbl">Ricercat' + G3(t.gender, 'o', 'a', 'ə') + ' da</span>' + hunters.map(av).join('') + '</div>');
-      const fr = r.fr.filter((x) => x !== r.p); if (fr.length) rows.push('<div class="relrow"><span class="lbl">Amici</span>' + fr.slice(0, 6).map(av).join('') + '</div>');
-      if (r.en.length) rows.push('<div class="relrow"><span class="lbl">Rivali</span>' + r.en.slice(0, 6).map(av).join('') + '</div>');
+
     }
     if (!badges.length && !rows.length) return '';
     return '<div><div class="sub" style="margin-bottom:8px">Legami e reputazione' + (atRes ? '' : ' adesso') + '</div>' + (badges.length ? '<div class="badges" style="margin-bottom:8px">' + badges.join('') + '</div>' : '') + (rows.length ? '<div class="rel">' + rows.join('') + '</div>' : '') + '</div>';
@@ -919,6 +996,7 @@
     if (st.tough) bits.push(plural(st.tough, 'sopravvissuto per un soffio', 'sopravvissuti per un soffio'));
     if (st.broken) bits.push(plural(st.broken, 'arma rotta', 'armi rotte'));
     if (st.looted) bits.push(plural(st.looted, 'oggetto razziato', 'oggetti razziati'));
+    if (st.trades) bits.push(plural(st.trades, 'scambio', 'scambi'));
     const met = (st.meteo || []).map((x) => 'G' + x.day + ' ' + x.n);
     if (!c.length && !bits.length && !met.length) return '';
     return '<p class="help eco-sum">' + (c.length ? '<b>Uccisi dall\'arena:</b> ' + esc(c.join(', ')) + '. ' : '') + (bits.length ? '<b>Conseguenze:</b> ' + esc(bits.join(' · ')) + '. ' : '') + (met.length ? '<b>Meteo:</b> ' + esc(met.join(' · ')) + '.' : '') + '</p>';
@@ -957,6 +1035,10 @@
     const hunter = maxBy((t) => t.foraged || 0); if (hunter && hunter.foraged >= 2) awards.push([soft ? 'Lo scroccone' : 'Il cacciatore', hunter, plural(hunter.foraged, 'pasto procurato', 'pasti procurati')]);
     const nurse = maxBy((t) => t.nursed || 0); if (nurse && nurse.nursed) awards.push([soft ? 'La spalla' : 'L\'infermiere', nurse, plural(nurse.nursed, 'compagno rimesso in sesto', 'compagni rimessi in sesto')]);
     const trapper = maxBy((t) => (t.trapKills || 0) * 3 + (t.trapsSet || 0)); if (trapper && trapper.trapsSet) awards.push(['Il trappolaio', trapper, plural(trapper.trapsSet, 'trappola piazzata', 'trappole piazzate') + (trapper.trapKills ? ', ' + trapper.trapKills + ' a segno' : '')]);
+    const merch = maxBy((t) => t.trades || 0); if (merch && merch.trades >= 2) awards.push(['Il mercante', merch, plural(merch.trades, 'scambio', 'scambi')]);
+    const inv2 = maxBy((t) => t.crafts || 0); if (inv2 && inv2.crafts) awards.push(['L\'inventore', inv2, plural(inv2.crafts, 'oggetto costruito o modificato', 'oggetti costruiti o modificati')]);
+    const heart = maxBy((t) => t.rejected || 0); if (heart && heart.rejected) awards.push(['Cuore infranto', heart, plural(heart.rejected, 'dichiarazione respinta', 'dichiarazioni respinte')]);
+    const soul = maxBy((t) => (t.diary || []).filter((d) => d.k === 'segreto').length); if (soul && (soul.diary || []).some((d) => d.k === 'segreto')) awards.push(['Il più misterioso', soul, plural(soul.diary.filter((d) => d.k === 'segreto').length, 'segreto nel diario', 'segreti nel diario')]);
     const busy = maxBy((t) => t.events); if (busy) awards.push(['Sempre in mezzo', busy, plural(busy.events, 'evento vissuto', 'eventi vissuti')]);
     const loot = maxBy((t) => t.items); if (loot && loot.items) awards.push(['Il collezionista', loot, plural(loot.items, 'oggetto trovato', 'oggetti trovati')]);
     const awardsH = '<div class="awards">' + awards.map(([a, t, d]) => '<button type="button" class="award card" data-prof="' + esc(t.id) + '">' + avHTML(t, { dead: !t.alive }) + '<span style="min-width:0"><span class="at">' + a + '</span><b>' + esc(t.name) + '</b><small>' + esc(d) + '</small></span></button>').join('') + '</div>';

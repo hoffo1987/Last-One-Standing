@@ -43,6 +43,23 @@ Ogni arena ha poi le sue regole:
 
 Le scelte degli eventi tengono conto di tutto questo: chi è ferito evita gli scontri e cerca cure, chi ha fame cerca cibo, chi è disperato tradisce più volentieri, le vittime più probabili sono i più deboli e stanchi. Nell'esito trovi le cause di morte, le conseguenze e il meteo di ogni giorno.
 
+## Oggetti
+Tredici tipi di oggetto, con nomi diversi in ogni arena: armi, protezioni, cure, cibo, attrezzi, mappe, trappole, esplosivi, veleni, portafortuna, alcol, merce di scambio e ricordi di casa. Nell'Arena c'è la guida completa (sezione "Gli oggetti e a cosa servono").
+- **Ogni oggetto ha una storia**: lo zaino nella scheda mostra cosa fa, la qualità (★), l'usura, e da dove viene ("Portato da casa", "Rubato a Marco · G3", "Preso a Lapo", "Dono degli sponsor", "Scambiato con Irene"…).
+- **Usura**: le armi si consumano a ogni colpo e si rompono; le protezioni riducono i danni e a volte parano un colpo mortale, poi si spaccano.
+- **Costruire**: chi è ingegnoso intinge l'arma nel veleno (poi avvelena a ogni colpo), unisce trappola ed esplosivo, ripara le armi con un attrezzo, si costruisce trappole.
+- **Scambi**: di notte chi ha fame o è ferito compra cibo e cure con merce, alcol o armi in più. L'avido chiede il doppio, il generoso regala.
+- **Ricordi**: ognuno parte con qualcosa scelto dal suo carattere (una foto di famiglia, una fiaschetta, un portafortuna…). I ricordi tengono su il morale; le lettere d'amore e i ricordi di chi non c'è più ancora di più.
+- **Bottino e sponsor**: chi uccide prende il meglio dallo zaino della vittima, il resto resta nella zona; gli sponsor aggiungono quello che serve di più a chi aiutano.
+
+## Carattere e vita interiore
+- **Obiettivi**: ognuno ha uno scopo che cambia con quello che succede (vendetta, proteggere chi ama, trovare cibo, curarsi, nascondersi, andare a caccia, conquistare il pubblico, trovare alleati, conquistare una persona, tradire in segreto). L'obiettivo decide dove si va di giorno e quali eventi si cercano: chi vuole vendetta segue le tracce del bersaglio, chi ha fame va nelle zone ricche, chi è ferito si nasconde, gli alleati restano insieme.
+- **Gesti notturni secondo i tratti**: il Carismatico e il Leader reclutano, il Pacifista e il Clemente mettono pace, il Bruto e l'Avido fanno i prepotenti, l'Impulsivo attacca briga, il Guaritore cura anche gli sconosciuti, il Generoso regala, il Furtivo ruba di notte e scopre i complotti, il Romantico scrive lettere, il Sonnambulo si sveglia dall'altra parte dell'arena, il Superstizioso fa i suoi riti, l'Ubriacone beve, l'Ingegnoso costruisce, il Cacciatore sfama il gruppo, il Leale giura protezione, il Solitario se ne va. Anche le caratteristiche alte contano (Intelligenza, Fortuna, Empatia).
+- **Cuori**: nascono cotte segrete; prima o poi ci si dichiara, e si può essere ricambiati o respinti. Chi ama in segreto qualcuno che si mette con un altro diventa geloso, a volte vendicativo.
+- **Complotti**: chi tradisce per natura (o per disperazione) sceglie in segreto la sua vittima nell'alleanza; una spia può smascherarlo prima che colpisca.
+- **Rapporti umani**: nella scheda, "Cosa prova per gli altri" mostra per ogni persona un'etichetta (Amore, Cotta segreta, Vendetta, Amico fidato, Alleato, In debito, Diffidenza, Nemico…), l'affinità e i ricordi in prima persona: «Mi ha salvato la vita», «Mi ha negato il cibo», «Ha ucciso Lapo».
+- **Diario segreto**: ogni notte (e a volte di giorno) ognuno scrive una pagina: pensieri, paure, segreti e anche i fatti che la diretta non ha mostrato. Nella lista "In gara" un'etichetta "diario" segnala chi ha una pagina nuova.
+
 ## Caratteristiche, tratti e prove
 - **Prove di abilità**: molti eventi sono una sfida su una caratteristica, con due esiti scritti. Il tiro somma caratteristica, due dadi, fortuna e tratti, e sottrae le condizioni (ferito, ubriaco, affamato…). La diretta mostra "Prova di Agilità · superata 15/11". Con valori alti si supera circa l'87% delle prove, con valori bassi circa il 20%.
 - **Eventi riservati** a chi ha una caratteristica molto alta o molto bassa, o un certo tratto.
@@ -71,6 +88,7 @@ src/data-core.js     eventi di base, tratti, caratteristiche, nomi
 src/data-themes.js   i 9 scenari (lessico, testi di fase, eventi speciali)
 src/content/_systems.js  sistema delle conseguenze: frasi di eco, oggetti speciali, eventi di legame
 src/content/_ecology.js  ecosistema delle arene: regole, indicatori, meteo, zone e testi delle conseguenze automatiche
+src/content/_items.js    catalogo degli oggetti, obiettivi, gesti dei tratti, diario segreto e ricordi dei rapporti
 src/content/pack-*.js    pacchetti per arena (eventi, disastri, 18+), condivisi e per adulti
 src/content/*.js         eventi aggiuntivi e disastri della versione precedente
 src/engine.js        motore di simulazione (funziona anche in Node)

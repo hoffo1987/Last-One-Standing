@@ -554,7 +554,7 @@ dialog::backdrop { background: hsl(var(--h) 30% 4% / .6); backdrop-filter: blur(
 .why.ok { color: var(--c-heal); border-color: color-mix(in srgb, var(--c-heal) 50%, transparent); }
 .why.ko { color: var(--c-kill); border-color: color-mix(in srgb, var(--c-kill) 50%, transparent); }
 .abars { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px 14px; }
-.abar { display: grid; grid-template-columns: 96px minmax(0, 1fr) 20px; gap: 8px; align-items: center; font-size: 13px; }
+.abar { display: grid; grid-template-columns: 122px minmax(0, 1fr) 20px; gap: 8px; align-items: center; font-size: 13px; }
 .abar i { height: 8px; background: var(--panel-2); border-radius: 4px; overflow: hidden; }
 .abar b { display: block; height: 100%; background: var(--muted); border-radius: 4px; }
 .abar b.hi { background: var(--c-heal); }
@@ -948,3 +948,66 @@ img.scene { object-fit: cover; object-position: center; user-select: none; }
 @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .ev.note.meteo .meteo { color: #8ab8f5; } }
 .tag18, .bc-18 { background: #b3261e; color: #fff; }
 .bc-18 { background: #fff; color: #b3261e; }
+
+/* ---------- la vita dei concorrenti: adesso, zaino, rapporti, diario ---------- */
+.nowcard { border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; display: grid; gap: 8px; background: var(--panel); }
+.nowlead { margin: 0; font-size: 15px; }
+.goal { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 8px; font-size: 14px; }
+.goal .glbl, .goal .gsince { font-family: var(--f-mono); font-size: 10.5px; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
+.goal .gsec { font-family: var(--f-mono); font-size: 10px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: color-mix(in srgb, var(--c-betray) 70%, var(--ink)); background: color-mix(in srgb, var(--c-betray) 14%, transparent); border-radius: 5px; padding: 1px 6px; }
+.thought { margin: 0; padding: 8px 12px; border-left: 3px solid var(--accent); background: var(--panel-2); border-radius: 0 8px 8px 0; font-style: italic; }
+.bag { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 250px), 1fr)); gap: 8px; }
+.bitem { display: grid; grid-template-columns: 34px minmax(0, 1fr); gap: 10px; padding: 10px; border: 1px solid var(--line); border-radius: 10px; background: var(--panel); min-width: 0; }
+.bic { width: 34px; height: 34px; border-radius: 9px; display: grid; place-items: center; background: var(--panel-2); color: var(--ink); }
+.bic svg { width: 19px; height: 19px; }
+.t-arma .bic, .t-esplosivo .bic, .t-trap .bic, .t-veleno .bic { color: color-mix(in srgb, var(--c-kill) 75%, var(--ink)); background: color-mix(in srgb, var(--c-kill) 12%, var(--panel-2)); }
+.t-med .bic, .t-cibo .bic, .t-armatura .bic { color: color-mix(in srgb, var(--c-heal) 75%, var(--ink)); background: color-mix(in srgb, var(--c-heal) 12%, var(--panel-2)); }
+.t-ricordo .bic, .t-amuleto .bic { color: color-mix(in srgb, var(--c-love) 75%, var(--ink)); background: color-mix(in srgb, var(--c-love) 12%, var(--panel-2)); }
+.t-valore .bic, .t-alcol .bic, .t-attrezzo .bic, .t-mappa .bic { color: color-mix(in srgb, var(--c-item) 75%, var(--ink)); background: color-mix(in srgb, var(--c-item) 14%, var(--panel-2)); }
+.bbody { min-width: 0; display: grid; gap: 3px; }
+.btop { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 8px; }
+.btop b { font-size: 14px; overflow-wrap: anywhere; }
+.stars { color: #d9a21a; font-size: 12px; letter-spacing: 1px; }
+.stars i { font-style: normal; opacity: .25; }
+.itag { font-family: var(--f-mono); font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; border-radius: 5px; padding: 1px 6px; }
+.itag.bad { color: color-mix(in srgb, var(--c-kill) 75%, var(--ink)); background: color-mix(in srgb, var(--c-kill) 13%, transparent); }
+.bmeta { display: flex; flex-wrap: wrap; align-items: center; gap: 2px 8px; font-size: 12px; color: var(--muted); }
+.btype { font-family: var(--f-mono); font-size: 10.5px; letter-spacing: .08em; text-transform: uppercase; }
+.uses { width: 54px; height: 5px; border-radius: 3px; background: var(--panel-2); overflow: hidden; display: inline-block; }
+.uses b { display: block; height: 100%; background: var(--c-item); }
+.bbody p { margin: 0; font-size: 12.5px; color: var(--muted); line-height: 1.4; }
+.people { display: grid; gap: 8px; }
+.person { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 10px; padding: 9px 10px; border-radius: 10px; background: var(--panel-2); align-items: start; }
+.person .av { --s: 36px; }
+.pbody { display: grid; gap: 5px; min-width: 0; }
+.ptop { display: flex; flex-wrap: wrap; gap: 4px 8px; align-items: baseline; }
+.plbl { font-family: var(--f-mono); font-size: 10.5px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+.l-amore .plbl, .l-cotta .plbl { color: color-mix(in srgb, var(--c-love) 75%, var(--ink)); }
+.l-vendetta .plbl, .l-nemico .plbl, .l-complotto .plbl { color: color-mix(in srgb, var(--c-kill) 75%, var(--ink)); }
+.l-amico .plbl, .l-alleato .plbl, .l-simpatia .plbl { color: color-mix(in srgb, var(--c-heal) 75%, var(--ink)); }
+.affbar { position: relative; height: 5px; border-radius: 3px; background: linear-gradient(90deg, color-mix(in srgb, var(--c-kill) 55%, transparent), var(--line) 50%, color-mix(in srgb, var(--c-heal) 55%, transparent)); max-width: 220px; }
+.affbar b { position: absolute; top: -3px; width: 3px; height: 11px; border-radius: 2px; background: var(--ink); transform: translateX(-50%); }
+.pmem { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; font-size: 13px; font-style: italic; }
+.pmem span { font-style: normal; font-family: var(--f-mono); font-size: 10.5px; color: var(--muted); }
+.diary { display: grid; gap: 10px; max-height: 420px; overflow: auto; padding-right: 4px; }
+.dday { display: grid; grid-template-columns: 34px minmax(0, 1fr); gap: 8px; }
+.dday .dd { font-family: var(--f-mono); font-size: 11px; color: var(--muted); padding-top: 3px; }
+.dday p { margin: 0 0 6px; font-size: 13.5px; line-height: 1.45; padding: 7px 10px; border-radius: 8px; background: var(--panel-2); }
+.dday .dk { display: block; font-family: var(--f-mono); font-size: 9.5px; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); margin-bottom: 2px; }
+.dday .dk-segreto { background: color-mix(in srgb, var(--c-betray) 10%, var(--panel-2)); }
+.dday .dk-segreto .dk { color: color-mix(in srgb, var(--c-betray) 75%, var(--ink)); }
+.dday .dk-fatto { background: color-mix(in srgb, var(--c-item) 10%, var(--panel-2)); }
+.newdiary { margin-left: 6px; font-family: var(--f-mono); font-size: 9.5px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: color-mix(in srgb, var(--c-betray) 75%, var(--ink)); background: color-mix(in srgb, var(--c-betray) 13%, transparent); border-radius: 5px; padding: 1px 5px; vertical-align: 2px; }
+.items-arena { border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; }
+.items-arena summary { cursor: pointer; display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 10px; list-style: none; }
+.items-arena summary::-webkit-details-marker { display: none; }
+.items-arena summary::after { content: "Mostra"; margin-left: auto; font-size: 12px; color: var(--accent-text); font-weight: 700; }
+.items-arena[open] summary::after { content: "Nascondi"; }
+.ia-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 260px), 1fr)); gap: 10px; margin-top: 12px; }
+.ia { display: grid; grid-template-columns: 34px minmax(0, 1fr); gap: 10px; }
+.ia b { font-size: 14px; }
+.iaex { display: block; font-size: 12px; color: var(--muted); font-style: italic; }
+.ia p { margin: 2px 0 0; font-size: 12.5px; color: var(--muted); line-height: 1.4; }
+.badge2.star { color: var(--accent-text); }
+.badge2.hot { color: color-mix(in srgb, var(--dead) 75%, var(--ink)); }
+.badge2.love { color: color-mix(in srgb, var(--c-love) 72%, var(--ink)); }

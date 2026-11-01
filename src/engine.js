@@ -335,6 +335,13 @@
     const closed = new Set(); // zone inghiottite dalla tempesta (Battle Royale)
     const traps = []; const zoneLoot = {};
     let SYS = []; let pendingNotes = [];
+    // oggetti e mente dei concorrenti
+    const IT = D.items || { types: {}, names: {}, how: {} };
+    const MIND = D.mind || { goals: {}, acts: {}, actsSoft: {}, diary: { trait: {} }, diarySoft: { trait: {} }, mem: {} };
+    let ORIGIN = null;
+    const ACT = (k) => (theme.soft && MIND.actsSoft && MIND.actsSoft[k]) || (MIND.acts || {})[k] || [];
+    const DIA = (k) => (theme.soft && MIND.diarySoft && MIND.diarySoft[k]) || (MIND.diary || {})[k] || [];
+    const DIAT = (tr) => (theme.soft && MIND.diarySoft && MIND.diarySoft.trait && MIND.diarySoft.trait[tr]) || ((MIND.diary || {}).trait || {})[tr] || [];
 
     const T = (cfg.cast || []).map((c, i) => ({
       id: c.id || 't' + i, name: (c.name || 'Concorrente ' + (i + 1)).trim(), gender: c.gender || 'M',
@@ -348,10 +355,12 @@
       revenges: 0, saves: 0, repaid: 0, amulets: 0, tests: 0, testsPassed: 0,
       hp: 100, en: 90, mo: 55, food: 70, pr: 0, infected: false, infKnown: false, cause: null, hurtPh: -1, sawDeath: -1,
       foraged: 0, nursed: 0, shared: 0, trapKills: 0, trapsSet: 0, survivedBeasts: 0,
+      goal: null, thought: '', crush: null, plot: null, diary: [], mem: {}, trades: 0, crafts: 0, acts: 0, rejected: 0, planPh: -9, vigilPh: -9, guard: null,
     }));
     if (T.length < 2) throw new Error('Servono almeno 2 concorrenti.');
     T.forEach((t) => {
       t.zone = rng.int(zoneCount);
+
       t.food = clamp(64 + t.attr.sop * 2, 0, 100);
       t.mo = clamp(50 + (t.attr.car - 5) * 2 + (t.attr.cor - 5) * 2 + (t.traits.includes('leader') ? 5 : 0) + (t.traits.includes('paranoico') ? -6 : 0), 20, 85);
     });
@@ -394,7 +403,7 @@
     const phases = [];
     let day = 0, deathCounter = 0, pendingFallen = [], noDeathStreak = 0;
     const stats = { events: 0, alliances: 0, betrayals: 0, firstBlood: null, deathsByDay: [], envDeaths: 0, killDeaths: 0, items: 0, revenges: 0, couples: 0, debtsRepaid: 0, amulets: 0, sponsors: 0, echoes: 0, tests: 0, testsPassed: 0,
-      causes: {}, shared: 0, nursed: 0, foraged: 0, trapsSet: 0, trapHits: 0, beasts: 0, infected: 0, cured: 0, broken: 0, looted: 0, meteo: [], expelled: 0 };
+      causes: {}, shared: 0, nursed: 0, foraged: 0, trapsSet: 0, trapHits: 0, beasts: 0, infected: 0, cured: 0, broken: 0, looted: 0, meteo: [], expelled: 0, trades: 0 };
 
     const hasItem = (t, it) => t.inv.some((x) => x.type === it);
     const itemOf = (t, it) => t.inv.find((x) => x.type === it);
@@ -422,6 +431,7 @@
       if ((attr === 'int' || attr === 'sop') && hasItem(t, 'mappa')) bonus += 2;
       if (attr === 'for' && hasItem(t, 'arma')) bonus += 1;
       const tb = wx('tb', null); if (tb && tb[attr]) bonus += tb[attr];
+      if (t.planPh >= phases.length - 3) bonus += 1;
       const die = 1 + rng.int(6) + rng.int(6);
       const roll = base + die + bonus;
       return { roll, dc, pass: roll >= dc, bonus };
@@ -547,6 +557,15 @@
       if (g0.cibo && P.food < 40) w *= 1.8;
       if (g0.med && P.hp < 55) w *= 2;
       if (g0.arma && !hasItem(P, 'arma')) w *= 1.3;
+      const gk = P.goal ? P.goal.k : '';
+      if (gk === 'caccia' && tg('agg')) w *= 1.6;
+      if (gk === 'nascondersi') { if (tg('agg')) w *= 0.5; if (tg('cow') || tg('stl')) w *= 1.8; }
+      if (gk === 'cibo' && tg('food')) w *= 1.8;
+      if (gk === 'curarsi' && tg('heal')) w *= 1.8;
+      if (gk === 'spettacolo' && tg('show')) w *= 2;
+      if (gk === 'reclutare' && (tg('ally') || tg('soc'))) w *= 1.8;
+      if (gk === 'tradire' && tg('betray')) w *= 3;
+      if (gk === 'cotta' && tg('love')) w *= 2;
       if (ev.origin === 'custom') w *= 1.5;
       else if (ev.origin === 'adult') w *= 1.25;
       else if (ev.origin !== 'base') w *= 1.3;
@@ -559,6 +578,8 @@
       if (P.partner === t.id) k -= 1.6;
       if (P.owes[t.id] || t.owes[P.id]) k -= 1.1;
       if (t.grudges[P.id]) k -= 0.9;
+      if (P.goal && P.goal.tg === t.id) k -= 1;
+      if (P.crush === t.id) k -= 0.6;
       const a = aff(P, t); if (a >= 40) k -= 0.7; else if (a <= -40) k -= 0.5;
       return k;
     }
@@ -618,21 +639,35 @@
     }
 
     // ---------- ecosistema: testi e valori vitali ----------
-    function sysText(k, people, vars) {
-      const fits = (x) => { let mx = -1; x.replace(/[{\[](\d)[}:]/g, (_, d) => { mx = Math.max(mx, +d); }); return mx < people.length; };
-      const list = (Array.isArray(TX(k)) ? TX(k) : []).filter(fits); if (!list.length) return null;
+    function fmt(src, people, vars) {
+      const fits = (x) => { let mx = -1; x.replace(/[{\[](\d)[}:]/g, (_, d) => { mx = Math.max(mx, +d); }); return mx < people.length && !/\{(i|ip|j|k|z|n)\}/.test(x.replace(/\{(i|ip|j|k|z|n)\}/g, (m, v) => (vars && vars[v] != null && vars[v] !== '' ? '' : m))); };
+      const list = (Array.isArray(src) ? src : []).filter(fits); if (!list.length) return null;
       let s = rng.pick(list);
       s = s.replace(/\[(\d):([^\]]*)\]/g, (_, i, o) => genderPick([people[+i]], o))
-        .replace(/\{(i|ip|z|m|n|d)\}/g, (_, x) => (vars && vars[x] != null ? vars[x] : ''))
+        .replace(/\{(i|ip|j|k|z|m|n|d)\}/g, (_, x) => (vars && vars[x] != null ? vars[x] : ''))
         .replace(LEX_RE, (_, k2) => (k2 === 'luogo' && vars && vars.z ? vars.z : rng.pick(LEX[k2] || ['qualcosa'])));
       s = cap(artPrep(s));
       return { plain: edFix(s.replace(/\{(\d)\}/g, (_, i) => people[+i].name)), html: edFix(esc(s).replace(/\{(\d)\}/g, (_, i) => nameTag(people[+i]))) };
     }
+    const sysText = (k, people, vars) => fmt(TX(k), people, vars);
     function sys(k, people, vars, o, pri) {
       const tx = sysText(k, people, vars); if (!tx) return null;
       const ev = Object.assign({ html: tx.html, plain: tx.plain, ids: people.map((p) => p.id), deaths: [], lethal: false, origin: 'sys', cat: 'none', why: 'conseguenza', echo: [] }, o || {});
       SYS.push({ pri: pri || 1, ev });
       return ev;
+    }
+    // ricordi dei rapporti (in prima persona) e diario segreto
+    function remember(a, b, k, x) {
+      if (!a || !b || a === b) return;
+      const l = (a.mem[b.id] = a.mem[b.id] || []);
+      if (l.length && l[l.length - 1].k === k && l[l.length - 1].ph === phases.length) return;
+      l.push({ ph: phases.length, k, x: x ? x.id : null });
+      if (l.length > 6) l.shift();
+    }
+    function remember1(t, html, kind) {
+      if (!t || !html) return;
+      t.diary.push({ ph: phases.length, d: day, h: html, k: kind || 'pensiero' });
+      if (t.diary.length > 80) t.diary.shift();
     }
     function syncSt(t) {
       const ph = phases.length;
@@ -644,6 +679,11 @@
     function hurt(t, dmg, by, cause, inTick) {
       if (!t.alive) return;
       dmg *= Math.max(0.55, 1.2 - t.attr.res * 0.04) * (hasTrait(t, 'sopravvissuto') ? 0.85 : 1);
+      const ar = itemOf(t, 'armatura');
+      if (ar && dmg >= 8) {
+        dmg *= 0.62; ar.u = (ar.u || 1) - 1;
+        if (ar.u <= 0) { takeItem(t, ar); sys('armorBreak', [t], { i: ar.name, ip: possessive(ar) }, { cat: 'hurt', why: 'oggetto' }, 1); }
+      }
       const hp0 = t.hp;
       t.hp -= dmg; if (!inTick) t.hp = Math.max(Math.min(8, hp0), t.hp);
       t.hurtPh = phases.length;
@@ -656,7 +696,38 @@
       t.mo -= Math.min(10, dmg / 4);
       syncSt(t);
     }
-    const capInv = (t) => { while (t.inv.length > 7) t.inv.shift(); };
+    const capInv = (t) => { while (t.inv.length > 8) { const k = t.inv.findIndex((x) => x.type !== 'ricordo'); t.inv.splice(k >= 0 ? k : 0, 1); } };
+    const itemName = (type) => {
+      const n = ((IT.names || {})[theme.id] || {})[type] || ((IT.names || {})._ || {})[type];
+      if (n && n.length) return rng.pick(n);
+      return ITEM_NAME[type] || rng.pick(LEX[type] || ['qualcosa']);
+    };
+    const maxUses = (type, q) => (type === 'arma' ? Math.max(2, Math.round((2 + (q || 2) * 2) / (MOD.wear || 1))) : type === 'armatura' ? 3 : 0);
+    function mkItem(type, name, how, from, q) {
+      const it = { type, name: name || itemName(type), how: how || ORIGIN || 'trovato', from: from ? from.id : null, d: day };
+      if (type === 'arma') it.q = q || clamp(Math.round(0.7 + rng.f() * 2.2 * MOD.weapon), 1, 3);
+      const mu = maxUses(type, it.q); if (mu) { it.u = mu; it.um = mu; }
+      return it;
+    }
+    const itemScore = (it) => (it.q || 2) * 10 + (it.u || 0) + (it.x ? 5 : 0);
+    function addItem(t, it) {
+      if (it.type === 'arma' || it.type === 'armatura') {
+        const old = itemOf(t, it.type);
+        if (old) { if (itemScore(old) >= itemScore(it)) return false; t.inv.splice(t.inv.indexOf(old), 1); }
+      }
+      t.inv.push(it); capInv(t); return true;
+    }
+    function takeItem(t, it) { const k = t.inv.indexOf(it); if (k >= 0) t.inv.splice(k, 1); return it; }
+    // l'arma si consuma a ogni colpo e alla fine si rompe
+    function wear(k, out) {
+      const w = itemOf(k, 'arma'); if (!w || !w.u) return;
+      w.u--;
+      if (w.u <= 0) {
+        takeItem(k, w); stats.broken++;
+        const e = sysText('weaponBreak', [k], { i: w.name, ip: possessive(w) });
+        if (e) { if (out && out.length < 3) out.push(Object.assign(e, { cls: '' })); else remember1(k, e.html, 'fatto'); }
+      }
+    }
     function eat(t) {
       const i = t.inv.findIndex((x) => x.type === 'cibo'); if (i < 0) return false;
       t.inv.splice(i, 1); t.food += 50; t.mo += 3;
@@ -692,11 +763,8 @@
           if (M && M.kill) k.pr += M.kill * Math.max(0.4, 1.2 - k.attr.emp * 0.06);
           if (dm <= -15 && out.length < 3 && rng.chance(0.5)) { const e = sysText('remorse', [k, v]); if (e) out.push(Object.assign(e, { cls: '' })); }
           else if (dm > 0 && k.kills === 2 && out.length < 3 && rng.chance(0.5)) { const e = sysText('bloodlust', [k]); if (e) out.push(Object.assign(e, { cls: 'warn' })); }
-          const w = itemOf(k, 'arma');
-          if (w && rng.chance(0.07 * MOD.weapon)) {
-            k.inv.splice(k.inv.indexOf(w), 1); stats.broken++;
-            const e = sysText('weaponBreak', [k], { i: w.name, ip: possessive(w) }); if (e && out.length < 3) out.push(Object.assign(e, { cls: '' }));
-          }
+          wear(k, out);
+          if (k.plot === v.id) k.plot = null;
           syncSt(k);
           if (k.grudges[v.id]) {
             const g = k.grudges[v.id]; delete k.grudges[v.id]; k.revenges++; stats.revenges++; k.fame += 2;
@@ -710,17 +778,17 @@
         // il bottino: chi uccide fruga nello zaino della vittima
         const K = killers.find((k) => k.alive);
         if (K && v.inv.length) {
-          let took = 0;
+          let took = 0; const left = [];
           v.inv.slice().forEach((it) => {
-            if (took >= 2) return;
             const mine = itemOf(K, it.type);
-            if (it.type === 'arma' ? !mine || (it.q || 2) > (mine.q || 2) : !mine || it.type === 'cibo') {
-              if (it.type === 'arma' && mine) K.inv.splice(K.inv.indexOf(mine), 1);
-              K.inv.push(Object.assign({}, it)); took++; stats.looted++;
+            const want = it.type !== 'ricordo' && (it.type === 'arma' || it.type === 'armatura' ? !mine || itemScore(it) > itemScore(mine) : !mine || it.type === 'cibo' || it.type === 'valore');
+            if (took < 2 && want) {
+              addItem(K, Object.assign({}, it, { how: theme.soft ? 'eredita' : 'bottino', from: v.id, d: day })); took++; stats.looted++;
               if (took === 1 && out.length < 3 && rng.chance(0.4)) { const e = sysText(theme.soft ? 'lootSoft' : 'loot', [K, v], { i: it.name }); if (e) out.push(Object.assign(e, { cls: '' })); }
-            }
+            } else left.push({ it, from: v.id });
           });
-          capInv(K);
+          // il resto dello zaino resta sul posto, per chi passerà di lì
+          if (left.length) (zoneLoot[v.zone] = zoneLoot[v.zone] || []).push(...left);
         }
       } else {
         stats.envDeaths++;
@@ -742,23 +810,18 @@
         syncSt(X);
         X.lost = v.id;
         killers.forEach((K) => {
+          remember(X, K, 'killedDear', v);
           if (addGrudge(X, K, 'kill', v) && echoed < 2) { const e = echo(lover ? E.grudgeLover : E.grudgeKill, [X, K, v], 'warn'); if (e) { out.push(e); echoed++; } }
         });
         if (!killers.length && lover && echoed < 2) { const e = echo(E.griefOnly, [X, v], 'warn'); if (e) { out.push(e); echoed++; } }
       });
       if (v.partner) { const p = byId[v.partner]; if (p) { p.partner = null; p.exPartner = v.id; } v.partner = null; }
     }
-    function giveItem(t, type, ctx, lexPick, name, q) {
+    function giveItem(t, type, ctx, lexPick, name, q, how, from, src) {
       const nm = name || (type === 'arma' ? lexPick('arma') : type === 'cibo' ? ctx.cibo || 'delle provviste' : ITEM_NAME[type] || lexPick(type));
-      const it = { type, name: nm };
-      if (type === 'arma') {
-        it.q = q || clamp(Math.round(0.7 + rng.f() * 2.2 * MOD.weapon), 1, 3);
-        const old = itemOf(t, 'arma');
-        if (old) { if ((old.q || 2) > it.q && !name) { it.q = old.q; it.name = old.name; } t.inv.splice(t.inv.indexOf(old), 1); }
-      }
-      t.inv.push(it); t.items++; stats.items++;
+      const it = src ? Object.assign({}, src, { how: how || 'trovato', from: from ? from.id : null, d: day }) : mkItem(type, nm, how, from, q);
+      addItem(t, it); t.items++; stats.items++;
       if (type === 'cibo' && t.food < 45) eat(t);
-      while (t.inv.length > 7) t.inv.shift();
     }
 
     function resolveTest(ev, roles) {
@@ -797,6 +860,15 @@
           ev.kills.forEach((k) => { if (k.v.includes(i)) k.by.forEach((b) => addGrudge(v, roles[b], 'attack')); });
           return;
         }
+        // la protezione para il colpo
+        const arm = itemOf(v, 'armatura');
+        if (v.alive && arm && alive().length > 2 && rng.chance(0.24)) {
+          saved.add(i); takeItem(v, arm);
+          const atk2 = ev.kills.find((k) => k.v.includes(i)); const K2 = atk2 ? roles[atk2.by[0]] : null;
+          hurt(v, 26, K2, 'wound'); if (K2) { addGrudge(v, K2, 'attack'); remember(v, K2, 'tried'); }
+          const e = fmt(ACT('armorSave'), [v], { i: arm.name, ip: possessive(arm) }); if (e) out.push(Object.assign(e, { cls: 'twist' }));
+          return;
+        }
         // la tempra: chi è in forma e resistente a volte sopravvive al colpo, ma ridotto malissimo
         const tough = 0.03 + (v.attr.res - 5) * 0.022 + (v.attr.fort - 5) * 0.01 + (hasTrait(v, 'sopravvissuto') ? 0.08 : 0) + (v.mo >= 80 ? 0.03 : 0);
         if (v.alive && v.hp >= 60 && alive().length > 2 && rng.chance(Math.max(0, tough))) {
@@ -804,7 +876,7 @@
           const atk = ev.kills.find((k) => k.v.includes(i));
           const K = atk ? roles[atk.by[0]] : null;
           v.hp = 9 + rng.int(10); v.hurtPh = phases.length; v.cause = K ? { k: 'wound', by: K.id, ph: phases.length } : { k: 'wound', ph: phases.length, by: null };
-          if (K) { addGrudge(v, K, 'attack'); K.fame += 1; }
+          if (K) { addGrudge(v, K, 'attack'); remember(v, K, 'tried'); K.fame += 1; }
           if (M && M.infect && !v.infected && rng.chance(M.infect)) { v.infected = true; v.pr = 10; stats.infected++; }
           syncSt(v); stats.tough = (stats.tough || 0) + 1;
           const e = sysText(K ? 'tough' : 'toughEnv', K ? [v, K] : [v]); if (e) out.push(Object.assign(e, { cls: 'twist' }));
@@ -815,7 +887,7 @@
         k.v.forEach((i) => { if (!saved.has(i)) kill(roles[i], killers, txt, out); });
         if (k.betray) {
           stats.betrayals++;
-          killers.forEach((t) => { t.betrayals++; t.traitor = true; leaveAlliance(t); });
+          killers.forEach((t) => { t.betrayals++; t.traitor = true; t.plot = null; leaveAlliance(t); });
         }
       }
       ev.dies.forEach((i) => { if (!saved.has(i)) kill(roles[i], [], txt, out); });
@@ -825,28 +897,29 @@
         switch (f.t) {
           case 'al': {
             const ts = f.r.map((i) => roles[i]).filter((x) => x.alive);
-            if (ts.length > 1) { joinAlliance(ts); stats.alliances++; ts.forEach((x) => { x.alliancesFormed++; x.mo += 10; ts.forEach((y) => x.id < y.id && addAff(x, y, Math.round(25 * (0.7 + (x.attr.car + y.attr.car) / 30)))); }); }
+            if (ts.length > 1) { joinAlliance(ts); stats.alliances++; ts.forEach((x) => { x.alliancesFormed++; x.mo += 10; ts.forEach((y) => remember(x, y, 'allied')); ts.forEach((y) => x.id < y.id && addAff(x, y, Math.round(25 * (0.7 + (x.attr.car + y.attr.car) / 30)))); }); }
             break;
           }
           case 'br': {
             const g = t.allyId != null ? [...(alliances.get(t.allyId) || [])].map((id) => byId[id]).filter((x) => x !== t && x.alive) : [];
             leaveAlliance(t); t.betrayals++; t.traitor = true; stats.betrayals++;
-            let n = 0; g.forEach((x) => { x.mo -= 18 * DR.mo; if (addGrudge(x, t, 'betray') && n++ < 1) { const e = echo(E.betray, [x, t], 'warn'); if (e) out.push(e); } });
+            t.plot = null;
+            let n = 0; g.forEach((x) => { x.mo -= 18 * DR.mo; remember(x, t, 'betrayed'); if (addGrudge(x, t, 'betray') && n++ < 1) { const e = echo(E.betray, [x, t], 'warn'); if (e) out.push(e); } });
             break;
           }
           case 'gain': giveItem(t, f.item, ctx, lexPick); break;
           case 'lose': { const i = t.inv.findIndex((x) => x.type === f.item); if (i >= 0) t.inv.splice(i, 1); if (f.item === 'cibo') t.food += 40; if (f.item === 'med') t.hp = Math.max(t.hp, 70); break; }
           case 'steal': {
             const i = u.inv.findIndex((x) => x.type === 'arma');
-            if (i >= 0) { const [it] = u.inv.splice(i, 1); giveItem(t, 'arma', ctx, lexPick, it.name, it.q); u.mo -= 10; if (u.alive && addGrudge(u, t, 'steal')) { const e = echo(E.steal, [u, t], 'warn'); if (e) out.push(e); } }
+            if (i >= 0) { const [it] = u.inv.splice(i, 1); giveItem(t, 'arma', ctx, lexPick, it.name, it.q, 'rubato', u, it); u.mo -= 10; remember(u, t, 'robbed'); if (u.alive && addGrudge(u, t, 'steal')) { const e = echo(E.steal, [u, t], 'warn'); if (e) out.push(e); } }
             break;
           }
           case 'give': {
             if (!u.alive) break;
             const own = itemOf(t, f.item);
             if (own) t.inv.splice(t.inv.indexOf(own), 1);
-            giveItem(u, f.item, ctx, lexPick, own ? own.name : null, own && own.q);
-            u.owes[t.id] = 'dono'; addAff(t, u, 20); u.mo += 8;
+            giveItem(u, f.item, ctx, lexPick, own ? own.name : null, own && own.q, 'dono', t, own);
+            u.owes[t.id] = 'dono'; addAff(t, u, 20); u.mo += 8; remember(u, t, 'gift');
             if (rng.chance(0.6)) { const e = echo(E.debt, [u, t], ''); if (e) out.push(e); }
             break;
           }
@@ -869,16 +942,21 @@
             if (M && M.cure) { if (M.infect) { if (t.infected && t.pr < M.cure) { t.infected = false; t.pr = 0; stats.cured++; } } else t.pr -= M.cure; }
             syncSt(t);
             const helper = roles.find((x) => x !== t && x.alive);
-            if (helper && ev.n > 1) { t.owes[helper.id] = 'cura'; addAff(t, helper, 30); helper.saves++; if (rng.chance(0.5)) { const e = echo(E.debt, [t, helper], ''); if (e) out.push(e); } }
+            if (helper && ev.n > 1) { t.owes[helper.id] = 'cura'; addAff(t, helper, 30); helper.saves++; remember(t, helper, 'cured'); if (rng.chance(0.5)) { const e = echo(E.debt, [t, helper], ''); if (e) out.push(e); } }
             break;
           }
-          case 'hit': if (u.alive) { hurt(u, (28 + rng.int(18)) * (1 + weaponPow(t) / 12), t, 'wound'); u.mo -= 6; if (addGrudge(u, t, 'attack') && rng.chance(0.6)) { const e = echo(E.hit, [u, t], 'warn'); if (e) out.push(e); } } break;
-          case 'save': if (u.alive) { u.owes[t.id] = 'vita'; addAff(t, u, 40); u.mo += 15; t.saves++; t.fame += 1; const e = echo(E.saved, [u, t], 'good'); if (e) out.push(e); } break;
-          case 'forgive': delete t.grudges[u.id]; addAff(t, u, 35); break;
+          case 'hit': if (u.alive) {
+            const wpn = itemOf(t, 'arma');
+            hurt(u, (28 + rng.int(18)) * (1 + weaponPow(t) / 12), t, 'wound'); u.mo -= 6; remember(u, t, 'hit');
+            if (wpn && wpn.x === 'veleno' && u.st.avvelenato == null) { u.st.avvelenato = phases.length; u.cause = { k: 'poison', by: t.id, ph: phases.length }; }
+            wear(t, out); if (addGrudge(u, t, 'attack') && rng.chance(0.6)) { const e = echo(E.hit, [u, t], 'warn'); if (e) out.push(e); } } break;
+          case 'save': if (u.alive) { u.owes[t.id] = 'vita'; addAff(t, u, 40); u.mo += 15; remember(u, t, 'saved'); t.saves++; t.fame += 1; const e = echo(E.saved, [u, t], 'good'); if (e) out.push(e); } break;
+          case 'forgive': delete t.grudges[u.id]; addAff(t, u, 35); remember(t, u, 'forgave'); break;
           case 'love': if (u.alive) {
             t.partner = u.id; u.partner = t.id; addAff(t, u, 70); stats.couples++; t.fame += 1; u.fame += 1; t.mo += 25; u.mo += 25;
+            remember(t, u, 'love'); remember(u, t, 'love'); if (t.crush === u.id) t.crush = null; if (u.crush === t.id) u.crush = null; jealousy(t, u);
             if (!cfg.teamWin && (t.allyId == null || u.allyId == null || t.allyId === u.allyId)) { const g = t.allyId != null ? alliances.get(t.allyId) : u.allyId != null ? alliances.get(u.allyId) : null; if (!g || g.size < 5) joinAlliance([t, u]); } const e = echo(E.couple, [t, u], 'love'); if (e) out.push(e); } break;
-          case 'repay': if (u) { delete t.owes[u.id]; addAff(t, u, 20); t.repaid++; stats.debtsRepaid++; const e = echo(E.repay, [t, u], 'good'); if (e) out.push(e); } break;
+          case 'repay': if (u) { delete t.owes[u.id]; addAff(t, u, 20); t.repaid++; remember(u, t, 'repaid'); stats.debtsRepaid++; const e = echo(E.repay, [t, u], 'good'); if (e) out.push(e); } break;
           case 'debt': if (u) t.owes[u.id] = 'favore'; break;
           case 'rel': if (u) addAff(t, u, f.v); break;
           case 'star': t.fame += 2; t.mo += 10; if (t.fame >= 5 && !t.starred) { t.starred = true; const e = echo(E.star, [t], 'good'); if (e) out.push(e); } break;
@@ -911,15 +989,16 @@
     }
 
     function snapshot() {
-      const zones = {}, allies = {}, st = {}, inv = {}, kills = {}, rel = {}, vit = {};
+      const zones = {}, allies = {}, st = {}, inv = {}, kills = {}, rel = {}, vit = {}, mind = {};
       T.forEach((t) => {
-        zones[t.id] = t.zone; allies[t.id] = t.allyId; st[t.id] = Object.keys(t.st); inv[t.id] = t.inv.map((x) => x.name + (x.type === 'arma' && x.q ? ['', ' ★', ' ★★', ' ★★★'][x.q] : '')); kills[t.id] = t.kills;
+        zones[t.id] = t.zone; allies[t.id] = t.allyId; st[t.id] = Object.keys(t.st); inv[t.id] = t.inv.map((x) => { const o = { t: x.type, n: x.name, h: x.how || 'trovato' }; if (x.q) o.q = x.q; if (x.u != null) { o.u = x.u; o.m = x.um; } if (x.from) o.f = x.from; if (x.d) o.d = x.d; if (x.x) o.x = x.x; return o; }); kills[t.id] = t.kills;
+        if (t.alive && t.goal) mind[t.id] = { g: t.goal.k, tg: t.goal.tg, since: t.goal.ph, th: t.thought };
         if (t.alive) vit[t.id] = [Math.round(Math.max(0, t.hp)), Math.round(t.en), Math.round(t.mo), Math.round(t.food), M && (!M.infect || t.infected) ? Math.round(t.pr) : -1];
         const friends = T.filter((u) => u !== t && u.alive && aff(t, u) >= 40).map((u) => u.id);
         const enemies = T.filter((u) => u !== t && u.alive && aff(t, u) <= -40 && !t.grudges[u.id]).map((u) => u.id);
-        rel[t.id] = { p: t.partner, g: Object.keys(t.grudges).filter((id) => byId[id].alive).map((id) => [id, t.grudges[id].why, t.grudges[id].victim]), o: Object.keys(t.owes).filter((id) => byId[id].alive), f: t.fame, tr: t.traitor, fr: friends, en: enemies, lost: t.lost };
+        rel[t.id] = { p: t.partner, g: Object.keys(t.grudges).filter((id) => byId[id].alive).map((id) => [id, t.grudges[id].why, t.grudges[id].victim]), o: Object.keys(t.owes).filter((id) => byId[id].alive), f: t.fame, tr: t.traitor, fr: friends, en: enemies, lost: t.lost, top: t.alive ? relTop(t) : [] };
       });
-      return { alive: alive().map((t) => t.id), zones, allies, st, inv, kills, rel, vit, closed: [...closed] };
+      return { alive: alive().map((t) => t.id), zones, allies, st, inv, kills, rel, vit, mind, closed: [...closed] };
     }
 
     function tickStatus() {
@@ -944,7 +1023,15 @@
       const opts = pools.sponsor.filter((e) => e.n === 1 && checkReq(e, [P]));
       const ev = rng.wpick(opts, (e) => weightFor(e, P));
       if (!ev) return;
-      const r = apply(ev, [P]); r.why = r.why || 'fama'; r.sponsor = true; events.push(r); stats.sponsors++; P.mo += 15; syncSt(P);
+      ORIGIN = 'sponsor';
+      const r = apply(ev, [P]); r.why = r.why || 'fama'; r.sponsor = true; events.push(r); stats.sponsors++; P.mo += 15;
+      // nella cassa c'è spesso anche qualcosa di utile, scelto in base ai bisogni
+      if (rng.chance(0.45)) {
+        const need = P.hp < 55 ? 'med' : P.food < 40 ? 'cibo' : !hasItem(P, 'armatura') ? 'armatura' : !hasItem(P, 'attrezzo') ? 'attrezzo' : 'valore';
+        const it = mkItem(need, need === 'cibo' ? rng.pick(LEX.cibo || ['delle provviste']) : null, 'sponsor');
+        if (addItem(P, it)) { P.items++; stats.items++; if (need === 'cibo' && P.food < 45) eat(P); const e = fmt(ACT('sponsorBonus'), [P], { i: it.name }); if (e) r.echo = (r.echo || []).concat([Object.assign(e, { cls: 'good' })]).slice(0, 3); }
+      }
+      ORIGIN = null; syncSt(P);
     }
 
     /* ---------- ecosistema: conseguenze automatiche ---------- */
@@ -1011,18 +1098,20 @@
         // esplorazione: cibo dalla zona o bottino dei caduti
         if (!hasItem(t, 'cibo') && t.food < 65) {
           const loot = zoneLoot[t.zone];
-          const li = loot ? loot.findIndex((x) => !itemOf(t, x.it.type) || x.it.type === 'cibo') : -1;
+          const li = loot ? loot.findIndex((x) => x.it.type !== 'ricordo' && (!itemOf(t, x.it.type) || x.it.type === 'cibo')) : -1;
           if (li >= 0 && rng.chance(0.3 + t.attr.sop * 0.03)) {
             const { it, from } = loot.splice(li, 1)[0];
-            t.inv.push(Object.assign({}, it)); capInv(t); t.items++; stats.items++; stats.looted++;
+            addItem(t, Object.assign({}, it, { how: 'zaino', from, d: day })); t.items++; stats.items++; stats.looted++;
             sys('scavenge', [t, byId[from]], { i: it.name, z: zoneName(t.zone) }, { cat: 'item', why: 'bottino', ids: [t.id] }, 2);
             if (it.type === 'cibo' && t.food < 45) eat(t);
           } else {
-            const p = (0.08 + t.attr.sop * 0.045 + (hasTrait(t, 'cacciatore') ? 0.15 : 0) + (hasItem(t, 'mappa') ? 0.12 * MOD.map : 0)) * ZP[t.zone][0] * MOD.forage * wx('forage', 1) * (t.en < 25 ? 0.6 : 1);
+            const p = (0.08 + t.attr.sop * 0.045 + (hasTrait(t, 'cacciatore') ? 0.15 : 0) + (hasItem(t, 'mappa') ? 0.12 * MOD.map : 0) + (hasItem(t, 'attrezzo') ? 0.12 : 0)) * ZP[t.zone][0] * MOD.forage * wx('forage', 1) * (t.en < 25 ? 0.6 : 1);
             if (rng.chance(Math.min(0.92, p))) {
               const hungry = t.food < 40; t.foraged++; stats.foraged++;
               const nm = rng.pick(LEX.cibo || ['delle provviste']);
-              if (t.food < 50) t.food += 34; else { t.inv.push({ type: 'cibo', name: nm }); capInv(t); t.items++; }
+              if (t.food < 50) t.food += 34; else { addItem(t, mkItem('cibo', nm, 'trovato')); t.items++; }
+              // a volte, cercando, si trova anche altro
+              if (rng.chance(0.16)) { const it = mkItem(rng.pick(['attrezzo', 'armatura', 'valore', 'alcol', 'med', 'valore']), null, 'trovato'); if (addItem(t, it)) { t.items++; stats.items++; const e = fmt(ACT('luckyFind'), [t], { i: it.name }); if (e) sys2(e, [t], 'item', 'Esplorazione', 0); } }
               if (hungry || rng.chance(0.15)) sys('forage', [t], {}, { cat: 'item', why: 'esplorazione' }, hungry ? 2 : 0);
             }
           }
@@ -1067,6 +1156,10 @@
         }
         syncSt(t);
       });
+      // cuori, gesti e scambi: ognuno secondo la propria natura
+      hearts();
+      personalActs();
+      barter();
       // sonno, guarigione naturale e umore
       let watchMsg = 0;
       A.forEach((t) => {
@@ -1088,7 +1181,8 @@
           t.st.malato = phases.length; t.cause = { k: t.cause && t.cause.by ? 'wound' : 'sick', by: t.cause ? t.cause.by : null, ph: t.cause && t.cause.by ? t.cause.ph : phases.length };
           sys('woundSick', [t], {}, { cat: 'hurt', why: 'ferite' }, 2);
         }
-        let dm = (t.allyId != null ? 4 : 0) + (t.partner ? 6 : 0) + (mates.some((x) => hasTrait(x, 'leader')) ? 3 : 0) + (t.fame >= 3 ? 2 : 0) +
+        const rc = itemOf(t, 'ricordo');
+        let dm = (rc ? (rc.from && byId[rc.from] && !byId[rc.from].alive ? 7 : 4) : 0) + (t.allyId != null ? 4 : 0) + (t.partner ? 6 : 0) + (mates.some((x) => hasTrait(x, 'leader')) ? 3 : 0) + (t.fame >= 3 ? 2 : 0) +
           (alone ? (hasTrait(t, 'solitario') ? 2 : -3) : 0) - (t.food < 25 ? 6 : 0) - (t.hp < 40 ? 6 : 0) - (meterBad(t) ? 5 : 0);
         if (dm < 0) dm *= DR.mo;
         t.mo += dm + (58 - t.mo) * 0.08;
@@ -1127,7 +1221,7 @@
         const tr = itemOf(t, 'trap');
         if (!tr || !t.alive) return;
         if ((t.attr.int >= 6 || hasTrait(t, 'ingegnoso') || hasTrait(t, 'cacciatore') || rng.chance(0.3)) && rng.chance(0.55)) {
-          t.inv.splice(t.inv.indexOf(tr), 1); traps.push({ owner: t.id, zone: t.zone, ph: phases.length, name: tr.name }); t.trapsSet++; stats.trapsSet++;
+          t.inv.splice(t.inv.indexOf(tr), 1); traps.push({ owner: t.id, zone: t.zone, ph: phases.length, name: tr.name, boom: tr.x === 'bomba' }); t.trapsSet++; stats.trapsSet++;
           if (rng.chance(0.45)) sys('trapSet', [t], { i: tr.name, z: zoneName(t.zone) }, { cat: 'item', why: 'trappola' }, 1);
         }
       });
@@ -1139,13 +1233,16 @@
         const p = 0.035 * MOD.beast * wx('beast', 1) * ZP[t.zone][1] * (alone ? 1.6 * (MOD.nightAlone ? 1 + MOD.nightAlone * 0.5 : 1) : 0.45) * (t.en < 30 ? 1.5 : 1) * (hasTrait(t, 'furtivo') ? 0.6 : 1) * Math.sqrt(diff);
         if (!rng.chance(p)) return;
         attacks++; stats.beasts++;
-        const def = Math.max(t.attr.furt, t.attr.agi, t.attr.cor) + d6() + (hasItem(t, 'arma') ? 2 : 0) + (alone ? 0 : 3) + (t.st.esausto != null ? -2 : 0);
+        const guarded = alive().some((x) => x.guard === t.id && x.zone === t.zone);
+        const def = Math.max(t.attr.furt, t.attr.agi, t.attr.cor) + d6() + (hasItem(t, 'arma') ? 2 : 0) + (hasItem(t, 'attrezzo') ? 1 : 0) + (alone ? 0 : 3) + (t.st.esausto != null ? -2 : 0) + (t.vigilPh >= phases.length - 1 ? 2 : 0) + (guarded ? 3 : 0);
         if (def >= 14) { t.survivedBeasts++; if (!alone) { allyMates(t).forEach((x) => addAff(t, x, 6)); sys('beastFend', [t], {}, { cat: 'ally', why: 'predatori' }, 2); } return; }
         hurt(t, 22 + rng.int(18), null, 'beast', true);
         if (t.hp > 0) sys('beastHit', [t], {}, { cat: 'hurt', why: 'predatori' }, 3);
       });
       if (alive().length > 1 && day > 1 && rng.chance(0.2)) { const ex = alive().find((t) => t.en < 15); if (ex) sys('exhausted', [ex], {}, { cat: 'hurt', why: 'riposo' }, 0); }
       alive().forEach((t) => Object.keys(t.owes).forEach((id) => { if (!byId[id].alive) delete t.owes[id]; }));
+      diaryNight();
+      alive().forEach(decideGoal);
     }
 
     // a ogni fase: consumi, veleni, emorragie, indicatore dell'arena, tempesta, trappole
@@ -1183,7 +1280,7 @@
         alive().forEach((t) => {
           if (!closed.has(t.zone)) return;
           const z = zoneName(t.zone);
-          const esc2 = 0.3 + t.attr.agi * 0.05 + t.en / 260 + (hasItem(t, 'mappa') ? 0.2 : 0);
+          const esc2 = 0.3 + t.attr.agi * 0.05 + t.en / 260 + (hasItem(t, 'mappa') ? 0.2 : 0) + (hasItem(t, 'attrezzo') ? 0.15 : 0);
           if (rng.chance(esc2)) { if (msgs < 1 && rng.chance(0.25)) { msgs++; sys('stormEscape', [t], { z }, { cat: 'none', why: 'tempesta' }, 0); } }
           else { hurt(t, (14 + rng.int(14)) * wx('storm', 1), null, 'storm', true); t.stormZ = z; if (t.hp > 0 && msgs < 2) { msgs++; sys('storm', [t], { z }, { cat: 'hurt', why: 'tempesta' }, 2); } }
           const open = [...Array(zoneCount).keys()].filter((i) => !closed.has(i));
@@ -1200,11 +1297,12 @@
           if (!rng.chance(0.16 * MOD.trap * wx('trap', 1))) continue;
           traps.splice(k, 1);
           const z = zoneName(tp.zone);
-          const dodge = Math.max(v.attr.furt, v.attr.int, v.attr.agi) + d6() + (hasTrait(v, 'fortunato') ? 1 : 0) + (hasTrait(v, 'paranoico') ? 1 : 0);
+          const dodge = Math.max(v.attr.furt, v.attr.int, v.attr.agi) + d6() + (hasTrait(v, 'fortunato') ? 1 : 0) + (hasTrait(v, 'paranoico') ? 1 : 0) + (hasItem(v, 'mappa') ? 3 : 0) + (hasItem(v, 'attrezzo') ? 2 : 0);
           if (dodge >= 15) { addAff(v, owner, -15); sys('trapDodge', [owner, v], { z }, { cat: 'none', why: 'trappola' }, 2); break; }
           stats.trapHits++;
           const friendly = owner.allyId != null && owner.allyId === v.allyId;
-          hurt(v, 32 + rng.int(22), owner.alive && !friendly ? owner : null, friendly ? 'wound' : 'trap', true);
+          hurt(v, (32 + rng.int(22)) * (tp.boom ? 1.5 : 1), owner.alive && !friendly ? owner : null, friendly ? 'wound' : 'trap', true);
+          remember(v, owner, 'trap');
           v.trapZ = z;
           if (friendly) { addAff(v, owner, -30); if (v.hp > 0) sys('trapAlly', [owner, v], { z }, { cat: 'hurt', why: 'trappola' }, 3); }
           else { if (owner.alive) { v.cause = { k: 'trap', by: owner.id, ph: phases.length }; addGrudge(v, owner, 'attack'); } if (v.hp > 0) sys('trapHit', [owner, v], { z }, { cat: 'hurt', why: 'trappola' }, 3); }
@@ -1244,10 +1342,350 @@
       });
     }
 
+
+    /* ---------------- la mente: obiettivi, gesti, segreti ---------------- */
+    const aliveId = (id) => !!(id && byId[id] && byId[id].alive);
+    const zoneMates = (t) => alive().filter((x) => x !== t && x.zone === t.zone);
+    const isAlly = (a, b) => a.allyId != null && a.allyId === b.allyId;
+    const canFight = (a, b) => !isAlly(a, b) && a.partner !== b.id && !(cfg.teamWin && a.team === b.team);
+    const traitName = (id) => (traitMap[id] ? traitMap[id].name : '');
+    // chi ama in segreto qualcuno che si mette con un altro
+    function jealousy(a, b) {
+      alive().forEach((x) => {
+        if (x === a || x === b) return;
+        const lost = x.crush === a.id ? a : x.crush === b.id ? b : null; if (!lost) return;
+        const rival = lost === a ? b : a;
+        x.crush = null; x.mo -= 15 * DR.mo; addAff(x, rival, -30); remember(x, rival, 'jealous');
+        if (hasTrait(x, 'vendicativo') || aff(x, rival) <= -45) addGrudge(x, rival, 'love');
+        const e = fmt(ACT('jealous'), [x, lost, rival]); if (e) sys2(e, [x, lost, rival], 'love', 'Gelosia', 2);
+        const d = fmt(DIA('jealousy'), [x, lost, rival]); if (d) remember1(x, d.html);
+      });
+    }
+    // un evento di sistema già scritto
+    function sys2(tx, people, cat, whyTxt, pri, ids) {
+      SYS.push({ pri: pri || 1, ev: { html: tx.html, plain: tx.plain, ids: ids || people.map((p) => p.id), deaths: [], lethal: false, origin: 'sys', cat: cat || 'none', why: 'carattere', whyTxt: whyTxt || '', echo: [] } });
+    }
+
+    // l'obiettivo del momento nasce da stato, legami e carattere
+    function decideGoal(t) {
+      const opts = [];
+      const gs = Object.keys(t.grudges).filter(aliveId).map((id) => byId[id]);
+      if (gs.length) {
+        const tg = gs.sort((a, b) => (t.grudges[b.id].why === 'kill') - (t.grudges[a.id].why === 'kill'))[0];
+        opts.push(['vendetta', tg, 3 + (hasTrait(t, 'vendicativo') ? 3 : 0) - (hasTrait(t, 'clemente') ? 2 : 0) - (hasTrait(t, 'pacifista') ? 1.5 : 0) + (t.grudges[tg.id].why === 'kill' ? 1 : 0) + (t.attr.cor - 5) * 0.2]);
+      }
+      if (t.hp < 45) opts.push(['curarsi', null, 4 + (45 - t.hp) / 10]);
+      if (t.food < 30) opts.push(['cibo', null, 3.5 + (30 - t.food) / 10 + (hasTrait(t, 'goloso') ? 1 : 0)]);
+      if (aliveId(t.partner)) opts.push(['proteggere', byId[t.partner], 2.5 + (byId[t.partner].hp < 50 ? 2 : 0) + (hasTrait(t, 'leale') ? 1 : 0)]);
+      if (aliveId(t.crush) && !t.partner) opts.push(['cotta', byId[t.crush], 2.2 + (hasTrait(t, 'romantico') ? 1.5 : 0)]);
+      if (aliveId(t.plot) && isAlly(t, byId[t.plot])) opts.push(['tradire', byId[t.plot], 3.2]);
+      if (hasTrait(t, 'codardo') || t.mo < 25 || (t.hp < 50 && t.kills === 0)) opts.push(['nascondersi', null, 1.5 + (hasTrait(t, 'codardo') ? 2 : 0) + (t.mo < 25 ? 1 : 0)]);
+      if (hasTrait(t, 'spietato') || hasTrait(t, 'bruto') || t.kills >= 3 || (hasTrait(t, 'cacciatore') && t.mo > 50)) opts.push(['caccia', null, 1.8 + (hasTrait(t, 'spietato') ? 1.5 : 0) + t.kills * 0.3]);
+      if (hasTrait(t, 'esibizionista') || (hasTrait(t, 'carismatico') && t.fame >= 2)) opts.push(['spettacolo', null, 1.6 + (hasTrait(t, 'esibizionista') ? 1 : 0)]);
+      if (t.allyId == null && !hasTrait(t, 'solitario') && (hasTrait(t, 'leader') || hasTrait(t, 'carismatico') || t.attr.car >= 7 || t.mo < 40)) opts.push(['reclutare', null, 1.5 + (hasTrait(t, 'leader') ? 1 : 0)]);
+      opts.push(['sopravvivere', null, 1.2]);
+      const noise = hasTrait(t, 'folle') ? 2.5 : hasTrait(t, 'impulsivo') ? 1.5 : 0.6;
+      let best = opts[0], bs = -1e9;
+      opts.forEach((o) => { const sc = o[2] + rng.f() * noise; if (sc > bs) { bs = sc; best = o; } });
+      let tg = best[1];
+      if (best[0] === 'caccia') tg = alive().filter((x) => x !== t && canFight(t, x)).sort((a, b) => combat(a) - combat(b))[0] || null;
+      const same = t.goal && t.goal.k === best[0] && t.goal.tg === (tg ? tg.id : null);
+      t.goal = { k: best[0], tg: tg ? tg.id : null, ph: same ? t.goal.ph : phases.length };
+      if (!same || !t.thought) {
+        const gd = (MIND.goals || {})[best[0]] || { th: [] };
+        const x = fmt(gd.th, tg ? [t, tg] : [t]) || fmt(gd.th.filter((l) => !/\{1\}|\[1:/.test(l)), [t]);
+        t.thought = x ? x.html : '';
+      }
+    }
+    // gli spostamenti di giorno seguono l'obiettivo e il gruppo
+    function moveByGoals() {
+      const open = [...Array(zoneCount).keys()].filter((i) => !closed.has(i));
+      if (!open.length) return;
+      const best = (f) => open.slice().sort((a, b) => f(b) - f(a))[0];
+      alive().forEach((t) => {
+        const g = t.goal || { k: 'sopravvivere' };
+        const tg = aliveId(g.tg) ? byId[g.tg] : null;
+        let z = null;
+        if ((g.k === 'vendetta' || g.k === 'caccia') && tg && rng.chance(0.3 + t.attr.furt * 0.04 + t.attr.int * 0.02 + (hasTrait(t, 'cacciatore') ? 0.15 : 0))) {
+          z = tg.zone;
+          if (g.k === 'vendetta' && rng.chance(0.5)) { const d = fmt(ACT('stalk'), [t, tg], { z: zoneName(z) }); if (d) remember1(t, d.html, 'mossa'); }
+        } else if ((g.k === 'proteggere' || g.k === 'cotta' || g.k === 'tradire') && tg && rng.chance(0.6)) z = tg.zone;
+        else if (g.k === 'cibo' && rng.chance(0.55)) z = best((i) => ZP[i][0] + rng.f() * 0.3);
+        else if ((g.k === 'nascondersi' || g.k === 'curarsi') && rng.chance(0.55)) { z = best((i) => ZP[i][2] - ZP[i][1] + rng.f() * 0.2); if (rng.chance(0.4)) { const d = fmt(ACT('hide'), [t], { z: zoneName(z) }); if (d) remember1(t, d.html, 'mossa'); } }
+        else if (t.allyId != null && rng.chance(0.6)) { const m = allyMates(t)[0]; if (m) z = m.zone; }
+        else if (rng.chance(0.15)) z = rng.pick(open);
+        if (z != null && !closed.has(z)) t.zone = z;
+      });
+    }
+
+    // complotti, cotte e confessioni nascono e muoiono di notte
+    function hearts() {
+      alive().forEach((t) => {
+        if (t.plot && (!aliveId(t.plot) || !isAlly(t, byId[t.plot]))) t.plot = null;
+        if (t.crush && (!aliveId(t.crush) || t.partner || aff(t, byId[t.crush]) < 0)) t.crush = null;
+        // il complotto: chi tradisce per natura, o per disperazione
+        if (!t.plot && t.allyId != null && day >= 2 && !hasTrait(t, 'leale') && (hasTrait(t, 'traditore') ? rng.chance(0.6) : hasTrait(t, 'avido') || (t.attr.emp <= 3 && t.mo < 40) ? rng.chance(0.25) : t.mo < 25 && !hasTrait(t, 'pacifista') ? rng.chance(0.12) : false)) {
+          const m = allyMates(t).sort((a, b) => b.inv.length - a.inv.length || aff(t, a) - aff(t, b))[0];
+          if (m) { t.plot = m.id; const d = fmt(DIA('plot'), [t, m]); if (d) remember1(t, d.html, 'segreto'); }
+        }
+        // la cotta segreta
+        if (!t.crush && !t.partner && (hasTrait(t, 'romantico') || t.attr.car + t.attr.emp >= 13 || rng.chance(0.06))) {
+          const c = alive().filter((x) => x !== t && !x.partner && x.id !== t.exPartner && aff(t, x) >= 25 && !t.grudges[x.id]).sort((a, b) => aff(t, b) - aff(t, a))[0];
+          if (c && rng.chance(hasTrait(t, 'romantico') ? 0.55 : 0.25)) { t.crush = c.id; t.crushPh = phases.length; const d = fmt(DIA('crush'), [t, c]); if (d) remember1(t, d.html, 'segreto'); }
+        }
+      });
+      // la confessione
+      alive().forEach((t) => {
+        if (!aliveId(t.crush) || t.partner || phases.length - (t.crushPh || 0) < 3) return;
+        const u = byId[t.crush];
+        if (u.partner || !rng.chance(hasTrait(t, 'romantico') ? 0.45 : 0.2 + t.attr.cor * 0.02)) return;
+        if (cfg.teamWin && u.team !== t.team) return;
+        const yes = u.crush === t.id || rng.chance(clamp((aff(t, u) - 25) / 60 + (hasTrait(u, 'romantico') ? 0.2 : 0) + (t.attr.car - 5) * 0.04, 0.08, 0.85));
+        t.crush = null;
+        if (yes) {
+          t.partner = u.id; u.partner = t.id; u.crush = null; addAff(t, u, 60); stats.couples++; t.mo += 25; u.mo += 25; t.fame += 1; u.fame += 1;
+          remember(t, u, 'love'); remember(u, t, 'love');
+          if (!cfg.teamWin && (t.allyId == null || u.allyId == null || t.allyId === u.allyId)) { const g = t.allyId != null ? alliances.get(t.allyId) : u.allyId != null ? alliances.get(u.allyId) : null; if (!g || g.size < 5) joinAlliance([t, u]); }
+          const e = fmt(ACT('confessYes'), [t, u]); if (e) sys2(e, [t, u], 'love', 'Dichiarazione', 4);
+          jealousy(t, u);
+        } else {
+          t.mo -= 15 * DR.mo; t.rejected++; addAff(t, u, -5); remember(t, u, 'rejected');
+          const e = fmt(ACT('confessNo'), [t, u]); if (e) sys2(e, [t, u], 'love', 'Dichiarazione', 3);
+          const d = fmt(DIA('rejected'), [t, u]); if (d) remember1(t, d.html, 'segreto');
+        }
+      });
+    }
+
+    // i gesti di ogni notte: ognuno agisce secondo la propria natura
+    function personalActs() {
+      const done = new Set();
+      rng.shuffle(alive()).forEach((t) => {
+        if (!t.alive || done.has(t.id)) return;
+        const tr = (x) => hasTrait(t, x);
+        const mates = zoneMates(t).filter((x) => !done.has(x.id));
+        const cand = [];
+        const add = (w, f) => { if (w > 0) cand.push([w, f]); };
+        const say = (k, people, vars, cat, why, pri) => { const e = fmt(ACT(k), people, vars); if (e) sys2(e, people, cat, why, pri); t.acts++; people.forEach((p) => done.add(p.id)); return true; };
+        // reclutare
+        if (t.allyId == null || (alliances.get(t.allyId) || new Set()).size < (tr('leader') ? 6 : 5)) {
+          const u = mates.find((x) => x.allyId == null && aff(t, x) > -20 && !t.grudges[x.id] && !x.grudges[t.id] && !hasTrait(x, 'solitario') && !(cfg.teamWin && cfg.teamsAllied && x.team !== t.team));
+          if (u) add((t.goal && t.goal.k === 'reclutare' ? 2 : 0) + (tr('leader') ? 1.2 : 0) + (tr('carismatico') ? 1.2 : 0) + (t.attr.car >= 8 ? 0.5 : 0), () => {
+            if (!rng.chance(0.35 + t.attr.car * 0.05 + aff(t, u) / 200)) return false;
+            joinAlliance([t, u]); stats.alliances++; t.alliancesFormed++; u.alliancesFormed++; addAff(t, u, 22); remember(u, t, 'recruited'); remember(t, u, 'allied');
+            return say('recruit', [t, u], {}, 'ally', traitName(tr('leader') ? 'leader' : 'carismatico') || 'Alleanza', 3);
+          });
+        }
+        // mettere pace
+        if (tr('pacifista') || tr('clemente') || t.attr.emp >= 8) {
+          const pair = []; mates.forEach((a) => mates.forEach((b) => { if (a !== b && a.grudges[b.id] && a.grudges[b.id].why !== 'kill') pair.push([a, b]); }));
+          if (pair.length) add(1.8 + (tr('pacifista') ? 1 : 0), () => {
+            const [a, b] = pair[0]; if (!rng.chance(0.35 + t.attr.car * 0.04 + t.attr.emp * 0.03)) return false;
+            delete a.grudges[b.id]; delete b.grudges[a.id]; addAff(a, b, 30); remember(a, t, 'mediated'); remember(b, t, 'mediated'); addAff(t, a, 10); addAff(t, b, 10);
+            return say('mediate', [t, a, b], {}, 'heal', traitName(tr('pacifista') ? 'pacifista' : 'clemente') || 'Empatia', 3);
+          });
+        }
+        // prepotenza
+        if ((tr('bruto') || tr('avido') || tr('spietato')) && t.attr.for >= 6) {
+          const u = mates.find((x) => canFight(t, x) && combat(x) < combat(t) - 3 && x.inv.some((it) => /cibo|valore|med|amuleto|armatura/.test(it.type)));
+          if (u) add(1.3 + (tr('bruto') ? 0.6 : 0), () => {
+            const it = u.inv.find((x) => /cibo|valore|med|amuleto|armatura/.test(x.type)); takeItem(u, it);
+            addItem(t, Object.assign({}, it, { how: 'rubato', from: u.id, d: day })); addGrudge(u, t, 'steal'); remember(u, t, 'bullied'); u.mo -= 10;
+            return say('bully', [t, u], { i: it.name, z: zoneName(t.zone) }, 'betray', traitName(tr('bruto') ? 'bruto' : tr('avido') ? 'avido' : 'spietato'), 3);
+          });
+        }
+        // rissa
+        if (tr('impulsivo') || tr('bruto') || t.mo < 25) {
+          const u = mates.find((x) => canFight(t, x) && (aff(t, x) <= -40 || t.grudges[x.id] || x.grudges[t.id]));
+          if (u) add(1.4 + (tr('impulsivo') ? 1 : 0), () => {
+            hurt(u, 12 + rng.int(10), t, 'wound', false); hurt(t, 10 + rng.int(10), u, 'wound', false); addAff(t, u, -15); remember(u, t, 'brawl'); remember(t, u, 'brawl');
+            return say('brawl', [t, u], { z: zoneName(t.zone) }, 'hurt', traitName(tr('impulsivo') ? 'impulsivo' : 'bruto') || 'Rissa', 3);
+          });
+        }
+        // curare uno sconosciuto
+        if (tr('guaritore') || (t.attr.emp >= 8 && t.attr.int >= 5)) {
+          const u = mates.find((x) => x.hp < 50 && !isAlly(t, x) && x.partner !== t.id);
+          if (u) add(1.6, () => {
+            u.hp += (18 + t.attr.int) * MOD.heal; u.owes[t.id] = 'cura'; addAff(t, u, 25); remember(u, t, 'healedStranger'); t.saves++; t.nursed++; syncSt(u);
+            return say('healStranger', [t, u], {}, 'heal', traitName(tr('guaritore') ? 'guaritore' : '') || 'Empatia', 3);
+          });
+        }
+        // regalare
+        if (tr('generoso') || t.attr.emp >= 8) {
+          const u = mates.concat(allyMates(t)).find((x) => x.mo < 35 || x.food < 30);
+          const it = t.inv.find((x) => (u && u.food < 30 ? x.type === 'cibo' : /cibo|valore|alcol|amuleto/.test(x.type)));
+          if (u && it) add(1.3 + (tr('generoso') ? 1 : 0), () => {
+            takeItem(t, it); addItem(u, Object.assign({}, it, { how: 'dono', from: t.id, d: day })); if (it.type === 'cibo' && u.food < 45) eat(u);
+            u.owes[t.id] = u.owes[t.id] || 'dono'; addAff(t, u, 20); u.mo += 8; remember(u, t, 'gift'); syncSt(u);
+            return say('gift', [t, u], { i: it.name }, 'heal', traitName(tr('generoso') ? 'generoso' : '') || 'Empatia', 2);
+          });
+        }
+        // spettacolo
+        if (tr('esibizionista') || (t.goal && t.goal.k === 'spettacolo')) add(1.2 + (tr('esibizionista') ? 0.8 : 0), () => { t.fame += Math.round(2 * MOD.fame); t.mo += 5; return say('show', [t], {}, 'none', traitName('esibizionista'), 1); });
+        // discorso al gruppo
+        if (tr('leader') && allyMates(t).length >= 2) add(1.1, () => { allyMates(t).forEach((x) => { x.mo += 8; addAff(t, x, 5); }); t.mo += 4; return say('speech', [t], {}, 'ally', traitName('leader'), 1); });
+        // rito portafortuna
+        if (tr('superstizioso')) add(0.9, () => { t.mo += 8; if (M && !M.infect) t.pr -= 10; const am = itemOf(t, 'amuleto'); return say('ritual', [t], { i: am ? am.name : '' }, 'none', traitName('superstizioso'), 0); });
+        // sonnambulismo
+        if (tr('sonnambulo')) add(1.1, () => { const z = rng.pick([...Array(zoneCount).keys()].filter((i) => i !== t.zone && !closed.has(i))); if (z == null) return false; t.zone = z; t.en -= 6; return say('sleepwalk', [t], { z: zoneName(z) }, 'none', traitName('sonnambulo'), 1); });
+        // follia
+        if (tr('folle')) add(0.9, () => { t.mo += 6; return say('madness', [t], {}, 'none', traitName('folle'), 0); });
+        // sfortuna
+        if (tr('sfortunato')) add(0.8, () => { const it = rng.pick(t.inv.filter((x) => x.type !== 'ricordo')); if (it) takeItem(t, it); else hurt(t, 6, null, 'wound', false); return say('mishap', [t], { i: it ? it.name : '' }, 'hurt', traitName('sfortunato'), 1); });
+        // fortuna
+        if (tr('fortunato') || t.attr.fort >= 8) add(0.7 + (tr('fortunato') ? 0.5 : 0), () => { const it = mkItem(rng.pick(['valore', 'attrezzo', 'armatura', 'med', 'amuleto', 'alcol']), null, 'trovato'); addItem(t, it); t.items++; stats.items++; return say('luckyFind', [t], { i: it.name }, 'item', traitName(tr('fortunato') ? 'fortunato' : '') || 'Fortuna', 1); });
+        // golosità
+        if (tr('goloso') && hasItem(t, 'cibo') && t.food >= 55) add(1, () => { const it = itemOf(t, 'cibo'); takeItem(t, it); t.food += 20; t.mo += 4; return say('glutton', [t], { i: it.name }, 'none', traitName('goloso'), 0); });
+        // bere
+        if (hasItem(t, 'alcol') && (tr('ubriacone') || t.mo < 25)) add(1.3 + (tr('ubriacone') ? 1 : 0), () => { const it = itemOf(t, 'alcol'); takeItem(t, it); t.st.ubriaco = phases.length; t.mo += 12; t.en -= 8; if (M && !M.infect && (M.id === 'freddo' || M.id === 'terrore' || M.id === 'ansia' || M.id === 'stress')) t.pr -= 15; syncSt(t); return say('drink', [t], { i: it.name }, 'none', traitName(tr('ubriacone') ? 'ubriacone' : '') || 'Morale', 1); });
+        // disinfettare una ferita infetta
+        if (hasItem(t, 'alcol') && (tr('guaritore') || t.attr.int >= 6)) {
+          const u = buddies(t).find((x) => x.st.malato != null);
+          if (u) add(2, () => { const it = itemOf(t, 'alcol'); takeItem(t, it); delete u.st.malato; u.owes[t.id] = 'cura'; addAff(t, u, 15); remember(u, t, 'cured'); return say('disinfect', [t, u], { i: it.name }, 'heal', 'Cure', 2); });
+        }
+        // il solitario se ne va
+        if (tr('solitario') && t.allyId != null && (alliances.get(t.allyId) || new Set()).size >= 3) add(0.8, () => { const m = allyMates(t); leaveAlliance(t); m.forEach((x) => addAff(x, t, -8)); return say('loner', [t], {}, 'none', traitName('solitario'), 2); });
+        // pianificare
+        if (tr('stratega') || t.attr.int >= 8) add(0.8, () => { t.planPh = phases.length; return say('plan', [t], {}, 'none', traitName(tr('stratega') ? 'stratega' : '') || 'Intelligenza', 0); });
+        // costruire
+        if (tr('ingegnoso') || t.attr.int >= 7) {
+          const w = itemOf(t, 'arma'), tp = itemOf(t, 'trap'), ex = itemOf(t, 'esplosivo'), vn = itemOf(t, 'veleno'), at = itemOf(t, 'attrezzo');
+          const why = traitName(tr('ingegnoso') ? 'ingegnoso' : '') || 'Ingegno';
+          if (tp && ex && !tp.x) add(2, () => { takeItem(t, ex); tp.x = 'bomba'; t.crafts++; return say('craftBomb', [t], {}, 'item', why, 2); });
+          if (w && vn && !w.x && !theme.soft) add(2, () => { takeItem(t, vn); w.x = 'veleno'; t.crafts++; return say('craftPoison', [t], { ip: possessive(w) }, 'item', why, 2); });
+          if (w && at && w.u != null && w.u <= Math.ceil((w.um || 4) / 2)) add(1.8, () => { w.u = Math.min(w.um || 6, w.u + 3); t.crafts++; return say('craftRepair', [t], { ip: possessive(w) }, 'item', why, 1); });
+          if (!tp && at && t.attr.int >= 7) add(0.7, () => { addItem(t, mkItem('trap', null, 'costruito')); t.crafts++; return say('craftTrap', [t], { i: at.name }, 'item', why, 1); });
+        }
+        // spiare e smascherare i complotti
+        if (tr('furtivo') || tr('paranoico') || t.attr.int >= 8) {
+          const plotter = allyMates(t).find((x) => x.plot && aliveId(x.plot) && isAlly(x, byId[x.plot]));
+          if (plotter) add(2.6, () => {
+            if (!rng.chance(0.3 + t.attr.furt * 0.03 + t.attr.int * 0.02)) return false;
+            const victim = byId[plotter.plot]; const grp = allyMates(plotter);
+            leaveAlliance(plotter); grp.forEach((x) => { addAff(x, plotter, -35); }); plotter.plot = null; plotter.traitor = true;
+            addAff(victim, t, 25); remember(victim, t, 'warned'); remember(plotter, t, 'exposed'); addGrudge(plotter, t, 'betray');
+            return say('spyExpose', [t, plotter, victim], {}, 'betray', traitName(tr('furtivo') ? 'furtivo' : tr('paranoico') ? 'paranoico' : '') || 'Intuito', 4);
+          });
+        }
+        // furto notturno
+        if (tr('furtivo') || (tr('avido') && t.attr.furt >= 6)) {
+          const u = mates.find((x) => !isAlly(t, x) && x.partner !== t.id && x.inv.some((it) => it.type !== 'ricordo'));
+          if (u) add(1.2, () => {
+            const it = rng.pick(u.inv.filter((x) => x.type !== 'ricordo')); takeItem(u, it); addItem(t, Object.assign({}, it, { how: 'rubato', from: u.id, d: day }));
+            if (hasTrait(u, 'paranoico') || rng.chance(Math.max(0.1, 0.4 - (t.attr.furt - 5) * 0.05))) { addGrudge(u, t, 'steal'); remember(u, t, 'nightTheft'); }
+            u.mo -= 6;
+            return say('nightTheft', [t, u], { i: it.name }, 'betray', traitName(tr('furtivo') ? 'furtivo' : 'avido'), 2);
+          });
+        }
+        // lettere e regali d'amore
+        if (tr('romantico') && (aliveId(t.partner) || aliveId(t.crush))) {
+          const u = byId[t.partner || t.crush];
+          add(1, () => { addItem(u, { type: 'ricordo', name: 'una lettera di ' + t.name, how: 'lettera', from: t.id, d: day }); addAff(t, u, 12); u.mo += 10; remember(u, t, 'letter'); return say('letter', [t, u], {}, 'love', traitName('romantico'), 1); });
+        }
+        // giuramento di protezione
+        if (tr('leale')) {
+          const u = buddies(t).find((x) => x.hp < 60);
+          if (u) add(1.2, () => { t.guard = u.id; addAff(t, u, 10); remember(u, t, 'oath'); return say('oath', [t, u], {}, 'ally', traitName('leale'), 1); });
+        }
+        // caccia per il gruppo
+        if (tr('cacciatore')) add(1, () => {
+          if (!rng.chance(0.45 + t.attr.sop * 0.04)) return false;
+          const hungry = [t].concat(allyMates(t)).filter((x) => x.food < 55);
+          hungry.forEach((x) => { x.food += 30; syncSt(x); if (x !== t) { addAff(t, x, 6); remember(x, t, 'shared'); } });
+          t.foraged++; stats.foraged++;
+          return say('hunt', [t], {}, 'item', traitName('cacciatore'), 1);
+        });
+        // sonno leggero
+        if (tr('paranoico')) add(0.6, () => { t.vigilPh = phases.length; t.en -= 5; return say('paranoid', [t], {}, 'none', traitName('paranoico'), 0); });
+        // perdono silenzioso
+        if (tr('clemente')) {
+          const id = Object.keys(t.grudges).find((x) => aliveId(x) && t.grudges[x].why !== 'kill');
+          if (id) add(1, () => { delete t.grudges[id]; addAff(t, byId[id], 20); remember(t, byId[id], 'forgave'); const d = fmt(ACT('forgiveQuiet'), [t, byId[id]]); if (d) remember1(t, d.html, 'segreto'); t.acts++; return true; });
+        }
+        if (!cand.length) return;
+        const pAct = 0.45 + Math.min(0.3, cand.length * 0.07) + (t.traits.length ? 0.1 : 0);
+        if (!rng.chance(pAct)) return;
+        const pick = rng.wpick(cand, (c) => c[0]);
+        if (pick) pick[1]();
+      });
+    }
+
+    // gli scambi della notte: chi ha fame compra da chi ne ha
+    function barter() {
+      alive().forEach((b) => {
+        const want = b.food < 40 && !hasItem(b, 'cibo') ? 'cibo' : b.hp < 50 && !hasItem(b, 'med') ? 'med' : null;
+        if (!want) return;
+        const pay = b.inv.filter((x) => x.type === 'valore' || x.type === 'alcol' || (x.type === 'arma' && b.attr.for <= 4) || x.type === 'esplosivo' || x.type === 'veleno');
+        const sellers = zoneMates(b).concat(allyMates(b)).filter((x) => x !== b && aff(b, x) > -30 && (want === 'cibo' ? x.inv.filter((it) => it.type === 'cibo').length >= (x.food >= 55 ? 1 : 2) : hasItem(x, 'med') && x.hp >= 70));
+        const s2 = sellers[0]; if (!s2) return;
+        const food = itemOf(s2, want);
+        if (hasTrait(s2, 'generoso') || (aff(s2, b) >= 50 && rng.chance(0.5))) {
+          takeItem(s2, food); addItem(b, Object.assign({}, food, { how: 'dono', from: s2.id, d: day })); if (want === 'cibo') eat(b); b.owes[s2.id] = 'dono'; addAff(s2, b, 15); remember(b, s2, 'gift'); stats.trades++;
+          const e = fmt(ACT('tradeFree'), [b, s2], { j: food.name }); if (e) sys2(e, [b, s2], 'heal', 'Scambio', 2);
+          return;
+        }
+        if (!pay.length) return;
+        const greedy = hasTrait(s2, 'avido');
+        if (greedy && pay.length < 2) return;
+        const give = pay.slice(0, greedy ? 2 : 1);
+        give.forEach((it) => { takeItem(b, it); addItem(s2, Object.assign({}, it, { how: 'scambio', from: b.id, d: day })); });
+        takeItem(s2, food); addItem(b, Object.assign({}, food, { how: 'scambio', from: s2.id, d: day })); if (want === 'cibo') eat(b);
+        b.trades++; s2.trades++; stats.trades++;
+        if (greedy) { addAff(b, s2, -10); remember(b, s2, 'fleeced'); } else { addAff(b, s2, 8); remember(b, s2, 'traded'); remember(s2, b, 'traded'); }
+        const e = fmt(ACT(greedy ? 'tradeGreedy' : 'trade'), [b, s2], { i: give[0].name, j: food.name, k: give[1] ? give[1].name : '' }); if (e) sys2(e, [b, s2], 'item', 'Scambio', 2);
+      });
+    }
+
+    // il diario: un pensiero per notte, ciò che la diretta non mostra
+    function diaryNight(prob) {
+      alive().forEach((t) => {
+        if (!rng.chance(prob || 0.8)) return;
+        const c = [];
+        const add = (w, k, people, vars) => { if (w > 0) c.push([w, k, people, vars]); };
+        if (t.lost && byId[t.lost] && !byId[t.lost].alive && t.st.lutto != null) add(4, 'grief', [t, byId[t.lost]]);
+        const gid = Object.keys(t.grudges).find(aliveId); if (gid) add(2.5 + (hasTrait(t, 'vendicativo') ? 2 : 0), 'revenge', [t, byId[gid]]);
+        if (aliveId(t.crush)) add(3, 'crush', [t, byId[t.crush]]);
+        if (aliveId(t.plot)) add(3, 'plot', [t, byId[t.plot]]);
+        const lastKill = t.killIds.length ? byId[t.killIds[t.killIds.length - 1]] : null;
+        if (lastKill && lastKill.deathPhase >= phases.length - 3) add(t.attr.emp >= 6 || hasTrait(t, 'pacifista') ? 3 : 0.5, 'guilt', [t, lastKill]);
+        if (t.kills >= 2 && (hasTrait(t, 'spietato') || t.attr.emp <= 3)) add(2, 'pride', [t], { n: String(t.kills) });
+        if (t.food < 30) add(2.5, 'hungry', [t]);
+        if (t.mo < 30 || meterBad(t)) add(2.2, 'fear', [t]);
+        if (t.hp < 45) add(2, 'hurt', [t]);
+        const ow = Object.keys(t.owes).find(aliveId); if (ow) add(t.owes[ow] === 'vita' ? 2.2 : 1.2, t.owes[ow] === 'vita' ? 'grateful' : 'debt', [t, byId[ow]]);
+        if (aliveId(t.partner)) add(2.5, 'couple', [t, byId[t.partner]]);
+        const rc = itemOf(t, 'ricordo');
+        if (rc) { const from = rc.from && byId[rc.from] && !byId[rc.from].alive && (rc.how === 'lettera' || rc.how === 'dono' || aff(t, byId[rc.from]) >= 30) ? byId[rc.from] : null; add(from ? 3 : 1.4, from ? 'keepsakeDead' : 'keepsake', from ? [t, from] : [t], { i: rc.name }); }
+        if (!buddies(t).length && day >= 2) add(1.2, 'lonely', [t]);
+        if (t.fame >= 4) add(1, 'star', [t]);
+        if (hasTrait(t, 'paranoico') && t.allyId != null) { const m = allyMates(t)[0]; if (m) add(1.5, 'suspicion', [t, m]); }
+        t.traits.forEach((x) => { if (DIAT(x).length) add(1, 'trait:' + x, [t]); });
+        add(0.8, 'calm', [t]);
+        const p = rng.wpick(c, (x) => x[0]); if (!p) return;
+        const src = p[1].startsWith('trait:') ? DIAT(p[1].slice(6)) : DIA(p[1]);
+        const d = fmt(src, p[2], Object.assign({}, p[3] || {})); if (d) remember1(t, d.html, /plot|crush|rejected/.test(p[1]) ? 'segreto' : 'pensiero');
+      });
+    }
+
+    // i rapporti più importanti, con un'etichetta umana
+    function relTop(t) {
+      const out = [];
+      alive().forEach((x) => {
+        if (x === t) return;
+        const a = aff(t, x);
+        const lbl = t.partner === x.id ? 'amore' : t.crush === x.id ? 'cotta' : t.plot === x.id ? 'complotto' : t.grudges[x.id] ? 'vendetta' : a >= 55 ? 'amico' : t.owes[x.id] ? 'debito' : isAlly(t, x) ? 'alleato' : a >= 25 ? 'simpatia' : a <= -55 ? 'nemico' : a <= -25 ? 'diffida' : t.mem[x.id] ? 'conoscente' : null;
+        if (!lbl) return;
+        const w = { amore: 200, cotta: 190, complotto: 185, vendetta: 180 }[lbl] || Math.abs(a) + (t.mem[x.id] ? 10 : 0);
+        out.push([x.id, Math.round(a), lbl, w]);
+      });
+      return out.sort((a, b) => b[3] - a[3]).slice(0, 8).map((x) => x.slice(0, 3));
+    }
+
     function runPhase(kind, pool, title, intro, opt) {
       const events = pendingNotes.splice(0);
       SYS = [];
+      ORIGIN = kind === 'f' ? 'festino' : null;
       tickStatus();
+      if (kind === 'd') moveByGoals();
       maybeDissolve(events);
       if (kind === 'd' && day >= 2) sponsorDrop(events);
       const before = alive().length;
@@ -1286,11 +1724,16 @@
       phaseTick(kind);
       resolveVitals();
       const deathsSys = SYS.filter((x) => x.ev.deaths.length).map((x) => x.ev);
-      const capN = kind === 'n' ? 5 : kind === 'b' ? 1 : 3;
+      const capN = kind === 'n' ? 7 : kind === 'b' ? 1 : 3;
       const sysDead = new Set(deathsSys.flatMap((e) => e.deaths));
-      const rest = SYS.filter((x) => !x.ev.deaths.length && x.ev.ids.every((id) => byId[id].alive || sysDead.has(id))).map((x) => [x, x.pri + rng.f()]).sort((a, b) => b[1] - a[1]).slice(0, capN).map((x) => x[0].ev);
+      const valid = SYS.filter((x) => !x.ev.deaths.length && x.ev.ids.every((id) => byId[id].alive || sysDead.has(id))).map((x) => [x, x.pri + rng.f()]).sort((a, b) => b[1] - a[1]);
+      const rest = valid.slice(0, capN).map((x) => x[0].ev);
+      // quello che la diretta non mostra finisce nel diario di chi l'ha vissuto
+      valid.slice(capN).forEach(([x]) => x.ev.ids.forEach((id) => remember1(byId[id], x.ev.html, 'fatto')));
       events.push(...rest, ...deathsSys);
-      SYS = [];
+      SYS = []; ORIGIN = null;
+      if (kind === 'b') alive().forEach(decideGoal);
+      if (kind === 'd' || kind === 'dis' || kind === 'f') diaryNight(0.35);
       const died = before - alive().length;
       noDeathStreak = died ? 0 : noDeathStreak + 1;
       phases.push(Object.assign({ kind, day, title, intro, events, snap: snapshot(), meteo: W.n ? { n: W.n, d: W.d } : null }, opt || {}));
@@ -1370,6 +1813,13 @@
     }
     const loversEnd = () => { const a = alive(); return !cfg.teamWin && a.length === 2 && a[0].partner === a[1].id && runLovers(); };
 
+    // ognuno porta qualcosa da casa, scelto dal suo carattere
+    T.forEach((t) => {
+      const tr = (x) => t.traits.includes(x);
+      const home = tr('superstizioso') ? 'amuleto' : tr('ubriacone') ? 'alcol' : tr('ingegnoso') || tr('cacciatore') ? 'attrezzo' : tr('avido') || tr('fortunato') ? 'valore' : tr('guaritore') ? 'med' :
+        tr('romantico') || t.attr.emp >= 7 || rng.chance(0.2) ? 'ricordo' : rng.chance(0.12) ? 'valore' : null;
+      if (home) t.inv.push(mkItem(home, null, 'casa', null));
+    });
     let feastDone = false, lastDisaster = -9;
     const usedDisasters = new Set();
     while (true) {
@@ -1411,6 +1861,8 @@
       partner: t.partner, exPartner: t.exPartner,
       foraged: t.foraged, nursed: t.nursed, shared: t.shared, trapKills: t.trapKills, trapsSet: t.trapsSet, survivedBeasts: t.survivedBeasts,
       deathCause: t.alive ? null : t.deathKind || null,
+      diary: t.diary, mem: t.mem, trades: t.trades, crafts: t.crafts, acts: t.acts, rejected: t.rejected,
+      bag: t.inv.map((x) => ({ t: x.type, n: x.name, h: x.how || 'trovato', q: x.q, u: x.u, m: x.um, f: x.from, d: x.d, x: x.x })),
     }));
     return { version: 2, theme: theme.id, adult, seed, days: day, phases, tributes: stripped, winners: winners.map((t) => t.id), stats };
   }

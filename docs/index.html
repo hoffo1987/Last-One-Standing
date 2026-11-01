@@ -577,7 +577,7 @@ dialog::backdrop { background: hsl(var(--h) 30% 4% / .6); backdrop-filter: blur(
 .why.ok { color: var(--c-heal); border-color: color-mix(in srgb, var(--c-heal) 50%, transparent); }
 .why.ko { color: var(--c-kill); border-color: color-mix(in srgb, var(--c-kill) 50%, transparent); }
 .abars { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px 14px; }
-.abar { display: grid; grid-template-columns: 96px minmax(0, 1fr) 20px; gap: 8px; align-items: center; font-size: 13px; }
+.abar { display: grid; grid-template-columns: 122px minmax(0, 1fr) 20px; gap: 8px; align-items: center; font-size: 13px; }
 .abar i { height: 8px; background: var(--panel-2); border-radius: 4px; overflow: hidden; }
 .abar b { display: block; height: 100%; background: var(--muted); border-radius: 4px; }
 .abar b.hi { background: var(--c-heal); }
@@ -971,6 +971,69 @@ img.scene { object-fit: cover; object-position: center; user-select: none; }
 @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .ev.note.meteo .meteo { color: #8ab8f5; } }
 .tag18, .bc-18 { background: #b3261e; color: #fff; }
 .bc-18 { background: #fff; color: #b3261e; }
+
+/* ---------- la vita dei concorrenti: adesso, zaino, rapporti, diario ---------- */
+.nowcard { border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; display: grid; gap: 8px; background: var(--panel); }
+.nowlead { margin: 0; font-size: 15px; }
+.goal { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 8px; font-size: 14px; }
+.goal .glbl, .goal .gsince { font-family: var(--f-mono); font-size: 10.5px; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
+.goal .gsec { font-family: var(--f-mono); font-size: 10px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: color-mix(in srgb, var(--c-betray) 70%, var(--ink)); background: color-mix(in srgb, var(--c-betray) 14%, transparent); border-radius: 5px; padding: 1px 6px; }
+.thought { margin: 0; padding: 8px 12px; border-left: 3px solid var(--accent); background: var(--panel-2); border-radius: 0 8px 8px 0; font-style: italic; }
+.bag { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 250px), 1fr)); gap: 8px; }
+.bitem { display: grid; grid-template-columns: 34px minmax(0, 1fr); gap: 10px; padding: 10px; border: 1px solid var(--line); border-radius: 10px; background: var(--panel); min-width: 0; }
+.bic { width: 34px; height: 34px; border-radius: 9px; display: grid; place-items: center; background: var(--panel-2); color: var(--ink); }
+.bic svg { width: 19px; height: 19px; }
+.t-arma .bic, .t-esplosivo .bic, .t-trap .bic, .t-veleno .bic { color: color-mix(in srgb, var(--c-kill) 75%, var(--ink)); background: color-mix(in srgb, var(--c-kill) 12%, var(--panel-2)); }
+.t-med .bic, .t-cibo .bic, .t-armatura .bic { color: color-mix(in srgb, var(--c-heal) 75%, var(--ink)); background: color-mix(in srgb, var(--c-heal) 12%, var(--panel-2)); }
+.t-ricordo .bic, .t-amuleto .bic { color: color-mix(in srgb, var(--c-love) 75%, var(--ink)); background: color-mix(in srgb, var(--c-love) 12%, var(--panel-2)); }
+.t-valore .bic, .t-alcol .bic, .t-attrezzo .bic, .t-mappa .bic { color: color-mix(in srgb, var(--c-item) 75%, var(--ink)); background: color-mix(in srgb, var(--c-item) 14%, var(--panel-2)); }
+.bbody { min-width: 0; display: grid; gap: 3px; }
+.btop { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 8px; }
+.btop b { font-size: 14px; overflow-wrap: anywhere; }
+.stars { color: #d9a21a; font-size: 12px; letter-spacing: 1px; }
+.stars i { font-style: normal; opacity: .25; }
+.itag { font-family: var(--f-mono); font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; border-radius: 5px; padding: 1px 6px; }
+.itag.bad { color: color-mix(in srgb, var(--c-kill) 75%, var(--ink)); background: color-mix(in srgb, var(--c-kill) 13%, transparent); }
+.bmeta { display: flex; flex-wrap: wrap; align-items: center; gap: 2px 8px; font-size: 12px; color: var(--muted); }
+.btype { font-family: var(--f-mono); font-size: 10.5px; letter-spacing: .08em; text-transform: uppercase; }
+.uses { width: 54px; height: 5px; border-radius: 3px; background: var(--panel-2); overflow: hidden; display: inline-block; }
+.uses b { display: block; height: 100%; background: var(--c-item); }
+.bbody p { margin: 0; font-size: 12.5px; color: var(--muted); line-height: 1.4; }
+.people { display: grid; gap: 8px; }
+.person { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 10px; padding: 9px 10px; border-radius: 10px; background: var(--panel-2); align-items: start; }
+.person .av { --s: 36px; }
+.pbody { display: grid; gap: 5px; min-width: 0; }
+.ptop { display: flex; flex-wrap: wrap; gap: 4px 8px; align-items: baseline; }
+.plbl { font-family: var(--f-mono); font-size: 10.5px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+.l-amore .plbl, .l-cotta .plbl { color: color-mix(in srgb, var(--c-love) 75%, var(--ink)); }
+.l-vendetta .plbl, .l-nemico .plbl, .l-complotto .plbl { color: color-mix(in srgb, var(--c-kill) 75%, var(--ink)); }
+.l-amico .plbl, .l-alleato .plbl, .l-simpatia .plbl { color: color-mix(in srgb, var(--c-heal) 75%, var(--ink)); }
+.affbar { position: relative; height: 5px; border-radius: 3px; background: linear-gradient(90deg, color-mix(in srgb, var(--c-kill) 55%, transparent), var(--line) 50%, color-mix(in srgb, var(--c-heal) 55%, transparent)); max-width: 220px; }
+.affbar b { position: absolute; top: -3px; width: 3px; height: 11px; border-radius: 2px; background: var(--ink); transform: translateX(-50%); }
+.pmem { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; font-size: 13px; font-style: italic; }
+.pmem span { font-style: normal; font-family: var(--f-mono); font-size: 10.5px; color: var(--muted); }
+.diary { display: grid; gap: 10px; max-height: 420px; overflow: auto; padding-right: 4px; }
+.dday { display: grid; grid-template-columns: 34px minmax(0, 1fr); gap: 8px; }
+.dday .dd { font-family: var(--f-mono); font-size: 11px; color: var(--muted); padding-top: 3px; }
+.dday p { margin: 0 0 6px; font-size: 13.5px; line-height: 1.45; padding: 7px 10px; border-radius: 8px; background: var(--panel-2); }
+.dday .dk { display: block; font-family: var(--f-mono); font-size: 9.5px; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); margin-bottom: 2px; }
+.dday .dk-segreto { background: color-mix(in srgb, var(--c-betray) 10%, var(--panel-2)); }
+.dday .dk-segreto .dk { color: color-mix(in srgb, var(--c-betray) 75%, var(--ink)); }
+.dday .dk-fatto { background: color-mix(in srgb, var(--c-item) 10%, var(--panel-2)); }
+.newdiary { margin-left: 6px; font-family: var(--f-mono); font-size: 9.5px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: color-mix(in srgb, var(--c-betray) 75%, var(--ink)); background: color-mix(in srgb, var(--c-betray) 13%, transparent); border-radius: 5px; padding: 1px 5px; vertical-align: 2px; }
+.items-arena { border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; }
+.items-arena summary { cursor: pointer; display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 10px; list-style: none; }
+.items-arena summary::-webkit-details-marker { display: none; }
+.items-arena summary::after { content: "Mostra"; margin-left: auto; font-size: 12px; color: var(--accent-text); font-weight: 700; }
+.items-arena[open] summary::after { content: "Nascondi"; }
+.ia-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 260px), 1fr)); gap: 10px; margin-top: 12px; }
+.ia { display: grid; grid-template-columns: 34px minmax(0, 1fr); gap: 10px; }
+.ia b { font-size: 14px; }
+.iaex { display: block; font-size: 12px; color: var(--muted); font-style: italic; }
+.ia p { margin: 2px 0 0; font-size: 12.5px; color: var(--muted); line-height: 1.4; }
+.badge2.star { color: var(--accent-text); }
+.badge2.hot { color: color-mix(in srgb, var(--dead) 75%, var(--ink)); }
+.badge2.love { color: color-mix(in srgb, var(--c-love) 72%, var(--ink)); }
 </style>
 
 <header class="top">
@@ -2487,6 +2550,212 @@ img.scene { object-fit: cover; object-position: center; user-select: none; }
     healed: ['La reputazione di {0} si sta riprendendo.'],
     grave: ['La reputazione di {0} è ai minimi: un altro passo falso e sarà fuori.'],
   };
+})(typeof window !== 'undefined' ? window : globalThis);
+
+;
+/* Oggetti, carattere e vita interiore dei concorrenti.
+ *
+ * - D.items: catalogo dei tipi di oggetto (cosa fanno, come si chiamano in
+ *   ogni arena), usato dal motore e spiegato nell'interfaccia.
+ * - D.mind: obiettivi, pensieri, azioni notturne guidate dai tratti,
+ *   diario segreto e ricordi dei rapporti.
+ *
+ * Segnaposto: {0} {1} {2} concorrenti, [0:o/a] accordo, {i} {j} oggetti,
+ * {ip} oggetto con possessivo, {z} zona, {n} numero, {cibo} dal lessico. */
+(function (G) {
+  const D = (G.LOS_DATA = G.LOS_DATA || {});
+
+  D.items = {
+    order: ['arma', 'armatura', 'med', 'cibo', 'attrezzo', 'mappa', 'trap', 'esplosivo', 'veleno', 'amuleto', 'alcol', 'valore', 'ricordo'],
+    types: {
+      arma: { label: 'Arma', desc: 'Più forza negli scontri, in base alla qualità (★). Si consuma a ogni colpo e alla fine si rompe; con un attrezzo si può riparare. Chi è ingegnoso può intingerla nel veleno.' },
+      armatura: { label: 'Protezione', desc: 'Riduce i danni e a volte para un colpo mortale. Si consuma a ogni colpo incassato.' },
+      med: { label: 'Cure', desc: 'Si usa da soli o sugli alleati: richiude le ferite gravi, ferma veleni e infezioni presi in tempo, abbassa l\'indicatore dell\'arena.' },
+      cibo: { label: 'Cibo', desc: 'Si mangia quando la sazietà cala. Si può dividere con gli alleati, regalare o scambiare.' },
+      attrezzo: { label: 'Attrezzo', desc: 'Più cibo trovato, fughe più facili da tempeste e trappole, difesa migliore di notte, armi riparate.' },
+      mappa: { label: 'Mappa', desc: 'Più cibo, meno disastri, trappole scoperte in anticipo e vie di fuga sicure.' },
+      trap: { label: 'Trappola', desc: 'Di notte chi la sa usare la piazza nella sua zona. Chi ci passa rischia grosso, e l\'uccisione va a chi l\'ha piazzata.' },
+      esplosivo: { label: 'Esplosivo', desc: 'Più forza negli scontri. Chi è ingegnoso ci costruisce trappole esplosive. Da ubriachi è un pessimo compagno.' },
+      veleno: { label: 'Veleno', desc: 'Apre la strada agli avvelenamenti; chi è ingegnoso ci intinge l\'arma, che poi avvelena a ogni colpo.' },
+      amuleto: { label: 'Portafortuna', desc: 'Può salvare una volta da morte certa (sempre, per chi è superstizioso). Calma Terrore e Corruzione.' },
+      alcol: { label: 'Alcol', desc: 'Scalda, fa dimenticare, disinfetta le ferite infette. E ubriaca.' },
+      valore: { label: 'Merce di scambio', desc: 'Non serve a niente, tranne che a comprare cibo e cure da chi ne ha.' },
+      ricordo: { label: 'Ricordo', desc: 'Un pezzo di casa: ogni notte tiene su il morale. Se è di qualcuno che non c\'è più, ancora di più.' },
+    },
+    /* nomi dei tipi nuovi per ogni arena (gli altri vengono dal lessico dell'arena) */
+    names: {
+      _: {
+        armatura: ['un giubbotto imbottito', 'uno scudo improvvisato', 'dei parastinchi di fortuna'],
+        attrezzo: ['una corda', 'una torcia', 'un coltellino multiuso'],
+        valore: ['una manciata di monete', 'un orologio d\'oro'],
+        alcol: ['una fiaschetta di whisky'],
+        ricordo: ['una foto di famiglia', 'una lettera mai spedita', 'il braccialetto di una sorella', 'un disegno fatto da un bambino', 'un medaglione con una ciocca di capelli', 'una cartolina di casa'],
+      },
+      classico: { armatura: ['un giubbotto di cuoio', 'uno scudo di legno', 'dei parastinchi di corteccia'], attrezzo: ['una corda di canapa', 'un acciarino', 'un binocolo da caccia'], valore: ['una manciata di monete d\'oro', 'un orologio da taschino'], alcol: ['una fiaschetta di whisky'] },
+      fantasy: { armatura: ['una cotta di maglia elfica', 'uno scudo runico', 'un mantello di scaglie di drago'], attrezzo: ['una lanterna fatata', 'una corda incantata', 'una bussola che indica i desideri'], valore: ['un sacchetto di monete d\'argento', 'una gemma che canta'], alcol: ['una fiaschetta di idromele', 'una pozione di coraggio liquido'] },
+      scifi: { armatura: ['una tuta corazzata', 'uno scudo energetico portatile'], attrezzo: ['un multiattrezzo', 'una torcia al plasma', 'un tablet di diagnostica'], valore: ['una chiavetta di crediti', 'un chip di accesso dorato'], alcol: ['una bottiglia di vodka sintetica'] },
+      zombie: { armatura: ['un giubbotto antiproiettile', 'delle protezioni da hockey', 'un casco da motociclista'], attrezzo: ['una torcia a manovella', 'un piede di porco', 'un walkie-talkie'], valore: ['una stecca di sigarette', 'una scatola di batterie'], alcol: ['una bottiglia di vodka'] },
+      royale: { armatura: ['un giubbotto tattico di livello 2', 'un elmetto da paracadutista', 'uno zaino corazzato'], attrezzo: ['un drone esploratore', 'un binocolo', 'un rampino'], valore: ['un sacchetto di monete dell\'evento', 'una skin leggendaria'], alcol: ['una lattina di birra calda'] },
+      horror: { armatura: ['l\'armatura del cavaliere nel salone', 'un vassoio d\'argento usato come scudo'], attrezzo: ['un candelabro', 'una chiave che apre tutte le porte', 'una tavola ouija'], valore: ['dei gioielli di famiglia', 'un anello con lo stemma della villa'], alcol: ['una bottiglia di vino del 1890'] },
+      wasteland: { armatura: ['un\'armatura di copertoni', 'uno scudo ricavato da un cartello stradale', 'una maschera antigas'], attrezzo: ['un contatore Geiger', 'una chiave inglese', 'una borraccia filtrante'], valore: ['una manciata di tappi di bottiglia', 'una tanica di benzina'], alcol: ['una bottiglia di distillato di cactus'] },
+      liceo: { armatura: ['un alibi di ferro', 'una felpa col cappuccio'], attrezzo: ['gli appunti di tutto l\'anno', 'una calcolatrice scientifica', 'un caricabatterie di riserva'], valore: ['dei buoni pasto', 'le risposte del compito di domani'], alcol: ['una lattina di energy drink'], ricordo: ['un portachiavi dell\'amicizia', 'il quaderno delle confidenze', 'il biglietto del primo concerto', 'una foto di classe delle medie'] },
+      ufficio: { armatura: ['una scrivania d\'angolo strategica', 'delle cuffie antirumore'], attrezzo: ['una chiavetta USB con tutte le password', 'una macro di Excel miracolosa'], valore: ['dei buoni pasto', 'delle ferie arretrate'], alcol: ['un amaro della cena aziendale'], ricordo: ['la foto del gatto', 'una tazza con scritto «Il capo migliore del mondo»', 'il badge del primo giorno'] },
+    },
+    how: { casa: 'Portato da casa', trovato: 'Trovato', sponsor: 'Dono degli sponsor', festino: 'Preso al festino', rubato: 'Rubato a {1}', bottino: 'Preso a {1}', eredita: 'Ereditato da {1}', dono: 'Regalo di {1}', scambio: 'Scambiato con {1}', costruito: 'Costruito', zaino: 'Trovato tra le cose di {1}', lettera: 'Scritto da {1}' },
+  };
+
+  /* ---------------- la mente dei concorrenti ---------------- */
+  D.mind = {
+    goals: {
+      vendetta: { label: 'Vendetta su {1}', th: ['Ha un solo nome in testa: {1}.', 'Sta cercando {1}, e prima o poi l[1:o/a] troverà.'] },
+      proteggere: { label: 'Proteggere {1}', th: ['Deve tenere al sicuro {1}, a ogni costo.', 'Dorme poco: veglia su {1}.'] },
+      tradire: { label: 'Tradire {1}', secret: true, th: ['Sorride a {1}, ma sta già scegliendo il momento.', 'Ha studiato lo zaino di {1}. Sa cosa prendere, dopo.'] },
+      cibo: { label: 'Trovare cibo', th: ['Ha fame, e la fame decide per l[0:ui/ei].', 'Pensa solo a cosa mettere sotto i denti.'] },
+      curarsi: { label: 'Curarsi', th: ['Deve curarsi, o non arriverà lontano.', 'Ogni passo fa male. Cerca un posto tranquillo e qualcosa per le ferite.'] },
+      nascondersi: { label: 'Nascondersi', th: ['Vuole solo sparire per un po\'.', 'Meno si fa vedere, meglio è.'] },
+      caccia: { label: 'Andare a caccia', th: ['Cerca la prossima preda.', 'Ha preso gusto alla caccia.'] },
+      spettacolo: { label: 'Conquistare il pubblico', th: ['Pensa alle telecamere più che ai nemici.', 'Sa che gli sponsor amano chi dà spettacolo.'] },
+      reclutare: { label: 'Trovare alleati', th: ['Cerca qualcuno di cui fidarsi.', 'Da sol[0:o/a] non si va lontano: cerca compagnia.'] },
+      cotta: { label: 'Conquistare {1}', secret: true, th: ['Non smette di pensare a {1}.', 'Cerca il coraggio di parlare a {1}.'] },
+      sopravvivere: { label: 'Sopravvivere', th: ['Un giorno alla volta.', 'Vuole solo arrivare a domani.', 'Tiene la testa bassa e gli occhi aperti.'] },
+    },
+    /* etichette dei rapporti, dal più forte */
+    rel: { amore: 'Amore', cotta: 'Cotta segreta', vendetta: 'Vendetta', amico: 'Amico fidato', simpatia: 'Simpatia', alleato: 'Alleato', debito: 'In debito', nemico: 'Nemico', diffida: 'Diffidenza', conoscente: 'Conoscente', complotto: 'Bersaglio segreto' },
+    /* ricordi dei rapporti, in prima persona (dal punto di vista di chi ricorda) */
+    mem: {
+      saved: 'Mi ha salvato la vita.', cured: 'Mi ha curato.', shared: 'Ha diviso il cibo con me.', denied: 'Mi ha negato il cibo.', robbed: 'Mi ha derubato.',
+      hit: 'Mi ha ferito.', killedDear: 'Ha ucciso {2}.', allied: 'Abbiamo stretto un\'alleanza.', betrayed: 'Mi ha tradito.', gift: 'Mi ha fatto un regalo.',
+      love: 'Ci siamo innamorati.', repaid: 'Ha saldato il suo debito.', forgave: 'Ho deciso di perdonare.', traded: 'Abbiamo fatto affari.', fleeced: 'Mi ha spennato.',
+      warned: 'Mi ha avvisato di un tradimento.', exposed: 'Ha svelato il mio piano.', mediated: 'Ha messo pace tra noi.', trap: 'La sua trappola mi ha quasi ucciso.',
+      expelled: 'Mi ha cacciato dal gruppo.', comforted: 'Mi è stato vicino nel momento peggiore.', tried: 'Ha cercato di uccidermi.', bullied: 'Mi ha preso le cose con la forza.',
+      brawl: 'Ci siamo presi a botte.', rejected: 'Mi ha detto di no.', healedStranger: 'Mi ha aiutato senza chiedere niente.', letter: 'Mi ha scritto una lettera.',
+      jealous: 'Sta con la persona che amo.', nightTheft: 'Mi ha svuotato lo zaino di notte.', oath: 'Ha giurato di proteggermi.', recruited: 'Mi ha voluto nel suo gruppo.',
+    },
+    memSoft: { hit: 'Mi ha umiliato.', killedDear: 'Ha fatto fuori {2}.', tried: 'Ha cercato di farmi fuori.', brawl: 'Abbiamo litigato davanti a tutti.', trap: 'Ci sono cascato in pieno.' },
+
+    /* azioni notturne guidate da tratti e caratteristiche */
+    acts: {
+      recruit: ['{0} convince {1} a unirsi al gruppo: «Da soli non si va lontano.»', '{0} offre a {1} un posto vicino al fuoco e un\'alleanza. {1} accetta.', '{0} parla con {1} per mezz\'ora. Alla fine si stringono la mano: ora sono alleati.'],
+      mediate: ['{0} si mette in mezzo tra {1} e {2}: dopo un\'ora di parole, si stringono la mano.', '{0} costringe {1} e {2} a parlarsi. Non diventano amici, ma smettono di cercarsi.'],
+      bully: ['{0} si piazza davanti a {1} e allunga la mano. {1} consegna {i} senza fiatare.', '{0} spiega a {1} che da oggi {i} cambia proprietario. {1} non trova argomenti validi.'],
+      brawl: ['{0} e {1} si incrociano a {z} e finisce a botte. Nessuno vince, entrambi sanguinano.', 'Una parola di troppo tra {0} e {1}, e volano i pugni. Si separano ammaccati e furiosi.'],
+      healStranger: ['{0} trova {1} ferit[1:o/a] e, senza chiedere niente, l[1:o/a] medica.', '{0} non conosce {1}, ma non riesce a lasciarl[1:o/a] sanguinare. L[1:o/a] ricuce in silenzio.'],
+      gift: ['{0} regala {i} a {1}, che ha l\'aria di averne bisogno.', '{0} lascia {i} accanto a {1} che dorme. Nessun biglietto.'],
+      show: ['{0} improvvisa uno spettacolo per le telecamere. Gli sponsor prendono appunti.', '{0} fa un discorso commovente alla telecamera più vicina. Il pubblico applaude.', '{0} si allena a torso nudo all\'alba, per nessun motivo pratico. Lo share sale.'],
+      speech: ['{0} raduna l\'alleanza e fa un discorso da film. Funziona: tutti dormono meglio.', '{0} assegna i turni, divide le razioni e dà a ognuno un compito. Il gruppo respira.'],
+      ritual: ['{0} dispone sassi in cerchio e recita una formula imparata dalla nonna. Si sente subito meglio.', '{0} bacia {i} tre volte prima di dormire. Non si sa mai.'],
+      sleepwalk: ['{0} si alza nel sonno e cammina fino a {z}. Si sveglia lì, senza sapere come.', 'Gli altri vedono {0} passare nel buio, a occhi chiusi, diretto a {z}. Nessuno ha il coraggio di fermarl[0:o/a].'],
+      madness: ['{0} passa la notte a discutere con un sasso. Il sasso, a quanto pare, ha torto.', '{0} dipinge una faccia sul proprio zaino e lo presenta a tutti come un nuovo alleato.', '{0} ride da sol[0:o/a] per un\'ora. Nessuno chiede perché.'],
+      mishap: ['{0} inciampa nel buio e perde {i}. Addio.', '{0} si siede su un formicaio. Non è una metafora.', '{0} usa {i} come cuscino. Al mattino {i} non c\'è più.'],
+      glutton: ['{0} si mangia {i} in un boccone, anche se non aveva fame. Domani se ne pentirà.', '{0} «assaggia» {i}. Ne resta solo il ricordo.'],
+      drink: ['{0} svuota {i} fino all\'ultima goccia. La notte diventa più calda e molto più rumorosa.', '{0} brinda alla salute di tutti i presenti con {i}. Anche di quelli che vorrebbe morti.'],
+      disinfect: ['{0} versa {i} sulla ferita infetta di {1}. Urla, ma la febbre scende.'],
+      loner: ['{0} lascia l\'alleanza: troppa gente, troppe voci. Meglio sol[0:o/a].', '{0} se ne va prima dell\'alba. Non è niente di personale: è proprio fatto così.'],
+      plan: ['{0} disegna una mappa nella polvere e ripassa il piano tre volte.', '{0} studia gli spostamenti degli altri e prende appunti mentali. Domani sarà pront[0:o/a].'],
+      craftPoison: ['{0} intinge {ip} nel veleno, con molta, molta attenzione.', '{0} passa la notte a trattare {ip} col veleno. Ora basta un graffio.'],
+      craftBomb: ['{0} combina la trappola con l\'esplosivo. Il risultato è piccolo, brutto e pericolosissimo.'],
+      craftRepair: ['{0} rimette in sesto {ip} con l\'attrezzo giusto. Quasi come nuovo.', '{0} affila e sistema {ip} per tutta la notte.'],
+      craftTrap: ['{0} costruisce una trappola con {i} e un po\' di ingegno.', 'Con {i} e quello che trova in giro, {0} si fa una trappola. Non è elegante, ma funziona.'],
+      trade: ['{0} cede {i} a {1} in cambio di {j}. Affare fatto.', '{0} e {1} contrattano per un\'ora: alla fine {0} dà {i} e ottiene {j}.'],
+      tradeGreedy: ['{1} vende {j} a {0} a peso d\'oro: {0} deve dare {i} e anche {k}.'],
+      tradeFree: ['{1} vede la fame di {0} e [0:gli/le] regala {j}. «Me lo restituirai in un altro modo.»', '{1} lascia {j} a {0} senza chiedere niente in cambio.'],
+      spyExpose: ['{0} sente {1} borbottare nel sonno come liberarsi di {2}. All\'alba lo racconta a tutti: {1} viene cacciat[1:o/a] dal gruppo.', '{0} scopre i piani di {1} contro {2} e li svela al gruppo. Per {1} non c\'è più posto.'],
+      nightTheft: ['{0} sfila {i} dallo zaino di {1} mentre dorme. Mattina amara per {1}.', 'Nel buio, {0} alleggerisce lo zaino di {1}: sparisce {i}.'],
+      confessYes: ['{0} trova il coraggio e confessa tutto a {1}. {1} sorride: era ora.', '{0} dice a {1} quello che prova. {1} non risponde: l[0:o/a] bacia.'],
+      confessNo: ['{0} confessa i suoi sentimenti a {1}. {1} risponde che preferisce restare amic[1:o/a]. Silenzio imbarazzato fino all\'alba.', '{0} si dichiara a {1}, che arrossisce e cambia argomento. Molto, molto in fretta.'],
+      letter: ['{0} scrive una lettera per {1} e la lascia sul suo zaino.', '{0} scrive a {1} una lettera piena di cancellature e la infila nel suo zaino.'],
+      jealous: ['{0} vede {1} e {2} insieme e qualcosa si rompe. Non dice niente. Per ora.', 'La notizia di {1} e {2} arriva anche a {0}. Da quel momento, {0} guarda {2} in un altro modo.'],
+      oath: ['{0} giura a {1} che nessuno l[1:o/a] toccherà finché c\'è l[0:ui/ei].', '{0} si mette di guardia davanti a {1} tutta la notte, senza che nessuno glielo chieda.'],
+      hunt: ['{0} torna dalla caccia con {cibo} per tutta l\'alleanza.', '{0} esce all\'alba e rientra con {cibo}. Nessuno chiede come.'],
+      paranoid: ['{0} dorme con un occhio aperto. Letteralmente.', '{0} sposta il proprio giaciglio tre volte durante la notte.'],
+      forgiveQuiet: ['{0} decide di perdonare {1}. Non lo dice a nessuno, ma smette di cercarl[1:o/a].'],
+      stalk: ['{0} segue le tracce di {1} fino a {z}.'],
+      hide: ['{0} trova un nascondiglio a {z} e decide di non uscire per un po\'.'],
+      armorSave: ['{0} viene colpit[0:o/a] in pieno, ma {ip} regge: {0} si rialza ammaccat[0:o/a], ma viv[0:o/a].', 'Il colpo era mortale, ma {ip} si spacca al posto di {0}.'],
+      sponsorBonus: ['Nella cassa, per {0}, c\'è anche {i}.', 'Gli sponsor aggiungono {i}: hanno notato di cosa ha bisogno {0}.'],
+      luckyFind: ['{0} inciampa su {i}. A volte la fortuna è solo guardare per terra.', '{0} trova {i} esattamente dove nessuno aveva guardato.'],
+    },
+    actsSoft: {
+      bully: ['{0} convince {1} con le cattive a cedere {i}.'],
+      brawl: ['{0} e {1} litigano a voce altissima a {z}. Ne escono male entrambi.'],
+      healStranger: ['{0} difende {1} dalle chiacchiere di corridoio. Non erano nemmeno amici.'],
+      nightTheft: ['{0} fa sparire {i} dall\'armadietto di {1}. Nessuno ha visto niente.'],
+      craftPoison: ['{0} prepara un pettegolezzo velenosissimo da usare con {ip}.'],
+      sleepwalk: ['{0} si addormenta in {z} e si sveglia lì, con l\'impronta della tastiera in faccia.'],
+      plan: ['{0} scrive il piano per domani con tre evidenziatori diversi.', '{0} studia gli spostamenti degli altri e prende appunti. Domani sarà pront[0:o/a].'],
+      paranoid: ['{0} controlla chi ha visualizzato le sue storie. Due volte.'],
+    },
+
+    /* il diario segreto: ciò che la diretta non racconta */
+    diary: {
+      grief: ['Di notte, {0} parla a bassa voce con {1}, come se fosse ancora lì.', '{0} conserva qualcosa che apparteneva a {1}. Non lo mostra a nessuno.', '{0} sogna {1}. Si sveglia piangendo e finge che sia il fumo.'],
+      revenge: ['{0} ripassa ogni dettaglio della faccia di {1}. Non vuole sbagliare persona.', '{0} ha capito le abitudini di {1}: dove dorme, quando mangia, quando abbassa la guardia.', '{0} non ha più paura. Ha solo un nome in testa: {1}.'],
+      crush: ['{0} guarda {1} dormire e si chiede se sia il momento giusto per dirglielo.', 'Ogni volta che {1} ride, {0} dimentica per un attimo dove si trova.', '{0} ha scritto il nome di {1} su un sasso, poi l\'ha nascosto. Imbarazzante.'],
+      plot: ['{0} ha deciso: quando sarà il momento, {1} sarà il primo.', '{0} sorride a {1} durante la cena. Dentro, sta già contando i giorni.', '{0} ha studiato lo zaino di {1}: sa esattamente cosa prendere, dopo.'],
+      guilt: ['{0} sogna {1}. Nel sogno, {1} non dice niente. Guarda e basta.', '{0} si lava le mani nel buio, anche se sono pulite.', '{0} si chiede se {1} avesse qualcuno ad aspettarl[1:o/a] a casa.'],
+      pride: ['{0} tiene il conto: {n}. Il numero non l[0:o/a] spaventa più.', '{0} dorme benissimo. È questo, forse, il dettaglio più inquietante.'],
+      hungry: ['{0} sogna {cibo} e si sveglia masticando l\'aria.', '{0} conta le provviste che non ha. Il conto è veloce.', 'La pancia di {0} brontola così forte che teme di farsi scoprire.'],
+      fear: ['{0} trema per tutta la notte, e non è per il freddo.', '{0} sussulta a ogni rumore. Ce ne sono tanti.', '{0} si chiede, per la prima volta, se vale la pena continuare.'],
+      hurt: ['{0} stringe i denti per non far sentire quanto fa male.', '{0} controlla la ferita ogni ora. Non migliora.'],
+      debt: ['{0} sa di dovere qualcosa a {1}. Prima o poi ripagherà, e lo sa anche {1}.', '{0} non sopporta di essere in debito con {1}. Ci pensa più di quanto vorrebbe.'],
+      grateful: ['{0} non l\'ha detto a voce alta, ma deve la vita a {1}. Ci pensa spesso.'],
+      couple: ['{0} e {1} si raccontano come sarà dopo, se ci sarà un dopo.', '{0} tiene la mano di {1} mentre dorme. Solo per un minuto, dice.', '{0} ha già deciso: se resteranno in due, non alzerà un dito contro {1}.'],
+      keepsake: ['{0} stringe {i} e per un attimo è di nuovo a casa.', '{0} guarda {i} a lungo prima di addormentarsi.'],
+      keepsakeDead: ['{0} stringe {i} tra le mani. È tutto quello che resta di {1}.', '{0} rilegge {i} alla luce del fuoco. {1} non c\'è più, ma lì dentro sì.'],
+      lonely: ['{0} non parla con nessuno da giorni. Ha iniziato a rispondersi da sol[0:o/a].', '{0} guarda il fuoco di un\'altra alleanza in lontananza e non sa se sia invidia o sollievo.'],
+      star: ['{0} ripassa le pose migliori per le telecamere. Il pubblico, dopotutto, è un alleato.', '{0} ha capito come funziona: più fai spettacolo, più ti mandano regali.'],
+      suspicion: ['{0} non si fida di {1}. Non c\'è un motivo preciso, ed è proprio questo il punto.', '{0} tiene d\'occhio {1}, che negli ultimi giorni è troppo gentile.'],
+      rejected: ['{0} ripensa al no di {1}. Fa più male di qualunque ferita.'],
+      jealousy: ['{0} non riesce a guardare {1} e {2} insieme. Si gira dall\'altra parte.'],
+      calm: ['{0} pensa a casa e fa una lista di cose da fare quando uscirà. È una lista lunga.', '{0} guarda le stelle e prova a contarle per addormentarsi.', '{0} si chiede chi stia facendo il tifo per l[0:ui/ei], là fuori.', '{0} ripassa i nomi di chi è ancora in gara. Ogni sera la lista è più corta.', '{0} si rammenda i calzini con un filo d\'erba. Bisogna pur tenersi occupati.'],
+      trait: {
+        goloso: ['{0} nasconde un pezzo di {cibo} per i tempi difficili. Lo mangia subito.'],
+        stratega: ['{0} ha un piano. E un piano di riserva. E uno per quando falliscono entrambi.'],
+        codardo: ['{0} ha trovato un nascondiglio perfetto e non lo dirà a nessuno.'],
+        ubriacone: ['{0} sogna una locanda calda e un bicchiere pieno. Si sveglia con la bocca secca.'],
+        folle: ['{0} ha dato un nome a tutti i sassi della zona. Il preferito si chiama Gianfranco.'],
+        superstizioso: ['{0} ha contato i corvi: sette. Sette è un buon numero. Forse.'],
+        vendicativo: ['{0} ha una lista. Non è una lista della spesa.'],
+        clemente: ['{0} prova a ricordare il viso di tutti, anche di quelli che l[0:o/a] hanno ferito. Non porta rancore. Quasi mai.'],
+        leale: ['{0} ripete i nomi degli alleati prima di dormire, come una preghiera.'],
+        traditore: ['{0} si esercita a sembrare sincer[0:o/a] davanti a una pozzanghera.'],
+        esibizionista: ['{0} prova le battute per l\'intervista finale. È sicur[0:o/a] che ci sarà.'],
+        paranoico: ['{0} ha sentito dei passi. Erano i suoi.'],
+        romantico: ['{0} scrive poesie nella polvere e le cancella prima dell\'alba.'],
+        solitario: ['{0} finalmente ha un po\' di silenzio. Lo assapora.'],
+        sonnambulo: ['{0} si sveglia con le scarpe infangate e nessun ricordo della notte.'],
+        pacifista: ['{0} si chiede se ci sia un modo per uscirne senza fare del male a nessuno.'],
+        spietato: ['{0} affila l\'arma con una calma che mette i brividi.'],
+        avido: ['{0} conta e riconta le cose nello zaino. Gli piace sentirle pesare.'],
+        generoso: ['{0} pensa a chi ha meno di l[0:ui/ei]. È un pensiero scomodo, nell\'arena.'],
+        leader: ['{0} non dorme finché tutti gli altri non dormono.'],
+        guaritore: ['{0} prepara bende con quello che trova. Prima o poi serviranno.'],
+        ingegnoso: ['{0} smonta e rimonta qualcosa per tutta la notte. Non si sa cosa.'],
+        cacciatore: ['{0} legge le tracce degli altri concorrenti come un libro aperto.'],
+        fortunato: ['{0} trova un quadrifoglio. Lo trova sempre.'],
+        sfortunato: ['A {0} piove addosso. Solo a {0}.'],
+        furtivo: ['{0} ha passato la notte a osservare gli altri senza farsi vedere. Sa più cose di quante ne dirà.'],
+        impulsivo: ['{0} ha deciso di cambiare piano tre volte in un\'ora.'],
+        bruto: ['{0} fa flessioni nel buio per tenersi caldo. E per farsi sentire.'],
+        carismatico: ['{0} sa già chi convincerà domani. E come.'],
+        sopravvissuto: ['{0} ha visto di peggio. Davvero.'],
+      },
+    },
+    diarySoft: {
+      pride: ['{0} aggiorna la lista dei rivali fatti fuori: {n}. Non le fa più effetto.'],
+      guilt: ['{0} si sente in colpa per {1}. Un po\'.'],
+      hurt: ['{0} rilegge i commenti cattivi su di sé, uno per uno.'],
+      grief: ['{0} scrive un messaggio a {1}, che non è più nei giochi. Non lo invia.'],
+      trait: { spietato: ['{0} aggiorna la sua lista di nemici. Con una certa soddisfazione.'], bruto: ['{0} fa flessioni davanti allo specchio del bagno. Per farsi sentire.'] },
+    },
+  };
+})(typeof window !== 'undefined' ? window : globalThis);
+
+/* testi delle conseguenze legate agli oggetti, accanto a quelli dell'ecosistema */
+(function (G) {
+  const D = G.LOS_DATA; if (!D || !D.eco) return;
+  D.eco.txt.armorBreak = ['{0} incassa il colpo: {ip} si sfascia, ma ha fatto il suo dovere.', '{0} ha parato l\'ultimo colpo con {ip}, che ora è da buttare.'];
+  if (D.eco.txtSoft) D.eco.txtSoft.armorBreak = ['{0} incassa l\'ennesima frecciata: {ip} non regge più.'];
 })(typeof window !== 'undefined' ? window : globalThis);
 
 ;
@@ -5316,6 +5585,13 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
     const closed = new Set(); // zone inghiottite dalla tempesta (Battle Royale)
     const traps = []; const zoneLoot = {};
     let SYS = []; let pendingNotes = [];
+    // oggetti e mente dei concorrenti
+    const IT = D.items || { types: {}, names: {}, how: {} };
+    const MIND = D.mind || { goals: {}, acts: {}, actsSoft: {}, diary: { trait: {} }, diarySoft: { trait: {} }, mem: {} };
+    let ORIGIN = null;
+    const ACT = (k) => (theme.soft && MIND.actsSoft && MIND.actsSoft[k]) || (MIND.acts || {})[k] || [];
+    const DIA = (k) => (theme.soft && MIND.diarySoft && MIND.diarySoft[k]) || (MIND.diary || {})[k] || [];
+    const DIAT = (tr) => (theme.soft && MIND.diarySoft && MIND.diarySoft.trait && MIND.diarySoft.trait[tr]) || ((MIND.diary || {}).trait || {})[tr] || [];
 
     const T = (cfg.cast || []).map((c, i) => ({
       id: c.id || 't' + i, name: (c.name || 'Concorrente ' + (i + 1)).trim(), gender: c.gender || 'M',
@@ -5329,10 +5605,12 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
       revenges: 0, saves: 0, repaid: 0, amulets: 0, tests: 0, testsPassed: 0,
       hp: 100, en: 90, mo: 55, food: 70, pr: 0, infected: false, infKnown: false, cause: null, hurtPh: -1, sawDeath: -1,
       foraged: 0, nursed: 0, shared: 0, trapKills: 0, trapsSet: 0, survivedBeasts: 0,
+      goal: null, thought: '', crush: null, plot: null, diary: [], mem: {}, trades: 0, crafts: 0, acts: 0, rejected: 0, planPh: -9, vigilPh: -9, guard: null,
     }));
     if (T.length < 2) throw new Error('Servono almeno 2 concorrenti.');
     T.forEach((t) => {
       t.zone = rng.int(zoneCount);
+
       t.food = clamp(64 + t.attr.sop * 2, 0, 100);
       t.mo = clamp(50 + (t.attr.car - 5) * 2 + (t.attr.cor - 5) * 2 + (t.traits.includes('leader') ? 5 : 0) + (t.traits.includes('paranoico') ? -6 : 0), 20, 85);
     });
@@ -5375,7 +5653,7 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
     const phases = [];
     let day = 0, deathCounter = 0, pendingFallen = [], noDeathStreak = 0;
     const stats = { events: 0, alliances: 0, betrayals: 0, firstBlood: null, deathsByDay: [], envDeaths: 0, killDeaths: 0, items: 0, revenges: 0, couples: 0, debtsRepaid: 0, amulets: 0, sponsors: 0, echoes: 0, tests: 0, testsPassed: 0,
-      causes: {}, shared: 0, nursed: 0, foraged: 0, trapsSet: 0, trapHits: 0, beasts: 0, infected: 0, cured: 0, broken: 0, looted: 0, meteo: [], expelled: 0 };
+      causes: {}, shared: 0, nursed: 0, foraged: 0, trapsSet: 0, trapHits: 0, beasts: 0, infected: 0, cured: 0, broken: 0, looted: 0, meteo: [], expelled: 0, trades: 0 };
 
     const hasItem = (t, it) => t.inv.some((x) => x.type === it);
     const itemOf = (t, it) => t.inv.find((x) => x.type === it);
@@ -5403,6 +5681,7 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
       if ((attr === 'int' || attr === 'sop') && hasItem(t, 'mappa')) bonus += 2;
       if (attr === 'for' && hasItem(t, 'arma')) bonus += 1;
       const tb = wx('tb', null); if (tb && tb[attr]) bonus += tb[attr];
+      if (t.planPh >= phases.length - 3) bonus += 1;
       const die = 1 + rng.int(6) + rng.int(6);
       const roll = base + die + bonus;
       return { roll, dc, pass: roll >= dc, bonus };
@@ -5528,6 +5807,15 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
       if (g0.cibo && P.food < 40) w *= 1.8;
       if (g0.med && P.hp < 55) w *= 2;
       if (g0.arma && !hasItem(P, 'arma')) w *= 1.3;
+      const gk = P.goal ? P.goal.k : '';
+      if (gk === 'caccia' && tg('agg')) w *= 1.6;
+      if (gk === 'nascondersi') { if (tg('agg')) w *= 0.5; if (tg('cow') || tg('stl')) w *= 1.8; }
+      if (gk === 'cibo' && tg('food')) w *= 1.8;
+      if (gk === 'curarsi' && tg('heal')) w *= 1.8;
+      if (gk === 'spettacolo' && tg('show')) w *= 2;
+      if (gk === 'reclutare' && (tg('ally') || tg('soc'))) w *= 1.8;
+      if (gk === 'tradire' && tg('betray')) w *= 3;
+      if (gk === 'cotta' && tg('love')) w *= 2;
       if (ev.origin === 'custom') w *= 1.5;
       else if (ev.origin === 'adult') w *= 1.25;
       else if (ev.origin !== 'base') w *= 1.3;
@@ -5540,6 +5828,8 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
       if (P.partner === t.id) k -= 1.6;
       if (P.owes[t.id] || t.owes[P.id]) k -= 1.1;
       if (t.grudges[P.id]) k -= 0.9;
+      if (P.goal && P.goal.tg === t.id) k -= 1;
+      if (P.crush === t.id) k -= 0.6;
       const a = aff(P, t); if (a >= 40) k -= 0.7; else if (a <= -40) k -= 0.5;
       return k;
     }
@@ -5599,21 +5889,35 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
     }
 
     // ---------- ecosistema: testi e valori vitali ----------
-    function sysText(k, people, vars) {
-      const fits = (x) => { let mx = -1; x.replace(/[{\[](\d)[}:]/g, (_, d) => { mx = Math.max(mx, +d); }); return mx < people.length; };
-      const list = (Array.isArray(TX(k)) ? TX(k) : []).filter(fits); if (!list.length) return null;
+    function fmt(src, people, vars) {
+      const fits = (x) => { let mx = -1; x.replace(/[{\[](\d)[}:]/g, (_, d) => { mx = Math.max(mx, +d); }); return mx < people.length && !/\{(i|ip|j|k|z|n)\}/.test(x.replace(/\{(i|ip|j|k|z|n)\}/g, (m, v) => (vars && vars[v] != null && vars[v] !== '' ? '' : m))); };
+      const list = (Array.isArray(src) ? src : []).filter(fits); if (!list.length) return null;
       let s = rng.pick(list);
       s = s.replace(/\[(\d):([^\]]*)\]/g, (_, i, o) => genderPick([people[+i]], o))
-        .replace(/\{(i|ip|z|m|n|d)\}/g, (_, x) => (vars && vars[x] != null ? vars[x] : ''))
+        .replace(/\{(i|ip|j|k|z|m|n|d)\}/g, (_, x) => (vars && vars[x] != null ? vars[x] : ''))
         .replace(LEX_RE, (_, k2) => (k2 === 'luogo' && vars && vars.z ? vars.z : rng.pick(LEX[k2] || ['qualcosa'])));
       s = cap(artPrep(s));
       return { plain: edFix(s.replace(/\{(\d)\}/g, (_, i) => people[+i].name)), html: edFix(esc(s).replace(/\{(\d)\}/g, (_, i) => nameTag(people[+i]))) };
     }
+    const sysText = (k, people, vars) => fmt(TX(k), people, vars);
     function sys(k, people, vars, o, pri) {
       const tx = sysText(k, people, vars); if (!tx) return null;
       const ev = Object.assign({ html: tx.html, plain: tx.plain, ids: people.map((p) => p.id), deaths: [], lethal: false, origin: 'sys', cat: 'none', why: 'conseguenza', echo: [] }, o || {});
       SYS.push({ pri: pri || 1, ev });
       return ev;
+    }
+    // ricordi dei rapporti (in prima persona) e diario segreto
+    function remember(a, b, k, x) {
+      if (!a || !b || a === b) return;
+      const l = (a.mem[b.id] = a.mem[b.id] || []);
+      if (l.length && l[l.length - 1].k === k && l[l.length - 1].ph === phases.length) return;
+      l.push({ ph: phases.length, k, x: x ? x.id : null });
+      if (l.length > 6) l.shift();
+    }
+    function remember1(t, html, kind) {
+      if (!t || !html) return;
+      t.diary.push({ ph: phases.length, d: day, h: html, k: kind || 'pensiero' });
+      if (t.diary.length > 80) t.diary.shift();
     }
     function syncSt(t) {
       const ph = phases.length;
@@ -5625,6 +5929,11 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
     function hurt(t, dmg, by, cause, inTick) {
       if (!t.alive) return;
       dmg *= Math.max(0.55, 1.2 - t.attr.res * 0.04) * (hasTrait(t, 'sopravvissuto') ? 0.85 : 1);
+      const ar = itemOf(t, 'armatura');
+      if (ar && dmg >= 8) {
+        dmg *= 0.62; ar.u = (ar.u || 1) - 1;
+        if (ar.u <= 0) { takeItem(t, ar); sys('armorBreak', [t], { i: ar.name, ip: possessive(ar) }, { cat: 'hurt', why: 'oggetto' }, 1); }
+      }
       const hp0 = t.hp;
       t.hp -= dmg; if (!inTick) t.hp = Math.max(Math.min(8, hp0), t.hp);
       t.hurtPh = phases.length;
@@ -5637,7 +5946,38 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
       t.mo -= Math.min(10, dmg / 4);
       syncSt(t);
     }
-    const capInv = (t) => { while (t.inv.length > 7) t.inv.shift(); };
+    const capInv = (t) => { while (t.inv.length > 8) { const k = t.inv.findIndex((x) => x.type !== 'ricordo'); t.inv.splice(k >= 0 ? k : 0, 1); } };
+    const itemName = (type) => {
+      const n = ((IT.names || {})[theme.id] || {})[type] || ((IT.names || {})._ || {})[type];
+      if (n && n.length) return rng.pick(n);
+      return ITEM_NAME[type] || rng.pick(LEX[type] || ['qualcosa']);
+    };
+    const maxUses = (type, q) => (type === 'arma' ? Math.max(2, Math.round((2 + (q || 2) * 2) / (MOD.wear || 1))) : type === 'armatura' ? 3 : 0);
+    function mkItem(type, name, how, from, q) {
+      const it = { type, name: name || itemName(type), how: how || ORIGIN || 'trovato', from: from ? from.id : null, d: day };
+      if (type === 'arma') it.q = q || clamp(Math.round(0.7 + rng.f() * 2.2 * MOD.weapon), 1, 3);
+      const mu = maxUses(type, it.q); if (mu) { it.u = mu; it.um = mu; }
+      return it;
+    }
+    const itemScore = (it) => (it.q || 2) * 10 + (it.u || 0) + (it.x ? 5 : 0);
+    function addItem(t, it) {
+      if (it.type === 'arma' || it.type === 'armatura') {
+        const old = itemOf(t, it.type);
+        if (old) { if (itemScore(old) >= itemScore(it)) return false; t.inv.splice(t.inv.indexOf(old), 1); }
+      }
+      t.inv.push(it); capInv(t); return true;
+    }
+    function takeItem(t, it) { const k = t.inv.indexOf(it); if (k >= 0) t.inv.splice(k, 1); return it; }
+    // l'arma si consuma a ogni colpo e alla fine si rompe
+    function wear(k, out) {
+      const w = itemOf(k, 'arma'); if (!w || !w.u) return;
+      w.u--;
+      if (w.u <= 0) {
+        takeItem(k, w); stats.broken++;
+        const e = sysText('weaponBreak', [k], { i: w.name, ip: possessive(w) });
+        if (e) { if (out && out.length < 3) out.push(Object.assign(e, { cls: '' })); else remember1(k, e.html, 'fatto'); }
+      }
+    }
     function eat(t) {
       const i = t.inv.findIndex((x) => x.type === 'cibo'); if (i < 0) return false;
       t.inv.splice(i, 1); t.food += 50; t.mo += 3;
@@ -5673,11 +6013,8 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
           if (M && M.kill) k.pr += M.kill * Math.max(0.4, 1.2 - k.attr.emp * 0.06);
           if (dm <= -15 && out.length < 3 && rng.chance(0.5)) { const e = sysText('remorse', [k, v]); if (e) out.push(Object.assign(e, { cls: '' })); }
           else if (dm > 0 && k.kills === 2 && out.length < 3 && rng.chance(0.5)) { const e = sysText('bloodlust', [k]); if (e) out.push(Object.assign(e, { cls: 'warn' })); }
-          const w = itemOf(k, 'arma');
-          if (w && rng.chance(0.07 * MOD.weapon)) {
-            k.inv.splice(k.inv.indexOf(w), 1); stats.broken++;
-            const e = sysText('weaponBreak', [k], { i: w.name, ip: possessive(w) }); if (e && out.length < 3) out.push(Object.assign(e, { cls: '' }));
-          }
+          wear(k, out);
+          if (k.plot === v.id) k.plot = null;
           syncSt(k);
           if (k.grudges[v.id]) {
             const g = k.grudges[v.id]; delete k.grudges[v.id]; k.revenges++; stats.revenges++; k.fame += 2;
@@ -5691,17 +6028,17 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
         // il bottino: chi uccide fruga nello zaino della vittima
         const K = killers.find((k) => k.alive);
         if (K && v.inv.length) {
-          let took = 0;
+          let took = 0; const left = [];
           v.inv.slice().forEach((it) => {
-            if (took >= 2) return;
             const mine = itemOf(K, it.type);
-            if (it.type === 'arma' ? !mine || (it.q || 2) > (mine.q || 2) : !mine || it.type === 'cibo') {
-              if (it.type === 'arma' && mine) K.inv.splice(K.inv.indexOf(mine), 1);
-              K.inv.push(Object.assign({}, it)); took++; stats.looted++;
+            const want = it.type !== 'ricordo' && (it.type === 'arma' || it.type === 'armatura' ? !mine || itemScore(it) > itemScore(mine) : !mine || it.type === 'cibo' || it.type === 'valore');
+            if (took < 2 && want) {
+              addItem(K, Object.assign({}, it, { how: theme.soft ? 'eredita' : 'bottino', from: v.id, d: day })); took++; stats.looted++;
               if (took === 1 && out.length < 3 && rng.chance(0.4)) { const e = sysText(theme.soft ? 'lootSoft' : 'loot', [K, v], { i: it.name }); if (e) out.push(Object.assign(e, { cls: '' })); }
-            }
+            } else left.push({ it, from: v.id });
           });
-          capInv(K);
+          // il resto dello zaino resta sul posto, per chi passerà di lì
+          if (left.length) (zoneLoot[v.zone] = zoneLoot[v.zone] || []).push(...left);
         }
       } else {
         stats.envDeaths++;
@@ -5723,23 +6060,18 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
         syncSt(X);
         X.lost = v.id;
         killers.forEach((K) => {
+          remember(X, K, 'killedDear', v);
           if (addGrudge(X, K, 'kill', v) && echoed < 2) { const e = echo(lover ? E.grudgeLover : E.grudgeKill, [X, K, v], 'warn'); if (e) { out.push(e); echoed++; } }
         });
         if (!killers.length && lover && echoed < 2) { const e = echo(E.griefOnly, [X, v], 'warn'); if (e) { out.push(e); echoed++; } }
       });
       if (v.partner) { const p = byId[v.partner]; if (p) { p.partner = null; p.exPartner = v.id; } v.partner = null; }
     }
-    function giveItem(t, type, ctx, lexPick, name, q) {
+    function giveItem(t, type, ctx, lexPick, name, q, how, from, src) {
       const nm = name || (type === 'arma' ? lexPick('arma') : type === 'cibo' ? ctx.cibo || 'delle provviste' : ITEM_NAME[type] || lexPick(type));
-      const it = { type, name: nm };
-      if (type === 'arma') {
-        it.q = q || clamp(Math.round(0.7 + rng.f() * 2.2 * MOD.weapon), 1, 3);
-        const old = itemOf(t, 'arma');
-        if (old) { if ((old.q || 2) > it.q && !name) { it.q = old.q; it.name = old.name; } t.inv.splice(t.inv.indexOf(old), 1); }
-      }
-      t.inv.push(it); t.items++; stats.items++;
+      const it = src ? Object.assign({}, src, { how: how || 'trovato', from: from ? from.id : null, d: day }) : mkItem(type, nm, how, from, q);
+      addItem(t, it); t.items++; stats.items++;
       if (type === 'cibo' && t.food < 45) eat(t);
-      while (t.inv.length > 7) t.inv.shift();
     }
 
     function resolveTest(ev, roles) {
@@ -5778,6 +6110,15 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
           ev.kills.forEach((k) => { if (k.v.includes(i)) k.by.forEach((b) => addGrudge(v, roles[b], 'attack')); });
           return;
         }
+        // la protezione para il colpo
+        const arm = itemOf(v, 'armatura');
+        if (v.alive && arm && alive().length > 2 && rng.chance(0.24)) {
+          saved.add(i); takeItem(v, arm);
+          const atk2 = ev.kills.find((k) => k.v.includes(i)); const K2 = atk2 ? roles[atk2.by[0]] : null;
+          hurt(v, 26, K2, 'wound'); if (K2) { addGrudge(v, K2, 'attack'); remember(v, K2, 'tried'); }
+          const e = fmt(ACT('armorSave'), [v], { i: arm.name, ip: possessive(arm) }); if (e) out.push(Object.assign(e, { cls: 'twist' }));
+          return;
+        }
         // la tempra: chi è in forma e resistente a volte sopravvive al colpo, ma ridotto malissimo
         const tough = 0.03 + (v.attr.res - 5) * 0.022 + (v.attr.fort - 5) * 0.01 + (hasTrait(v, 'sopravvissuto') ? 0.08 : 0) + (v.mo >= 80 ? 0.03 : 0);
         if (v.alive && v.hp >= 60 && alive().length > 2 && rng.chance(Math.max(0, tough))) {
@@ -5785,7 +6126,7 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
           const atk = ev.kills.find((k) => k.v.includes(i));
           const K = atk ? roles[atk.by[0]] : null;
           v.hp = 9 + rng.int(10); v.hurtPh = phases.length; v.cause = K ? { k: 'wound', by: K.id, ph: phases.length } : { k: 'wound', ph: phases.length, by: null };
-          if (K) { addGrudge(v, K, 'attack'); K.fame += 1; }
+          if (K) { addGrudge(v, K, 'attack'); remember(v, K, 'tried'); K.fame += 1; }
           if (M && M.infect && !v.infected && rng.chance(M.infect)) { v.infected = true; v.pr = 10; stats.infected++; }
           syncSt(v); stats.tough = (stats.tough || 0) + 1;
           const e = sysText(K ? 'tough' : 'toughEnv', K ? [v, K] : [v]); if (e) out.push(Object.assign(e, { cls: 'twist' }));
@@ -5796,7 +6137,7 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
         k.v.forEach((i) => { if (!saved.has(i)) kill(roles[i], killers, txt, out); });
         if (k.betray) {
           stats.betrayals++;
-          killers.forEach((t) => { t.betrayals++; t.traitor = true; leaveAlliance(t); });
+          killers.forEach((t) => { t.betrayals++; t.traitor = true; t.plot = null; leaveAlliance(t); });
         }
       }
       ev.dies.forEach((i) => { if (!saved.has(i)) kill(roles[i], [], txt, out); });
@@ -5806,28 +6147,29 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
         switch (f.t) {
           case 'al': {
             const ts = f.r.map((i) => roles[i]).filter((x) => x.alive);
-            if (ts.length > 1) { joinAlliance(ts); stats.alliances++; ts.forEach((x) => { x.alliancesFormed++; x.mo += 10; ts.forEach((y) => x.id < y.id && addAff(x, y, Math.round(25 * (0.7 + (x.attr.car + y.attr.car) / 30)))); }); }
+            if (ts.length > 1) { joinAlliance(ts); stats.alliances++; ts.forEach((x) => { x.alliancesFormed++; x.mo += 10; ts.forEach((y) => remember(x, y, 'allied')); ts.forEach((y) => x.id < y.id && addAff(x, y, Math.round(25 * (0.7 + (x.attr.car + y.attr.car) / 30)))); }); }
             break;
           }
           case 'br': {
             const g = t.allyId != null ? [...(alliances.get(t.allyId) || [])].map((id) => byId[id]).filter((x) => x !== t && x.alive) : [];
             leaveAlliance(t); t.betrayals++; t.traitor = true; stats.betrayals++;
-            let n = 0; g.forEach((x) => { x.mo -= 18 * DR.mo; if (addGrudge(x, t, 'betray') && n++ < 1) { const e = echo(E.betray, [x, t], 'warn'); if (e) out.push(e); } });
+            t.plot = null;
+            let n = 0; g.forEach((x) => { x.mo -= 18 * DR.mo; remember(x, t, 'betrayed'); if (addGrudge(x, t, 'betray') && n++ < 1) { const e = echo(E.betray, [x, t], 'warn'); if (e) out.push(e); } });
             break;
           }
           case 'gain': giveItem(t, f.item, ctx, lexPick); break;
           case 'lose': { const i = t.inv.findIndex((x) => x.type === f.item); if (i >= 0) t.inv.splice(i, 1); if (f.item === 'cibo') t.food += 40; if (f.item === 'med') t.hp = Math.max(t.hp, 70); break; }
           case 'steal': {
             const i = u.inv.findIndex((x) => x.type === 'arma');
-            if (i >= 0) { const [it] = u.inv.splice(i, 1); giveItem(t, 'arma', ctx, lexPick, it.name, it.q); u.mo -= 10; if (u.alive && addGrudge(u, t, 'steal')) { const e = echo(E.steal, [u, t], 'warn'); if (e) out.push(e); } }
+            if (i >= 0) { const [it] = u.inv.splice(i, 1); giveItem(t, 'arma', ctx, lexPick, it.name, it.q, 'rubato', u, it); u.mo -= 10; remember(u, t, 'robbed'); if (u.alive && addGrudge(u, t, 'steal')) { const e = echo(E.steal, [u, t], 'warn'); if (e) out.push(e); } }
             break;
           }
           case 'give': {
             if (!u.alive) break;
             const own = itemOf(t, f.item);
             if (own) t.inv.splice(t.inv.indexOf(own), 1);
-            giveItem(u, f.item, ctx, lexPick, own ? own.name : null, own && own.q);
-            u.owes[t.id] = 'dono'; addAff(t, u, 20); u.mo += 8;
+            giveItem(u, f.item, ctx, lexPick, own ? own.name : null, own && own.q, 'dono', t, own);
+            u.owes[t.id] = 'dono'; addAff(t, u, 20); u.mo += 8; remember(u, t, 'gift');
             if (rng.chance(0.6)) { const e = echo(E.debt, [u, t], ''); if (e) out.push(e); }
             break;
           }
@@ -5850,16 +6192,21 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
             if (M && M.cure) { if (M.infect) { if (t.infected && t.pr < M.cure) { t.infected = false; t.pr = 0; stats.cured++; } } else t.pr -= M.cure; }
             syncSt(t);
             const helper = roles.find((x) => x !== t && x.alive);
-            if (helper && ev.n > 1) { t.owes[helper.id] = 'cura'; addAff(t, helper, 30); helper.saves++; if (rng.chance(0.5)) { const e = echo(E.debt, [t, helper], ''); if (e) out.push(e); } }
+            if (helper && ev.n > 1) { t.owes[helper.id] = 'cura'; addAff(t, helper, 30); helper.saves++; remember(t, helper, 'cured'); if (rng.chance(0.5)) { const e = echo(E.debt, [t, helper], ''); if (e) out.push(e); } }
             break;
           }
-          case 'hit': if (u.alive) { hurt(u, (28 + rng.int(18)) * (1 + weaponPow(t) / 12), t, 'wound'); u.mo -= 6; if (addGrudge(u, t, 'attack') && rng.chance(0.6)) { const e = echo(E.hit, [u, t], 'warn'); if (e) out.push(e); } } break;
-          case 'save': if (u.alive) { u.owes[t.id] = 'vita'; addAff(t, u, 40); u.mo += 15; t.saves++; t.fame += 1; const e = echo(E.saved, [u, t], 'good'); if (e) out.push(e); } break;
-          case 'forgive': delete t.grudges[u.id]; addAff(t, u, 35); break;
+          case 'hit': if (u.alive) {
+            const wpn = itemOf(t, 'arma');
+            hurt(u, (28 + rng.int(18)) * (1 + weaponPow(t) / 12), t, 'wound'); u.mo -= 6; remember(u, t, 'hit');
+            if (wpn && wpn.x === 'veleno' && u.st.avvelenato == null) { u.st.avvelenato = phases.length; u.cause = { k: 'poison', by: t.id, ph: phases.length }; }
+            wear(t, out); if (addGrudge(u, t, 'attack') && rng.chance(0.6)) { const e = echo(E.hit, [u, t], 'warn'); if (e) out.push(e); } } break;
+          case 'save': if (u.alive) { u.owes[t.id] = 'vita'; addAff(t, u, 40); u.mo += 15; remember(u, t, 'saved'); t.saves++; t.fame += 1; const e = echo(E.saved, [u, t], 'good'); if (e) out.push(e); } break;
+          case 'forgive': delete t.grudges[u.id]; addAff(t, u, 35); remember(t, u, 'forgave'); break;
           case 'love': if (u.alive) {
             t.partner = u.id; u.partner = t.id; addAff(t, u, 70); stats.couples++; t.fame += 1; u.fame += 1; t.mo += 25; u.mo += 25;
+            remember(t, u, 'love'); remember(u, t, 'love'); if (t.crush === u.id) t.crush = null; if (u.crush === t.id) u.crush = null; jealousy(t, u);
             if (!cfg.teamWin && (t.allyId == null || u.allyId == null || t.allyId === u.allyId)) { const g = t.allyId != null ? alliances.get(t.allyId) : u.allyId != null ? alliances.get(u.allyId) : null; if (!g || g.size < 5) joinAlliance([t, u]); } const e = echo(E.couple, [t, u], 'love'); if (e) out.push(e); } break;
-          case 'repay': if (u) { delete t.owes[u.id]; addAff(t, u, 20); t.repaid++; stats.debtsRepaid++; const e = echo(E.repay, [t, u], 'good'); if (e) out.push(e); } break;
+          case 'repay': if (u) { delete t.owes[u.id]; addAff(t, u, 20); t.repaid++; remember(u, t, 'repaid'); stats.debtsRepaid++; const e = echo(E.repay, [t, u], 'good'); if (e) out.push(e); } break;
           case 'debt': if (u) t.owes[u.id] = 'favore'; break;
           case 'rel': if (u) addAff(t, u, f.v); break;
           case 'star': t.fame += 2; t.mo += 10; if (t.fame >= 5 && !t.starred) { t.starred = true; const e = echo(E.star, [t], 'good'); if (e) out.push(e); } break;
@@ -5892,15 +6239,16 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
     }
 
     function snapshot() {
-      const zones = {}, allies = {}, st = {}, inv = {}, kills = {}, rel = {}, vit = {};
+      const zones = {}, allies = {}, st = {}, inv = {}, kills = {}, rel = {}, vit = {}, mind = {};
       T.forEach((t) => {
-        zones[t.id] = t.zone; allies[t.id] = t.allyId; st[t.id] = Object.keys(t.st); inv[t.id] = t.inv.map((x) => x.name + (x.type === 'arma' && x.q ? ['', ' ★', ' ★★', ' ★★★'][x.q] : '')); kills[t.id] = t.kills;
+        zones[t.id] = t.zone; allies[t.id] = t.allyId; st[t.id] = Object.keys(t.st); inv[t.id] = t.inv.map((x) => { const o = { t: x.type, n: x.name, h: x.how || 'trovato' }; if (x.q) o.q = x.q; if (x.u != null) { o.u = x.u; o.m = x.um; } if (x.from) o.f = x.from; if (x.d) o.d = x.d; if (x.x) o.x = x.x; return o; }); kills[t.id] = t.kills;
+        if (t.alive && t.goal) mind[t.id] = { g: t.goal.k, tg: t.goal.tg, since: t.goal.ph, th: t.thought };
         if (t.alive) vit[t.id] = [Math.round(Math.max(0, t.hp)), Math.round(t.en), Math.round(t.mo), Math.round(t.food), M && (!M.infect || t.infected) ? Math.round(t.pr) : -1];
         const friends = T.filter((u) => u !== t && u.alive && aff(t, u) >= 40).map((u) => u.id);
         const enemies = T.filter((u) => u !== t && u.alive && aff(t, u) <= -40 && !t.grudges[u.id]).map((u) => u.id);
-        rel[t.id] = { p: t.partner, g: Object.keys(t.grudges).filter((id) => byId[id].alive).map((id) => [id, t.grudges[id].why, t.grudges[id].victim]), o: Object.keys(t.owes).filter((id) => byId[id].alive), f: t.fame, tr: t.traitor, fr: friends, en: enemies, lost: t.lost };
+        rel[t.id] = { p: t.partner, g: Object.keys(t.grudges).filter((id) => byId[id].alive).map((id) => [id, t.grudges[id].why, t.grudges[id].victim]), o: Object.keys(t.owes).filter((id) => byId[id].alive), f: t.fame, tr: t.traitor, fr: friends, en: enemies, lost: t.lost, top: t.alive ? relTop(t) : [] };
       });
-      return { alive: alive().map((t) => t.id), zones, allies, st, inv, kills, rel, vit, closed: [...closed] };
+      return { alive: alive().map((t) => t.id), zones, allies, st, inv, kills, rel, vit, mind, closed: [...closed] };
     }
 
     function tickStatus() {
@@ -5925,7 +6273,15 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
       const opts = pools.sponsor.filter((e) => e.n === 1 && checkReq(e, [P]));
       const ev = rng.wpick(opts, (e) => weightFor(e, P));
       if (!ev) return;
-      const r = apply(ev, [P]); r.why = r.why || 'fama'; r.sponsor = true; events.push(r); stats.sponsors++; P.mo += 15; syncSt(P);
+      ORIGIN = 'sponsor';
+      const r = apply(ev, [P]); r.why = r.why || 'fama'; r.sponsor = true; events.push(r); stats.sponsors++; P.mo += 15;
+      // nella cassa c'è spesso anche qualcosa di utile, scelto in base ai bisogni
+      if (rng.chance(0.45)) {
+        const need = P.hp < 55 ? 'med' : P.food < 40 ? 'cibo' : !hasItem(P, 'armatura') ? 'armatura' : !hasItem(P, 'attrezzo') ? 'attrezzo' : 'valore';
+        const it = mkItem(need, need === 'cibo' ? rng.pick(LEX.cibo || ['delle provviste']) : null, 'sponsor');
+        if (addItem(P, it)) { P.items++; stats.items++; if (need === 'cibo' && P.food < 45) eat(P); const e = fmt(ACT('sponsorBonus'), [P], { i: it.name }); if (e) r.echo = (r.echo || []).concat([Object.assign(e, { cls: 'good' })]).slice(0, 3); }
+      }
+      ORIGIN = null; syncSt(P);
     }
 
     /* ---------- ecosistema: conseguenze automatiche ---------- */
@@ -5992,18 +6348,20 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
         // esplorazione: cibo dalla zona o bottino dei caduti
         if (!hasItem(t, 'cibo') && t.food < 65) {
           const loot = zoneLoot[t.zone];
-          const li = loot ? loot.findIndex((x) => !itemOf(t, x.it.type) || x.it.type === 'cibo') : -1;
+          const li = loot ? loot.findIndex((x) => x.it.type !== 'ricordo' && (!itemOf(t, x.it.type) || x.it.type === 'cibo')) : -1;
           if (li >= 0 && rng.chance(0.3 + t.attr.sop * 0.03)) {
             const { it, from } = loot.splice(li, 1)[0];
-            t.inv.push(Object.assign({}, it)); capInv(t); t.items++; stats.items++; stats.looted++;
+            addItem(t, Object.assign({}, it, { how: 'zaino', from, d: day })); t.items++; stats.items++; stats.looted++;
             sys('scavenge', [t, byId[from]], { i: it.name, z: zoneName(t.zone) }, { cat: 'item', why: 'bottino', ids: [t.id] }, 2);
             if (it.type === 'cibo' && t.food < 45) eat(t);
           } else {
-            const p = (0.08 + t.attr.sop * 0.045 + (hasTrait(t, 'cacciatore') ? 0.15 : 0) + (hasItem(t, 'mappa') ? 0.12 * MOD.map : 0)) * ZP[t.zone][0] * MOD.forage * wx('forage', 1) * (t.en < 25 ? 0.6 : 1);
+            const p = (0.08 + t.attr.sop * 0.045 + (hasTrait(t, 'cacciatore') ? 0.15 : 0) + (hasItem(t, 'mappa') ? 0.12 * MOD.map : 0) + (hasItem(t, 'attrezzo') ? 0.12 : 0)) * ZP[t.zone][0] * MOD.forage * wx('forage', 1) * (t.en < 25 ? 0.6 : 1);
             if (rng.chance(Math.min(0.92, p))) {
               const hungry = t.food < 40; t.foraged++; stats.foraged++;
               const nm = rng.pick(LEX.cibo || ['delle provviste']);
-              if (t.food < 50) t.food += 34; else { t.inv.push({ type: 'cibo', name: nm }); capInv(t); t.items++; }
+              if (t.food < 50) t.food += 34; else { addItem(t, mkItem('cibo', nm, 'trovato')); t.items++; }
+              // a volte, cercando, si trova anche altro
+              if (rng.chance(0.16)) { const it = mkItem(rng.pick(['attrezzo', 'armatura', 'valore', 'alcol', 'med', 'valore']), null, 'trovato'); if (addItem(t, it)) { t.items++; stats.items++; const e = fmt(ACT('luckyFind'), [t], { i: it.name }); if (e) sys2(e, [t], 'item', 'Esplorazione', 0); } }
               if (hungry || rng.chance(0.15)) sys('forage', [t], {}, { cat: 'item', why: 'esplorazione' }, hungry ? 2 : 0);
             }
           }
@@ -6048,6 +6406,10 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
         }
         syncSt(t);
       });
+      // cuori, gesti e scambi: ognuno secondo la propria natura
+      hearts();
+      personalActs();
+      barter();
       // sonno, guarigione naturale e umore
       let watchMsg = 0;
       A.forEach((t) => {
@@ -6069,7 +6431,8 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
           t.st.malato = phases.length; t.cause = { k: t.cause && t.cause.by ? 'wound' : 'sick', by: t.cause ? t.cause.by : null, ph: t.cause && t.cause.by ? t.cause.ph : phases.length };
           sys('woundSick', [t], {}, { cat: 'hurt', why: 'ferite' }, 2);
         }
-        let dm = (t.allyId != null ? 4 : 0) + (t.partner ? 6 : 0) + (mates.some((x) => hasTrait(x, 'leader')) ? 3 : 0) + (t.fame >= 3 ? 2 : 0) +
+        const rc = itemOf(t, 'ricordo');
+        let dm = (rc ? (rc.from && byId[rc.from] && !byId[rc.from].alive ? 7 : 4) : 0) + (t.allyId != null ? 4 : 0) + (t.partner ? 6 : 0) + (mates.some((x) => hasTrait(x, 'leader')) ? 3 : 0) + (t.fame >= 3 ? 2 : 0) +
           (alone ? (hasTrait(t, 'solitario') ? 2 : -3) : 0) - (t.food < 25 ? 6 : 0) - (t.hp < 40 ? 6 : 0) - (meterBad(t) ? 5 : 0);
         if (dm < 0) dm *= DR.mo;
         t.mo += dm + (58 - t.mo) * 0.08;
@@ -6108,7 +6471,7 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
         const tr = itemOf(t, 'trap');
         if (!tr || !t.alive) return;
         if ((t.attr.int >= 6 || hasTrait(t, 'ingegnoso') || hasTrait(t, 'cacciatore') || rng.chance(0.3)) && rng.chance(0.55)) {
-          t.inv.splice(t.inv.indexOf(tr), 1); traps.push({ owner: t.id, zone: t.zone, ph: phases.length, name: tr.name }); t.trapsSet++; stats.trapsSet++;
+          t.inv.splice(t.inv.indexOf(tr), 1); traps.push({ owner: t.id, zone: t.zone, ph: phases.length, name: tr.name, boom: tr.x === 'bomba' }); t.trapsSet++; stats.trapsSet++;
           if (rng.chance(0.45)) sys('trapSet', [t], { i: tr.name, z: zoneName(t.zone) }, { cat: 'item', why: 'trappola' }, 1);
         }
       });
@@ -6120,13 +6483,16 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
         const p = 0.035 * MOD.beast * wx('beast', 1) * ZP[t.zone][1] * (alone ? 1.6 * (MOD.nightAlone ? 1 + MOD.nightAlone * 0.5 : 1) : 0.45) * (t.en < 30 ? 1.5 : 1) * (hasTrait(t, 'furtivo') ? 0.6 : 1) * Math.sqrt(diff);
         if (!rng.chance(p)) return;
         attacks++; stats.beasts++;
-        const def = Math.max(t.attr.furt, t.attr.agi, t.attr.cor) + d6() + (hasItem(t, 'arma') ? 2 : 0) + (alone ? 0 : 3) + (t.st.esausto != null ? -2 : 0);
+        const guarded = alive().some((x) => x.guard === t.id && x.zone === t.zone);
+        const def = Math.max(t.attr.furt, t.attr.agi, t.attr.cor) + d6() + (hasItem(t, 'arma') ? 2 : 0) + (hasItem(t, 'attrezzo') ? 1 : 0) + (alone ? 0 : 3) + (t.st.esausto != null ? -2 : 0) + (t.vigilPh >= phases.length - 1 ? 2 : 0) + (guarded ? 3 : 0);
         if (def >= 14) { t.survivedBeasts++; if (!alone) { allyMates(t).forEach((x) => addAff(t, x, 6)); sys('beastFend', [t], {}, { cat: 'ally', why: 'predatori' }, 2); } return; }
         hurt(t, 22 + rng.int(18), null, 'beast', true);
         if (t.hp > 0) sys('beastHit', [t], {}, { cat: 'hurt', why: 'predatori' }, 3);
       });
       if (alive().length > 1 && day > 1 && rng.chance(0.2)) { const ex = alive().find((t) => t.en < 15); if (ex) sys('exhausted', [ex], {}, { cat: 'hurt', why: 'riposo' }, 0); }
       alive().forEach((t) => Object.keys(t.owes).forEach((id) => { if (!byId[id].alive) delete t.owes[id]; }));
+      diaryNight();
+      alive().forEach(decideGoal);
     }
 
     // a ogni fase: consumi, veleni, emorragie, indicatore dell'arena, tempesta, trappole
@@ -6164,7 +6530,7 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
         alive().forEach((t) => {
           if (!closed.has(t.zone)) return;
           const z = zoneName(t.zone);
-          const esc2 = 0.3 + t.attr.agi * 0.05 + t.en / 260 + (hasItem(t, 'mappa') ? 0.2 : 0);
+          const esc2 = 0.3 + t.attr.agi * 0.05 + t.en / 260 + (hasItem(t, 'mappa') ? 0.2 : 0) + (hasItem(t, 'attrezzo') ? 0.15 : 0);
           if (rng.chance(esc2)) { if (msgs < 1 && rng.chance(0.25)) { msgs++; sys('stormEscape', [t], { z }, { cat: 'none', why: 'tempesta' }, 0); } }
           else { hurt(t, (14 + rng.int(14)) * wx('storm', 1), null, 'storm', true); t.stormZ = z; if (t.hp > 0 && msgs < 2) { msgs++; sys('storm', [t], { z }, { cat: 'hurt', why: 'tempesta' }, 2); } }
           const open = [...Array(zoneCount).keys()].filter((i) => !closed.has(i));
@@ -6181,11 +6547,12 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
           if (!rng.chance(0.16 * MOD.trap * wx('trap', 1))) continue;
           traps.splice(k, 1);
           const z = zoneName(tp.zone);
-          const dodge = Math.max(v.attr.furt, v.attr.int, v.attr.agi) + d6() + (hasTrait(v, 'fortunato') ? 1 : 0) + (hasTrait(v, 'paranoico') ? 1 : 0);
+          const dodge = Math.max(v.attr.furt, v.attr.int, v.attr.agi) + d6() + (hasTrait(v, 'fortunato') ? 1 : 0) + (hasTrait(v, 'paranoico') ? 1 : 0) + (hasItem(v, 'mappa') ? 3 : 0) + (hasItem(v, 'attrezzo') ? 2 : 0);
           if (dodge >= 15) { addAff(v, owner, -15); sys('trapDodge', [owner, v], { z }, { cat: 'none', why: 'trappola' }, 2); break; }
           stats.trapHits++;
           const friendly = owner.allyId != null && owner.allyId === v.allyId;
-          hurt(v, 32 + rng.int(22), owner.alive && !friendly ? owner : null, friendly ? 'wound' : 'trap', true);
+          hurt(v, (32 + rng.int(22)) * (tp.boom ? 1.5 : 1), owner.alive && !friendly ? owner : null, friendly ? 'wound' : 'trap', true);
+          remember(v, owner, 'trap');
           v.trapZ = z;
           if (friendly) { addAff(v, owner, -30); if (v.hp > 0) sys('trapAlly', [owner, v], { z }, { cat: 'hurt', why: 'trappola' }, 3); }
           else { if (owner.alive) { v.cause = { k: 'trap', by: owner.id, ph: phases.length }; addGrudge(v, owner, 'attack'); } if (v.hp > 0) sys('trapHit', [owner, v], { z }, { cat: 'hurt', why: 'trappola' }, 3); }
@@ -6225,10 +6592,350 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
       });
     }
 
+
+    /* ---------------- la mente: obiettivi, gesti, segreti ---------------- */
+    const aliveId = (id) => !!(id && byId[id] && byId[id].alive);
+    const zoneMates = (t) => alive().filter((x) => x !== t && x.zone === t.zone);
+    const isAlly = (a, b) => a.allyId != null && a.allyId === b.allyId;
+    const canFight = (a, b) => !isAlly(a, b) && a.partner !== b.id && !(cfg.teamWin && a.team === b.team);
+    const traitName = (id) => (traitMap[id] ? traitMap[id].name : '');
+    // chi ama in segreto qualcuno che si mette con un altro
+    function jealousy(a, b) {
+      alive().forEach((x) => {
+        if (x === a || x === b) return;
+        const lost = x.crush === a.id ? a : x.crush === b.id ? b : null; if (!lost) return;
+        const rival = lost === a ? b : a;
+        x.crush = null; x.mo -= 15 * DR.mo; addAff(x, rival, -30); remember(x, rival, 'jealous');
+        if (hasTrait(x, 'vendicativo') || aff(x, rival) <= -45) addGrudge(x, rival, 'love');
+        const e = fmt(ACT('jealous'), [x, lost, rival]); if (e) sys2(e, [x, lost, rival], 'love', 'Gelosia', 2);
+        const d = fmt(DIA('jealousy'), [x, lost, rival]); if (d) remember1(x, d.html);
+      });
+    }
+    // un evento di sistema già scritto
+    function sys2(tx, people, cat, whyTxt, pri, ids) {
+      SYS.push({ pri: pri || 1, ev: { html: tx.html, plain: tx.plain, ids: ids || people.map((p) => p.id), deaths: [], lethal: false, origin: 'sys', cat: cat || 'none', why: 'carattere', whyTxt: whyTxt || '', echo: [] } });
+    }
+
+    // l'obiettivo del momento nasce da stato, legami e carattere
+    function decideGoal(t) {
+      const opts = [];
+      const gs = Object.keys(t.grudges).filter(aliveId).map((id) => byId[id]);
+      if (gs.length) {
+        const tg = gs.sort((a, b) => (t.grudges[b.id].why === 'kill') - (t.grudges[a.id].why === 'kill'))[0];
+        opts.push(['vendetta', tg, 3 + (hasTrait(t, 'vendicativo') ? 3 : 0) - (hasTrait(t, 'clemente') ? 2 : 0) - (hasTrait(t, 'pacifista') ? 1.5 : 0) + (t.grudges[tg.id].why === 'kill' ? 1 : 0) + (t.attr.cor - 5) * 0.2]);
+      }
+      if (t.hp < 45) opts.push(['curarsi', null, 4 + (45 - t.hp) / 10]);
+      if (t.food < 30) opts.push(['cibo', null, 3.5 + (30 - t.food) / 10 + (hasTrait(t, 'goloso') ? 1 : 0)]);
+      if (aliveId(t.partner)) opts.push(['proteggere', byId[t.partner], 2.5 + (byId[t.partner].hp < 50 ? 2 : 0) + (hasTrait(t, 'leale') ? 1 : 0)]);
+      if (aliveId(t.crush) && !t.partner) opts.push(['cotta', byId[t.crush], 2.2 + (hasTrait(t, 'romantico') ? 1.5 : 0)]);
+      if (aliveId(t.plot) && isAlly(t, byId[t.plot])) opts.push(['tradire', byId[t.plot], 3.2]);
+      if (hasTrait(t, 'codardo') || t.mo < 25 || (t.hp < 50 && t.kills === 0)) opts.push(['nascondersi', null, 1.5 + (hasTrait(t, 'codardo') ? 2 : 0) + (t.mo < 25 ? 1 : 0)]);
+      if (hasTrait(t, 'spietato') || hasTrait(t, 'bruto') || t.kills >= 3 || (hasTrait(t, 'cacciatore') && t.mo > 50)) opts.push(['caccia', null, 1.8 + (hasTrait(t, 'spietato') ? 1.5 : 0) + t.kills * 0.3]);
+      if (hasTrait(t, 'esibizionista') || (hasTrait(t, 'carismatico') && t.fame >= 2)) opts.push(['spettacolo', null, 1.6 + (hasTrait(t, 'esibizionista') ? 1 : 0)]);
+      if (t.allyId == null && !hasTrait(t, 'solitario') && (hasTrait(t, 'leader') || hasTrait(t, 'carismatico') || t.attr.car >= 7 || t.mo < 40)) opts.push(['reclutare', null, 1.5 + (hasTrait(t, 'leader') ? 1 : 0)]);
+      opts.push(['sopravvivere', null, 1.2]);
+      const noise = hasTrait(t, 'folle') ? 2.5 : hasTrait(t, 'impulsivo') ? 1.5 : 0.6;
+      let best = opts[0], bs = -1e9;
+      opts.forEach((o) => { const sc = o[2] + rng.f() * noise; if (sc > bs) { bs = sc; best = o; } });
+      let tg = best[1];
+      if (best[0] === 'caccia') tg = alive().filter((x) => x !== t && canFight(t, x)).sort((a, b) => combat(a) - combat(b))[0] || null;
+      const same = t.goal && t.goal.k === best[0] && t.goal.tg === (tg ? tg.id : null);
+      t.goal = { k: best[0], tg: tg ? tg.id : null, ph: same ? t.goal.ph : phases.length };
+      if (!same || !t.thought) {
+        const gd = (MIND.goals || {})[best[0]] || { th: [] };
+        const x = fmt(gd.th, tg ? [t, tg] : [t]) || fmt(gd.th.filter((l) => !/\{1\}|\[1:/.test(l)), [t]);
+        t.thought = x ? x.html : '';
+      }
+    }
+    // gli spostamenti di giorno seguono l'obiettivo e il gruppo
+    function moveByGoals() {
+      const open = [...Array(zoneCount).keys()].filter((i) => !closed.has(i));
+      if (!open.length) return;
+      const best = (f) => open.slice().sort((a, b) => f(b) - f(a))[0];
+      alive().forEach((t) => {
+        const g = t.goal || { k: 'sopravvivere' };
+        const tg = aliveId(g.tg) ? byId[g.tg] : null;
+        let z = null;
+        if ((g.k === 'vendetta' || g.k === 'caccia') && tg && rng.chance(0.3 + t.attr.furt * 0.04 + t.attr.int * 0.02 + (hasTrait(t, 'cacciatore') ? 0.15 : 0))) {
+          z = tg.zone;
+          if (g.k === 'vendetta' && rng.chance(0.5)) { const d = fmt(ACT('stalk'), [t, tg], { z: zoneName(z) }); if (d) remember1(t, d.html, 'mossa'); }
+        } else if ((g.k === 'proteggere' || g.k === 'cotta' || g.k === 'tradire') && tg && rng.chance(0.6)) z = tg.zone;
+        else if (g.k === 'cibo' && rng.chance(0.55)) z = best((i) => ZP[i][0] + rng.f() * 0.3);
+        else if ((g.k === 'nascondersi' || g.k === 'curarsi') && rng.chance(0.55)) { z = best((i) => ZP[i][2] - ZP[i][1] + rng.f() * 0.2); if (rng.chance(0.4)) { const d = fmt(ACT('hide'), [t], { z: zoneName(z) }); if (d) remember1(t, d.html, 'mossa'); } }
+        else if (t.allyId != null && rng.chance(0.6)) { const m = allyMates(t)[0]; if (m) z = m.zone; }
+        else if (rng.chance(0.15)) z = rng.pick(open);
+        if (z != null && !closed.has(z)) t.zone = z;
+      });
+    }
+
+    // complotti, cotte e confessioni nascono e muoiono di notte
+    function hearts() {
+      alive().forEach((t) => {
+        if (t.plot && (!aliveId(t.plot) || !isAlly(t, byId[t.plot]))) t.plot = null;
+        if (t.crush && (!aliveId(t.crush) || t.partner || aff(t, byId[t.crush]) < 0)) t.crush = null;
+        // il complotto: chi tradisce per natura, o per disperazione
+        if (!t.plot && t.allyId != null && day >= 2 && !hasTrait(t, 'leale') && (hasTrait(t, 'traditore') ? rng.chance(0.6) : hasTrait(t, 'avido') || (t.attr.emp <= 3 && t.mo < 40) ? rng.chance(0.25) : t.mo < 25 && !hasTrait(t, 'pacifista') ? rng.chance(0.12) : false)) {
+          const m = allyMates(t).sort((a, b) => b.inv.length - a.inv.length || aff(t, a) - aff(t, b))[0];
+          if (m) { t.plot = m.id; const d = fmt(DIA('plot'), [t, m]); if (d) remember1(t, d.html, 'segreto'); }
+        }
+        // la cotta segreta
+        if (!t.crush && !t.partner && (hasTrait(t, 'romantico') || t.attr.car + t.attr.emp >= 13 || rng.chance(0.06))) {
+          const c = alive().filter((x) => x !== t && !x.partner && x.id !== t.exPartner && aff(t, x) >= 25 && !t.grudges[x.id]).sort((a, b) => aff(t, b) - aff(t, a))[0];
+          if (c && rng.chance(hasTrait(t, 'romantico') ? 0.55 : 0.25)) { t.crush = c.id; t.crushPh = phases.length; const d = fmt(DIA('crush'), [t, c]); if (d) remember1(t, d.html, 'segreto'); }
+        }
+      });
+      // la confessione
+      alive().forEach((t) => {
+        if (!aliveId(t.crush) || t.partner || phases.length - (t.crushPh || 0) < 3) return;
+        const u = byId[t.crush];
+        if (u.partner || !rng.chance(hasTrait(t, 'romantico') ? 0.45 : 0.2 + t.attr.cor * 0.02)) return;
+        if (cfg.teamWin && u.team !== t.team) return;
+        const yes = u.crush === t.id || rng.chance(clamp((aff(t, u) - 25) / 60 + (hasTrait(u, 'romantico') ? 0.2 : 0) + (t.attr.car - 5) * 0.04, 0.08, 0.85));
+        t.crush = null;
+        if (yes) {
+          t.partner = u.id; u.partner = t.id; u.crush = null; addAff(t, u, 60); stats.couples++; t.mo += 25; u.mo += 25; t.fame += 1; u.fame += 1;
+          remember(t, u, 'love'); remember(u, t, 'love');
+          if (!cfg.teamWin && (t.allyId == null || u.allyId == null || t.allyId === u.allyId)) { const g = t.allyId != null ? alliances.get(t.allyId) : u.allyId != null ? alliances.get(u.allyId) : null; if (!g || g.size < 5) joinAlliance([t, u]); }
+          const e = fmt(ACT('confessYes'), [t, u]); if (e) sys2(e, [t, u], 'love', 'Dichiarazione', 4);
+          jealousy(t, u);
+        } else {
+          t.mo -= 15 * DR.mo; t.rejected++; addAff(t, u, -5); remember(t, u, 'rejected');
+          const e = fmt(ACT('confessNo'), [t, u]); if (e) sys2(e, [t, u], 'love', 'Dichiarazione', 3);
+          const d = fmt(DIA('rejected'), [t, u]); if (d) remember1(t, d.html, 'segreto');
+        }
+      });
+    }
+
+    // i gesti di ogni notte: ognuno agisce secondo la propria natura
+    function personalActs() {
+      const done = new Set();
+      rng.shuffle(alive()).forEach((t) => {
+        if (!t.alive || done.has(t.id)) return;
+        const tr = (x) => hasTrait(t, x);
+        const mates = zoneMates(t).filter((x) => !done.has(x.id));
+        const cand = [];
+        const add = (w, f) => { if (w > 0) cand.push([w, f]); };
+        const say = (k, people, vars, cat, why, pri) => { const e = fmt(ACT(k), people, vars); if (e) sys2(e, people, cat, why, pri); t.acts++; people.forEach((p) => done.add(p.id)); return true; };
+        // reclutare
+        if (t.allyId == null || (alliances.get(t.allyId) || new Set()).size < (tr('leader') ? 6 : 5)) {
+          const u = mates.find((x) => x.allyId == null && aff(t, x) > -20 && !t.grudges[x.id] && !x.grudges[t.id] && !hasTrait(x, 'solitario') && !(cfg.teamWin && cfg.teamsAllied && x.team !== t.team));
+          if (u) add((t.goal && t.goal.k === 'reclutare' ? 2 : 0) + (tr('leader') ? 1.2 : 0) + (tr('carismatico') ? 1.2 : 0) + (t.attr.car >= 8 ? 0.5 : 0), () => {
+            if (!rng.chance(0.35 + t.attr.car * 0.05 + aff(t, u) / 200)) return false;
+            joinAlliance([t, u]); stats.alliances++; t.alliancesFormed++; u.alliancesFormed++; addAff(t, u, 22); remember(u, t, 'recruited'); remember(t, u, 'allied');
+            return say('recruit', [t, u], {}, 'ally', traitName(tr('leader') ? 'leader' : 'carismatico') || 'Alleanza', 3);
+          });
+        }
+        // mettere pace
+        if (tr('pacifista') || tr('clemente') || t.attr.emp >= 8) {
+          const pair = []; mates.forEach((a) => mates.forEach((b) => { if (a !== b && a.grudges[b.id] && a.grudges[b.id].why !== 'kill') pair.push([a, b]); }));
+          if (pair.length) add(1.8 + (tr('pacifista') ? 1 : 0), () => {
+            const [a, b] = pair[0]; if (!rng.chance(0.35 + t.attr.car * 0.04 + t.attr.emp * 0.03)) return false;
+            delete a.grudges[b.id]; delete b.grudges[a.id]; addAff(a, b, 30); remember(a, t, 'mediated'); remember(b, t, 'mediated'); addAff(t, a, 10); addAff(t, b, 10);
+            return say('mediate', [t, a, b], {}, 'heal', traitName(tr('pacifista') ? 'pacifista' : 'clemente') || 'Empatia', 3);
+          });
+        }
+        // prepotenza
+        if ((tr('bruto') || tr('avido') || tr('spietato')) && t.attr.for >= 6) {
+          const u = mates.find((x) => canFight(t, x) && combat(x) < combat(t) - 3 && x.inv.some((it) => /cibo|valore|med|amuleto|armatura/.test(it.type)));
+          if (u) add(1.3 + (tr('bruto') ? 0.6 : 0), () => {
+            const it = u.inv.find((x) => /cibo|valore|med|amuleto|armatura/.test(x.type)); takeItem(u, it);
+            addItem(t, Object.assign({}, it, { how: 'rubato', from: u.id, d: day })); addGrudge(u, t, 'steal'); remember(u, t, 'bullied'); u.mo -= 10;
+            return say('bully', [t, u], { i: it.name, z: zoneName(t.zone) }, 'betray', traitName(tr('bruto') ? 'bruto' : tr('avido') ? 'avido' : 'spietato'), 3);
+          });
+        }
+        // rissa
+        if (tr('impulsivo') || tr('bruto') || t.mo < 25) {
+          const u = mates.find((x) => canFight(t, x) && (aff(t, x) <= -40 || t.grudges[x.id] || x.grudges[t.id]));
+          if (u) add(1.4 + (tr('impulsivo') ? 1 : 0), () => {
+            hurt(u, 12 + rng.int(10), t, 'wound', false); hurt(t, 10 + rng.int(10), u, 'wound', false); addAff(t, u, -15); remember(u, t, 'brawl'); remember(t, u, 'brawl');
+            return say('brawl', [t, u], { z: zoneName(t.zone) }, 'hurt', traitName(tr('impulsivo') ? 'impulsivo' : 'bruto') || 'Rissa', 3);
+          });
+        }
+        // curare uno sconosciuto
+        if (tr('guaritore') || (t.attr.emp >= 8 && t.attr.int >= 5)) {
+          const u = mates.find((x) => x.hp < 50 && !isAlly(t, x) && x.partner !== t.id);
+          if (u) add(1.6, () => {
+            u.hp += (18 + t.attr.int) * MOD.heal; u.owes[t.id] = 'cura'; addAff(t, u, 25); remember(u, t, 'healedStranger'); t.saves++; t.nursed++; syncSt(u);
+            return say('healStranger', [t, u], {}, 'heal', traitName(tr('guaritore') ? 'guaritore' : '') || 'Empatia', 3);
+          });
+        }
+        // regalare
+        if (tr('generoso') || t.attr.emp >= 8) {
+          const u = mates.concat(allyMates(t)).find((x) => x.mo < 35 || x.food < 30);
+          const it = t.inv.find((x) => (u && u.food < 30 ? x.type === 'cibo' : /cibo|valore|alcol|amuleto/.test(x.type)));
+          if (u && it) add(1.3 + (tr('generoso') ? 1 : 0), () => {
+            takeItem(t, it); addItem(u, Object.assign({}, it, { how: 'dono', from: t.id, d: day })); if (it.type === 'cibo' && u.food < 45) eat(u);
+            u.owes[t.id] = u.owes[t.id] || 'dono'; addAff(t, u, 20); u.mo += 8; remember(u, t, 'gift'); syncSt(u);
+            return say('gift', [t, u], { i: it.name }, 'heal', traitName(tr('generoso') ? 'generoso' : '') || 'Empatia', 2);
+          });
+        }
+        // spettacolo
+        if (tr('esibizionista') || (t.goal && t.goal.k === 'spettacolo')) add(1.2 + (tr('esibizionista') ? 0.8 : 0), () => { t.fame += Math.round(2 * MOD.fame); t.mo += 5; return say('show', [t], {}, 'none', traitName('esibizionista'), 1); });
+        // discorso al gruppo
+        if (tr('leader') && allyMates(t).length >= 2) add(1.1, () => { allyMates(t).forEach((x) => { x.mo += 8; addAff(t, x, 5); }); t.mo += 4; return say('speech', [t], {}, 'ally', traitName('leader'), 1); });
+        // rito portafortuna
+        if (tr('superstizioso')) add(0.9, () => { t.mo += 8; if (M && !M.infect) t.pr -= 10; const am = itemOf(t, 'amuleto'); return say('ritual', [t], { i: am ? am.name : '' }, 'none', traitName('superstizioso'), 0); });
+        // sonnambulismo
+        if (tr('sonnambulo')) add(1.1, () => { const z = rng.pick([...Array(zoneCount).keys()].filter((i) => i !== t.zone && !closed.has(i))); if (z == null) return false; t.zone = z; t.en -= 6; return say('sleepwalk', [t], { z: zoneName(z) }, 'none', traitName('sonnambulo'), 1); });
+        // follia
+        if (tr('folle')) add(0.9, () => { t.mo += 6; return say('madness', [t], {}, 'none', traitName('folle'), 0); });
+        // sfortuna
+        if (tr('sfortunato')) add(0.8, () => { const it = rng.pick(t.inv.filter((x) => x.type !== 'ricordo')); if (it) takeItem(t, it); else hurt(t, 6, null, 'wound', false); return say('mishap', [t], { i: it ? it.name : '' }, 'hurt', traitName('sfortunato'), 1); });
+        // fortuna
+        if (tr('fortunato') || t.attr.fort >= 8) add(0.7 + (tr('fortunato') ? 0.5 : 0), () => { const it = mkItem(rng.pick(['valore', 'attrezzo', 'armatura', 'med', 'amuleto', 'alcol']), null, 'trovato'); addItem(t, it); t.items++; stats.items++; return say('luckyFind', [t], { i: it.name }, 'item', traitName(tr('fortunato') ? 'fortunato' : '') || 'Fortuna', 1); });
+        // golosità
+        if (tr('goloso') && hasItem(t, 'cibo') && t.food >= 55) add(1, () => { const it = itemOf(t, 'cibo'); takeItem(t, it); t.food += 20; t.mo += 4; return say('glutton', [t], { i: it.name }, 'none', traitName('goloso'), 0); });
+        // bere
+        if (hasItem(t, 'alcol') && (tr('ubriacone') || t.mo < 25)) add(1.3 + (tr('ubriacone') ? 1 : 0), () => { const it = itemOf(t, 'alcol'); takeItem(t, it); t.st.ubriaco = phases.length; t.mo += 12; t.en -= 8; if (M && !M.infect && (M.id === 'freddo' || M.id === 'terrore' || M.id === 'ansia' || M.id === 'stress')) t.pr -= 15; syncSt(t); return say('drink', [t], { i: it.name }, 'none', traitName(tr('ubriacone') ? 'ubriacone' : '') || 'Morale', 1); });
+        // disinfettare una ferita infetta
+        if (hasItem(t, 'alcol') && (tr('guaritore') || t.attr.int >= 6)) {
+          const u = buddies(t).find((x) => x.st.malato != null);
+          if (u) add(2, () => { const it = itemOf(t, 'alcol'); takeItem(t, it); delete u.st.malato; u.owes[t.id] = 'cura'; addAff(t, u, 15); remember(u, t, 'cured'); return say('disinfect', [t, u], { i: it.name }, 'heal', 'Cure', 2); });
+        }
+        // il solitario se ne va
+        if (tr('solitario') && t.allyId != null && (alliances.get(t.allyId) || new Set()).size >= 3) add(0.8, () => { const m = allyMates(t); leaveAlliance(t); m.forEach((x) => addAff(x, t, -8)); return say('loner', [t], {}, 'none', traitName('solitario'), 2); });
+        // pianificare
+        if (tr('stratega') || t.attr.int >= 8) add(0.8, () => { t.planPh = phases.length; return say('plan', [t], {}, 'none', traitName(tr('stratega') ? 'stratega' : '') || 'Intelligenza', 0); });
+        // costruire
+        if (tr('ingegnoso') || t.attr.int >= 7) {
+          const w = itemOf(t, 'arma'), tp = itemOf(t, 'trap'), ex = itemOf(t, 'esplosivo'), vn = itemOf(t, 'veleno'), at = itemOf(t, 'attrezzo');
+          const why = traitName(tr('ingegnoso') ? 'ingegnoso' : '') || 'Ingegno';
+          if (tp && ex && !tp.x) add(2, () => { takeItem(t, ex); tp.x = 'bomba'; t.crafts++; return say('craftBomb', [t], {}, 'item', why, 2); });
+          if (w && vn && !w.x && !theme.soft) add(2, () => { takeItem(t, vn); w.x = 'veleno'; t.crafts++; return say('craftPoison', [t], { ip: possessive(w) }, 'item', why, 2); });
+          if (w && at && w.u != null && w.u <= Math.ceil((w.um || 4) / 2)) add(1.8, () => { w.u = Math.min(w.um || 6, w.u + 3); t.crafts++; return say('craftRepair', [t], { ip: possessive(w) }, 'item', why, 1); });
+          if (!tp && at && t.attr.int >= 7) add(0.7, () => { addItem(t, mkItem('trap', null, 'costruito')); t.crafts++; return say('craftTrap', [t], { i: at.name }, 'item', why, 1); });
+        }
+        // spiare e smascherare i complotti
+        if (tr('furtivo') || tr('paranoico') || t.attr.int >= 8) {
+          const plotter = allyMates(t).find((x) => x.plot && aliveId(x.plot) && isAlly(x, byId[x.plot]));
+          if (plotter) add(2.6, () => {
+            if (!rng.chance(0.3 + t.attr.furt * 0.03 + t.attr.int * 0.02)) return false;
+            const victim = byId[plotter.plot]; const grp = allyMates(plotter);
+            leaveAlliance(plotter); grp.forEach((x) => { addAff(x, plotter, -35); }); plotter.plot = null; plotter.traitor = true;
+            addAff(victim, t, 25); remember(victim, t, 'warned'); remember(plotter, t, 'exposed'); addGrudge(plotter, t, 'betray');
+            return say('spyExpose', [t, plotter, victim], {}, 'betray', traitName(tr('furtivo') ? 'furtivo' : tr('paranoico') ? 'paranoico' : '') || 'Intuito', 4);
+          });
+        }
+        // furto notturno
+        if (tr('furtivo') || (tr('avido') && t.attr.furt >= 6)) {
+          const u = mates.find((x) => !isAlly(t, x) && x.partner !== t.id && x.inv.some((it) => it.type !== 'ricordo'));
+          if (u) add(1.2, () => {
+            const it = rng.pick(u.inv.filter((x) => x.type !== 'ricordo')); takeItem(u, it); addItem(t, Object.assign({}, it, { how: 'rubato', from: u.id, d: day }));
+            if (hasTrait(u, 'paranoico') || rng.chance(Math.max(0.1, 0.4 - (t.attr.furt - 5) * 0.05))) { addGrudge(u, t, 'steal'); remember(u, t, 'nightTheft'); }
+            u.mo -= 6;
+            return say('nightTheft', [t, u], { i: it.name }, 'betray', traitName(tr('furtivo') ? 'furtivo' : 'avido'), 2);
+          });
+        }
+        // lettere e regali d'amore
+        if (tr('romantico') && (aliveId(t.partner) || aliveId(t.crush))) {
+          const u = byId[t.partner || t.crush];
+          add(1, () => { addItem(u, { type: 'ricordo', name: 'una lettera di ' + t.name, how: 'lettera', from: t.id, d: day }); addAff(t, u, 12); u.mo += 10; remember(u, t, 'letter'); return say('letter', [t, u], {}, 'love', traitName('romantico'), 1); });
+        }
+        // giuramento di protezione
+        if (tr('leale')) {
+          const u = buddies(t).find((x) => x.hp < 60);
+          if (u) add(1.2, () => { t.guard = u.id; addAff(t, u, 10); remember(u, t, 'oath'); return say('oath', [t, u], {}, 'ally', traitName('leale'), 1); });
+        }
+        // caccia per il gruppo
+        if (tr('cacciatore')) add(1, () => {
+          if (!rng.chance(0.45 + t.attr.sop * 0.04)) return false;
+          const hungry = [t].concat(allyMates(t)).filter((x) => x.food < 55);
+          hungry.forEach((x) => { x.food += 30; syncSt(x); if (x !== t) { addAff(t, x, 6); remember(x, t, 'shared'); } });
+          t.foraged++; stats.foraged++;
+          return say('hunt', [t], {}, 'item', traitName('cacciatore'), 1);
+        });
+        // sonno leggero
+        if (tr('paranoico')) add(0.6, () => { t.vigilPh = phases.length; t.en -= 5; return say('paranoid', [t], {}, 'none', traitName('paranoico'), 0); });
+        // perdono silenzioso
+        if (tr('clemente')) {
+          const id = Object.keys(t.grudges).find((x) => aliveId(x) && t.grudges[x].why !== 'kill');
+          if (id) add(1, () => { delete t.grudges[id]; addAff(t, byId[id], 20); remember(t, byId[id], 'forgave'); const d = fmt(ACT('forgiveQuiet'), [t, byId[id]]); if (d) remember1(t, d.html, 'segreto'); t.acts++; return true; });
+        }
+        if (!cand.length) return;
+        const pAct = 0.45 + Math.min(0.3, cand.length * 0.07) + (t.traits.length ? 0.1 : 0);
+        if (!rng.chance(pAct)) return;
+        const pick = rng.wpick(cand, (c) => c[0]);
+        if (pick) pick[1]();
+      });
+    }
+
+    // gli scambi della notte: chi ha fame compra da chi ne ha
+    function barter() {
+      alive().forEach((b) => {
+        const want = b.food < 40 && !hasItem(b, 'cibo') ? 'cibo' : b.hp < 50 && !hasItem(b, 'med') ? 'med' : null;
+        if (!want) return;
+        const pay = b.inv.filter((x) => x.type === 'valore' || x.type === 'alcol' || (x.type === 'arma' && b.attr.for <= 4) || x.type === 'esplosivo' || x.type === 'veleno');
+        const sellers = zoneMates(b).concat(allyMates(b)).filter((x) => x !== b && aff(b, x) > -30 && (want === 'cibo' ? x.inv.filter((it) => it.type === 'cibo').length >= (x.food >= 55 ? 1 : 2) : hasItem(x, 'med') && x.hp >= 70));
+        const s2 = sellers[0]; if (!s2) return;
+        const food = itemOf(s2, want);
+        if (hasTrait(s2, 'generoso') || (aff(s2, b) >= 50 && rng.chance(0.5))) {
+          takeItem(s2, food); addItem(b, Object.assign({}, food, { how: 'dono', from: s2.id, d: day })); if (want === 'cibo') eat(b); b.owes[s2.id] = 'dono'; addAff(s2, b, 15); remember(b, s2, 'gift'); stats.trades++;
+          const e = fmt(ACT('tradeFree'), [b, s2], { j: food.name }); if (e) sys2(e, [b, s2], 'heal', 'Scambio', 2);
+          return;
+        }
+        if (!pay.length) return;
+        const greedy = hasTrait(s2, 'avido');
+        if (greedy && pay.length < 2) return;
+        const give = pay.slice(0, greedy ? 2 : 1);
+        give.forEach((it) => { takeItem(b, it); addItem(s2, Object.assign({}, it, { how: 'scambio', from: b.id, d: day })); });
+        takeItem(s2, food); addItem(b, Object.assign({}, food, { how: 'scambio', from: s2.id, d: day })); if (want === 'cibo') eat(b);
+        b.trades++; s2.trades++; stats.trades++;
+        if (greedy) { addAff(b, s2, -10); remember(b, s2, 'fleeced'); } else { addAff(b, s2, 8); remember(b, s2, 'traded'); remember(s2, b, 'traded'); }
+        const e = fmt(ACT(greedy ? 'tradeGreedy' : 'trade'), [b, s2], { i: give[0].name, j: food.name, k: give[1] ? give[1].name : '' }); if (e) sys2(e, [b, s2], 'item', 'Scambio', 2);
+      });
+    }
+
+    // il diario: un pensiero per notte, ciò che la diretta non mostra
+    function diaryNight(prob) {
+      alive().forEach((t) => {
+        if (!rng.chance(prob || 0.8)) return;
+        const c = [];
+        const add = (w, k, people, vars) => { if (w > 0) c.push([w, k, people, vars]); };
+        if (t.lost && byId[t.lost] && !byId[t.lost].alive && t.st.lutto != null) add(4, 'grief', [t, byId[t.lost]]);
+        const gid = Object.keys(t.grudges).find(aliveId); if (gid) add(2.5 + (hasTrait(t, 'vendicativo') ? 2 : 0), 'revenge', [t, byId[gid]]);
+        if (aliveId(t.crush)) add(3, 'crush', [t, byId[t.crush]]);
+        if (aliveId(t.plot)) add(3, 'plot', [t, byId[t.plot]]);
+        const lastKill = t.killIds.length ? byId[t.killIds[t.killIds.length - 1]] : null;
+        if (lastKill && lastKill.deathPhase >= phases.length - 3) add(t.attr.emp >= 6 || hasTrait(t, 'pacifista') ? 3 : 0.5, 'guilt', [t, lastKill]);
+        if (t.kills >= 2 && (hasTrait(t, 'spietato') || t.attr.emp <= 3)) add(2, 'pride', [t], { n: String(t.kills) });
+        if (t.food < 30) add(2.5, 'hungry', [t]);
+        if (t.mo < 30 || meterBad(t)) add(2.2, 'fear', [t]);
+        if (t.hp < 45) add(2, 'hurt', [t]);
+        const ow = Object.keys(t.owes).find(aliveId); if (ow) add(t.owes[ow] === 'vita' ? 2.2 : 1.2, t.owes[ow] === 'vita' ? 'grateful' : 'debt', [t, byId[ow]]);
+        if (aliveId(t.partner)) add(2.5, 'couple', [t, byId[t.partner]]);
+        const rc = itemOf(t, 'ricordo');
+        if (rc) { const from = rc.from && byId[rc.from] && !byId[rc.from].alive && (rc.how === 'lettera' || rc.how === 'dono' || aff(t, byId[rc.from]) >= 30) ? byId[rc.from] : null; add(from ? 3 : 1.4, from ? 'keepsakeDead' : 'keepsake', from ? [t, from] : [t], { i: rc.name }); }
+        if (!buddies(t).length && day >= 2) add(1.2, 'lonely', [t]);
+        if (t.fame >= 4) add(1, 'star', [t]);
+        if (hasTrait(t, 'paranoico') && t.allyId != null) { const m = allyMates(t)[0]; if (m) add(1.5, 'suspicion', [t, m]); }
+        t.traits.forEach((x) => { if (DIAT(x).length) add(1, 'trait:' + x, [t]); });
+        add(0.8, 'calm', [t]);
+        const p = rng.wpick(c, (x) => x[0]); if (!p) return;
+        const src = p[1].startsWith('trait:') ? DIAT(p[1].slice(6)) : DIA(p[1]);
+        const d = fmt(src, p[2], Object.assign({}, p[3] || {})); if (d) remember1(t, d.html, /plot|crush|rejected/.test(p[1]) ? 'segreto' : 'pensiero');
+      });
+    }
+
+    // i rapporti più importanti, con un'etichetta umana
+    function relTop(t) {
+      const out = [];
+      alive().forEach((x) => {
+        if (x === t) return;
+        const a = aff(t, x);
+        const lbl = t.partner === x.id ? 'amore' : t.crush === x.id ? 'cotta' : t.plot === x.id ? 'complotto' : t.grudges[x.id] ? 'vendetta' : a >= 55 ? 'amico' : t.owes[x.id] ? 'debito' : isAlly(t, x) ? 'alleato' : a >= 25 ? 'simpatia' : a <= -55 ? 'nemico' : a <= -25 ? 'diffida' : t.mem[x.id] ? 'conoscente' : null;
+        if (!lbl) return;
+        const w = { amore: 200, cotta: 190, complotto: 185, vendetta: 180 }[lbl] || Math.abs(a) + (t.mem[x.id] ? 10 : 0);
+        out.push([x.id, Math.round(a), lbl, w]);
+      });
+      return out.sort((a, b) => b[3] - a[3]).slice(0, 8).map((x) => x.slice(0, 3));
+    }
+
     function runPhase(kind, pool, title, intro, opt) {
       const events = pendingNotes.splice(0);
       SYS = [];
+      ORIGIN = kind === 'f' ? 'festino' : null;
       tickStatus();
+      if (kind === 'd') moveByGoals();
       maybeDissolve(events);
       if (kind === 'd' && day >= 2) sponsorDrop(events);
       const before = alive().length;
@@ -6267,11 +6974,16 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
       phaseTick(kind);
       resolveVitals();
       const deathsSys = SYS.filter((x) => x.ev.deaths.length).map((x) => x.ev);
-      const capN = kind === 'n' ? 5 : kind === 'b' ? 1 : 3;
+      const capN = kind === 'n' ? 7 : kind === 'b' ? 1 : 3;
       const sysDead = new Set(deathsSys.flatMap((e) => e.deaths));
-      const rest = SYS.filter((x) => !x.ev.deaths.length && x.ev.ids.every((id) => byId[id].alive || sysDead.has(id))).map((x) => [x, x.pri + rng.f()]).sort((a, b) => b[1] - a[1]).slice(0, capN).map((x) => x[0].ev);
+      const valid = SYS.filter((x) => !x.ev.deaths.length && x.ev.ids.every((id) => byId[id].alive || sysDead.has(id))).map((x) => [x, x.pri + rng.f()]).sort((a, b) => b[1] - a[1]);
+      const rest = valid.slice(0, capN).map((x) => x[0].ev);
+      // quello che la diretta non mostra finisce nel diario di chi l'ha vissuto
+      valid.slice(capN).forEach(([x]) => x.ev.ids.forEach((id) => remember1(byId[id], x.ev.html, 'fatto')));
       events.push(...rest, ...deathsSys);
-      SYS = [];
+      SYS = []; ORIGIN = null;
+      if (kind === 'b') alive().forEach(decideGoal);
+      if (kind === 'd' || kind === 'dis' || kind === 'f') diaryNight(0.35);
       const died = before - alive().length;
       noDeathStreak = died ? 0 : noDeathStreak + 1;
       phases.push(Object.assign({ kind, day, title, intro, events, snap: snapshot(), meteo: W.n ? { n: W.n, d: W.d } : null }, opt || {}));
@@ -6351,6 +7063,13 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
     }
     const loversEnd = () => { const a = alive(); return !cfg.teamWin && a.length === 2 && a[0].partner === a[1].id && runLovers(); };
 
+    // ognuno porta qualcosa da casa, scelto dal suo carattere
+    T.forEach((t) => {
+      const tr = (x) => t.traits.includes(x);
+      const home = tr('superstizioso') ? 'amuleto' : tr('ubriacone') ? 'alcol' : tr('ingegnoso') || tr('cacciatore') ? 'attrezzo' : tr('avido') || tr('fortunato') ? 'valore' : tr('guaritore') ? 'med' :
+        tr('romantico') || t.attr.emp >= 7 || rng.chance(0.2) ? 'ricordo' : rng.chance(0.12) ? 'valore' : null;
+      if (home) t.inv.push(mkItem(home, null, 'casa', null));
+    });
     let feastDone = false, lastDisaster = -9;
     const usedDisasters = new Set();
     while (true) {
@@ -6392,6 +7111,8 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
       partner: t.partner, exPartner: t.exPartner,
       foraged: t.foraged, nursed: t.nursed, shared: t.shared, trapKills: t.trapKills, trapsSet: t.trapsSet, survivedBeasts: t.survivedBeasts,
       deathCause: t.alive ? null : t.deathKind || null,
+      diary: t.diary, mem: t.mem, trades: t.trades, crafts: t.crafts, acts: t.acts, rejected: t.rejected,
+      bag: t.inv.map((x) => ({ t: x.type, n: x.name, h: x.how || 'trovato', q: x.q, u: x.u, m: x.um, f: x.from, d: x.d, x: x.x })),
     }));
     return { version: 2, theme: theme.id, adult, seed, days: day, phases, tributes: stripped, winners: winners.map((t) => t.id), stats };
   }
@@ -6896,6 +7617,70 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
   const WHY = { carattere: 'Carattere', vendetta: 'Vendetta', debito: 'Debito', coppia: 'Coppia', lutto: 'Lutto', fama: 'Fama', reputazione: 'Reputazione', oggetto: 'Oggetto', condizione: 'Conseguenza',
     conseguenza: 'Conseguenza', ferite: 'Ferite', stenti: 'Stenti', infezione: 'Infezione', tempesta: 'Tempesta', predatori: 'Pericolo notturno', trappola: 'Trappola', alleanza: 'Alleanza', cure: 'Cure', morale: 'Morale', riposo: 'Notte', esplorazione: 'Esplorazione', bottino: 'Bottino', incidente: 'Incidente' };
   const ECO = D.eco || { arenas: {} };
+  const ITM = D.items || { types: {}, how: {}, order: [] }, MND = D.mind || { goals: {}, rel: {}, mem: {} };
+  const ITIC = {
+    arma: sv('<path d="M14.5 3.5 20.5 9.5 10 20l-4.5 1 1-4.5z"/><path d="m4 20 3-3"/>'), armatura: sv('<path d="M12 3 4.5 6v6c0 4.5 3.2 7.6 7.5 9 4.3-1.4 7.5-4.5 7.5-9V6z"/>'),
+    med: sv('<rect x="4" y="7" width="16" height="13" rx="2"/><path d="M9 7V5h6v2M12 10.5v6M9 13.5h6"/>'), cibo: sv('<path d="M12 6c-4 0-7 3-7 7s3 7 7 7 7-3 7-7-3-7-7-7z"/><path d="M12 6c0-2 1-3 3-3"/>'),
+    attrezzo: sv('<path d="M14.5 6.5a4 4 0 0 0-5.3 5.3L3.5 17.5l3 3 5.7-5.7a4 4 0 0 0 5.3-5.3l-2.5 2.5-2.5-.5-.5-2.5z"/>'), mappa: sv('<path d="m3 6 6-2 6 2 6-2v14l-6 2-6-2-6 2z"/><path d="M9 4v14M15 6v14"/>'),
+    trap: sv('<path d="M3 17h18M5 17l2-7 2 7 2-7 2 7 2-7 2 7 2-7"/>'), esplosivo: sv('<circle cx="11" cy="14" r="6"/><path d="m15 9 3-3M18 6l2-1M18 6l1 2"/>'),
+    veleno: sv('<path d="M9 3h6M10 3v5l-4 8a3 3 0 0 0 2.7 4.3h6.6A3 3 0 0 0 18 16l-4-8V3"/><path d="M8 14h8"/>'), amuleto: sv('<path d="M8 3h8l-4 5z"/><circle cx="12" cy="15" r="6"/><path d="m12 12 1 2.2 2.4.3-1.8 1.6.5 2.4-2.1-1.2-2.1 1.2.5-2.4-1.8-1.6 2.4-.3z"/>'),
+    alcol: sv('<path d="M10 3h4M10.5 3v4L8 10v10h8V10l-2.5-3V3"/><path d="M8 14h8"/>'), valore: sv('<circle cx="12" cy="12" r="8"/><path d="M14.5 9.5c-.5-1-1.5-1.5-2.5-1.5-1.5 0-2.5.8-2.5 2s1 1.6 2.5 2 2.5.8 2.5 2-1 2-2.5 2c-1 0-2-.5-2.5-1.5M12 6.5V8M12 16v1.5"/>'),
+    ricordo: sv('<rect x="5" y="4" width="14" height="16" rx="1.5"/><path d="M9 4v4l1.5-1 1.5 1V4M8.5 13h7M8.5 16h5"/>'),
+  };
+  const nmOf = (id) => (BY[id] ? BY[id].name : 'qualcuno');
+  const fill = (tpl, ids) => tpl.replace(/\{(\d)\}/g, (_, k) => esc(nmOf(ids[+k])));
+  function goalLabel(m) { const g = (MND.goals || {})[m.g]; return g ? g.label.replace('{1}', m.tg ? nmOf(m.tg) : '') : ''; }
+  function bagHTML(items, theme) {
+    if (!items.length) return '<p class="help">Zaino vuoto.</p>';
+    const order = ITM.order || [];
+    return '<div class="bag">' + items.slice().sort((a, b) => order.indexOf(a.t) - order.indexOf(b.t)).map((it) => {
+      const ty = (ITM.types || {})[it.t] || { label: it.t, desc: '' };
+      const how = ((ITM.how || {})[it.h] || 'Trovato').replace('{1}', esc(nmOf(it.f))) + (it.d ? ' · G' + it.d : '');
+      const stars = it.q ? '<span class="stars" title="Qualità">' + '★'.repeat(it.q) + '<i>' + '★'.repeat(3 - it.q) + '</i></span>' : '';
+      const uses = it.u != null && it.m ? '<span class="uses" title="Usura: ' + it.u + ' su ' + it.m + '"><b style="width:' + Math.round((it.u / it.m) * 100) + '%"></b></span>' : '';
+      const tag = it.x === 'veleno' ? '<span class="itag bad">Avvelenata</span>' : it.x === 'bomba' ? '<span class="itag bad">Esplosiva</span>' : '';
+      return '<div class="bitem t-' + esc(it.t) + '"><span class="bic">' + (ITIC[it.t] || ITIC.valore) + '</span><div class="bbody"><div class="btop"><b>' + esc(it.n) + '</b>' + stars + tag + '</div>' +
+        '<div class="bmeta"><span class="btype">' + esc(ty.label) + '</span><span>' + how + '</span>' + uses + '</div><p>' + esc(ty.desc) + '</p></div></div>';
+    }).join('') + '</div>';
+  }
+  function nowHTML(t, snap, i, theme) {
+    const m = (snap.mind || {})[t.id]; const v = (snap.vit || {})[t.id]; const st = snap.st[t.id] || [];
+    const zone = theme.lex.luogo[snap.zones[t.id]] || '';
+    const bits = [];
+    if (v) { if (v[0] < 25) bits.push('ridott' + G3(t.gender, 'o', 'a', 'ə') + ' male'); else if (v[0] < 55) bits.push('ferit' + G3(t.gender, 'o', 'a', 'ə')); if (v[3] < 25) bits.push('affamat' + G3(t.gender, 'o', 'a', 'ə')); if (v[1] < 22) bits.push('sfinit' + G3(t.gender, 'o', 'a', 'ə')); if (v[2] < 22) bits.push('a pezzi'); else if (v[2] >= 80) bits.push('carichissim' + G3(t.gender, 'o', 'a', 'ə')); }
+    if (st.includes('ubriaco')) bits.push('ubriac' + G3(t.gender, 'o', 'a', 'ə'));
+    const allies = snap.allies[t.id] != null ? snap.alive.filter((x) => x !== t.id && snap.allies[x] === snap.allies[t.id]).length : 0;
+    const where = zone ? zone.replace(/^(il |lo |la |l'|i |gli |le )/i, (a) => a.toLowerCase()) : '';
+    const lead = (where ? 'A ' + where : 'In gara') + (bits.length ? ', ' + bits.join(', ') : '') + (allies ? ', con ' + plural(allies, 'alleato', 'alleati') : ', da sol' + G3(t.gender, 'o', 'a', 'ə')) + '.';
+    const g = m ? (MND.goals || {})[m.g] : null;
+    return '<div class="nowcard"><div class="sub">Adesso</div><p class="nowlead">' + esc(fixA(lead)) + '</p>' +
+      (m && g ? '<div class="goal' + (g.secret ? ' secret' : '') + '"><span class="glbl">Obiettivo</span><b>' + esc(goalLabel(m)) + '</b>' + (g.secret ? '<span class="gsec" title="Gli altri concorrenti non lo sanno">segreto</span>' : '') + (m.since != null && m.since < i ? '<span class="gsince">da G' + (SIM.phases[m.since] ? SIM.phases[m.since].day || 1 : 1) + '</span>' : '') + '</div>' : '') +
+      (m && m.th ? '<blockquote class="thought">' + linkify(m.th) + '</blockquote>' : '') + '</div>';
+  }
+  // «a il Fiume» → «al Fiume» per i testi composti qui
+  function fixA(s) { return s.replace(/^A (il|lo|la|i|gli|le|l') ?/, (m, a) => ({ il: 'Al ', lo: 'Allo ', la: 'Alla ', i: 'Ai ', gli: 'Agli ', le: 'Alle ', "l'": "All'" }[a])); }
+  function peopleHTML(t, snap, i) {
+    const top = ((snap.rel || {})[t.id] || {}).top || [];
+    if (!top.length) return '';
+    const L2 = MND.rel || {}, MM = Object.assign({}, MND.mem || {}, SIM && THEMES[SIM.theme].soft ? MND.memSoft || {} : {});
+    const rows = top.map(([id, a, lbl]) => {
+      const mem = ((t.mem || {})[id] || []).filter((m) => m.ph <= i).slice(-3).reverse();
+      const pct = Math.round((a + 100) / 2);
+      return '<div class="person l-' + esc(lbl) + '">' + avHTML(BY[id], { btn: true }) + '<div class="pbody"><div class="ptop"><b>' + esc(nmOf(id)) + '</b><span class="plbl">' + esc(L2[lbl] || lbl) + '</span></div>' +
+        '<span class="affbar" title="Affinità ' + a + '"><b style="left:' + pct + '%"></b></span>' +
+        (mem.length ? '<ul class="pmem">' + mem.map((m) => '<li>«' + fill(MM[m.k] || '', [t.id, id, m.x]) + '» <span>G' + (SIM.phases[m.ph] ? SIM.phases[m.ph].day || 1 : '') + '</span></li>').join('') + '</ul>' : '') + '</div></div>';
+    }).join('');
+    return '<div><div class="sub" style="margin-bottom:8px">Cosa prova per gli altri</div><div class="people">' + rows + '</div></div>';
+  }
+  function diaryHTML(t, i) {
+    const all = (t.diary || []).filter((d) => d.ph <= i);
+    if (!all.length) return '<div><div class="sub" style="margin-bottom:6px">Diario segreto</div><p class="help">Ancora nessuna pagina.</p></div>';
+    const K = { segreto: 'Segreto', pensiero: 'Pensiero', fatto: 'Fuori onda', mossa: 'Mossa' };
+    const days = {}; all.forEach((d) => (days[d.d] = days[d.d] || []).push(d));
+    const ds = Object.keys(days).map(Number).sort((a, b) => b - a);
+    return '<div><div class="sub" style="margin-bottom:6px">Diario segreto · ' + plural(all.length, 'pagina', 'pagine') + '</div><p class="help" style="margin-bottom:8px">Quello che la diretta non mostra: pensieri, segreti e fatti fuori onda.</p><div class="diary">' +
+      ds.map((d) => '<div class="dday"><span class="dd">G' + (d || 1) + '</span><div>' + days[d].slice().reverse().map((x) => '<p class="dk-' + esc(x.k) + '"><span class="dk">' + (K[x.k] || '') + '</span>' + linkify(x.h) + '</p>').join('') + '</div></div>').join('') + '</div></div>';
+  }
   const arenaOf = (id) => ECO.arenas[id] || {};
   const vitLabels = (th) => (th && th.soft ? ECO.labelsSoft : ECO.labels) || { hp: 'Salute', en: 'Energia', mo: 'Morale', food: 'Sazietà' };
   const whyLabel = (e, theme) => (e.why === 'arena' && arenaOf(theme.id).meter ? arenaOf(theme.id).meter.name : WHY[e.why] || '');
@@ -7431,11 +8216,19 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
         '<div><h3>' + (t.soft ? 'Armi improprie' : 'Armi') + '</h3><ul>' + t.lex.arma.slice(0, 6).map((x) => '<li>' + esc(strip(x)) + '</li>').join('') + '</ul></div>' +
         '<div><h3>Pericoli</h3><ul>' + t.lex.mostro.map((x) => '<li>' + esc(strip(x)) + '</li>').join('') + '</ul></div>' +
       '</div>' +
-      rulesHTML(t) +
+      rulesHTML(t) + itemsHTML(t) +
       '<div><h3 class="sub" style="margin-bottom:8px">Alcuni disastri</h3><div class="chips">' + dz.slice(0, 10).map((x) => '<span class="chip dim">' + esc(x) + '</span>').join('') + '<span class="chip dim">e altri ' + Math.max(0, dz.length - 10) + '</span></div></div>' +
       (sample ? '<div class="sample"><h3 class="sub">Un assaggio' + (S.cast.length >= 4 ? ' con il tuo cast' : '') + '</h3>' + sample + '</div>' : '');
     AN.field($('#arenaPreview .apv-banner'), t.id, { intensity: 1.2 });
     const ap = $('#arenaPreview'); ap.classList.remove('swap'); void ap.offsetWidth; ap.classList.add('swap');
+  }
+  function itemsHTML(t) {
+    const names = Object.assign({}, (ITM.names || {})._ || {}, (ITM.names || {})[t.id] || {});
+    const lex = Object.assign({}, D.lexDefault || {}, t.lex || {});
+    (D.packs || []).forEach((pk) => { if (pk.lex && (pk.theme === t.id)) Object.assign(lex, pk.lex); });
+    const ex = (k) => (names[k] || (k === 'med' ? ['un kit medico'] : k === 'trap' ? ['una trappola'] : lex[k]) || []).slice(0, 2).map((x) => x.replace(/^(il |lo |la |l'|i |gli |le |un |uno |una |un'|delle |dei |degli |del |della |dell')/i, '')).join(', ');
+    return '<details class="items-arena"><summary><span class="eyebrow">Zaino</span><b>Gli oggetti e a cosa servono</b><span class="help">' + (ITM.order || []).length + ' tipi</span></summary><div class="ia-grid">' +
+      (ITM.order || []).map((k) => { const ty = ITM.types[k]; return '<div class="ia"><span class="bic">' + (ITIC[k] || '') + '</span><div><b>' + esc(ty.label) + '</b>' + (ex(k) ? '<span class="iaex">' + esc(ex(k)) + '</span>' : '') + '<p>' + esc(ty.desc) + '</p></div></div>'; }).join('') + '</div></details>';
   }
   function rulesHTML(t) {
     const A = arenaOf(t.id); if (!A.rule) return '';
@@ -7545,7 +8338,7 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
     const avs = '<span class="avs">' + e.ids.slice(0, 4).map((id) => avHTML(by[id], { dead: e.deaths.includes(id), btn: !plain })).join('') + '</span>';
     const chip = lbl ? '<span class="cat">' + IC[cat] + (e.deaths.length > 1 && (cat === 'kill' || cat === 'death') ? e.deaths.length + ' ' + (theme.soft ? 'fuori' : 'morti') : lbl) + '</span>' : '<span></span>';
     const fix = (h) => (plain ? h.replace(/<b class="nm"[^>]*>/g, '<b>') : linkify(h));
-    const why = e.test ? '<span title="Tiro ' + e.test.roll + ' contro soglia ' + e.test.dc + '">Prova di ' + esc(ATTRN[e.test.attr] || e.test.attr) + ' · <span class="dice"><span class="roll">' + e.test.roll + '</span>/' + e.test.dc + '</span> · ' + (e.test.pass ? 'superata' : 'fallita') + '</span>' : e.sponsor ? 'Sponsor' : whyLabel(e, theme);
+    const why = e.test ? '<span title="Tiro ' + e.test.roll + ' contro soglia ' + e.test.dc + '">Prova di ' + esc(ATTRN[e.test.attr] || e.test.attr) + ' · <span class="dice"><span class="roll">' + e.test.roll + '</span>/' + e.test.dc + '</span> · ' + (e.test.pass ? 'superata' : 'fallita') + '</span>' : e.sponsor ? 'Sponsor' : e.whyTxt ? esc(e.whyTxt) : whyLabel(e, theme);
     const echo = (e.echo || []).length ? '<ul class="echo">' + e.echo.map((x) => '<li class="' + (x.cls || '') + '">' + fix(x.html) + '</li>').join('') + '</ul>' : '';
     return '<div class="ev' + (e.deaths.length ? ' lethal' : '') + (anim ? ' in fx-' + cat + (e.sponsor ? ' fx-sponsor' : '') : '') + '" style="--cc:var(--c-' + cat + ');--d:' + (delay || 0) + 'ms">' + avs + '<div class="evbody">' + (why ? '<span class="why' + (e.test ? (e.test.pass ? ' ok' : ' ko') : '') + '">' + why + '</span>' : '') + '<p>' + fix(e.html) + '</p>' + echo + '</div>' + chip + '</div>';
   }
@@ -7640,8 +8433,10 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
       const al = SIM.tributes.filter((t) => aliveSet.has(t.id)).sort((a, b) => (ph.snap.kills[b.id] || 0) - (ph.snap.kills[a.id] || 0));
       h = '<div class="plist">' + al.map((t) => {
         const st = ph.snap.st[t.id] || [], inv = ph.snap.inv[t.id] || [];
-        const sub = [st.length ? st.map((s) => L.STATUS_LABEL[s] || s).join(', ') : 'in forma', inv.length ? plural(inv.length, 'oggetto', 'oggetti') : ''].filter(Boolean).join(' · ');
-        return '<button type="button" class="prow" data-prof="' + esc(t.id) + '">' + avHTML(t) + '<span style="min-width:0"><span class="pn">' + esc(t.name) + '</span><span class="ps">' + esc(sub) + '</span>' + vbars((ph.snap.vit || {})[t.id], theme, false) + '</span><span class="pk">' + (ph.snap.kills[t.id] || 0) + (soft ? ' elim.' : ' ucc.') + '</span></button>';
+        const m = (ph.snap.mind || {})[t.id], g = m && (MND.goals || {})[m.g];
+        const sub = [st.length ? st.map((s) => L.STATUS_LABEL[s] || s).join(', ') : 'in forma', g && !g.secret && m.g !== 'sopravvivere' ? goalLabel(m) : '', inv.length ? plural(inv.length, 'oggetto', 'oggetti') : ''].filter(Boolean).join(' · ');
+        const fresh = (t.diary || []).some((d) => d.ph === i);
+        return '<button type="button" class="prow" data-prof="' + esc(t.id) + '">' + avHTML(t) + '<span style="min-width:0"><span class="pn">' + esc(t.name) + (fresh ? '<span class="newdiary" title="Nuova pagina nel diario segreto">diario</span>' : '') + '</span><span class="ps">' + esc(sub) + '</span>' + vbars((ph.snap.vit || {})[t.id], theme, false) + '</span><span class="pk">' + (ph.snap.kills[t.id] || 0) + (soft ? ' elim.' : ' ucc.') + '</span></button>';
       }).join('') + '</div>';
     } else {
       const groups = {};
@@ -7710,13 +8505,17 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
           '<div class="chips">' + (t.traits.length ? t.traits.map((x) => '<span class="chip" title="' + esc(TRAITS[x].desc) + '">' + esc(TRAITS[x].name) + '</span>').join('') : '<span class="chip dim">Nessun tratto</span>') + '</div></div></div>' +
         '<div class="pstats"><div><b>' + kills + '</b><span>' + (soft ? 'eliminazioni' : 'uccisioni') + '</span></div><div><b>' + hist.length + '</b><span>eventi vissuti</span></div><div><b>' + (dead ? t.deathDay : SIM.phases[i].day || 1) + '</b><span>' + (dead ? 'giorno dell\'uscita' : 'giorni in gara') + '</span></div></div>' +
         (dead ? '<div><div class="sub" style="margin-bottom:6px">Come è andata</div><div class="ev lethal" style="--cc:var(--c-kill);grid-template-columns:minmax(0,1fr)"><p>' + linkify(t.deathHtml) + '</p></div></div>' : '') +
+        (!dead ? nowHTML(t, snap, i, theme) : '') +
         (!dead && snap.vit && snap.vit[id] ? '<div><div class="sub" style="margin-bottom:8px">Condizione fisica</div>' + vbars(snap.vit[id], theme, true) + '</div>' : '') +
         (dead && t.deathCause && causeTxt(t, theme) ? '<p class="help">Causa: ' + esc(causeTxt(t, theme)) + (t.killerIds.length ? ', per mano di ' + esc(t.killerIds.map((k) => BY[k].name).join(', ')) : '') + '.</p>' : '') +
         (!dead ? '<div class="row" style="gap:16px;align-items:flex-start">' +
           '<div style="flex:1;min-width:140px"><div class="sub" style="margin-bottom:6px">Condizioni</div><div class="chips">' + (st.length ? st.map((s) => '<span class="chip st">' + esc(L.STATUS_LABEL[s] || s) + '</span>').join('') : '<span class="chip dim">In forma</span>') + '</div></div>' +
-          '<div style="flex:1;min-width:140px"><div class="sub" style="margin-bottom:6px">Zaino</div><div class="chips">' + (inv.length ? inv.map((x) => '<span class="chip dim">' + esc(x) + '</span>').join('') : '<span class="chip dim">Vuoto</span>') + '</div></div></div>' +
+          '</div>' +
+          '<div><div class="sub" style="margin-bottom:8px">Zaino · ' + plural(inv.length, 'oggetto', 'oggetti') + '</div>' + bagHTML(inv, theme) + '</div>' +
           '<div><div class="sub" style="margin-bottom:6px">Alleati</div><div class="row">' + (ally.length ? ally.map((x) => avHTML(BY[x], { btn: true })).join('') : '<span class="help">Nessuno, per ora.</span>') + '</div></div>' : '') +
         relHTML(id, snap, dead, atRes) +
+        (!dead ? peopleHTML(t, snap, i) : '') +
+        diaryHTML(t, dead ? t.deathPhase : i) +
         attrHTML(t, theme) +
         '<div><div class="sub" style="margin-bottom:8px">La sua storia' + (atRes ? '' : ' finora') + '</div><div class="ptl">' + (hist.length ? hist.map(({ e, p }) => '<div class="it" style="--cc:var(--c-' + (e.cat || 'none') + ')"><span>' + (p.kind === 'b' ? 'Inizio' : 'G' + p.day + ' ' + (p.kind === 'n' ? 'notte' : p.kind === 'd' ? 'giorno' : KIND[p.kind].toLowerCase())) + '</span><p>' + linkify(e.html) + '</p></div>').join('') : '<p class="help">Nessun evento ancora.</p>') + '</div></div>' +
       '</div>';
@@ -7747,8 +8546,7 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
       r.o.filter((x) => alive.has(x)).forEach((x) => rows.push('<div class="relrow"><span class="lbl">Deve un favore a</span>' + av(x) + '</div>'));
       const hunters = snap.alive.filter((x) => x !== id && snap.rel[x] && snap.rel[x].g.some(([y]) => y === id));
       if (hunters.length) rows.push('<div class="relrow"><span class="lbl">Ricercat' + G3(t.gender, 'o', 'a', 'ə') + ' da</span>' + hunters.map(av).join('') + '</div>');
-      const fr = r.fr.filter((x) => x !== r.p); if (fr.length) rows.push('<div class="relrow"><span class="lbl">Amici</span>' + fr.slice(0, 6).map(av).join('') + '</div>');
-      if (r.en.length) rows.push('<div class="relrow"><span class="lbl">Rivali</span>' + r.en.slice(0, 6).map(av).join('') + '</div>');
+
     }
     if (!badges.length && !rows.length) return '';
     return '<div><div class="sub" style="margin-bottom:8px">Legami e reputazione' + (atRes ? '' : ' adesso') + '</div>' + (badges.length ? '<div class="badges" style="margin-bottom:8px">' + badges.join('') + '</div>' : '') + (rows.length ? '<div class="rel">' + rows.join('') + '</div>' : '') + '</div>';
@@ -7770,6 +8568,7 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
     if (st.tough) bits.push(plural(st.tough, 'sopravvissuto per un soffio', 'sopravvissuti per un soffio'));
     if (st.broken) bits.push(plural(st.broken, 'arma rotta', 'armi rotte'));
     if (st.looted) bits.push(plural(st.looted, 'oggetto razziato', 'oggetti razziati'));
+    if (st.trades) bits.push(plural(st.trades, 'scambio', 'scambi'));
     const met = (st.meteo || []).map((x) => 'G' + x.day + ' ' + x.n);
     if (!c.length && !bits.length && !met.length) return '';
     return '<p class="help eco-sum">' + (c.length ? '<b>Uccisi dall\'arena:</b> ' + esc(c.join(', ')) + '. ' : '') + (bits.length ? '<b>Conseguenze:</b> ' + esc(bits.join(' · ')) + '. ' : '') + (met.length ? '<b>Meteo:</b> ' + esc(met.join(' · ')) + '.' : '') + '</p>';
@@ -7808,6 +8607,10 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
     const hunter = maxBy((t) => t.foraged || 0); if (hunter && hunter.foraged >= 2) awards.push([soft ? 'Lo scroccone' : 'Il cacciatore', hunter, plural(hunter.foraged, 'pasto procurato', 'pasti procurati')]);
     const nurse = maxBy((t) => t.nursed || 0); if (nurse && nurse.nursed) awards.push([soft ? 'La spalla' : 'L\'infermiere', nurse, plural(nurse.nursed, 'compagno rimesso in sesto', 'compagni rimessi in sesto')]);
     const trapper = maxBy((t) => (t.trapKills || 0) * 3 + (t.trapsSet || 0)); if (trapper && trapper.trapsSet) awards.push(['Il trappolaio', trapper, plural(trapper.trapsSet, 'trappola piazzata', 'trappole piazzate') + (trapper.trapKills ? ', ' + trapper.trapKills + ' a segno' : '')]);
+    const merch = maxBy((t) => t.trades || 0); if (merch && merch.trades >= 2) awards.push(['Il mercante', merch, plural(merch.trades, 'scambio', 'scambi')]);
+    const inv2 = maxBy((t) => t.crafts || 0); if (inv2 && inv2.crafts) awards.push(['L\'inventore', inv2, plural(inv2.crafts, 'oggetto costruito o modificato', 'oggetti costruiti o modificati')]);
+    const heart = maxBy((t) => t.rejected || 0); if (heart && heart.rejected) awards.push(['Cuore infranto', heart, plural(heart.rejected, 'dichiarazione respinta', 'dichiarazioni respinte')]);
+    const soul = maxBy((t) => (t.diary || []).filter((d) => d.k === 'segreto').length); if (soul && (soul.diary || []).some((d) => d.k === 'segreto')) awards.push(['Il più misterioso', soul, plural(soul.diary.filter((d) => d.k === 'segreto').length, 'segreto nel diario', 'segreti nel diario')]);
     const busy = maxBy((t) => t.events); if (busy) awards.push(['Sempre in mezzo', busy, plural(busy.events, 'evento vissuto', 'eventi vissuti')]);
     const loot = maxBy((t) => t.items); if (loot && loot.items) awards.push(['Il collezionista', loot, plural(loot.items, 'oggetto trovato', 'oggetti trovati')]);
     const awardsH = '<div class="awards">' + awards.map(([a, t, d]) => '<button type="button" class="award card" data-prof="' + esc(t.id) + '">' + avHTML(t, { dead: !t.alive }) + '<span style="min-width:0"><span class="at">' + a + '</span><b>' + esc(t.name) + '</b><small>' + esc(d) + '</small></span></button>').join('') + '</div>';
