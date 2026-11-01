@@ -1,6 +1,6 @@
 // Test headless del motore: node tools/test-engine.js [partite per tema]
 const path = require('path');
-for (const f of ['data-core.js', 'data-themes.js', 'engine.js']) require(path.join(__dirname, '..', 'src', f));
+for (const f of ['data-core.js', 'data-themes.js', ...require('fs').readdirSync(path.join(__dirname, '..', 'src', 'content')).map((x) => 'content/' + x), 'engine.js']) require(path.join(__dirname, '..', 'src', f));
 const LOS = globalThis.LOS, D = globalThis.LOS_DATA;
 const N = +process.argv[2] || 40;
 let fail = 0, games = 0;

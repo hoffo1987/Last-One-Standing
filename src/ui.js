@@ -8,22 +8,56 @@
   const THEMES = Object.fromEntries(D.themes.map((t) => [t.id, t]));
   const TRAITS = Object.fromEntries(D.traits.map((t) => [t.id, t]));
   const KEY = 'last-one-standing:v1';
-  const SPEED = { lenta: 7000, normale: 4000, veloce: 1800 };
+  const SPEED = { lenta: 7000, normale: 3800, veloce: 1700 };
   const G3 = (g, m, f, n) => (g === 'F' ? f : g === 'N' ? n : m);
+  const COUNTS = L.countTemplates();
+  const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* ---------------- icone ---------------- */
+  const sv = (p, extra) => '<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"' + (extra || '') + '>' + p + '</svg>';
+  const SKULL = '<path d="M12 3a8 8 0 0 0-8 8c0 2.8 1.4 4.6 3 5.6V20h10v-3.4c1.6-1 3-2.8 3-5.6a8 8 0 0 0-8-8z"/><circle cx="9" cy="11.5" r="1.6" fill="currentColor"/><circle cx="15" cy="11.5" r="1.6" fill="currentColor"/><path d="M10.5 20v-2.5M13.5 20v-2.5"/>';
+  const IC = {
+    b: sv('<path d="M5 21V4h11l-2 4 2 4H5"/>'),
+    d: sv('<circle cx="12" cy="12" r="4"/><path d="M12 2.5v2M12 19.5v2M4.6 4.6l1.4 1.4M18 18l1.4 1.4M2.5 12h2M19.5 12h2M4.6 19.4 6 18M18 6l1.4-1.4"/>'),
+    n: sv('<path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5Z"/>'),
+    f: sv('<rect x="4" y="10" width="16" height="10" rx="1.5"/><path d="M3 7h18v3H3zM12 7v13M12 7c-2-4-6-3-5 0M12 7c2-4 6-3 5 0"/>'),
+    dis: sv('<path d="M13 2 4 14h7l-1 8 9-12h-7z"/>'),
+    fallen: sv(SKULL),
+    finale: sv('<path d="M3 18h18l-2-10-5 4-2-7-2 7-5-4z"/><path d="M3 21h18"/>'),
+    kill: sv('<circle cx="12" cy="12" r="7"/><path d="M12 2v5M12 17v5M2 12h5M17 12h5"/>'),
+    death: sv(SKULL),
+    betray: sv('<path d="M12 20s-7-4.5-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.5-7 10-7 10z"/><path d="m12.5 7.5-2 3.5 3 2-2 3.5"/>'),
+    ally: sv('<circle cx="9" cy="12" r="5"/><circle cx="15" cy="12" r="5"/>'),
+    heal: sv('<path d="M9.5 3.5h5v6h6v5h-6v6h-5v-6h-6v-5h6z"/>'),
+    item: sv('<rect x="5" y="7" width="14" height="14" rx="3"/><path d="M9 7V5.5a3 3 0 0 1 6 0V7M9 13h6"/>'),
+    hurt: sv('<path d="M12 3s6 7 6 11a6 6 0 0 1-12 0c0-4 6-11 6-11z"/>'),
+    cam: sv('<path d="M4 8h3l2-2.5h6L17 8h3v11H4z"/><circle cx="12" cy="13" r="3.5"/>'),
+    play: '<path d="M8 5v14l11-7z" fill="currentColor"/>',
+    pause: '<path d="M7 5h4v14H7zM13 5h4v14h-4z" fill="currentColor"/>',
+  };
+  const GRIP = '<svg viewBox="0 0 10 16" fill="currentColor" aria-hidden="true"><circle cx="2.5" cy="3" r="1.4"/><circle cx="7.5" cy="3" r="1.4"/><circle cx="2.5" cy="8" r="1.4"/><circle cx="7.5" cy="8" r="1.4"/><circle cx="2.5" cy="13" r="1.4"/><circle cx="7.5" cy="13" r="1.4"/></svg>';
+  const CAT = {
+    kill: ['Uccisione', 'Eliminazione'], death: ['Morte', 'Fuori'], betray: ['Tradimento', 'Tradimento'], ally: ['Alleanza', 'Alleanza'],
+    heal: ['Cura', 'Recupero'], item: ['Bottino', 'Asso nella manica'], hurt: ['Guaio', 'Colpo basso'], none: ['', ''],
+  };
+  const KIND = { b: 'Apertura', d: 'Giorno', n: 'Notte', f: 'Evento speciale', dis: 'Disastro', fallen: 'Bilancio', finale: 'Finale' };
+  const DIFFS = [
+    ['bassa', 'Bassa', 'Partite lunghe, pochi morti', 1], ['normale', 'Normale', 'L\'equilibrio classico', 2],
+    ['alta', 'Alta', 'L\'arena non perdona', 3], ['massacro', 'Massacro', 'Finisce in pochi giorni', 4],
+  ];
 
   /* ---------------- stato ---------------- */
   const S = {
     cast: [],
-    settings: { theme: 'classico', difficulty: 'normale', seed: '', maxDays: 20, teamsAllied: true, teamWin: false, speed: 'normale', teamSize: 2 },
+    settings: { theme: 'classico', difficulty: 'normale', seed: '', maxDays: 20, teamsAllied: true, teamWin: false, speed: 'normale', teamSize: 2, view: 'grid' },
     custom: [],
-    run: null, // { cfg, phase }
+    run: null,
     ui: null,
   };
-  let SIM = null, playTimer = null, lastRendered = -1;
-  const openAttrs = new Set();
+  let SIM = null, BY = {}, playTimer = null, lastRendered = -1, sideTab = 'map', editId = null, photoTarget = null;
 
   function newSeed() {
-    const w = ['aurora', 'brace', 'cenere', 'duna', 'eco', 'falco', 'gelo', 'lampo', 'nebbia', 'ombra', 'quarzo', 'rovo', 'selce', 'tuono', 'vento', 'zolfo'];
+    const w = ['aurora', 'brace', 'cenere', 'duna', 'eco', 'falco', 'gelo', 'lampo', 'nebbia', 'ombra', 'quarzo', 'rovo', 'selce', 'tuono', 'vento', 'zolfo', 'ferro', 'corvo', 'lupo', 'brina'];
     return w[Math.floor(Math.random() * w.length)] + '-' + Math.floor(Math.random() * 9000 + 1000);
   }
   const teamColor = (team) => L.PALETTE[(Math.max(1, team) - 1) % L.PALETTE.length];
@@ -33,9 +67,7 @@
     clearTimeout(saveTimer);
     saveTimer = setTimeout(() => {
       try { localStorage.setItem(KEY, JSON.stringify(S)); }
-      catch (e) {
-        if (!warnedQuota) { warnedQuota = true; toast('Spazio del browser esaurito: le ultime modifiche non sono state salvate. Prova a usare foto più piccole.'); }
-      }
+      catch (e) { if (!warnedQuota) { warnedQuota = true; toast('Lo spazio del browser è pieno: le ultime modifiche non sono state salvate. Prova con foto più piccole.'); } }
     }, 250);
   }
   function load() {
@@ -45,6 +77,7 @@
       const d = JSON.parse(raw);
       if (Array.isArray(d.cast)) S.cast = d.cast.map(sanitizeTribute).filter(Boolean);
       if (d.settings) Object.assign(S.settings, d.settings);
+      if (!THEMES[S.settings.theme]) S.settings.theme = 'classico';
       if (Array.isArray(d.custom)) S.custom = d.custom.map(sanitizeCustom).filter(Boolean);
       if (d.run && d.run.cfg) S.run = d.run;
       if (d.ui === 'light' || d.ui === 'dark') S.ui = d.ui;
@@ -52,7 +85,6 @@
     } catch (e) { return false; }
   }
 
-  /* ---------------- validazione dati importati ---------------- */
   function sanitizeTribute(t, i) {
     if (!t || typeof t !== 'object') return null;
     const attr = {};
@@ -60,25 +92,16 @@
     const team = Math.max(1, Math.min(99, Math.round(+t.team) || (i || 0) + 1));
     return {
       id: typeof t.id === 'string' && t.id ? t.id.slice(0, 40) : 'c' + Math.random().toString(36).slice(2, 10),
-      name: String(t.name || '').slice(0, 40),
-      gender: ['M', 'F', 'N'].includes(t.gender) ? t.gender : 'M',
-      team, color: teamColor(team),
+      name: String(t.name || '').slice(0, 40), gender: ['M', 'F', 'N'].includes(t.gender) ? t.gender : 'M', team, color: teamColor(team),
       img: typeof t.img === 'string' && /^data:image\/(png|jpe?g|webp|gif);base64,[A-Za-z0-9+/=]+$/.test(t.img) && t.img.length < 400000 ? t.img : '',
-      traits: (Array.isArray(t.traits) ? t.traits : []).filter((x) => TRAITS[x]).slice(0, 3),
-      attr,
+      traits: (Array.isArray(t.traits) ? t.traits : []).filter((x) => TRAITS[x]).slice(0, 3), attr,
     };
   }
   function sanitizeCustom(c) {
     if (!c || typeof c.text !== 'string' || !c.text.trim()) return null;
     const n = Math.max(1, Math.min(4, Math.round(+c.n) || 1));
     const letters = 'ABCD'.slice(0, n).split('');
-    const out = {
-      id: c.id || 'e' + Math.random().toString(36).slice(2, 9),
-      phase: ['tutte', 'b', 'd', 'n', 'f'].includes(c.phase) ? c.phase : 'tutte', n,
-      text: c.text.trim().slice(0, 240),
-      dies: (Array.isArray(c.dies) ? c.dies : []).filter((x) => letters.includes(x)),
-      killer: letters.includes(c.killer) ? c.killer : '',
-    };
+    const out = { id: c.id || 'e' + Math.random().toString(36).slice(2, 9), phase: ['tutte', 'b', 'd', 'n', 'f'].includes(c.phase) ? c.phase : 'tutte', n, text: c.text.trim().slice(0, 240), dies: (Array.isArray(c.dies) ? c.dies : []).filter((x) => letters.includes(x)), killer: letters.includes(c.killer) ? c.killer : '' };
     try { L.parseLine(L.customToLine(out), 'custom'); } catch (e) { return null; }
     return out;
   }
@@ -88,14 +111,19 @@
     const p = String(name || '?').trim().split(/\s+/).filter(Boolean);
     return ((p[0] || '?')[0] + (p.length > 1 ? p[p.length - 1][0] : (p[0] || '')[1] || '')).toUpperCase();
   }
-  function avHTML(t, cls) {
-    return '<span class="av ' + (cls || '') + '" style="--c:' + esc(t.color || teamColor(t.team || 1)) + '" title="' + esc(t.name) + '">' +
-      (t.img ? '<img src="' + esc(t.img) + '" alt="">' : esc(initials(t.name))) + '</span>';
+  function avHTML(t, opt) {
+    opt = opt || {};
+    const inner = t.img ? '<img src="' + esc(t.img) + '" alt="">' : esc(initials(t.name));
+    const cls = 'av' + (opt.dead ? ' dead' : '');
+    const st = 'style="--c:' + esc(t.color || teamColor(t.team || 1)) + '"';
+    if (opt.btn) return '<button type="button" class="' + cls + '" ' + st + ' data-prof="' + esc(t.id) + '" title="' + esc(t.name) + '" aria-label="Scheda di ' + esc(t.name) + '">' + inner + '</button>';
+    return '<span class="' + cls + '" ' + st + ' title="' + esc(t.name) + '">' + inner + '</span>';
   }
+  const linkify = (html) => html.replace(/<b class="nm" data-id="/g, '<button type="button" class="nm" data-prof="').replace(/<\/b>/g, '</button>');
   let toastTimer;
   function toast(msg) {
     const el = $('#toast'); el.textContent = msg; el.hidden = false;
-    clearTimeout(toastTimer); toastTimer = setTimeout(() => (el.hidden = true), 3200);
+    clearTimeout(toastTimer); toastTimer = setTimeout(() => (el.hidden = true), 3400);
   }
   function copyText(text, okMsg) {
     const fallback = () => {
@@ -104,184 +132,225 @@
       let ok = false; try { ok = document.execCommand('copy'); } catch (e) { /* niente */ }
       ta.remove(); toast(ok ? okMsg : 'Il browser ha bloccato la copia: seleziona il testo e copialo a mano.');
     };
-    try {
-      if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(() => toast(okMsg), fallback);
-      else fallback();
-    } catch (e) { fallback(); }
+    try { if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(() => toast(okMsg), fallback); else fallback(); }
+    catch (e) { fallback(); }
   }
   const nTeams = () => new Set(S.cast.map((t) => t.team)).size;
+  const plural = (n, s, p) => n + ' ' + (n === 1 ? s : p);
+  function setHue(id) { const t = THEMES[id]; if (t) document.documentElement.style.setProperty('--h', t.hue); }
 
   /* ---------------- tema chiaro/scuro ---------------- */
-  function applyUi() {
-    if (S.ui) document.documentElement.dataset.theme = S.ui; else delete document.documentElement.dataset.theme;
-  }
+  function applyUi() { if (S.ui) document.documentElement.dataset.theme = S.ui; else delete document.documentElement.dataset.theme; }
   $('#themeBtn').addEventListener('click', () => {
     const cur = S.ui || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
-    S.ui = cur === 'dark' ? 'light' : 'dark';
-    applyUi(); save();
+    S.ui = cur === 'dark' ? 'light' : 'dark'; applyUi(); save();
   });
 
   /* ---------------- navigazione ---------------- */
-  const VIEWS = ['cast', 'arena', 'diretta', 'esito'];
+  const VIEWS = ['home', 'cast', 'arena', 'diretta', 'esito'];
+  let curView = '';
   function route() {
     let v = (location.hash || '').slice(1);
-    if (!VIEWS.includes(v)) v = 'cast';
+    if (!VIEWS.includes(v)) v = 'home';
+    const changed = v !== curView; curView = v;
     VIEWS.forEach((x) => ($('#v-' + x).hidden = x !== v));
-    $$('.tabs a').forEach((a) => (a.dataset.tab === v ? a.setAttribute('aria-current', 'page') : a.removeAttribute('aria-current')));
+    const order = ['cast', 'arena', 'diretta', 'esito'];
+    const reached = { cast: S.cast.length > 1, arena: !!SIM, diretta: !!SIM && S.run && (S.run.seen || 0) >= SIM.phases.length - 1, esito: false };
+    $$('.steps a').forEach((a) => {
+      a.dataset.tab === v ? a.setAttribute('aria-current', 'page') : a.removeAttribute('aria-current');
+      a.classList.toggle('done', !!reached[a.dataset.tab] && order.indexOf(a.dataset.tab) < order.indexOf(v));
+    });
+    $('#liveDot').hidden = !SIM;
     if (v !== 'diretta') stopPlay();
+    if (v !== 'home') stopHomeLoop();
+    setHue((v === 'diretta' || v === 'esito') && SIM ? SIM.theme : S.settings.theme);
+    if (v === 'home') renderHome();
+    if (v === 'cast') renderCast();
+    if (v === 'arena') renderArena();
     if (v === 'diretta') renderLive(true);
     if (v === 'esito') renderResults();
-    if (v === 'arena') renderArena();
-    window.scrollTo({ top: 0 });
+    if (changed) window.scrollTo({ top: 0, behavior: 'auto' });
   }
   window.addEventListener('hashchange', route);
+  document.addEventListener('click', (e) => {
+    const q = e.target.closest('[data-quick]'); if (q) { e.preventDefault(); quickPlay(); return; }
+    const p = e.target.closest('[data-prof]'); if (p && SIM) { e.preventDefault(); openProfile(p.dataset.prof); return; }
+    const c = e.target.closest('[data-close]'); if (c) c.closest('dialog').close();
+  });
+  $$('dialog').forEach((d) => d.addEventListener('click', (e) => { if (e.target === d) d.close(); }));
+
+  /* =============== HOME =============== */
+  let homeTimer = null, demo = null, demoI = 0;
+  function renderHome() {
+    $('#facts').innerHTML = [[COUNTS.events, 'modelli di evento'], [COUNTS.disasters, 'disastri diversi'], [D.themes.length, 'arene da esplorare'], [D.traits.length, 'tratti di personalità']]
+      .map(([n, l]) => '<div class="fact"><b>' + n + '</b><span>' + l + '</span></div>').join('');
+    $('#arenaStrip').innerHTML = D.themes.map((t) => posterHTML(t, false, 'a')).join('');
+    const r = $('#resume');
+    if (SIM) {
+      const th = THEMES[SIM.theme]; const done = (S.run.seen || 0) >= SIM.phases.length - 1;
+      r.hidden = false; r.className = 'resume card';
+      r.innerHTML = '<div class="rtext"><div class="eyebrow">' + (done ? 'Ultima partita' : 'Partita in corso') + '</div><b>' + esc(th.name) + '</b><div class="muted">' + SIM.tributes.length + ' concorrenti · fase ' + ((S.run.phase || 0) + 1) + ' di ' + SIM.phases.length + '</div></div>' +
+        '<a class="btn primary" href="#diretta">' + (done ? 'Rivedi la diretta' : 'Riprendi la diretta') + '</a>' + (done ? '<a class="btn" href="#esito">Vedi l\'esito</a>' : '');
+    } else r.hidden = true;
+    startHomeLoop();
+  }
+  function posterHTML(t, selectable, tag) {
+    const pt = COUNTS.perTheme[t.id];
+    const inner = '<span class="pcheck" aria-hidden="true">✓</span><span class="pg" aria-hidden="true">' + t.glyph + '</span>' +
+      '<span class="pmeta">' + (t.soft ? 'Senza morti · ' : '') + pt.events + ' eventi · ' + pt.disasters + ' disastri</span><b>' + esc(t.name) + '</b><small>' + esc(t.tag) + '</small>';
+    if (tag === 'a') return '<a class="poster-card" href="#arena" data-theme="' + t.id + '" style="--ph:' + t.hue + '">' + inner + '</a>';
+    return '<button type="button" class="poster-card" role="radio" aria-checked="' + !!selectable + '" data-theme="' + t.id + '" style="--ph:' + t.hue + '">' + inner + '</button>';
+  }
+  $('#arenaStrip').addEventListener('click', (e) => { const a = e.target.closest('[data-theme]'); if (a) { S.settings.theme = a.dataset.theme; save(); } });
+  function startHomeLoop() {
+    stopHomeLoop();
+    if (!demo) {
+      try { demo = L.simulate({ cast: L.randomCast(24, 'vetrina', 2), theme: S.settings.theme, seed: 'vetrina', difficulty: 'alta', teamsAllied: true }); } catch (e) { demo = null; }
+    }
+    if (!demo) return;
+    const evs = []; demo.phases.forEach((p) => p.events.forEach((e) => evs.push({ e, p })));
+    const total = demo.tributes.length;
+    const draw = () => {
+      if (demoI >= evs.length) demoI = 0;
+      const { e, p } = evs[demoI];
+      const deadSoFar = new Set();
+      for (let k = 0; k <= demoI; k++) evs[k].e.deaths.forEach((id) => deadSoFar.add(id));
+      $('#hbAlive').textContent = total - deadSoFar.size;
+      $('#hbDay').textContent = (KIND[p.kind] === 'Apertura' ? 'APERTURA' : 'GIORNO ' + p.day);
+      $('#hbTally').innerHTML = '<i class="d"></i>'.repeat(deadSoFar.size) + '<i></i>'.repeat(total - deadSoFar.size);
+      $('#hbLine').innerHTML = e.html.replace(/<b class="nm"[^>]*>/g, '<b>');
+      demoI++;
+    };
+    draw();
+    if (!reduced) homeTimer = setInterval(draw, 2300);
+  }
+  function stopHomeLoop() { if (homeTimer) { clearInterval(homeTimer); homeTimer = null; } }
+  function quickPlay() {
+    const themes = D.themes.map((t) => t.id);
+    const theme = themes[Math.floor(Math.random() * themes.length)];
+    const cast = L.randomCast(24, Math.random().toString(36), 2).map(sanitizeTribute);
+    runSim({ cast, theme, difficulty: 'normale', seed: newSeed(), maxDays: 20, teamsAllied: true, teamWin: false, custom: S.custom.slice() });
+    toast('Partita lampo: ' + THEMES[theme].name + ' con 24 concorrenti casuali. Il tuo cast non è stato toccato.');
+  }
+  $('#quickPlay').addEventListener('click', quickPlay);
 
   /* =============== CONCORRENTI =============== */
-  const GRIP = '<svg viewBox="0 0 10 16" fill="currentColor"><circle cx="2.5" cy="3" r="1.4"/><circle cx="7.5" cy="3" r="1.4"/><circle cx="2.5" cy="8" r="1.4"/><circle cx="7.5" cy="8" r="1.4"/><circle cx="2.5" cy="13" r="1.4"/><circle cx="7.5" cy="13" r="1.4"/></svg>';
-
-  function cardHTML(t, i) {
-    const avg = (D.attrs.reduce((s, a) => s + t.attr[a.id], 0) / D.attrs.length).toFixed(1);
-    const traitOpts = D.traits.filter((x) => !t.traits.includes(x.id)).map((x) => '<option value="' + x.id + '" title="' + esc(x.desc) + '">' + esc(x.name) + '</option>').join('');
-    return '<article class="card panel" data-id="' + esc(t.id) + '">' +
-      '<div class="top-row">' +
-        '<button class="grip" type="button" aria-label="Trascina per riordinare" title="Trascina per riordinare">' + GRIP + '</button>' +
-        '<button class="avbtn" type="button" data-act="photo" aria-label="Carica una foto per ' + esc(t.name || 'questo concorrente') + '">' + avHTML(t) + '</button>' +
-        '<input class="nameinp" type="text" id="name-' + esc(t.id) + '" data-f="name" value="' + esc(t.name) + '" placeholder="Nome" aria-label="Nome" maxlength="40">' +
-        '<div class="order"><button type="button" data-act="up" aria-label="Sposta su"' + (i === 0 ? ' disabled' : '') + '>↑</button><button type="button" data-act="down" aria-label="Sposta giù"' + (i === S.cast.length - 1 ? ' disabled' : '') + '>↓</button></div>' +
-        '<button class="x" type="button" data-act="del" aria-label="Rimuovi ' + esc(t.name) + '" title="Rimuovi">✕</button>' +
+  function tileHTML(t, i, showOrder) {
+    const traits = t.traits.length ? t.traits.map((id) => '<span class="chip" title="' + esc(TRAITS[id].desc) + '">' + esc(TRAITS[id].name) + '</span>').join('') : '<span class="chip dim">Nessun tratto</span>';
+    return '<article class="tile" data-id="' + esc(t.id) + '">' +
+      '<button class="grip" type="button" aria-label="Trascina per riordinare" title="Trascina per riordinare">' + GRIP + '</button>' +
+      '<div class="thead">' +
+        '<button class="avbtn" type="button" data-act="photo" aria-label="Carica una foto per ' + esc(t.name || 'questo concorrente') + '">' + avHTML(t) + '<span class="cam">' + IC.cam + '</span></button>' +
+        '<div style="min-width:0;flex:1"><input class="tname" type="text" id="name-' + esc(t.id) + '" data-f="name" value="' + esc(t.name) + '" placeholder="Nome" aria-label="Nome" maxlength="40">' +
+        '<div class="tsub"><span class="teamchip" style="--c:' + esc(t.color) + '"><i></i>Squadra ' + t.team + '</span></div></div>' +
       '</div>' +
-      '<div class="meta">' +
-        '<div class="seg sm" role="group" aria-label="Genere">' +
-          ['M', 'F', 'N'].map((g) => '<button type="button" data-act="g" data-v="' + g + '" aria-pressed="' + (t.gender === g) + '">' + G3(g, 'Lui', 'Lei', 'Neutro') + '</button>').join('') +
-        '</div>' +
-        '<label class="team" for="team-' + esc(t.id) + '">Squadra <input type="number" min="1" max="99" id="team-' + esc(t.id) + '" data-f="team" value="' + t.team + '"></label>' +
-        (t.img ? '<button class="btn ghost" style="padding:2px 8px;font-size:12.5px" type="button" data-act="rmphoto">Togli foto</button>' : '') +
+      '<div class="chips">' + traits + '</div>' +
+      '<div class="tacts">' +
+        '<div class="gsel" role="group" aria-label="Genere">' + ['M', 'F', 'N'].map((g) => '<button type="button" data-act="g" data-v="' + g + '" aria-pressed="' + (t.gender === g) + '">' + G3(g, 'Lui', 'Lei', 'Neutro') + '</button>').join('') + '</div>' +
+        '<button class="btn" type="button" data-act="edit">Modifica</button>' +
+        (showOrder ? '<div class="ord"><button type="button" data-act="up" aria-label="Sposta prima"' + (i === 0 ? ' disabled' : '') + '>↑</button><button type="button" data-act="down" aria-label="Sposta dopo"' + (i === S.cast.length - 1 ? ' disabled' : '') + '>↓</button></div>' : '') +
       '</div>' +
-      '<div class="chips">' +
-        t.traits.map((id) => '<span class="chip" title="' + esc(TRAITS[id].desc) + '">' + esc(TRAITS[id].name) + '<button type="button" data-act="rmtrait" data-v="' + id + '" aria-label="Togli ' + esc(TRAITS[id].name) + '">✕</button></span>').join('') +
-        (t.traits.length < 3 ? '<select data-f="trait" id="trait-' + esc(t.id) + '" aria-label="Aggiungi tratto"><option value="">+ Tratto</option>' + traitOpts + '</select>' : '') +
-      '</div>' +
-      '<details class="attrs"' + (openAttrs.has(t.id) ? ' open' : '') + '><summary>Caratteristiche <span class="mono">media ' + avg + '</span></summary>' +
-        '<div class="attrgrid">' + D.attrs.map((a) => '<label for="a-' + esc(t.id) + '-' + a.id + '">' + a.name + '</label><input type="range" min="1" max="10" id="a-' + esc(t.id) + '-' + a.id + '" data-f="attr" data-k="' + a.id + '" value="' + t.attr[a.id] + '"><output>' + t.attr[a.id] + '</output>').join('') + '</div>' +
-        '<div class="row" style="margin-top:8px"><button class="btn" style="padding:4px 10px;font-size:13px" type="button" data-act="rattr">Valori casuali</button></div>' +
-      '</details>' +
     '</article>';
   }
-
   function renderCast() {
-    $('#castList').innerHTML = S.cast.map(cardHTML).join('') + '<button class="addcard" type="button" id="addOne">+ Aggiungi concorrente</button>';
+    $$('#viewSeg button').forEach((b) => b.setAttribute('aria-pressed', b.dataset.v === S.settings.view));
+    $('#teamSize').value = String(S.settings.teamSize || 2);
+    const add = '<button class="addtile" type="button" id="addOne"><span>+ Aggiungi concorrente</span></button>';
+    if (S.settings.view === 'team') {
+      const teams = {};
+      S.cast.forEach((t, i) => (teams[t.team] = teams[t.team] || []).push([t, i]));
+      $('#castList').innerHTML = Object.keys(teams).sort((a, b) => a - b).map((k) => '<div class="teamblock"><h3><i style="--c:' + teamColor(+k) + '"></i>Squadra ' + k + ' <span>' + teams[k].length + '</span></h3><div class="castgrid">' + teams[k].map(([t, i]) => tileHTML(t, i, false)).join('') + '</div></div>').join('') + '<div class="castgrid">' + add + '</div>';
+    } else {
+      $('#castList').innerHTML = '<div class="castgrid">' + S.cast.map((t, i) => tileHTML(t, i, true)).join('') + add + '</div>';
+    }
     updateCounts();
   }
   function updateCounts() {
     const n = S.cast.length;
-    $('#castCount').innerHTML = n + ' <small>' + (n === 1 ? 'concorrente' : 'concorrenti') + ' · ' + nTeams() + ' squadre</small>';
-    $('#tabCount').textContent = n;
+    $('#tabCount').textContent = n || '';
+    $('#castSummary').innerHTML = '<b>' + n + '</b> ' + (n === 1 ? 'concorrente' : 'concorrenti') + ' · ' + plural(nTeams(), 'squadra', 'squadre');
+    const names = S.cast.map((t) => t.name.trim().toLowerCase()).filter(Boolean);
+    const dup = names.filter((x, i) => names.indexOf(x) !== i);
+    const empty = S.cast.filter((t) => !t.name.trim()).length;
+    const msgs = [];
+    if (n < 2) msgs.push('Servono almeno 2 concorrenti per giocare.');
+    if (dup.length) msgs.push('Ci sono nomi ripetuti: ' + [...new Set(dup)].slice(0, 3).join(', ') + '. Nella diretta sarà difficile distinguerli.');
+    if (empty) msgs.push(plural(empty, 'concorrente non ha', 'concorrenti non hanno') + ' un nome: verrà usato un nome provvisorio.');
+    $('#castNotice').hidden = !msgs.length; $('#castNotice').textContent = msgs.join(' ');
   }
-  function refreshCard(id) {
+  const findT = (el) => { const c = el.closest('.tile'); return c ? S.cast.find((t) => t.id === c.dataset.id) : null; };
+  function refreshTile(id) {
     const i = S.cast.findIndex((t) => t.id === id);
-    const el = $('.card[data-id="' + CSS.escape(id) + '"]');
+    const el = $('.tile[data-id="' + CSS.escape(id) + '"]');
     if (i < 0 || !el) return renderCast();
-    const tmp = document.createElement('div'); tmp.innerHTML = cardHTML(S.cast[i], i);
+    const tmp = document.createElement('div'); tmp.innerHTML = tileHTML(S.cast[i], i, S.settings.view !== 'team');
     el.replaceWith(tmp.firstChild);
   }
-  const findT = (el) => { const c = el.closest('.card'); return c ? S.cast.find((t) => t.id === c.dataset.id) : null; };
-
-  function addTribute() {
+  function addTribute(open) {
     const used = new Set(S.cast.map((t) => t.name));
     const g = S.cast.length % 2 ? 'M' : 'F';
-    const name = (D.names[g].find((x) => !used.has(x))) || 'Concorrente ' + (S.cast.length + 1);
-    const team = S.cast.length ? Math.ceil((S.cast.length + 1) / (+S.settings.teamSize || 1)) : 1;
+    const name = D.names[g].find((x) => !used.has(x)) || 'Concorrente ' + (S.cast.length + 1);
+    const ts = +S.settings.teamSize || 1;
+    const team = Math.floor(S.cast.length / ts) + 1;
     const t = sanitizeTribute({ name, gender: g, team, traits: [], attr: {} });
     D.attrs.forEach((a) => (t.attr[a.id] = 3 + Math.floor(Math.random() * 6)));
-    S.cast.push(t);
-    renderCast(); save();
-    const inp = $('#name-' + CSS.escape(t.id)); if (inp) { inp.focus(); inp.select(); }
+    S.cast.push(t); renderCast(); save();
+    if (open) openEditor(t.id);
+    else { const inp = $('#name-' + CSS.escape(t.id)); if (inp) { inp.focus(); inp.select(); } }
   }
-
+  $('#btnAdd').addEventListener('click', () => addTribute(true));
   $('#castList').addEventListener('click', (e) => {
-    if (e.target.closest('#addOne')) return addTribute();
+    if (e.target.closest('#addOne')) return addTribute(false);
     const b = e.target.closest('[data-act]'); if (!b) return;
     const t = findT(b); if (!t) return;
     const i = S.cast.indexOf(t);
     switch (b.dataset.act) {
-      case 'del': S.cast.splice(i, 1); renderCast(); break;
-      case 'up': if (i > 0) { [S.cast[i - 1], S.cast[i]] = [S.cast[i], S.cast[i - 1]]; renderCast(); $('.card[data-id="' + CSS.escape(t.id) + '"] [data-act="up"]')?.focus(); } break;
-      case 'down': if (i < S.cast.length - 1) { [S.cast[i + 1], S.cast[i]] = [S.cast[i], S.cast[i + 1]]; renderCast(); $('.card[data-id="' + CSS.escape(t.id) + '"] [data-act="down"]')?.focus(); } break;
-      case 'g': t.gender = b.dataset.v; refreshCard(t.id); break;
-      case 'rmtrait': t.traits = t.traits.filter((x) => x !== b.dataset.v); refreshCard(t.id); break;
-      case 'rattr': D.attrs.forEach((a) => (t.attr[a.id] = 1 + Math.floor(Math.random() * 10))); openAttrs.add(t.id); refreshCard(t.id); break;
+      case 'edit': return openEditor(t.id);
       case 'photo': photoTarget = t.id; $('#avatarFile').click(); return;
-      case 'rmphoto': t.img = ''; refreshCard(t.id); break;
+      case 'g': t.gender = b.dataset.v; refreshTile(t.id); break;
+      case 'up': if (i > 0) { [S.cast[i - 1], S.cast[i]] = [S.cast[i], S.cast[i - 1]]; renderCast(); $('.tile[data-id="' + CSS.escape(t.id) + '"] [data-act="up"]')?.focus(); } break;
+      case 'down': if (i < S.cast.length - 1) { [S.cast[i + 1], S.cast[i]] = [S.cast[i], S.cast[i + 1]]; renderCast(); $('.tile[data-id="' + CSS.escape(t.id) + '"] [data-act="down"]')?.focus(); } break;
       default: return;
     }
     save();
   });
   $('#castList').addEventListener('input', (e) => {
-    const f = e.target.dataset.f; if (!f) return;
+    if (e.target.dataset.f !== 'name') return;
     const t = findT(e.target); if (!t) return;
-    if (f === 'name') {
-      t.name = e.target.value.slice(0, 40);
-      const av = e.target.closest('.card').querySelector('.avbtn .av');
-      if (av && !t.img) av.textContent = initials(t.name);
-    } else if (f === 'team') {
-      const v = Math.round(+e.target.value);
-      if (v >= 1 && v <= 99) { t.team = v; t.color = teamColor(v); const av = e.target.closest('.card').querySelector('.avbtn .av'); if (av) av.style.setProperty('--c', t.color); updateCounts(); }
-    } else if (f === 'attr') {
-      t.attr[e.target.dataset.k] = +e.target.value;
-      e.target.nextElementSibling.textContent = e.target.value;
-      const avg = (D.attrs.reduce((s, a) => s + t.attr[a.id], 0) / D.attrs.length).toFixed(1);
-      e.target.closest('details').querySelector('summary .mono').textContent = 'media ' + avg;
-    }
+    t.name = e.target.value.slice(0, 40);
+    const av = e.target.closest('.tile').querySelector('.avbtn .av'); if (av && !t.img) av.textContent = initials(t.name);
     save();
   });
-  $('#castList').addEventListener('change', (e) => {
-    if (e.target.dataset.f !== 'trait' || !e.target.value) return;
-    const t = findT(e.target); if (!t) return;
-    if (t.traits.length < 3) t.traits.push(e.target.value);
-    refreshCard(t.id); save();
-    $('#trait-' + CSS.escape(t.id))?.focus();
-  });
-  $('#castList').addEventListener('toggle', (e) => {
-    if (!e.target.matches('details.attrs')) return;
-    const t = findT(e.target); if (!t) return;
-    e.target.open ? openAttrs.add(t.id) : openAttrs.delete(t.id);
-  }, true);
-
+  $('#castList').addEventListener('change', (e) => { if (e.target.dataset.f === 'name') updateCounts(); });
   // trascinamento
   let dragId = null;
-  $('#castList').addEventListener('pointerdown', (e) => {
-    const g = e.target.closest('.grip'); if (!g) return;
-    g.closest('.card').draggable = true;
-  });
+  $('#castList').addEventListener('pointerdown', (e) => { const g = e.target.closest('.grip'); if (g) g.closest('.tile').draggable = true; });
   $('#castList').addEventListener('dragstart', (e) => {
-    const c = e.target.closest('.card'); if (!c) return;
+    const c = e.target.closest('.tile'); if (!c) return;
     dragId = c.dataset.id; c.classList.add('dragging');
     try { e.dataTransfer.effectAllowed = 'move'; e.dataTransfer.setData('text/plain', dragId); } catch (err) { /* niente */ }
   });
   $('#castList').addEventListener('dragover', (e) => {
-    const c = e.target.closest('.card'); if (!c || !dragId) return;
+    const c = e.target.closest('.tile'); if (!c || !dragId) return;
     e.preventDefault();
-    $$('.card.over').forEach((x) => x !== c && x.classList.remove('over'));
+    $$('.tile.over').forEach((x) => x !== c && x.classList.remove('over'));
     if (c.dataset.id !== dragId) c.classList.add('over');
   });
   $('#castList').addEventListener('drop', (e) => {
-    const c = e.target.closest('.card'); if (!c || !dragId) return;
+    const c = e.target.closest('.tile'); if (!c || !dragId) return;
     e.preventDefault();
     const from = S.cast.findIndex((t) => t.id === dragId);
+    const target = S.cast.find((t) => t.id === c.dataset.id);
     const [m] = S.cast.splice(from, 1);
-    let to = S.cast.findIndex((t) => t.id === c.dataset.id);
+    let to = S.cast.indexOf(target);
     const rect = c.getBoundingClientRect();
-    if (e.clientX > rect.left + rect.width / 2 || e.clientY > rect.bottom - 10) to += 1;
+    if (e.clientX > rect.left + rect.width / 2) to += 1;
+    if (S.settings.view === 'team' && target) { m.team = target.team; m.color = teamColor(m.team); }
     S.cast.splice(to, 0, m);
     renderCast(); save();
   });
-  $('#castList').addEventListener('dragend', () => {
-    dragId = null;
-    $$('.card').forEach((c) => { c.draggable = false; c.classList.remove('dragging', 'over'); });
-  });
-
+  $('#castList').addEventListener('dragend', () => { dragId = null; $$('.tile').forEach((c) => { c.draggable = false; c.classList.remove('dragging', 'over'); }); });
   // foto
-  let photoTarget = null;
   $('#avatarFile').addEventListener('change', (e) => {
     const f = e.target.files[0]; e.target.value = '';
     const t = S.cast.find((x) => x.id === photoTarget); if (!f || !t) return;
@@ -290,64 +359,125 @@
     rd.onload = () => {
       const img = new Image();
       img.onload = () => {
-        const s = 128, cv = document.createElement('canvas'); cv.width = cv.height = s;
+        const s = 160, cv = document.createElement('canvas'); cv.width = cv.height = s;
         const k = Math.max(s / img.width, s / img.height), w = img.width * k, h = img.height * k;
         cv.getContext('2d').drawImage(img, (s - w) / 2, (s - h) / 2, w, h);
         t.img = cv.toDataURL('image/jpeg', 0.82);
-        refreshCard(t.id); save();
+        save(); if ($('#editDlg').open && editId === t.id) renderEditor(); refreshTile(t.id);
       };
       img.onerror = () => toast('Non riesco a leggere questa immagine.');
       img.src = rd.result;
     };
     rd.readAsDataURL(f);
   });
-
   // barra strumenti
   $('#btnRandom').addEventListener('click', () => {
-    S.cast = L.randomCast(+$('#presetSize').value, Math.random().toString(36), +$('#teamSize').value).map(sanitizeTribute);
-    openAttrs.clear(); renderCast(); save(); toast('Cast generato: ' + S.cast.length + ' concorrenti.');
+    S.cast = L.randomCast(+$('#presetSize').value, Math.random().toString(36), +S.settings.teamSize || 2).map(sanitizeTribute);
+    renderCast(); save(); toast('Cast generato: ' + S.cast.length + ' concorrenti.');
   });
   $('#teamSize').addEventListener('change', (e) => { S.settings.teamSize = +e.target.value; save(); });
   $('#btnRegroup').addEventListener('click', () => {
-    const ts = +$('#teamSize').value || 1;
+    const ts = +S.settings.teamSize || 1;
     S.cast.forEach((t, i) => { t.team = Math.floor(i / ts) + 1; t.color = teamColor(t.team); });
     renderCast(); save(); toast('Squadre ricomposte in ordine, da ' + ts + '.');
   });
+  $('#viewSeg').addEventListener('click', (e) => { const b = e.target.closest('button'); if (!b) return; S.settings.view = b.dataset.v; save(); renderCast(); });
   $('#btnClear').addEventListener('click', () => ($('#clearConfirm').hidden = false));
   $('#clearNo').addEventListener('click', () => ($('#clearConfirm').hidden = true));
   $('#clearYes').addEventListener('click', () => { S.cast = []; $('#clearConfirm').hidden = true; renderCast(); save(); });
 
-  // importa / esporta
-  function exportJSON() {
-    return JSON.stringify({ app: 'last-one-standing', versione: 1, cast: S.cast, regole: S.settings, eventi: S.custom }, null, 2);
+  // scheda di modifica
+  function openEditor(id) { editId = id; renderEditor(); if (!$('#editDlg').open) $('#editDlg').showModal(); }
+  function renderEditor() {
+    const t = S.cast.find((x) => x.id === editId); if (!t) return $('#editDlg').close();
+    const sum = D.attrs.reduce((s, a) => s + t.attr[a.id], 0);
+    $('#editBody').innerHTML =
+      '<div class="dh"><h2 id="h-edit">' + esc(t.name || 'Senza nome') + '</h2><button class="iconbtn" data-close type="button" aria-label="Chiudi">✕</button></div>' +
+      '<div class="db">' +
+        '<div class="profhead"><button class="avbtn" type="button" data-e="photo" aria-label="Carica una foto">' + avHTML(t) + '<span class="cam">' + IC.cam + '</span></button>' +
+          '<div class="ps"><div class="row">' + (t.img ? '<button class="btn sm" type="button" data-e="rmphoto">Togli la foto</button>' : '<button class="btn sm" type="button" data-e="photo">Carica una foto</button>') + '</div><small class="help">La foto resta solo in questo browser.</small></div></div>' +
+        '<label class="field" for="e-name"><span>Nome</span><input type="text" id="e-name" value="' + esc(t.name) + '" maxlength="40"></label>' +
+        '<div class="row" style="gap:16px;align-items:flex-end">' +
+          '<div class="field"><span>Genere (per le frasi)</span><div class="seg" role="group" aria-label="Genere">' + ['M', 'F', 'N'].map((g) => '<button type="button" data-e="g" data-v="' + g + '" aria-pressed="' + (t.gender === g) + '">' + G3(g, 'Lui', 'Lei', 'Neutro') + '</button>').join('') + '</div></div>' +
+          '<label class="field" for="e-team" style="width:110px"><span>Squadra</span><input type="number" id="e-team" min="1" max="99" value="' + t.team + '"></label>' +
+        '</div>' +
+        '<div class="field"><span>Tratti · ' + t.traits.length + ' di 3</span><div class="traitpick">' + D.traits.map((x) => '<button type="button" data-e="trait" data-v="' + x.id + '" aria-pressed="' + t.traits.includes(x.id) + '"' + (!t.traits.includes(x.id) && t.traits.length >= 3 ? ' disabled' : '') + ' title="' + esc(x.desc) + '">' + esc(x.name) + '</button>').join('') + '</div><p class="help traitdesc" id="traitDesc">' + (t.traits.length ? t.traits.map((x) => '<b>' + esc(TRAITS[x].name) + '</b>: ' + esc(TRAITS[x].desc)).join(' ') : 'Passa sopra un tratto per leggerne l\'effetto.') + '</p></div>' +
+        '<div class="field"><span>Caratteristiche · totale <b id="attrSum">' + sum + '</b></span><div class="attrgrid">' + D.attrs.map((a) => '<label for="ea-' + a.id + '">' + a.name + '</label><input type="range" min="1" max="10" id="ea-' + a.id + '" data-k="' + a.id + '" value="' + t.attr[a.id] + '"><output>' + t.attr[a.id] + '</output>').join('') + '</div>' +
+          '<div class="row" style="margin-top:6px"><button class="btn sm" type="button" data-e="rattr">Valori casuali</button><button class="btn sm" type="button" data-e="avg">Tutti a 5</button></div></div>' +
+        '<div class="row" style="justify-content:space-between;border-top:1px solid var(--line);padding-top:14px"><button class="btn danger ghost" type="button" data-e="del">Elimina concorrente</button><button class="btn primary" type="button" data-close>Fatto</button></div>' +
+        '<div class="confirm" id="delConfirm" hidden>Eliminare ' + esc(t.name || 'questo concorrente') + '? <button class="btn danger sm" type="button" data-e="delyes">Elimina</button></div>' +
+      '</div>';
   }
+  $('#editDlg').addEventListener('click', (e) => {
+    const b = e.target.closest('[data-e]'); if (!b) return;
+    const t = S.cast.find((x) => x.id === editId); if (!t) return;
+    switch (b.dataset.e) {
+      case 'photo': photoTarget = t.id; $('#avatarFile').click(); return;
+      case 'rmphoto': t.img = ''; break;
+      case 'g': t.gender = b.dataset.v; break;
+      case 'trait': t.traits.includes(b.dataset.v) ? (t.traits = t.traits.filter((x) => x !== b.dataset.v)) : t.traits.length < 3 && t.traits.push(b.dataset.v); break;
+      case 'rattr': D.attrs.forEach((a) => (t.attr[a.id] = 1 + Math.floor(Math.random() * 10))); break;
+      case 'avg': D.attrs.forEach((a) => (t.attr[a.id] = 5)); break;
+      case 'del': $('#delConfirm').hidden = false; return;
+      case 'delyes': S.cast = S.cast.filter((x) => x.id !== t.id); save(); $('#editDlg').close(); renderCast(); return;
+      default: return;
+    }
+    save(); renderEditor();
+    const again = $('#editBody [data-e="' + b.dataset.e + '"]' + (b.dataset.v ? '[data-v="' + b.dataset.v + '"]' : '')); if (again) again.focus();
+  });
+  $('#editDlg').addEventListener('input', (e) => {
+    const t = S.cast.find((x) => x.id === editId); if (!t) return;
+    if (e.target.id === 'e-name') { t.name = e.target.value.slice(0, 40); $('#h-edit').textContent = t.name || 'Senza nome'; }
+    else if (e.target.id === 'e-team') { const v = Math.round(+e.target.value); if (v >= 1 && v <= 99) { t.team = v; t.color = teamColor(v); const av = $('#editBody .profhead .av'); if (av) av.style.setProperty('--c', t.color); } }
+    else if (e.target.dataset.k) { t.attr[e.target.dataset.k] = +e.target.value; e.target.nextElementSibling.textContent = e.target.value; $('#attrSum').textContent = D.attrs.reduce((s, a) => s + t.attr[a.id], 0); }
+    save();
+  });
+  $('#editDlg').addEventListener('mouseover', (e) => { const b = e.target.closest('[data-e="trait"]'); if (b) { const x = TRAITS[b.dataset.v]; $('#traitDesc').innerHTML = '<b>' + esc(x.name) + '</b>: ' + esc(x.desc); } });
+  $('#editDlg').addEventListener('focusin', (e) => { const b = e.target.closest('[data-e="trait"]'); if (b) { const x = TRAITS[b.dataset.v]; $('#traitDesc').innerHTML = '<b>' + esc(x.name) + '</b>: ' + esc(x.desc); } });
+  $('#editDlg').addEventListener('close', () => { if (curView === 'cast') renderCast(); });
+
+  // elenco incollato
+  $('#btnBulk').addEventListener('click', () => { $('#bulkMsg').textContent = ''; $('#bulkDlg').showModal(); $('#bulkText').focus(); });
+  $('#bulkGo').addEventListener('click', () => {
+    const lines = $('#bulkText').value.split('\n').map((l) => l.trim()).filter(Boolean);
+    if (!lines.length) { $('#bulkMsg').textContent = 'Scrivi almeno un nome.'; return; }
+    const G = { lui: 'M', m: 'M', maschio: 'M', uomo: 'M', lei: 'F', f: 'F', femmina: 'F', donna: 'F', neutro: 'N', n: 'N', loro: 'N' };
+    const base = $('#bulkReplace').checked ? [] : S.cast.slice();
+    const ts = +S.settings.teamSize || 1;
+    const added = lines.slice(0, 200).map((l, k) => {
+      const [name, g, team] = l.split(/[,;\t]/).map((x) => (x || '').trim());
+      const i = base.length + k;
+      const t = sanitizeTribute({ name, gender: G[(g || '').toLowerCase()] || (i % 2 ? 'M' : 'F'), team: +team || Math.floor(i / ts) + 1, traits: [] });
+      D.attrs.forEach((a) => (t.attr[a.id] = 3 + Math.floor(Math.random() * 6)));
+      return t;
+    });
+    S.cast = base.concat(added); save(); renderCast();
+    $('#bulkDlg').close(); $('#bulkText').value = '';
+    toast(plural(added.length, 'concorrente aggiunto', 'concorrenti aggiunti') + '.');
+  });
+
+  // importa / esporta
+  const exportJSON = () => JSON.stringify({ app: 'last-one-standing', versione: 2, cast: S.cast, regole: S.settings, eventi: S.custom }, null, 2);
   function importJSON(text) {
-    let d;
-    try { d = JSON.parse(text); } catch (e) { return 'Il testo non è un JSON valido.'; }
+    let d; try { d = JSON.parse(text); } catch (e) { return 'Il testo non è un JSON valido.'; }
     const cast = Array.isArray(d) ? d : d.cast;
     if (!Array.isArray(cast) || !cast.length) return 'Non trovo un elenco di concorrenti ("cast") nel testo.';
     S.cast = cast.slice(0, 200).map(sanitizeTribute).filter(Boolean);
-    const rules = d.regole || d.settings;
-    if (rules && typeof rules === 'object') {
-      if (THEMES[rules.theme]) S.settings.theme = rules.theme;
-      if (L.DIFF[rules.difficulty]) S.settings.difficulty = rules.difficulty;
-      if (typeof rules.seed === 'string') S.settings.seed = rules.seed.slice(0, 60);
-      if (+rules.maxDays >= 5 && +rules.maxDays <= 40) S.settings.maxDays = +rules.maxDays;
-      ['teamsAllied', 'teamWin'].forEach((k) => typeof rules[k] === 'boolean' && (S.settings[k] = rules[k]));
+    const r = d.regole || d.settings;
+    if (r && typeof r === 'object') {
+      if (THEMES[r.theme]) S.settings.theme = r.theme;
+      if (L.DIFF[r.difficulty]) S.settings.difficulty = r.difficulty;
+      if (typeof r.seed === 'string') S.settings.seed = r.seed.slice(0, 60);
+      if (+r.maxDays >= 5 && +r.maxDays <= 40) S.settings.maxDays = +r.maxDays;
+      ['teamsAllied', 'teamWin'].forEach((k) => typeof r[k] === 'boolean' && (S.settings[k] = r[k]));
     }
     const ev = d.eventi || d.custom;
     if (Array.isArray(ev)) S.custom = ev.slice(0, 200).map(sanitizeCustom).filter(Boolean);
-    renderCast(); save();
-    return null;
+    renderCast(); save(); return null;
   }
   $('#btnIO').addEventListener('click', () => { $('#ioText').value = exportJSON(); $('#ioMsg').textContent = ''; $('#ioDlg').showModal(); });
-  $('#ioClose').addEventListener('click', () => $('#ioDlg').close());
   $('#ioCopy').addEventListener('click', () => copyText($('#ioText').value, 'Configurazione copiata negli appunti.'));
-  $('#ioImport').addEventListener('click', () => {
-    const err = importJSON($('#ioText').value);
-    if (err) $('#ioMsg').textContent = err;
-    else { $('#ioDlg').close(); toast('Importati ' + S.cast.length + ' concorrenti.'); }
-  });
+  $('#ioImport').addEventListener('click', () => { const err = importJSON($('#ioText').value); if (err) $('#ioMsg').textContent = err; else { $('#ioDlg').close(); toast('Importati ' + S.cast.length + ' concorrenti.'); } });
   $('#ioFile').addEventListener('change', (e) => {
     const f = e.target.files[0]; e.target.value = ''; if (!f) return;
     const rd = new FileReader();
@@ -357,56 +487,72 @@
 
   /* =============== ARENA =============== */
   function renderArena() {
-    const c = L.countTemplates();
-    $('#arenaSub').textContent = 'Scegli uno dei ' + c.themes + ' scenari: ognuno ha lessico, eventi e disastri propri. In tutto ' + c.events + ' modelli di evento e ' + c.disasters + ' disastri, più quelli che scrivi tu.';
-    $('#themeList').innerHTML = D.themes.map((t) =>
-      '<button type="button" class="theme" data-id="' + t.id + '" aria-pressed="' + (S.settings.theme === t.id) + '" style="--h:' + t.hue + '">' +
-      '<span class="gl" aria-hidden="true">' + t.glyph + '</span><b>' + esc(t.name) + '</b><small>' + esc(t.tag) + '</small>' +
-      (t.soft ? '<span class="soft">senza morti</span>' : '') + '</button>').join('');
-    $$('#diffSeg button').forEach((b) => b.setAttribute('aria-pressed', b.dataset.v === S.settings.difficulty));
-    $$('#speedSeg button').forEach((b) => b.setAttribute('aria-pressed', b.dataset.v === S.settings.speed));
+    $('#arenaSub').textContent = 'Ogni arena ha luoghi, armi, pericoli e disastri propri. In tutto ' + COUNTS.events + ' modelli di evento e ' + COUNTS.disasters + ' disastri, più quelli che scrivi tu.';
+    $('#themeList').innerHTML = D.themes.map((t) => posterHTML(t, S.settings.theme === t.id)).join('');
+    $('#diffSeg').innerHTML = DIFFS.map(([v, n, d, k]) => '<button type="button" role="radio" data-v="' + v + '" aria-checked="' + (S.settings.difficulty === v) + '"><b>' + n + ' <span class="sk" aria-hidden="true">' + '✖'.repeat(k) + '</span></b><small>' + d + '</small></button>').join('');
     $('#maxDays').value = S.settings.maxDays; $('#maxDaysOut').textContent = S.settings.maxDays;
     $('#seed').value = S.settings.seed;
-    $('#teamsAllied').checked = !!S.settings.teamsAllied;
-    $('#teamWin').checked = !!S.settings.teamWin;
-    renderCustomForm(); renderCustomList();
-    $('#startMsg').textContent = S.cast.length < 2 ? 'Servono almeno 2 concorrenti: aggiungili nella sezione Concorrenti.' : S.cast.length + ' concorrenti pronti.';
+    $('#teamsAllied').checked = !!S.settings.teamsAllied; $('#teamWin').checked = !!S.settings.teamWin;
+    renderPreview(); renderCustomForm(); renderCustomList(); renderStartSum();
+  }
+  function renderPreview() {
+    const t = THEMES[S.settings.theme], pt = COUNTS.perTheme[t.id];
+    const strip = (s) => s.replace(/^(il |lo |la |l'|i |gli |le |un |uno |una |un'|delle |dei |degli |del |della |dell')/i, '');
+    const pools = L.buildPools(t, []);
+    const dz = pools.disasters.map((d) => d.n);
+    let sample = '';
+    try {
+      const cast = (S.cast.length >= 4 ? S.cast.slice(0, 8) : L.randomCast(8, 'anteprima', 2));
+      const r = L.simulate({ cast, theme: t.id, seed: 'anteprima-' + t.id, difficulty: 'normale', teamsAllied: false });
+      const evs = r.phases.flatMap((p) => p.events).filter((e) => !e.note);
+      const pick = [evs.find((e) => e.cat === 'kill' || e.cat === 'death'), evs.find((e) => e.cat === 'ally'), evs.find((e) => e.cat === 'item' || e.cat === 'none')].filter(Boolean);
+      sample = pick.map((e) => evHTML(e, r.tributes, t, false, true)).join('');
+    } catch (e) { sample = ''; }
+    $('#arenaPreview').innerHTML =
+      '<div class="apv-head"><span class="gl" aria-hidden="true">' + t.glyph + '</span><div><div class="eyebrow">' + pt.events + ' eventi · ' + pt.disasters + ' disastri' + (t.soft ? ' · nessuno muore' : '') + '</div><h2>' + esc(t.name) + '</h2></div></div>' +
+      '<p class="muted">' + esc(t.intro.b) + ' ' + esc(t.tag) + '</p>' +
+      '<div class="apv-grid">' +
+        '<div><h3>Luoghi</h3><ul>' + t.lex.luogo.map((x) => '<li>' + esc(strip(x)) + '</li>').join('') + '</ul></div>' +
+        '<div><h3>' + (t.soft ? 'Armi improprie' : 'Armi') + '</h3><ul>' + t.lex.arma.slice(0, 6).map((x) => '<li>' + esc(strip(x)) + '</li>').join('') + '</ul></div>' +
+        '<div><h3>Pericoli</h3><ul>' + t.lex.mostro.map((x) => '<li>' + esc(strip(x)) + '</li>').join('') + '</ul></div>' +
+      '</div>' +
+      '<div><h3 class="sub" style="margin-bottom:8px">Alcuni disastri</h3><div class="chips">' + dz.slice(0, 10).map((x) => '<span class="chip dim">' + esc(x) + '</span>').join('') + '<span class="chip dim">e altri ' + Math.max(0, dz.length - 10) + '</span></div></div>' +
+      (sample ? '<div class="sample"><h3 class="sub">Un assaggio' + (S.cast.length >= 4 ? ' con il tuo cast' : '') + '</h3>' + sample + '</div>' : '');
+  }
+  function renderStartSum() {
+    const t = THEMES[S.settings.theme];
+    $('#startSum').innerHTML = '<b>' + S.cast.length + '</b> concorrenti · <b>' + esc(t.name) + '</b> · difficoltà <b>' + DIFFS.find((d) => d[0] === S.settings.difficulty)[1].toLowerCase() + '</b>';
+    $('#startMsg').textContent = S.cast.length < 2 ? 'Servono almeno 2 concorrenti: aggiungili nella sezione Concorrenti, oppure prova una partita lampo.' : '';
+    $('#btnStart').disabled = S.cast.length < 2;
   }
   $('#themeList').addEventListener('click', (e) => {
-    const b = e.target.closest('.theme'); if (!b) return;
-    S.settings.theme = b.dataset.id; save();
-    $$('#themeList .theme').forEach((x) => x.setAttribute('aria-pressed', x === b));
-    updatePreview();
+    const b = e.target.closest('[data-theme]'); if (!b) return;
+    S.settings.theme = b.dataset.theme; save(); setHue(S.settings.theme);
+    $$('#themeList [data-theme]').forEach((x) => x.setAttribute('aria-checked', x === b));
+    renderPreview(); renderStartSum(); updatePreview();
   });
-  $('#diffSeg').addEventListener('click', (e) => { const b = e.target.closest('button'); if (!b) return; S.settings.difficulty = b.dataset.v; save(); $$('#diffSeg button').forEach((x) => x.setAttribute('aria-pressed', x === b)); });
-  $('#speedSeg').addEventListener('click', (e) => { const b = e.target.closest('button'); if (!b) return; S.settings.speed = b.dataset.v; save(); $$('#speedSeg button').forEach((x) => x.setAttribute('aria-pressed', x === b)); });
+  $('#diffSeg').addEventListener('click', (e) => { const b = e.target.closest('button'); if (!b) return; S.settings.difficulty = b.dataset.v; save(); $$('#diffSeg button').forEach((x) => x.setAttribute('aria-checked', x === b)); renderStartSum(); });
   $('#maxDays').addEventListener('input', (e) => { S.settings.maxDays = +e.target.value; $('#maxDaysOut').textContent = e.target.value; save(); });
   $('#seed').addEventListener('input', (e) => { S.settings.seed = e.target.value.slice(0, 60); save(); });
   $('#seedNew').addEventListener('click', () => { S.settings.seed = newSeed(); $('#seed').value = S.settings.seed; save(); });
   $('#teamsAllied').addEventListener('change', (e) => { S.settings.teamsAllied = e.target.checked; save(); });
-  $('#teamWin').addEventListener('change', (e) => { S.settings.teamWin = e.target.checked; save(); });
+  $('#teamWin').addEventListener('change', (e) => { S.settings.teamWin = e.target.checked; save(); if (e.target.checked && nTeams() < 2) toast('Con una sola squadra la vittoria di squadra finisce subito: dividi il cast in più squadre.'); });
 
   // eventi personalizzati
-  const PH_LABEL = { tutte: 'Tutte', b: 'Inizio', d: 'Giorno', n: 'Notte', f: 'Festino' };
+  const PH_LABEL = { tutte: 'Sempre', b: 'Inizio', d: 'Giorno', n: 'Notte', f: 'Festino' };
   function renderCustomForm() {
-    const n = +$('#cN').value;
-    const ls = 'ABCD'.slice(0, n).split('');
-    const prevDies = $$('#cDies input:checked').map((x) => x.value);
-    const prevKiller = $('#cKiller').value;
+    const n = +$('#cN').value, ls = 'ABCD'.slice(0, n).split('');
+    const prevDies = $$('#cDies input:checked').map((x) => x.value), prevK = $('#cKiller').value;
     $('#cDies').innerHTML = ls.map((l) => '<label for="cd-' + l + '"><input type="checkbox" id="cd-' + l + '" value="' + l + '"' + (prevDies.includes(l) ? ' checked' : '') + '>' + l + '</label>').join('');
-    $('#cKiller').innerHTML = '<option value="">Nessuno</option>' + ls.map((l) => '<option' + (prevKiller === l ? ' selected' : '') + '>' + l + '</option>').join('');
+    $('#cKiller').innerHTML = '<option value="">Nessuno</option>' + ls.map((l) => '<option' + (prevK === l ? ' selected' : '') + '>' + l + '</option>').join('');
     updatePreview();
   }
-  function readCustom() {
-    return { phase: $('#cPhase').value, n: +$('#cN').value, text: $('#cText').value.trim(), dies: $$('#cDies input:checked').map((x) => x.value), killer: $('#cKiller').value };
-  }
+  const readCustom = () => ({ phase: $('#cPhase').value, n: +$('#cN').value, text: $('#cText').value.trim(), dies: $$('#cDies input:checked').map((x) => x.value), killer: $('#cKiller').value });
   function validateCustom(c) {
     if (!c.text) return 'Scrivi il testo dell\'evento.';
-    if (!c.text.includes('{A}')) return 'Il testo deve contenere almeno {A}.';
-    const ls = 'ABCD'.slice(0, c.n);
-    for (const l of ls) if (!c.text.includes('{' + l + '}')) return 'Con ' + c.n + ' concorrenti il testo deve nominare anche {' + l + '}.';
+    for (const l of 'ABCD'.slice(0, c.n)) if (!c.text.includes('{' + l + '}')) return 'Con ' + c.n + ' concorrenti il testo deve nominare anche {' + l + '}.';
     if (c.killer && !c.dies.filter((x) => x !== c.killer).length) return 'Hai scelto chi uccide: indica anche chi muore.';
-    if (c.killer && c.dies.includes(c.killer)) return 'Chi uccide non può anche morire nello stesso evento.';
+    if (c.killer && c.dies.includes(c.killer)) return 'Chi uccide non può morire nello stesso evento.';
     try { L.parseLine(L.customToLine(c), 'custom'); } catch (e) { return e.message; }
     return null;
   }
@@ -416,229 +562,297 @@
     try { $('#cPreview').innerHTML = L.previewCustom(c, S.settings.theme); } catch (e) { $('#cPreview').textContent = e.message; }
   }
   function renderCustomList() {
+    $('#customCount').textContent = S.custom.length ? '· ' + S.custom.length : '';
     $('#cList').innerHTML = S.custom.length
-      ? S.custom.map((c) => '<div class="citem" data-id="' + esc(c.id) + '"><span class="tag">' + PH_LABEL[c.phase] + ' · ' + c.n + (c.dies.length ? ' · letale' : '') + '</span><span>' + esc(c.text) + '</span><button class="x" type="button" data-act="cdel" aria-label="Elimina evento" style="border:0;background:none;cursor:pointer;color:var(--muted)">✕</button></div>').join('')
-      : '<p class="help">Nessun evento personalizzato. Quelli che aggiungi compaiono più spesso di quelli di base.</p>';
+      ? S.custom.map((c) => '<div class="citem" data-id="' + esc(c.id) + '"><span class="tag">' + PH_LABEL[c.phase] + ' · ' + c.n + (c.dies.length ? ' · letale' : '') + '</span><span class="txt">' + esc(c.text) + '</span><button class="x" type="button" data-act="cdel" aria-label="Elimina evento">✕</button></div>').join('')
+      : '<p class="help">Nessun evento personalizzato. Quelli che aggiungi escono più spesso di quelli di base.</p>';
   }
   $('#cN').addEventListener('change', renderCustomForm);
   ['cText', 'cKiller', 'cPhase'].forEach((id) => $('#' + id).addEventListener('input', updatePreview));
   $('#cDies').addEventListener('change', updatePreview);
   $('#cAdd').addEventListener('click', () => {
-    const c = readCustom(); const err = validateCustom(c);
+    const c = readCustom(), err = validateCustom(c);
     if (err) { $('#cMsg').textContent = err; return; }
     S.custom.push(sanitizeCustom(c)); save();
     $('#cText').value = ''; $('#cMsg').textContent = 'Evento aggiunto.';
     renderCustomList(); updatePreview();
   });
-  $('#cList').addEventListener('click', (e) => {
-    const b = e.target.closest('[data-act="cdel"]'); if (!b) return;
-    const id = b.closest('.citem').dataset.id;
-    S.custom = S.custom.filter((c) => c.id !== id); save(); renderCustomList();
-  });
+  $('#cList').addEventListener('click', (e) => { const b = e.target.closest('[data-act="cdel"]'); if (!b) return; S.custom = S.custom.filter((c) => c.id !== b.closest('.citem').dataset.id); save(); renderCustomList(); });
 
   // avvio
+  function runSim(cfg) {
+    try { SIM = L.simulate(cfg); } catch (e) { toast('Simulazione non riuscita: ' + e.message); return false; }
+    BY = Object.fromEntries(SIM.tributes.map((t) => [t.id, t]));
+    S.run = { cfg, phase: 0, seen: 0 }; lastRendered = -1; save();
+    if (location.hash === '#diretta') route(); else location.hash = '#diretta';
+    return true;
+  }
   function startRun(seed) {
     if (S.cast.length < 2) { toast('Servono almeno 2 concorrenti.'); location.hash = '#cast'; return; }
     S.cast.forEach((t, i) => { if (!t.name.trim()) t.name = 'Concorrente ' + (i + 1); });
-    const sd = seed || S.settings.seed || newSeed();
-    S.settings.seed = sd;
-    const cfg = { cast: JSON.parse(JSON.stringify(S.cast)), theme: S.settings.theme, difficulty: S.settings.difficulty, seed: sd, maxDays: S.settings.maxDays, teamsAllied: S.settings.teamsAllied, teamWin: S.settings.teamWin, custom: S.custom.slice() };
-    try { SIM = L.simulate(cfg); } catch (e) { toast('Simulazione non riuscita: ' + e.message); return; }
-    S.run = { cfg, phase: 0 };
-    lastRendered = -1; save();
-    if (location.hash === '#diretta') renderLive(true); else location.hash = '#diretta';
+    S.settings.seed = seed || S.settings.seed || newSeed();
+    runSim({ cast: JSON.parse(JSON.stringify(S.cast)), theme: S.settings.theme, difficulty: S.settings.difficulty, seed: S.settings.seed, maxDays: S.settings.maxDays, teamsAllied: S.settings.teamsAllied, teamWin: S.settings.teamWin, custom: S.custom.slice() });
   }
   $('#btnStart').addEventListener('click', () => startRun());
 
   /* =============== DIRETTA =============== */
-  const KIND_LABEL = { b: 'Apertura', d: 'Giorno', n: 'Notte', f: 'Evento speciale', dis: 'Evento dell\'arena', fallen: 'Bilancio', finale: 'Finale' };
-  const tById = () => Object.fromEntries(SIM.tributes.map((t) => [t.id, t]));
-
+  function evHTML(e, tributes, theme, anim, plain) {
+    const by = tributes ? Object.fromEntries(tributes.map((t) => [t.id, t])) : BY;
+    if (e.note) return '<div class="ev note' + (anim ? ' in' : '') + '"><p>' + e.html + '</p></div>';
+    const cat = e.cat || 'none';
+    const lbl = CAT[cat][theme.soft ? 1 : 0];
+    const avs = '<span class="avs">' + e.ids.slice(0, 4).map((id) => avHTML(by[id], { dead: e.deaths.includes(id), btn: !plain })).join('') + '</span>';
+    const chip = lbl ? '<span class="cat">' + IC[cat] + (e.deaths.length > 1 && (cat === 'kill' || cat === 'death') ? e.deaths.length + ' ' + (theme.soft ? 'fuori' : 'morti') : lbl) + '</span>' : '<span></span>';
+    return '<div class="ev' + (e.deaths.length ? ' lethal' : '') + (anim ? ' in' : '') + '" style="--cc:var(--c-' + cat + ')">' + avs + '<p>' + (plain ? e.html.replace(/<b class="nm"[^>]*>/g, '<b>') : linkify(e.html)) + '</p>' + chip + '</div>';
+  }
   function renderLive(fromRoute) {
-    const has = !!SIM;
-    $('#liveEmpty').hidden = has; $('#liveBody').hidden = !has;
-    if (!has) return;
-    const theme = THEMES[SIM.theme];
+    $('#liveEmpty').hidden = !!SIM; $('#liveBody').hidden = !SIM;
+    if (!SIM) return;
+    const theme = THEMES[SIM.theme], soft = !!theme.soft;
     const P = SIM.phases, i = Math.max(0, Math.min(P.length - 1, S.run.phase || 0));
-    S.run.phase = i;
-    const ph = P[i], by = tById();
-    const total = SIM.tributes.length;
-    const forward = i === lastRendered + 1 && !fromRoute;
+    S.run.phase = i; S.run.seen = Math.max(S.run.seen || 0, i);
+    const ph = P[i], total = SIM.tributes.length;
+    const forward = !fromRoute && i === lastRendered + 1;
     lastRendered = i;
 
-    $('#phEyebrow').textContent = theme.name + ' · ' + KIND_LABEL[ph.kind] + ' · fase ' + (i + 1) + ' di ' + P.length;
-    $('#phTitle').textContent = ph.kind === 'fallen' ? ph.title + ' · Giorno ' + ph.day : ph.title;
+    $('#bcArena').textContent = theme.glyph + ' ' + theme.name;
+    $('#bcPhase').textContent = 'Fase ' + (i + 1) + ' / ' + P.length;
+    $('#bcKind').textContent = KIND[ph.kind] + (ph.day ? ' · giorno ' + ph.day : '');
+    $('#phTitle').textContent = ph.title;
     $('#phIntro').textContent = ph.intro || '';
-    const aliveN = ph.snap.alive.length;
-    $('#aliveBig').innerHTML = aliveN + '<small>/' + total + '</small>';
+    $('#aliveBig').textContent = ph.snap.alive.length; $('#aliveTot').textContent = '/' + total;
+    $('#aliveLbl').textContent = soft ? 'ancora in gioco' : 'superstiti';
     const deadNow = SIM.tributes.filter((t) => !t.alive && t.deathPhase <= i).sort((a, b) => a.order - b.order);
-    const newly = new Set(ph.events.flatMap((e) => e.deaths));
-    $('#tally').innerHTML = deadNow.map((t) => '<i class="d' + (newly.has(t.id) && forward ? ' new' : '') + '"></i>').join('') + '<i></i>'.repeat(total - deadNow.length);
+    const newly = new Set(ph.kind === 'fallen' ? [] : ph.events.flatMap((e) => e.deaths));
+    $('#tally').innerHTML = deadNow.map((t) => '<i class="d' + (newly.has(t.id) && forward ? ' new' : '') + '" title="' + esc(t.name) + '"></i>').join('') + '<i></i>'.repeat(total - deadNow.length);
 
-    let body = '';
+    // timeline per giorno
+    const days = [];
+    P.forEach((p, k) => { const d = p.day || 1; let g = days.find((x) => x.d === d); if (!g) days.push((g = { d, ks: [] })); g.ks.push(k); });
+    $('#timeline').innerHTML = days.map((g) => '<div class="tday"><span>G' + g.d + '</span><div>' + g.ks.map((k) => {
+      const p = P[k]; const dn = p.kind === 'fallen' ? p.deaths.length : p.events.reduce((s, e) => s + e.deaths.length, 0);
+      const seen = k <= (S.run.seen || 0);
+      return '<button type="button" class="tph' + (k === i ? ' cur' : seen ? ' seen' : ' locked') + '" data-k="' + k + '" title="' + esc(p.title) + '" aria-label="Fase ' + (k + 1) + ': ' + esc(p.title) + '">' + IC[p.kind] + (dn && seen && p.kind !== 'fallen' ? '<span class="dn">' + dn + '</span>' : '') + '</button>';
+    }).join('') + '</div></div>').join('');
+    const cur = $('#timeline .tph.cur'); if (cur) { const tl = $('#timeline'); tl.scrollLeft = Math.max(0, cur.offsetLeft - tl.clientWidth / 2); }
+
+    // contenuto
     if (ph.kind === 'fallen') {
-      body = ph.deaths.length
-        ? '<div class="fallen-grid">' + ph.deaths.map((id) => { const t = by[id]; return '<div class="fcard' + (forward ? ' ev in' : '') + '">' + avHTML(t, 'dead') + '<b>' + esc(t.name) + '</b><small>Squadra ' + t.team + (t.killerIds.length ? ' · per mano di ' + esc(t.killerIds.map((k) => by[k].name).join(', ')) : '') + '</small></div>'; }).join('') + '</div>'
-        : '<div class="panel empty">' + esc(ph.intro) + '</div>';
+      $('#phBody').innerHTML = '<div class="memorial' + (forward ? ' rise' : '') + '"><h2>' + (soft ? 'Fuori dai giochi' : 'In memoria') + '</h2>' +
+        (ph.deaths.length ? '<div class="memgrid">' + ph.deaths.map((id) => { const t = BY[id]; return '<button type="button" class="mem" data-prof="' + esc(id) + '">' + avHTML(t, { dead: true }) + '<b>' + esc(t.name) + '</b><small>Squadra ' + t.team + (t.killerIds.length ? '<br>per mano di ' + esc(t.killerIds.map((k) => BY[k].name).join(', ')) : '<br>vittima dell\'arena') + '</small><span class="mono">' + t.kills + ' ' + (soft ? 'elim.' : 'ucc.') + '</span></button>'; }).join('') + '</div>' : '<div class="emptyday">' + esc(ph.intro) + '</div>') + '</div>';
     } else {
-      body = '<div class="events">' + ph.events.map((e, k) => {
-        const avs = e.note ? '' : '<span class="avs">' + e.ids.slice(0, 5).map((id) => avHTML(by[id], e.deaths.includes(id) ? 'dead' : '')).join('') + '</span>';
-        const badge = e.deaths.length ? '<span class="skull">' + (theme.soft ? 'Fuori' : (e.deaths.length > 1 ? e.deaths.length + ' morti' : 'Morte')) + '</span>' : '';
-        return '<div class="ev' + (e.deaths.length ? ' lethal' : '') + (e.note ? ' note' : '') + (forward ? ' in' : '') + '" style="animation-delay:' + Math.min(k * 70, 1400) + 'ms">' + avs + '<p>' + e.html + '</p>' + badge + '</div>';
-      }).join('') + '</div>';
+      $('#phBody').innerHTML = ph.events.map((e, k) => evHTML(e, null, theme, forward).replace('class="ev', 'style="animation-delay:' + Math.min(k * 90, 1800) + 'ms" class="ev')).join('');
     }
-    $('#phBody').innerHTML = body;
+    renderSide(i);
 
-    // mappa
-    const zones = theme.lex.luogo.map((z) => z.replace(/^(il |lo |la |l'|i |gli |le )/i, ''));
-    const lethalZones = {};
-    ph.events.forEach((e) => e.deaths.length && e.ids.forEach((id) => (lethalZones[ph.snap.zones[id]] = 1)));
-    $('#map').innerHTML = zones.map((z, zi) => {
-      const here = ph.snap.alive.filter((id) => ph.snap.zones[id] === zi);
-      return '<div class="zone' + (lethalZones[zi] ? ' hot' : '') + '"><span class="zn">' + esc(z) + '</span><div class="dots">' + here.map((id) => avHTML(by[id])).join('') + '</div></div>';
-    }).join('');
-    $('#mapNote').textContent = Object.keys(lethalZones).length ? 'riquadro = scontri' : '';
-
-    // caduti
-    $('#feedTitle').firstChild.textContent = ((theme.labels && theme.labels.dead) || 'Caduti') + ' ';
-    $('#feedCount').textContent = deadNow.length;
-    $('#feed').innerHTML = deadNow.length ? deadNow.slice().reverse().map((t) => '<div>' + avHTML(t, 'dead') + '<span><b>' + esc(t.name) + '</b>' + (t.killerIds.length ? ' <span class="muted">da ' + esc(t.killerIds.map((k) => by[k].name).join(', ')) + '</span>' : '') + '</span><span class="d">G' + t.deathDay + '</span></div>').join('') : '<span class="muted">Ancora nessuno.</span>';
-    // in gara
-    const aliveSet = new Set(ph.snap.alive);
-    $('#roster').innerHTML = SIM.tributes.map((t) => avHTML(t, aliveSet.has(t.id) ? '' : 'dead')).join('');
-
-    // progressi
-    $('#progress').innerHTML = P.map((p, k) => '<button type="button" class="' + (k === i ? 'cur' : k < i ? 'done' : p.kind === 'fallen' ? 'fallen' : '') + '" data-k="' + k + '" aria-label="Fase ' + (k + 1) + ': ' + esc(p.title) + '" title="' + esc(p.title) + '"></button>').join('');
-    $('#prevBtn').disabled = i === 0;
     const last = i === P.length - 1;
-    $('#nextBtn').textContent = last ? 'Vedi l\'esito →' : 'Avanti ▶';
-    $('#playBtn').textContent = playTimer ? 'Pausa' : 'Riproduci';
-    $('#playBtn').disabled = last;
+    $('#prevBtn').disabled = i === 0;
+    $('#nextLbl').textContent = last ? 'Esito' : 'Avanti';
+    $$('#speedSeg button').forEach((b) => b.setAttribute('aria-pressed', b.dataset.v === S.settings.speed));
+    syncPlay();
     save();
   }
-  function go(k) {
-    if (!SIM) return;
-    S.run.phase = Math.max(0, Math.min(SIM.phases.length - 1, k));
-    renderLive(false);
+  function renderSide(i) {
+    const theme = THEMES[SIM.theme], ph = SIM.phases[i], soft = !!theme.soft;
+    $$('.stabs button').forEach((b) => b.setAttribute('aria-selected', b.dataset.s === sideTab));
+    const aliveSet = new Set(ph.snap.alive);
+    let h = '';
+    if (sideTab === 'map') {
+      const zones = theme.lex.luogo.map((z) => z.replace(/^(il |lo |la |l'|i |gli |le )/i, ''));
+      const hot = {};
+      ph.events.forEach((e) => e.deaths.length && e.ids.forEach((id) => (hot[ph.snap.zones[id]] = 1)));
+      h = '<div class="map">' + zones.map((z, zi) => {
+        const here = ph.snap.alive.filter((id) => ph.snap.zones[id] === zi);
+        return '<div class="zone' + (hot[zi] ? ' hot' : '') + '"><span class="zn"><span>' + esc(z) + '</span></span><div class="dots">' + here.map((id) => avHTML(BY[id], { btn: true })).join('') + '</div></div>';
+      }).join('') + '</div><p class="help" style="margin-top:10px">Tocca un volto per aprire la scheda del concorrente.</p>';
+    } else if (sideTab === 'fallen') {
+      const dead = SIM.tributes.filter((t) => !t.alive && t.deathPhase <= i).sort((a, b) => b.order - a.order);
+      h = dead.length ? '<div class="plist">' + dead.map((t) => '<button type="button" class="prow" data-prof="' + esc(t.id) + '">' + avHTML(t, { dead: true }) + '<span style="min-width:0"><span class="pn">' + esc(t.name) + '</span><span class="ps">' + (t.killerIds.length ? 'per mano di ' + esc(t.killerIds.map((k) => BY[k].name).join(', ')) : 'vittima dell\'arena') + '</span></span><span class="pk">G' + t.deathDay + '</span></button>').join('') + '</div>' : '<p class="help">Ancora nessuno.</p>';
+    } else if (sideTab === 'alive') {
+      const al = SIM.tributes.filter((t) => aliveSet.has(t.id)).sort((a, b) => (ph.snap.kills[b.id] || 0) - (ph.snap.kills[a.id] || 0));
+      h = '<div class="plist">' + al.map((t) => {
+        const st = ph.snap.st[t.id] || [], inv = ph.snap.inv[t.id] || [];
+        const sub = [st.length ? st.map((s) => L.STATUS_LABEL[s] || s).join(', ') : 'in forma', inv.length ? plural(inv.length, 'oggetto', 'oggetti') : ''].filter(Boolean).join(' · ');
+        return '<button type="button" class="prow" data-prof="' + esc(t.id) + '">' + avHTML(t) + '<span style="min-width:0"><span class="pn">' + esc(t.name) + '</span><span class="ps">' + esc(sub) + '</span></span><span class="pk">' + (ph.snap.kills[t.id] || 0) + (soft ? ' elim.' : ' ucc.') + '</span></button>';
+      }).join('') + '</div>';
+    } else {
+      const groups = {};
+      ph.snap.alive.forEach((id) => { const g = ph.snap.allies[id]; if (g != null) (groups[g] = groups[g] || []).push(id); });
+      const gs = Object.values(groups).filter((g) => g.length > 1);
+      const solo = ph.snap.alive.filter((id) => ph.snap.allies[id] == null);
+      h = (gs.length ? gs.map((g, k) => '<div class="agroup"><h4>Alleanza ' + (k + 1) + ' · ' + g.length + '</h4><div class="row">' + g.map((id) => avHTML(BY[id], { btn: true })).join('') + '</div></div>').join('') : '<p class="help" style="margin-bottom:10px">Nessuna alleanza attiva.</p>') +
+        (solo.length ? '<div class="agroup"><h4>Da soli · ' + solo.length + '</h4><div class="row">' + solo.map((id) => avHTML(BY[id], { btn: true })).join('') + '</div></div>' : '');
+    }
+    $('#sideBody').innerHTML = h;
   }
+  $('.stabs').addEventListener('click', (e) => { const b = e.target.closest('button'); if (!b || !SIM) return; sideTab = b.dataset.s; renderSide(S.run.phase); });
+  function go(k) { if (!SIM) return; S.run.phase = Math.max(0, Math.min(SIM.phases.length - 1, k)); renderLive(false); }
   function next() {
     if (!SIM) return;
     if (S.run.phase >= SIM.phases.length - 1) { stopPlay(); location.hash = '#esito'; return; }
     go(S.run.phase + 1);
     if (S.run.phase >= SIM.phases.length - 1) stopPlay();
+    if (window.scrollY > 300 && !playTimer) $('.broadcast').scrollIntoView({ behavior: reduced ? 'auto' : 'smooth' });
   }
-  function stopPlay() { if (playTimer) { clearInterval(playTimer); playTimer = null; } const b = $('#playBtn'); if (b) b.textContent = 'Riproduci'; }
+  function syncPlay() { $('#playIcon').innerHTML = playTimer ? IC.pause : IC.play; $('#playBtn').setAttribute('aria-label', playTimer ? 'Pausa' : 'Riproduci'); }
+  function stopPlay() { if (playTimer) { clearInterval(playTimer); playTimer = null; } if ($('#playIcon')) syncPlay(); }
+  function startPlay() { stopPlay(); playTimer = setInterval(next, SPEED[S.settings.speed] || 3800); syncPlay(); }
   $('#nextBtn').addEventListener('click', next);
   $('#prevBtn').addEventListener('click', () => { stopPlay(); lastRendered = -2; go(S.run.phase - 1); });
-  $('#playBtn').addEventListener('click', () => {
-    if (playTimer) return stopPlay();
-    playTimer = setInterval(next, SPEED[S.settings.speed] || 4000);
-    $('#playBtn').textContent = 'Pausa';
-    next();
-  });
-  $('#progress').addEventListener('click', (e) => { const b = e.target.closest('button'); if (!b) return; stopPlay(); lastRendered = -2; go(+b.dataset.k); });
+  $('#playBtn').addEventListener('click', () => { if (playTimer) return stopPlay(); if (S.run.phase >= SIM.phases.length - 1) go(0); startPlay(); next(); });
+  $('#speedSeg').addEventListener('click', (e) => { const b = e.target.closest('button'); if (!b) return; S.settings.speed = b.dataset.v; save(); $$('#speedSeg button').forEach((x) => x.setAttribute('aria-pressed', x === b)); if (playTimer) startPlay(); });
+  $('#timeline').addEventListener('click', (e) => { const b = e.target.closest('.tph'); if (!b) return; stopPlay(); lastRendered = -2; go(+b.dataset.k); });
   document.addEventListener('keydown', (e) => {
-    if ($('#v-diretta').hidden || /input|textarea|select/i.test(e.target.tagName) || $('#ioDlg').open) return;
+    if ($('#v-diretta').hidden || /input|textarea|select/i.test(e.target.tagName) || $$('dialog').some((d) => d.open)) return;
     if (e.key === 'ArrowRight') { e.preventDefault(); next(); }
-    if (e.key === 'ArrowLeft') { e.preventDefault(); stopPlay(); lastRendered = -2; go(S.run.phase - 1); }
+    else if (e.key === 'ArrowLeft') { e.preventDefault(); stopPlay(); lastRendered = -2; go(S.run.phase - 1); }
+    else if (e.key === ' ' && e.target === document.body) { e.preventDefault(); $('#playBtn').click(); }
   });
+
+  /* =============== SCHEDA CONCORRENTE =============== */
+  function openProfile(id) {
+    const t = BY[id]; if (!t) return;
+    const theme = THEMES[SIM.theme], soft = !!theme.soft;
+    const atRes = curView === 'esito';
+    const i = atRes ? SIM.phases.length - 1 : S.run.phase || 0;
+    const snap = SIM.phases[i].snap;
+    const dead = !t.alive && t.deathPhase <= i;
+    const kills = atRes ? t.kills : snap.kills[id] || 0;
+    const hist = [];
+    SIM.phases.slice(0, i + 1).forEach((p, k) => p.events.forEach((e) => { if (e.ids.includes(id)) hist.push({ e, p, k }); }));
+    const ally = snap.allies[id] != null && !dead ? snap.alive.filter((x) => x !== id && snap.allies[x] === snap.allies[id]) : [];
+    const st = dead ? [] : snap.st[id] || [], inv = dead ? [] : snap.inv[id] || [];
+    const winner = atRes && t.alive;
+    $('#profBody').innerHTML =
+      '<div class="dh"><h2 id="h-prof">' + esc(t.name) + '</h2><button class="iconbtn" data-close type="button" aria-label="Chiudi">✕</button></div>' +
+      '<div class="db">' +
+        '<div class="profhead">' + avHTML(t, { dead }) + '<div class="ps"><span class="status-pill ' + (dead ? 'dead' : 'alive') + '">' + (winner ? (soft ? 'Ha vinto' : G3(t.gender, 'Vincitore', 'Vincitrice', 'Vincitorə')) : dead ? (soft ? 'Fuori dai giochi' : G3(t.gender, 'Morto', 'Morta', 'Mortə')) + ' · giorno ' + t.deathDay : 'In gara') + '</span>' +
+          '<span class="muted">Squadra ' + t.team + (atRes ? ' · ' + t.rank + '° posto' : '') + '</span>' +
+          '<div class="chips">' + (t.traits.length ? t.traits.map((x) => '<span class="chip" title="' + esc(TRAITS[x].desc) + '">' + esc(TRAITS[x].name) + '</span>').join('') : '<span class="chip dim">Nessun tratto</span>') + '</div></div></div>' +
+        '<div class="pstats"><div><b>' + kills + '</b><span>' + (soft ? 'eliminazioni' : 'uccisioni') + '</span></div><div><b>' + hist.length + '</b><span>eventi vissuti</span></div><div><b>' + (dead ? t.deathDay : SIM.phases[i].day || 1) + '</b><span>' + (dead ? 'giorno dell\'uscita' : 'giorni in gara') + '</span></div></div>' +
+        (dead ? '<div><div class="sub" style="margin-bottom:6px">Come è andata</div><div class="ev lethal" style="--cc:var(--c-kill);grid-template-columns:minmax(0,1fr)"><p>' + linkify(t.deathHtml) + '</p></div></div>' : '') +
+        (!dead ? '<div class="row" style="gap:16px;align-items:flex-start">' +
+          '<div style="flex:1;min-width:140px"><div class="sub" style="margin-bottom:6px">Condizioni</div><div class="chips">' + (st.length ? st.map((s) => '<span class="chip st">' + esc(L.STATUS_LABEL[s] || s) + '</span>').join('') : '<span class="chip dim">In forma</span>') + '</div></div>' +
+          '<div style="flex:1;min-width:140px"><div class="sub" style="margin-bottom:6px">Zaino</div><div class="chips">' + (inv.length ? inv.map((x) => '<span class="chip dim">' + esc(x) + '</span>').join('') : '<span class="chip dim">Vuoto</span>') + '</div></div></div>' +
+          '<div><div class="sub" style="margin-bottom:6px">Alleati</div><div class="row">' + (ally.length ? ally.map((x) => avHTML(BY[x], { btn: true })).join('') : '<span class="help">Nessuno, per ora.</span>') + '</div></div>' : '') +
+        '<div><div class="sub" style="margin-bottom:8px">La sua storia' + (atRes ? '' : ' finora') + '</div><div class="ptl">' + (hist.length ? hist.map(({ e, p }) => '<div class="it" style="--cc:var(--c-' + (e.cat || 'none') + ')"><span>' + (p.kind === 'b' ? 'Inizio' : 'G' + p.day + ' ' + (p.kind === 'n' ? 'notte' : p.kind === 'd' ? 'giorno' : KIND[p.kind].toLowerCase())) + '</span><p>' + linkify(e.html) + '</p></div>').join('') : '<p class="help">Nessun evento ancora.</p>') + '</div></div>' +
+      '</div>';
+    if (!$('#profDlg').open) $('#profDlg').showModal();
+    $('#profDlg').scrollTop = 0;
+  }
 
   /* =============== ESITO =============== */
   function renderResults() {
-    const has = !!SIM;
-    $('#resEmpty').hidden = has; $('#resBody').hidden = !has;
-    if (!has) return;
-    const theme = THEMES[SIM.theme], by = tById(), soft = !!theme.soft;
-    const W = SIM.winners.map((id) => by[id]);
-    const kWord = soft ? 'eliminazion' : 'uccision';
-    const plural = (n, base) => n + ' ' + base + (n === 1 ? 'e' : 'i');
+    $('#resEmpty').hidden = !!SIM; $('#resBody').hidden = !SIM;
+    if (!SIM) return;
+    const theme = THEMES[SIM.theme], soft = !!theme.soft, st = SIM.stats;
+    const W = SIM.winners.map((id) => BY[id]);
+    const kN = (n) => n + ' ' + (soft ? (n === 1 ? 'eliminazione' : 'eliminazioni') : (n === 1 ? 'uccisione' : 'uccisioni'));
     let hero;
     if (W.length === 1) {
       const w = W[0];
-      hero = '<div class="hero panel">' + avHTML(w) + '<div style="min-width:0"><div class="eyebrow">' + esc(theme.name) + ' · ' + SIM.days + ' giorni · ' + SIM.tributes.length + ' concorrenti</div>' +
-        '<h1>' + esc(w.name) + '</h1><p><b>' + G3(w.gender, 'Ultimo', 'Ultima', 'Ultimə') + ' in piedi</b> con ' + plural(w.kills, kWord) + '. Squadra ' + w.team + (w.traits.length ? ' · ' + w.traits.map((x) => TRAITS[x].name).join(', ') : '') + '.</p></div></div>';
+      hero = '<div class="winhero">' + avHTML(w, { btn: true }) + '<div style="min-width:0"><div class="eyebrow">' + theme.glyph + ' ' + esc(theme.name) + ' · ' + plural(SIM.days, 'giorno', 'giorni') + ' · ' + SIM.tributes.length + ' concorrenti</div>' +
+        '<h1>' + esc(w.name) + '</h1><p><b style="color:var(--screen-ink)">' + G3(w.gender, 'Ultimo', 'Ultima', 'Ultimə') + ' in piedi.</b> Squadra ' + w.team + (w.traits.length ? ' · ' + w.traits.map((x) => TRAITS[x].name).join(', ') : '') + '.</p>' +
+        '<div class="wstats"><div><b>' + w.kills + '</b><span>' + (soft ? 'eliminazioni' : 'uccisioni') + '</span></div><div><b>' + w.events + '</b><span>eventi vissuti</span></div><div><b>' + w.alliancesFormed + '</b><span>alleanze</span></div><div><b>' + w.items + '</b><span>oggetti trovati</span></div></div></div></div>';
     } else if (W.length > 1) {
-      hero = '<div class="hero panel" style="grid-template-columns:minmax(0,1fr)"><div class="eyebrow">' + esc(theme.name) + ' · ' + SIM.days + ' giorni</div><h1>Vince la squadra ' + W[0].team + '</h1><div class="avs">' + W.map((w) => avHTML(w)).join('') + '</div><p>' + W.map((w) => esc(w.name) + ' (' + w.kills + ')').join(', ') + '.</p></div>';
-    } else {
-      hero = '<div class="hero panel" style="grid-template-columns:minmax(0,1fr)"><h1>Nessun superstite</h1><p>L\'arena non ha risparmiato nessuno.</p></div>';
-    }
-    const st = SIM.stats;
-    const fb = st.firstBlood ? by[st.firstBlood.victim] : null;
-    const tiles = [
-      [SIM.days, 'giorni nell\'arena'], [st.events, 'eventi raccontati'], [st.alliances, 'alleanze strette'],
-      [st.betrayals, 'tradimenti'], [st.killDeaths, soft ? 'eliminati da un rivale' : 'morti per mano altrui'], [st.envDeaths, soft ? 'eliminati dalle circostanze' : 'morti per colpa dell\'arena'],
-    ].map(([v, l]) => '<div class="tile panel"><b>' + v + '</b><span>' + l + '</span></div>').join('');
+      hero = '<div class="winhero" style="grid-template-columns:minmax(0,1fr)"><div><div class="eyebrow">' + theme.glyph + ' ' + esc(theme.name) + ' · ' + plural(SIM.days, 'giorno', 'giorni') + '</div><h1>Vince la squadra ' + W[0].team + '</h1><div class="teamavs">' + W.map((w) => avHTML(w, { btn: true })).join('') + '</div><p style="margin-top:12px">' + W.map((w) => esc(w.name) + ' (' + kN(w.kills) + ')').join(' · ') + '</p></div></div>';
+    } else hero = '<div class="winhero" style="grid-template-columns:minmax(0,1fr)"><div><h1>Nessun superstite</h1><p>L\'arena non ha risparmiato nessuno.</p></div></div>';
 
     const ranked = SIM.tributes.slice().sort((a, b) => a.rank - b.rank || b.kills - a.kills);
-    const rows = ranked.map((t) => '<tr class="' + (t.alive ? 'win' : '') + '"><td class="n">' + t.rank + '°</td><td><span class="who">' + avHTML(t, t.alive ? '' : 'dead') + esc(t.name) + '</span></td><td class="n">' + t.team + '</td><td class="n">' + t.kills + '</td>' +
-      '<td>' + (t.alive ? '<b>' + (W.length > 1 ? 'Squadra vincitrice' : G3(t.gender, 'Vincitore', 'Vincitrice', 'Vincitorə')) + '</b>' : t.killerIds.length ? esc(t.killerIds.map((k) => by[k].name).join(', ')) : '<span class="muted">L\'arena</span>') + '</td>' +
-      '<td class="n">' + (t.alive ? '–' : 'G' + t.deathDay) + '</td><td class="cause">' + (t.alive ? '' : t.deathHtml) + '</td></tr>').join('');
+    const podiumT = ranked.slice(0, 3);
+    const podium = podiumT.length >= 3 ? '<div class="podium">' + [podiumT[1], podiumT[0], podiumT[2]].map((t, k) => { const p = [2, 1, 3][k]; return '<button type="button" class="pod p' + p + '" data-prof="' + esc(t.id) + '">' + avHTML(t, { dead: !t.alive }) + '<b>' + esc(t.name) + '</b><small>' + kN(t.kills) + (t.alive ? '' : ' · G' + t.deathDay) + '</small><span class="step">' + p + '</span></button>'; }).join('') + '</div>' : '';
 
+    const awards = [];
+    const maxBy = (f) => SIM.tributes.slice().sort((a, b) => f(b) - f(a) || a.rank - b.rank)[0];
+    const killer = maxBy((t) => t.kills); if (killer && killer.kills) awards.push([soft ? 'La più temibile' : 'Il più letale', killer, kN(killer.kills)]);
+    if (st.firstBlood) { const v = BY[st.firstBlood.victim]; awards.push([soft ? 'Prima a uscire' : 'Primo sangue', v, st.firstBlood.killers.length ? 'per mano di ' + st.firstBlood.killers.map((k) => BY[k].name).join(', ') : 'vittima dell\'arena']); }
+    const trait = maxBy((t) => t.betrayals); if (trait && trait.betrayals) awards.push(['Il voltagabbana', trait, plural(trait.betrayals, 'tradimento', 'tradimenti')]);
+    const soc = maxBy((t) => t.alliancesFormed); if (soc && soc.alliancesFormed) awards.push(['Il diplomatico', soc, plural(soc.alliancesFormed, 'alleanza stretta', 'alleanze strette')]);
+    const busy = maxBy((t) => t.events); if (busy) awards.push(['Sempre in mezzo', busy, plural(busy.events, 'evento vissuto', 'eventi vissuti')]);
+    const loot = maxBy((t) => t.items); if (loot && loot.items) awards.push(['Il collezionista', loot, plural(loot.items, 'oggetto trovato', 'oggetti trovati')]);
+    const awardsH = '<div class="awards">' + awards.map(([a, t, d]) => '<button type="button" class="award card" data-prof="' + esc(t.id) + '">' + avHTML(t, { dead: !t.alive }) + '<span style="min-width:0"><span class="at">' + a + '</span><b>' + esc(t.name) + '</b><small>' + esc(d) + '</small></span></button>').join('') + '</div>';
+
+    // grafico dei superstiti
+    const P = SIM.phases, total = SIM.tributes.length;
+    const Wd = 640, Hd = 200, pl = 34, pr = 10, pt = 12, pb = 26;
+    const xs = (k) => pl + (P.length > 1 ? (k / (P.length - 1)) * (Wd - pl - pr) : 0);
+    const ys = (n) => pt + (1 - n / total) * (Hd - pt - pb);
+    const pts = P.map((p, k) => [xs(k), ys(p.snap.alive.length)]);
+    let path = 'M' + xs(0) + ' ' + ys(total);
+    pts.forEach(([x, y]) => (path += ' L' + x.toFixed(1) + ' ' + y.toFixed(1)));
+    const area = path + ' L' + xs(P.length - 1) + ' ' + ys(0) + ' L' + xs(0) + ' ' + ys(0) + ' Z';
+    const ticks = [];
+    let lastDay = 0; P.forEach((p, k) => { if (p.day !== lastDay) { lastDay = p.day; ticks.push('<line x1="' + xs(k) + '" x2="' + xs(k) + '" y1="' + pt + '" y2="' + (Hd - pb) + '" stroke="var(--line)" stroke-dasharray="2 3"/><text x="' + (xs(k) + 3) + '" y="' + (Hd - 8) + '">G' + p.day + '</text>'); } });
+    const yl = [total, Math.round(total / 2), 0].map((n) => '<text x="' + (pl - 6) + '" y="' + (ys(n) + 4) + '" text-anchor="end">' + n + '</text><line x1="' + pl + '" x2="' + (Wd - pr) + '" y1="' + ys(n) + '" y2="' + ys(n) + '" stroke="var(--line)"/>').join('');
+    const chart = '<div class="chart"><svg viewBox="0 0 ' + Wd + ' ' + Hd + '" role="img" aria-label="Superstiti fase per fase">' + yl + ticks.join('') + '<path d="' + area + '" fill="var(--accent)" fill-opacity=".14"/><path d="' + path + '" fill="none" stroke="var(--accent)" stroke-width="2.5" stroke-linejoin="round"/><circle cx="' + pts[pts.length - 1][0] + '" cy="' + pts[pts.length - 1][1] + '" r="5" fill="var(--accent)"/></svg></div>';
+
+    // momenti salienti
+    const all = []; P.forEach((p, k) => p.events.forEach((e) => all.push({ e, p, k })));
+    const hl = [];
+    const add = (x) => x && !hl.includes(x) && hl.push(x);
+    add(all.find((x) => x.e.deaths.length));
+    all.filter((x) => x.e.deaths.length >= 2).slice(0, 2).forEach(add);
+    all.filter((x) => x.e.cat === 'betray' && x.e.deaths.length).slice(0, 2).forEach(add);
+    all.filter((x) => x.p.kind === 'dis' && x.e.deaths.length).slice(0, 1).forEach(add);
+    add([...all].reverse().find((x) => x.e.deaths.length));
+    hl.sort((a, b) => a.k - b.k);
+    const hlH = '<div class="highlights">' + hl.slice(0, 7).map((x) => evHTML(x.e, null, theme, false).replace('<p>', '<p><span class="sub" style="display:block;margin-bottom:2px">' + esc(x.p.title) + '</span>')).join('') + '</div>';
+
+    const rows = ranked.map((t) => '<tr class="' + (t.alive ? 'win' : '') + '"><td class="n">' + t.rank + '°</td><td><button type="button" class="who" data-prof="' + esc(t.id) + '">' + avHTML(t, { dead: !t.alive }) + esc(t.name) + '</button></td><td class="n">' + t.team + '</td><td class="n">' + t.kills + '</td>' +
+      '<td>' + (t.alive ? '<b>' + (W.length > 1 ? 'Squadra vincitrice' : G3(t.gender, 'Vincitore', 'Vincitrice', 'Vincitorə')) + '</b>' : t.killerIds.length ? esc(t.killerIds.map((k) => BY[k].name).join(', ')) : '<span class="muted">L\'arena</span>') + '</td>' +
+      '<td class="n">' + (t.alive ? '–' : 'G' + t.deathDay) + '</td><td class="cause">' + (t.alive ? '' : linkify(t.deathHtml)) + '</td></tr>').join('');
     const killers = SIM.tributes.filter((t) => t.kills > 0).sort((a, b) => b.kills - a.kills).slice(0, 8);
     const maxK = Math.max(1, ...killers.map((t) => t.kills));
-    const kbars = killers.length ? killers.map((t) => '<div class="bar"><span class="lbl">' + esc(t.name) + '</span><span class="tr"><i style="width:' + (100 * t.kills / maxK) + '%;background:' + esc(t.color) + '"></i></span><span class="v">' + t.kills + '</span></div>').join('') : '<p class="muted">Nessuno ha eliminato un rivale.</p>';
-    const dd = []; for (let d = 1; d <= SIM.days; d++) dd.push([d, st.deathsByDay[d] || 0]);
-    const maxD = Math.max(1, ...dd.map((x) => x[1]));
-    const dbars = dd.map(([d, n]) => '<div class="bar dd"><span class="lbl">Giorno ' + d + '</span><span class="tr"><i style="width:' + (100 * n / maxD) + '%"></i></span><span class="v">' + n + '</span></div>').join('');
+    const kbars = killers.length ? killers.map((t) => '<div class="bar"><span class="lbl">' + esc(t.name) + '</span><span class="tr"><i style="width:' + (100 * t.kills / maxK) + '%;background:' + esc(t.color) + '"></i></span><span class="v">' + t.kills + '</span></div>').join('') : '<p class="help">Nessuno ha eliminato un rivale.</p>';
 
     $('#resBody').innerHTML = hero +
-      '<div class="tiles">' + tiles + '</div>' +
-      '<div class="row" style="margin-bottom:16px">' +
-        '<button class="btn primary" type="button" id="rAgain">Rigioca con un nuovo seme</button>' +
-        '<button class="btn" type="button" id="rCopy">Copia il riepilogo</button>' +
-        '<a class="btn" href="#diretta">Rivedi la diretta</a><a class="btn" href="#cast">Modifica il cast</a>' +
-        '<span class="help mono">seme: ' + esc(SIM.seed) + '</span>' +
-      '</div>' +
-      '<div class="res-grid">' +
-        '<div class="panel"><h2>Classifica</h2>' + (fb ? '<p class="help" style="margin:-4px 0 12px">Primo sangue: ' + esc(fb.name) + (st.firstBlood.killers.length ? ', per mano di ' + esc(st.firstBlood.killers.map((k) => by[k].name).join(', ')) : ', vittima dell\'arena') + '.</p>' : '') +
-          '<div class="tablewrap"><table><thead><tr><th>Pos.</th><th>Concorrente</th><th>Sq.</th><th>' + (soft ? 'Elim.' : 'Ucc.') + '</th><th>Per mano di</th><th>Giorno</th><th>Come è andata</th></tr></thead><tbody>' + rows + '</tbody></table></div></div>' +
-        '<div class="stack">' +
-          '<div class="panel"><h2>' + (soft ? 'Chi ha eliminato di più' : 'Chi ha ucciso di più') + '</h2><div class="bars">' + kbars + '</div></div>' +
-          '<div class="panel"><h2>' + ((theme.labels && theme.labels.dead) || 'Caduti') + ' per giorno</h2><div class="bars">' + dbars + '</div></div>' +
-          '<div class="panel poster"><h2>Locandina</h2><img id="posterImg" alt="Locandina della partita"><p class="help" style="margin-top:8px">Tieni premuto sull\'immagine (o clic destro) per salvarla.</p></div>' +
-        '</div>' +
-      '</div>';
-    $('#rAgain').addEventListener('click', () => { S.settings.seed = newSeed(); startRun(S.settings.seed); });
+      '<div class="resactions"><button class="btn primary lg" type="button" id="rAgain">Rigioca con un nuovo seme</button><button class="btn" type="button" id="rCopy">Copia il riepilogo</button><a class="btn" href="#diretta">Rivedi la diretta</a><a class="btn" href="#cast">Nuova partita</a><span class="help mono">seme ' + esc(SIM.seed) + '</span></div>' +
+      '<div class="resgrid"><div>' +
+        (podium ? '<section class="block card"><h2>Il podio</h2>' + podium + '</section>' : '') +
+        '<section class="block card"><h2>I premi della partita</h2>' + awardsH + '</section>' +
+        '<section class="block card"><h2>Momenti salienti</h2>' + hlH + '</section>' +
+        '<section class="block card"><h2>Classifica completa</h2><div class="tablewrap"><table><thead><tr><th>Pos.</th><th>Concorrente</th><th>Sq.</th><th>' + (soft ? 'Elim.' : 'Ucc.') + '</th><th>Per mano di</th><th>Giorno</th><th>Come è andata</th></tr></thead><tbody>' + rows + '</tbody></table></div></section>' +
+      '</div><div>' +
+        '<section class="block card"><h2>Superstiti nel tempo</h2>' + chart + '<p class="help" style="margin-top:8px">' + st.killDeaths + ' ' + (soft ? 'eliminati da un rivale' : 'morti per mano altrui') + ', ' + st.envDeaths + ' per colpa dell\'arena · ' + st.alliances + ' alleanze · ' + st.betrayals + ' tradimenti · ' + st.events + ' eventi.</p></section>' +
+        '<section class="block card"><h2>' + (soft ? 'Chi ha eliminato di più' : 'Chi ha ucciso di più') + '</h2><div class="bars">' + kbars + '</div></section>' +
+        '<section class="block card posterbox"><h2>Locandina</h2><img id="posterImg" alt="Locandina della partita"><p class="help" style="margin-top:8px">Tieni premuto sull\'immagine, o clic destro, per salvarla.</p></section>' +
+      '</div></div>';
+    $('#rAgain').addEventListener('click', () => { const cfg = Object.assign({}, S.run.cfg, { seed: newSeed() }); runSim(cfg); });
     $('#rCopy').addEventListener('click', () => copyText(summaryText(), 'Riepilogo copiato negli appunti.'));
     drawPoster().then((url) => { const im = $('#posterImg'); if (im && url) im.src = url; });
   }
-
   function summaryText() {
-    const theme = THEMES[SIM.theme], by = tById();
-    const W = SIM.winners.map((id) => by[id]);
+    const theme = THEMES[SIM.theme], W = SIM.winners.map((id) => BY[id]);
     const lines = ['LAST ONE STANDING · ' + theme.name, SIM.tributes.length + ' concorrenti · ' + SIM.days + ' giorni · seme ' + SIM.seed, ''];
-    if (W.length === 1) lines.push(G3(W[0].gender, 'Ultimo', 'Ultima', 'Ultimə') + ' in piedi: ' + W[0].name + ' (' + W[0].kills + ' ' + (theme.soft ? 'eliminazioni' : 'uccisioni') + ')');
+    if (W.length === 1) lines.push(G3(W[0].gender, 'Ultimo', 'Ultima', 'Ultimə') + ' in piedi: ' + W[0].name + ' (' + W[0].kills + ')');
     else if (W.length) lines.push('Vince la squadra ' + W[0].team + ': ' + W.map((w) => w.name).join(', '));
     lines.push('', 'Classifica:');
-    SIM.tributes.slice().sort((a, b) => a.rank - b.rank).forEach((t) => lines.push(t.rank + '. ' + t.name + ' — ' + t.kills + (t.alive ? '' : ' — ' + t.deathText)));
+    SIM.tributes.slice().sort((a, b) => a.rank - b.rank).forEach((t) => lines.push(t.rank + '. ' + t.name + ' · ' + t.kills + (t.alive ? '' : ' · ' + t.deathText)));
     return lines.join('\n');
   }
-
   async function drawPoster() {
     try { if (document.fonts && document.fonts.ready) await document.fonts.ready; } catch (e) { /* niente */ }
-    const theme = THEMES[SIM.theme], by = tById();
-    const W = SIM.winners.map((id) => by[id]);
+    const theme = THEMES[SIM.theme], W = SIM.winners.map((id) => BY[id]), h = theme.hue;
     const cv = document.createElement('canvas'); cv.width = 1080; cv.height = 1350;
     const g = cv.getContext('2d');
-    const gold = '#e3b04b', ink = '#e7e9ee', mute = '#9aa3b4';
-    g.fillStyle = '#0f1218'; g.fillRect(0, 0, 1080, 1350);
-    // tacche di conteggio
-    const total = SIM.tributes.length, tw = Math.min(18, 900 / total);
-    SIM.tributes.slice().sort((a, b) => (a.alive ? 1 : 0) - (b.alive ? 1 : 0) || a.order - b.order).forEach((t, i) => {
-      g.fillStyle = t.alive ? gold : '#f06a5c'; g.globalAlpha = t.alive ? 1 : 0.85;
-      g.fillRect(90 + i * tw, 1170, Math.max(3, tw - 5), 44);
-    });
+    const acc = 'hsl(' + h + ' 90% 62%)', ink = '#eef0f4', mute = 'hsl(' + h + ' 10% 66%)';
+    g.fillStyle = 'hsl(' + h + ' 30% 6%)'; g.fillRect(0, 0, 1080, 1350);
+    const rg = g.createRadialGradient(540, 560, 40, 540, 560, 760); rg.addColorStop(0, 'hsla(' + h + ',90%,55%,.45)'); rg.addColorStop(1, 'hsla(' + h + ',90%,55%,0)');
+    g.fillStyle = rg; g.fillRect(0, 0, 1080, 1350);
+    g.save(); g.translate(540, 560); g.fillStyle = 'hsla(' + h + ',80%,60%,.06)';
+    for (let a = 0; a < 30; a++) { g.rotate(Math.PI * 2 / 30); g.beginPath(); g.moveTo(0, 0); g.lineTo(900, -40); g.lineTo(900, 40); g.closePath(); g.fill(); }
+    g.restore();
+    const total = SIM.tributes.length, tw = Math.min(20, 900 / total);
+    SIM.tributes.slice().sort((a, b) => (a.alive ? 1 : 0) - (b.alive ? 1 : 0) || a.order - b.order).forEach((t, i) => { g.fillStyle = t.alive ? acc : '#ff5b4b'; g.globalAlpha = t.alive ? 1 : 0.7; g.fillRect(90 + i * tw, 1172, Math.max(3, tw - 5), 46); });
     g.globalAlpha = 1;
     const disp = '"Big Shoulders Display", "Arial Narrow", sans-serif', mono = '"JetBrains Mono", monospace', body = 'Barlow, sans-serif';
-    g.fillStyle = mute; g.font = '500 28px ' + mono; g.textAlign = 'left';
-    g.fillText((theme.name + ' · ' + SIM.days + ' giorni · ' + total + ' concorrenti').toUpperCase(), 90, 130);
-    g.fillStyle = gold; g.font = '900 120px ' + disp;
-    const head = W.length === 1 ? G3(W[0].gender, 'ULTIMO IN PIEDI', 'ULTIMA IN PIEDI', 'ULTIMƏ IN PIEDI') : W.length ? 'SQUADRA ' + W[0].team : 'NESSUN SUPERSTITE';
-    g.fillText(head, 84, 250);
+    g.fillStyle = mute; g.font = '500 26px ' + mono; g.textAlign = 'left';
+    g.fillText((theme.name + ' · ' + SIM.days + ' giorni · ' + total + ' concorrenti').toUpperCase(), 90, 120);
+    g.fillStyle = acc; g.font = '900 118px ' + disp;
+    g.fillText(W.length === 1 ? G3(W[0].gender, 'ULTIMO IN PIEDI', 'ULTIMA IN PIEDI', 'ULTIMƏ IN PIEDI') : W.length ? 'SQUADRA ' + W[0].team : 'NESSUN SUPERSTITE', 84, 236);
     const loadImg = (src) => new Promise((res) => { const im = new Image(); im.onload = () => res(im); im.onerror = () => res(null); im.src = src; });
     async function avatar(t, x, y, r) {
-      g.save(); g.beginPath(); g.arc(x, y, r, 0, Math.PI * 2); g.closePath();
-      g.fillStyle = t.color || '#888'; g.fill(); g.clip();
+      g.save(); g.beginPath(); g.arc(x, y, r, 0, Math.PI * 2); g.closePath(); g.fillStyle = t.color || '#888'; g.fill(); g.clip();
       const im = t.img ? await loadImg(t.img) : null;
       if (im) g.drawImage(im, x - r, y - r, r * 2, r * 2);
       else { g.fillStyle = '#fff'; g.font = '800 ' + Math.round(r * 0.8) + 'px ' + disp; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText(initials(t.name), x, y + r * 0.04); }
@@ -646,12 +860,12 @@
     }
     if (W.length === 1) {
       const w = W[0];
-      g.strokeStyle = gold; g.lineWidth = 10; g.beginPath(); g.arc(540, 560, 236, 0, Math.PI * 2); g.stroke();
-      await avatar(w, 540, 560, 222);
-      g.fillStyle = ink; g.textAlign = 'center'; g.font = '900 ' + (w.name.length > 14 ? 96 : 130) + 'px ' + disp;
-      g.fillText(w.name.toUpperCase(), 540, 930);
+      g.strokeStyle = acc; g.lineWidth = 12; g.beginPath(); g.arc(540, 560, 240, 0, Math.PI * 2); g.stroke();
+      await avatar(w, 540, 560, 224);
+      g.fillStyle = ink; g.textAlign = 'center'; g.font = '900 ' + (w.name.length > 14 ? 96 : 132) + 'px ' + disp;
+      g.fillText(w.name.toUpperCase(), 540, 935);
       g.fillStyle = mute; g.font = '500 38px ' + body;
-      g.fillText(w.kills + ' ' + (theme.soft ? (w.kills === 1 ? 'eliminazione' : 'eliminazioni') : (w.kills === 1 ? 'uccisione' : 'uccisioni')) + ' · squadra ' + w.team, 540, 995);
+      g.fillText(w.kills + ' ' + (theme.soft ? (w.kills === 1 ? 'eliminazione' : 'eliminazioni') : (w.kills === 1 ? 'uccisione' : 'uccisioni')) + ' · squadra ' + w.team, 540, 998);
     } else if (W.length) {
       const r = Math.min(150, 420 / W.length);
       for (let k = 0; k < W.length; k++) await avatar(W[k], 540 + (k - (W.length - 1) / 2) * (r * 2.2), 560, r);
@@ -660,34 +874,23 @@
     }
     g.textAlign = 'left';
     const top = SIM.tributes.filter((t) => t.kills > 0 && !t.alive).sort((a, b) => b.kills - a.kills).slice(0, 3);
-    if (top.length) {
-      g.fillStyle = mute; g.font = '500 24px ' + mono; g.fillText('I PIÙ PERICOLOSI TRA GLI SCONFITTI', 90, 1070);
-      g.fillStyle = ink; g.font = '700 34px ' + body;
-      g.fillText(top.map((t) => t.name + ' ' + t.kills).join('   ·   '), 90, 1118);
-    }
-    g.fillStyle = mute; g.font = '500 24px ' + mono;
-    g.fillText('LAST ONE STANDING · SEME ' + String(SIM.seed).toUpperCase().slice(0, 30), 90, 1280);
+    if (top.length) { g.fillStyle = mute; g.font = '500 23px ' + mono; g.fillText('I PIÙ PERICOLOSI TRA GLI SCONFITTI', 90, 1076); g.fillStyle = ink; g.font = '700 34px ' + body; g.fillText(top.map((t) => t.name + ' ' + t.kills).join('   ·   '), 90, 1124); }
+    g.fillStyle = mute; g.font = '500 23px ' + mono;
+    g.fillText('LAST ONE STANDING · SEME ' + String(SIM.seed).toUpperCase().slice(0, 30), 90, 1282);
     try { return cv.toDataURL('image/png'); } catch (e) { return ''; }
   }
 
   /* ---------------- avvio ---------------- */
   function boot(hot) {
     const had = load();
-    if (!had) {
-      S.cast = L.randomCast(24, 'benvenuto', 2).map(sanitizeTribute);
-      S.settings.seed = 'benvenuto-2026';
-    }
+    if (!had) { S.cast = L.randomCast(24, 'benvenuto', 2).map(sanitizeTribute); S.settings.seed = 'benvenuto-2026'; }
     if (!S.settings.seed) S.settings.seed = newSeed();
-    $('#teamSize').value = String(S.settings.teamSize || 2);
     applyUi();
-    renderCast();
     if (S.run && S.run.cfg) {
-      try { SIM = L.simulate(S.run.cfg); } catch (e) { SIM = null; S.run = null; }
-    } else if (!had && S.cast.length >= 2) {
-      const cfg = { cast: JSON.parse(JSON.stringify(S.cast)), theme: S.settings.theme, difficulty: S.settings.difficulty, seed: S.settings.seed, maxDays: S.settings.maxDays, teamsAllied: S.settings.teamsAllied, teamWin: S.settings.teamWin, custom: [] };
-      SIM = L.simulate(cfg); S.run = { cfg, phase: 0 };
+      try { SIM = L.simulate(S.run.cfg); BY = Object.fromEntries(SIM.tributes.map((t) => [t.id, t])); } catch (e) { SIM = null; S.run = null; }
     }
     if (hot && typeof hot.phase === 'number' && S.run) S.run.phase = hot.phase;
+    updateCounts();
     route();
   }
   const H = window.claude && window.claude.hot;

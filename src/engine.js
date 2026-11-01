@@ -92,6 +92,9 @@
     ev.kills.forEach((k) => k.v.forEach((v) => vic.add(v)));
     ev.victims = [...vic];
     ev.lethal = ev.victims.length > 0;
+    ev.cat = ev.kills.some((k) => k.betray) ? 'betray' : ev.kills.length ? 'kill' : ev.dies.length ? 'death' :
+      ev.fx.some((f) => f.t === 'br') ? 'betray' : ev.fx.some((f) => f.t === 'al') ? 'ally' : ev.fx.some((f) => f.t === 'cure') ? 'heal' :
+      ev.fx.some((f) => f.t === 'status') ? 'hurt' : ev.fx.some((f) => f.t === 'gain' || f.t === 'steal') ? 'item' : 'none';
     // tutte le lettere usate devono rientrare in n
     const used = new Set();
     for (const re of [/\{([A-F])\}/g, /\{arma:([A-F])\}/g, /\[([A-F]+):/g]) {
@@ -120,12 +123,27 @@
   }
 
   const PHASES = ['b', 'd', 'n', 'f', 'finale', 'ds', 'fallback'];
+  function parseDisasters(src, origin) {
+    if (!src) return [];
+    return src.split('\n').map((l) => l.trim()).filter(Boolean).map((l) => {
+      const p = l.split('|').map((x) => x.trim());
+      if (p.length < 5) throw new Error('Disastro incompleto: ' + l);
+      const st = p[5] || 'ferito';
+      return { n: p[0], intro: p[1], out: parseBlock('1 d:A | ' + p[2] + '\n1 s:A=' + st + ' | ' + p[3] + '\n1 | ' + p[4], origin) };
+    });
+  }
+  const poolCache = {};
   function buildPools(theme, custom) {
+    const key = theme.id + '|' + JSON.stringify(custom || []);
+    if (poolCache[key]) return poolCache[key];
     const src = theme.soft ? theme.pool : D.core;
+    const more = (D.more || {})[theme.id] || {};
     const pools = {};
     for (const k of PHASES) {
       pools[k] = parseBlock(src[k], theme.soft ? theme.id : 'base');
+      if (!theme.soft && D.coreExtra && D.coreExtra[k]) pools[k] = pools[k].concat(parseBlock(D.coreExtra[k], 'base'));
       if (!theme.soft && theme.extra && theme.extra[k]) pools[k] = pools[k].concat(parseBlock(theme.extra[k], theme.id));
+      if (more.extra && more.extra[k]) pools[k] = pools[k].concat(parseBlock(more.extra[k], theme.id));
     }
     (custom || []).forEach((c) => {
       if (!c || !c.text) return;
@@ -134,20 +152,31 @@
       const targets = c.phase === 'tutte' ? ['b', 'd', 'n', 'f'] : [c.phase];
       targets.forEach((p) => pools[p] && pools[p].push(ev));
     });
-    pools.disasters = (theme.disasters || []).map((d) => ({ n: d.n, intro: d.intro, out: parseBlock(d.out, theme.id) }));
+    pools.disasters = (theme.disasters || []).map((d) => ({ n: d.n, intro: d.intro, out: parseBlock(d.out, theme.id) }))
+      .concat(parseDisasters(more.dis, theme.id));
+    const ks = Object.keys(poolCache); if (ks.length > 30) delete poolCache[ks[0]];
+    poolCache[key] = pools;
     return pools;
   }
 
   function countTemplates() {
-    let events = 0, disasters = 0;
+    let events = 0, disasters = 0, outcomes = 0;
     const cnt = (s) => (s ? s.split('\n').filter((l) => l.trim() && l.includes('|')).length : 0);
-    PHASES.forEach((k) => (events += cnt(D.core[k])));
+    const perTheme = {};
+    PHASES.forEach((k) => (events += cnt(D.core[k]) + cnt((D.coreExtra || {})[k])));
     D.themes.forEach((t) => {
-      if (t.soft) PHASES.forEach((k) => (events += cnt(t.pool[k])));
-      else if (t.extra) Object.values(t.extra).forEach((s) => (events += cnt(s)));
-      (t.disasters || []).forEach((d) => { disasters += 1; events += cnt(d.out); });
+      let e = 0, d = 0;
+      const more = (D.more || {})[t.id] || {};
+      if (t.soft) PHASES.forEach((k) => (e += cnt(t.pool[k])));
+      if (!t.soft && t.extra) Object.values(t.extra).forEach((s) => (e += cnt(s)));
+      if (more.extra) Object.values(more.extra).forEach((s) => (e += cnt(s)));
+      (t.disasters || []).forEach((x) => { d += 1; outcomes += cnt(x.out); });
+      const md = more.dis ? more.dis.split('\n').filter((l) => l.trim()).length : 0;
+      d += md; outcomes += md * 3;
+      events += e; disasters += d;
+      perTheme[t.id] = { events: e, disasters: d };
     });
-    return { events, disasters, themes: D.themes.length };
+    return { events, disasters, outcomes, themes: D.themes.length, perTheme };
   }
 
   /* ---------------- Grammatica ---------------- */
@@ -172,7 +201,7 @@
   const PREP = { in: 'ne', di: 'de', a: 'a', da: 'da', su: 'su' };
   const ARTI = { lo: 'llo', la: 'lla', "l'": "ll'", gli: 'gli', le: 'lle' };
   function artPrep(s) {
-    return s.replace(/(^|[^\p{L}'])(in|di|a|da|su) (il|lo|la|l'|i|gli|le)(?=[ \p{L}])/gu, (m, pre, p, a) => {
+    return s.replace(/(^|[^\p{L}'])(in|di|a|da|su) (il(?= )|lo(?= )|la(?= )|i(?= )|gli(?= )|le(?= )|l'(?=\p{L}))/gu, (m, pre, p, a) => {
       const P = PREP[p];
       const out = a === 'il' ? (P === 'ne' || P === 'de' ? P + 'l' : P + 'l') : a === 'i' ? P + 'i' : P + ARTI[a];
       return pre + out + (a === "l'" ? '' : '');
@@ -406,7 +435,7 @@
         }
       }
       stats.events++;
-      return { html: txt.html, plain: txt.plain, ids: roles.map((t) => t.id), deaths: ev.victims.map((i) => roles[i].id).filter((id) => !byId[id].alive), lethal: ev.lethal, origin: ev.origin };
+      return { html: txt.html, plain: txt.plain, ids: roles.map((t) => t.id), deaths: ev.victims.map((i) => roles[i].id).filter((id) => !byId[id].alive), lethal: ev.lethal, origin: ev.origin, cat: ev.cat };
     }
 
     function lethalProb(kind) {
@@ -418,9 +447,9 @@
     }
 
     function snapshot() {
-      const zones = {}, allies = {}, st = {};
-      T.forEach((t) => { zones[t.id] = t.zone; allies[t.id] = t.allyId; st[t.id] = Object.keys(t.st); });
-      return { alive: alive().map((t) => t.id), zones, allies, st };
+      const zones = {}, allies = {}, st = {}, inv = {}, kills = {};
+      T.forEach((t) => { zones[t.id] = t.zone; allies[t.id] = t.allyId; st[t.id] = Object.keys(t.st); inv[t.id] = t.inv.map((x) => x.name); kills[t.id] = t.kills; });
+      return { alive: alive().map((t) => t.id), zones, allies, st, inv, kills };
     }
 
     function maybeDissolve(events) {
