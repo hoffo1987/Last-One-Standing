@@ -38,7 +38,7 @@
 3 plot:A>B ally:ABC rel:AC+20 | {A} prende da parte {C} e [C:gli/le] racconta, sottovoce, cosa pensa davvero di {B}. {C} ascolta. {C} non dice niente.
 1 trait:A=solitario @stl | {A} trova una radura dove non c'è nessuno e, per la prima volta da giorni, sorride.
 1 trait:A=cacciatore +cibo:A | {A} segue una pista di sangue per un'ora. In fondo c'è un cervo ferito. Stasera si mangia bene.
-2 trait:A=generoso stat:B<food30 give:A>B=cibo | {A} vede {B} frugare tra le foglie e gli lancia {cibo} senza dire una parola.
+2 trait:A=generoso stat:B<food30 give:A>B=cibo | {A} vede {B} frugare tra le foglie e [B:gli/le] lancia {cibo} senza dire una parola.
 `,
       n: `
 1 stat:A<hp30 @heal s:A=sconvolto | {A} passa la notte stringendo la ferita con le mani e contando le stelle per non svenire.
@@ -65,7 +65,7 @@
 `,
       sponsor: `
 1 +armatura:A @gift | Arriva un paracadute per {A}: dentro c'è {armatura}. Il messaggio dice: «Stai attent[A:o/a]».
-1 +attrezzo:A @gift | Gli sponsor mandano a {A} {attrezzo} e un biglietto: «Usalo bene».
+1 +attrezzo:A @gift | Gli sponsor mandano a {A} {attrezzo} e un biglietto: «Fanne buon uso».
 1 +ricordo:A mo:A+20 @gift | Gli sponsor mandano a {A} un pacchetto da casa: dentro c'è {ricordo}. {A} si commuove in diretta nazionale.
 `,
       finale: `

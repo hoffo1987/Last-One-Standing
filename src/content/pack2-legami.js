@@ -5,11 +5,11 @@
     theme: 'tutte',
     ev: {
       d: `
-1 con:A=ricordo stat:A<mo30 mo:A+20 | {A} rilegge {ricordo:A} per la decima volta. Alla decima, finalmente, sorride.
-1 con:A=valore stat:A<food30 -valore:A +cibo:A | {A} cede {valore} pur di mangiare qualcosa. Non è mai stato così felice di fare un pessimo affare.
+1 con:A=ricordo stat:A<mo30 mo:A+20 | {A} guarda {ricordo:A} per la decima volta. Alla decima, finalmente, sorride.
+1 con:A=valore stat:A<food30 -valore:A +cibo:A | {A} cede {valore} pur di mangiare qualcosa. Non è mai stat[A:o/a] così felice di fare un pessimo affare.
 1 con:A=attrezzo @int +mappa:A | Con {attrezzo:A} e un po' di pazienza, {A} si costruisce {mappa}.
 1 con:A=alcol stat:A<mo25 -alcol:A s:A=ubriaco mo:A+15 | {A} affoga i dispiaceri in {alcol}. I dispiaceri, a quanto pare, sanno nuotare.
-1 con:A=armatura @show star:A | {A} si mette in posa con {armatura:A} per le telecamere. Sembra un eroe da copertina.
+1 con:A=armatura @show star:A | {A} si mette in posa con {armatura:A} per le telecamere. Sembra un personaggio da copertina.
 1 stat:A>mo80 @soc | {A} è di umore così buono che saluta perfino i nemici. Alcuni ricambiano, confusi.
 1 stat:A<en20 s:A=ferito | {A} è così stanc[A:o/a] che inciampa sui propri piedi. Due volte.
 1 stat:A<food25 @food | Lo stomaco di {A} brontola così forte che si sente in tutta la zona.
@@ -29,7 +29,7 @@
 2 couple:AB rel:AB-20 | {A} e {B} litigano per chi ha finito {cibo}. È la loro prima litigata, e la ricorderanno.
 2 friend:AB give:A>B=ricordo | {A} regala a {B} {ricordo:A}. «Custodiscilo tu. Mi fido.»
 2 friend:AB mo:A+10 mo:B+10 | {A} e {B} si raccontano gli aneddoti più imbarazzanti della loro vita. Ridono fino alle lacrime.
-2 enemy:AB rel:AB-10 | {A} e {B} si incrociano e si guardano in cagnesco per un minuto intero. Nessuno dei due cede.
+2 enemy:AB rel:AB-10 | {A} e {B} si incrociano e si guardano in cagnesco per un minuto intero. Non cede nessuno.
 2 enemy:AB forgive:A>B grudge:A>B @soc | {A} e {B} si ritrovano bloccat[AB:i/e] nello stesso posto per ore. Finiscono per parlare. {A} decide di lasciar perdere.
 2 owe:A>B repay:A>B give:A>B=valore | {A} paga il suo debito cedendo {valore} a {B}. Ora sono pari.
 2 owe:A>B rel:AB-10 | {B} ricorda a {A}, davanti a tutti, che [B:gli/le] deve un favore. {A} arrossisce.

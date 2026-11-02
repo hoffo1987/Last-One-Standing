@@ -122,8 +122,8 @@
             <div class="cform">
               <label class="field" for="cPhase"><span>Quando</span><select id="cPhase"><option value="tutte">In ogni fase</option><option value="b">All'inizio</option><option value="d">Di giorno</option><option value="n">Di notte</option><option value="f">Al festino</option></select></label>
               <label class="field" for="cN"><span>Concorrenti</span><select id="cN"><option>1</option><option selected>2</option><option>3</option><option>4</option></select></label>
-              <label class="field" for="cKiller"><span>Chi uccide</span><select id="cKiller"><option value="">Nessuno</option></select></label>
-              <div class="field"><span>Chi muore</span><div class="letters" id="cDies"></div></div>
+              <label class="field" for="cKiller"><span id="cKillerLabel">Chi uccide</span><select id="cKiller"><option value="">Nessuno</option></select></label>
+              <div class="field"><span id="cDiesLabel">Chi muore</span><div class="letters" id="cDies"></div></div>
               <label class="field wide" for="cText"><span>Testo</span><input type="text" id="cText" placeholder="{A} sfida {B} a una gara di indovinelli e l[B:o/a] batte."></label>
               <div class="wide preview" id="cPreview">L'anteprima apparirà qui mentre scrivi.</div>
               <div class="wide row"><button class="btn primary" id="cAdd" type="button">Aggiungi evento</button><span class="help" id="cMsg" role="status"></span></div>
@@ -147,7 +147,7 @@
         </div>
         <label class="field" for="seed"><span>Seme della partita</span>
           <div class="seedrow"><input type="text" id="seed" autocomplete="off" spellcheck="false"><button class="btn" id="seedNew" type="button" title="Nuovo seme casuale" aria-label="Nuovo seme casuale"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="3.5" width="17" height="17" rx="4" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="8.5" cy="8.5" r="1.6" fill="currentColor"/><circle cx="15.5" cy="15.5" r="1.6" fill="currentColor"/><circle cx="12" cy="12" r="1.6" fill="currentColor"/></svg></button></div>
-          <small class="help">Stesso seme e stesso cast danno la stessa storia.</small></label>
+          <small class="help">Stesso seme, cast e regole danno la stessa storia nella stessa versione del gioco.</small></label>
         <div class="startbox">
           <div class="startsum" id="startSum"></div>
           <button class="btn primary xl" id="btnStart" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4.5v15l12-7.5z" fill="currentColor"/></svg>Avvia la simulazione</button>

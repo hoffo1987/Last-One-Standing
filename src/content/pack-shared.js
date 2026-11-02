@@ -32,19 +32,19 @@
 1 @luck | {A} trova un quadrifoglio. Non succede niente, ma {A} si sente invincibile per tutto il giorno.
 1 @mad | {A} prova a parlare con le telecamere nascoste negli alberi, chiedendo un'intervista. La telecamera fa zoom, per gentilezza.
 2 | {A} e {B} si incrociano e si accorgono di indossare la stessa giacca. Imbarazzo profondo. Se ne vanno senza una parola.
-2 @soc rel:AB+30 | {A} e {B} si sfidano a sasso-carta-forbici per decidere chi deve combattere. Pareggiano quaranta volte e diventano amici.
+2 @soc rel:AB+30 | {A} e {B} si sfidano a sasso-carta-forbici per decidere chi deve combattere. Pareggiano quaranta volte e diventano amic[AB:i/he].
 2 hit:A>B @agg | {A} lancia una pigna a {B} per scherzo. La pigna era più dura del previsto.
 2 k:A>B @luck | {A} starnutisce proprio mentre {B} sta per colpirl[A:o/a]. Il colpo va a vuoto, quello di {A} no.
 2 @cow | {A} e {B} si incontrano, si spaventano a vicenda e scappano in direzioni opposte urlando.
 2 save:A>B @heal | {A} tira fuori {B} da una pozza di fango in cui stava affondando con grande dignità.
 2 k:A>B @mad | {A} sfida {B} a una gara di sguardi. {B} sbatte le palpebre per prim[B:o/a]. {A} prende la cosa molto sul serio.
 2 give:A>B=cibo @soc | {A} baratta con {B} metà della propria scorta in cambio di una barzelletta. La barzelletta è pessima. Lo scambio resta valido.
-2 steal:A<B @luck | {B} lascia {arma:B} incustodita per allacciarsi una scarpa. {A} passa di lì. Coincidenze.
+2 steal:A<B @luck | {B} lascia {arma:B} senza sorveglianza per allacciarsi una scarpa. {A} passa di lì. Coincidenze.
 2 love:AB @luck | {A} cade da un albero dritt[A:o/a] addosso a {B}. Si guardano. Scatta qualcosa. Probabilmente una costola.
 2 couple:AB @mad | {A} e {B} si sposano davanti a un sasso che fa da celebrante. Il sasso non obietta.
 2 enemy:AB | {A} e {B} si insultano da una parte all'altra del fiume per un'ora intera. Nessuno dei due sa nuotare.
 2 owe:A>B | {A} fa per {B} un disegno di ringraziamento con il carbone. È bruttissimo. {B} lo conserva.
-3 k:AB>C @luck | {A} e {B} litigano per un sasso e lo lanciano entrambi nello stesso istante. Lo prende {C}, che passava di lì.
+3 k:AB>C @luck | {A} e {B} litigano per un sasso e lo lanciano nello stesso istante. Lo prende {C}, che passava di lì.
 3 | {A}, {B} e {C} si contendono un cespuglio pieno di bacche e finiscono per dividerselo. Le bacche erano lassative.
 3 al:ABC @show | {A}, {B} e {C} formano una band. Il primo concerto è anche l'ultimo: un'esibizione fa rumore e attira l'attenzione di tutti.
 4 | {A}, {B}, {C} e {D} si ritrovano nello stesso posto, si guardano, e capiscono che la prima persona a muoversi sarà l'ultima. Restano immobili fino al tramonto.

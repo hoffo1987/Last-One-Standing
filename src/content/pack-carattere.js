@@ -46,7 +46,7 @@
 2 test:A=int ok:steal:A<B ko:rel:BA-30 | {A} distrae {B} con una domanda filosofica e intanto [B:gli/le] sfila l'arma. || {A} prova a distrarre {B} con una domanda filosofica. {B} risponde e poi l[A:o/a] manda a quel paese.
 2 test:A=car ok:repay:A>B ko:rel:AB-10 | {A} saluta {B} con un sorriso e [B:gli/le] promette che il debito è saldato. {B} accetta. || {A} prova a convincere {B} che il debito è saldato. {B} non è d'accordo.
 3 test:A=car ok:al:ABC ko:hit:B>A | {A} tiene un discorso da leader e convince {B} e {C} a seguirl[A:o/a]. || {A} tiene un discorso da leader. {B} e {C} ridono, e {B} [A:gli/le] tira un sasso.
-3 test:A=agi ok:k:A>BC | {A} si muove tra {B} e {C} come un fulmine: due colpi, nessuna risposta. || {A} prova a colpire insieme {B} e {C} e manca entrambi. Fortuna che sono distratti.
+3 test:A=agi ok:k:A>BC | {A} si muove tra {B} e {C} come un fulmine: due colpi, nessuna risposta. || {A} prova a colpire insieme {B} e {C} e l[BC:i/e] manca. Fortuna che sono distratt[BC:i/e].
 `,
       n: `
 1 test:A=furt ok:+cibo:A ko:s:A=ferito @stl | Di notte {A} entra in un accampamento nemico e ne esce con le provviste. || Di notte {A} entra in un accampamento nemico, pesta una mano e deve scappare inseguit[A:o/a].
@@ -140,7 +140,7 @@
 1 trait:A=solitario @stl | {A} si costruisce un rifugio talmente lontano da tutti che il cameraman deve fare tre ore di cammino.
 2 trait:A=solitario rel:BA-10 | {B} propone un'alleanza a {A}, che risponde chiudendo la porta del rifugio. Il rifugio non ha una porta: la disegna.
 1 trait:A=codardo @cow | {A} scappa da {mostro}. Poi si accorge che era un cespuglio con la forma di {mostro}. Scappa lo stesso.
-1 trait:A=folle @mad | {A} si dichiara imperatore dell'arena e impone una tassa ai sassi.
+1 trait:A=folle @mad | {A} si proclama sovran[A:o/a] dell'arena e impone una tassa ai sassi.
 1 trait:A=fortunato +cibo:A @luck | Un uccello lascia cadere un pesce in testa a {A}. Pranzo servito.
 1 trait:A=sfortunato s:A=ferito | {A} trova finalmente un riparo sicuro. Il riparo crolla.
 1 trait:A=paranoico | {A} non dorme da tre giorni perché è convint[A:o/a] che gli alberi l[A:o/a] stiano spiando. Gli alberi hanno le telecamere, quindi ha ragione.

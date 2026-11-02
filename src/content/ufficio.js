@@ -70,7 +70,7 @@ Il blackout | Un blackout cancella tutto il lavoro non salvato. | {A} perde la p
 L'audit esterno | Arrivano i revisori esterni. | {A} non trova i documenti richiesti ed è fuori. | {A} viene interrogat[A:o/a] per ore. | {A} consegna tutto in perfetto ordine.
 Lo sciopero | I sindacati proclamano uno sciopero generale. | {A} viene scelt[A:o/a] come capro espiatorio. | {A} deve coprire il lavoro di tre colleghi. | {A} si schiera dalla parte giusta.
 Il premio di produzione | Viene annunciato un premio di produzione per un solo dipendente. | {A} perde la testa per invidia e insulta il vincitore. | {A} lavora così tanto da ammalarsi. | {A} vince il premio. | malato
-Il nuovo stagista | Arriva uno stagista più bravo di tutti. | {A} viene sostituit[A:o/a] dallo stagista. | {A} deve insegnare tutto allo stagista. | {A} diventa il mentore dello stagista.
+Il nuovo stagista | Arriva uno stagista più bravo di tutti. | {A} viene sostituit[A:o/a] dallo stagista. | {A} deve insegnare tutto allo stagista. | {A} fa da mentore allo stagista.
 La macchinetta del caffè | La macchinetta del caffè si rompe per una settimana. | {A} non regge la crisi d'astinenza e se ne va. | {A} lavora a metà della velocità. | {A} porta la propria moka in ufficio. | malato
 Il Consiglio di amministrazione | Il Consiglio di amministrazione visita l'ufficio. | {A} si presenta in tuta da ginnastica. | {A} balbetta durante la presentazione. | {A} fa la presentazione migliore della giornata.
 `,

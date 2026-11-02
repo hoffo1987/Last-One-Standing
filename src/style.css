@@ -617,7 +617,7 @@ main { padding-bottom: 40px; }
 .story .ev { grid-template-columns: auto minmax(0, 1fr); }
 .story .ev .cat { grid-column: 2; justify-self: start; }
 .poster-card { min-height: 232px; }
-.poster-card .pmeta { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
+.poster-card .pmeta { white-space: normal; max-width: 100%; line-height: 1.4; }
 
 @media (max-width: 760px) { .toast { bottom: calc(210px + env(safe-area-inset-bottom, 0px)); } }
 .poster-card .psoft { position: absolute; top: 18px; left: 54px; font-family: var(--f-mono); font-size: 10px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; background: rgba(0,0,0,.45); border: 1px solid rgba(255,255,255,.2); border-radius: 6px; padding: 3px 7px; }

@@ -440,7 +440,7 @@
       pool: {
         b: `
 1 | {A} conquista l'ultimo banco vicino al termosifone.
-1 +arma:A | {A} scopre {arma} su un compagno e se lo tiene per il momento giusto.
+1 +arma:A | {A} scopre {arma} su un compagno e conserva la scoperta per il momento giusto.
 1 @cow | {A} si siede in prima fila sperando di passare inosservat[A:o/a].
 1 +cibo:A | {A} arriva con {cibo} e diventa subito popolare.
 1 d:A *0.6 | {A} si presenta il primo giorno con la maglietta sbagliata e non si riprenderà mai.
@@ -626,7 +626,7 @@
         f: `
 1 | {A} si gode l'open bar con moderazione.
 1 @cow | {A} salta la cena aziendale.
-1 +arma:A | {A} registra {arma} durante la cena.
+1 +arma:A | {A} si procura {arma} durante la cena.
 1 d:A | {A} dice al Direttore cosa pensa davvero di lui ed è fuori.
 2 k:A>B @agg | {A} fa ubriacare {B}, che dà spettacolo davanti ai capi.
 2 al:AB @soc | {A} e {B} cantano insieme al karaoke.

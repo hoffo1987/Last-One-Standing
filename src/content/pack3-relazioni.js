@@ -22,11 +22,11 @@
 2 attract:A>B single:A @show | {A} si sistema i capelli tre volte prima di passare davanti a {B}. Il pubblico se ne accorge prima di {B}.
 2 rival:AB @show star:A star:B | {A} e {B} si sfidano a chi resiste più a lungo appes[AB:i/e] a un ramo. Vincono gli sponsor, che si divertono.
 2 rival:AB ris:A>B+10 ris:B>A+10 | {A} e {B} si sfidano in una gara di abilità. Finisce in parità, e si stringono la mano controvoglia.
-2 rival:AB rel:AB+15 @soc | {A} e {B} scoprono di avere più cose in comune di quanto pensassero. È irritante, per entrambi.
+2 rival:AB rel:AB+15 @soc | {A} e {B} scoprono di avere più cose in comune di quanto pensassero. È irritante, per tutt[AB:i/e].
 2 ex:AB @mad | {A} e {B} si incrociano e fingono di non conoscersi. Non ci crede nessuno, nemmeno loro.
 2 ex:AB reunite:AB *0.6 | {A} e {B} si parlano per la prima volta dopo la rottura. Finisce con un bacio, e con tutti che dicono «lo sapevo».
 2 ex:AB rel:AB-10 | {A} racconta a tutti la sua versione della rottura con {B}. {B} ne racconta un'altra. Nessuna delle due è vera.
-2 ex:AB fid:A>B+10 | {A} e {B} decidono di restare amici. Ci credono quasi.
+2 ex:AB fid:A>B+10 | {A} e {B} decidono di restare amic[AB:i/he]. Ci credono quasi.
 2 close:AB mo:A+10 mo:B+10 | {A} e {B} ormai si capiscono con uno sguardo. Gli altri li trovano inquietanti.
 2 close:AB promise:A>B=protezione | {A} dice a {B}, senza giri di parole, che l[B:o/a] proteggerà. {B} non risponde, ma sorride.
 2 close:AB give:A>B=ricordo | {A} regala a {B} {ricordo:A}. «Se esco solo io, voglio che ce l'abbia tu.»
@@ -67,7 +67,7 @@
 2 fear:A>B k:B>A *0.8 | {A} scappa da {B} da giorni. Oggi non scappa abbastanza.
 2 fear:A>B k:A>B *0.4 | Mess[A:o/a] all'angolo, {A} trova il coraggio della disperazione. {B} non se lo aspettava.
 2 rival:AB k:A>B *0.8 | Il duello tra {A} e {B} dura un'ora. Alla fine {A} saluta {B} con rispetto, l'ultima volta.
-2 rival:AB hit:A>B hit:B>A | {A} e {B} si affrontano alla pari. Si separano ferit[AB:i/e], ed entrambi, stranamente, sorridono.
+2 rival:AB hit:A>B hit:B>A | {A} e {B} si affrontano alla pari. Si separano ferit[AB:i/e], e, stranamente, sorridono.
 2 trust:A>B save:B>A | {A} si fida di {B}, e {B} non l[A:o/a] delude: arriva appena in tempo.
 2 close:AB stat:B<hp35 save:A>B | {A} non lascia {B} da sol[B:o/a] nemmeno per un minuto, finché il peggio non è passato.
 2 promise:A>B save:A>B | {A} si ricorda della promessa fatta a {B} quando il pericolo arriva. Si mette in mezzo.

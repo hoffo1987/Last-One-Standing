@@ -5,8 +5,8 @@
     theme: 'scifi',
     ev: {
       b: `
-1 +armatura:A @luck | {A} si infila {armatura} trovata nell'Hangar. È di due taglie più grande, ma il pericolo non guarda le taglie.
-1 +attrezzo:A @int | {A} stacca {attrezzo} da una parete e lo stringe come un tesoro. In una stazione spaziale, lo è.
+1 +armatura:A @luck | {A} trova {armatura} nell'Hangar e si attrezza. È di due taglie più grande, ma il pericolo non guarda le taglie.
+1 +attrezzo:A @int | {A} stacca {attrezzo} da una parete e custodisce il bottino come un tesoro. In una stazione spaziale, lo è.
 2 al:AB +attrezzo:B | {A} e {B} si chiudono insieme nella stessa capsula durante lo sbarco. Quando si riapre, sono una squadra.
 2 k:A>B @agg | {A} apre il portellone sbagliato al momento giusto. Per {B}, è il momento sbagliato.
 1 test:A=int12 ok:+mappa:A ko:pr:A+25 | {A} hackera il primo terminale che trova e scarica la planimetria della stazione. || {A} prova ad hackerare un terminale e disattiva per sbaglio il proprio ricircolatore.
@@ -32,7 +32,7 @@
 2 goal:A=cibo give:B>A=cibo debt:A>B | {B} passa a {A} un tubetto di gel proteico attraverso una grata. «Ricordatelo.»
 2 con:A=armatura hit:B>A | {B} spara a {A} con un taser, ma {armatura:A} scarica tutto a terra.
 2 con:A=alcol give:A>B=alcol rel:AB+20 | {A} e {B} brindano con {alcol} guardando la Terra dall'oblò. Fa meno paura, così.
-2 test:A=int13 ok:pr:A-30 ok:pr:B-30 ko:pr:A+20 | {A} ricalibra il ricircolatore del modulo che divide con {B}. Tornano a respirare entrambi. || {A} ricalibra il ricircolatore del modulo che divide con {B}. Adesso soffia aria calda e polvere.
+2 test:A=int13 ok:pr:A-30 ok:pr:B-30 ko:pr:A+20 | {A} ricalibra il ricircolatore del modulo che divide con {B}. Finalmente respirano di nuovo. || {A} ricalibra il ricircolatore del modulo che divide con {B}. Adesso soffia aria calda e polvere.
 2 owe:A>B repay:A>B rel:AB+10 | {A} sblocca la porta del modulo dove {B} è rimast[B:o/a] chius[B:o/a]. Debito saldato.
 3 plot:A>B ally:ABC rel:AC+20 | {A} mostra a {C} una registrazione manomessa in cui {B} sembra parlare male di l[C:ui/ei]. {C} si convince.
 `,

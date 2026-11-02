@@ -17,7 +17,7 @@
 1 +cibo:A @int | {A} costruisce una trappola per conigli. Cattura uno scoiattolo arrabbiatissimo. Lo mangia lo stesso.
 1 s:A=ferito @mad | {A} prova ad accendere il fuoco sfregando due bastoncini per tre ore. Si accende il polso.
 1 @show | {A} si fa una corona di fiori e si proclama regina del Bosco. Il Bosco non commenta.
-1 +arma:A @luck | {A} trova {arma} incastrata in un albero. Il proprietario precedente è ancora lì vicino, molto meno in forma.
+1 +arma:A @luck | {A} trova {arma} tra i rami di un albero. Il proprietario precedente è ancora lì vicino, molto meno in forma.
 1 d:A *0.6 | {A} mangia delle bacche viola perché "quelle viola sono sempre buone". Non lo erano.
 1 @int +mappa:A | {A} si arrampica sull'albero più alto e disegna una mappa sulla propria maglietta.
 1 @soc star:A | {A} ringrazia ogni sponsor per nome, in ordine alfabetico. Ci mette due ore. Funziona.
@@ -119,7 +119,7 @@ Il miele | Dagli alberi cola un miele dolcissimo che attira tutti gli orsi dell'
 2 hit:A>B @agg | {A} morde l'orecchio a {B} e se lo tiene come trofeo.
 `,
       n: `
-2 couple:AB | {A} e {B} fanno talmente rumore nella grotta che mezza arena sa dove sono. A nessuno dei due sembra importare.
+2 couple:AB | {A} e {B} fanno talmente rumore nella grotta che mezza arena sa dove sono. Non sembra importare a nessuno.
 2 love:AB | Dopo una notte gelida, {A} e {B} decidono di scaldarsi nel modo più antico del mondo. Al mattino si danno del lei.
 1 need:A=ubriaco d:A @drunk | Ubriac[A:o/a] fradic[A:io/ia], {A} va a fare pipì sul bordo di una scogliera. Al buio.
 2 k:A>B @stl | {A} strangola {B} nel sonno con i suoi stessi lacci delle scarpe. Lentamente.
@@ -130,7 +130,7 @@ L'acqua afrodisiaca | Gli organizzatori aggiungono qualcosa all'acqua del Fiume.
 La pioggia di frattaglie | Dal cielo cadono interiora di animale. Gli organizzatori la chiamano "arte". | {A} scivola su un intestino e si rompe il collo. | {A} vomita per sei ore di fila. | {A} raccoglie le frattaglie migliori e si fa uno spiedino. | malato
 Le zanzare carnivore | Zanzare grandi come passeri prosciugano il sangue di chiunque. | {A} viene dissanguat[A:o/a] fino all'ultima goccia. | {A} si risveglia pallid[A:o/a] come un lenzuolo. | {A} si cosparge di aglio, cosa che funziona sorprendentemente bene. | malato
 Il gas della risata | Un gas fa ridere tutti fino alle lacrime, e oltre. | {A} ride così tanto da non riuscire a respirare. | {A} ride per otto ore e si incrina una costola. | {A} trattiene il respiro e guarda gli altri contorcersi. | sconvolto
-Il tritacarne | Lame rotanti spuntano dal terreno della Cornucopia. | {A} viene ridott[A:o/a] in poltiglia. La regia passa alla pubblicità con un certo ritardo. | {A} perde due dita del piede. | {A} salta sopra le lame come un ballerino.
+Il tritacarne | Lame rotanti spuntano dal terreno della Cornucopia. | {A} viene ridott[A:o/a] in poltiglia. La regia passa alla pubblicità con un certo ritardo. | {A} perde due dita del piede. | {A} salta sopra le lame con un passo di danza.
 L'orgia dei lupi | La luna piena manda in calore tutti i lupi mutanti. Sono distratti, ma enormi. | {A} interrompe i lupi nel momento sbagliato. | {A} viene travolt[A:o/a] da una coppia di lupi molto impegnata. | {A} passa oltre in punta di piedi, cercando di non guardare.
 `,
   });

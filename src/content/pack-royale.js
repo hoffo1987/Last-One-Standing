@@ -52,7 +52,7 @@
 `,
       f: `
 2 k:A>B | {A} e {B} arrivano alla cassa leggendaria nello stesso istante. Uno dei due la apre.
-1 +amuleto:A | Nella cassa leggendaria c'è anche {amuleto}. {A} se lo infila in tasca prima che qualcuno se ne accorga.
+1 +amuleto:A | Nella cassa leggendaria c'è anche {amuleto}. {A} ne approfitta prima che qualcuno se ne accorga.
 `,
       ds: `
 1 con:A=mappa | Grazie a {mappa:A}, {A} era già nella zona sicura da un'ora.

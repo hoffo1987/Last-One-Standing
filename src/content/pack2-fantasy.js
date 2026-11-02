@@ -5,7 +5,7 @@
     theme: 'fantasy',
     ev: {
       b: `
-1 +armatura:A @luck | Dall'Altare, {A} afferra {armatura}. Sulla fodera c'è ricamato il nome di un eroe morto. Non è di buon auspicio.
+1 +armatura:A @luck | Dall'Altare, {A} afferra {armatura}. Sopra c'è il nome di un eroe morto. Non è di buon auspicio.
 1 +attrezzo:A @int | {A} ignora le spade e prende {attrezzo}. Un vecchio gufo sull'Altare annuisce approvando.
 2 al:AB +amuleto:A | {A} e {B} toccano insieme lo stesso amuleto sull'Altare: si accende, e decidono che è un segno.
 2 k:A>B @agg | {A} pronuncia la prima parola magica che [A:gli/le] viene in mente. Funziona. Purtroppo per {B}.
@@ -18,7 +18,7 @@
 1 stat:A<food30 +cibo:A | {A} segue un profumo di pane appena sfornato fino a una casetta di marzapane. Nessuno in casa. Per fortuna.
 1 con:A=attrezzo +mappa:A @int | {A} usa {attrezzo:A} per leggere le stelle di giorno. Ne ricava {mappa}.
 1 con:A=valore -valore:A +med:A | {A} paga un folletto con {valore}. Il folletto, in cambio, [A:gli/le] dà {med:A} e un consiglio pessimo.
-1 con:A=ricordo mo:A+15 pr:A-10 | {A} tiene stretto {ricordo:A} mentre attraversa la Palude stregata. Le voci, stavolta, tacciono.
+1 con:A=ricordo mo:A+15 pr:A-10 | {A} stringe {ricordo:A} mentre attraversa la Palude stregata. Le voci, stavolta, tacciono.
 1 wx:buio @stl | Nella nebbia degli elfi, {A} attraversa la Foresta senza che un solo ramo scricchioli.
 1 wx:abbondanza +cibo:A | {A} trova un albero di mele d'oro. Non ne mangia una sola: ne mangia diciotto.
 1 wx:pericolo s:A=ferito | Una pioggia di cenere del drago coglie {A} allo scoperto. Le bruciature durano giorni.
@@ -31,15 +31,15 @@
 2 goal:A=vendetta grudge:A>B hit:A>B | {A} lancia una maledizione contro {B} per {caro:A}. Lo colpisce di striscio. La prossima volta mirerà meglio.
 2 goal:A=caccia k:A>B @agg | {A} chiede a un corvo dove si trovi {B}. Il corvo glielo dice. I corvi non sono mai neutrali.
 2 con:A=armatura hit:B>A | {B} scaglia un dardo incantato contro {A}, ma {armatura:A} lo assorbe con un ronzio.
-2 con:A=alcol give:A>B=alcol rel:AB+20 | {A} offre a {B} un sorso di {alcol}. Diventano amici per la pelle in esattamente un sorso.
-2 test:A=int13 ok:+amuleto:A ok:rel:AB+15 ko:hit:B>A | {A} risolve l'indovinello della sfinge al posto di {B}. La sfinge regala a entrambi un amuleto, e {B} ringrazia. || {A} sbaglia l'indovinello della sfinge. La sfinge scaglia {B} contro {A}. Letteralmente.
+2 con:A=alcol give:A>B=alcol rel:AB+20 | {A} offre a {B} un sorso di {alcol}. Diventano amic[AB:i/he] per la pelle in esattamente un sorso.
+2 test:A=int13 ok:+amuleto:A ok:rel:AB+15 ko:hit:B>A | {A} risolve l'indovinello della sfinge al posto di {B}. La sfinge regala un amuleto a {A}, e {B} ringrazia. || {A} sbaglia l'indovinello della sfinge. La sfinge scaglia {B} contro {A}. Letteralmente.
 2 owe:A>B repay:A>B +cibo:B | {A} lascia a {B} un cestino di pane elfico: è il modo degli elfi per dire «siamo pari».
 2 enemy:AB stat:A>pr50 hit:A>B | La corruzione rende {A} irascibile: vede {B} e l[B:o/a] attacca senza una parola.
 3 plot:A>B ally:ABC rel:AC+20 | {A} legge a {C} un futuro inventato nelle foglie di tè: nel futuro, {B} tradisce tutti. {C} ci crede.
 `,
       n: `
 1 stat:A>pr60 pr:A+10 s:A=sconvolto | {A} sogna di trasformarsi in pietra. Al risveglio, ha un piede un po' più freddo dell'altro.
-1 con:A=amuleto mo:A+10 | {A} dorme con {amuleto:A} stretto al petto. Per la prima volta, nessun incubo.
+1 con:A=amuleto mo:A+10 | {A} dorme con {amuleto:A} vicino al petto. Per la prima volta, nessun incubo.
 1 wx:pericolo s:A=ferito | Nella notte senza luna, qualcosa morde {A} alla caviglia e sparisce nel buio.
 2 crush:A>B @soc | {A} veglia {B} tutta la notte con una lucciola in un barattolo, perché non abbia paura del buio.
 2 plot:A>B tr:A>B *2 | {A} aspetta che {B} si addormenti sotto le stelle. Le stelle guardano, e non dicono niente.
@@ -60,7 +60,7 @@
 `,
       finale: `
 2 k:A>B | Sul Picco del drago, {A} e {B} si affrontano mentre il drago guarda incuriosito. Alla fine il drago applaude. Solo uno dei due può sentirlo.
-2 k:A>B con:A=amuleto | {B} lancia l'ultima maledizione, ma {amuleto:A} la rimbalza indietro. {A} non deve fare altro.
+2 k:A>B con:A=amuleto | {B} lancia l'ultima maledizione, ma {amuleto:A} la fa rimbalzare indietro. {A} non deve fare altro.
 `,
     },
     dis: `

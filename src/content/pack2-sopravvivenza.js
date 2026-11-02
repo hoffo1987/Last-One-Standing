@@ -19,7 +19,7 @@
 2 goal:A=proteggere couple:AB save:A>B | {A} si mette davanti a {B} quando arriva il pericolo. Ne esce con un graffio e un sorriso.
 2 stat:B<hp30 save:A>B @heal | {A} trova {B} quasi svenut[B:o/a] e l[B:o/a] porta al riparo. {B} non lo dimenticherà.
 2 stat:B<hp30 k:A>B @agg | {A} trova {B} ferit[B:o/a] e indifes[B:o/a]. Non è un momento di pietà.
-2 stat:A<food25 steal:A<B @stl | La fame rende {A} audace: sfila {arma:B} a {B} per scambiarla con del cibo.
+2 stat:A<food25 steal:A<B @stl | La fame rende {A} audace: sfila {arma:B} a {B} per ottenere del cibo in cambio.
 2 con:A=armatura k:B>A *0.4 | {B} trova l'unico punto scoperto di {armatura:A}. {A} non se l'aspettava.
 2 con:A=attrezzo save:A>B @int | {A} usa {attrezzo:A} per tirare fuori {B} da un pozzo. {B} non ha parole.
 2 crush:A>B save:A>B @heal | {A} si butta senza pensarci per salvare {B}. Solo dopo si chiede cosa stesse facendo.

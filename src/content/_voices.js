@@ -8,15 +8,15 @@
 
   D.voice = {
     kill: {
-      _: ['Niente di personale.', 'Mi dispiace. Davvero.', 'Uno in meno.', 'Dovevi correre più veloce.', 'Te l\'avevo detto di stare lontano.', 'Non guardarmi così.', 'Era tu o io.', 'Scusa. Cioè, no.', 'Qualcuno doveva farlo.', 'Ricordati di me, lassù.'],
+      _: ['Niente di personale.', 'Mi dispiace. Davvero.', 'Una persona in meno.', 'Dovevi correre più veloce.', 'Te l\'avevo detto di stare lontano.', 'Non guardarmi così.', 'O tu o io.', 'Scusa. Cioè, no.', 'Qualcuno doveva farlo.', 'Ricordati di me, lassù.'],
       trait: {
         spietato: ['Il prossimo.', 'Troppo facile.', 'Ne voglio ancora.', 'Silenzio, finalmente.'],
         esibizionista: ['Avete visto? Rallentatela al replay!', 'Questa va nel trailer.', 'Applausi, grazie, grazie.'],
-        folle: ['Ops.', 'Era vivo? Ah, era vivo.', 'Ahahah! No, aspetta. Ahahah!'],
+        folle: ['Ops.', 'Era viv[1:o/a]? Ah, era viv[1:o/a].', 'Ahahah! No, aspetta. Ahahah!'],
         bruto: ['Più grosso è, più rumore fa.', 'Ecco fatto.'],
         stratega: ['Esattamente come previsto.', 'Fase due completata.'],
         cacciatore: ['Le tracce non mentono mai.', 'Ti ho seguito per due giorni. Ne valeva la pena.'],
-        codardo: ['Non volevo! Cioè, sì, ma non volevo!', 'Mi ha spaventato lui!'],
+        codardo: ['Non volevo! Cioè, sì, ma non volevo!', 'Mi ha spaventato [1:lui/lei]!'],
         pacifista: ['Perdonami. Ti prego, perdonami.', 'Non doveva andare così.'],
         sopravvissuto: ['Io resto in piedi. Sempre.'],
         impulsivo: ['Ho pensato dopo. Come sempre.'],
@@ -26,9 +26,9 @@
       arena: {
         classico: ['Il cannone suonerà per te.', 'Che il Bosco ti accolga.'],
         fantasy: ['Che le rune ti siano lievi.', 'Il drago ringrazia per la cena.'],
-        scifi: ['Disconnesso.', 'Fine della trasmissione.', 'Ti ho tolto l\'ossigeno per farti un favore.'],
+        scifi: ['Disconness[1:o/a].', 'Fine della trasmissione.', 'Ti ho tolto l\'ossigeno per farti un favore.'],
         zombie: ['Meglio così che diventare uno di loro.', 'Almeno non ti rialzerai. Spero.'],
-        royale: ['GG.', 'Eliminato. Prossimo cerchio.', 'Rimani pure a guardare dagli spalti.'],
+        royale: ['GG.', 'Eliminat[1:o/a]. Prossimo cerchio.', 'Rimani pure a guardare dagli spalti.'],
         horror: ['Ora fai parte della villa.', 'Saluta i fantasmi da parte mia.'],
         wasteland: ['Il deserto si prende tutto.', 'I tuoi stivali sono miei.'],
       },
@@ -73,7 +73,7 @@
     taunt: {
       _: ['Tutto qui?', 'Ritenta, sarai più fortunat[1:o/a].', 'La prossima volta mirerò meglio.', 'Questo è solo un assaggio.', 'Corri, {1}, corri.', 'Ci rivediamo presto.'],
       trait: { bruto: ['Ti piego in due.'], esibizionista: ['Sorridi, {1}, ti stanno riprendendo mentre perdi.'], spietato: ['La prossima volta non mi fermo.'], impulsivo: ['Non so perché l\'ho fatto. Ma lo rifarei.'] },
-      arena: { royale: ['Sei rimasto senza scudo, eh?'], fantasy: ['Il tuo incantesimo era scaduto.'], wasteland: ['Benvenuto nel deserto.'] },
+      arena: { royale: ['Sei rimast[1:o/a] senza scudo, eh?'], fantasy: ['Il tuo incantesimo era scaduto.'], wasteland: ['Benvenut[1:o/a] nel deserto.'] },
     },
     sponsor: { _: ['Grazie, grazie, vi amo tutti!', 'Lo sapevo che mi volevate bene.', 'Mamma, se mi guardi: hanno mandato un regalo!', 'Ringrazio gli sponsor e anche il mio parrucchiere.'], trait: { esibizionista: ['Il pubblico ha parlato. E ha buon gusto.'], avido: ['Solo questo? Ne voglio un altro.'] } },
     disaster: {

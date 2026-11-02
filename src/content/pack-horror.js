@@ -5,7 +5,7 @@
     theme: 'horror',
     ev: {
       b: `
-1 +amuleto:A | {A} si mette al collo {amuleto} trovato sotto il piatto. Era lì apposta? Meglio non chiederselo.
+1 +amuleto:A | {A} trova {amuleto} sotto il piatto e se ne appropria. Era lì apposta? Meglio non chiederselo.
 1 s:A=sconvolto | {A} si siede a tavola e trova il proprio nome inciso sul segnaposto. Con la data di oggi.
 2 k:A>B | {A} infilza {B} con la forchetta da arrosto. A tavola. Davanti a tutti. Che maleducazione.
 2 save:A>B | {A} tira via {B} dalla sedia un attimo prima che il lampadario ci cada sopra.
@@ -17,7 +17,7 @@
 1 @mad | {A} organizza un tè con le bambole della Soffitta. Le bambole partecipano con entusiasmo.
 1 s:A=ferito | {A} scivola sulle scale di servizio. Le scale hanno un gradino in più rispetto a ieri.
 1 d:A *0.5 | {A} entra nella stanza chiusa a chiave "solo per dare un'occhiata". La porta si richiude da sola.
-1 +arma:A | {A} trova {arma} appesa sopra il camino, accanto a un ritratto che somiglia a {A} in modo inquietante.
+1 +arma:A | {A} trova sopra il camino {arma}, accanto a un ritratto che somiglia a {A} in modo inquietante.
 1 @show star:A | {A} fa una diretta dalla Cappella raccontando storie di fantasmi. Uno dei fantasmi corregge i dettagli.
 1 +mappa:A @int | {A} trova in Biblioteca {mappa}, con un passaggio segreto segnato a matita.
 1 s:A=sconvolto | {A} sente bussare dall'interno di un armadio. Tre volte. Poi una voce che dice il suo nome.

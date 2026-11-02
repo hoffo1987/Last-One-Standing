@@ -26,7 +26,7 @@
 1 stat:A<food30 +cibo:A | {A} scopre un distributore in Palestra che regala due merendine invece di una.
 1 con:A=attrezzo star:A @int | {A} usa {attrezzo:A} per prendere nove nella verifica di matematica. Il professore sospetta qualcosa, ma non trova niente.
 1 con:A=valore -valore:A +attrezzo:A | {A} compra {attrezzo} da uno di quinta con {valore}. Affare.
-1 con:A=ricordo mo:A+15 | {A} sfoglia {ricordo:A} durante l'ora di religione. [A:Gli/Le] viene da sorridere.
+1 con:A=ricordo mo:A+15 | {A} guarda {ricordo:A} durante l'ora di religione. [A:Gli/Le] viene da sorridere.
 1 wx:buio @stl | Approfittando del caos, {A} entra in sala professori e legge in anteprima le domande della verifica.
 1 wx:abbondanza +cibo:A | Alla gita, {A} riempie lo zaino di panini dell'autogrill. Ne avanza per tutta la settimana.
 1 wx:pericolo s:A=ferito | La settimana dei colloqui: la madre di {A} incontra il professore di storia. Disastro.

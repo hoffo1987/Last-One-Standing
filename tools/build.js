@@ -24,7 +24,13 @@ function assetsFor(uri) {
   const sagome = fs.readdirSync(path.join(A, 'sagome')).filter((f) => f.endsWith('.webp')).sort().map((f) => uri('sagome/' + f, 'image/webp'));
   return 'window.LOS_ASSETS = ' + JSON.stringify({ logo: uri('logo.webp', 'image/webp'), icona: uri('icona.webp', 'image/webp'), favicon: uri('favicon.png', 'image/png'), panoramica: uri('panoramica.webp', 'image/webp'), sagome, arene }) + ';';
 }
-const code = ['data-core.js', 'data-themes.js', ...content, 'engine.js', 'art.js', 'anim.js', 'ui.js'].map(src).join('\n;\n');
+const scripts = ['data-core.js', 'data-themes.js', ...content, 'engine.js', 'art.js', 'anim.js', 'replay.js', 'ui.js'];
+// Impronta dei sorgenti, indipendente dai fine riga del checkout e dagli output generati.
+const buildHash = require('crypto').createHash('sha256');
+for (const f of [...scripts, 'style.css', 'shell.html']) buildHash.update(f + '\0' + src(f).replace(/\r\n/g, '\n') + '\0');
+buildHash.update(fs.readFileSync(__filename, 'utf8').replace(/\r\n/g, '\n'));
+const buildId = buildHash.digest('hex');
+const code = 'window.LOS_BUILD = ' + JSON.stringify(buildId) + ';\n;\n' + scripts.map(src).join('\n;\n');
 const page = (assetsJs) => {
   const js = assetsJs + '\n;\n' + code;
   if (/<\/script/i.test(js)) throw new Error('Il JS contiene </script>');

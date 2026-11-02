@@ -10,6 +10,7 @@ Simulatore di battle royale, tutto in italiano. Crei il cast, scegli una delle 9
 - **Concorrenti** con 10 caratteristiche (forza, agilità, intelligenza, carisma, fortuna, resistenza, furtività, coraggio, empatia, sopravvivenza), fino a 3 dei 30 tratti, squadra e foto.
 - **Motore**: alleanze e tradimenti, oggetti (armi, cibo, medicine, trappole), stati (ferito, avvelenato, malato, affamato), pericolo crescente con i giorni, festino, disastri e scontro finale.
 - **Seme**: stesso seme, cast completo e impostazioni danno la stessa partita, usando la stessa versione di motore e contenuti.
+- **Ripresa fedele**: la partita generata viene conservata nel browser con il suo risultato completo, così un aggiornamento di testi o motore non cambia la storia già iniziata.
 - **Diretta** con tabellone, tacche dei superstiti, mappa a zone, elenco dei caduti e riproduzione automatica.
 - **Esito** con classifica, statistiche, grafici e locandina generata.
 - Eventi personalizzati con anteprima, importazione ed esportazione in JSON, salvataggio nel browser e tema chiaro o scuro.
@@ -86,7 +87,7 @@ Ogni concorrente prova qualcosa di diverso per ognuno degli altri, e non sempre 
 Dove si vede: nella diretta, la scheda **Legami** ha la **mappa dei legami** (un grafo dei vivi colorato per tipo di legame, con le frecce per i sentimenti non ricambiati, filtrabile e interattivo). Nella scheda di ogni concorrente, "Cosa prova per gli altri" mostra etichetta, dimensioni, cosa prova l'altro in cambio e i ricordi; "Promesse" elenca quelle fatte e ricevute e come sono finite. Nell'esito, **Le storie della partita** raccontano il grande amore, l'amicizia più forte, la nemesi, il tradimento più crudele, il gesto di pietà, l'amore non corrisposto, maestro e allievo, l'odio e la paura più grandi.
 
 ## Caratteristiche, tratti e prove
-- **Prove di abilità**: molti eventi sono una sfida su una caratteristica, con due esiti scritti. Il tiro somma caratteristica, due dadi, fortuna e tratti, e sottrae le condizioni (ferito, ubriaco, affamato…). La diretta mostra "Prova di Agilità · superata 15/11". Con valori alti si supera circa l'87% delle prove, con valori bassi circa il 20%.
+- **Prove di abilità**: molti eventi sono una sfida su una caratteristica, con due esiti scritti. Il tiro somma caratteristica, due dadi da sei (2–12), fortuna e tratti, e sottrae le condizioni (ferito, ubriaco, affamato…). La diretta mostra "Prova di Agilità · superata 15/11". La probabilità di riuscita dipende dalla difficoltà della prova e dalla condizione del concorrente.
 - **Eventi riservati** a chi ha una caratteristica molto alta o molto bassa, o un certo tratto.
 - **Effetti sul sistema delle conseguenze**: l'empatia rende più facili lutti e vendette, il coraggio riduce fughe e shock, la sopravvivenza ritarda la fame e protegge dai disastri, il carisma accelera alleanze e fama, la resistenza allontana le morti per ferite e malattie. Tra i tratti: il Vendicativo giura vendetta per poco, il Clemente perdona, chi è Superstizioso viene sempre salvato dall'amuleto, il Goloso patisce prima la fame, il Leader guida alleanze più grandi.
 
@@ -125,6 +126,7 @@ src/engine.js        motore di simulazione (funziona anche in Node)
 src/art.js           usa logo e illustrazioni da assets/ (con ripiego in SVG), icone, coriandoli
 assets/              logo, icona, panoramica, anteprima dei link, sagome dei concorrenti e illustrazioni delle 9 arene (ottimizzati e incorporati dalla build)
 src/anim.js          motore delle animazioni: atmosfere per arena, effetti degli eventi, transizioni, coriandoli
+src/replay.js        risultati immutabili nel browser, con IndexedDB e ripiego su localStorage
 docs/                versione per il web (Vercel o GitHub Pages): pagina leggera e immagini in docs/img con l'impronta nel nome, servite con cache lunga
 src/ui.js            interfaccia
 src/style.css        stile
@@ -143,6 +145,9 @@ node tools/test-consequences.js # regressioni su consumi, trasferimenti, salvata
 node tools/test-import.js       # importazione atomica, ID, eventi personalizzati e compatibilità dei salvataggi
 node tools/test-state-history.js # responsabilità dei danni differiti, valori vitali e durata delle promesse
 node tools/test-timeline.js      # statistiche e promesse nella fase corretta della diretta
+node tools/test-rendering.js     # accordi, pronomi, battute e metadati dei colpi evitati
+node tools/test-replay.js        # archivio dei risultati, immutabilità e guasti della memoria del browser
+node tools/test-persistence-ui.js # ripresa senza risimulazione, migrazione legacy e operazioni asincrone
 node tools/test-engine.js 40    # 40 partite per arena, metà con i contenuti 18+, controlla regole e determinismo
 node tools/fuzz.js 1500         # partite con impostazioni casuali e casi limite (2-60 concorrenti, una sola squadra, valori estremi)
 ```
@@ -150,7 +155,7 @@ Per giocare basta aprire `dist/index.html` (o `dist/last-one-standing.html`) in 
 
 **Sito pubblico con Vercel:** il file `vercel.json` dice a Vercel di eseguire `node tools/build.js` e pubblicare la cartella `docs/`. Basta importare il repository su Vercel, senza cambiare impostazioni (Framework: Other).
 
-**Sito pubblico con GitHub Pages:** la build copia la versione completa in `docs/`. Su GitHub: Settings → Pages → Source "Deploy from a branch" → ramo `main`, cartella `/docs`. L'immagine di anteprima dei link (`docs/anteprima.jpg`) e le icone sono già incluse.
+**Sito pubblico con GitHub Pages:** la build crea la versione web in `docs/`, con le immagini in `docs/img/`. Su GitHub: Settings → Pages → Source "Deploy from a branch" → ramo `main`, cartella `/docs`. L'immagine di anteprima dei link (`docs/anteprima.jpg`) e le icone sono già incluse.
 
 ## Formato degli eventi
 I disastri in `src/content/` usano un formato compatto: `Nome | introduzione | morte | danno | salvezza [| stato]`.
@@ -179,4 +184,12 @@ Restano supportati il formato esportato v2, gli alias `settings`/`custom` e gli 
 
 L'importazione verifica l'intera configurazione prima di sostituirla. Un errore indica l'elemento da correggere e lascia intatti i dati attuali. Gli ID duplicati o riservati, gli eventi incoerenti e gli elenchi oltre 200 elementi vengono segnalati; i testi degli eventi oltre 240 caratteri non vengono tagliati in silenzio.
 
-Le correzioni degli effetti possono cambiare gli esiti rispetto alle versioni precedenti. La ripresa attuale ricostruisce la partita dalla configurazione salvata: non è ancora un replay immutabile tra versioni diverse del motore o dei contenuti.
+### Ripresa delle partite
+
+Le nuove partite conservano il risultato completo: eventi, conseguenze, istantanee, diari, classifica e foto. Alla riapertura si legge quel risultato, senza richiamare il motore. Ogni risultato ha un identificativo proprio e l'impronta della build che lo ha generato; salvarlo di nuovo non può sostituirlo con una storia diversa.
+
+L'archivio usa IndexedDB, con un ripiego su localStorage quando IndexedDB non è disponibile. Se il risultato manca o è danneggiato viene mostrato un avviso, conservando cast e impostazioni. Se lo spazio è esaurito si può continuare nella pagina aperta, ma il salvataggio non viene dichiarato riuscito.
+
+I vecchi salvataggi contengono soltanto la configurazione: vengono ricostruiti una volta con la versione attuale, con un avviso esplicito, e poi archiviati. Gli esiti possono quindi differire dalla partita originale delle versioni precedenti.
+
+La ripresa riguarda l'ultima partita selezionata su quel browser e quella origine. Non è un archivio consultabile di tutte le partite e non si sincronizza tra dispositivi. L'esportazione JSON trasferisce cast, regole ed eventi personalizzati, non il risultato della partita. Cancellare i dati del sito elimina anche i risultati salvati.

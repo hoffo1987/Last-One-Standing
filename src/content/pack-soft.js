@@ -43,7 +43,7 @@
 2 esplosivo:A k:A>B | {A} lancia {esplosivo:A} contro {B}. L'effetto è devastante.
 1 need:A=affamato @mad | {A} salta la colazione e alla terza ora mangia una gomma da cancellare. Per sbaglio, dice.
 1 s:A=ubriaco @mad | {A} beve tre energy drink prima della verifica e consegna dopo quattro minuti un compito scritto in diagonale.
-2 enemy:AB | {A} e {B} si sfidano a chi prende il voto più alto. Prendono entrambi sei meno.
+2 enemy:AB | {A} e {B} si sfidano a chi prende il voto più alto. Prendono sei meno a testa.
 2 friend:AB al:AB | {A} e {B} si giurano amicizia eterna incidendo le iniziali sotto un banco.
 `,
       n: `
@@ -122,7 +122,7 @@ Il ballo di fine anno anticipato | Il ballo di fine anno viene anticipato a sorp
 2 feared:B @cow | {A} vede {B} avvicinarsi alla propria scrivania e finge una telefonata importantissima.
 3 feared:C k:AB>C *2 | {A} e {B} si alleano per far cadere {C}, che ha già fatto licenziare troppi colleghi.
 2 traitor:B rel:AB-30 | {A} scopre che {B} ha parlato male di tutti al Direttore. Lo dice a tutti in pausa caffè.
-1 fame:A @gift +amuleto:A | Il Direttore nota {A} alla festa aziendale e [A:gli/le] regala {amuleto}.
+1 fame:A @gift +amuleto:A | Il Direttore nota {A} alla festa aziendale: da quel momento {A} può contare su {amuleto}.
 1 fame:A s:A=ferito | {A} si fa vedere troppo in riunione e si ritrova con tre progetti in più.
 1 +veleno:A @stl | {A} ottiene {veleno} e sorride davanti al monitor.
 2 veleno:A k:A>B @stl *1.5 | {A} invia {veleno:A} su {B}. Venerdì {B} riceve lo scatolone.
@@ -170,7 +170,7 @@ La settimana corta | L'azienda introduce la settimana di quattro giorni, ma con 
 Il trasloco digitale | Tutti i documenti vengono spostati su un nuovo sistema. Metà spariscono. | {A} perde il contratto del cliente più importante ed è fuori. | {A} perde una settimana di lavoro. | {A} aveva una copia di tutto su chiavetta.
 Il colloquio annuale | Il Direttore incontra uno per uno tutti i dipendenti. | {A} dice la verità su cosa pensa dell'azienda. | {A} balbetta e si guadagna un richiamo. | {A} recita la parte alla perfezione e ottiene un aumento.
 La riunione fiume | La riunione del lunedì dura fino al martedì. | {A} si addormenta in riunione ed è licenziat[A:o/a]. | {A} non mangia per un giorno intero. | {A} porta i panini e diventa indispensabile. | affamato
-La stagista prodigio | Arriva una stagista che sa fare tutto meglio di tutti. | {A} viene sostituit[A:o/a] dalla stagista. | {A} deve rifare tutto il lavoro che la stagista ha corretto. | {A} diventa il mentore della stagista.
+La stagista prodigio | Arriva una stagista che sa fare tutto meglio di tutti. | {A} viene sostituit[A:o/a] dalla stagista. | {A} deve rifare tutto il lavoro che la stagista ha corretto. | {A} fa da mentore alla stagista.
 La cyber truffa | Una mail truffaldina arriva a tutti, firmata dal Direttore. | {A} paga la "fattura urgente" con la carta aziendale. | {A} clicca sul link e infetta il computer. | {A} riconosce la truffa e la segnala.
 Il caldo record | L'aria condizionata si rompe nella settimana più calda dell'anno. | {A} sviene in sala riunioni e non torna più. | {A} lavora con i piedi in un secchio d'acqua. | {A} lavora dalla sala server, unica stanza fresca. | malato
 Il controllo degli orari | Il nuovo badge registra ogni minuto di pausa. | {A} supera le pause consentite ed è licenziat[A:o/a]. | {A} riceve un richiamo per le pause caffè. | {A} non fa mai pausa e viene premiat[A:o/a].

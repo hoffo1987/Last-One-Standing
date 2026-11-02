@@ -106,6 +106,7 @@ test('Il memoriale usa le uccisioni dello snapshot, senza anticipare i crediti p
 test('La scheda selezionata passa fase e contesto corretti alle statistiche', () => {
   const c = fixture();
   Object.assign(c, { curView: 'diretta', S: { run: { phase: 0 } }, THEMES: { classico: { id: 'classico' } }, TRAITS: {}, KIND: { d: 'Giorno' },
+    stopped: 0, stopPlay: () => { c.stopped++; },
     G3: (g, m, f, n) => g === 'F' ? f : g === 'N' ? n : m,
     avHTML: () => '', nowHTML: () => '', vbars: () => '', bagHTML: () => '', relHTML: () => '', peopleHTML: () => '', diaryHTML: () => '',
     plural: (n, s, p) => n + ' ' + (n === 1 ? s : p), linkify: (s) => s });
@@ -118,5 +119,6 @@ test('La scheda selezionata passa fase e contesto corretti alle statistiche', ()
   assert.match(c.elements['#profBody'].innerHTML, /sciolta/);
   c.curView = 'esito'; c.openProfile('a');
   assert.match(c.elements['#profBody'].innerHTML, /prove superate 2 su 3/);
+  assert.equal(c.stopped, 3, 'La riproduzione deve fermarsi mentre si legge una scheda');
 });
 console.log('\nOK: ' + checks + ' gruppi di regressioni temporali dell’interfaccia');

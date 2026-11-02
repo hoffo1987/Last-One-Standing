@@ -43,7 +43,7 @@
 2 k:A>B | {A} e {B} si contendono uno zaino: {A} ha la meglio e {B} non si rialza più.
 2 k:A>B +arma:A | {A} scaglia {arma} contro {B}, che crolla a terra.
 2 k:A>B w:A @agg | {A} trafigge {B} con {arma:A}.
-2 k:A>B k:B>A | {A} e {B} si colpiscono nello stesso istante: nessuno dei due sopravvive.
+2 k:A>B k:B>A | {A} e {B} si colpiscono nello stesso istante: non sopravvive nessuno.
 2 al:AB @soc | {A} e {B} si scambiano uno sguardo e decidono di fuggire insieme.
 2 | {A} e {B} lottano per una borraccia, poi scappano in direzioni opposte.
 2 hit:A>B @agg | {A} colpisce {B} con un sasso e l[B:o/a] lascia stordit[B:o/a].
@@ -56,7 +56,7 @@
 3 al:ABC @soc | {A}, {B} e {C} formano un'alleanza in mezzo al caos.
 3 k:A>B | {A} uccide {B} mentre {C} approfitta della distrazione per fuggire.
 3 | {A}, {B} e {C} arrivano insieme allo stesso zaino e se lo strappano a vicenda.
-4 k:AB>CD @agg *0.6 | {A} e {B} tendono un agguato a {C} e {D}: nessuno dei due sopravvive.
+4 k:AB>CD @agg *0.6 | {A} e {B} tendono un agguato a {C} e {D}: né {C} né {D} sopravvive.
 4 al:AB al:CD | {A} e {B} si alleano, mentre poco lontano fanno lo stesso {C} e {D}.
 `,
     d: `
@@ -109,7 +109,7 @@
 2 need:B=* cure:B @heal | {A} medica le ferite di {B}.
 2 d:B | {A} assiste impotente mentre {B} viene trascinat[B:o/a] via da {mostro}.
 2 k:A>B @mad | {A} perde il controllo e massacra {B} senza un motivo apparente.
-2 save:A>B al:AB | {A} salva {B} da {mostro}: i due stringono un patto.
+2 save:A>B al:AB | {A} salva {B} da {mostro}: stringono un patto.
 2 @cow | {A} vede {B} da lontano e cambia strada di corsa.
 2 s:A=ferito | {A} prova ad attaccare {B}, ma ha la peggio e deve ritirarsi.
 3 al:ABC @soc | {A}, {B} e {C} formano un'alleanza.

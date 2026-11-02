@@ -316,32 +316,44 @@
     const o = opts.split('/');
     const gs = group.map((t) => t.gender || 'M');
     if (gs.every((g) => g === 'F')) return o[1] !== undefined ? o[1] : o[0];
-    if (gs.every((g) => g === 'N')) return o[2] !== undefined ? o[2] : 'ə';
+    if (gs.every((g) => g === 'N')) {
+      if (o[2] !== undefined) return o[2];
+      // Convenzione dell'app: schwa per i suffissi, lə/ləi per i pronomi
+      // singolari. Una terza forma scritta nel modello ha sempre precedenza.
+      const pronoun = { 'gli/le': 'lə', 'lui/lei': 'ləi', 'ui/ei': 'əi' }[opts.toLowerCase()];
+      return pronoun ? (/^\p{Lu}/u.test(opts) ? pronoun[0].toUpperCase() + pronoun.slice(1) : pronoun) : 'ə';
+    }
     return o[0];
   }
-  const ART = /^(un'|una |uno |un |il |lo |la |l'|i |gli |le |delle |dei |degli |del |della |dell')/i;
+  const ART = /^(un['’]|una |uno |un |il |lo |la |l['’]|i |gli |le |delle |dei |degli |del |dello |della |dell['’])/i;
   function possessive(item, fallback) {
     if (!item) return fallback || 'la sua arma';
     const s = item.name;
     const m = s.match(ART);
     const bare = m ? s.slice(m[0].length) : s;
-    const a = m ? m[0].toLowerCase() : '';
+    const a = m ? m[0].toLowerCase().replace(/’/g, "'") : '';
     if (/^(delle |le )/.test(a)) return 'le sue ' + bare;
     if (/^(dei |degli |i |gli )/.test(a)) return 'i suoi ' + bare;
-    const fem = /^(una |un'|la |della |dell')/.test(a);
+    // L'articolo eliso non rivela il genere: conservare il nome dell'oggetto
+    // evita accordi inventati come "il suo armatura" o "la sua arco".
+    if (a === "l'" || a === "dell'") return (m[0].includes('’') ? 'l’' : "l'") + bare;
+    const fem = /^(una |un'|la |della )/.test(a);
     return (fem ? 'la sua ' : 'il suo ') + bare;
   }
   const PREP = { in: 'ne', di: 'de', a: 'a', da: 'da', su: 'su' };
   const ARTI = { lo: 'llo', la: 'lla', "l'": "ll'", gli: 'gli', le: 'lle' };
   function artPrep(s) {
-    return s.replace(/(^|[^\p{L}'])(in|di|a|da|su) (il(?= )|lo(?= )|la(?= )|i(?= )|gli(?= )|le(?= )|l'(?=\p{L}))/gu, (m, pre, p, a) => {
-      const P = PREP[p];
-      return pre + (a === 'il' ? P + 'l' : a === 'i' ? P + 'i' : P + ARTI[a]);
+    return s.replace(/(^|[^\p{L}'’])(in|di|a|da|su) (il(?= )|lo(?= )|la(?= )|i(?= )|gli(?= )|le(?= )|l['’](?=\p{L}))/giu, (m, pre, p, article) => {
+      const P = PREP[p.toLowerCase()], a = article.toLowerCase().replace(/’/g, "'");
+      let joined = a === 'il' ? P + 'l' : a === 'i' ? P + 'i' : P + ARTI[a];
+      if (article.includes('’')) joined = joined.replace("'", '’');
+      return pre + (/^\p{Lu}/u.test(p) ? cap(joined) : joined);
     });
   }
   const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   const cap = (s) => s.charAt(0).toUpperCase() + s.slice(1);
-  const edFix = (s) => s.replace(/ e ((?:<b[^>]*>)?)(?=[Ee][^\s])/g, ' ed $1').replace(/(^|[ («])a ((?:<b[^>]*>)?)(?=[AÀ][^\s'’])/g, '$1ad $2');
+  const edFix = (s) => s.replace(/(^|[ («])([Ee]) ((?:<b[^>]*>)?)(?=[Ee][^\s])/g, (_, pre, p, tag) => pre + p + 'd ' + tag)
+    .replace(/(^|[ («])([Aa]) ((?:<b[^>]*>)?)(?=[AÀaà][^\s'’])/g, (_, pre, p, tag) => pre + p + 'd ' + tag);
   const nameTag = (t) => '<b class="nm" data-id="' + esc(t.id) + '" style="--c:' + esc(t.color || '#888') + '">' + esc(t.name) + '</b>';
 
   /* ---------------- Simulazione ---------------- */
@@ -516,7 +528,7 @@
       if (attr === 'for' && hasItem(t, 'arma')) bonus += 1;
       const tb = wx('tb', null); if (tb && tb[attr]) bonus += tb[attr];
       if (t.planPh >= phases.length - 3) bonus += 1;
-      const die = 1 + rng.int(6) + rng.int(6);
+      const die = 2 + rng.int(6) + rng.int(6);
       const roll = base + die + bonus;
       return { roll, dc, pass: roll >= dc, bonus };
     }
@@ -1093,6 +1105,7 @@
         k.v.forEach((i) => {
           if (saved.has(i)) return;
           const v = roles[i]; const wasAlive = v.alive;
+          const lastPartner = byId[v.partner || v.exPartner];
           kill(v, killers, txt, out);
           if (wasAlive && !v.alive) witness(killers[0], 'kill', v, roles);
           if (!wasAlive || v.alive || spoke || !rng.chance(0.38)) return;
@@ -1101,7 +1114,7 @@
           if (dear[i] && dear[i].K.alive) pushVoice(out, voice('revenge', dear[i].K, [v, dear[i].x]));
           else if (k.betray && KA) pushVoice(out, voice('betray', KA, [v]));
           else if (KA && rng.chance(0.5)) pushVoice(out, voice('kill', KA, [v]));
-          else pushVoice(out, voice('last', v, [killers[0], v.exPartner && byId[v.exPartner] ? byId[v.exPartner] : undefined].filter(Boolean)));
+          else pushVoice(out, voice('last', v, [killers[0], lastPartner].filter(Boolean)));
         });
         if (k.betray) {
           stats.betrayals++;
@@ -1185,7 +1198,7 @@
           case 'love': if (u.alive) {
             t.partner = u.id; u.partner = t.id; addAff(t, u, 70); stats.couples++; t.fame += 1; u.fame += 1; t.mo += 25; u.mo += 25;
             remember(t, u, 'love'); remember(u, t, 'love'); if (t.crush === u.id) t.crush = null; if (u.crush === t.id) u.crush = null; jealousy(t, u);
-            if (rng.chance(0.5)) pushVoice(out, voice('love', rng.chance(0.5) ? t : u, [rng.chance(0.5) ? u : t]));
+            if (rng.chance(0.5)) { const speaker = rng.chance(0.5) ? t : u; pushVoice(out, voice('love', speaker, [speaker === t ? u : t])); }
             if (!cfg.teamWin && (t.allyId == null || u.allyId == null || t.allyId === u.allyId)) { const g = t.allyId != null ? alliances.get(t.allyId) : u.allyId != null ? alliances.get(u.allyId) : null; if (!g || g.size < 5) joinAlliance([t, u]); } const e = echo(E.couple, [t, u], 'love'); if (e) out.push(e); } break;
           case 'repay': if (u) { delete t.owes[u.id]; addAff(t, u, 20); t.repaid++; remember(u, t, 'repaid'); stats.debtsRepaid++; const e = echo(E.repay, [t, u], 'good'); if (e) out.push(e); } break;
           case 'debt': if (u) t.owes[u.id] = 'favore'; break;
@@ -1215,7 +1228,9 @@
         else if (CURKIND === 'f' && rng.chance(0.15)) pushVoice(out, voice('feast', roles[0]));
       }
       stats.events++;
-      return { html: txt.html, plain: txt.plain, ids: roles.map((t) => t.id), deaths: roles.filter((t, i) => ev.victims.includes(i) && !t.alive).map((t) => t.id), lethal: ev.lethal, origin: ev.origin, cat: ev.cat, why: ev.why, echo: out.slice(0, 3), test: ev.testRes || null };
+      const deaths = roles.filter((t, i) => ev.victims.includes(i) && !t.alive).map((t) => t.id);
+      const cat = ev.lethal && !deaths.length && ev.cat !== 'betray' ? 'hurt' : ev.cat;
+      return { html: txt.html, plain: txt.plain, ids: roles.map((t) => t.id), deaths, lethal: deaths.length > 0, origin: ev.origin, cat, why: ev.why, echo: out.slice(0, 3), test: ev.testRes || null };
     }
 
     function lethalProb(kind) {
@@ -2463,7 +2478,7 @@
       .replace(POSS_RE, (_, it, c2) => possessive(it === 'arma' ? roles[L(c2)].inv[0] : null, 'il suo bottino'))
       .replace(LEX_RE, (_, k) => lexPick(k));
     s = cap(artPrep(s));
-    return esc(s).replace(/\{([A-F])\}/g, (_, c2) => '<b class="nm" style="--c:' + roles[L(c2)].color + '">' + roles[L(c2)].name + '</b>');
+    return edFix(esc(s).replace(/\{([A-F])\}/g, (_, c2) => '<b class="nm" style="--c:' + roles[L(c2)].color + '">' + roles[L(c2)].name + '</b>'));
   }
 
   /* Rende un testo con concorrenti fittizi tutti dello stesso genere (per i controlli automatici) */
@@ -2480,7 +2495,7 @@
       .replace(POSS_RE, (_, it, c2) => possessive(roles[L(c2)].inv.find((x) => x.type === it), 'il suo bottino'))
       .replace(LEX_RE, (_, k) => pick(k));
     s = cap(artPrep(s));
-    return s.replace(/\{([A-F])\}/g, (_, c) => names[L(c)]);
+    return edFix(s.replace(/\{([A-F])\}/g, (_, c) => names[L(c)]));
   }
 
   G.LOS = { renderSample, simulate, parseLine, parseBlock, parseDisasters, buildPools, makeRng, randomCast, countTemplates, previewCustom, customToLine, PALETTE, STATUS_LABEL, DIFF };

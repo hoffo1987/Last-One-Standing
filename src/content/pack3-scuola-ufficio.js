@@ -79,7 +79,7 @@
 2 love:AB @soc | {A} e {B} scoprono di prendere lo stesso treno ogni mattina. Da quel giorno siedono vicini.
 2 couple:AB star:A | {A} dedica a {B} un intero slide deck, a tema «perché sei la persona migliore dell'ufficio».
 2 steal:A<B @stl | {A} prende in prestito {arma:B} di {B} e se lo dimentica nel cassetto.
-2 rel:AB+20 @soc | {A} e {B} scoprono di odiare entrambi le riunioni del lunedì. Diventano amici in cinque minuti.
+2 rel:AB+20 @soc | {A} e {B} scoprono di odiare entrambi le riunioni del lunedì. Diventano amic[AB:i/he] in cinque minuti.
 2 rel:AB-20 | {A} e {B} si contendono l'ultima capsula di caffè buono.
 2 trait:A=avido steal:A<B | {A} si fa prestare da {B} {arma:B} «per cinque minuti». Sono passati tre giorni.
 2 trait:A=vendicativo grudge:A>B hit:A>B | {A} non ha dimenticato cosa ha fatto {B} in riunione. Oggi inoltra al capo una vecchia mail di {B}.

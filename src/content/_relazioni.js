@@ -12,8 +12,8 @@
     /* etichette da A verso B, dalla più forte; c = colore nella mappa */
     labels: {
       amore: { n: 'Amore', c: 'love', d: 'Fanno coppia.' },
-      ex: { n: 'Ex', c: 'love', d: 'Sono stati insieme. Non lo sono più.' },
-      cotta: { n: 'Cotta segreta', c: 'love', d: 'Ne è attratto in segreto.' },
+      ex: { n: 'Ex', c: 'love', d: 'Erano una coppia. Ora non lo sono più.' },
+      cotta: { n: 'Cotta segreta', c: 'love', d: 'Prova un\'attrazione segreta.' },
       complotto: { n: 'Bersaglio segreto', c: 'plot', d: 'Sta tramando contro questa persona.' },
       nemesi: { n: 'Nemesi', c: 'hate', d: 'La odia e la rispetta: è la sfida della sua vita.' },
       vendetta: { n: 'Vendetta', c: 'hate', d: 'Ha giurato di fargliela pagare.' },
@@ -25,8 +25,8 @@
       amico: { n: 'Amico fidato', c: 'friend', d: 'Si fida e le vuole bene.' },
       mentore: { n: 'Mentore', c: 'friend', d: 'Ha imparato molto da questa persona.' },
       protetto: { n: 'Da proteggere', c: 'friend', d: 'Ha promesso di proteggerla.' },
-      complice: { n: 'Complice', c: 'ally', d: 'Si fidano l\'uno dell\'altra, senza troppe smancerie.' },
-      alleatoComodo: { n: 'Alleato di comodo', c: 'ally', d: 'Sono alleati, ma non si fida.' },
+      complice: { n: 'Complice', c: 'ally', d: 'La fiducia è reciproca, senza troppe smancerie.' },
+      alleatoComodo: { n: 'Alleato di comodo', c: 'ally', d: 'Condividono il gruppo, senza vera fiducia.' },
       alleato: { n: 'Alleato', c: 'ally', d: 'Fanno parte dello stesso gruppo.' },
       rivale: { n: 'Rivale', c: 'rival', d: 'Non si piacciono, ma si rispettano.' },
       ammirazione: { n: 'Ammirazione', c: 'rival', d: 'La rispetta moltissimo.' },
@@ -54,17 +54,17 @@
     },
     /* nuovi ricordi, in prima persona */
     mem: {
-      sawKill: 'L\'ho visto uccidere {2}.', sawSave: 'L\'ho visto salvare {2}.', rumorBad: 'Ho sentito cose brutte sul suo conto.', rumorGood: 'Tutti ne parlano bene.',
+      sawKill: 'Ho visto questa persona uccidere {2}.', sawSave: 'Ho visto questa persona salvare {2}.', rumorBad: 'Ho sentito cose brutte sul suo conto.', rumorGood: 'Tutti ne parlano bene.',
       rumorFear: 'Mi hanno detto di starle alla larga.', promise: 'Ci siamo fatti una promessa.', promiseKept: 'Ha mantenuto la promessa.', promiseBroken: 'Mi aveva promesso una cosa. Non l\'ha mantenuta.',
-      spared: 'Poteva uccidermi. Non l\'ha fatto.', sparedThem: 'Ho avuto la sua vita in mano. L\'ho lasciata andare.', breakup: 'Ci siamo lasciati.', reunion: 'Siamo tornati insieme.',
+      spared: 'Poteva uccidermi. Non l\'ha fatto.', sparedThem: 'Ho avuto la sua vita in mano. L\'ho lasciata andare.', breakup: 'La nostra storia è finita.', reunion: 'La nostra coppia si è ricomposta.',
       rivalLove: 'Ci piace la stessa persona.', coalition: 'Ci siamo uniti contro {2}.', mentor: 'Mi ha insegnato come sopravvivere.', student: 'Ho insegnato tutto quello che so.',
       fought: 'Abbiamo combattuto fianco a fianco.', submitted: 'Ho chiesto la sua protezione.', protector: 'Mi ha chiesto protezione.', liedTo: 'Mi ha raccontato una bugia.',
       hardship: 'Siamo sopravvissuti insieme al peggio.', split: 'Per colpa sua il gruppo si è spaccato.', guilt: 'Il male che ho fatto non me lo perdono.',
     },
-    memSoft: { sawKill: 'L\'ho visto far fuori {2}.', spared: 'Poteva farmi fuori. Non l\'ha fatto.', sparedThem: 'Potevo farla fuori. Non l\'ho fatto.', fought: 'Ci siamo coperti a vicenda.' },
+    memSoft: { sawKill: 'Ho visto questa persona far fuori {2}.', spared: 'Poteva farmi fuori. Non l\'ha fatto.', sparedThem: 'Potevo mettere fine alla sua gara. Ho scelto di fermarmi.', fought: 'Ci siamo coperti a vicenda.' },
 
     promises: {
-      kinds: { fedelta: 'Fedeltà', protezione: 'Protezione', vendetta: 'Vendicarla', cibo: 'Dividere il cibo' },
+      kinds: { fedelta: 'Fedeltà', protezione: 'Protezione', vendetta: 'Vendetta', cibo: 'Dividere il cibo' },
       make: {
         fedelta: ['{0} e {1} si giurano fedeltà con una stretta di mano lunghissima.', '{0} guarda {1} negli occhi: «Io non ti tradirò. Mai». {1} ci crede.'],
         protezione: ['{0} giura a {1} che l[1:o/a] proteggerà, costi quel che costi.', '{0} promette a {1}: «Finché ci sono io, nessuno ti tocca».'],
@@ -90,10 +90,10 @@
       gossipFear: ['{0} avverte {1}: «Stai lontano da {2}. Ho visto cosa sa fare».', '{0} racconta a {1} cosa ha visto fare a {2}. {1} non dorme tranquill[1:o/a], dopo.', '{0} disegna una croce sulla mappa di {1}: «Lì c\'è {2}. Non andarci».'],
       gossipLie: ['{0} sussurra a {1} una storia su {2}. Non è vera, ma {1} ci crede.', '{0} inventa di sana pianta un tradimento di {2} e lo racconta a {1}. Funziona.', '{0} mostra a {1} un «indizio» contro {2}: un sasso, un nodo, una parola sentita a metà. A {1} basta.'],
       gossipCaught: ['{0} prova a mettere {1} contro {2}, ma {1} non ci casca. E se lo segna.', '{1} ascolta la storia di {0} su {2} e sorride: «Bella. Peccato che non sia vera».'],
-      spare: ['Ma all\'ultimo {0} abbassa l\'arma: non riesce a uccidere {1}.', '{0} ha {1} in pugno. Poi l[1:o/a] lascia andare. Nessuno dei due sa bene perché.', '{0} si ferma a un passo dal colpo finale. «Vattene», dice a {1}. {1} non se lo fa ripetere.'],
+      spare: ['Ma all\'ultimo {0} abbassa l\'arma: non riesce a uccidere {1}.', '{0} ha {1} in pugno. Poi l[1:o/a] lascia andare. Non sanno bene perché.', '{0} si ferma a un passo dal colpo finale. «Vattene», dice a {1}. {1} non se lo fa ripetere.'],
       breakup: ['{0} e {1} si lasciano. Nessuno grida: è peggio.', '{0} restituisce a {1} quello che {1} [0:gli/le] aveva regalato. È finita.', 'Dopo l\'ennesimo litigio, {0} dice a {1} che non ce la fa più. Si lasciano.'],
       breakupJealous: ['{0} ha visto come {1} guarda {2}. Basta così: si lasciano.'],
-      reunion: ['{0} e {1} tornano insieme dopo giorni di sguardi. Il pubblico applaude.', '{0} trova {1} da sol[1:o/a] al buio. Nessuno dei due dice niente. Poi si abbracciano: sono di nuovo una coppia.'],
+      reunion: ['{0} e {1} tornano insieme dopo giorni di sguardi. Il pubblico applaude.', '{0} trova {1} da sol[1:o/a] al buio. Restano in silenzio. Poi si abbracciano: sono di nuovo una coppia.'],
       triangle: ['{0} e {1} scoprono di avere una cotta per la stessa persona: {2}. Da ora sono rivali.'],
       coalition: ['{0} e {1} si mettono d\'accordo: insieme contro {2}. Da soli non avrebbero speranze.', '{0} e {1} hanno paura della stessa persona, {2}. La paura, a volte, unisce.'],
       submit: ['{0} ha troppa paura di {1}: si mette sotto la sua protezione e [1:gli/le] cede {i}.', '{0} si presenta da {1} a testa bassa, con {i} come offerta. {1} accetta il tributo.'],

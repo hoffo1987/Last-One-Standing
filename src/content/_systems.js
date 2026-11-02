@@ -145,7 +145,7 @@
 2 love:AB | {A} e {B} si scontrano nella mischia e si guardano un secondo di troppo. Scatta qualcosa.
 1 +amuleto:A @luck | {A} raccoglie da terra {amuleto}. Sembra niente. Non lo è.
 1 +mappa:A @int | {A} afferra {mappa} invece di un'arma. Scelta discutibile, o geniale.
-1 +esplosivo:A | {A} si ritrova in mano {esplosivo} e corre via tenendolo il più lontano possibile dal corpo.
+1 +esplosivo:A | {A} si ritrova in mano {esplosivo} e corre via tenendo il braccio il più lontano possibile dal corpo.
 1 +veleno:A @stl | {A} infila in tasca {veleno} senza che nessuno se ne accorga.
 2 hit:A>B @agg | {A} rifila un pugno a {B} per uno zaino. {B} se lo segna.
 2 give:A>B=cibo @heal | In mezzo al caos, {A} lancia una borraccia a {B}, che non l[A:o/a] conosce nemmeno.

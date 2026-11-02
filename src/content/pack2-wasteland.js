@@ -33,7 +33,7 @@
 2 goal:A=caccia k:A>B @agg | {A} segue le tracce di pneumatico di {B} nel deserto. Le tracce finiscono, e anche {B}.
 2 goal:A=cibo give:B>A=cibo debt:A>B | {B} lancia a {A} una lattina ammaccata. «Quando trovi acqua, ricordati di me.»
 2 con:A=armatura hit:B>A | {B} colpisce {A} con una spranga, ma {armatura:A} fa un rumore di campana e regge.
-2 con:A=alcol give:A>B=alcol rel:AB+20 | {A} e {B} si passano {alcol} attorno a un fuoco di copertoni. Non sono amici. Stasera, quasi.
+2 con:A=alcol give:A>B=alcol rel:AB+20 | {A} e {B} si passano {alcol} attorno a un fuoco di copertoni. Non sono amic[AB:i/he]. Stasera, quasi.
 2 steal:A<B @stl trait:A=avido | {A} sfila {arma:B} dalla cintura di {B} mentre [B:gli/le] offre da bere.
 2 owe:A>B repay:A>B rel:AB+10 | {A} tira fuori {B} dalle sabbie mobili con una catena da moto. Debito saldato.
 3 plot:A>B ally:ABC rel:AC+20 | {A} dice a {C} di aver visto {B} contare le razioni del gruppo di notte. {C} comincia a contare quelle di {B}.

@@ -1,0 +1,224 @@
+/* Archivio locale dei risultati già generati: nessuna risimulazione o rete. */
+(function (G) {
+  'use strict';
+  const DB = 'last-one-standing:replays', STORE = 'replays', PREFIX = 'last-one-standing:replay:v1:';
+  const own = (o, k) => Object.prototype.hasOwnProperty.call(o, k);
+  const record = (x) => x != null && typeof x === 'object' && !Array.isArray(x);
+  const integer = (x, min = 0) => Number.isInteger(x) && x >= min;
+  const idOk = (x) => typeof x === 'string' && x.length > 0 && !/[{}]/.test(x) && !own(Object.prototype, x) && x !== 'prototype';
+  const replayIdOk = (x) => typeof x === 'string' && /^[a-zA-Z0-9_-]{1,100}$/.test(x);
+  const colorOk = (x) => x == null || typeof x === 'string' && /^#[a-fA-F0-9]{3,8}$/.test(x);
+  const imageOk = (x) => x === '' || typeof x === 'string' && /^data:image\/(png|jpe?g|webp|gif);base64,[A-Za-z0-9+/=]+$/.test(x);
+  const classes = new Set(['', 'good', 'warn', 'love', 'twist', 'quote']);
+  const categories = new Set(['none', 'kill', 'death', 'betray', 'ally', 'heal', 'item', 'hurt', 'love']);
+  const kinds = new Set(['b', 'd', 'n', 'f', 'dis', 'fallen', 'finale']);
+  const promiseKinds = new Set(['fedelta', 'protezione', 'vendetta', 'cibo']);
+  let opening = null, serial = 0;
+  const copy = (x) => G.structuredClone(x);
+
+  // Il motore genera grassetti e a capo, con eventuale riferimento al concorrente.
+  // Si controlla senza modificare l'HTML, per conservare il risultato originale.
+  function safeHtml(s, ids) {
+    if (typeof s !== 'string') return false;
+    let depth = 0, valid = true;
+    const rest = s.replace(/<[^>]*>/g, (tag) => {
+      if (tag === '<br>') return '';
+      if (tag === '<b>' || tag === '<b class="meteo">') { depth++; return ''; }
+      if (tag === '</b>') { if (--depth < 0) valid = false; return ''; }
+      const m = tag.match(/^<b class="nm" data-id="([^"<>]*)" style="--c:(#[a-fA-F0-9]{3,8})">$/);
+      if (!m) { valid = false; return ''; }
+      const id = m[1].replace(/&(amp|lt|gt|quot|#39);/g, (_, x) => ({ amp: '&', lt: '<', gt: '>', quot: '"', '#39': "'" }[x]));
+      if (!ids.has(id)) valid = false;
+      depth++; return '';
+    });
+    return valid && depth === 0 && !/[<>]/.test(rest);
+  }
+  function validate(result) {
+    try {
+      if (!record(result) || result.version !== 2 || typeof result.theme !== 'string' || typeof result.seed !== 'string' || typeof result.adult !== 'boolean' || !integer(result.days, 1)) return false;
+      if (!Array.isArray(result.tributes) || result.tributes.length < 2 || !Array.isArray(result.phases) || !result.phases.length || !record(result.stats)) return false;
+      const data = G.LOS_DATA, theme = data && Array.isArray(data.themes) ? data.themes.find((t) => t.id === result.theme) : null;
+      if (data && !theme) return false;
+      const attrs = data && data.attrs ? new Set(data.attrs.map((a) => a.id)) : null;
+      const traits = data && data.traits ? new Set(data.traits.map((t) => t.id)) : null;
+      const ids = new Set(result.tributes.map((t) => t && t.id)), nph = result.phases.length;
+      if (ids.size !== result.tributes.length || [...ids].some((id) => !idOk(id))) return false;
+      const refs = (xs) => Array.isArray(xs) && xs.every((id) => ids.has(id));
+      const phase = (x) => integer(x) && x < nph;
+      const textList = (xs) => Array.isArray(xs) && xs.every((x) => typeof x === 'string');
+      const promise = (q) => record(q) && ids.has(q.to) && promiseKinds.has(q.k) && phase(q.ph) && integer(q.d) && (q.done == null || ['mantenuta', 'tradita', 'sciolta'].includes(q.done)) && (q.end == null || phase(q.end) && q.end >= q.ph);
+      const item = (it) => record(it) && typeof it.t === 'string' && typeof it.n === 'string' && (it.q == null || integer(it.q, 1) && it.q <= 3) && (it.u == null || Number.isFinite(it.u) && it.u >= 0) && (it.m == null || Number.isFinite(it.m) && it.m > 0) && (it.f == null || ids.has(it.f));
+      const event = (e) => record(e) && safeHtml(e.html, ids) && typeof e.plain === 'string' && refs(e.ids) && refs(e.deaths) && (e.note || categories.has(e.cat)) &&
+        (e.echo == null || Array.isArray(e.echo) && e.echo.every((x) => record(x) && safeHtml(x.html, ids) && typeof x.plain === 'string' && classes.has(x.cls || ''))) &&
+        (e.test == null || record(e.test) && ids.has(e.test.who) && typeof e.test.attr === 'string' && (!attrs || attrs.has(e.test.attr)) && Number.isFinite(e.test.roll) && Number.isFinite(e.test.dc) && typeof e.test.pass === 'boolean');
+      for (const t of result.tributes) {
+        if (!record(t) || typeof t.name !== 'string' || !['M', 'F', 'N'].includes(t.gender) || !integer(t.team, 1) || !integer(t.rank, 1) || typeof t.alive !== 'boolean' || !colorOk(t.color) || !imageOk(t.img)) return false;
+        if (!textList(t.traits) || traits && t.traits.some((x) => !traits.has(x)) || !record(t.attr) || attrs && [...attrs].some((a) => !Number.isFinite(t.attr[a]) || t.attr[a] < 1 || t.attr[a] > 10)) return false;
+        if (!refs(t.killIds) || !refs(t.killerIds) || !textList(t.inv) || !textList(t.st) || !integer(t.deathDay) || !Number.isInteger(t.deathPhase) || (t.alive ? t.deathPhase !== -1 : !phase(t.deathPhase))) return false;
+        for (const k of ['kills', 'events', 'alliancesFormed', 'betrayals', 'items', 'tests', 'testsPassed']) if (!integer(t[k])) return false;
+        if (!safeHtml(t.deathHtml, ids) || !Array.isArray(t.diary) || !t.diary.every((d) => record(d) && phase(d.ph) && integer(d.d) && typeof d.k === 'string' && safeHtml(d.h, ids))) return false;
+        if (!Array.isArray(t.promises) || !t.promises.every(promise) || !Array.isArray(t.bag) || !t.bag.every(item) || !record(t.mem)) return false;
+        for (const [id, memories] of Object.entries(t.mem)) if (!ids.has(id) || !Array.isArray(memories) || !memories.every((m) => record(m) && phase(m.ph) && typeof m.k === 'string' && (m.x == null || ids.has(m.x)))) return false;
+      }
+      for (const p of result.phases) {
+        if (!record(p) || !kinds.has(p.kind) || typeof p.title !== 'string' || typeof p.intro !== 'string' || !integer(p.day) || !Array.isArray(p.events) || !p.events.every(event)) return false;
+        if (p.deaths != null && !refs(p.deaths)) return false;
+        if (p.kind === 'fallen' && !refs(p.deaths)) return false;
+        const s = p.snap;
+        if (!record(s) || !refs(s.alive) || new Set(s.alive).size !== s.alive.length) return false;
+        if (!['zones', 'allies', 'st', 'inv', 'kills', 'rel', 'vit', 'mind'].every((k) => record(s[k])) || !Array.isArray(s.edges) || !Array.isArray(s.closed)) return false;
+        for (const id of ids) {
+          if (!integer(s.zones[id]) || !textList(s.st[id]) || !Array.isArray(s.inv[id]) || !s.inv[id].every(item) || !integer(s.kills[id])) return false;
+          const r = s.rel[id];
+          if (!record(r) || !Array.isArray(r.g) || !r.g.every((g) => Array.isArray(g) && ids.has(g[0]) && (g[2] == null || ids.has(g[2]))) || !refs(r.o) || !refs(r.fr) || !refs(r.en) || !Array.isArray(r.top)) return false;
+          if (!r.top.every((x) => Array.isArray(x) && ids.has(x[0]) && Number.isFinite(x[1]) && typeof x[2] === 'string' && (x[3] == null || record(x[3])))) return false;
+        }
+        for (const id of s.alive) if (!Array.isArray(s.vit[id]) || s.vit[id].length !== 5 || s.vit[id].some((x, i) => !Number.isFinite(x) || x > 100 || x < (i === 4 ? -1 : 0))) return false;
+        if (!s.edges.every((e) => Array.isArray(e) && integer(e[0]) && e[0] < ids.size && integer(e[1]) && e[1] < ids.size && ['love', 'friend', 'ally', 'hate', 'fear', 'rival', 'plot'].includes(e[2]) && Number.isFinite(e[3]) && [0, 1, 2].includes(e[4]))) return false;
+      }
+      if (!refs(result.winners) || !result.winners.length || result.winners.length !== result.tributes.filter((t) => t.alive).length || result.winners.some((id) => !result.tributes.find((t) => t.id === id).alive)) return false;
+      if (!Array.isArray(result.stats.deathsByDay) || !record(result.stats.causes) || !Object.values(result.stats.causes).every((x) => integer(x)) || !Array.isArray(result.stats.meteo) || !Array.isArray(result.stats.stories)) return false;
+      if (!result.stats.meteo.every((x) => record(x) && integer(x.day, 1) && typeof x.n === 'string') || !result.stats.stories.every((x) => record(x) && ids.has(x.a) && ids.has(x.b) && typeof x.k === 'string' && Number.isFinite(x.v))) return false;
+      // Rifiuta anche HTML eseguibile annidato nei diari/pensieri o classi corrotte.
+      const seen = new Set();
+      function plainData(x, depth) {
+        if (depth > 80) return false;
+        if (x == null || typeof x === 'string' || typeof x === 'boolean' || typeof x === 'undefined') return true;
+        if (typeof x === 'number') return Number.isFinite(x);
+        if (typeof x !== 'object' || seen.has(x)) return false;
+        seen.add(x);
+        const ok = Object.entries(x).every(([k, v]) => (!['html', 'deathHtml', 'h', 'th'].includes(k) || typeof v !== 'string' || safeHtml(v, ids)) && plainData(v, depth + 1));
+        seen.delete(x); return ok;
+      }
+      return plainData(result, 0);
+    } catch (e) { return false; }
+  }
+  function envelopeOk(e, id) {
+    return record(e) && e.schema === 1 && e.id === id && typeof e.buildId === 'string' && Number.isFinite(e.createdAt) && e.createdAt > 0 && validate(e.result);
+  }
+  function openDb() {
+    if (opening) return opening;
+    opening = new Promise((resolve, reject) => {
+      if (!G.indexedDB || typeof G.indexedDB.open !== 'function') return reject(new Error('IndexedDB non disponibile.'));
+      let settled = false, req;
+      const timer = G.setTimeout(() => { settled = true; reject(new Error('Archivio delle partite temporaneamente non disponibile.')); }, 4000);
+      try { req = G.indexedDB.open(DB, 1); } catch (e) { G.clearTimeout(timer); reject(e); return; }
+      req.onupgradeneeded = () => { if (!req.result.objectStoreNames.contains(STORE)) req.result.createObjectStore(STORE); };
+      req.onerror = () => { G.clearTimeout(timer); settled = true; reject(req.error || new Error('Archivio delle partite non disponibile.')); };
+      req.onblocked = () => { G.clearTimeout(timer); settled = true; reject(new Error('Archivio delle partite temporaneamente bloccato.')); };
+      req.onsuccess = () => {
+        G.clearTimeout(timer);
+        const db = req.result;
+        if (settled) { db.close(); return; }
+        settled = true;
+        db.onversionchange = () => { db.close(); opening = null; };
+        resolve(db);
+      };
+    }).catch((e) => { opening = null; throw e; });
+    return opening;
+  }
+  function readDb(db, id) {
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction(STORE, 'readonly'), req = tx.objectStore(STORE).get(id);
+      let value;
+      req.onsuccess = () => { value = req.result; };
+      tx.oncomplete = () => resolve(value);
+      tx.onerror = tx.onabort = () => reject(tx.error || req.error || new Error('Impossibile leggere la partita salvata.'));
+    });
+  }
+  function writeDb(db, envelope) {
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction(STORE, 'readwrite'), store = tx.objectStore(STORE), req = store.get(envelope.id);
+      let saved = envelope, conflict = false;
+      req.onsuccess = () => {
+        if (req.result !== undefined) {
+          if (!envelopeOk(req.result, envelope.id) || JSON.stringify(req.result.result) !== JSON.stringify(envelope.result)) { conflict = true; tx.abort(); return; }
+          saved = req.result;
+        } else store.add(envelope, envelope.id);
+      };
+      tx.oncomplete = () => resolve(saved);
+      tx.onerror = tx.onabort = () => reject(new Error(conflict ? 'Una partita salvata non può essere sostituita: usa un nuovo identificativo.' : 'Impossibile salvare la partita nell’archivio del browser.'));
+    });
+  }
+  // JSON non conserva undefined, -0 o buchi negli array: i percorsi mantengono il
+  // risultato originale nel ripiego locale, senza toccare i salvataggi precedenti.
+  function encode(e) {
+    const paths = [], negativeZeros = [], holes = [];
+    const walk = (x, p) => {
+      if (x === undefined) { paths.push(p); return null; }
+      if (Object.is(x, -0)) { negativeZeros.push(p); return 0; }
+      if (Array.isArray(x)) return Array.from({ length: x.length }, (_, i) => {
+        if (!own(x, i)) { holes.push(p.concat(i)); return null; }
+        return walk(x[i], p.concat(i));
+      });
+      if (record(x)) return Object.fromEntries(Object.entries(x).map(([k, v]) => [k, walk(v, p.concat(k))]));
+      return x;
+    };
+    return JSON.stringify({ codec: 1, snapshot: walk(e, []), undefinedPaths: paths, negativeZeros, holes });
+  }
+  function decode(raw) {
+    try {
+      const data = JSON.parse(raw);
+      if (!record(data) || data.codec !== 1 || !record(data.snapshot) || !Array.isArray(data.undefinedPaths)) return null;
+      const restore = (p, type) => {
+        if (!Array.isArray(p) || !p.length || p.length > 80) return null;
+        if (!p.every((k) => typeof k === 'string' || integer(k))) return null;
+        let x = data.snapshot;
+        for (const k of p.slice(0, -1)) { if (x == null || !own(x, k)) return null; x = x[k]; }
+        const k = p[p.length - 1]; if (x == null || !own(x, k) || x[k] !== (type === 'zero' ? 0 : null)) return null;
+        if (type === 'hole') { if (!Array.isArray(x) || !integer(k)) return null; delete x[k]; }
+        else Object.defineProperty(x, k, { value: type === 'zero' ? -0 : undefined, writable: true, enumerable: true, configurable: true });
+        return true;
+      };
+      if (!data.undefinedPaths.every((p) => restore(p, 'undefined'))) return null;
+      if (data.negativeZeros != null && (!Array.isArray(data.negativeZeros) || !data.negativeZeros.every((p) => restore(p, 'zero')))) return null;
+      if (data.holes != null && (!Array.isArray(data.holes) || !data.holes.every((p) => restore(p, 'hole')))) return null;
+      return data.snapshot;
+    } catch (e) { return null; }
+  }
+  function readLocal(id) {
+    const raw = G.localStorage.getItem(PREFIX + id);
+    return raw == null ? null : decode(raw);
+  }
+  function writeLocal(e) {
+    const raw = G.localStorage.getItem(PREFIX + e.id);
+    if (raw != null) {
+      const old = decode(raw);
+      if (!envelopeOk(old, e.id) || JSON.stringify(old.result) !== JSON.stringify(e.result)) throw new Error('Una partita salvata non può essere sostituita: usa un nuovo identificativo.');
+      return old;
+    }
+    // setItem è atomico: se la quota è esaurita, il precedente replay resta intatto.
+    G.localStorage.setItem(PREFIX + e.id, encode(e)); return e;
+  }
+  function createId() {
+    return 'r-' + (G.crypto && typeof G.crypto.randomUUID === 'function' ? G.crypto.randomUUID() : Date.now().toString(36) + '-' + (++serial).toString(36) + '-' + Math.random().toString(36).slice(2, 12));
+  }
+  async function save(id, result, meta = {}) {
+    if (!replayIdOk(id)) throw new Error('Identificativo della partita non valido.');
+    const e = { schema: 1, id, buildId: meta.buildId == null ? String(G.LOS_BUILD || 'sviluppo') : meta.buildId, createdAt: meta.createdAt == null ? Date.now() : meta.createdAt, result: copy(result) };
+    if (!envelopeOk(e, id)) throw new Error('Il risultato della partita non è valido e non è stato salvato.');
+    // Un replay nato nel ripiego locale resta immutabile anche se IndexedDB
+    // diventa disponibile in un'apertura successiva del browser.
+    let local;
+    try { local = readLocal(id); } catch (err) { /* IndexedDB può funzionare anche con localStorage disabilitato. */ }
+    if (local) {
+      if (!envelopeOk(local, id) || JSON.stringify(local.result) !== JSON.stringify(e.result)) throw new Error('Una partita salvata non può essere sostituita: usa un nuovo identificativo.');
+      return { id, buildId: local.buildId, createdAt: local.createdAt, storage: 'localStorage' };
+    }
+    let db;
+    try { db = await openDb(); } catch (err) {
+      const saved = writeLocal(e); return { id, buildId: saved.buildId, createdAt: saved.createdAt, storage: 'localStorage' };
+    }
+    const saved = await writeDb(db, e);
+    return { id, buildId: saved.buildId, createdAt: saved.createdAt, storage: 'indexedDB' };
+  }
+  async function load(id) {
+    if (!replayIdOk(id)) return null;
+    let e, db;
+    try { db = await openDb(); } catch (err) { e = readLocal(id); return envelopeOk(e, id) ? copy(e.result) : null; }
+    e = await readDb(db, id);
+    if (e === undefined) { try { e = readLocal(id); } catch (err) { e = null; } }
+    return envelopeOk(e, id) ? copy(e.result) : null;
+  }
+  G.LOS_REPLAY = { createId, save, load, validate };
+})(typeof window === 'object' ? window : globalThis);

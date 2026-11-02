@@ -42,7 +42,7 @@
 `,
       f: `
 1 s:A=avvelenato | {A} assaggia una portata del banchetto e si sente subito male.
-1 +arma:A | {A} trova {arma} nascosta sotto la tovaglia del banchetto.
+1 +arma:A | {A} trova {arma} sotto la tovaglia del banchetto.
 2 k:A>B | {A} offre a {B} un calice di vino avvelenato.
 `,
     },

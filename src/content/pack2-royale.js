@@ -59,7 +59,7 @@
 1 +ricordo:A mo:A+20 @gift | Gli sponsor mandano a {A} un videomessaggio della famiglia e {ricordo}.
 `,
       finale: `
-2 k:A>B | Ultimo cerchio, grande come un campo da tennis. {A} e {B} si guardano. Il resto è un clip da dieci milioni di visualizzazioni.
+2 k:A>B | Ultimo cerchio, grande come un campo da tennis. {A} e {B} si guardano. Il resto è una clip da dieci milioni di visualizzazioni.
 2 k:A>B con:A=armatura | {B} spara per prim[B:o/a], ma {armatura:A} regge l'ultimo colpo. {A} vince la partita.
 `,
     },

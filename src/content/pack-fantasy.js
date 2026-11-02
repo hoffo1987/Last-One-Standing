@@ -10,7 +10,7 @@
 2 k:A>B | {A} lancia un incantesimo di fuoco contro {B}. Funziona fin troppo bene.
 2 save:A>B @heal | {A} alza uno scudo di luce davanti a {B} appena in tempo.
 1 @show star:A | {A} sale sull'Altare e grida "Per il reame!". Nessuno sa quale reame, ma il pubblico adora.
-2 al:AB @soc | {A} e {B} si riconoscono: hanno studiato nella stessa accademia di magia, entrambi bocciati in Teletrasporto.
+2 al:AB @soc | {A} e {B} si riconoscono: hanno studiato nella stessa accademia di magia, con una bocciatura a testa in Teletrasporto.
 `,
       d: `
 1 +cibo:A @soc | {A} aiuta un mercante gnomo a ritrovare il proprio cappello e viene pagat[A:o/a] in formaggio.
@@ -61,7 +61,7 @@
     },
     dis: `
 Il mercato delle anime | Un mercante demoniaco offre potere in cambio di un anno di vita. Molti accettano. | {A} firma senza leggere: l'anno era quello corrente. | {A} cede tre giorni di vita e si sente subito più debole. | {A} legge il contratto, trova la clausola e se ne va. | malato
-Il drago affamato | Il drago ha deciso che oggi si mangia fuori. | {A} viene inghiottit[A:o/a] intero, con tanto di zaino. | {A} viene sputat[A:o/a] fuori perché non era di suo gusto. | {A} offre al drago una pecora e se ne va.
+Il drago affamato | Il drago ha deciso che oggi si mangia fuori. | {A} viene inghiottit[A:o/a] inter[A:o/a], con tanto di zaino. | {A} viene sputat[A:o/a] fuori perché non era di suo gusto. | {A} offre al drago una pecora e se ne va.
 La pioggia di rospi parlanti | Dal cielo piovono rospi che urlano insulti. | {A} viene sommers[A:o/a] da una valanga di rospi offensivi. | {A} viene ferit[A:o/a] nell'orgoglio e nel naso. | {A} insulta i rospi a sua volta e li mette in fuga. | sconvolto
 Il ballo delle armature | Le armature vuote della Torre si animano e danzano un valzer mortale. | {A} viene trascinat[A:o/a] nel ballo e calpestat[A:o/a] a morte. | {A} balla un giro e ne esce con un piede rotto. | {A} si rifiuta di ballare: le armature sono offese ma rispettose.
 L'incantesimo scambiato | Un mago pasticcione scambia i corpi di metà dei concorrenti per un'ora. | {A} non riesce a tornare nel proprio corpo e si dissolve. | {A} torna nel proprio corpo, ma con il raffreddore di qualcun altro. | {A} non viene coinvolt[A:o/a] e si gode lo spettacolo. | malato
@@ -69,7 +69,7 @@ Lo sciame di ombre | Ombre senza padrone cercano un corpo da abitare. | {A} vien
 La montagna che cammina | Il Picco del drago si alza e si sposta di dieci chilometri. | {A} viene schiacciat[A:o/a] da un passo della montagna. | {A} cade dalla montagna mentre si sposta. | {A} si fa dare un passaggio dalla montagna.
 Il torneo del re | Un re spettrale indice un torneo: chi rifiuta viene giustiziato. | {A} perde al primo turno contro un cavaliere senza testa. | {A} perde in semifinale e viene ferit[A:o/a]. | {A} vince il torneo e riceve una corona arrugginita.
 La gelata eterna | Una strega del ghiaccio congela il reame per un giorno. | {A} diventa una statua di ghiaccio molto espressiva. | {A} perde la punta del naso per il gelo. | {A} si scalda vicino al drago addormentato. | malato
-Gli gnomi da giardino | Migliaia di gnomi di pietra si animano e circondano gli accampamenti. | {A} viene circondat[A:o/a] e preso a picconate. | {A} viene morsicat[A:o/a] a una caviglia da uno gnomo. | {A} offre loro del tè e diventa loro amic[A:o/a].
+Gli gnomi da giardino | Migliaia di gnomi di pietra si animano e circondano gli accampamenti. | {A} viene circondat[A:o/a] e pres[A:o/a] a picconate. | {A} viene morsicat[A:o/a] a una caviglia da uno gnomo. | {A} offre loro del tè e diventa loro amic[A:o/a].
 La biblioteca infinita | Un'enorme biblioteca appare e risucchia chi entra a leggere. | {A} resta intrappolat[A:o/a] in un libro di contabilità elfica. | {A} esce dalla biblioteca con un'emicrania terribile. | {A} esce con un libro di incantesimi sotto il braccio.
 La fontana dei desideri | Una fontana esaudisce i desideri, in modo molto letterale. | {A} chiede di "non avere più problemi". Esaudito. | {A} chiede di essere più forte e si ritrova con un braccio enorme e uno normale. | {A} chiede un panino ed è soddisfatt[A:o/a].
 Il buco nel cielo | Il cielo si strappa e da lì cadono stelle, pezzi di luna e un pianoforte. | {A} viene colpit[A:o/a] dal pianoforte. | {A} viene colpit[A:o/a] da un pezzo di luna, piccolo ma deciso. | {A} si siede al pianoforte e suona.
