@@ -53,6 +53,11 @@
       <div class="facts" id="facts"></div>
       <div class="resume" id="resume" hidden></div>
       <div class="archive-launch"><button class="btn" type="button" id="btnArchive">Archivio partite e replay</button></div>
+      <section class="card studio-panel" aria-labelledby="h-seasons"><h2 id="h-seasons">Stagioni e tornei</h2>
+        <p class="help">Conserva un cast per più round: 1 punto per la partecipazione, 3 per la vittoria e 1 per ogni eliminazione attribuita.</p>
+        <div class="row"><label>Nome della stagione<input id="seasonName" maxlength="80" placeholder="La mia stagione"></label><button class="btn" id="seasonCreate" type="button">Crea con il cast attuale</button></div>
+        <label>Stagione<select id="seasonSelect"></select></label><div id="seasonBoard"></div><p class="help" id="seasonMsg" role="status"></p>
+      </section>
       <div class="howto">
         <div class="how"><span class="hn">1</span><h3>Crea il cast</h3><p>Nomi, genere, squadre, tratti e foto. Puoi incollare un elenco di nomi o generarne uno.</p></div>
         <div class="how"><span class="hn">2</span><h3>Scegli l'arena</h3><p>Nove mondi con armi, luoghi, mostri e disastri propri. Decidi la difficoltà e il seme.</p></div>
@@ -103,6 +108,10 @@
       </div>
     </div>
     <div class="notice" id="castNotice" hidden></div>
+    <details class="card studio-panel"><summary>Legami prima dei giochi</summary><p class="help">Amicizie, rivalità e coppie sono reciproche. Fiducia e attrazione vanno dalla prima persona alla seconda.</p>
+      <div class="row"><label>Da<select id="relationFrom"></select></label><label>Verso<select id="relationTo"></select></label><label>Legame<select id="relationType"><option value="amicizia">Amicizia</option><option value="rivalita">Rivalità</option><option value="coppia">Coppia</option><option value="fiducia">Fiducia →</option><option value="attrazione">Attrazione →</option></select></label><button class="btn" id="relationAdd" type="button">Aggiungi legame</button></div>
+      <div id="relationsList"></div><p class="help" id="relationMsg" role="status"></p>
+    </details>
     <div id="clearConfirm" hidden class="confirm">Eliminare tutti i concorrenti? <button class="btn danger" id="clearYes" type="button">Elimina tutti</button> <button class="btn" id="clearNo" type="button">Annulla</button></div>
     <div id="castList"></div>
     <input type="file" id="avatarFile" accept="image/*" hidden>
@@ -130,11 +139,19 @@
               <div class="wide row"><button class="btn primary" id="cAdd" type="button">Aggiungi evento</button><span class="help" id="cMsg" role="status"></span></div>
             </div>
             <div class="clist" id="cList"></div>
+            <details id="advancedEditor"><summary>Editor avanzato e pacchetti</summary>
+              <p class="help">Un evento per riga: partecipanti, requisiti ed effetti prima di <code>|</code>, racconto dopo. Le prove usano due esiti separati da <code>||</code>. <a href="https://github.com/hoffo1987/Last-One-Standing/blob/main/docs-dev/eventi.md" target="_blank" rel="noopener">Guida completa</a>.</p>
+              <label>Fase<select id="advancedPhase"><option value="tutte">In ogni fase</option><option value="b">Apertura</option><option value="d">Giorno</option><option value="n">Notte</option><option value="f">Festino</option></select></label>
+              <label>Evento completo<textarea id="advancedLine" rows="4" maxlength="2000" placeholder="2 save:A>B | {A} aiuta {B} a uscire dai guai."></textarea></label>
+              <div class="row"><button class="btn primary" id="advancedSave" type="button">Salva evento avanzato</button><button class="btn" id="advancedCancel" type="button">Nuovo evento</button></div><p id="advancedMsg" class="help" role="status"></p><div id="advancedPreview" class="preview"></div>
+              <details><summary>Pacchetto JSON di eventi</summary><label>Pacchetto<textarea id="eventPack" rows="5" spellcheck="false"></textarea></label><div class="row"><button class="btn" id="packExport" type="button">Esporta gli eventi</button><button class="btn" id="packImport" type="button">Aggiungi pacchetto</button></div><p id="packMsg" class="help" role="status"></p></details>
+            </details>
           </div>
         </details>
       </div>
       <aside class="rules card" aria-labelledby="h-rules">
         <h2 id="h-rules">Regole</h2>
+        <button class="btn" id="labOpen" type="button">Laboratorio di bilanciamento</button>
         <div class="field"><span>Difficoltà</span><div class="diffs" id="diffSeg" role="radiogroup" aria-label="Difficoltà" aria-describedby="difficultyHelp"></div><p class="help" id="difficultyHelp">Regola soprattutto la frequenza delle eliminazioni e dei disastri. Le caratteristiche del cast continuano a contare.</p></div>
         <label class="field" for="maxDays"><span>Durata massima · <b id="maxDaysOut"></b> giorni</span><input type="range" id="maxDays" min="5" max="40" step="1"><small class="help">Allo scadere scatta lo scontro finale.</small></label>
         <label class="switch" for="teamsAllied"><input type="checkbox" id="teamsAllied" role="switch"><span class="sw" aria-hidden="true"></span><span>Compagni di squadra alleati<small>Chi è nella stessa squadra comincia in alleanza. Le alleanze possono cambiare durante la partita; la squadra rimane la stessa.</small></span></label>
@@ -188,6 +205,7 @@
         <label><input type="checkbox" id="hideFuture"> Nascondi gli eventi futuri e la durata totale</label>
         <label><input type="checkbox" id="adaptivePlay"> Adatta la riproduzione alla quantità di testo</label>
         <label><input type="checkbox" id="reduceMotion"> Riduci le animazioni</label>
+        <label><input type="checkbox" id="followOnly"> Mostra solo gli eventi dei concorrenti seguiti</label>
         <p class="help" id="motionNote">Le preferenze del sistema sulle animazioni vengono sempre rispettate.</p>
       </details>
       <div id="phaseAnnouncement" class="sr-only" role="status" aria-live="polite" aria-atomic="true"></div>
@@ -265,6 +283,13 @@
     <p id="archiveMsg" class="help" role="status"></p>
   </div>
 </dialog>
+<dialog id="labDlg" aria-labelledby="h-lab"><div class="dlgbody studio-dialog">
+  <div class="row between"><h2 id="h-lab">Laboratorio di bilanciamento</h2><button class="iconbtn" data-close type="button" aria-label="Chiudi laboratorio">✕</button></div>
+  <p class="help">Usa cast, legami e regole attuali su molti semi. La partita aperta resta intatta. Ogni componente della squadra vincente conta una vittoria.</p>
+  <label>Partite nel campione<input id="labCount" type="number" min="5" max="200" value="30"></label>
+  <div class="row"><button class="btn primary" id="labRun" type="button">Avvia il campione</button><button class="btn" id="labCancel" type="button" disabled>Interrompi</button><button class="btn" id="labCopy" type="button">Copia risultati</button></div>
+  <progress id="labProgress" value="0" max="30" aria-label="Partite analizzate nel campione"></progress><p id="labMsg" class="help" role="status"></p><div id="labResults"></div>
+</div></dialog>
 <div class="toast" id="toast" hidden role="status"></div>
 <div class="sim-progress card" id="simProgress" hidden role="status"><span>La partita prende forma…</span><button class="btn sm" type="button" id="cancelSim">Annulla il calcolo</button></div>
 

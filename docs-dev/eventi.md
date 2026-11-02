@@ -158,3 +158,30 @@ Lo stato facoltativo riguarda l'esito di danno, altrimenti vale `ferito`.
 Mantenere diversi e plausibili tutti e tre gli esiti. Il testo deve raccontare
 soltanto ciò che gli effetti registrano; una battuta non deve promettere un
 oggetto, una cura o una relazione che il modello non applica.
+
+## Editor avanzato e pacchetti del sito
+
+In Arena → Eventi personalizzati → Editor avanzato e pacchetti puoi inserire
+una riga completa (massimo 2000 caratteri). La fase si sceglie nel menu esterno:
+`b` apertura, `d` giorno, `n` notte, `f` festino o `tutte`. La preview usa nomi
+dimostrativi e il lessico dell'arena selezionata. Modifica e Duplica sono disponibili anche
+per gli eventi creati con il modulo semplice; modificarli nell'editor completo
+li conserva nel formato avanzato, senza perdere requisiti o effetti.
+
+Il pacchetto esportato ha questa forma:
+
+```json
+{
+  "app": "last-one-standing-events",
+  "version": 1,
+  "events": [
+    {"id": "aiuto-1", "phase": "d", "raw": "2 save:A>B | {A} aiuta {B} a uscire dai guai."}
+  ]
+}
+```
+
+L'importazione accetta anche direttamente l'array degli eventi o la proprietà
+`eventi` della configurazione generale. Aggiunge gli eventi con nuovi ID, senza
+toccare cast e regole. Se una riga è invalida o il totale supera 200 eventi,
+non aggiunge nulla. ID, fase, partecipanti e tag vengono controllati dallo stesso
+validatore usato per la configurazione generale.

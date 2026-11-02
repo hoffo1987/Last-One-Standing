@@ -188,7 +188,7 @@ async function test(name, run) { await run(); passed++; console.log('  OK ' + na
   });
   await test('Il digest di build precede il modulo replay, che precede l’interfaccia', () => {
     const build = fs.readFileSync(path.join(__dirname, 'build.js'), 'utf8');
-    assert.ok(build.includes("'replay.js', 'ui.js'")); assert.ok(build.includes("createHash('sha256')"));
+    assert.ok(build.includes("'replay.js', 'studio.js', 'ui.js'")); assert.ok(build.includes("createHash('sha256')"));
     assert.ok(build.includes('window.LOS_BUILD = '));
   });
   console.log('\nOK: ' + passed + ' gruppi di regressioni dell’archivio replay');

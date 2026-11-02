@@ -212,6 +212,20 @@
     for (const re of [/\{([A-F])\}/g, /\{(?:caro|perso|partner):([A-F])\}/g]) { let mm; while ((mm = re.exec(text))) named.add(mm[1]); }
     for (let i = 0; i < ev.n; i++) if (!named.has(String.fromCharCode(65 + i))) throw new Error('Il concorrente {' + String.fromCharCode(65 + i) + '} partecipa ma non è nominato nel testo: ' + line);
     for (const ch of used) if (L(ch) >= ev.n) throw new Error('Il testo usa {' + ch + '} ma l\'evento ha solo ' + ev.n + ' concorrenti: ' + line);
+    const attrs = new Set((D.attrs || []).map((a) => a.id)), traits = new Set((D.traits || []).map((t) => t.id));
+    const statuses = new Set(['ferito', 'avvelenato', 'malato', 'affamato', 'ubriaco', 'sconvolto', 'lutto']);
+    if (ev.test && (!attrs.has(ev.test.attr) || !Number.isFinite(ev.test.dc) || ev.test.dc < 1)) throw new Error('Prova con caratteristica o soglia non valida.');
+    for (const r of ev.req) {
+      if (r.t === 'att' && !attrs.has(r.attr)) throw new Error('Caratteristica sconosciuta: ' + r.attr);
+      if ((r.t === 'trait' || r.t === 'notrait') && !traits.has(r.trait)) throw new Error('Tratto sconosciuto: ' + r.trait);
+      if (r.t === 'need' && r.s !== '*' && !statuses.has(r.s)) throw new Error('Stato sconosciuto: ' + r.s);
+      if ((r.t === 'has' || r.t === 'canReceive') && !ITEMS.split('|').includes(r.item)) throw new Error('Oggetto sconosciuto: ' + r.item);
+      if (r.v != null && !Number.isFinite(r.v)) throw new Error('Soglia non finita.');
+    }
+    for (const f of ev.fx.concat(ev.ok.fx, ev.ko.fx)) {
+      if (f.t === 'status' && !statuses.has(f.s)) throw new Error('Stato sconosciuto: ' + f.s);
+      if (f.v != null && !Number.isFinite(f.v)) throw new Error('Effetto numerico non finito.');
+    }
     return ev;
   }
 
@@ -220,6 +234,10 @@
     return src.split('\n').map((l) => l.trim()).filter((l) => l && !l.startsWith('#')).map((l) => parseLine(l, origin));
   }
   function customToLine(c) {
+    if (c.raw != null) {
+      if (typeof c.raw !== 'string' || !c.raw.trim() || c.raw.length > 2000 || /[\r\n]/.test(c.raw)) throw new Error('Scrivi un solo evento avanzato, entro 2000 caratteri.');
+      return c.raw.trim();
+    }
     const toks = [String(c.n)];
     const dies = (c.dies || []).filter((x) => x !== c.killer);
     if (c.killer && dies.length) toks.push('k:' + c.killer + '>' + dies.join(''));
@@ -258,7 +276,7 @@
       packs.forEach((pk) => { if (pk.ev && pk.ev[k]) pools[k] = pools[k].concat(parseBlock(pk.ev[k], pk.adult ? 'adult' : pk.theme === theme.id ? theme.id : 'base')); });
     }
     (custom || []).forEach((c) => {
-      if (!c || !c.text) return;
+      if (!c || (!c.text && !c.raw)) return;
       let ev;
       try { ev = parseLine(customToLine(c), 'custom'); } catch (e) { return; }
       const targets = c.phase === 'tutte' ? ['b', 'd', 'n', 'f'] : [c.phase];
@@ -377,6 +395,26 @@
     };
   }
 
+  function normalizeInitialRelations(value, ids) {
+    if (value === undefined) return [];
+    if (!Array.isArray(value) || value.length > 200) throw new Error('Sono ammessi al massimo 200 legami iniziali.');
+    const known = new Set(Array.isArray(ids) ? ids.map((t) => typeof t === 'string' ? t : t.id) : ids);
+    const kinds = new Set(['amicizia', 'rivalita', 'coppia', 'fiducia', 'attrazione']), seen = new Set(), partners = new Map(), crushes = new Set();
+    return value.map((r, i) => {
+      if (!r || typeof r !== 'object' || !known.has(r.from) || !known.has(r.to) || r.from === r.to || !kinds.has(r.type)) throw new Error('Legame iniziale ' + (i + 1) + ': persone o tipo non validi.');
+      const pair = ['amicizia', 'rivalita', 'coppia'].includes(r.type) ? [r.from, r.to].sort() : [r.from, r.to];
+      const key = JSON.stringify([r.type, ...pair]); if (seen.has(key)) throw new Error('Legame iniziale duplicato.'); seen.add(key);
+      if (r.type === 'attrazione') {
+        if (crushes.has(r.from)) throw new Error('Una persona può iniziare con una sola cotta segreta.');
+        crushes.add(r.from);
+      }
+      if (r.type === 'coppia') {
+        if (partners.has(r.from) || partners.has(r.to)) throw new Error('Una persona può iniziare in una sola coppia.');
+        partners.set(r.from, r.to); partners.set(r.to, r.from);
+      }
+      return { from: r.from, to: r.to, type: r.type };
+    });
+  }
   function simulate(cfg) {
     if (!cfg || !Array.isArray(cfg.cast) || cfg.cast.length < 2) throw new Error('Servono almeno 2 concorrenti.');
     const castIds = new Set();
@@ -387,6 +425,7 @@
       if (castIds.has(id)) throw new Error('Identificativo del concorrente duplicato: ' + id + '.');
       castIds.add(id);
     });
+    const initialRelations = normalizeInitialRelations(cfg.initialRelations, castIds);
     const theme = D.themes.find((t) => t.id === cfg.theme) || D.themes[0];
     const seed = cfg.seed == null || cfg.seed === '' ? String(Date.now()) : String(cfg.seed);
     const rng = makeRng(seed + '|' + theme.id);
@@ -2411,6 +2450,14 @@
         tr('romantico') || t.attr.emp >= 7 || rng.chance(0.2) ? 'ricordo' : rng.chance(0.12) ? 'valore' : null;
       if (home) t.inv.push(mkItem(home, null, 'casa', null));
     });
+    initialRelations.forEach(({ from, to, type }) => {
+      const a = byId[from], b = byId[to];
+      if (type === 'amicizia') { addAff(a, b, 55); tweak(a, b, { f: 40, k: 50 }); tweak(b, a, { f: 40, k: 50 }); remember(a, b, 'initialFriend'); remember(b, a, 'initialFriend'); }
+      if (type === 'rivalita') { addAff(a, b, -35); tweak(a, b, { r: 45, f: -20, k: 50 }); tweak(b, a, { r: 45, f: -20, k: 50 }); remember(a, b, 'initialRival'); remember(b, a, 'initialRival'); }
+      if (type === 'coppia') { a.partner = b.id; b.partner = a.id; addAff(a, b, 70); tweak(a, b, { f: 45, t: 70, k: 60 }); tweak(b, a, { f: 45, t: 70, k: 60 }); remember(a, b, 'love'); remember(b, a, 'love'); stats.couples++; }
+      if (type === 'fiducia') { tweak(a, b, { f: 60, k: 40 }); remember(a, b, 'initialTrust'); }
+      if (type === 'attrazione') { tweak(a, b, { t: 75, k: 30 }); a.crush = b.id; remember(a, b, 'initialCrush'); }
+    });
     let feastDone = false, lastDisaster = -9;
     const usedDisasters = new Set();
     while (true) {
@@ -2543,5 +2590,5 @@
     return edFix(s.replace(/\{([A-F])\}/g, (_, c) => names[L(c)]));
   }
 
-  G.LOS = { renderSample, simulate, parseLine, parseBlock, parseDisasters, buildPools, makeRng, randomCast, countTemplates, previewCustom, customToLine, PALETTE, STATUS_LABEL, DIFF };
+  G.LOS = { renderSample, simulate, parseLine, parseBlock, parseDisasters, buildPools, makeRng, randomCast, countTemplates, previewCustom, customToLine, normalizeInitialRelations, PALETTE, STATUS_LABEL, DIFF };
 })(typeof window !== 'undefined' ? window : globalThis);

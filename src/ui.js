@@ -215,7 +215,8 @@
   /* ---------------- stato ---------------- */
   const S = {
     cast: [],
-    settings: { theme: 'classico', difficulty: 'normale', seed: '', maxDays: 20, teamsAllied: true, teamWin: false, speed: 'normale', teamSize: 2, view: 'grid', adult: false, hideFuture: true, adaptivePlay: true, reduceMotion: false },
+    settings: { theme: 'classico', difficulty: 'normale', seed: '', maxDays: 20, teamsAllied: true, teamWin: false, speed: 'normale', teamSize: 2, view: 'grid', adult: false, hideFuture: true, adaptivePlay: true, reduceMotion: false, followOnly: false },
+    initialRelations: [], followed: [], seasons: [],
     custom: [],
     run: null,
     ui: null,
@@ -264,6 +265,10 @@
       const next = { cast: Array.isArray(d.cast) ? normalizeCast(d.cast) : S.cast,
         settings: sanitizeSettings(d.settings), custom: S.custom,
         run: null, ui: d.ui === 'light' || d.ui === 'dark' ? d.ui : S.ui };
+      next.followed = Array.isArray(d.followed) ? [...new Set(d.followed.filter(validId))].slice(0, 2000) : [];
+      try { next.initialRelations = d.initialRelations == null ? [] : L.normalizeInitialRelations(d.initialRelations, next.cast); }
+      catch (e) { next.initialRelations = []; warnings.push('Legami iniziali non validi esclusi: ' + e.message); }
+      next.seasons = Array.isArray(d.seasons) && typeof studio !== 'undefined' && studio ? studio.restoreSeasons(d.seasons, warnings) : [];
       if (own(d, 'custom')) {
         // I vecchi salvataggi potevano contenere eventi accettati senza tutti i controlli.
         // Si recuperano quelli validi; l'importazione di un nuovo file resta invece atomica.
@@ -286,7 +291,8 @@
           const cast = normalizeCast(d.run.cfg.cast.map((t) => record(t) && t.img === '@cast' ? Object.assign({}, t, { img: imgs[t.id] || '' }) : t));
           const custom = d.run.cfg.custom == null ? [] : normalizeCustoms(d.run.cfg.custom);
           if (d.run.replayId != null && !validId(d.run.replayId)) throw new Error('Riferimento alla partita non valido.');
-          if (cast.length >= 2) next.run = Object.assign({}, d.run, { cfg: Object.assign({}, d.run.cfg, { cast, custom }) });
+          const initialRelations = L.normalizeInitialRelations(d.run.cfg.initialRelations, cast);
+          if (cast.length >= 2) next.run = Object.assign({}, d.run, { cfg: Object.assign({}, d.run.cfg, { cast, custom, initialRelations }) });
         } catch (e) { warnings.push('La partita salvata contiene dati non validi e non è stata ripresa.'); }
       }
       Object.assign(S, next);
@@ -308,7 +314,7 @@
     if (own(SPEED, x.speed)) st.speed = x.speed;
     if ([1, 2, 3, 4].includes(+x.teamSize)) st.teamSize = +x.teamSize;
     if (x.view === 'grid' || x.view === 'team') st.view = x.view;
-    ['teamsAllied', 'teamWin', 'adult', 'hideFuture', 'adaptivePlay', 'reduceMotion'].forEach((k) => { if (typeof x[k] === 'boolean') st[k] = x[k]; });
+    ['teamsAllied', 'teamWin', 'adult', 'hideFuture', 'adaptivePlay', 'reduceMotion', 'followOnly'].forEach((k) => { if (typeof x[k] === 'boolean') st[k] = x[k]; });
     return st;
   }
   function sanitizeTribute(t, i) {
@@ -341,6 +347,12 @@
   }
   function sanitizeCustom(c) {
     if (!record(c)) return null;
+    if (c.raw != null) {
+      if (validateCustom(c)) return null;
+      const ev = L.parseLine(c.raw, 'custom');
+      const advanced = { id: c.id == null || c.id === '' ? inputId('e') : c.id, phase: c.phase == null ? 'tutte' : c.phase, raw: c.raw.trim(), n: ev.n, text: ev.text, dies: [], killer: '' };
+      return validId(advanced.id) ? advanced : null;
+    }
     const out = { id: c.id == null || c.id === '' ? inputId('e') : c.id,
       phase: c.phase == null ? 'tutte' : c.phase, n: c.n == null ? 1 : +c.n,
       text: typeof c.text === 'string' ? c.text.trim() : c.text,
@@ -461,6 +473,7 @@
   /* =============== HOME =============== */
   let homeTimer = null, demo = null, demoI = 0, demoPending = false;
   function renderHome() {
+    if (typeof studio !== 'undefined' && studio) studio.renderSeasons();
     $('#facts').innerHTML = [[COUNTS.events, 'modelli di evento, più ' + COUNTS.adultEvents + ' per adulti'], [COUNTS.disasters, 'disastri, più ' + COUNTS.adultDisasters + ' per adulti'], [D.themes.length, 'arene da esplorare'], [D.traits.length + ' · ' + D.attrs.length, 'tratti e caratteristiche che cambiano la storia']]
       .map(([n, l]) => '<div class="fact"><b>' + n + '</b><span>' + l + '</span></div>').join('');
     $('#arenaStrip').innerHTML = D.themes.map((t) => posterHTML(t, false, 'a')).join('');
@@ -547,6 +560,7 @@
     '</article>';
   }
   function renderCast() {
+    if (typeof studio !== 'undefined' && studio) studio.renderRelations();
     $$('#viewSeg button').forEach((b) => b.setAttribute('aria-pressed', b.dataset.v === S.settings.view));
     $('#teamSize').value = String(S.settings.teamSize || 2);
     const add = '<button class="addtile" type="button" id="addOne"><span>+ Aggiungi concorrente</span></button>';
@@ -759,7 +773,7 @@
   });
 
   // importa / esporta
-  const exportJSON = () => JSON.stringify({ app: 'last-one-standing', versione: 2, cast: S.cast, regole: S.settings, eventi: S.custom }, null, 2);
+  const exportJSON = () => JSON.stringify({ app: 'last-one-standing', versione: 2, cast: S.cast, regole: S.settings, eventi: S.custom, legami: S.initialRelations || [] }, null, 2);
   function importJSON(text) {
     let d; try { d = JSON.parse(text); } catch (e) { return 'Il testo non è un JSON valido.'; }
     if (!record(d) && !Array.isArray(d)) return 'Il JSON deve contenere una configurazione o un elenco di concorrenti.';
@@ -781,6 +795,8 @@
         if (ev.length > 200) return 'Puoi importare al massimo 200 eventi personalizzati per volta: riduci l’elenco nel file.';
         next.custom = normalizeCustoms(ev);
       }
+      const ids = new Set(next.cast.map((t) => t.id));
+      next.initialRelations = own(d, 'legami') ? L.normalizeInitialRelations(d.legami, next.cast) : (S.initialRelations || []).filter((r) => ids.has(r.from) && ids.has(r.to));
     } catch (e) { return e.message; }
     // Nessuna parte della configurazione cambia finché tutti gli elementi sono validi.
     Object.assign(S, next);
@@ -817,7 +833,16 @@
     const settings = sanitizeSettings(raw, S.settings);
     const cast = result.tributes.map((t) => ({ id: t.id, name: t.name, gender: t.gender, team: t.team, color: t.color, img: t.img, traits: t.traits.slice(), attr: { ...t.attr } }));
     return { cast, theme: result.theme, seed: result.seed, adult: result.adult && S.settings.adult, difficulty: settings.difficulty, maxDays: settings.maxDays,
-      teamsAllied: settings.teamsAllied, teamWin: settings.teamWin, custom: raw.custom == null ? [] : normalizeCustoms(raw.custom) };
+      teamsAllied: settings.teamsAllied, teamWin: settings.teamWin, custom: raw.custom == null ? [] : normalizeCustoms(raw.custom), initialRelations: L.normalizeInitialRelations(raw.initialRelations, cast) };
+  }
+  async function openSavedReplay(id) {
+    const generation = runGeneration, entry = await REPLAY.entry(id); if (!entry) throw new Error('Partita non disponibile.');
+    if (entry.result.adult && !S.settings.adult) throw new Error('Per aprire questo replay attiva i contenuti 18+ nelle opzioni dell’arena.');
+    const cfg = archiveConfiguration(entry); if (generation !== runGeneration) return;
+    runGeneration++; if (RUNNER) RUNNER.cancel(); simulationBusy(false); stopPlay();
+    SIM = entry.result; BY = Object.fromEntries(SIM.tributes.map((t) => [t.id, t]));
+    S.run = { cfg, phase: 0, seen: 0, replayId: id, replaySaved: true }; lastRendered = -1; save();
+    $('#archiveDlg').close(); if (location.hash === '#diretta') route(); else location.hash = '#diretta';
   }
   $('#btnArchive').addEventListener('click', openArchive);
   $('#archiveList').addEventListener('click', async (e) => {
@@ -831,13 +856,7 @@
         $('#replayText').value = await REPLAY.exportReplay(id); $('#replayIO').open = true;
         $('#archiveMsg').textContent = 'Replay completo pronto da copiare o scaricare.';
       } else {
-        const generation = runGeneration, entry = await REPLAY.entry(id); if (!entry) throw new Error('Partita non disponibile.');
-        if (entry.result.adult && !S.settings.adult) throw new Error('Per aprire questo replay attiva i contenuti 18+ nelle opzioni dell’arena.');
-        const cfg = archiveConfiguration(entry); if (generation !== runGeneration) return;
-        runGeneration++; if (RUNNER) RUNNER.cancel(); simulationBusy(false); stopPlay();
-        SIM = entry.result; BY = Object.fromEntries(SIM.tributes.map((t) => [t.id, t]));
-        S.run = { cfg, phase: 0, seen: 0, replayId: id, replaySaved: true }; lastRendered = -1; save();
-        $('#archiveDlg').close(); if (location.hash === '#diretta') route(); else location.hash = '#diretta';
+        await openSavedReplay(id);
       }
     } catch (error) { $('#archiveMsg').textContent = error.message; }
     finally { button.disabled = false; }
@@ -979,6 +998,10 @@
   }
   const readCustom = () => ({ phase: $('#cPhase').value, n: +$('#cN').value, text: $('#cText').value.trim(), dies: $$('#cDies input:checked').map((x) => x.value), killer: $('#cKiller').value });
   function validateCustom(c) {
+    if (record(c) && c.raw != null) {
+      if (!['tutte', 'b', 'd', 'n', 'f'].includes(c.phase == null ? 'tutte' : c.phase)) return 'La fase dell\'evento non è valida.';
+      try { L.parseLine(L.customToLine(c), 'custom'); return null; } catch (e) { return e.message; }
+    }
     if (!record(c) || typeof c.text !== 'string' || !c.text.trim()) return 'Scrivi il testo dell\'evento.';
     if (c.text.trim().length > 240) return 'Il testo dell\'evento può contenere al massimo 240 caratteri.';
     const n = c.n == null ? 1 : +c.n;
@@ -1002,8 +1025,9 @@
   function renderCustomList() {
     $('#customCount').textContent = S.custom.length ? '· ' + S.custom.length : '';
     $('#cList').innerHTML = S.custom.length
-      ? S.custom.map((c) => '<div class="citem" data-id="' + esc(c.id) + '"><span class="tag">' + PH_LABEL[c.phase] + ' · ' + c.n + (c.dies.length ? (THEMES[S.settings.theme].soft ? ' · con eliminazioni' : ' · letale') : '') + '</span><span class="txt">' + esc(c.text) + '</span><button class="x" type="button" data-act="cdel" aria-label="Elimina evento">✕</button></div>').join('')
-      : '<p class="help">Nessun evento personalizzato. Quelli che aggiungi escono più spesso di quelli di base.</p>';
+      ? S.custom.map((c) => '<div class="citem" data-id="' + esc(c.id) + '"><span class="tag">' + PH_LABEL[c.phase] + ' · ' + c.n + (c.raw ? ' · avanzato' : c.dies.length ? (THEMES[S.settings.theme].soft ? ' · con eliminazioni' : ' · letale') : '') + '</span><span class="txt">' + esc(c.text) + '</span><button class="btn sm" type="button" data-act="cedit">Modifica</button><button class="btn sm" type="button" data-act="cdup">Duplica</button><button class="x" type="button" data-act="cdel" aria-label="Elimina evento">✕</button></div>').join('')
+      : '<p class="help">Nessun evento personalizzato. Gli eventi del modulo semplice hanno peso doppio; nell’editor avanzato puoi scegliere il peso.</p>';
+    if (typeof studio !== 'undefined' && studio) studio.previewAdvanced();
   }
   $('#cN').addEventListener('change', renderCustomForm);
   ['cText', 'cKiller', 'cPhase'].forEach((id) => $('#' + id).addEventListener('input', updatePreview));
@@ -1026,6 +1050,7 @@
   $('#cancelSim').addEventListener('click', () => { runGeneration++; if (RUNNER) RUNNER.cancel(); simulationBusy(false); toast('Calcolo annullato.'); });
   async function runSim(cfg) {
     const generation = ++runGeneration;
+    if (typeof studio !== 'undefined' && studio) studio.beforeSimulation();
     if (RUNNER) RUNNER.cancel(); stopPlay(); simulationBusy(true);
     let result;
     try { result = RUNNER ? await RUNNER.simulate(cfg) : L.simulate(cfg); }
@@ -1035,7 +1060,9 @@
     SIM = result;
     BY = Object.fromEntries(SIM.tributes.map((t) => [t.id, t]));
     S.run = { cfg, phase: 0, seen: 0 }; lastRendered = -1;
-    persistRun(S.run, SIM); save();
+    const run = S.run, stored = persistRun(run, SIM);
+    if (typeof studio !== 'undefined' && studio) studio.recordResult(cfg, SIM, run.replayId, stored);
+    save();
     if (location.hash === '#diretta') route(); else location.hash = '#diretta';
     return true;
   }
@@ -1043,8 +1070,9 @@
     if (S.cast.length < 2) { toast('Servono almeno 2 concorrenti.'); location.hash = '#cast'; return; }
     S.cast.forEach((t, i) => { if (!t.name.trim()) t.name = 'Concorrente ' + (i + 1); });
     S.settings.seed = seed || S.settings.seed || newSeed();
-    runSim({ cast: JSON.parse(JSON.stringify(S.cast)), theme: S.settings.theme, difficulty: S.settings.difficulty, seed: S.settings.seed, maxDays: S.settings.maxDays, teamsAllied: S.settings.teamsAllied, teamWin: S.settings.teamWin, custom: S.custom.slice(), adult: !!S.settings.adult });
+    runSim(currentConfiguration());
   }
+  function currentConfiguration() { return { cast: JSON.parse(JSON.stringify(S.cast)), theme: S.settings.theme, difficulty: S.settings.difficulty, seed: S.settings.seed || newSeed(), maxDays: S.settings.maxDays, teamsAllied: S.settings.teamsAllied, teamWin: S.settings.teamWin, custom: JSON.parse(JSON.stringify(S.custom)), adult: !!S.settings.adult, initialRelations: L.normalizeInitialRelations(S.initialRelations, S.cast) }; }
   $('#btnStart').addEventListener('click', () => startRun());
 
   /* =============== DIRETTA =============== */
@@ -1059,7 +1087,7 @@
     const why = e.test ? '<span title="Tiro ' + e.test.roll + ' contro soglia ' + e.test.dc + '">Prova di ' + esc(ATTRN[e.test.attr] || e.test.attr) + ' · <span class="dice"><span class="roll">' + e.test.roll + '</span>/' + e.test.dc + '</span> · ' + (e.test.pass ? 'superata' : 'fallita') + '</span>' : e.sponsor ? 'Sponsor' : e.whyTxt ? esc(e.whyTxt) : whyLabel(e, theme);
     const echo = ((e.echo || []).length ? '<ul class="echo">' + e.echo.map((x) => '<li class="' + (x.cls || '') + '">' + fix(x.html) + '</li>').join('') + '</ul>' : '') +
       (e.reason ? '<details class="event-reason"><summary>Il contesto</summary><p>' + esc(e.reason) + '</p></details>' : '');
-    return '<div class="ev' + (e.deaths.length ? ' lethal' : '') + (anim ? ' in fx-' + cat + (e.sponsor ? ' fx-sponsor' : '') : '') + '" style="--cc:var(--c-' + cat + ');--d:' + (delay || 0) + 'ms">' + avs + '<div class="evbody">' + (why ? '<span class="why' + (e.test ? (e.test.pass ? ' ok' : ' ko') : '') + '">' + why + '</span>' : '') + '<p>' + fix(e.html) + '</p>' + echo + '</div>' + chip + '</div>';
+    return '<div class="ev' + (!tributes && (S.followed || []).some((id) => e.ids.includes(id)) ? ' followed' : '') + (e.deaths.length ? ' lethal' : '') + (anim ? ' in fx-' + cat + (e.sponsor ? ' fx-sponsor' : '') : '') + '" style="--cc:var(--c-' + cat + ');--d:' + (delay || 0) + 'ms">' + avs + '<div class="evbody">' + (why ? '<span class="why' + (e.test ? (e.test.pass ? ' ok' : ' ko') : '') + '">' + why + '</span>' : '') + '<p>' + fix(e.html) + '</p>' + echo + '</div>' + chip + '</div>';
   }
   function timelineHTML(P, i, seenAt, hideFuture) {
     const days = [];
@@ -1078,6 +1106,7 @@
     const P = SIM.phases, i = Math.max(0, Math.min(P.length - 1, S.run.phase || 0));
     S.run.phase = i; S.run.seen = Math.max(S.run.seen || 0, i);
     const ph = P[i], total = SIM.tributes.length;
+    const visibleEvents = ph.events.filter((e) => e.note || !S.settings.followOnly || (S.followed || []).some((id) => e.ids.includes(id)));
     const forward = !fromRoute && i === lastRendered + 1;
     lastRendered = i;
 
@@ -1104,14 +1133,14 @@
       $('#phBody').innerHTML = '<div class="memorial' + (forward ? ' rise' : '') + '"><h2>' + (soft ? 'Fuori dai giochi' : 'In memoria') + '</h2>' +
         (ph.deaths.length ? '<div class="memgrid">' + ph.deaths.map((id) => { const t = BY[id]; return '<button type="button" class="mem" data-prof="' + esc(id) + '">' + avHTML(t, { dead: true }) + '<b>' + esc(t.name) + '</b><small>Squadra ' + t.team + (t.killerIds.length ? '<br>per mano di ' + esc(t.killerIds.map((k) => BY[k].name).join(', ')) : '<br>vittima dell\'arena') + '</small><span class="mono">' + (ph.snap.kills[t.id] || 0) + ' ' + (soft ? 'elim.' : 'ucc.') + '</span></button>'; }).join('') + '</div>' : '<div class="emptyday">' + esc(ph.intro) + '</div>') + '</div>';
     } else {
-      $('#phBody').innerHTML = ph.events.map((e, k) => evHTML(e, null, theme, forward, false, Math.min(k * 90, 1800))).join('');
+      $('#phBody').innerHTML = (visibleEvents.length ? visibleEvents.map((e, k) => evHTML(e, null, theme, forward, false, Math.min(k * 90, 1800))).join('') : '<p class="help">Nessun evento per i concorrenti seguiti in questa fase. Puoi seguirne uno dalla sua scheda o disattivare il filtro.</p>');
     }
     renderSide(i);
-    $('#phaseAnnouncement').textContent = 'Fase ' + (i + 1) + ': ' + ph.title + '. ' + plural(ph.events.length, 'evento', 'eventi') + ', ' + plural(ph.snap.alive.length, 'concorrente in gara', 'concorrenti in gara') + '.';
-    ['hideFuture', 'adaptivePlay', 'reduceMotion'].forEach((k) => { $('#' + k).checked = !!S.settings[k]; });
+    $('#phaseAnnouncement').textContent = 'Fase ' + (i + 1) + ': ' + ph.title + '. ' + plural(visibleEvents.length, 'evento visibile', 'eventi visibili') + ', ' + plural(ph.snap.alive.length, 'concorrente in gara', 'concorrenti in gara') + '.';
+    ['hideFuture', 'adaptivePlay', 'reduceMotion', 'followOnly'].forEach((k) => { $('#' + k).checked = !!S.settings[k]; });
     if (forward && !AN.reduced && ph.kind !== 'fallen') {
       const cards = $$('#phBody .ev');
-      ph.events.forEach((e, k) => {
+      visibleEvents.forEach((e, k) => {
         const c = cards[k]; if (!c) return;
         const at = Math.min(k * 90, 1800) + 260;
         setTimeout(() => {
@@ -1156,7 +1185,7 @@
       const dead = SIM.tributes.filter((t) => !t.alive && t.deathPhase <= i).sort((a, b) => b.order - a.order);
       h = dead.length ? '<div class="plist">' + dead.map((t) => '<button type="button" class="prow" data-prof="' + esc(t.id) + '">' + avHTML(t, { dead: true }) + '<span style="min-width:0"><span class="pn">' + esc(t.name) + '</span><span class="ps">' + (t.killerIds.length ? 'per mano di ' + esc(t.killerIds.map((k) => BY[k].name).join(', ')) + (causeTxt(t, theme) ? ' · ' + causeTxt(t, theme) : '') : causeTxt(t, theme) ? 'per ' + causeTxt(t, theme) : 'vittima dell\'arena') + '</span></span><span class="pk">G' + t.deathDay + '</span></button>').join('') + '</div>' : '<p class="help">Ancora nessuno.</p>';
     } else if (sideTab === 'alive') {
-      const al = SIM.tributes.filter((t) => aliveSet.has(t.id)).sort((a, b) => (ph.snap.kills[b.id] || 0) - (ph.snap.kills[a.id] || 0));
+      const al = SIM.tributes.filter((t) => aliveSet.has(t.id)).sort((a, b) => Number((S.followed || []).includes(b.id)) - Number((S.followed || []).includes(a.id)) || (ph.snap.kills[b.id] || 0) - (ph.snap.kills[a.id] || 0));
       h = '<div class="plist">' + al.map((t) => {
         const st = ph.snap.st[t.id] || [], inv = ph.snap.inv[t.id] || [];
         const m = (ph.snap.mind || {})[t.id], g = m && (MND.goals || {})[m.g];
@@ -1228,7 +1257,7 @@
   $('#prevBtn').addEventListener('click', () => { stopPlay(); lastRendered = -2; go(S.run.phase - 1); });
   $('#playBtn').addEventListener('click', () => { if (!SIM) return; if (playing) return stopPlay(); if (S.run.phase >= SIM.phases.length - 1) go(0); startPlay(); next(); });
   $('#speedSeg').addEventListener('click', (e) => { const b = e.target.closest('button'); if (!b) return; S.settings.speed = b.dataset.v; save(); $$('#speedSeg button').forEach((x) => x.setAttribute('aria-pressed', x === b)); if (playing) startPlay(); });
-  ['hideFuture', 'adaptivePlay', 'reduceMotion'].forEach((key) => $('#' + key).addEventListener('change', (e) => {
+  ['hideFuture', 'adaptivePlay', 'reduceMotion', 'followOnly'].forEach((key) => $('#' + key).addEventListener('change', (e) => {
     S.settings[key] = e.target.checked; save();
     if (key === 'reduceMotion') AN.setReduced(S.settings.reduceMotion);
     if (SIM && curView === 'diretta') renderLive(true);
@@ -1281,6 +1310,7 @@
         attrHTML(t, theme, i, atRes) +
         '<div><div class="sub" style="margin-bottom:8px">La sua storia' + (atRes ? '' : ' finora') + '</div><div class="ptl">' + (hist.length ? hist.map(({ e, p }) => '<div class="it" style="--cc:var(--c-' + (e.cat || 'none') + ')"><span>' + (p.kind === 'b' ? 'Inizio' : 'G' + p.day + ' ' + (p.kind === 'n' ? 'notte' : p.kind === 'd' ? 'giorno' : KIND[p.kind].toLowerCase())) + '</span><p>' + linkify(e.html) + '</p></div>').join('') : '<p class="help">Nessun evento ancora.</p>') + '</div></div>' +
       '</div>';
+    if (typeof studio !== 'undefined' && studio) studio.renderProfile(t);
     if (!$('#profDlg').open) $('#profDlg').showModal();
     $('#profDlg').scrollTop = 0;
   }
@@ -1469,9 +1499,10 @@
         '<section class="block card"><h2>' + (soft ? 'Chi ha eliminato di più' : 'Chi ha ucciso di più') + '</h2><div class="bars">' + kbars + '</div></section>' +
         '<section class="block card posterbox"><h2>Locandina</h2><img id="posterImg" alt="Locandina della partita"><p class="help" style="margin-top:8px">Tieni premuto sull\'immagine, o clic destro, per salvarla.</p></section>' +
       '</div></div>';
-    $('#rAgain').addEventListener('click', () => { const cfg = Object.assign({}, S.run.cfg, { seed: newSeed() }); runSim(cfg); });
+    $('#rAgain').addEventListener('click', () => { const cfg = Object.assign({}, S.run.cfg, { seed: newSeed() }); delete cfg.seasonId; runSim(cfg); });
     $('#rArchive').addEventListener('click', openArchive);
     $('#rCopy').addEventListener('click', () => copyText(summaryText(), 'Riepilogo copiato negli appunti.'));
+    if (typeof studio !== 'undefined' && studio) studio.renderResults();
     drawPoster().then((url) => { const im = $('#posterImg'); if (im && url) im.src = url; });
     const wh = $('#resBody .winhero');
     if (wh) { AN.field(wh, theme.id, { intensity: 1.6, cls: 'fx-win' }); }
@@ -1614,6 +1645,7 @@
     route();
     if (load.warning) toast(load.warning);
   }
+  const studio = window.LOS_STUDIO ? window.LOS_STUDIO.init({ S, L, D, REPLAY, RUNNER, save, toast, esc, plural, inputId, normalizeCast, normalizeCustoms, sanitizeSettings, renderCustomList, currentConfiguration, runSim, simulationBusy, copyText, openSavedReplay, causeTxt, getSIM: () => SIM, renderLive, go, openProfile }) : null;
   const H = window.claude && window.claude.hot;
   if (H && typeof H.snapshot === 'function') { try { H.snapshot(() => ({ phase: S.run ? S.run.phase : 0 })); } catch (e) { /* niente */ } }
   if (H && typeof H.ready === 'function') H.ready(boot); else boot((H && H.data) || {});

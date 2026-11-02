@@ -80,6 +80,7 @@
     rel: { amore: 'Amore', cotta: 'Cotta segreta', vendetta: 'Vendetta', amico: 'Amico fidato', simpatia: 'Simpatia', alleato: 'Alleato', debito: 'In debito', nemico: 'Nemico', diffida: 'Diffidenza', conoscente: 'Conoscente', complotto: 'Bersaglio segreto' },
     /* ricordi dei rapporti, in prima persona (dal punto di vista di chi ricorda) */
     mem: {
+      initialFriend: 'La nostra amicizia risale a prima dei giochi.', initialRival: 'La rivalità tra noi è iniziata prima dei giochi.', initialTrust: 'La mia fiducia risale a prima dei giochi.', initialCrush: 'La cotta per questa persona precede i giochi.',
       saved: 'Mi ha salvato la vita.', cured: 'Mi ha permesso di riprendermi.', shared: 'Ha diviso il cibo con me.', denied: 'Mi ha negato il cibo.', robbed: 'Ha rubato le mie cose.',
       hit: 'Mi ha fatto del male.', killedDear: 'Ha ucciso {2}.', allied: 'Abbiamo stretto un\'alleanza.', betrayed: 'Ha tradito la mia fiducia.', gift: 'Mi ha fatto un regalo.',
       love: 'Tra noi è nato un amore.', repaid: 'Ha saldato il suo debito.', forgave: 'Ho deciso di perdonare.', traded: 'Abbiamo fatto affari.', fleeced: 'Mi ha spennato.',

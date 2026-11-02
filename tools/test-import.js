@@ -28,6 +28,16 @@ function context(saved) {
   vm.createContext(c); vm.runInContext(definitions, c); return c;
 }
 const cast = [{ id: 'alice-1', name: 'Alice', gender: 'F', team: 1, traits: ['leale'], attr: { for: 9 }, img: 'data:image/png;base64,AQ==' }, { id: 'bruno_2', name: 'Bruno', gender: 'M', team: 2 }];
+test('Legami iniziali ed eventi avanzati usano la stessa importazione atomica', () => {
+  const c = context(), raw = '2 test:A=int12 ok:save:A>B ko:hp:A-10 | {A} aiuta {B}. || {A} non riesce ad aiutare {B}.';
+  assert.equal(c.importJSON(JSON.stringify({ cast, legami: [{ from: 'alice-1', to: 'bruno_2', type: 'amicizia' }], eventi: [{ id: 'avanzato', raw, phase: 'd' }] })), null);
+  assert.equal(c.S.initialRelations[0].type, 'amicizia'); assert.equal(c.S.custom[0].raw, raw); assert.equal(c.S.custom[0].n, 2);
+  const before = JSON.stringify(c.S);
+  assert.match(c.importJSON(JSON.stringify({ cast, legami: [{ from: 'alice-1', to: 'assente', type: 'fiducia' }] })), /Legame/);
+  assert.equal(JSON.stringify(c.S), before);
+  assert.match(c.importJSON(JSON.stringify({ cast, eventi: [{ raw: '1 s:A=inesistente | {A} aspetta.' }] })), /Stato sconosciuto/);
+  assert.equal(JSON.stringify(c.S), before);
+});
 function rejected(data, pattern) {
   const c = context(), before = JSON.stringify(c.S);
   const error = c.importJSON(JSON.stringify(data));

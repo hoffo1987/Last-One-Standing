@@ -109,6 +109,17 @@ Un interruttore nella sezione Arena, attivo solo dopo la conferma dell'età, agg
 - **Diretta**: regia in stile televisivo, linea del tempo per giorni, mappa, caduti, alleanze, scheda di ogni concorrente con la sua storia, riproduzione automatica e tasti freccia.
 - **Esito**: podio, premi, momenti salienti, grafico dei superstiti, classifica e locandina.
 
+## Strumenti di gioco
+
+- **Legami iniziali**, nella sezione Concorrenti: amicizia, rivalità e coppia sono reciproche; fiducia e attrazione hanno una direzione. Ogni persona può avere una sola coppia e una sola cotta iniziale. I rapporti entrano nel motore e nei ricordi, ma possono cambiare durante la partita. Le coppie non creano automaticamente un'alleanza. Fino a 200 legami, inclusi nell'esportazione della configurazione come `legami`.
+- **Concorrenti seguiti**: dalla scheda personale puoi seguirne uno o più. La diretta evidenzia i loro eventi, li mette in cima alla lista dei vivi e offre un filtro facoltativo. Avvisi generali e memoriali restano visibili. La preferenza è locale al browser e non cambia la simulazione.
+- **Le svolte della vittoria**: nell'esito, una selezione di incontri, aiuti, eliminazioni e colpi di scena realmente registrati permette di tornare alle fasi corrispondenti. È un percorso narrativo, non una misura delle cause decisive della vittoria.
+- **Editor avanzato e pacchetti**, dentro Eventi personalizzati: modifica o duplica gli eventi, usa il formato completo del motore con requisiti e prove a due esiti, oppure importa un pacchetto JSON. L'intero pacchetto viene validato prima di aggiungere eventi; cast e regole restano invariati. Limite complessivo: 200 eventi. La [guida al formato](docs-dev/eventi.md) elenca i tag.
+- **Laboratorio di bilanciamento**, nella sezione Arena: esegue da 5 a 200 partite con il cast e le regole attuali su semi distinti. Mostra vittorie, frequenze osservate, posizione media, eliminazioni e cause di uscita. Puoi interrompere il campione e conservare le osservazioni parziali. Non sostituisce né archivia la partita aperta; i risultati aggregati sono copiabili in JSON.
+- **Stagioni e tornei**, nella Home: conserva cast, legami, eventi e regole alla creazione; ogni round usa un nuovo seme derivato dal seme originale. La classifica assegna a ogni concorrente 1 punto per partecipazione, 3 per vittoria e 1 per eliminazione attribuita. Ogni membro della squadra vincente riceve i punti vittoria. A parità valgono vittorie, posizione media e infine nome. Fino a 50 stagioni e 200 round per stagione, salvati sul browser. I replay dei round vengono conservati nell'archivio; eventuali errori di salvataggio sono indicati. L'esportazione della configurazione non include la classifica stagionale: salva separatamente i replay importanti.
+
+L'archivio delle partite consente di riaprire, rinominare, confrontare ed esportare risultati immutabili. Importare un replay assegna un nuovo identificativo e non risimula il risultato. Configurazioni, preferenze e stagioni dipendono dalla memoria del browser: cancellare i dati del sito le rimuove.
+
 ## Struttura
 ```
 src/data-core.js     eventi di base, tratti, caratteristiche, nomi
@@ -129,6 +140,7 @@ assets/              logo, icona, panoramica, anteprima dei link, sagome dei con
 src/anim.js          motore delle animazioni: atmosfere per arena, effetti degli eventi, transizioni, coriandoli
 src/replay.js        risultati immutabili nel browser, con IndexedDB e ripiego su localStorage
 src/simulator.js     esecuzione asincrona del motore in Web Worker, annullamento e ripiego compatibile
+src/studio.js        legami iniziali, seguiti, percorsi narrativi, eventi avanzati, laboratorio e stagioni
 docs/                versione per il web (Vercel o GitHub Pages): pagina leggera e immagini in docs/img con l'impronta nel nome, servite con cache lunga
 src/ui.js            interfaccia
 src/style.css        stile
@@ -156,6 +168,7 @@ node tools/test-persistence-ui.js # ripresa senza risimulazione, migrazione lega
 node tools/test-reading.js       # timeline senza spoiler, tempi adattivi e gestione della pausa
 node tools/test-variety-history.js # varietà, memoria storica e contesto degli eventi
 node tools/test-worker.js        # stesso risultato nel worker e nel motore principale
+node tools/test-studio.js        # legami iniziali, eventi avanzati, laboratorio, stagioni e percorsi della vittoria
 node tools/measure-variety.js 10 # misura ripetizioni con cast e semi riproducibili in tutte le arene
 node tools/test-engine.js 40    # 40 partite per arena, metà con i contenuti 18+, controlla regole e determinismo
 node tools/fuzz.js 1500         # partite con impostazioni casuali e casi limite (2-60 concorrenti, una sola squadra, valori estremi)
