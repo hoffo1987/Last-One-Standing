@@ -51,7 +51,7 @@ for (const b of blocks) {
     const out = LOS.renderSample(body, b.theme, g);
     if (/[{}\[\]§]/.test(out)) errors.push(b.where + ' (' + g + '): segnaposto non risolto: ' + out);
     if (/\b(\w+) \1\b/i.test(out.replace(/\b(che|da|ha|più|molto|tre|due|ancora|sempre|poi)\b/gi, ''))) warns.push(b.where + ': parola ripetuta: ' + out);
-    if (/\s[,.]|\.\.(?!\.)|  /.test(out)) warns.push(b.where + ': punteggiatura: ' + out);
+    if (/\s[,.]|(?<!\.)\.\.(?!\.)|  /.test(out)) warns.push(b.where + ': punteggiatura: ' + out);
     if (/\b(il|lo|la|un|una|uno)\s+(il|lo|la|un|una|uno|i|gli|le)\b/i.test(out)) warns.push(b.where + ': doppio articolo: ' + out);
     if (/\b(di|a|da|in|su) (il|lo|la|i|gli|le) /.test(out)) warns.push(b.where + ': preposizione non articolata: ' + out);
     if (g === 'F' && /\b(Alfa|Beta|Gamma|Delta)\b[^.!?]*\b(è|viene|resta|rimane|sembra|torna|esce) (stato|morto|ferito|ucciso|preso|sorpreso|caduto|rimasto|salvo|vivo|bloccato|chiuso|costretto|nascosto|svenuto|pronto|convinto)\b/.test(out)) warns.push(b.where + ': possibile accordo maschile con una donna: ' + out);

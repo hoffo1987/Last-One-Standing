@@ -22,7 +22,7 @@
       trap: { label: 'Trappola', desc: 'Di notte chi la sa usare la piazza nella sua zona. Chi ci passa rischia grosso, e l\'uccisione va a chi l\'ha piazzata.' },
       esplosivo: { label: 'Esplosivo', desc: 'Più forza negli scontri. Chi è ingegnoso ci costruisce trappole esplosive. Da ubriachi è un pessimo compagno.' },
       veleno: { label: 'Veleno', desc: 'Apre la strada agli avvelenamenti; chi è ingegnoso ci intinge l\'arma, che poi avvelena a ogni colpo.' },
-      amuleto: { label: 'Portafortuna', desc: 'Può salvare una volta da morte certa (sempre, per chi è superstizioso). Calma Terrore e Corruzione.' },
+      amuleto: { label: 'Portafortuna', desc: 'Può evitare una morte diretta narrata da un evento: probabilità 85%, certa per chi è superstizioso. Si consuma quando salva. Non ferma i danni periodici di fame, malattie e ferite. Calma Terrore e Corruzione.' },
       alcol: { label: 'Alcol', desc: 'Scalda, fa dimenticare, disinfetta le ferite infette. E ubriaca.' },
       valore: { label: 'Merce di scambio', desc: 'Non serve a niente, tranne che a comprare cibo e cure da chi ne ha.' },
       ricordo: { label: 'Ricordo', desc: 'Un pezzo di casa: ogni notte tiene su il morale. Se è di qualcuno che non c\'è più, ancora di più.' },
@@ -36,7 +36,7 @@
       trap: { label: 'Tranello', desc: 'Si prepara nella propria zona durante la notte. Chi ci casca perde reputazione e rischia l\'eliminazione, attribuita a chi ha preparato il tranello.' },
       esplosivo: { label: 'Colpo di scena', desc: 'Dà più forza negli scontri di reputazione e può rendere più efficace un tranello. Usarlo senza lucidità può causare una figuraccia.' },
       veleno: { label: 'Colpo basso', desc: 'Pettegolezzi e segnalazioni aprono la strada a eventi che mettono in difficoltà i rivali e possono farli uscire dai giochi.' },
-      amuleto: { label: 'Carta di riserva', desc: 'Può evitare una volta un\'eliminazione diretta; per chi è superstizioso funziona sempre.' },
+      amuleto: { label: 'Carta di riserva', desc: 'Può evitare un\'eliminazione diretta narrata da un evento: probabilità 85%, certa per chi è superstizioso. Si consuma quando salva; non impedisce il ritiro per reputazione o energie esaurite.' },
       alcol: { label: 'Bevanda', desc: 'Una pausa può abbassare Ansia e Stress, ma può anche ridurre lucidità ed energie. Nel Liceo si tratta di energy drink.' },
     },
     /* nomi dei tipi nuovi per ogni arena (gli altri vengono dal lessico dell'arena) */

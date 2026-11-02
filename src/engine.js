@@ -365,6 +365,18 @@
   Object.assign(STATUS_LABEL, (D.eco && D.eco.statusLabel) || {});
   const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
 
+  // La storia delle scelte è locale alla partita. Anche copie dello stesso testo
+  // in pacchetti diversi condividono frequenza e intervallo di esclusione.
+  function eventVariety() {
+    const counts = new Map(), recent = [];
+    const key = (ev) => ev.text.toLowerCase().replace(/\s+/g, ' ').trim();
+    return {
+      recent: (ev) => recent.includes(key(ev)),
+      weight: (ev) => 1 / Math.pow(1 + (counts.get(key(ev)) || 0), 1.5),
+      record(ev) { const k = key(ev); counts.set(k, (counts.get(k) || 0) + 1); recent.push(k); if (recent.length > 8) recent.shift(); },
+    };
+  }
+
   function simulate(cfg) {
     if (!cfg || !Array.isArray(cfg.cast) || cfg.cast.length < 2) throw new Error('Servono almeno 2 concorrenti.');
     const castIds = new Set();
@@ -380,6 +392,7 @@
     const rng = makeRng(seed + '|' + theme.id);
     const adult = !!cfg.adult && !theme.noAdult;
     const pools = buildPools(theme, cfg.custom, adult);
+    const variety = eventVariety();
     const LEX = pools.lex;
     const E = Object.assign({}, D.echo || {}, theme.soft ? D.echoSoft || {} : {});
     const diff = Object.prototype.hasOwnProperty.call(DIFF, cfg.difficulty) ? DIFF[cfg.difficulty] : 1;
@@ -422,7 +435,7 @@
       revenges: 0, saves: 0, repaid: 0, amulets: 0, tests: 0, testsPassed: 0,
       hp: 100, en: 90, mo: 55, food: 70, pr: 0, infected: false, infKnown: false, cause: null, poisonSource: null, hurtPh: -1, sawDeath: -1,
       foraged: 0, nursed: 0, shared: 0, trapKills: 0, trapsSet: 0, survivedBeasts: 0,
-      goal: null, thought: '', crush: null, plot: null, diary: [], mem: {}, promises: [], hunt: null, vowed: null, spares: 0, trades: 0, crafts: 0, acts: 0, rejected: 0, planPh: -9, vigilPh: -9, guard: null,
+      goal: null, thought: '', crush: null, plot: null, diary: [], mem: {}, memoryHistory: {}, promises: [], hunt: null, vowed: null, spares: 0, trades: 0, crafts: 0, acts: 0, rejected: 0, planPh: -9, vigilPh: -9, guard: null,
     }));
     if (T.length < 2) throw new Error('Servono almeno 2 concorrenti.');
     T.forEach((t) => {
@@ -692,7 +705,7 @@
       if (ev.origin === 'custom') w *= 1.5;
       else if (ev.origin === 'adult') w *= 1.25;
       else if (ev.origin !== 'base') w *= 1.3;
-      return w;
+      return w * variety.weight(ev);
     }
 
     function relKey(P, t) {
@@ -808,7 +821,9 @@
       if (!a || !b || a === b) return;
       const l = (a.mem[b.id] = a.mem[b.id] || []);
       if (l.length && l[l.length - 1].k === k && l[l.length - 1].ph === phases.length) return;
-      l.push({ ph: phases.length, k, x: x ? x.id : null });
+      const fact = { ph: phases.length, k, x: x ? x.id : null };
+      l.push(fact);
+      (a.memoryHistory[b.id] || (a.memoryHistory[b.id] = [])).push(fact);
       if (l.length > 8) l.shift();
       tweak(a, b, (BD.memfx || {})[k], scale);
       tweak(a, b, { k: 4 });
@@ -816,7 +831,8 @@
     function remember1(t, html, kind) {
       if (!t || !html) return;
       t.diary.push({ ph: phases.length, d: day, h: html, k: kind || 'pensiero' });
-      if (t.diary.length > 80) t.diary.shift();
+      // Il diario è un documento storico, non una coda di lavoro: le pagine
+      // precedenti restano disponibili anche nelle partite più lunghe.
     }
     function syncSt(t) {
       const ph = phases.length;
@@ -1040,8 +1056,35 @@
       out.testRes = { who: who.id, attr: ev.test.attr, roll: res.roll, dc: res.dc, pass: res.pass };
       return out;
     }
+    function eventReason(ev, roles) {
+      // Si descrivono soltanto condizioni effettivamente richieste dal modello,
+      // osservate prima dell'azione; nessuna spiegazione inventata a posteriori.
+      for (const r of ev.req) {
+        const A = roles[(r.r || [0])[0]], B = r.r && roles[r.r[1]];
+        if (!A) continue;
+        if (r.t === 'grudge' && B) {
+          const g = A.grudges[B.id], lost = g && byId[g.victim];
+          return A.name + ' ha un rancore verso ' + B.name + (lost ? ' per la perdita di ' + lost.name : '') + '.';
+        }
+        if (r.t === 'owe' && B) return A.name + ' deve un favore a ' + B.name + '.';
+        if (r.t === 'couple' && B) return A.name + ' e ' + B.name + ' sono una coppia.';
+        if (r.t === 'crush' && B) return A.name + ' prova una cotta segreta per ' + B.name + '.';
+        if (r.t === 'plot' && B) return A.name + ' sta tramando contro ' + B.name + '.';
+        if (r.t === 'goal' && A.goal) {
+          const goal = (MIND.goals || {})[A.goal.k];
+          if (goal) return 'Obiettivo di ' + A.name + ': ' + goal.label.replace('{1}', A.goal.tg && byId[A.goal.tg] ? byId[A.goal.tg].name : 'qualcuno') + '.';
+        }
+        if (r.t === 'stat') {
+          const labels = Object.assign({ hp: 'salute', en: 'energia', mo: 'morale', food: 'sazietà', pr: M ? M.name : 'indicatore' }, theme.soft ? { hp: 'reputazione', en: 'energie' } : {});
+          return A.name + ': ' + labels[r.k] + ' ' + Math.round(A[r.k]) + '/100 prima dell\'evento.';
+        }
+      }
+      return '';
+    }
     function apply(ev, roles) {
       CTX = null;
+      variety.record(ev);
+      const reason = eventReason(ev, roles);
       if (ev.test) ev = resolveTest(ev, roles);
       const ctx = {};
       const lexPick = (k) => (ctx[k] != null ? ctx[k] : (ctx[k] = rng.pick(LEX[k] || ['qualcosa'])));
@@ -1230,7 +1273,7 @@
       stats.events++;
       const deaths = roles.filter((t, i) => ev.victims.includes(i) && !t.alive).map((t) => t.id);
       const cat = ev.lethal && !deaths.length && ev.cat !== 'betray' ? 'hurt' : ev.cat;
-      return { html: txt.html, plain: txt.plain, ids: roles.map((t) => t.id), deaths, lethal: deaths.length > 0, origin: ev.origin, cat, why: ev.why, echo: out.slice(0, 3), test: ev.testRes || null };
+      return { html: txt.html, plain: txt.plain, ids: roles.map((t) => t.id), deaths, lethal: deaths.length > 0, origin: ev.origin, cat, why: ev.why, reason, echo: out.slice(0, 3), test: ev.testRes || null };
     }
 
     function lethalProb(kind) {
@@ -1997,7 +2040,7 @@
     /* ---------------- le relazioni ---------------- */
     const BA = (k) => (theme.soft && BD.actsSoft && BD.actsSoft[k]) || (BD.acts || {})[k] || [];
     const BDI = (k) => (BD.diary || {})[k] || [];
-    const hasMem = (a, b, k) => (a.mem[b.id] || []).some((m) => m.k === k);
+    const hasMem = (a, b, k) => (a.memoryHistory[b.id] || []).some((m) => m.k === k);
     // l'etichetta umana di quello che A prova per B
     function labelOf(a, b) {
       const x = peek(a, b), L = like(a, b);
@@ -2244,7 +2287,9 @@
         for (let attempt = 0; attempt < 25 && !done; attempt++) {
           const wantLethal = nAlive > 1 && rng.chance(pL);
           const cand = wantLethal ? candL : candS;
-          const ev = rng.wpick(cand, wOf);
+          // Se nessun modello recente può essere evitato, i tentativi successivi
+          // riaprono il catalogo: i requisiti dell'evento hanno sempre precedenza.
+          const ev = rng.wpick(cand, (e) => attempt < 12 && variety.recent(e) ? 0 : wOf(e));
           if (!ev) continue;
           const roles = assign(ev, P, un);
           if (!roles) continue;
@@ -2253,7 +2298,7 @@
           roles.forEach((t) => un.delete(t.id));
           done = true;
         }
-        if (!done) { events.push(apply(rng.pick(fallback), [P])); un.delete(P.id); }
+        if (!done) { events.push(apply(rng.wpick(fallback, (e) => variety.weight(e)), [P])); un.delete(P.id); }
       }
       // conseguenze automatiche della fase
       if (kind === 'n') nightEnd();
@@ -2289,7 +2334,7 @@
       if (!pool.length) return false;
       const events = [];
       for (let k = 0; k < 10 && !isEnded(); k++) {
-        const ev = rng.wpick(pool, (e) => e.w);
+        const ev = rng.wpick(pool, (e) => e.w * variety.weight(e));
         const roles = rng.chance(0.5) ? [A, B] : [B, A];
         if (!checkReq(ev, roles)) continue;
         events.push(apply(ev, roles));
@@ -2407,7 +2452,7 @@
       partner: t.partner, exPartner: t.exPartner,
       foraged: t.foraged, nursed: t.nursed, shared: t.shared, trapKills: t.trapKills, trapsSet: t.trapsSet, survivedBeasts: t.survivedBeasts,
       deathCause: t.alive ? null : t.deathKind || null,
-      diary: t.diary, mem: t.mem, trades: t.trades, crafts: t.crafts, acts: t.acts, rejected: t.rejected,
+      diary: t.diary, mem: t.memoryHistory, trades: t.trades, crafts: t.crafts, acts: t.acts, rejected: t.rejected,
       promises: t.promises.map((q) => ({ to: q.to, k: q.k, d: q.d, ph: q.ph, done: q.done || null, end: q.endPh != null ? q.endPh : null })), spares: t.spares, promisesKept: t.promisesKept || 0, promisesBroken: t.promisesBroken || 0,
       bag: t.inv.map((x) => ({ t: x.type, n: x.name, h: x.how || 'trovato', q: x.q, u: x.u, m: x.um, f: x.from, d: x.d, x: x.x })),
     }));
@@ -2418,7 +2463,7 @@
       for (let i = 0; i < T.length; i++) for (let j = i + 1; j < T.length; j++) {
         const a = T[i], b = T[j], ab = peek(a, b), ba = peek(b, a), la = like(a, b), lb = like(b, a);
         const lovers = hasMem(a, b, 'love') || hasMem(b, a, 'love');
-        const lastAB = (a.mem[b.id] || []).filter((m) => m.k === 'breakup' || m.k === 'reunion' || m.k === 'love').slice(-1)[0];
+        const lastAB = (a.memoryHistory[b.id] || []).filter((m) => m.k === 'breakup' || m.k === 'reunion' || m.k === 'love').slice(-1)[0];
         const broke = lastAB && lastAB.k === 'breakup';
         if (lovers) put('amore', a, b, ab.t + ba.t + Math.min(la, lb) + 20 - (broke ? 40 : 0), broke ? 'finito' : !a.alive && !b.alive ? 'tragico' : !a.alive || !b.alive ? 'spezzato' : 'insieme');
         if (!lovers && la >= 30 && lb >= 30) put('amicizia', a, b, Math.min(la, lb) + Math.min(ab.f, ba.f) + (ab.n.fw || 0) * 10 + (ab.n.sv || 0) * 10 + (ba.n.sv || 0) * 10, (ab.n.fw || 0) ? 'armi' : '');

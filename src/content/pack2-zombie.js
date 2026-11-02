@@ -66,7 +66,7 @@
     },
     dis: `
 L'orda gigante | Centomila infetti invadono la città da nord. | {A} viene travolt[A:o/a] dall'orda. | {A} viene mors[A:o/a] mentre si arrampica su un lampione. | {A} si cosparge di sangue di infetto e cammina in mezzo a loro. | ferito
-Il bombardamento | I militari decidono di bombardare la Periferia. | {A} era in Periferia. | {A} viene sbalzat[A:o/a] da un'esplosione. | {A} sente gli aerei arrivare e corre nella Metropolitana. | ferito
+Il bombardamento | I militari decidono di bombardare la Periferia. | {A} era in Periferia. | {A} raggiunge la Metropolitana con il rombo dell'esplosione ancora nelle orecchie e una gamba che cede. | {A} sente gli aerei arrivare e corre nella Metropolitana. | ferito
 Il mutante | Un infetto enorme, grosso come un furgone, sfonda le pareti della Scuola. | {A} si trova sulla sua strada. | {A} viene lanciat[A:o/a] contro un muro. | {A} si nasconde in un armadietto e trattiene il respiro. | ferito
 L'acqua contaminata | L'acquedotto è contaminato: chi beve si ammala. | {A} beve dal rubinetto senza pensarci. | {A} ne beve un sorso e passa la notte con la febbre. | {A} beve solo acqua in bottiglia, per principio. | malato
 L'incendio dei palazzi | Un incendio si propaga da un palazzo all'altro. | {A} resta intrappolat[A:o/a] all'ultimo piano. | {A} salta da una finestra e atterra su un'auto. | {A} è già in strada e guarda le fiamme da lontano. | ferito

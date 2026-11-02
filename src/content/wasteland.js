@@ -48,31 +48,31 @@
     },
     dis: `
 Pioggia acida | Una pioggia giallastra corrode metallo e pelle. | {A} resta allo scoperto e non sopravvive. | {A} si riempie di ustioni chimiche. | {A} si rifugia nella carcassa di un autobus.
-Onda di calore | Il termometro supera i sessanta gradi. | {A} muore disidratat[A:o/a]. | {A} sviene e si risveglia con la febbre. | {A} si nasconde in una cisterna vuota. | affamato
+Onda di calore | Il termometro supera i sessanta gradi. | {A} raggiunge la cisterna senza più avere la forza di aprirla. | {A} sviene e si risveglia con la febbre. | {A} si nasconde in una cisterna vuota. | affamato
 Sciame di locuste | Uno sciame di locuste mutanti oscura il cielo. | {A} viene divorat[A:o/a] dalle locuste. | {A} viene mors[A:o/a] in tutto il corpo. | {A} si chiude in un container.
-Il vecchio reattore | Un vecchio reattore nucleare sotterraneo si risveglia. | {A} assorbe una dose letale di radiazioni. | {A} perde i capelli e comincia a vomitare. | {A} si allontana nella direzione opposta. | malato
+Il vecchio reattore | Un vecchio reattore nucleare sotterraneo si risveglia. | {A} segue il calore fino al reattore. Il contatore Geiger smette di ticchettare troppo tardi. | {A} perde i capelli e comincia a vomitare. | {A} si allontana nella direzione opposta. | malato
 Terremoto | Un terremoto apre voragini nella sabbia. | {A} viene inghiottit[A:o/a] da una voragine. | {A} si rompe una gamba saltando una crepa. | {A} si trova sul cemento della Diga.
-Esplosione della Diga | La Diga cede e un muro d'acqua attraversa la valle. | {A} viene travolt[A:o/a] dall'acqua. | {A} viene sbattut[A:o/a] contro le rocce. | {A} si arrampica su un pilone.
+Esplosione della Diga | La Diga cede e un muro d'acqua attraversa la valle. | {A} scompare tra i piloni abbattuti dall'acqua della Diga. | {A} viene sbattut[A:o/a] contro le rocce. | {A} si arrampica su un pilone.
 La tempesta elettrica | Fulmini violacei colpiscono il deserto. | {A} viene colpit[A:o/a] da un fulmine. | {A} viene sbalzat[A:o/a] da un fulmine vicino. | {A} si sdraia in una buca.
 I mutanti | Una tribù di mutanti scende dalle colline. | {A} viene catturat[A:o/a] e non si sa più nulla. | {A} si libera dai mutanti, ma con una ferita profonda. | {A} si finge mort[A:o/a] e i mutanti passano oltre.
 Il verme gigante | Un verme delle sabbie lungo cento metri emerge dal terreno. | {A} viene inghiottit[A:o/a] dal verme. | {A} viene sbalzat[A:o/a] via dal colpo di coda. | {A} resta immobile sulle rocce.
 Gas dalla Raffineria | Una nube tossica esce dalla Raffineria. | {A} respira la nube e muore. | {A} respira il gas e tossisce sangue. | {A} indossa una maschera fatta di filtri. | avvelenato
-Fuoco sull'Autostrada | Un'autocisterna esplode sull'Autostrada spezzata. | {A} viene investit[A:o/a] dalle fiamme. | {A} riporta ustioni gravi. | {A} si trovava già lontano.
+Fuoco sull'Autostrada | Un'autocisterna esplode sull'Autostrada spezzata. | {A} viene investit[A:o/a] dalle fiamme. | {A} attraversa il guardrail in fiamme e ne porta addosso le conseguenze. | {A} si trovava già lontano.
 La carovana degli schiavisti | Gli schiavisti setacciano il deserto. | {A} viene catturat[A:o/a] e portat[A:o/a] via in catene. | {A} sfugge agli schiavisti, ma viene colpit[A:o/a] di striscio. | {A} si nasconde sotto la sabbia.
 Il sole nero | Un'eclisse totale oscura il deserto per ore. | {A} si perde nel buio e precipita da un viadotto. | {A} inciampa nelle macerie. | {A} accende una torcia e resta ferm[A:o/a].
 Tempesta di vetro | Il vento solleva milioni di schegge di vetro dalla Città fantasma. | {A} viene fatt[A:o/a] a pezzi dal vetro. | {A} si copre, ma resta ferit[A:o/a]. | {A} si chiude in un bunker.
 Gli avvoltoi | Stormi di avvoltoi giganti scendono su chi è debole. | {A} viene attaccat[A:o/a] mentre cammina. | {A} viene beccat[A:o/a] alle spalle. | {A} spara in aria e gli avvoltoi si allontanano.
 Le sabbie mobili | Le dune si trasformano in sabbie mobili. | {A} viene inghiottit[A:o/a] dalla sabbia. | {A} esce dalla sabbia senza scarpe e con le gambe ferite. | {A} si aggrappa a un palo.
-La pioggia di cenere | Un vulcano lontano copre il cielo di cenere. | {A} soffoca nella cenere. | {A} si ammala ai polmoni. | {A} respira attraverso un panno bagnato. | malato
+La pioggia di cenere | Un vulcano lontano copre il cielo di cenere. | {A} cerca aria sotto un cielo che ormai lascia cadere soltanto cenere. | {A} si ammala ai polmoni. | {A} respira attraverso un panno bagnato. | malato
 L'acqua finisce | Ogni pozzo conosciuto si prosciuga. | {A} muore di sete. | {A} sopravvive bevendo dal radiatore di un camion. | {A} aveva una scorta nascosta. | affamato
 La banda dei motociclisti | Una banda di motociclisti armati attraversa la zona. | {A} viene investit[A:o/a] dalla banda. | {A} viene colpit[A:o/a] da una catena. | {A} si nasconde in un tubo di scarico.
-Il gelo notturno | Di notte la temperatura scende a meno trenta. | {A} muore congelat[A:o/a]. | {A} perde la sensibilità alle mani. | {A} si avvolge in vecchie coperte. | malato
-I cani mutati | Un branco di cani a due teste caccia nel deserto. | {A} viene sbranat[A:o/a]. | {A} viene mors[A:o/a] a un braccio. | {A} lascia della carne come esca e scappa.
+Il gelo notturno | Di notte la temperatura scende a meno trenta. | {A} muore congelat[A:o/a]. | {A} cerca di stringere la borraccia, ma le dita non rispondono più. | {A} si avvolge in vecchie coperte. | malato
+I cani mutati | Un branco di cani a due teste caccia nel deserto. | {A} viene sbranat[A:o/a]. | {A} tiene lontana una testa del cane. La seconda raggiunge il braccio. | {A} lascia della carne come esca e scappa.
 La pioggia di rottami | Un vecchio satellite precipita in pezzi sul deserto. | {A} viene schiacciat[A:o/a] da un rottame. | {A} viene colpit[A:o/a] da un frammento. | {A} si ripara dietro un muro.
-Il fungo atomico | All'orizzonte si alza un fungo atomico. | {A} viene investit[A:o/a] dall'onda d'urto. | {A} viene accecat[A:o/a] per ore dal lampo. | {A} si getta in un fosso.
+Il fungo atomico | All'orizzonte si alza un fungo atomico. | {A} guarda il fungo atomico fino all'arrivo dell'onda che spazza via il riparo. | {A} viene accecat[A:o/a] per ore dal lampo. | {A} si stende in un fosso e aspetta il passaggio dell'onda d'urto.
 La nebbia verde | Una nebbia verdognola esce dal Cratere. | {A} si perde nella nebbia e non ne esce. | {A} si riempie di macchie sulla pelle. | {A} sale sul tetto di un camion. | malato
 I banditi della Diga | I banditi della Diga chiedono un pedaggio di sangue. | {A} non può pagare e viene uccis[A:o/a]. | {A} paga con una ferita. | {A} paga con tutto il carburante che ha.
-Il tornado | Un tornado di sabbia attraversa le Terre Desolate. | {A} viene sollevat[A:o/a] e scagliat[A:o/a] lontano. | {A} viene colpit[A:o/a] da detriti. | {A} si chiude in un bunker.
+Il tornado | Un tornado di sabbia attraversa le Terre Desolate. | {A} viene sollevat[A:o/a] e scagliat[A:o/a] lontano. | {A} viene colpit[A:o/a] da detriti. | {A} chiude il portello del bunker mentre la sabbia comincia a strappare la vernice.
 La miniera | Una vecchia miniera crolla sotto i piedi di chi ci cammina sopra. | {A} cade nei cunicoli. | {A} si rompe un braccio nella caduta. | {A} si trovava sulla roccia solida.
 `,
   };

@@ -47,10 +47,10 @@
 `,
     },
     dis: `
-Bombardamento di artiglieria | L'artiglieria colpisce a caso una zona dell'isola. | {A} viene colpit[A:o/a] da una granata d'artiglieria. | {A} viene ferit[A:o/a] da una scheggia. | {A} si mette al riparo in un bunker.
+Bombardamento di artiglieria | L'artiglieria colpisce a caso una zona dell'isola. | {A} viene colpit[A:o/a] da una granata d'artiglieria. | {A} si ripara dietro una cassa, ma una scheggia attraversa il legno. | {A} raggiunge un bunker prima della seconda salva.
 Uragano | Un uragano si abbatte sull'isola. | {A} viene trascinat[A:o/a] via dal vento. | {A} viene colpit[A:o/a] da un pezzo di tetto. | {A} si chiude nella cantina di una casa.
-Gas tossico | Un gas tossico si diffonde dalla Centrale elettrica. | {A} non trova la maschera in tempo. | {A} respira il gas e tossisce per ore. | {A} indossa una maschera antigas. | avvelenato
-Tsunami | Un'onda gigante colpisce il Villaggio costiero. | {A} viene travolt[A:o/a] dall'onda. | {A} viene sbattut[A:o/a] contro un muro. | {A} corre verso la collina in tempo.
+Gas tossico | Un gas tossico si diffonde dalla Centrale elettrica. | {A} non trova la maschera in tempo. | {A} respira il gas e tossisce per ore. | {A} stringe la maschera antigas sul viso e attraversa la nube senza respirarla. | avvelenato
+Tsunami | Un'onda gigante colpisce il Villaggio costiero. | {A} viene travolt[A:o/a] dall'onda. | {A} si aggrappa a un balcone dopo che l'onda ha reso la strada irriconoscibile. | {A} corre verso la collina in tempo.
 Il cerchio rosso | Un cerchio rosso compare sulla mappa: bombardamento in arrivo. | {A} non esce dal cerchio in tempo. | {A} esce dal cerchio ferit[A:o/a] alle gambe. | {A} esce dal cerchio di corsa.
 Incendio nella Foresta | Un incendio si propaga nella Foresta. | {A} resta intrappolat[A:o/a] dal fuoco. | {A} si ustiona per scappare. | {A} guida un'auto fuori dalla Foresta.
 Elicotteri d'assalto | Elicotteri armati pattugliano l'isola. | {A} viene colpit[A:o/a] dall'elicottero. | {A} viene ferit[A:o/a] da una raffica. | {A} si nasconde sotto un ponte.
@@ -63,14 +63,14 @@ Mine nel campo | Un campo minato si rivela sotto il grano della Fattoria. | {A} 
 Pioggia di casse | Le casse di rifornimento cadono a decine. | {A} viene colpit[A:o/a] da una cassa in caduta. | {A} viene colpit[A:o/a] di striscio da una cassa. | {A} raccoglie una cassa intatta.
 Cani da guardia | I cani della Base militare vengono liberati. | {A} viene raggiunt[A:o/a] dai cani. | {A} viene mors[A:o/a] a un braccio. | {A} si arrampica su una torre.
 Zona ridotta | La zona si riduce a metà in un minuto. | {A} non fa in tempo a rientrare. | {A} rientra con la salute a un filo. | {A} era già al centro della zona.
-Esplosione della Centrale | La Centrale elettrica esplode. | {A} viene investit[A:o/a] dall'esplosione. | {A} viene sbalzat[A:o/a] dall'onda d'urto. | {A} era dall'altra parte dell'isola.
-Il cecchino fantasma | Un cecchino controllato dagli organizzatori colpisce chi resta fermo. | {A} viene centrat[A:o/a] mentre si cura. | {A} viene ferit[A:o/a] a una spalla. | {A} continua a muoversi a zig zag.
+Esplosione della Centrale | La Centrale elettrica esplode. | {A} resta dietro il cancello della Centrale quando il reattore esplode. | {A} viene sbalzat[A:o/a] dall'onda d'urto. | {A} era dall'altra parte dell'isola.
+Il cecchino fantasma | Un cecchino controllato dagli organizzatori colpisce chi resta fermo. | {A} viene centrat[A:o/a] mentre si cura. | {A} vede il mirino troppo tardi: la spalla paga il ritardo. | {A} continua a muoversi a zig zag.
 Interferenza | Un'interferenza disattiva i visori e le radio. | {A} cade da un tetto per la mancanza di visibilità. | {A} si ferisce cadendo. | {A} non aveva mai usato il visore.
 Il ponte crolla | Il ponte che collega le due metà dell'isola crolla. | {A} cade in acqua con il ponte. | {A} si aggrappa al bordo e risale ferit[A:o/a]. | {A} aveva già attraversato.
 Ondata di calore | Il sole picchia sull'isola senza un filo d'ombra. | {A} muore per un colpo di calore. | {A} si disidrata e perde forza. | {A} trova una bottiglia d'acqua fresca. | affamato
 Squadra di bot | Una squadra di bot armati entra in gioco. | {A} viene eliminat[A:o/a] dai bot. | {A} viene ferit[A:o/a] combattendo i bot. | {A} elimina i bot da sol[A:o/a].
 Allagamento | La pioggia allaga le zone basse dell'isola. | {A} annega in un sottopassaggio allagato. | {A} perde lo zaino nella corrente. | {A} sale sulla collina.
-Granate a grappolo | Dal cielo cadono granate a grappolo. | {A} viene colpit[A:o/a] in pieno. | {A} viene ferit[A:o/a] alle gambe. | {A} si getta in un fosso.
+Granate a grappolo | Dal cielo cadono granate a grappolo. | {A} sceglie il fosso su cui cade la prima granata. | {A} viene ferit[A:o/a] alle gambe. | {A} si getta in un fosso.
 Il drone kamikaze | Un drone kamikaze punta il giocatore più vicino. | {A} non riesce a sfuggire al drone. | {A} abbatte il drone, ma viene ferit[A:o/a] dall'esplosione. | {A} si nasconde in un edificio.
 Il faro | Il faro dell'isola illumina chiunque si trovi all'aperto di notte. | {A} viene individuat[A:o/a] e colpit[A:o/a]. | {A} viene colpit[A:o/a] di striscio. | {A} resta all'ombra di un muro.
 Tempesta di sabbia | Una tempesta di sabbia avvolge l'Aeroporto. | {A} si perde e finisce fuori dalla zona. | {A} perde l'orientamento e si ferisce. | {A} si chiude in un hangar.

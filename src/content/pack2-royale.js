@@ -68,7 +68,7 @@ Il bombardamento a tappeto | Una zona rossa compare sulla mappa: arrivano le bom
 L'elicottero da caccia | Un elicottero degli organizzatori sorvola l'isola sparando a caso. | {A} viene inquadrat[A:o/a] dal mirino. | {A} prende un colpo di striscio. | {A} si sdraia sotto un'auto finché l'elicottero non passa. | ferito
 Lo tsunami | Un'onda gigante si abbatte sul Villaggio costiero. | {A} viene trascinat[A:o/a] in mare. | {A} viene sbattut[A:o/a] contro un muro. | {A} è già sulla collina, a guardare. | ferito
 I lupi bionici | Branchi di lupi con occhi rossi escono dalla Foresta. | {A} viene circondat[A:o/a]. | {A} viene mors[A:o/a] mentre scappa. | {A} si chiude in un silos. | ferito
-La zona tossica | Una nube verde copre la Fattoria. | {A} respira troppa nube. | {A} tossisce per ore. | {A} indossa una maschera antigas presa a un soldato. | malato
+La zona tossica | Una nube verde copre la Fattoria. | {A} respira troppa nube. | {A} raggiunge il bordo della nube, ma continua a tossire anche al sicuro. | {A} indossa una maschera antigas presa a un soldato. | malato
 Il crollo del ponte | Il ponte principale dell'isola crolla mentre tutti lo attraversano. | {A} cade con il ponte. | {A} si aggrappa ai cavi e risale ferit[A:o/a]. | {A} aveva scelto di nuotare. | ferito
 La pioggia di casse | Cento casse cadono dal cielo in un minuto. | {A} viene colpit[A:o/a] da una cassa. | {A} viene sfiorat[A:o/a] e perde un dente. | {A} raccoglie tre casse senza un graffio. | ferito
 Il blackout del server | L'arena «laggha»: per qualche minuto tutto si muove a scatti. | {A} si teletrasporta dentro un muro. | {A} cade da un tetto per un errore di calcolo. | {A} resta immobile finché tutto torna normale. | sconvolto

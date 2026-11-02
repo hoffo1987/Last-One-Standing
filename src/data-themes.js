@@ -642,7 +642,7 @@
 1 @luck | {A} era in ferie.
 1 s:A=ferito | {A} si salva, ma con un richiamo scritto.
 1 @int | {A} aveva già aggiornato il curriculum.
-2 ally:AB | {A} e {B} si coprono a vicenda.
+2 ally:AB | {A} e {B} si coprono le spalle davanti al Direttore.
 2 k:A>B | {A} scarica tutta la responsabilità su {B}.
 `,
         fallback: `

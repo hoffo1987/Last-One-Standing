@@ -1066,3 +1066,28 @@ img.scene { object-fit: cover; object-position: center; user-select: none; }
 .story2.k-amore { border-left: 3px solid var(--c-love); } .story2.k-amicizia, .story2.k-mentore, .story2.k-pieta { border-left: 3px solid var(--c-heal); }
 .story2.k-nemesi, .story2.k-odio, .story2.k-tradimento { border-left: 3px solid var(--c-kill); } .story2.k-paura { border-left: 3px solid #8a5bd6; } .story2.k-nonCorrisposto { border-left: 3px solid #e08a2b; }
 .dday .dk-fatto .dk { color: color-mix(in srgb, var(--muted) 75%, var(--ink)); }
+
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; border: 0; }
+.reading-options { margin: 12px 0 18px; padding: 12px 16px; }
+.reading-options summary { cursor: pointer; font-weight: 600; }
+.reading-options label { display: flex; gap: 10px; align-items: center; margin-top: 12px; }
+.reading-options input { flex: 0 0 auto; accent-color: var(--accent); }
+.reading-options .help { margin-top: 10px; }
+.sim-progress { position: fixed; inset: auto 16px 90px auto; z-index: 100; padding: 16px; display: flex; align-items: center; gap: 16px; max-width: calc(100% - 32px); box-shadow: 0 6px 30px #0006; }
+.archive-launch { margin: 16px 0; }
+.archive-dialog { width: min(820px, calc(100vw - 48px)); }
+.archive-dialog #archiveList { display: grid; gap: 12px; margin: 18px 0; }
+.archive-entry { padding: 14px; border: 1px solid var(--line); border-radius: 12px; }
+.archive-entry > label:not(.archive-select) { display: grid; gap: 6px; }
+.archive-entry .archive-select { display: flex; gap: 8px; align-items: center; margin-bottom: 10px; }
+.archive-entry input[data-title] { width: 100%; }
+.archive-entry .help { margin: 8px 0; }
+.archive-dialog details { margin-top: 18px; }
+.archive-dialog textarea { width: 100%; margin: 10px 0; }
+.archive-dialog #archiveComparison { margin-top: 16px; }
+.event-reason { margin-top: 10px; color: var(--muted); font-size: 12px; }
+.event-reason summary { cursor: pointer; }
+.event-reason p { margin-top: 6px; font-size: inherit; }
+[data-reduced-motion] *, [data-reduced-motion] *::before, [data-reduced-motion] *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+[data-reduced-motion] .fx-field, [data-reduced-motion] .ripple, [data-reduced-motion] .confetti { display: none !important; }
+[data-reduced-motion] .reveal, [data-reduced-motion] .tilting, [data-reduced-motion] .hh-scenes { transform: none !important; }

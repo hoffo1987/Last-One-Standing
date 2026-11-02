@@ -4,7 +4,8 @@
  * Rispetta prefers-reduced-motion: in quel caso tutto resta fermo e leggibile. */
 (function (G) {
   'use strict';
-  const reduced = G.matchMedia && G.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const motionQuery = G.matchMedia ? G.matchMedia('(prefers-reduced-motion: reduce)') : null;
+  let preference = false, reduced = !!(motionQuery && motionQuery.matches);
   const TAU = Math.PI * 2;
   const R = (a, b) => a + Math.random() * (b - a);
   const pick = (a) => a[Math.floor(Math.random() * a.length)];
@@ -90,6 +91,13 @@
     const p = Object.assign(base, k); p.life0 = p.life; p.o = 1; return p;
   }
   let raf = 0, last = 0;
+  function setReduced(value) {
+    preference = !!value; reduced = preference || !!(motionQuery && motionQuery.matches);
+    document.documentElement.toggleAttribute('data-reduced-motion', reduced);
+    if (reduced) { if (raf) cancelAnimationFrame(raf); raf = 0; last = 0; }
+    else loop();
+  }
+  if (motionQuery && motionQuery.addEventListener) motionQuery.addEventListener('change', () => setReduced(preference));
   function loop() {
     if (reduced || raf) return;
     const tick = (now) => {
@@ -111,7 +119,7 @@
     const from = opts.from != null ? opts.from : parseFloat(el.textContent) || 0;
     if (reduced || from === to) { el.textContent = to; return; }
     const dur = opts.dur || 900, t0 = performance.now();
-    const step = (now) => { const k = Math.min(1, (now - t0) / dur), e = 1 - Math.pow(1 - k, 3); el.textContent = Math.round(from + (to - from) * e); if (k < 1) requestAnimationFrame(step); };
+    const step = (now) => { if (reduced) { el.textContent = to; return; } const k = Math.min(1, (now - t0) / dur), e = 1 - Math.pow(1 - k, 3); el.textContent = Math.round(from + (to - from) * e); if (k < 1) requestAnimationFrame(step); };
     requestAnimationFrame(step);
   }
   function kinetic(el, style) {
@@ -140,17 +148,17 @@
   }
   function tilt(root, sel) {
     if (reduced || !root || root.__tilt || matchMedia('(hover: none)').matches) return; root.__tilt = true;
-    root.addEventListener('pointermove', (e) => { const c = e.target.closest(sel); if (!c) return; const r = c.getBoundingClientRect(); const x = (e.clientX - r.left) / r.width - 0.5, y = (e.clientY - r.top) / r.height - 0.5; c.style.setProperty('--rx', (-y * 8).toFixed(2) + 'deg'); c.style.setProperty('--ry', (x * 10).toFixed(2) + 'deg'); c.style.setProperty('--gx', ((x + 0.5) * 100).toFixed(1) + '%'); c.style.setProperty('--gy', ((y + 0.5) * 100).toFixed(1) + '%'); c.classList.add('tilting'); });
+    root.addEventListener('pointermove', (e) => { if (reduced) return; const c = e.target.closest(sel); if (!c) return; const r = c.getBoundingClientRect(); const x = (e.clientX - r.left) / r.width - 0.5, y = (e.clientY - r.top) / r.height - 0.5; c.style.setProperty('--rx', (-y * 8).toFixed(2) + 'deg'); c.style.setProperty('--ry', (x * 10).toFixed(2) + 'deg'); c.style.setProperty('--gx', ((x + 0.5) * 100).toFixed(1) + '%'); c.style.setProperty('--gy', ((y + 0.5) * 100).toFixed(1) + '%'); c.classList.add('tilting'); });
     root.addEventListener('pointerleave', () => root.querySelectorAll('.tilting').forEach((c) => { c.classList.remove('tilting'); c.style.removeProperty('--rx'); c.style.removeProperty('--ry'); }), true);
     root.addEventListener('pointerout', (e) => { const c = e.target.closest(sel); if (c && !c.contains(e.relatedTarget)) { c.classList.remove('tilting'); c.style.removeProperty('--rx'); c.style.removeProperty('--ry'); } });
   }
   function parallax(host, layer) {
     if (reduced || !host || host.__par || matchMedia('(hover: none)').matches) return; host.__par = true;
-    host.addEventListener('pointermove', (e) => { const r = host.getBoundingClientRect(); const x = (e.clientX - r.left) / r.width - 0.5, y = (e.clientY - r.top) / r.height - 0.5; layer.style.setProperty('--px', (x * -18).toFixed(1) + 'px'); layer.style.setProperty('--py', (y * -10).toFixed(1) + 'px'); });
+    host.addEventListener('pointermove', (e) => { if (reduced) return; const r = host.getBoundingClientRect(); const x = (e.clientX - r.left) / r.width - 0.5, y = (e.clientY - r.top) / r.height - 0.5; layer.style.setProperty('--px', (x * -18).toFixed(1) + 'px'); layer.style.setProperty('--py', (y * -10).toFixed(1) + 'px'); });
   }
   function ripple(root) {
     if (reduced || root.__ripple) return; root.__ripple = true;
-    root.addEventListener('pointerdown', (e) => { const b = e.target.closest('.btn, .pbtn, .poster-card'); if (!b) return; const r = b.getBoundingClientRect(); const s = document.createElement('span'); s.className = 'ripple'; const d = Math.max(r.width, r.height) * 2; s.style.width = s.style.height = d + 'px'; s.style.left = e.clientX - r.left - d / 2 + 'px'; s.style.top = e.clientY - r.top - d / 2 + 'px'; b.appendChild(s); setTimeout(() => s.remove(), 650); });
+    root.addEventListener('pointerdown', (e) => { if (reduced) return; const b = e.target.closest('.btn, .pbtn, .poster-card'); if (!b) return; const r = b.getBoundingClientRect(); const s = document.createElement('span'); s.className = 'ripple'; const d = Math.max(r.width, r.height) * 2; s.style.width = s.style.height = d + 'px'; s.style.left = e.clientX - r.left - d / 2 + 'px'; s.style.top = e.clientY - r.top - d / 2 + 'px'; b.appendChild(s); setTimeout(() => s.remove(), 650); });
   }
   let revealIO = null;
   function reveal(els) {
@@ -197,6 +205,7 @@
     burst(innerWidth * 0.3); setTimeout(() => burst(innerWidth * 0.7), 260); setTimeout(() => burst(innerWidth * 0.5), 560);
     let t = 0;
     (function frame() {
+      if (reduced) { cv.remove(); return; }
       t++; g.clearRect(0, 0, innerWidth, innerHeight);
       P.forEach((p) => {
         p.vy += 0.32; p.vx *= 0.985; p.x += p.vx + Math.sin((t + p.w * 20) / 12) * 0.8; p.y += p.vy; p.a += p.va;
@@ -216,5 +225,5 @@
     })();
   }
 
-  G.LOS_ANIM = { reduced, field, countTo, kinetic, dice, domBurst, tilt, parallax, ripple, reveal, phaseFx, intensityFor, confetti };
+  G.LOS_ANIM = { get reduced() { return reduced; }, setReduced, field, countTo, kinetic, dice, domBurst, tilt, parallax, ripple, reveal, phaseFx, intensityFor, confetti };
 })(typeof window !== 'undefined' ? window : globalThis);

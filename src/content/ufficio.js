@@ -52,7 +52,7 @@ Taglio dei costi | Il Direttore annuncia un taglio del dieci per cento del perso
 Il trasloco | L'ufficio trasloca in un'altra sede in periferia. | {A} non regge il pendolarismo e si dimette. | {A} perde gli scatoloni con tutti i documenti. | {A} sceglie la scrivania migliore della nuova sede.
 Lo smart working forzato | Tutti a casa per un mese, con controlli a sorpresa via webcam. | {A} viene sorpres[A:o/a] in pigiama durante una call con il cliente. | {A} non riesce a collegarsi e perde una riunione importante. | {A} lavora meglio da casa che in ufficio.
 La valutazione annuale | Arrivano le valutazioni di fine anno. | {A} riceve il voto più basso dell'azienda ed è fuori. | {A} riceve una valutazione mediocre. | {A} riceve un aumento.
-L'hackeraggio | Un attacco informatico blocca tutti i computer. | {A} aveva aperto il link sospetto: licenziat[A:o/a]. | {A} perde una settimana di lavoro. | {A} aveva un backup di tutto.
+L'hackeraggio | Un attacco informatico blocca tutti i computer. | {A} aveva aperto il link sospetto: licenziat[A:o/a]. | {A} passa la settimana a ricostruire documenti dai messaggi inviati. | {A} aveva un backup di tutto.
 La gita di team building | L'azienda organizza un weekend di team building in montagna. | {A} perde la gara di orientamento e il gruppo l[A:o/a] abbandona. | {A} si fa male durante il percorso sugli alberi. | {A} guida il gruppo alla vittoria.
 Il nuovo capo | Arriva un nuovo capo che vuole cambiare tutto. | {A} contraddice il nuovo capo davanti a tutti. | {A} viene mess[A:o/a] in un progetto senza speranza. | {A} diventa il braccio destro del nuovo capo.
 Il guasto all'aria condizionata | L'aria condizionata si rompe a luglio. | {A} sviene in sala riunioni ed è fuori per mesi. | {A} lavora tutto il giorno in un bagno di sudore. | {A} si sposta nella sala server, l'unica fresca. | malato
@@ -65,13 +65,13 @@ La festa di Natale | La festa di Natale aziendale finisce fuori controllo. | {A}
 Il controllo delle note spese | Il controllo di gestione esamina tutte le note spese. | {A} ha messo in nota spese una vacanza ai Caraibi. | {A} deve restituire dei rimborsi. | {A} non ha mai chiesto un rimborso.
 La sostituzione con l'intelligenza artificiale | L'azienda introduce un programma che fa il lavoro di metà dell'ufficio. | {A} viene sostituit[A:o/a] dal programma. | {A} viene spostat[A:o/a] a controllare il programma. | {A} impara a usare il programma meglio di chiunque.
 L'influenza dell'ufficio | Un virus si diffonde in tutto l'open space. | {A} resta a casa troppo a lungo e viene sostituit[A:o/a]. | {A} lavora con la febbre e sbaglia tutto. | {A} non si ammala. | malato
-La gara di vendite | Il Direttore lancia una gara: chi vende meno se ne va. | {A} arriva ultim[A:o/a] nella classifica delle vendite. | {A} vende pochissimo e viene mess[A:o/a] sotto osservazione. | {A} vince la gara.
+La gara di vendite | Il Direttore lancia una gara: chi vende meno se ne va. | {A} arriva ultim[A:o/a] nella classifica delle vendite. | {A} vende pochissimo e viene mess[A:o/a] sotto osservazione. | {A} chiude il contratto decisivo e si prende il primo posto.
 Il blackout | Un blackout cancella tutto il lavoro non salvato. | {A} perde la presentazione del giorno e non si riprende. | {A} deve rifare tutto da capo. | {A} aveva salvato ogni cinque minuti.
 L'audit esterno | Arrivano i revisori esterni. | {A} non trova i documenti richiesti ed è fuori. | {A} viene interrogat[A:o/a] per ore. | {A} consegna tutto in perfetto ordine.
 Lo sciopero | I sindacati proclamano uno sciopero generale. | {A} viene scelt[A:o/a] come capro espiatorio. | {A} deve coprire il lavoro di tre colleghi. | {A} si schiera dalla parte giusta.
 Il premio di produzione | Viene annunciato un premio di produzione per un solo dipendente. | {A} perde la testa per invidia e insulta il vincitore. | {A} lavora così tanto da ammalarsi. | {A} vince il premio. | malato
 Il nuovo stagista | Arriva uno stagista più bravo di tutti. | {A} viene sostituit[A:o/a] dallo stagista. | {A} deve insegnare tutto allo stagista. | {A} fa da mentore allo stagista.
-La macchinetta del caffè | La macchinetta del caffè si rompe per una settimana. | {A} non regge la crisi d'astinenza e se ne va. | {A} lavora a metà della velocità. | {A} porta la propria moka in ufficio. | malato
+La macchinetta del caffè | La macchinetta del caffè si rompe per una settimana. | {A} non regge la crisi d'astinenza e se ne va. | {A} impiega il doppio del tempo a fare ogni cosa senza il caffè della mattina. | {A} porta la propria moka in ufficio. | malato
 Il Consiglio di amministrazione | Il Consiglio di amministrazione visita l'ufficio. | {A} si presenta in tuta da ginnastica. | {A} balbetta durante la presentazione. | {A} fa la presentazione migliore della giornata.
 `,
   };

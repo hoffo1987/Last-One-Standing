@@ -94,7 +94,8 @@
     } catch (e) { return false; }
   }
   function envelopeOk(e, id) {
-    return record(e) && e.schema === 1 && e.id === id && typeof e.buildId === 'string' && Number.isFinite(e.createdAt) && e.createdAt > 0 && validate(e.result);
+    return record(e) && e.schema === 1 && e.id === id && typeof e.buildId === 'string' && Number.isFinite(e.createdAt) && e.createdAt > 0 &&
+      (e.title == null || typeof e.title === 'string' && e.title.length <= 100) && (e.configuration == null || record(e.configuration)) && validate(e.result);
   }
   function openDb() {
     if (opening) return opening;
@@ -196,6 +197,8 @@
   async function save(id, result, meta = {}) {
     if (!replayIdOk(id)) throw new Error('Identificativo della partita non valido.');
     const e = { schema: 1, id, buildId: meta.buildId == null ? String(G.LOS_BUILD || 'sviluppo') : meta.buildId, createdAt: meta.createdAt == null ? Date.now() : meta.createdAt, result: copy(result) };
+    if (meta.title != null) e.title = String(meta.title).trim().slice(0, 100);
+    if (meta.configuration != null) e.configuration = copy(meta.configuration);
     if (!envelopeOk(e, id)) throw new Error('Il risultato della partita non è valido e non è stato salvato.');
     // Un replay nato nel ripiego locale resta immutabile anche se IndexedDB
     // diventa disponibile in un'apertura successiva del browser.
@@ -212,13 +215,59 @@
     const saved = await writeDb(db, e);
     return { id, buildId: saved.buildId, createdAt: saved.createdAt, storage: 'indexedDB' };
   }
-  async function load(id) {
+  async function readEnvelope(id) {
     if (!replayIdOk(id)) return null;
     let e, db;
-    try { db = await openDb(); } catch (err) { e = readLocal(id); return envelopeOk(e, id) ? copy(e.result) : null; }
+    try { db = await openDb(); } catch (err) { e = readLocal(id); return envelopeOk(e, id) ? { e, storage: 'localStorage' } : null; }
     e = await readDb(db, id);
-    if (e === undefined) { try { e = readLocal(id); } catch (err) { e = null; } }
-    return envelopeOk(e, id) ? copy(e.result) : null;
+    if (e === undefined) { try { e = readLocal(id); } catch (err) { e = null; } return envelopeOk(e, id) ? { e, storage: 'localStorage' } : null; }
+    return envelopeOk(e, id) ? { e, storage: 'indexedDB', db } : null;
   }
-  G.LOS_REPLAY = { createId, save, load, validate };
+  async function load(id) { const stored = await readEnvelope(id); return stored ? copy(stored.e.result) : null; }
+  async function entry(id) { const stored = await readEnvelope(id); return stored ? copy(stored.e) : null; }
+  async function list() {
+    const entries = new Map();
+    let db;
+    try { db = await openDb(); } catch (e) { /* Il ripiego locale resta consultabile. */ }
+    if (db) {
+      const all = await new Promise((resolve, reject) => {
+        const tx = db.transaction(STORE, 'readonly'), req = tx.objectStore(STORE).getAll(); let value = [];
+        req.onsuccess = () => { value = req.result; }; tx.oncomplete = () => resolve(value);
+        tx.onerror = tx.onabort = () => reject(tx.error || new Error('Impossibile leggere l’archivio.'));
+      });
+      all.forEach((e) => { if (e && replayIdOk(e.id) && envelopeOk(e, e.id)) entries.set(e.id, e); });
+    }
+    try {
+      for (let i = 0; i < G.localStorage.length; i++) {
+        const key = G.localStorage.key(i); if (!key || !key.startsWith(PREFIX)) continue;
+        const id = key.slice(PREFIX.length), e = readLocal(id);
+        if (!entries.has(id) && replayIdOk(id) && envelopeOk(e, id)) entries.set(id, e);
+      }
+    } catch (e) { if (!db) throw e; }
+    return [...entries.values()].sort((a, b) => b.createdAt - a.createdAt || a.id.localeCompare(b.id)).map((e) => ({ id: e.id, title: e.title || '', createdAt: e.createdAt, buildId: e.buildId, theme: e.result.theme, seed: e.result.seed, adult: e.result.adult, days: e.result.days, count: e.result.tributes.length }));
+  }
+  async function rename(id, title) {
+    if (typeof title !== 'string' || !title.trim() || title.trim().length > 100) throw new Error('Scegli un nome tra 1 e 100 caratteri.');
+    const stored = await readEnvelope(id); if (!stored) throw new Error('Partita non disponibile.');
+    const value = title.trim();
+    if (stored.storage === 'localStorage') { G.localStorage.setItem(PREFIX + id, encode({ ...stored.e, title: value })); return; }
+    await new Promise((resolve, reject) => {
+      const tx = stored.db.transaction(STORE, 'readwrite'), store = tx.objectStore(STORE), req = store.get(id);
+      req.onsuccess = () => { if (!envelopeOk(req.result, id)) return tx.abort(); store.put({ ...req.result, title: value }, id); };
+      tx.oncomplete = resolve; tx.onerror = tx.onabort = () => reject(new Error('Impossibile rinominare la partita.'));
+    });
+  }
+  async function exportReplay(id) {
+    const stored = await readEnvelope(id); if (!stored) throw new Error('Partita non disponibile.');
+    return encode(stored.e);
+  }
+  async function importReplay(raw) {
+    if (typeof raw !== 'string' || raw.length > 50000000) throw new Error('Il replay deve essere un JSON di massimo 50 MB.');
+    const e = decode(raw);
+    if (!e || !replayIdOk(e.id) || !envelopeOk(e, e.id) || e.result.tributes.length > 200 || e.result.phases.length > 500) throw new Error('Replay non valido o formato non supportato.');
+    const id = createId();
+    await save(id, e.result, { buildId: e.buildId, createdAt: e.createdAt, title: e.title, configuration: e.configuration });
+    return id;
+  }
+  G.LOS_REPLAY = { createId, save, load, validate, entry, list, rename, exportReplay, importReplay };
 })(typeof window === 'object' ? window : globalThis);

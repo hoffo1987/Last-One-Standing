@@ -2,6 +2,7 @@
 const path = require('path');
 for (const f of ['data-core.js', 'data-themes.js', ...require('fs').readdirSync(path.join(__dirname, '..', 'src', 'content')).filter((x) => x.endsWith('.js')).sort().map((x) => 'content/' + x), 'engine.js']) require(path.join(__dirname, '..', 'src', f));
 const LOS = globalThis.LOS, D = globalThis.LOS_DATA;
+require(path.join(__dirname, '..', 'src', 'replay.js'));
 const N = +process.argv[2] || 40;
 let fail = 0, games = 0;
 const err = (m) => { fail++; if (fail < 25) console.error('  ✗ ' + m); };
@@ -18,6 +19,7 @@ for (const th of D.themes) {
     const cast = LOS.randomCast(n, th.id + i, 1 + (i % 3));
     const adult = i % 2 === 1;
     const r = LOS.simulate({ cast, theme: th.id, seed: 's' + i, difficulty: diffs[i % 4], teamWin, teamsAllied, maxDays: 20, adult });
+    if (!globalThis.LOS_REPLAY.validate(r)) err(`${th.id}#${i}: risultato non archiviabile`);
     if (th.noAdult && r.adult) err(th.id + ': contenuti 18+ attivi nel Liceo');
     games++; days += r.days;
     const alive = r.tributes.filter((t) => t.alive);

@@ -11,6 +11,7 @@ Simulatore di battle royale, tutto in italiano. Crei il cast, scegli una delle 9
 - **Motore**: alleanze e tradimenti, oggetti (armi, cibo, medicine, trappole), stati (ferito, avvelenato, malato, affamato), pericolo crescente con i giorni, festino, disastri e scontro finale.
 - **Seme**: stesso seme, cast completo e impostazioni danno la stessa partita, usando la stessa versione di motore e contenuti.
 - **Ripresa fedele**: la partita generata viene conservata nel browser con il suo risultato completo, così un aggiornamento di testi o motore non cambia la storia già iniziata.
+- **Archivio partite**: nomi personalizzati, confronto tra due risultati, importazione ed esportazione di replay completi.
 - **Diretta** con tabellone, tacche dei superstiti, mappa a zone, elenco dei caduti e riproduzione automatica.
 - **Esito** con classifica, statistiche, grafici e locandina generata.
 - Eventi personalizzati con anteprima, importazione ed esportazione in JSON, salvataggio nel browser e tema chiaro o scuro.
@@ -24,7 +25,7 @@ Ogni concorrente ha una memoria. Quello che succede cambia quello che succederà
 - **Tradimenti e reputazione**: chi tradisce viene ricordato come traditore, chi uccide molto diventa temuto e gli altri si coalizzano.
 - **Fama**: le imprese spettacolari attirano gli sponsor, che mandano doni da soli.
 - **Fame**: la sazietà cala a ogni fase; chi ha provviste le mangia, chi non ne ha le cerca di notte (meglio con Sopravvivenza alta, una mappa e una zona ricca), e chi resta a zero si indebolisce fino a morire di stenti.
-- **Oggetti con effetti veri**: l'amuleto salva una volta dalla morte, la mappa protegge dai disastri, veleni ed esplosivi abilitano eventi propri.
+- **Oggetti con effetti veri**: l'amuleto può evitare una morte diretta di un evento (85%, certo per i Superstiziosi), poi si consuma; non protegge da tutti i danni periodici. La mappa aiuta nei disastri, veleni ed esplosivi abilitano eventi propri.
 - **Stati temporanei**: ferito, malato, avvelenato, affamato, ubriaco, sconvolto, in lutto.
 Sotto ogni evento la diretta mostra le conseguenze ("↳ Walter giura vendetta su Paola") e un'etichetta con il motivo dell'evento (Vendetta, Debito, Coppia, Lutto…).
 
@@ -37,7 +38,7 @@ Ogni concorrente ha cinque valori da 0 a 100, visibili nella scheda e in forma r
 - **Indicatore dell'arena**: Freddo (Arena Classica), Corruzione (Reame Incantato), Debito d'ossigeno (Stazione Orbitale), Infezione (Città degli Infetti), Terrore (Villa Maledetta), Radiazioni (Terre Desolate), Ansia (Liceo), Stress (Ufficio). Ognuno sale e scende con regole proprie (notte, solitudine, ferite, morti viste da vicino, zone contaminate, uccisioni) e ha le sue difese (caratteristiche, alleati, portafortuna, cure).
 
 Ogni arena ha poi le sue regole:
-- **Caratteristiche chiave**: tre caratteristiche contano di più per combattere e sopravvivere (per esempio Furtività, Agilità e Sopravvivenza in città, Coraggio ed Empatia nella villa). In prova, a parità di tutto il resto, chi le ha alte arriva in media 4°-5° su 12, chi le ha basse 8°-9°.
+- **Caratteristiche chiave**: tre caratteristiche contano di più per combattere e sopravvivere (per esempio Furtività, Agilità e Sopravvivenza in città, Coraggio ed Empatia nella villa). Non garantiscono un piazzamento: l'esito dipende anche da cast, tratti, equipaggiamento, eventi e seme.
 - **Meteo del giorno**: 83 condizioni diverse (nebbia, tempeste solari, orde in migrazione, compiti di matematica…) che cambiano consumi, agguati, ricerca di cibo, prove e pericoli notturni.
 - **Zone**: ogni luogo ha risorse, pericolo e riparo propri. Nel Battle Royale la tempesta chiude una zona al giorno e chi resta fuori perde salute. Nella Città degli Infetti un morso diventa infezione: gli alleati possono curarla con un kit medico se fatto in tempo, oppure cacciare l'infetto dal gruppo.
 - **Oggetti**: le armi hanno una qualità (★ fino a ★★★) e possono rompersi; chi uccide fruga nello zaino della vittima; gli zaini di chi muore per l'arena restano nella zona per chi passa; le trappole vengono piazzate di notte e scattano sui concorrenti di passaggio (la vittima sa chi cercare); kit medici e cure abbassano gli indicatori.
@@ -61,7 +62,7 @@ Tredici tipi di oggetto, con nomi diversi in ogni arena: armi, protezioni, cure,
 - **Cuori**: nascono cotte segrete; prima o poi ci si dichiara, e si può essere ricambiati o respinti. Chi ama in segreto qualcuno che si mette con un altro diventa geloso, a volte vendicativo.
 - **Complotti**: chi tradisce per natura (o per disperazione) sceglie in segreto la sua vittima nell'alleanza; una spia può smascherarlo prima che colpisca.
 - **Rapporti umani**: nella scheda, "Cosa prova per gli altri" mostra per ogni persona un'etichetta (Amore, Cotta segreta, Vendetta, Amico fidato, Alleato, In debito, Diffidenza, Nemico…), l'affinità e i ricordi in prima persona: «Mi ha salvato la vita», «Mi ha negato il cibo», «Ha ucciso Lapo».
-- **Diario segreto**: ogni notte (e a volte di giorno) ognuno scrive una pagina: pensieri, paure, segreti e anche i fatti che la diretta non ha mostrato. Nella lista "In gara" un'etichetta "diario" segnala chi ha una pagina nuova.
+- **Diario segreto**: ogni notte (e a volte di giorno) ognuno scrive una pagina: pensieri, paure, segreti e anche i fatti che la diretta non ha mostrato. Le pagine e la storia completa dei ricordi restano consultabili; gli otto ricordi recenti usati dal motore sono separati dall'archivio storico. Nella lista "In gara" un'etichetta "diario" segnala chi ha una pagina nuova.
 
 ## Eventi che leggono la storia
 Il formato degli eventi conosce tutto quello che succede nella partita, quindi ogni evento nasce da qualcosa e lascia qualcosa:
@@ -127,6 +128,7 @@ src/art.js           usa logo e illustrazioni da assets/ (con ripiego in SVG), i
 assets/              logo, icona, panoramica, anteprima dei link, sagome dei concorrenti e illustrazioni delle 9 arene (ottimizzati e incorporati dalla build)
 src/anim.js          motore delle animazioni: atmosfere per arena, effetti degli eventi, transizioni, coriandoli
 src/replay.js        risultati immutabili nel browser, con IndexedDB e ripiego su localStorage
+src/simulator.js     esecuzione asincrona del motore in Web Worker, annullamento e ripiego compatibile
 docs/                versione per il web (Vercel o GitHub Pages): pagina leggera e immagini in docs/img con l'impronta nel nome, servite con cache lunga
 src/ui.js            interfaccia
 src/style.css        stile
@@ -135,11 +137,14 @@ tools/build.js       crea dist/last-one-standing.html (file unico con immagini i
 tools/test-engine.js test del motore senza browser
 tools/lint-content.js controllo statico dei contenuti
 tools/fuzz.js        collaudo con partite casuali
+docs-dev/eventi.md   guida completa ai requisiti, effetti e testi degli eventi
+.github/workflows/quality.yml CI con regressioni, determinismo, fuzz e verifica della build
 ```
 
 ## Comandi
 ```
 node tools/build.js             # crea il file unico in dist/last-one-standing.html
+node tools/check.js             # tutti i controlli mirati, anche in CI (Node 24)
 node tools/lint-content.js      # controlla tutte le righe di evento e disastro (sintassi, partecipanti, segnaposto, grammatica di base)
 node tools/test-consequences.js # regressioni su consumi, trasferimenti, salvataggi e formato degli eventi
 node tools/test-import.js       # importazione atomica, ID, eventi personalizzati e compatibilità dei salvataggi
@@ -148,6 +153,10 @@ node tools/test-timeline.js      # statistiche e promesse nella fase corretta de
 node tools/test-rendering.js     # accordi, pronomi, battute e metadati dei colpi evitati
 node tools/test-replay.js        # archivio dei risultati, immutabilità e guasti della memoria del browser
 node tools/test-persistence-ui.js # ripresa senza risimulazione, migrazione legacy e operazioni asincrone
+node tools/test-reading.js       # timeline senza spoiler, tempi adattivi e gestione della pausa
+node tools/test-variety-history.js # varietà, memoria storica e contesto degli eventi
+node tools/test-worker.js        # stesso risultato nel worker e nel motore principale
+node tools/measure-variety.js 10 # misura ripetizioni con cast e semi riproducibili in tutte le arene
 node tools/test-engine.js 40    # 40 partite per arena, metà con i contenuti 18+, controlla regole e determinismo
 node tools/fuzz.js 1500         # partite con impostazioni casuali e casi limite (2-60 concorrenti, una sola squadra, valori estremi)
 ```
@@ -192,4 +201,28 @@ L'archivio usa IndexedDB, con un ripiego su localStorage quando IndexedDB non è
 
 I vecchi salvataggi contengono soltanto la configurazione: vengono ricostruiti una volta con la versione attuale, con un avviso esplicito, e poi archiviati. Gli esiti possono quindi differire dalla partita originale delle versioni precedenti.
 
-La ripresa riguarda l'ultima partita selezionata su quel browser e quella origine. Non è un archivio consultabile di tutte le partite e non si sincronizza tra dispositivi. L'esportazione JSON trasferisce cast, regole ed eventi personalizzati, non il risultato della partita. Cancellare i dati del sito elimina anche i risultati salvati.
+La ripresa automatica riguarda l'ultima partita selezionata su quel browser e quella origine. Il pulsante **Archivio partite e replay** permette di consultare gli altri risultati salvati, dare loro un nome e confrontarne due. Rinominare una partita non modifica il risultato.
+
+L'esportazione **della configurazione**, nella sezione Concorrenti, trasferisce cast, regole ed eventi personalizzati. L'esportazione **del replay**, nell'archivio, trasferisce il risultato completo con foto, diari e istantanee, anche se nel frattempo il motore è cambiato. Il riepilogo testuale nell'Esito è soltanto una sintesi. Importare un replay assegna un nuovo ID e non sostituisce la partita aperta; un replay 18+ richiede che i contenuti per adulti siano attivi per poterlo aprire.
+
+Le nuove partite conservano anche la configurazione usata. I replay creati prima dell'introduzione dell'archivio possono non averla: la storia resta fedele, mentre una nuova simulazione parte dalle regole disponibili. Non c'è sincronizzazione automatica tra dispositivi. Cancellare i dati del sito elimina anche i risultati salvati.
+
+### Lettura, accessibilità e calcolo
+
+In Diretta, **Opzioni di lettura** permette di nascondere gli eventi futuri e la durata totale, usare tempi di riproduzione proporzionati al testo e ridurre le animazioni. La modalità senza spoiler mostra le fasi già viste e un solo pulsante generico per la prossima fase; disattivandola torna disponibile tutta la timeline. Aprire una scheda o nascondere la pagina mette in pausa la riproduzione.
+
+I gruppi Arena e Difficoltà e le schede del pannello laterale si navigano con le frecce, Home ed End. I cambi pagina spostano il focus al titolo; il lettore di schermo riceve un annuncio breve della fase, mentre gli eventi restano disponibili per una lettura volontaria.
+
+La simulazione usa lo stesso sorgente del motore in un Web Worker e si può annullare. Il file portatile incorpora già quel sorgente: non scarica altro codice. Se il browser non consente i worker viene usato il motore principale. I risultati sono verificati come identici nelle nove arene. L'archivio e la visualizzazione restano sul thread della pagina; un calcolo in background non elimina il costo di mostrare centinaia di schede o di leggere un archivio molto grande.
+
+### Squadre, alleanze e difficoltà
+
+La squadra è un dato del concorrente e rimane la stessa. Un'alleanza è un legame che può nascere, sciogliersi o subire tradimenti. **Compagni di squadra alleati** crea le alleanze iniziali; **Vittoria di squadra** termina la partita quando rimangono soltanto concorrenti della stessa squadra. Con una sola squadra, attivare quest'ultima opzione produce una vittoria immediata.
+
+La difficoltà modifica soprattutto frequenza delle eliminazioni e dei disastri. Non è un livello di abilità richiesto al giocatore, che osserva la simulazione. Le probabilità effettive dipendono anche dalle condizioni del cast e dall'arena.
+
+### Manutenzione e diritti
+
+La [guida agli eventi](docs-dev/eventi.md) descrive il linguaggio completo. Il workflow [Qualità](.github/workflows/quality.yml) esegue gli stessi controlli locali, 360 partite con determinismo e validazione dell'archivio, 1.500 partite casuali e il controllo degli output generati. Usa soltanto accesso in lettura al repository, secondo la [sintassi di GitHub Actions](https://docs.github.com/en/actions/reference/workflows-and-actions/workflow-syntax).
+
+Il progetto mantiene **tutti i diritti riservati**, secondo [LICENSE](LICENSE). La provenienza documentata delle risorse visive è in [ASSETS.md](ASSETS.md).

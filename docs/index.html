@@ -1089,6 +1089,31 @@ img.scene { object-fit: cover; object-position: center; user-select: none; }
 .story2.k-amore { border-left: 3px solid var(--c-love); } .story2.k-amicizia, .story2.k-mentore, .story2.k-pieta { border-left: 3px solid var(--c-heal); }
 .story2.k-nemesi, .story2.k-odio, .story2.k-tradimento { border-left: 3px solid var(--c-kill); } .story2.k-paura { border-left: 3px solid #8a5bd6; } .story2.k-nonCorrisposto { border-left: 3px solid #e08a2b; }
 .dday .dk-fatto .dk { color: color-mix(in srgb, var(--muted) 75%, var(--ink)); }
+
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; border: 0; }
+.reading-options { margin: 12px 0 18px; padding: 12px 16px; }
+.reading-options summary { cursor: pointer; font-weight: 600; }
+.reading-options label { display: flex; gap: 10px; align-items: center; margin-top: 12px; }
+.reading-options input { flex: 0 0 auto; accent-color: var(--accent); }
+.reading-options .help { margin-top: 10px; }
+.sim-progress { position: fixed; inset: auto 16px 90px auto; z-index: 100; padding: 16px; display: flex; align-items: center; gap: 16px; max-width: calc(100% - 32px); box-shadow: 0 6px 30px #0006; }
+.archive-launch { margin: 16px 0; }
+.archive-dialog { width: min(820px, calc(100vw - 48px)); }
+.archive-dialog #archiveList { display: grid; gap: 12px; margin: 18px 0; }
+.archive-entry { padding: 14px; border: 1px solid var(--line); border-radius: 12px; }
+.archive-entry > label:not(.archive-select) { display: grid; gap: 6px; }
+.archive-entry .archive-select { display: flex; gap: 8px; align-items: center; margin-bottom: 10px; }
+.archive-entry input[data-title] { width: 100%; }
+.archive-entry .help { margin: 8px 0; }
+.archive-dialog details { margin-top: 18px; }
+.archive-dialog textarea { width: 100%; margin: 10px 0; }
+.archive-dialog #archiveComparison { margin-top: 16px; }
+.event-reason { margin-top: 10px; color: var(--muted); font-size: 12px; }
+.event-reason summary { cursor: pointer; }
+.event-reason p { margin-top: 6px; font-size: inherit; }
+[data-reduced-motion] *, [data-reduced-motion] *::before, [data-reduced-motion] *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+[data-reduced-motion] .fx-field, [data-reduced-motion] .ripple, [data-reduced-motion] .confetti { display: none !important; }
+[data-reduced-motion] .reveal, [data-reduced-motion] .tilting, [data-reduced-motion] .hh-scenes { transform: none !important; }
 </style>
 
 <header class="top">
@@ -1137,6 +1162,7 @@ img.scene { object-fit: cover; object-position: center; user-select: none; }
     <div class="wrap">
       <div class="facts" id="facts"></div>
       <div class="resume" id="resume" hidden></div>
+      <div class="archive-launch"><button class="btn" type="button" id="btnArchive">Archivio partite e replay</button></div>
       <div class="howto">
         <div class="how"><span class="hn">1</span><h3>Crea il cast</h3><p>Nomi, genere, squadre, tratti e foto. Puoi incollare un elenco di nomi o generarne uno.</p></div>
         <div class="how"><span class="hn">2</span><h3>Scegli l'arena</h3><p>Nove mondi con armi, luoghi, mostri e disastri propri. Decidi la difficoltà e il seme.</p></div>
@@ -1219,10 +1245,10 @@ img.scene { object-fit: cover; object-position: center; user-select: none; }
       </div>
       <aside class="rules card" aria-labelledby="h-rules">
         <h2 id="h-rules">Regole</h2>
-        <div class="field"><span>Difficoltà</span><div class="diffs" id="diffSeg" role="radiogroup" aria-label="Difficoltà"></div></div>
+        <div class="field"><span>Difficoltà</span><div class="diffs" id="diffSeg" role="radiogroup" aria-label="Difficoltà" aria-describedby="difficultyHelp"></div><p class="help" id="difficultyHelp">Regola soprattutto la frequenza delle eliminazioni e dei disastri. Le caratteristiche del cast continuano a contare.</p></div>
         <label class="field" for="maxDays"><span>Durata massima · <b id="maxDaysOut"></b> giorni</span><input type="range" id="maxDays" min="5" max="40" step="1"><small class="help">Allo scadere scatta lo scontro finale.</small></label>
-        <label class="switch" for="teamsAllied"><input type="checkbox" id="teamsAllied" role="switch"><span class="sw" aria-hidden="true"></span><span>Compagni di squadra alleati<small>All'inizio chi è nella stessa squadra forma un'alleanza.</small></span></label>
-        <label class="switch" for="teamWin"><input type="checkbox" id="teamWin" role="switch"><span class="sw" aria-hidden="true"></span><span>Vittoria di squadra<small>Si vince quando restano solo membri della stessa squadra.</small></span></label>
+        <label class="switch" for="teamsAllied"><input type="checkbox" id="teamsAllied" role="switch"><span class="sw" aria-hidden="true"></span><span>Compagni di squadra alleati<small>Chi è nella stessa squadra comincia in alleanza. Le alleanze possono cambiare durante la partita; la squadra rimane la stessa.</small></span></label>
+        <label class="switch" for="teamWin"><input type="checkbox" id="teamWin" role="switch"><span class="sw" aria-hidden="true"></span><span>Vittoria di squadra<small>La partita termina quando restano solo membri della stessa squadra, anche se le alleanze sono cambiate. Con una sola squadra termina subito.</small></span></label>
         <div class="adultbox" id="adultBox">
           <label class="switch" for="adult"><input type="checkbox" id="adult" role="switch"><span class="sw adult" aria-hidden="true"></span><span>Contenuti 18+ <span class="tag18">18+</span><small id="adultNote">Violenza esplicita, linguaggio volgare, alcol e sostanze, allusioni sessuali tra adulti.</small></span></label>
           <div class="confirm18" id="adultConfirm" hidden>
@@ -1267,13 +1293,21 @@ img.scene { object-fit: cover; object-position: center; user-select: none; }
         <div class="tally" id="tally" aria-hidden="true"></div>
       </div>
       <div class="timeline" id="timeline" aria-label="Fasi della partita"></div>
+      <details class="reading-options card">
+        <summary>Opzioni di lettura</summary>
+        <label><input type="checkbox" id="hideFuture"> Nascondi gli eventi futuri e la durata totale</label>
+        <label><input type="checkbox" id="adaptivePlay"> Adatta la riproduzione alla quantità di testo</label>
+        <label><input type="checkbox" id="reduceMotion"> Riduci le animazioni</label>
+        <p class="help" id="motionNote">Le preferenze del sistema sulle animazioni vengono sempre rispettate.</p>
+      </details>
+      <div id="phaseAnnouncement" class="sr-only" role="status" aria-live="polite" aria-atomic="true"></div>
       <div class="livegrid">
-        <div class="livefeed" id="phBody" aria-live="polite"></div>
+        <div class="livefeed" id="phBody" role="region" aria-labelledby="phTitle"></div>
         <aside class="sidepanel card">
           <div class="stabs" role="tablist" aria-label="Pannello laterale">
-            <button role="tab" type="button" data-s="map">Mappa</button><button role="tab" type="button" data-s="fallen">Caduti</button><button role="tab" type="button" data-s="alive">In gara</button><button role="tab" type="button" data-s="allies">Legami</button>
+            <button role="tab" type="button" id="side-tab-map" aria-controls="sideBody" aria-selected="true" data-s="map">Mappa</button><button role="tab" type="button" id="side-tab-fallen" aria-controls="sideBody" aria-selected="false" tabindex="-1" data-s="fallen">Caduti</button><button role="tab" type="button" id="side-tab-alive" aria-controls="sideBody" aria-selected="false" tabindex="-1" data-s="alive">In gara</button><button role="tab" type="button" id="side-tab-allies" aria-controls="sideBody" aria-selected="false" tabindex="-1" data-s="allies">Legami</button>
           </div>
-          <div class="sbody" id="sideBody"></div>
+          <div class="sbody" id="sideBody" role="tabpanel" aria-labelledby="side-tab-map" tabindex="0"></div>
         </aside>
       </div>
       <div class="player">
@@ -1327,13 +1361,24 @@ img.scene { object-fit: cover; object-position: center; user-select: none; }
 
 <dialog id="editDlg" class="drawer" aria-labelledby="h-edit"><div id="editBody"></div></dialog>
 <dialog id="profDlg" class="drawer" aria-labelledby="h-prof"><div id="profBody"></div></dialog>
+<dialog id="archiveDlg" aria-labelledby="h-archive">
+  <div class="dlgbody archive-dialog">
+    <div class="row between"><h2 id="h-archive">Archivio partite</h2><button class="iconbtn" type="button" data-close aria-label="Chiudi archivio">✕</button></div>
+    <p class="help">Le partite restano su questo browser. Esporta un replay completo per conservarlo altrove o riaprirlo su un altro dispositivo.</p>
+    <div id="archiveList"></div>
+    <button class="btn sm" type="button" id="archiveCompare">Confronta le due partite selezionate</button>
+    <div id="archiveComparison"></div>
+    <details id="replayIO"><summary>Importa o esporta un replay completo</summary>
+      <label for="replayText">JSON del replay</label><textarea id="replayText" rows="7" spellcheck="false" placeholder="Incolla qui un replay esportato da questo gioco"></textarea>
+      <div class="row"><button class="btn" type="button" id="archiveImport">Importa replay</button><button class="btn" type="button" id="archiveCopy">Copia JSON</button><button class="btn" type="button" id="archiveDownload">Scarica JSON</button></div>
+    </details>
+    <p id="archiveMsg" class="help" role="status"></p>
+  </div>
+</dialog>
 <div class="toast" id="toast" hidden role="status"></div>
+<div class="sim-progress card" id="simProgress" hidden role="status"><span>La partita prende forma…</span><button class="btn sm" type="button" id="cancelSim">Annulla il calcolo</button></div>
 
-<script>window.LOS_ASSETS = {"logo":"img/logo.f2d5175789.webp","icona":"img/icona.8b02ddeb49.webp","favicon":"img/favicon.86774dc7cf.png","panoramica":"img/panoramica.66c4c27255.webp","sagome":["img/sagome-cappuccio.e8876ba986.webp","img/sagome-esploratore.9a99fd13f8.webp","img/sagome-viaggiatore.5e36435604.webp"],"arene":{"classico":"img/arene-classico.42c6ba42ee.webp","fantasy":"img/arene-fantasy.75b7fb0d32.webp","horror":"img/arene-horror.48052d80b4.webp","liceo":"img/arene-liceo.05ed578a90.webp","royale":"img/arene-royale.36c9952cd7.webp","scifi":"img/arene-scifi.403694f00f.webp","ufficio":"img/arene-ufficio.67b271bea3.webp","wasteland":"img/arene-wasteland.889002ace8.webp","zombie":"img/arene-zombie.36c9135a12.webp"}};
-;
-window.LOS_BUILD = "bb1b6ba49ee09efdcce12b82046abcb4e403570629b853a60c12b93816d9636f";
-;
-/* Last One Standing — eventi di base (italiano).
+<script id="simulation-source">/* Last One Standing — eventi di base (italiano).
  * Formato riga:  <n> <tag...> | <testo>
  *  n            numero di concorrenti coinvolti (A, B, C, ...)
  *  k:AB>CD      A e B uccidono C e D           d:AB   A e B muoiono (ambiente)
@@ -2252,7 +2297,7 @@ window.LOS_BUILD = "bb1b6ba49ee09efdcce12b82046abcb4e403570629b853a60c12b93816d9
 1 @luck | {A} era in ferie.
 1 s:A=ferito | {A} si salva, ma con un richiamo scritto.
 1 @int | {A} aveva già aggiornato il curriculum.
-2 ally:AB | {A} e {B} si coprono a vicenda.
+2 ally:AB | {A} e {B} si coprono le spalle davanti al Direttore.
 2 k:A>B | {A} scarica tutta la responsabilità su {B}.
 `,
         fallback: `
@@ -2692,7 +2737,7 @@ window.LOS_BUILD = "bb1b6ba49ee09efdcce12b82046abcb4e403570629b853a60c12b93816d9
       trap: { label: 'Trappola', desc: 'Di notte chi la sa usare la piazza nella sua zona. Chi ci passa rischia grosso, e l\'uccisione va a chi l\'ha piazzata.' },
       esplosivo: { label: 'Esplosivo', desc: 'Più forza negli scontri. Chi è ingegnoso ci costruisce trappole esplosive. Da ubriachi è un pessimo compagno.' },
       veleno: { label: 'Veleno', desc: 'Apre la strada agli avvelenamenti; chi è ingegnoso ci intinge l\'arma, che poi avvelena a ogni colpo.' },
-      amuleto: { label: 'Portafortuna', desc: 'Può salvare una volta da morte certa (sempre, per chi è superstizioso). Calma Terrore e Corruzione.' },
+      amuleto: { label: 'Portafortuna', desc: 'Può evitare una morte diretta narrata da un evento: probabilità 85%, certa per chi è superstizioso. Si consuma quando salva. Non ferma i danni periodici di fame, malattie e ferite. Calma Terrore e Corruzione.' },
       alcol: { label: 'Alcol', desc: 'Scalda, fa dimenticare, disinfetta le ferite infette. E ubriaca.' },
       valore: { label: 'Merce di scambio', desc: 'Non serve a niente, tranne che a comprare cibo e cure da chi ne ha.' },
       ricordo: { label: 'Ricordo', desc: 'Un pezzo di casa: ogni notte tiene su il morale. Se è di qualcuno che non c\'è più, ancora di più.' },
@@ -2706,7 +2751,7 @@ window.LOS_BUILD = "bb1b6ba49ee09efdcce12b82046abcb4e403570629b853a60c12b93816d9
       trap: { label: 'Tranello', desc: 'Si prepara nella propria zona durante la notte. Chi ci casca perde reputazione e rischia l\'eliminazione, attribuita a chi ha preparato il tranello.' },
       esplosivo: { label: 'Colpo di scena', desc: 'Dà più forza negli scontri di reputazione e può rendere più efficace un tranello. Usarlo senza lucidità può causare una figuraccia.' },
       veleno: { label: 'Colpo basso', desc: 'Pettegolezzi e segnalazioni aprono la strada a eventi che mettono in difficoltà i rivali e possono farli uscire dai giochi.' },
-      amuleto: { label: 'Carta di riserva', desc: 'Può evitare una volta un\'eliminazione diretta; per chi è superstizioso funziona sempre.' },
+      amuleto: { label: 'Carta di riserva', desc: 'Può evitare un\'eliminazione diretta narrata da un evento: probabilità 85%, certa per chi è superstizioso. Si consuma quando salva; non impedisce il ritiro per reputazione o energie esaurite.' },
       alcol: { label: 'Bevanda', desc: 'Una pausa può abbassare Ansia e Stress, ma può anche ridurre lucidità ed energie. Nel Liceo si tratta di energy drink.' },
     },
     /* nomi dei tipi nuovi per ogni arena (gli altri vengono dal lessico dell'arena) */
@@ -3291,7 +3336,7 @@ window.LOS_BUILD = "bb1b6ba49ee09efdcce12b82046abcb4e403570629b853a60c12b93816d9
 2 save:A>B | {A} trascina {B} al sicuro mentre tutto crolla.
 2 couple:AB | {A} e {B} si stringono e aspettano che passi. Passa.
 2 grudge:A>B k:A>B *2 | Nel caos generale, {A} ne approfitta per regolare i conti con {B}. Per {caro:A}.
-2 hit:A>B | Nel fuggi fuggi, {A} spinge {B} a terra per passare per prim[A:o/a].
+2 hit:A>B | Nel caos della fuga, {A} spinge {B} a terra per passare per prim[A:o/a].
 `,
       sponsor: `
 1 +med:A @gift | Un drone degli sponsor recapita a {A} un kit medico con un biglietto: "Siamo tutti con te".
@@ -3556,7 +3601,7 @@ Alberi abbattuti | Gli alberi del Bosco vengono abbattuti dall'alto, uno dopo l'
 Notte infinita | Gli organizzatori spengono il sole: l'arena resta al buio per un giorno intero. | {A} cammina al buio e cade in un burrone. | {A} si ferisce inciampando tra le rocce. | {A} resta immobile al riparo finché la luce non torna.
 Cinghiali d'acciaio | Una mandria di cinghiali dalle zanne d'acciaio carica attraverso il Bosco. | {A} viene travolt[A:o/a] dalla carica. | {A} viene incornat[A:o/a] a una gamba. | {A} sale su un masso e guarda passare la mandria.
 Sanguisughe giganti | Il Fiume si riempie di sanguisughe lunghe come un braccio. | {A} viene dissanguat[A:o/a] mentre attraversa il guado. | {A} si stacca le sanguisughe, ma ha perso molto sangue. | {A} decide di non attraversare il Fiume. | malato
-Pioggia di aghi | Dal cielo cadono aghi di metallo sottili come capelli. | {A} non trova riparo in tempo. | {A} si protegge con lo zaino, ma si ferisce le mani. | {A} si rifugia in una grotta.
+Pioggia di aghi | Dal cielo cadono aghi di metallo sottili come capelli. | {A} raggiunge la grotta quando gli aghi hanno già fatto il loro lavoro. | {A} si protegge con lo zaino, ma si ferisce le mani. | {A} si rifugia in una grotta.
 Rovine allagate | Le Rovine vengono allagate da una sorgente sotterranea. | {A} resta intrappolat[A:o/a] in un sotterraneo. | {A} riemerge tossendo acqua. | {A} si arrampica sul tetto di un vecchio edificio.
 La gabbia | Delle sbarre si alzano dal terreno e dividono l'arena in recinti. | {A} resta chius[A:o/a] in un recinto con {mostro}. | {A} resta incastrat[A:o/a] tra le sbarre e si ferisce per liberarsi. | {A} scavalca le sbarre prima che si chiudano.
 Ragni velenosi | Ragni grandi come mani escono dalle tane. | {A} viene mors[A:o/a] decine di volte. | {A} viene mors[A:o/a] una volta e la gamba si gonfia. | {A} brucia le tane con una torcia. | avvelenato
@@ -3690,7 +3735,7 @@ Spettri della Torre | Gli spettri dei vecchi re escono dalla Torre in rovina. | 
 L'Idra | Un'idra a sette teste emerge dal Lago nebbioso. | {A} viene divorat[A:o/a] da una delle teste. | {A} taglia una testa, ma ne nascono due e deve fuggire ferit[A:o/a]. | {A} si nasconde dietro una cascata.
 Nebbia dell'oblio | Una nebbia argentea fa dimenticare a tutti il proprio nome. | {A} vaga senza meta fino a perdersi per sempre. | {A} si ritrova senza sapere dove sia, con le mani ferite. | {A} incide il proprio nome su una pietra e lo ricorda. | malato
 Piante strangolatrici | Le radici della Foresta elfica si animano. | {A} viene stritolat[A:o/a] dalle radici. | {A} si libera tagliando i rami, ma resta ferit[A:o/a]. | {A} brucia le radici con una torcia.
-L'incendio del drago | Il drago sorvola la Foresta elfica sputando fuoco. | {A} viene avvolt[A:o/a] dalle fiamme. | {A} riporta ustioni su tutto il corpo. | {A} si tuffa nel Lago appena in tempo.
+L'incendio del drago | Il drago sorvola la Foresta elfica sputando fuoco. | {A} si trova sulla traiettoria del respiro del drago. Non resta una via di fuga. | {A} riporta ustioni su tutto il corpo. | {A} si tuffa nel Lago appena in tempo.
 Il portale | Un portale viola si apre al centro del reame. | {A} viene risucchiat[A:o/a] in un'altra dimensione. | {A} viene sputat[A:o/a] fuori dal portale con le ossa doloranti. | {A} si aggrappa a una colonna e resiste.
 Basilisco | Un basilisco striscia fuori dalle Miniere. | {A} incrocia lo sguardo del basilisco e diventa pietra. | {A} viene mors[A:o/a] mentre fugge a occhi chiusi. | {A} usa uno scudo lucido come specchio. | avvelenato
 Pioggia di rane | Il cielo si apre e cadono migliaia di rane velenose. | {A} viene sepolt[A:o/a] da una valanga di rane. | {A} tocca una rana e la mano si gonfia. | {A} si copre con un mantello e aspetta. | avvelenato
@@ -3763,7 +3808,7 @@ L'albero antico | L'albero più antico della Foresta elfica si risveglia e recla
     },
     dis: `
 La porta rossa | Una porta rossa compare in fondo al corridoio. | {A} la apre ed entra: non torna più. | {A} la apre appena e qualcosa [A:gli/le] graffia la mano. | {A} la chiude con un chiodo e un crocifisso.
-Il ritratto | Uno dei ritratti del salone si stacca dalla parete. | {A} viene trascinat[A:o/a] dentro il quadro. | {A} si ferisce cercando di distruggerlo. | {A} gira tutti i ritratti verso il muro.
+Il ritratto | Uno dei ritratti del salone si stacca dalla parete. | {A} viene trascinat[A:o/a] dentro il quadro. | {A} si ferisce cercando di distruggerlo. | {A} copre il quadro con un lenzuolo. Da sotto si sente protestare.
 La pioggia di sangue | Dal soffitto comincia a gocciolare sangue. | {A} scivola sulle scale e si rompe il collo. | {A} si ammala dopo esserne stat[A:o/a] toccat[A:o/a]. | {A} si chiude in Biblioteca. | malato
 Il pozzo | Dal pozzo del giardino sale un canto. | {A} si sporge troppo e cade nel pozzo. | {A} viene graffiat[A:o/a] da mani che escono dal pozzo. | {A} copre il pozzo con una lastra di pietra.
 Gli insetti | Uno sciame di mosche invade la villa. | {A} viene soffocat[A:o/a] dallo sciame. | {A} viene punt[A:o/a] da centinaia di insetti. | {A} accende un fuoco e lo sciame se ne va. | avvelenato
@@ -4783,7 +4828,7 @@ La carneficina dei droni | I droni di sicurezza passano alla modalità "smembram
 Il pubblico vota | Il pubblico vota in diretta chi colpire con un fulmine artificiale. | {A} è la persona più odiata della stagione. | {A} riceve una scossa leggera ma umiliante. | {A} è troppo amat[A:o/a] per essere votat[A:o/a].
 La pausa pubblicitaria | Durante la pubblicità, gli organizzatori si dimenticano di sorvegliare le trappole. | {A} cade in una trappola che nessuno doveva attivare. | {A} viene sfiorat[A:o/a] da una lama impazzita. | {A} approfitta della pausa per riposarsi.
 Il cambio di regia | Arriva un nuovo regista che vuole più azione. | {A} viene scelt[A:o/a] come primo bersaglio della nuova regia. | {A} si ritrova inseguit[A:o/a] da un drone con la telecamera e una lama. | {A} non è abbastanza interessante per il nuovo regista.
-La pioggia di coriandoli | Per festeggiare la metà della stagione, gli organizzatori fanno piovere coriandoli. Di vetro. | {A} viene ridott[A:o/a] a brandelli in un'atmosfera di festa. | {A} si riempie di tagli sottilissimi. | {A} si ripara sotto una roccia e guarda lo spettacolo.
+La pioggia di coriandoli | Per festeggiare la metà della stagione, gli organizzatori fanno piovere coriandoli. Di vetro. | {A} viene ridott[A:o/a] a brandelli in un'atmosfera di festa. | {A} raccoglie coriandoli di vetro nelle mani prima di capire lo scherzo. | {A} si ripara sotto una roccia e guarda lo spettacolo.
 L'ospite speciale | Una celebrità entra nell'arena per un giorno, con una squadra di guardie del corpo armate. | {A} chiede un autografo nel momento sbagliato. | {A} viene allontanat[A:o/a] a calci da una guardia del corpo. | {A} ottiene un selfie e un panino.
 Lo sponsor ritirato | Uno sponsor si ritira e reclama indietro tutti i regali. Con i droni. | {A} non vuole restituire il regalo e viene colpit[A:o/a] dal drone. | {A} restituisce il regalo e si ferisce cercando di nasconderne una parte. | {A} non aveva ricevuto regali. Per una volta, è un vantaggio.
 Il gioco a quiz | Gli organizzatori interrompono tutto per un quiz di cultura generale. Chi sbaglia paga. | {A} sbaglia la capitale dell'Australia. | {A} sbaglia una domanda facile e prende una scossa. | {A} risponde a tutto e vince un frigorifero, che non sa dove mettere.
@@ -5236,10 +5281,10 @@ Lo zoo infetto | Gli animali dello zoo sono stati infettati. Anche la giraffa. |
 La parata | Un'orda gigantesca attraversa il centro con una banda musicale zombie in testa. | {A} viene travolt[A:o/a] dalla parata. | {A} perde una scarpa e un dito del piede. | {A} si unisce alla parata fingendo di essere infett[A:o/a]. | malato
 La pioggia di volantini | Un aereo lancia volantini con scritto "Mantenete la calma". Fa anche un rumore infernale. | {A} viene raggiunt[A:o/a] dall'orda richiamata dal rumore. | {A} si fa male cadendo da una scala. | {A} legge il volantino e mantiene la calma.
 L'ospedale crolla | L'Ospedale cede e libera i pazienti del reparto di isolamento. | {A} viene sepolt[A:o/a] sotto le macerie. | {A} viene graffiat[A:o/a] da un paziente in camice. | {A} si trovava dall'altra parte della città. | malato
-La nebbia tossica | Una fabbrica chimica esplode e copre la città di nebbia gialla. | {A} respira la nebbia e cade a terra. | {A} tossisce per ore. | {A} indossa una maschera antigas trovata in una caserma. | avvelenato
+La nebbia tossica | Una fabbrica chimica esplode e copre la città di nebbia gialla. | {A} respira la nebbia e cade a terra. | {A} esce dalla nube con gli occhi in fiamme e il fiato corto. | {A} indossa una maschera antigas trovata in una caserma. | avvelenato
 Il centro commerciale chiude | Le saracinesche del centro commerciale si abbassano tutte contemporaneamente. | {A} resta chius[A:o/a] dentro con l'orda. | {A} si incastra sotto una saracinesca. | {A} esce dall'uscita di sicurezza.
 Il sangue in acqua | Le acque del fiume diventano rosse: gli squali si sono infettati. | {A} prova ad attraversare il fiume a nuoto. | {A} viene mors[A:o/a] a un piede. | {A} attraversa sul ponte. | malato
-La rivolta dei sopravvissuti | Un gruppo di sopravvissuti armati decide che i concorrenti sono una minaccia. | {A} viene giustiziat[A:o/a] sul posto. | {A} viene colpit[A:o/a] da un colpo di avvertimento. | {A} si unisce ai sopravvissuti per un giorno.
+La rivolta dei sopravvissuti | Un gruppo di sopravvissuti armati decide che i concorrenti sono una minaccia. | {A} viene giustiziat[A:o/a] sul posto. | {A} fugge dal posto di blocco con un proiettile di avvertimento nel fianco. | {A} si unisce ai sopravvissuti per un giorno.
 I neonati | Una scuola materna infetta si apre. Sono piccoli, sono veloci, sono tantissimi. | {A} viene sommers[A:o/a] da un esercito di infetti alti un metro. | {A} viene mors[A:o/a] a una caviglia. | {A} sale su un'altalena e aspetta che si stanchino. | malato
 Il blackout eterno | La città perde l'elettricità per sempre. | {A} cade nella tromba di un ascensore al buio. | {A} si ferisce inciampando in un cadavere. | {A} aveva una torcia a manovella.
 Il mutante corazzato | Un infetto ricoperto da piastre d'osso attraversa la città distruggendo auto. | {A} viene schiacciat[A:o/a] da un'auto lanciata. | {A} viene colpit[A:o/a] da un detrito. | {A} si nasconde in un tombino.
@@ -5772,7 +5817,7 @@ Il bombardamento a tappeto | Una zona rossa compare sulla mappa: arrivano le bom
 L'elicottero da caccia | Un elicottero degli organizzatori sorvola l'isola sparando a caso. | {A} viene inquadrat[A:o/a] dal mirino. | {A} prende un colpo di striscio. | {A} si sdraia sotto un'auto finché l'elicottero non passa. | ferito
 Lo tsunami | Un'onda gigante si abbatte sul Villaggio costiero. | {A} viene trascinat[A:o/a] in mare. | {A} viene sbattut[A:o/a] contro un muro. | {A} è già sulla collina, a guardare. | ferito
 I lupi bionici | Branchi di lupi con occhi rossi escono dalla Foresta. | {A} viene circondat[A:o/a]. | {A} viene mors[A:o/a] mentre scappa. | {A} si chiude in un silos. | ferito
-La zona tossica | Una nube verde copre la Fattoria. | {A} respira troppa nube. | {A} tossisce per ore. | {A} indossa una maschera antigas presa a un soldato. | malato
+La zona tossica | Una nube verde copre la Fattoria. | {A} respira troppa nube. | {A} raggiunge il bordo della nube, ma continua a tossire anche al sicuro. | {A} indossa una maschera antigas presa a un soldato. | malato
 Il crollo del ponte | Il ponte principale dell'isola crolla mentre tutti lo attraversano. | {A} cade con il ponte. | {A} si aggrappa ai cavi e risale ferit[A:o/a]. | {A} aveva scelto di nuotare. | ferito
 La pioggia di casse | Cento casse cadono dal cielo in un minuto. | {A} viene colpit[A:o/a] da una cassa. | {A} viene sfiorat[A:o/a] e perde un dente. | {A} raccoglie tre casse senza un graffio. | ferito
 Il blackout del server | L'arena «laggha»: per qualche minuto tutto si muove a scatti. | {A} si teletrasporta dentro un muro. | {A} cade da un tetto per un errore di calcolo. | {A} resta immobile finché tutto torna normale. | sconvolto
@@ -5847,7 +5892,7 @@ Il blackout del server | L'arena «laggha»: per qualche minuto tutto si muove a
 `,
     },
     dis: `
-La falla nello scafo | Un modulo intero si apre verso lo spazio. | {A} viene risucchiat[A:o/a] nel vuoto. | {A} si aggrappa a una maniglia e perde lo zaino. | {A} chiude il portellone con un piede, appena in tempo. | affamato
+La falla nello scafo | Un modulo intero si apre verso lo spazio. | {A} attraversa la falla insieme agli ultimi metri cubi di ossigeno. | {A} si aggrappa a una maniglia e perde lo zaino. | {A} chiude il portellone con un piede, appena in tempo. | affamato
 L'intelligenza artificiale ribelle | Il computer di bordo decide che gli esseri umani sono un errore di sistema. | {A} entra in un ascensore. L'ascensore non si ferma più. | {A} viene colpit[A:o/a] da un braccio robotico impazzito. | {A} chiede gentilmente al computer di smettere. Funziona, chissà perché. | ferito
 Lo sciame di nanobot | Nanobot difettosi si diffondono nei condotti mangiando tutto quello che trovano. | {A} viene smontat[A:o/a] atomo per atomo. | {A} perde i capelli, le sopracciglia e un'unghia. | {A} si chiude in una cella frigorifera finché i nanobot non si spengono. | ferito
 La gravità invertita | La gravità della stazione si inverte all'improvviso. | {A} cade verso il soffitto del Reattore. | {A} si rompe un polso atterrando sul soffitto. | {A} si aggrappa a un tubo e aspetta che passi. | ferito
@@ -6084,8 +6129,8 @@ La cena dei licenziamenti | Il Direttore invita tutti a cena: a fine serata, con
 La tempesta di vetro | Il vento solleva milioni di schegge di vetro fuso. | {A} viene sorpres[A:o/a] allo scoperto. | {A} si ritrova con la schiena piena di schegge. | {A} si nasconde in un tubo di cemento. | ferito
 L'esplosione della Raffineria | La Raffineria salta in aria con un boato che si sente a cento chilometri. | {A} era troppo vicin[A:o/a]. | {A} viene ustionat[A:o/a] dall'onda di calore. | {A} si butta dietro un muro di sacchi di sabbia. | ferito
 La pioggia acida | Dal cielo cade una pioggia che corrode il metallo. | {A} non trova riparo. | {A} si ritrova la pelle piena di piccole ustioni. | {A} si infila sotto un camion ribaltato. | ferito
-I vermi delle dune | Vermi giganti emergono dalla sabbia. | {A} viene inghiottit[A:o/a] da un verme. | {A} viene sbalzat[A:o/a] in aria da una duna che esplode. | {A} resta immobile finché i vermi non se ne vanno. | ferito
-Il crollo della Diga | La Diga cede: un muro d'acqua attraversa il deserto. | {A} viene travolt[A:o/a] dall'acqua. | {A} viene trascinat[A:o/a] per un chilometro e beve molta acqua sporca. | {A} sale sulla carcassa di un aereo. | malato
+I vermi delle dune | Vermi giganti emergono dalla sabbia. | {A} sparisce tra le fauci emerse sotto la duna. | {A} viene sbalzat[A:o/a] in aria da una duna che esplode. | {A} resta immobile finché i vermi non se ne vanno. | ferito
+Il crollo della Diga | La Diga cede: un muro d'acqua attraversa il deserto. | {A} sparisce sotto il muro d'acqua che cancella la pista nel deserto. | {A} viene trascinat[A:o/a] per un chilometro e beve molta acqua sporca. | {A} sale sulla carcassa di un aereo. | malato
 L'invasione dei predoni | Una banda di predoni attraversa l'arena bruciando tutto. | {A} viene catturat[A:o/a] e non torna. | {A} viene derubat[A:o/a] e picchiat[A:o/a]. | {A} si finge mort[A:o/a] e i predoni passano oltre. | ferito
 La siccità | Per un giorno intero non si trova una goccia d'acqua. | {A} crolla disidratat[A:o/a]. | {A} si trascina per ore con la lingua gonfia. | {A} aveva una tanica nascosta sotto la sabbia. | affamato
 Il cratere che si apre | Il terreno sprofonda in un nuovo cratere radioattivo. | {A} cade nel cratere. | {A} si ferma sul bordo, ma respira polvere velenosa. | {A} sente il terreno tremare e si allontana di corsa. | malato
@@ -6162,7 +6207,7 @@ Il cratere che si apre | Il terreno sprofonda in un nuovo cratere radioattivo. |
     },
     dis: `
 L'orda gigante | Centomila infetti invadono la città da nord. | {A} viene travolt[A:o/a] dall'orda. | {A} viene mors[A:o/a] mentre si arrampica su un lampione. | {A} si cosparge di sangue di infetto e cammina in mezzo a loro. | ferito
-Il bombardamento | I militari decidono di bombardare la Periferia. | {A} era in Periferia. | {A} viene sbalzat[A:o/a] da un'esplosione. | {A} sente gli aerei arrivare e corre nella Metropolitana. | ferito
+Il bombardamento | I militari decidono di bombardare la Periferia. | {A} era in Periferia. | {A} raggiunge la Metropolitana con il rombo dell'esplosione ancora nelle orecchie e una gamba che cede. | {A} sente gli aerei arrivare e corre nella Metropolitana. | ferito
 Il mutante | Un infetto enorme, grosso come un furgone, sfonda le pareti della Scuola. | {A} si trova sulla sua strada. | {A} viene lanciat[A:o/a] contro un muro. | {A} si nasconde in un armadietto e trattiene il respiro. | ferito
 L'acqua contaminata | L'acquedotto è contaminato: chi beve si ammala. | {A} beve dal rubinetto senza pensarci. | {A} ne beve un sorso e passa la notte con la febbre. | {A} beve solo acqua in bottiglia, per principio. | malato
 L'incendio dei palazzi | Un incendio si propaga da un palazzo all'altro. | {A} resta intrappolat[A:o/a] all'ultimo piano. | {A} salta da una finestra e atterra su un'auto. | {A} è già in strada e guarda le fiamme da lontano. | ferito
@@ -6418,10 +6463,10 @@ Il gas nervino | I militari rilasciano un gas per fermare gli infetti. Ferma anc
 `,
     },
     dis: `
-Bombardamento di artiglieria | L'artiglieria colpisce a caso una zona dell'isola. | {A} viene colpit[A:o/a] da una granata d'artiglieria. | {A} viene ferit[A:o/a] da una scheggia. | {A} si mette al riparo in un bunker.
+Bombardamento di artiglieria | L'artiglieria colpisce a caso una zona dell'isola. | {A} viene colpit[A:o/a] da una granata d'artiglieria. | {A} si ripara dietro una cassa, ma una scheggia attraversa il legno. | {A} raggiunge un bunker prima della seconda salva.
 Uragano | Un uragano si abbatte sull'isola. | {A} viene trascinat[A:o/a] via dal vento. | {A} viene colpit[A:o/a] da un pezzo di tetto. | {A} si chiude nella cantina di una casa.
-Gas tossico | Un gas tossico si diffonde dalla Centrale elettrica. | {A} non trova la maschera in tempo. | {A} respira il gas e tossisce per ore. | {A} indossa una maschera antigas. | avvelenato
-Tsunami | Un'onda gigante colpisce il Villaggio costiero. | {A} viene travolt[A:o/a] dall'onda. | {A} viene sbattut[A:o/a] contro un muro. | {A} corre verso la collina in tempo.
+Gas tossico | Un gas tossico si diffonde dalla Centrale elettrica. | {A} non trova la maschera in tempo. | {A} respira il gas e tossisce per ore. | {A} stringe la maschera antigas sul viso e attraversa la nube senza respirarla. | avvelenato
+Tsunami | Un'onda gigante colpisce il Villaggio costiero. | {A} viene travolt[A:o/a] dall'onda. | {A} si aggrappa a un balcone dopo che l'onda ha reso la strada irriconoscibile. | {A} corre verso la collina in tempo.
 Il cerchio rosso | Un cerchio rosso compare sulla mappa: bombardamento in arrivo. | {A} non esce dal cerchio in tempo. | {A} esce dal cerchio ferit[A:o/a] alle gambe. | {A} esce dal cerchio di corsa.
 Incendio nella Foresta | Un incendio si propaga nella Foresta. | {A} resta intrappolat[A:o/a] dal fuoco. | {A} si ustiona per scappare. | {A} guida un'auto fuori dalla Foresta.
 Elicotteri d'assalto | Elicotteri armati pattugliano l'isola. | {A} viene colpit[A:o/a] dall'elicottero. | {A} viene ferit[A:o/a] da una raffica. | {A} si nasconde sotto un ponte.
@@ -6434,14 +6479,14 @@ Mine nel campo | Un campo minato si rivela sotto il grano della Fattoria. | {A} 
 Pioggia di casse | Le casse di rifornimento cadono a decine. | {A} viene colpit[A:o/a] da una cassa in caduta. | {A} viene colpit[A:o/a] di striscio da una cassa. | {A} raccoglie una cassa intatta.
 Cani da guardia | I cani della Base militare vengono liberati. | {A} viene raggiunt[A:o/a] dai cani. | {A} viene mors[A:o/a] a un braccio. | {A} si arrampica su una torre.
 Zona ridotta | La zona si riduce a metà in un minuto. | {A} non fa in tempo a rientrare. | {A} rientra con la salute a un filo. | {A} era già al centro della zona.
-Esplosione della Centrale | La Centrale elettrica esplode. | {A} viene investit[A:o/a] dall'esplosione. | {A} viene sbalzat[A:o/a] dall'onda d'urto. | {A} era dall'altra parte dell'isola.
-Il cecchino fantasma | Un cecchino controllato dagli organizzatori colpisce chi resta fermo. | {A} viene centrat[A:o/a] mentre si cura. | {A} viene ferit[A:o/a] a una spalla. | {A} continua a muoversi a zig zag.
+Esplosione della Centrale | La Centrale elettrica esplode. | {A} resta dietro il cancello della Centrale quando il reattore esplode. | {A} viene sbalzat[A:o/a] dall'onda d'urto. | {A} era dall'altra parte dell'isola.
+Il cecchino fantasma | Un cecchino controllato dagli organizzatori colpisce chi resta fermo. | {A} viene centrat[A:o/a] mentre si cura. | {A} vede il mirino troppo tardi: la spalla paga il ritardo. | {A} continua a muoversi a zig zag.
 Interferenza | Un'interferenza disattiva i visori e le radio. | {A} cade da un tetto per la mancanza di visibilità. | {A} si ferisce cadendo. | {A} non aveva mai usato il visore.
 Il ponte crolla | Il ponte che collega le due metà dell'isola crolla. | {A} cade in acqua con il ponte. | {A} si aggrappa al bordo e risale ferit[A:o/a]. | {A} aveva già attraversato.
 Ondata di calore | Il sole picchia sull'isola senza un filo d'ombra. | {A} muore per un colpo di calore. | {A} si disidrata e perde forza. | {A} trova una bottiglia d'acqua fresca. | affamato
 Squadra di bot | Una squadra di bot armati entra in gioco. | {A} viene eliminat[A:o/a] dai bot. | {A} viene ferit[A:o/a] combattendo i bot. | {A} elimina i bot da sol[A:o/a].
 Allagamento | La pioggia allaga le zone basse dell'isola. | {A} annega in un sottopassaggio allagato. | {A} perde lo zaino nella corrente. | {A} sale sulla collina.
-Granate a grappolo | Dal cielo cadono granate a grappolo. | {A} viene colpit[A:o/a] in pieno. | {A} viene ferit[A:o/a] alle gambe. | {A} si getta in un fosso.
+Granate a grappolo | Dal cielo cadono granate a grappolo. | {A} sceglie il fosso su cui cade la prima granata. | {A} viene ferit[A:o/a] alle gambe. | {A} si getta in un fosso.
 Il drone kamikaze | Un drone kamikaze punta il giocatore più vicino. | {A} non riesce a sfuggire al drone. | {A} abbatte il drone, ma viene ferit[A:o/a] dall'esplosione. | {A} si nasconde in un edificio.
 Il faro | Il faro dell'isola illumina chiunque si trovi all'aperto di notte. | {A} viene individuat[A:o/a] e colpit[A:o/a]. | {A} viene colpit[A:o/a] di striscio. | {A} resta all'ombra di un muro.
 Tempesta di sabbia | Una tempesta di sabbia avvolge l'Aeroporto. | {A} si perde e finisce fuori dalla zona. | {A} perde l'orientamento e si ferisce. | {A} si chiude in un hangar.
@@ -6501,7 +6546,7 @@ Tempesta di sabbia | Una tempesta di sabbia avvolge l'Aeroporto. | {A} si perde 
     dis: `
 Tempesta solare | Una tempesta solare investe la stazione: le schermature cedono. | {A} assorbe una dose letale di radiazioni. | {A} si ritrova con la pelle arrossata e la nausea. | {A} si chiude nel modulo schermato. | malato
 Pioggia di micrometeoriti | Una pioggia di micrometeoriti crivella lo scafo. | {A} viene trapassat[A:o/a] da un frammento. | {A} viene ferit[A:o/a] da schegge di metallo. | {A} si rifugia nel nucleo centrale.
-Incendio nella Serra | Le piante della Serra idroponica prendono fuoco. | {A} resta intrappolat[A:o/a] tra le fiamme. | {A} riporta ustioni sulle braccia. | {A} attiva gli estintori in tempo.
+Incendio nella Serra | Le piante della Serra idroponica prendono fuoco. | {A} resta nella Serra mentre le porte tagliafuoco si chiudono. | {A} riporta ustioni sulle braccia. | {A} attiva gli estintori in tempo.
 Blackout totale | La stazione resta senza energia: buio, freddo e niente ossigeno nuovo. | {A} soffoca in un modulo sigillato. | {A} sviene per la mancanza d'aria, ma si risveglia. | {A} trova una bombola d'emergenza. | malato
 Virus nell'IA | L'intelligenza artificiale della stazione impazzisce e chiude le porte a caso. | {A} resta chius[A:o/a] in un modulo che viene depressurizzato. | {A} resta schiacciat[A:o/a] per un braccio da una porta automatica. | {A} disattiva il proprio badge e diventa invisibile ai sensori.
 Spore aliene | Un container della Serra si apre e libera spore aliene. | {A} respira le spore e non si sveglia più. | {A} comincia a tossire una polvere verde. | {A} indossa una tuta sigillata. | avvelenato
@@ -6585,7 +6630,7 @@ Taglio dei costi | Il Direttore annuncia un taglio del dieci per cento del perso
 Il trasloco | L'ufficio trasloca in un'altra sede in periferia. | {A} non regge il pendolarismo e si dimette. | {A} perde gli scatoloni con tutti i documenti. | {A} sceglie la scrivania migliore della nuova sede.
 Lo smart working forzato | Tutti a casa per un mese, con controlli a sorpresa via webcam. | {A} viene sorpres[A:o/a] in pigiama durante una call con il cliente. | {A} non riesce a collegarsi e perde una riunione importante. | {A} lavora meglio da casa che in ufficio.
 La valutazione annuale | Arrivano le valutazioni di fine anno. | {A} riceve il voto più basso dell'azienda ed è fuori. | {A} riceve una valutazione mediocre. | {A} riceve un aumento.
-L'hackeraggio | Un attacco informatico blocca tutti i computer. | {A} aveva aperto il link sospetto: licenziat[A:o/a]. | {A} perde una settimana di lavoro. | {A} aveva un backup di tutto.
+L'hackeraggio | Un attacco informatico blocca tutti i computer. | {A} aveva aperto il link sospetto: licenziat[A:o/a]. | {A} passa la settimana a ricostruire documenti dai messaggi inviati. | {A} aveva un backup di tutto.
 La gita di team building | L'azienda organizza un weekend di team building in montagna. | {A} perde la gara di orientamento e il gruppo l[A:o/a] abbandona. | {A} si fa male durante il percorso sugli alberi. | {A} guida il gruppo alla vittoria.
 Il nuovo capo | Arriva un nuovo capo che vuole cambiare tutto. | {A} contraddice il nuovo capo davanti a tutti. | {A} viene mess[A:o/a] in un progetto senza speranza. | {A} diventa il braccio destro del nuovo capo.
 Il guasto all'aria condizionata | L'aria condizionata si rompe a luglio. | {A} sviene in sala riunioni ed è fuori per mesi. | {A} lavora tutto il giorno in un bagno di sudore. | {A} si sposta nella sala server, l'unica fresca. | malato
@@ -6598,13 +6643,13 @@ La festa di Natale | La festa di Natale aziendale finisce fuori controllo. | {A}
 Il controllo delle note spese | Il controllo di gestione esamina tutte le note spese. | {A} ha messo in nota spese una vacanza ai Caraibi. | {A} deve restituire dei rimborsi. | {A} non ha mai chiesto un rimborso.
 La sostituzione con l'intelligenza artificiale | L'azienda introduce un programma che fa il lavoro di metà dell'ufficio. | {A} viene sostituit[A:o/a] dal programma. | {A} viene spostat[A:o/a] a controllare il programma. | {A} impara a usare il programma meglio di chiunque.
 L'influenza dell'ufficio | Un virus si diffonde in tutto l'open space. | {A} resta a casa troppo a lungo e viene sostituit[A:o/a]. | {A} lavora con la febbre e sbaglia tutto. | {A} non si ammala. | malato
-La gara di vendite | Il Direttore lancia una gara: chi vende meno se ne va. | {A} arriva ultim[A:o/a] nella classifica delle vendite. | {A} vende pochissimo e viene mess[A:o/a] sotto osservazione. | {A} vince la gara.
+La gara di vendite | Il Direttore lancia una gara: chi vende meno se ne va. | {A} arriva ultim[A:o/a] nella classifica delle vendite. | {A} vende pochissimo e viene mess[A:o/a] sotto osservazione. | {A} chiude il contratto decisivo e si prende il primo posto.
 Il blackout | Un blackout cancella tutto il lavoro non salvato. | {A} perde la presentazione del giorno e non si riprende. | {A} deve rifare tutto da capo. | {A} aveva salvato ogni cinque minuti.
 L'audit esterno | Arrivano i revisori esterni. | {A} non trova i documenti richiesti ed è fuori. | {A} viene interrogat[A:o/a] per ore. | {A} consegna tutto in perfetto ordine.
 Lo sciopero | I sindacati proclamano uno sciopero generale. | {A} viene scelt[A:o/a] come capro espiatorio. | {A} deve coprire il lavoro di tre colleghi. | {A} si schiera dalla parte giusta.
 Il premio di produzione | Viene annunciato un premio di produzione per un solo dipendente. | {A} perde la testa per invidia e insulta il vincitore. | {A} lavora così tanto da ammalarsi. | {A} vince il premio. | malato
 Il nuovo stagista | Arriva uno stagista più bravo di tutti. | {A} viene sostituit[A:o/a] dallo stagista. | {A} deve insegnare tutto allo stagista. | {A} fa da mentore allo stagista.
-La macchinetta del caffè | La macchinetta del caffè si rompe per una settimana. | {A} non regge la crisi d'astinenza e se ne va. | {A} lavora a metà della velocità. | {A} porta la propria moka in ufficio. | malato
+La macchinetta del caffè | La macchinetta del caffè si rompe per una settimana. | {A} non regge la crisi d'astinenza e se ne va. | {A} impiega il doppio del tempo a fare ogni cosa senza il caffè della mattina. | {A} porta la propria moka in ufficio. | malato
 Il Consiglio di amministrazione | Il Consiglio di amministrazione visita l'ufficio. | {A} si presenta in tuta da ginnastica. | {A} balbetta durante la presentazione. | {A} fa la presentazione migliore della giornata.
 `,
   };
@@ -6661,31 +6706,31 @@ Il Consiglio di amministrazione | Il Consiglio di amministrazione visita l'uffic
     },
     dis: `
 Pioggia acida | Una pioggia giallastra corrode metallo e pelle. | {A} resta allo scoperto e non sopravvive. | {A} si riempie di ustioni chimiche. | {A} si rifugia nella carcassa di un autobus.
-Onda di calore | Il termometro supera i sessanta gradi. | {A} muore disidratat[A:o/a]. | {A} sviene e si risveglia con la febbre. | {A} si nasconde in una cisterna vuota. | affamato
+Onda di calore | Il termometro supera i sessanta gradi. | {A} raggiunge la cisterna senza più avere la forza di aprirla. | {A} sviene e si risveglia con la febbre. | {A} si nasconde in una cisterna vuota. | affamato
 Sciame di locuste | Uno sciame di locuste mutanti oscura il cielo. | {A} viene divorat[A:o/a] dalle locuste. | {A} viene mors[A:o/a] in tutto il corpo. | {A} si chiude in un container.
-Il vecchio reattore | Un vecchio reattore nucleare sotterraneo si risveglia. | {A} assorbe una dose letale di radiazioni. | {A} perde i capelli e comincia a vomitare. | {A} si allontana nella direzione opposta. | malato
+Il vecchio reattore | Un vecchio reattore nucleare sotterraneo si risveglia. | {A} segue il calore fino al reattore. Il contatore Geiger smette di ticchettare troppo tardi. | {A} perde i capelli e comincia a vomitare. | {A} si allontana nella direzione opposta. | malato
 Terremoto | Un terremoto apre voragini nella sabbia. | {A} viene inghiottit[A:o/a] da una voragine. | {A} si rompe una gamba saltando una crepa. | {A} si trova sul cemento della Diga.
-Esplosione della Diga | La Diga cede e un muro d'acqua attraversa la valle. | {A} viene travolt[A:o/a] dall'acqua. | {A} viene sbattut[A:o/a] contro le rocce. | {A} si arrampica su un pilone.
+Esplosione della Diga | La Diga cede e un muro d'acqua attraversa la valle. | {A} scompare tra i piloni abbattuti dall'acqua della Diga. | {A} viene sbattut[A:o/a] contro le rocce. | {A} si arrampica su un pilone.
 La tempesta elettrica | Fulmini violacei colpiscono il deserto. | {A} viene colpit[A:o/a] da un fulmine. | {A} viene sbalzat[A:o/a] da un fulmine vicino. | {A} si sdraia in una buca.
 I mutanti | Una tribù di mutanti scende dalle colline. | {A} viene catturat[A:o/a] e non si sa più nulla. | {A} si libera dai mutanti, ma con una ferita profonda. | {A} si finge mort[A:o/a] e i mutanti passano oltre.
 Il verme gigante | Un verme delle sabbie lungo cento metri emerge dal terreno. | {A} viene inghiottit[A:o/a] dal verme. | {A} viene sbalzat[A:o/a] via dal colpo di coda. | {A} resta immobile sulle rocce.
 Gas dalla Raffineria | Una nube tossica esce dalla Raffineria. | {A} respira la nube e muore. | {A} respira il gas e tossisce sangue. | {A} indossa una maschera fatta di filtri. | avvelenato
-Fuoco sull'Autostrada | Un'autocisterna esplode sull'Autostrada spezzata. | {A} viene investit[A:o/a] dalle fiamme. | {A} riporta ustioni gravi. | {A} si trovava già lontano.
+Fuoco sull'Autostrada | Un'autocisterna esplode sull'Autostrada spezzata. | {A} viene investit[A:o/a] dalle fiamme. | {A} attraversa il guardrail in fiamme e ne porta addosso le conseguenze. | {A} si trovava già lontano.
 La carovana degli schiavisti | Gli schiavisti setacciano il deserto. | {A} viene catturat[A:o/a] e portat[A:o/a] via in catene. | {A} sfugge agli schiavisti, ma viene colpit[A:o/a] di striscio. | {A} si nasconde sotto la sabbia.
 Il sole nero | Un'eclisse totale oscura il deserto per ore. | {A} si perde nel buio e precipita da un viadotto. | {A} inciampa nelle macerie. | {A} accende una torcia e resta ferm[A:o/a].
 Tempesta di vetro | Il vento solleva milioni di schegge di vetro dalla Città fantasma. | {A} viene fatt[A:o/a] a pezzi dal vetro. | {A} si copre, ma resta ferit[A:o/a]. | {A} si chiude in un bunker.
 Gli avvoltoi | Stormi di avvoltoi giganti scendono su chi è debole. | {A} viene attaccat[A:o/a] mentre cammina. | {A} viene beccat[A:o/a] alle spalle. | {A} spara in aria e gli avvoltoi si allontanano.
 Le sabbie mobili | Le dune si trasformano in sabbie mobili. | {A} viene inghiottit[A:o/a] dalla sabbia. | {A} esce dalla sabbia senza scarpe e con le gambe ferite. | {A} si aggrappa a un palo.
-La pioggia di cenere | Un vulcano lontano copre il cielo di cenere. | {A} soffoca nella cenere. | {A} si ammala ai polmoni. | {A} respira attraverso un panno bagnato. | malato
+La pioggia di cenere | Un vulcano lontano copre il cielo di cenere. | {A} cerca aria sotto un cielo che ormai lascia cadere soltanto cenere. | {A} si ammala ai polmoni. | {A} respira attraverso un panno bagnato. | malato
 L'acqua finisce | Ogni pozzo conosciuto si prosciuga. | {A} muore di sete. | {A} sopravvive bevendo dal radiatore di un camion. | {A} aveva una scorta nascosta. | affamato
 La banda dei motociclisti | Una banda di motociclisti armati attraversa la zona. | {A} viene investit[A:o/a] dalla banda. | {A} viene colpit[A:o/a] da una catena. | {A} si nasconde in un tubo di scarico.
-Il gelo notturno | Di notte la temperatura scende a meno trenta. | {A} muore congelat[A:o/a]. | {A} perde la sensibilità alle mani. | {A} si avvolge in vecchie coperte. | malato
-I cani mutati | Un branco di cani a due teste caccia nel deserto. | {A} viene sbranat[A:o/a]. | {A} viene mors[A:o/a] a un braccio. | {A} lascia della carne come esca e scappa.
+Il gelo notturno | Di notte la temperatura scende a meno trenta. | {A} muore congelat[A:o/a]. | {A} cerca di stringere la borraccia, ma le dita non rispondono più. | {A} si avvolge in vecchie coperte. | malato
+I cani mutati | Un branco di cani a due teste caccia nel deserto. | {A} viene sbranat[A:o/a]. | {A} tiene lontana una testa del cane. La seconda raggiunge il braccio. | {A} lascia della carne come esca e scappa.
 La pioggia di rottami | Un vecchio satellite precipita in pezzi sul deserto. | {A} viene schiacciat[A:o/a] da un rottame. | {A} viene colpit[A:o/a] da un frammento. | {A} si ripara dietro un muro.
-Il fungo atomico | All'orizzonte si alza un fungo atomico. | {A} viene investit[A:o/a] dall'onda d'urto. | {A} viene accecat[A:o/a] per ore dal lampo. | {A} si getta in un fosso.
+Il fungo atomico | All'orizzonte si alza un fungo atomico. | {A} guarda il fungo atomico fino all'arrivo dell'onda che spazza via il riparo. | {A} viene accecat[A:o/a] per ore dal lampo. | {A} si stende in un fosso e aspetta il passaggio dell'onda d'urto.
 La nebbia verde | Una nebbia verdognola esce dal Cratere. | {A} si perde nella nebbia e non ne esce. | {A} si riempie di macchie sulla pelle. | {A} sale sul tetto di un camion. | malato
 I banditi della Diga | I banditi della Diga chiedono un pedaggio di sangue. | {A} non può pagare e viene uccis[A:o/a]. | {A} paga con una ferita. | {A} paga con tutto il carburante che ha.
-Il tornado | Un tornado di sabbia attraversa le Terre Desolate. | {A} viene sollevat[A:o/a] e scagliat[A:o/a] lontano. | {A} viene colpit[A:o/a] da detriti. | {A} si chiude in un bunker.
+Il tornado | Un tornado di sabbia attraversa le Terre Desolate. | {A} viene sollevat[A:o/a] e scagliat[A:o/a] lontano. | {A} viene colpit[A:o/a] da detriti. | {A} chiude il portello del bunker mentre la sabbia comincia a strappare la vernice.
 La miniera | Una vecchia miniera crolla sotto i piedi di chi ci cammina sopra. | {A} cade nei cunicoli. | {A} si rompe un braccio nella caduta. | {A} si trovava sulla roccia solida.
 `,
   };
@@ -6743,13 +6788,13 @@ La miniera | Una vecchia miniera crolla sotto i piedi di chi ci cammina sopra. |
     dis: `
 L'orda di notte | Al calare del sole l'orda raddoppia. | {A} viene raggiunt[A:o/a] mentre cerca riparo. | {A} si chiude in un bagno e passa la notte a tenere la porta. | {A} sale sul tetto e tira su la scala.
 Incendio del quartiere | Un intero quartiere prende fuoco. | {A} resta intrappolat[A:o/a] in un palazzo in fiamme. | {A} si ustiona scendendo dalle scale antincendio. | {A} corre verso il fiume prima che il fuoco arrivi.
-La diga crolla | La diga a monte della città cede. | {A} viene travolt[A:o/a] dall'acqua. | {A} viene sbattut[A:o/a] contro un'auto dalla corrente. | {A} si arrampica su un lampione.
+La diga crolla | La diga a monte della città cede. | {A} perde la presa sul lampione e scompare nella corrente. | {A} viene sbattut[A:o/a] contro un'auto dalla corrente. | {A} si arrampica su un lampione.
 Gli infetti evolvono | Gli infetti diventano più veloci e cominciano a cacciare in branco. | {A} viene raggiunt[A:o/a] in corsa. | {A} viene mors[A:o/a] alla caviglia, ma riesce a scappare. | {A} si nasconde in un'auto blindata. | malato
-Sirene dell'allarme | Tutte le sirene della città si accendono insieme. | {A} viene circondat[A:o/a] dagli infetti richiamati dal rumore. | {A} viene graffiat[A:o/a] mentre scappa. | {A} si chiude in una cella frigorifera.
+Sirene dell'allarme | Tutte le sirene della città si accendono insieme. | {A} viene circondat[A:o/a] dagli infetti richiamati dal rumore. | {A} viene graffiat[A:o/a] mentre scappa. | {A} trova una cella frigorifera silenziosa e aspetta che gli infetti si allontanino.
 Il cecchino sul campanile | Un sopravvissuto impazzito spara dal campanile. | {A} viene colpit[A:o/a] mentre attraversa la piazza. | {A} viene ferit[A:o/a] a una spalla. | {A} capisce da dove arrivano i colpi e si tiene al coperto.
 Gas nervino | L'esercito rilascia gas nervino per fermare il contagio. | {A} respira il gas e crolla a terra. | {A} respira poco gas e trema per ore. | {A} indossa una maschera antigas. | avvelenato
 Il convoglio in fiamme | Un convoglio carico di benzina esplode in Periferia. | {A} viene investit[A:o/a] dall'esplosione. | {A} viene colpit[A:o/a] da un pezzo di lamiera. | {A} si trovava lontano dall'esplosione.
-Topi infetti | Migliaia di topi infetti escono dalle fogne. | {A} viene sommers[A:o/a] dai topi. | {A} viene mors[A:o/a] più volte. | {A} sale su un tavolo e li tiene lontani con una torcia. | malato
+Topi infetti | Migliaia di topi infetti escono dalle fogne. | {A} viene sommers[A:o/a] dai topi. | {A} riesce a scrollarsi di dosso i topi solo dopo una serie di morsi. | {A} sale su un tavolo e li tiene lontani con una torcia. | malato
 Crollo del ponte | Il ponte principale crolla sotto il peso degli infetti. | {A} cade nel fiume insieme agli infetti. | {A} si aggrappa al bordo e risale. | {A} non aveva ancora messo piede sul ponte.
 Il corridore | Un infetto velocissimo dà la caccia a chiunque corra. | {A} viene raggiunt[A:o/a] dal corridore. | {A} viene ferit[A:o/a] mentre si libera dal corridore. | {A} resta immobile e il corridore passa oltre.
 Bombardamento al napalm | Gli aerei sganciano napalm sul Centro commerciale. | {A} viene avvolt[A:o/a] dal fuoco. | {A} riporta ustioni gravi. | {A} si nasconde nel parcheggio sotterraneo.
@@ -6757,10 +6802,10 @@ Contaminazione dell'acqua | L'acquedotto è contaminato. | {A} beve l'acqua del 
 Il nido | Gli infetti hanno creato un nido nella Metropolitana. | {A} si perde nei tunnel e finisce nel nido. | {A} esce dai tunnel coperto di graffi. | {A} evita la Metropolitana. | malato
 Ospedale invaso | L'Ospedale viene invaso da centinaia di pazienti infetti. | {A} resta bloccat[A:o/a] in un ascensore. | {A} scende dalla finestra con un lenzuolo e si ferisce. | {A} trova un'uscita di servizio.
 Nebbia fitta | Una nebbia densa copre la città: gli infetti si sentono, ma non si vedono. | {A} va dritt[A:o/a] contro un gruppo di infetti. | {A} viene graffiat[A:o/a] da un infetto nascosto nella nebbia. | {A} resta fermo in un negozio finché la nebbia non si dirada. | malato
-Cani infetti | Un branco di cani infetti corre per le strade. | {A} non riesce a seminare il branco. | {A} viene mors[A:o/a] a una gamba. | {A} chiude il branco in un recinto. | malato
+Cani infetti | Un branco di cani infetti corre per le strade. | {A} non riesce a seminare il branco. | {A} scavalca il recinto, ma un cane raggiunge la caviglia prima del salto. | {A} chiude il branco in un recinto. | malato
 L'ultima trasmissione | La radio annuncia che non verranno più soccorsi. | {A} perde ogni speranza e si allontana nella notte. | {A} si abbandona alla disperazione e smette di mangiare. | {A} decide che si salverà da sol[A:o/a]. | affamato
-Il gigante | Un infetto mutato abbatte i muri come se fossero di carta. | {A} viene schiacciat[A:o/a] sotto le macerie. | {A} viene colpit[A:o/a] da un detrito. | {A} si nasconde nel bunker antiatomico.
-Lo sciacallo | Una banda di sciacalli armati saccheggia la città. | {A} viene uccis[A:o/a] dagli sciacalli. | {A} viene derubat[A:o/a] e picchiat[A:o/a]. | {A} si unisce per un giorno agli sciacalli e se ne va.
+Il gigante | Un infetto mutato abbatte i muri come se fossero di carta. | {A} viene schiacciat[A:o/a] sotto le macerie. | {A} evita il gigante, ma una pioggia di calcinacci rende la fuga dolorosa. | {A} si nasconde nel bunker antiatomico.
+Lo sciacallo | Una banda di sciacalli armati saccheggia la città. | {A} viene uccis[A:o/a] dagli sciacalli. | {A} torna dal posto di blocco senza provviste e con il volto pieno di lividi. | {A} si unisce per un giorno agli sciacalli e se ne va.
 Il treno fantasma | Un treno della metro senza conducente sfreccia nei tunnel. | {A} viene travolt[A:o/a] dal treno. | {A} si getta di lato e si rompe una costola. | {A} sente il rumore e si allontana dai binari.
 Tempesta elettrica | Una tempesta fa saltare tutta la corrente che restava. | {A} viene fulminat[A:o/a] da un cavo caduto. | {A} viene sbalzat[A:o/a] da una scossa. | {A} si tiene lontan[A:o/a] dai cavi.
 Mutazione dell'aria | L'infezione si diffonde anche per via aerea. | {A} si ammala gravemente e non supera la notte. | {A} comincia a tossire e ad avere la febbre alta. | {A} si chiude in una stanza sigillata con nastro adesivo. | malato
@@ -7140,6 +7185,18 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
   Object.assign(STATUS_LABEL, (D.eco && D.eco.statusLabel) || {});
   const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
 
+  // La storia delle scelte è locale alla partita. Anche copie dello stesso testo
+  // in pacchetti diversi condividono frequenza e intervallo di esclusione.
+  function eventVariety() {
+    const counts = new Map(), recent = [];
+    const key = (ev) => ev.text.toLowerCase().replace(/\s+/g, ' ').trim();
+    return {
+      recent: (ev) => recent.includes(key(ev)),
+      weight: (ev) => 1 / Math.pow(1 + (counts.get(key(ev)) || 0), 1.5),
+      record(ev) { const k = key(ev); counts.set(k, (counts.get(k) || 0) + 1); recent.push(k); if (recent.length > 8) recent.shift(); },
+    };
+  }
+
   function simulate(cfg) {
     if (!cfg || !Array.isArray(cfg.cast) || cfg.cast.length < 2) throw new Error('Servono almeno 2 concorrenti.');
     const castIds = new Set();
@@ -7155,6 +7212,7 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
     const rng = makeRng(seed + '|' + theme.id);
     const adult = !!cfg.adult && !theme.noAdult;
     const pools = buildPools(theme, cfg.custom, adult);
+    const variety = eventVariety();
     const LEX = pools.lex;
     const E = Object.assign({}, D.echo || {}, theme.soft ? D.echoSoft || {} : {});
     const diff = Object.prototype.hasOwnProperty.call(DIFF, cfg.difficulty) ? DIFF[cfg.difficulty] : 1;
@@ -7197,7 +7255,7 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
       revenges: 0, saves: 0, repaid: 0, amulets: 0, tests: 0, testsPassed: 0,
       hp: 100, en: 90, mo: 55, food: 70, pr: 0, infected: false, infKnown: false, cause: null, poisonSource: null, hurtPh: -1, sawDeath: -1,
       foraged: 0, nursed: 0, shared: 0, trapKills: 0, trapsSet: 0, survivedBeasts: 0,
-      goal: null, thought: '', crush: null, plot: null, diary: [], mem: {}, promises: [], hunt: null, vowed: null, spares: 0, trades: 0, crafts: 0, acts: 0, rejected: 0, planPh: -9, vigilPh: -9, guard: null,
+      goal: null, thought: '', crush: null, plot: null, diary: [], mem: {}, memoryHistory: {}, promises: [], hunt: null, vowed: null, spares: 0, trades: 0, crafts: 0, acts: 0, rejected: 0, planPh: -9, vigilPh: -9, guard: null,
     }));
     if (T.length < 2) throw new Error('Servono almeno 2 concorrenti.');
     T.forEach((t) => {
@@ -7467,7 +7525,7 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
       if (ev.origin === 'custom') w *= 1.5;
       else if (ev.origin === 'adult') w *= 1.25;
       else if (ev.origin !== 'base') w *= 1.3;
-      return w;
+      return w * variety.weight(ev);
     }
 
     function relKey(P, t) {
@@ -7583,7 +7641,9 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
       if (!a || !b || a === b) return;
       const l = (a.mem[b.id] = a.mem[b.id] || []);
       if (l.length && l[l.length - 1].k === k && l[l.length - 1].ph === phases.length) return;
-      l.push({ ph: phases.length, k, x: x ? x.id : null });
+      const fact = { ph: phases.length, k, x: x ? x.id : null };
+      l.push(fact);
+      (a.memoryHistory[b.id] || (a.memoryHistory[b.id] = [])).push(fact);
       if (l.length > 8) l.shift();
       tweak(a, b, (BD.memfx || {})[k], scale);
       tweak(a, b, { k: 4 });
@@ -7591,7 +7651,8 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
     function remember1(t, html, kind) {
       if (!t || !html) return;
       t.diary.push({ ph: phases.length, d: day, h: html, k: kind || 'pensiero' });
-      if (t.diary.length > 80) t.diary.shift();
+      // Il diario è un documento storico, non una coda di lavoro: le pagine
+      // precedenti restano disponibili anche nelle partite più lunghe.
     }
     function syncSt(t) {
       const ph = phases.length;
@@ -7815,8 +7876,35 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
       out.testRes = { who: who.id, attr: ev.test.attr, roll: res.roll, dc: res.dc, pass: res.pass };
       return out;
     }
+    function eventReason(ev, roles) {
+      // Si descrivono soltanto condizioni effettivamente richieste dal modello,
+      // osservate prima dell'azione; nessuna spiegazione inventata a posteriori.
+      for (const r of ev.req) {
+        const A = roles[(r.r || [0])[0]], B = r.r && roles[r.r[1]];
+        if (!A) continue;
+        if (r.t === 'grudge' && B) {
+          const g = A.grudges[B.id], lost = g && byId[g.victim];
+          return A.name + ' ha un rancore verso ' + B.name + (lost ? ' per la perdita di ' + lost.name : '') + '.';
+        }
+        if (r.t === 'owe' && B) return A.name + ' deve un favore a ' + B.name + '.';
+        if (r.t === 'couple' && B) return A.name + ' e ' + B.name + ' sono una coppia.';
+        if (r.t === 'crush' && B) return A.name + ' prova una cotta segreta per ' + B.name + '.';
+        if (r.t === 'plot' && B) return A.name + ' sta tramando contro ' + B.name + '.';
+        if (r.t === 'goal' && A.goal) {
+          const goal = (MIND.goals || {})[A.goal.k];
+          if (goal) return 'Obiettivo di ' + A.name + ': ' + goal.label.replace('{1}', A.goal.tg && byId[A.goal.tg] ? byId[A.goal.tg].name : 'qualcuno') + '.';
+        }
+        if (r.t === 'stat') {
+          const labels = Object.assign({ hp: 'salute', en: 'energia', mo: 'morale', food: 'sazietà', pr: M ? M.name : 'indicatore' }, theme.soft ? { hp: 'reputazione', en: 'energie' } : {});
+          return A.name + ': ' + labels[r.k] + ' ' + Math.round(A[r.k]) + '/100 prima dell\'evento.';
+        }
+      }
+      return '';
+    }
     function apply(ev, roles) {
       CTX = null;
+      variety.record(ev);
+      const reason = eventReason(ev, roles);
       if (ev.test) ev = resolveTest(ev, roles);
       const ctx = {};
       const lexPick = (k) => (ctx[k] != null ? ctx[k] : (ctx[k] = rng.pick(LEX[k] || ['qualcosa'])));
@@ -8005,7 +8093,7 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
       stats.events++;
       const deaths = roles.filter((t, i) => ev.victims.includes(i) && !t.alive).map((t) => t.id);
       const cat = ev.lethal && !deaths.length && ev.cat !== 'betray' ? 'hurt' : ev.cat;
-      return { html: txt.html, plain: txt.plain, ids: roles.map((t) => t.id), deaths, lethal: deaths.length > 0, origin: ev.origin, cat, why: ev.why, echo: out.slice(0, 3), test: ev.testRes || null };
+      return { html: txt.html, plain: txt.plain, ids: roles.map((t) => t.id), deaths, lethal: deaths.length > 0, origin: ev.origin, cat, why: ev.why, reason, echo: out.slice(0, 3), test: ev.testRes || null };
     }
 
     function lethalProb(kind) {
@@ -8772,7 +8860,7 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
     /* ---------------- le relazioni ---------------- */
     const BA = (k) => (theme.soft && BD.actsSoft && BD.actsSoft[k]) || (BD.acts || {})[k] || [];
     const BDI = (k) => (BD.diary || {})[k] || [];
-    const hasMem = (a, b, k) => (a.mem[b.id] || []).some((m) => m.k === k);
+    const hasMem = (a, b, k) => (a.memoryHistory[b.id] || []).some((m) => m.k === k);
     // l'etichetta umana di quello che A prova per B
     function labelOf(a, b) {
       const x = peek(a, b), L = like(a, b);
@@ -9019,7 +9107,9 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
         for (let attempt = 0; attempt < 25 && !done; attempt++) {
           const wantLethal = nAlive > 1 && rng.chance(pL);
           const cand = wantLethal ? candL : candS;
-          const ev = rng.wpick(cand, wOf);
+          // Se nessun modello recente può essere evitato, i tentativi successivi
+          // riaprono il catalogo: i requisiti dell'evento hanno sempre precedenza.
+          const ev = rng.wpick(cand, (e) => attempt < 12 && variety.recent(e) ? 0 : wOf(e));
           if (!ev) continue;
           const roles = assign(ev, P, un);
           if (!roles) continue;
@@ -9028,7 +9118,7 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
           roles.forEach((t) => un.delete(t.id));
           done = true;
         }
-        if (!done) { events.push(apply(rng.pick(fallback), [P])); un.delete(P.id); }
+        if (!done) { events.push(apply(rng.wpick(fallback, (e) => variety.weight(e)), [P])); un.delete(P.id); }
       }
       // conseguenze automatiche della fase
       if (kind === 'n') nightEnd();
@@ -9064,7 +9154,7 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
       if (!pool.length) return false;
       const events = [];
       for (let k = 0; k < 10 && !isEnded(); k++) {
-        const ev = rng.wpick(pool, (e) => e.w);
+        const ev = rng.wpick(pool, (e) => e.w * variety.weight(e));
         const roles = rng.chance(0.5) ? [A, B] : [B, A];
         if (!checkReq(ev, roles)) continue;
         events.push(apply(ev, roles));
@@ -9182,7 +9272,7 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
       partner: t.partner, exPartner: t.exPartner,
       foraged: t.foraged, nursed: t.nursed, shared: t.shared, trapKills: t.trapKills, trapsSet: t.trapsSet, survivedBeasts: t.survivedBeasts,
       deathCause: t.alive ? null : t.deathKind || null,
-      diary: t.diary, mem: t.mem, trades: t.trades, crafts: t.crafts, acts: t.acts, rejected: t.rejected,
+      diary: t.diary, mem: t.memoryHistory, trades: t.trades, crafts: t.crafts, acts: t.acts, rejected: t.rejected,
       promises: t.promises.map((q) => ({ to: q.to, k: q.k, d: q.d, ph: q.ph, done: q.done || null, end: q.endPh != null ? q.endPh : null })), spares: t.spares, promisesKept: t.promisesKept || 0, promisesBroken: t.promisesBroken || 0,
       bag: t.inv.map((x) => ({ t: x.type, n: x.name, h: x.how || 'trovato', q: x.q, u: x.u, m: x.um, f: x.from, d: x.d, x: x.x })),
     }));
@@ -9193,7 +9283,7 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
       for (let i = 0; i < T.length; i++) for (let j = i + 1; j < T.length; j++) {
         const a = T[i], b = T[j], ab = peek(a, b), ba = peek(b, a), la = like(a, b), lb = like(b, a);
         const lovers = hasMem(a, b, 'love') || hasMem(b, a, 'love');
-        const lastAB = (a.mem[b.id] || []).filter((m) => m.k === 'breakup' || m.k === 'reunion' || m.k === 'love').slice(-1)[0];
+        const lastAB = (a.memoryHistory[b.id] || []).filter((m) => m.k === 'breakup' || m.k === 'reunion' || m.k === 'love').slice(-1)[0];
         const broke = lastAB && lastAB.k === 'breakup';
         if (lovers) put('amore', a, b, ab.t + ba.t + Math.min(la, lb) + 20 - (broke ? 40 : 0), broke ? 'finito' : !a.alive && !b.alive ? 'tragico' : !a.alive || !b.alive ? 'spezzato' : 'insieme');
         if (!lovers && la >= 30 && lb >= 30) put('amicizia', a, b, Math.min(la, lb) + Math.min(ab.f, ba.f) + (ab.n.fw || 0) * 10 + (ab.n.sv || 0) * 10 + (ba.n.sv || 0) * 10, (ab.n.fw || 0) ? 'armi' : '');
@@ -9275,7 +9365,10 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
 
   G.LOS = { renderSample, simulate, parseLine, parseBlock, parseDisasters, buildPools, makeRng, randomCast, countTemplates, previewCustom, customToLine, PALETTE, STATUS_LABEL, DIFF };
 })(typeof window !== 'undefined' ? window : globalThis);
-
+</script>
+<script>window.LOS_ASSETS = {"logo":"img/logo.f2d5175789.webp","icona":"img/icona.8b02ddeb49.webp","favicon":"img/favicon.86774dc7cf.png","panoramica":"img/panoramica.66c4c27255.webp","sagome":["img/sagome-cappuccio.e8876ba986.webp","img/sagome-esploratore.9a99fd13f8.webp","img/sagome-viaggiatore.5e36435604.webp"],"arene":{"classico":"img/arene-classico.42c6ba42ee.webp","fantasy":"img/arene-fantasy.75b7fb0d32.webp","horror":"img/arene-horror.48052d80b4.webp","liceo":"img/arene-liceo.05ed578a90.webp","royale":"img/arene-royale.36c9952cd7.webp","scifi":"img/arene-scifi.403694f00f.webp","ufficio":"img/arene-ufficio.67b271bea3.webp","wasteland":"img/arene-wasteland.889002ace8.webp","zombie":"img/arene-zombie.36c9135a12.webp"}};
+;
+window.LOS_BUILD = "2017b59f59f2a7d564d1361a996e1c4cec81ed6731e0b05c75b9362ba51c21e2";
 ;
 /* Last One Standing — grafica vettoriale: logo, icone delle arene, illustrazioni.
  * Tutto è SVG generato in codice: nessuna immagine esterna. */
@@ -9453,7 +9546,8 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
  * Rispetta prefers-reduced-motion: in quel caso tutto resta fermo e leggibile. */
 (function (G) {
   'use strict';
-  const reduced = G.matchMedia && G.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const motionQuery = G.matchMedia ? G.matchMedia('(prefers-reduced-motion: reduce)') : null;
+  let preference = false, reduced = !!(motionQuery && motionQuery.matches);
   const TAU = Math.PI * 2;
   const R = (a, b) => a + Math.random() * (b - a);
   const pick = (a) => a[Math.floor(Math.random() * a.length)];
@@ -9539,6 +9633,13 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
     const p = Object.assign(base, k); p.life0 = p.life; p.o = 1; return p;
   }
   let raf = 0, last = 0;
+  function setReduced(value) {
+    preference = !!value; reduced = preference || !!(motionQuery && motionQuery.matches);
+    document.documentElement.toggleAttribute('data-reduced-motion', reduced);
+    if (reduced) { if (raf) cancelAnimationFrame(raf); raf = 0; last = 0; }
+    else loop();
+  }
+  if (motionQuery && motionQuery.addEventListener) motionQuery.addEventListener('change', () => setReduced(preference));
   function loop() {
     if (reduced || raf) return;
     const tick = (now) => {
@@ -9560,7 +9661,7 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
     const from = opts.from != null ? opts.from : parseFloat(el.textContent) || 0;
     if (reduced || from === to) { el.textContent = to; return; }
     const dur = opts.dur || 900, t0 = performance.now();
-    const step = (now) => { const k = Math.min(1, (now - t0) / dur), e = 1 - Math.pow(1 - k, 3); el.textContent = Math.round(from + (to - from) * e); if (k < 1) requestAnimationFrame(step); };
+    const step = (now) => { if (reduced) { el.textContent = to; return; } const k = Math.min(1, (now - t0) / dur), e = 1 - Math.pow(1 - k, 3); el.textContent = Math.round(from + (to - from) * e); if (k < 1) requestAnimationFrame(step); };
     requestAnimationFrame(step);
   }
   function kinetic(el, style) {
@@ -9589,17 +9690,17 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
   }
   function tilt(root, sel) {
     if (reduced || !root || root.__tilt || matchMedia('(hover: none)').matches) return; root.__tilt = true;
-    root.addEventListener('pointermove', (e) => { const c = e.target.closest(sel); if (!c) return; const r = c.getBoundingClientRect(); const x = (e.clientX - r.left) / r.width - 0.5, y = (e.clientY - r.top) / r.height - 0.5; c.style.setProperty('--rx', (-y * 8).toFixed(2) + 'deg'); c.style.setProperty('--ry', (x * 10).toFixed(2) + 'deg'); c.style.setProperty('--gx', ((x + 0.5) * 100).toFixed(1) + '%'); c.style.setProperty('--gy', ((y + 0.5) * 100).toFixed(1) + '%'); c.classList.add('tilting'); });
+    root.addEventListener('pointermove', (e) => { if (reduced) return; const c = e.target.closest(sel); if (!c) return; const r = c.getBoundingClientRect(); const x = (e.clientX - r.left) / r.width - 0.5, y = (e.clientY - r.top) / r.height - 0.5; c.style.setProperty('--rx', (-y * 8).toFixed(2) + 'deg'); c.style.setProperty('--ry', (x * 10).toFixed(2) + 'deg'); c.style.setProperty('--gx', ((x + 0.5) * 100).toFixed(1) + '%'); c.style.setProperty('--gy', ((y + 0.5) * 100).toFixed(1) + '%'); c.classList.add('tilting'); });
     root.addEventListener('pointerleave', () => root.querySelectorAll('.tilting').forEach((c) => { c.classList.remove('tilting'); c.style.removeProperty('--rx'); c.style.removeProperty('--ry'); }), true);
     root.addEventListener('pointerout', (e) => { const c = e.target.closest(sel); if (c && !c.contains(e.relatedTarget)) { c.classList.remove('tilting'); c.style.removeProperty('--rx'); c.style.removeProperty('--ry'); } });
   }
   function parallax(host, layer) {
     if (reduced || !host || host.__par || matchMedia('(hover: none)').matches) return; host.__par = true;
-    host.addEventListener('pointermove', (e) => { const r = host.getBoundingClientRect(); const x = (e.clientX - r.left) / r.width - 0.5, y = (e.clientY - r.top) / r.height - 0.5; layer.style.setProperty('--px', (x * -18).toFixed(1) + 'px'); layer.style.setProperty('--py', (y * -10).toFixed(1) + 'px'); });
+    host.addEventListener('pointermove', (e) => { if (reduced) return; const r = host.getBoundingClientRect(); const x = (e.clientX - r.left) / r.width - 0.5, y = (e.clientY - r.top) / r.height - 0.5; layer.style.setProperty('--px', (x * -18).toFixed(1) + 'px'); layer.style.setProperty('--py', (y * -10).toFixed(1) + 'px'); });
   }
   function ripple(root) {
     if (reduced || root.__ripple) return; root.__ripple = true;
-    root.addEventListener('pointerdown', (e) => { const b = e.target.closest('.btn, .pbtn, .poster-card'); if (!b) return; const r = b.getBoundingClientRect(); const s = document.createElement('span'); s.className = 'ripple'; const d = Math.max(r.width, r.height) * 2; s.style.width = s.style.height = d + 'px'; s.style.left = e.clientX - r.left - d / 2 + 'px'; s.style.top = e.clientY - r.top - d / 2 + 'px'; b.appendChild(s); setTimeout(() => s.remove(), 650); });
+    root.addEventListener('pointerdown', (e) => { if (reduced) return; const b = e.target.closest('.btn, .pbtn, .poster-card'); if (!b) return; const r = b.getBoundingClientRect(); const s = document.createElement('span'); s.className = 'ripple'; const d = Math.max(r.width, r.height) * 2; s.style.width = s.style.height = d + 'px'; s.style.left = e.clientX - r.left - d / 2 + 'px'; s.style.top = e.clientY - r.top - d / 2 + 'px'; b.appendChild(s); setTimeout(() => s.remove(), 650); });
   }
   let revealIO = null;
   function reveal(els) {
@@ -9646,6 +9747,7 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
     burst(innerWidth * 0.3); setTimeout(() => burst(innerWidth * 0.7), 260); setTimeout(() => burst(innerWidth * 0.5), 560);
     let t = 0;
     (function frame() {
+      if (reduced) { cv.remove(); return; }
       t++; g.clearRect(0, 0, innerWidth, innerHeight);
       P.forEach((p) => {
         p.vy += 0.32; p.vx *= 0.985; p.x += p.vx + Math.sin((t + p.w * 20) / 12) * 0.8; p.y += p.vy; p.a += p.va;
@@ -9665,8 +9767,61 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
     })();
   }
 
-  G.LOS_ANIM = { reduced, field, countTo, kinetic, dice, domBurst, tilt, parallax, ripple, reveal, phaseFx, intensityFor, confetti };
+  G.LOS_ANIM = { get reduced() { return reduced; }, setReduced, field, countTo, kinetic, dice, domBurst, tilt, parallax, ripple, reveal, phaseFx, intensityFor, confetti };
 })(typeof window !== 'undefined' ? window : globalThis);
+
+;
+/* Esegue lo stesso motore in background, anche nella versione HTML portatile. */
+(function (G) {
+  'use strict';
+  let worker = null, workerUrl = null, disabled = false, serial = 0;
+  const jobs = new Map();
+  const abortError = () => Object.assign(new Error('Calcolo annullato.'), { name: 'AbortError' });
+  function dispose() {
+    if (worker) worker.terminate(); worker = null;
+    if (workerUrl) G.URL.revokeObjectURL(workerUrl); workerUrl = null;
+  }
+  function fallback(id, job) {
+    G.setTimeout(() => {
+      if (!jobs.has(id)) return;
+      jobs.delete(id);
+      try { job.resolve(G.LOS.simulate(job.cfg)); } catch (e) { job.reject(e); }
+    }, 0);
+  }
+  function failWorker() {
+    disabled = true; dispose(); jobs.forEach((job, id) => fallback(id, job));
+  }
+  function getWorker() {
+    if (worker || disabled) return worker;
+    const script = G.document && G.document.getElementById('simulation-source');
+    if (!script || !script.textContent || !G.Worker || !G.Blob || !G.URL || !G.URL.createObjectURL) { disabled = true; return null; }
+    const handler = '\n;self.onmessage = function (event) { const job = event.data; try { self.postMessage({id:job.id, result:self.LOS.simulate(job.cfg)}); } catch (error) { self.postMessage({id:job.id, error:String(error.message || error)}); } };';
+    try {
+      workerUrl = G.URL.createObjectURL(new G.Blob([script.textContent, handler], { type: 'text/javascript' }));
+      worker = new G.Worker(workerUrl);
+      worker.onmessage = ({ data }) => {
+        const job = jobs.get(data.id); if (!job) return;
+        jobs.delete(data.id);
+        if (data.error) job.reject(new Error(data.error)); else job.resolve(data.result);
+      };
+      worker.onerror = failWorker;
+      worker.onmessageerror = failWorker;
+      return worker;
+    } catch (e) { disabled = true; dispose(); return null; }
+  }
+  function simulate(cfg) {
+    let input;
+    try { input = G.structuredClone(cfg); } catch (e) { return Promise.reject(e); }
+    return new Promise((resolve, reject) => {
+      const id = ++serial, job = { cfg: input, resolve, reject }; jobs.set(id, job);
+      const target = getWorker();
+      if (!target) return fallback(id, job);
+      try { target.postMessage({ id, cfg: input }); } catch (e) { jobs.delete(id); reject(e); }
+    });
+  }
+  function cancel() { dispose(); jobs.forEach((job) => job.reject(abortError())); jobs.clear(); }
+  G.LOS_SIMULATOR = { simulate, cancel };
+})(typeof window === 'object' ? window : globalThis);
 
 ;
 /* Archivio locale dei risultati già generati: nessuna risimulazione o rete. */
@@ -9765,7 +9920,8 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
     } catch (e) { return false; }
   }
   function envelopeOk(e, id) {
-    return record(e) && e.schema === 1 && e.id === id && typeof e.buildId === 'string' && Number.isFinite(e.createdAt) && e.createdAt > 0 && validate(e.result);
+    return record(e) && e.schema === 1 && e.id === id && typeof e.buildId === 'string' && Number.isFinite(e.createdAt) && e.createdAt > 0 &&
+      (e.title == null || typeof e.title === 'string' && e.title.length <= 100) && (e.configuration == null || record(e.configuration)) && validate(e.result);
   }
   function openDb() {
     if (opening) return opening;
@@ -9867,6 +10023,8 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
   async function save(id, result, meta = {}) {
     if (!replayIdOk(id)) throw new Error('Identificativo della partita non valido.');
     const e = { schema: 1, id, buildId: meta.buildId == null ? String(G.LOS_BUILD || 'sviluppo') : meta.buildId, createdAt: meta.createdAt == null ? Date.now() : meta.createdAt, result: copy(result) };
+    if (meta.title != null) e.title = String(meta.title).trim().slice(0, 100);
+    if (meta.configuration != null) e.configuration = copy(meta.configuration);
     if (!envelopeOk(e, id)) throw new Error('Il risultato della partita non è valido e non è stato salvato.');
     // Un replay nato nel ripiego locale resta immutabile anche se IndexedDB
     // diventa disponibile in un'apertura successiva del browser.
@@ -9883,22 +10041,68 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
     const saved = await writeDb(db, e);
     return { id, buildId: saved.buildId, createdAt: saved.createdAt, storage: 'indexedDB' };
   }
-  async function load(id) {
+  async function readEnvelope(id) {
     if (!replayIdOk(id)) return null;
     let e, db;
-    try { db = await openDb(); } catch (err) { e = readLocal(id); return envelopeOk(e, id) ? copy(e.result) : null; }
+    try { db = await openDb(); } catch (err) { e = readLocal(id); return envelopeOk(e, id) ? { e, storage: 'localStorage' } : null; }
     e = await readDb(db, id);
-    if (e === undefined) { try { e = readLocal(id); } catch (err) { e = null; } }
-    return envelopeOk(e, id) ? copy(e.result) : null;
+    if (e === undefined) { try { e = readLocal(id); } catch (err) { e = null; } return envelopeOk(e, id) ? { e, storage: 'localStorage' } : null; }
+    return envelopeOk(e, id) ? { e, storage: 'indexedDB', db } : null;
   }
-  G.LOS_REPLAY = { createId, save, load, validate };
+  async function load(id) { const stored = await readEnvelope(id); return stored ? copy(stored.e.result) : null; }
+  async function entry(id) { const stored = await readEnvelope(id); return stored ? copy(stored.e) : null; }
+  async function list() {
+    const entries = new Map();
+    let db;
+    try { db = await openDb(); } catch (e) { /* Il ripiego locale resta consultabile. */ }
+    if (db) {
+      const all = await new Promise((resolve, reject) => {
+        const tx = db.transaction(STORE, 'readonly'), req = tx.objectStore(STORE).getAll(); let value = [];
+        req.onsuccess = () => { value = req.result; }; tx.oncomplete = () => resolve(value);
+        tx.onerror = tx.onabort = () => reject(tx.error || new Error('Impossibile leggere l’archivio.'));
+      });
+      all.forEach((e) => { if (e && replayIdOk(e.id) && envelopeOk(e, e.id)) entries.set(e.id, e); });
+    }
+    try {
+      for (let i = 0; i < G.localStorage.length; i++) {
+        const key = G.localStorage.key(i); if (!key || !key.startsWith(PREFIX)) continue;
+        const id = key.slice(PREFIX.length), e = readLocal(id);
+        if (!entries.has(id) && replayIdOk(id) && envelopeOk(e, id)) entries.set(id, e);
+      }
+    } catch (e) { if (!db) throw e; }
+    return [...entries.values()].sort((a, b) => b.createdAt - a.createdAt || a.id.localeCompare(b.id)).map((e) => ({ id: e.id, title: e.title || '', createdAt: e.createdAt, buildId: e.buildId, theme: e.result.theme, seed: e.result.seed, adult: e.result.adult, days: e.result.days, count: e.result.tributes.length }));
+  }
+  async function rename(id, title) {
+    if (typeof title !== 'string' || !title.trim() || title.trim().length > 100) throw new Error('Scegli un nome tra 1 e 100 caratteri.');
+    const stored = await readEnvelope(id); if (!stored) throw new Error('Partita non disponibile.');
+    const value = title.trim();
+    if (stored.storage === 'localStorage') { G.localStorage.setItem(PREFIX + id, encode({ ...stored.e, title: value })); return; }
+    await new Promise((resolve, reject) => {
+      const tx = stored.db.transaction(STORE, 'readwrite'), store = tx.objectStore(STORE), req = store.get(id);
+      req.onsuccess = () => { if (!envelopeOk(req.result, id)) return tx.abort(); store.put({ ...req.result, title: value }, id); };
+      tx.oncomplete = resolve; tx.onerror = tx.onabort = () => reject(new Error('Impossibile rinominare la partita.'));
+    });
+  }
+  async function exportReplay(id) {
+    const stored = await readEnvelope(id); if (!stored) throw new Error('Partita non disponibile.');
+    return encode(stored.e);
+  }
+  async function importReplay(raw) {
+    if (typeof raw !== 'string' || raw.length > 50000000) throw new Error('Il replay deve essere un JSON di massimo 50 MB.');
+    const e = decode(raw);
+    if (!e || !replayIdOk(e.id) || !envelopeOk(e, e.id) || e.result.tributes.length > 200 || e.result.phases.length > 500) throw new Error('Replay non valido o formato non supportato.');
+    const id = createId();
+    await save(id, e.result, { buildId: e.buildId, createdAt: e.createdAt, title: e.title, configuration: e.configuration });
+    return id;
+  }
+  G.LOS_REPLAY = { createId, save, load, validate, entry, list, rename, exportReplay, importReplay };
 })(typeof window === 'object' ? window : globalThis);
 
 ;
 /* Last One Standing — interfaccia */
 (function () {
   'use strict';
-  const D = window.LOS_DATA, L = window.LOS, ART = window.LOS_ART, AN = window.LOS_ANIM, REPLAY = window.LOS_REPLAY;
+  const D = window.LOS_DATA, L = window.LOS, ART = window.LOS_ART, AN = window.LOS_ANIM, REPLAY = window.LOS_REPLAY, RUNNER = window.LOS_SIMULATOR;
   const $ = (s, r = document) => r.querySelector(s);
   const $$ = (s, r = document) => [...r.querySelectorAll(s)];
   const esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -9913,7 +10117,6 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
   const SPEED = { lenta: 7000, normale: 3800, veloce: 1700 };
   const G3 = (g, m, f, n) => (g === 'F' ? f : g === 'N' ? n : m);
   const COUNTS = L.countTemplates();
-  const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   /* ---------------- icone ---------------- */
   const sv = (p, extra) => '<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"' + (extra || '') + '>' + p + '</svg>';
@@ -10002,7 +10205,7 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
     }).join('');
     const marks = NET_CLS.map(([c]) => '<marker id="arr-' + c + '" viewBox="0 0 8 8" refX="15" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L8 4L0 8z" class="mk-' + c + '"/></marker>').join('');
     const legend = '<div class="netlegend" role="group" aria-label="Mostra o nascondi i tipi di legame">' + NET_CLS.map(([c, l]) => '<button type="button" class="nl e-' + c + (netOff.has(c) ? ' off' : '') + '" data-net="' + c + '" aria-pressed="' + !netOff.has(c) + '"><i></i>' + l + '</button>').join('') + '</div>';
-    return '<div class="netwrap"><h4>Mappa dei legami</h4><svg class="net" viewBox="0 0 320 320" role="img" aria-label="Mappa dei legami tra i concorrenti in gara"><defs>' + marks + '</defs>' + lines + nodes + '</svg>' + legend +
+    return '<div class="netwrap"><h4>Mappa dei legami</h4><svg class="net" viewBox="0 0 320 320" role="group" aria-label="Mappa dei legami tra i concorrenti in gara"><defs>' + marks + '</defs>' + lines + nodes + '</svg>' + legend +
       '<p class="help">Le frecce indicano un sentimento non ricambiato. Passa sopra un volto per evidenziarne i legami, toccalo per aprire la scheda.</p></div>';
   }
   function dimsHTML(d) {
@@ -10107,17 +10310,18 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
   }
   function renderDifficulty() {
     $('#diffSeg').innerHTML = DIFFS.map(([v]) => difficultyCopy(v, THEMES[S.settings.theme])).map(([v, n, d, k]) => '<button type="button" role="radio" data-v="' + v + '" aria-checked="' + (S.settings.difficulty === v) + '"><b>' + n + ' <span class="sk" aria-hidden="true">' + '✖'.repeat(k) + '</span></b><small>' + d + '</small></button>').join('');
+    radioFocus($('#diffSeg'));
   }
 
   /* ---------------- stato ---------------- */
   const S = {
     cast: [],
-    settings: { theme: 'classico', difficulty: 'normale', seed: '', maxDays: 20, teamsAllied: true, teamWin: false, speed: 'normale', teamSize: 2, view: 'grid', adult: false },
+    settings: { theme: 'classico', difficulty: 'normale', seed: '', maxDays: 20, teamsAllied: true, teamWin: false, speed: 'normale', teamSize: 2, view: 'grid', adult: false, hideFuture: true, adaptivePlay: true, reduceMotion: false },
     custom: [],
     run: null,
     ui: null,
   };
-  let SIM = null, BY = {}, playTimer = null, lastRendered = -1, sideTab = 'map', editId = null, photoTarget = null;
+  let SIM = null, BY = {}, playTimer = null, playing = false, lastRendered = -1, sideTab = 'map', editId = null, photoTarget = null;
   let runGeneration = 0;
 
   function newSeed() {
@@ -10141,7 +10345,7 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
     if (!REPLAY) return Promise.resolve(false);
     run.replayId = run.replayId || REPLAY.createId();
     run.replaySaved = false;
-    return REPLAY.save(run.replayId, result).then(() => {
+    return REPLAY.save(run.replayId, result, { configuration: run.cfg }).then(() => {
       run.replaySaved = true;
       if (S.run === run) save();
       return true;
@@ -10205,7 +10409,7 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
     if (own(SPEED, x.speed)) st.speed = x.speed;
     if ([1, 2, 3, 4].includes(+x.teamSize)) st.teamSize = +x.teamSize;
     if (x.view === 'grid' || x.view === 'team') st.view = x.view;
-    ['teamsAllied', 'teamWin', 'adult'].forEach((k) => { if (typeof x[k] === 'boolean') st[k] = x[k]; });
+    ['teamsAllied', 'teamWin', 'adult', 'hideFuture', 'adaptivePlay', 'reduceMotion'].forEach((k) => { if (typeof x[k] === 'boolean') st[k] = x[k]; });
     return st;
   }
   function sanitizeTribute(t, i) {
@@ -10310,6 +10514,20 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
   /* ---------------- navigazione ---------------- */
   const VIEWS = ['home', 'cast', 'arena', 'diretta', 'esito'];
   let curView = '';
+  function radioFocus(group) {
+    if (!group) return;
+    $$('[role="radio"]', group).forEach((b) => { b.tabIndex = b.getAttribute('aria-checked') === 'true' ? 0 : -1; });
+  }
+  document.addEventListener('keydown', (e) => {
+    if (!['ArrowRight', 'ArrowLeft', 'ArrowDown', 'ArrowUp', 'Home', 'End'].includes(e.key)) return;
+    const b = e.target.closest('[role="radio"], [role="tab"]'); if (!b) return;
+    const group = b.closest('[role="radiogroup"], [role="tablist"]'); if (!group) return;
+    const options = $$('[role="radio"], [role="tab"]', group).filter((x) => !x.disabled);
+    const current = options.indexOf(b); if (current < 0) return;
+    const step = e.key === 'ArrowLeft' || e.key === 'ArrowUp' ? -1 : 1;
+    const at = e.key === 'Home' ? 0 : e.key === 'End' ? options.length - 1 : (current + step + options.length) % options.length;
+    e.preventDefault(); options[at].click(); options[at].focus();
+  });
   function route() {
     let v = (location.hash || '').slice(1);
     if (!VIEWS.includes(v)) v = 'home';
@@ -10331,7 +10549,7 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
     if (v === 'arena') renderArena();
     if (v === 'diretta') renderLive(true);
     if (v === 'esito') renderResults();
-    if (changed) { window.scrollTo({ top: 0, behavior: 'auto' }); const sec = $('#v-' + v); sec.classList.remove('view-enter'); void sec.offsetWidth; sec.classList.add('view-enter'); }
+    if (changed) { window.scrollTo({ top: 0, behavior: 'auto' }); const sec = $('#v-' + v); sec.classList.remove('view-enter'); void sec.offsetWidth; sec.classList.add('view-enter'); const title = $('h1, h2', sec) || sec; title.tabIndex = -1; title.focus({ preventScroll: true }); }
   }
   window.addEventListener('hashchange', route);
   document.addEventListener('click', (e) => {
@@ -10351,7 +10569,7 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
     if (SIM) {
       const th = THEMES[SIM.theme]; const done = (S.run.seen || 0) >= SIM.phases.length - 1;
       r.hidden = false; r.className = 'resume card';
-      r.innerHTML = '<div class="rtext"><div class="eyebrow">' + (done ? 'Ultima partita' : 'Partita in corso') + '</div><b>' + esc(th.name) + '</b><div class="muted">' + SIM.tributes.length + ' concorrenti · fase ' + ((S.run.phase || 0) + 1) + ' di ' + SIM.phases.length + '</div></div>' +
+      r.innerHTML = '<div class="rtext"><div class="eyebrow">' + (done ? 'Ultima partita' : 'Partita in corso') + '</div><b>' + esc(th.name) + '</b><div class="muted">' + SIM.tributes.length + ' concorrenti · fase ' + ((S.run.phase || 0) + 1) + (S.settings.hideFuture && !done ? '' : ' di ' + SIM.phases.length) + '</div></div>' +
         '<a class="btn primary" href="#diretta">' + (done ? 'Rivedi la diretta' : 'Riprendi la diretta') + '</a>' + (done ? '<a class="btn" href="#esito">Vedi l\'esito</a>' : '');
     } else r.hidden = true;
     startHomeLoop();
@@ -10397,7 +10615,7 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
       demoI++;
     };
     draw();
-    if (!reduced) homeTimer = setInterval(draw, 2300);
+    if (!AN.reduced) homeTimer = setInterval(draw, 2300);
   }
   function stopHomeLoop() { if (homeTimer) { clearInterval(homeTimer); homeTimer = null; } }
   function quickPlay() {
@@ -10671,18 +10889,96 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
   }
   $('#btnIO').addEventListener('click', () => { $('#ioText').value = exportJSON(); $('#ioMsg').textContent = ''; $('#ioDlg').showModal(); });
   $('#ioCopy').addEventListener('click', () => copyText($('#ioText').value, 'Configurazione copiata negli appunti.'));
-  $('#ioImport').addEventListener('click', () => { const err = importJSON($('#ioText').value); if (err) $('#ioMsg').textContent = err; else { $('#ioDlg').close(); toast('Importati ' + S.cast.length + ' concorrenti.'); } });
+  $('#ioImport').addEventListener('click', () => { const err = importJSON($('#ioText').value); if (err) $('#ioMsg').textContent = err; else { AN.setReduced(S.settings.reduceMotion); $('#ioDlg').close(); toast('Importati ' + S.cast.length + ' concorrenti.'); } });
   $('#ioFile').addEventListener('change', (e) => {
     const f = e.target.files[0]; e.target.value = ''; if (!f) return;
     const rd = new FileReader();
-    rd.onload = () => { $('#ioText').value = rd.result; const err = importJSON(rd.result); if (err) $('#ioMsg').textContent = err; else { $('#ioDlg').close(); toast('Importati ' + S.cast.length + ' concorrenti.'); } };
+    rd.onload = () => { $('#ioText').value = rd.result; const err = importJSON(rd.result); if (err) $('#ioMsg').textContent = err; else { AN.setReduced(S.settings.reduceMotion); $('#ioDlg').close(); toast('Importati ' + S.cast.length + ' concorrenti.'); } };
     rd.readAsText(f);
+  });
+
+  /* ---------------- archivio dei risultati ---------------- */
+  async function renderArchive() {
+    const entries = await REPLAY.list();
+    $('#archiveList').innerHTML = entries.length ? entries.map((e) => '<article class="archive-entry" data-replay="' + esc(e.id) + '">' +
+      '<label class="archive-select"><input type="checkbox" data-compare value="' + esc(e.id) + '"> Confronta</label>' +
+      '<label>Nome della partita<input data-title maxlength="100" value="' + esc(e.title || THEMES[e.theme].name + ' · ' + e.seed) + '"></label>' +
+      '<p class="help">' + esc(new Date(e.createdAt).toLocaleString('it-IT')) + ' · ' + e.count + ' concorrenti · ' + plural(e.days, 'giorno', 'giorni') + ' · ' + esc(THEMES[e.theme].name) + (e.adult ? ' · 18+' : '') + '</p>' +
+      '<div class="row"><button class="btn sm" type="button" data-archive="open">Rivedi dall’inizio</button><button class="btn sm" type="button" data-archive="rename">Salva nome</button><button class="btn sm" type="button" data-archive="export">Esporta replay</button></div></article>').join('') :
+      '<p class="help">Nessuna partita archiviata. Le nuove partite vengono aggiunte automaticamente; puoi anche importare un replay completo.</p>';
+  }
+  async function openArchive() {
+    if (!REPLAY) return toast('Archivio non disponibile.');
+    stopPlay(); $('#archiveMsg').textContent = ''; $('#archiveComparison').innerHTML = ''; $('#archiveList').textContent = 'Caricamento…';
+    $('#archiveDlg').showModal();
+    try { await renderArchive(); } catch (e) { $('#archiveMsg').textContent = 'Archivio non disponibile: ' + e.message; }
+  }
+  function archiveConfiguration(entry) {
+    const result = entry.result, raw = entry.configuration || (S.run && S.run.replayId === entry.id ? S.run.cfg : null) || {};
+    const settings = sanitizeSettings(raw, S.settings);
+    const cast = result.tributes.map((t) => ({ id: t.id, name: t.name, gender: t.gender, team: t.team, color: t.color, img: t.img, traits: t.traits.slice(), attr: { ...t.attr } }));
+    return { cast, theme: result.theme, seed: result.seed, adult: result.adult && S.settings.adult, difficulty: settings.difficulty, maxDays: settings.maxDays,
+      teamsAllied: settings.teamsAllied, teamWin: settings.teamWin, custom: raw.custom == null ? [] : normalizeCustoms(raw.custom) };
+  }
+  $('#btnArchive').addEventListener('click', openArchive);
+  $('#archiveList').addEventListener('click', async (e) => {
+    const button = e.target.closest('[data-archive]'); if (!button) return;
+    const row = button.closest('[data-replay]'), id = row.dataset.replay;
+    button.disabled = true;
+    try {
+      if (button.dataset.archive === 'rename') {
+        await REPLAY.rename(id, $('[data-title]', row).value); $('#archiveMsg').textContent = 'Nome salvato.';
+      } else if (button.dataset.archive === 'export') {
+        $('#replayText').value = await REPLAY.exportReplay(id); $('#replayIO').open = true;
+        $('#archiveMsg').textContent = 'Replay completo pronto da copiare o scaricare.';
+      } else {
+        const generation = runGeneration, entry = await REPLAY.entry(id); if (!entry) throw new Error('Partita non disponibile.');
+        if (entry.result.adult && !S.settings.adult) throw new Error('Per aprire questo replay attiva i contenuti 18+ nelle opzioni dell’arena.');
+        const cfg = archiveConfiguration(entry); if (generation !== runGeneration) return;
+        runGeneration++; if (RUNNER) RUNNER.cancel(); simulationBusy(false); stopPlay();
+        SIM = entry.result; BY = Object.fromEntries(SIM.tributes.map((t) => [t.id, t]));
+        S.run = { cfg, phase: 0, seen: 0, replayId: id, replaySaved: true }; lastRendered = -1; save();
+        $('#archiveDlg').close(); if (location.hash === '#diretta') route(); else location.hash = '#diretta';
+      }
+    } catch (error) { $('#archiveMsg').textContent = error.message; }
+    finally { button.disabled = false; }
+  });
+  $('#archiveImport').addEventListener('click', async () => {
+    const button = $('#archiveImport'); button.disabled = true;
+    try { await REPLAY.importReplay($('#replayText').value); await renderArchive(); $('#archiveMsg').textContent = 'Replay importato. La partita in corso è rimasta invariata.'; }
+    catch (e) { $('#archiveMsg').textContent = e.message; }
+    finally { button.disabled = false; }
+  });
+  $('#archiveCopy').addEventListener('click', () => copyText($('#replayText').value, 'Replay copiato negli appunti.'));
+  let replayDownloadUrl = null;
+  $('#archiveDownload').addEventListener('click', () => {
+    if (!$('#replayText').value.trim()) { $('#archiveMsg').textContent = 'Esporta prima una partita dall’elenco.'; return; }
+    if (replayDownloadUrl) URL.revokeObjectURL(replayDownloadUrl);
+    replayDownloadUrl = URL.createObjectURL(new Blob([$('#replayText').value], { type: 'application/json' }));
+    const link = document.createElement('a'); link.href = replayDownloadUrl; link.download = 'last-one-standing-replay.json'; link.click();
+  });
+  $('#archiveDlg').addEventListener('close', () => { if (replayDownloadUrl) URL.revokeObjectURL(replayDownloadUrl); replayDownloadUrl = null; });
+  $('#archiveCompare').addEventListener('click', async () => {
+    const ids = $$('#archiveList [data-compare]:checked').map((x) => x.value);
+    if (ids.length !== 2) { $('#archiveMsg').textContent = 'Seleziona esattamente due partite da confrontare.'; return; }
+    try {
+      const entries = await Promise.all(ids.map((id) => REPLAY.entry(id)));
+      if (entries.some((e) => !e)) throw new Error('Una delle partite non è disponibile.');
+      if (entries.some((e) => e.result.adult) && !S.settings.adult) throw new Error('Attiva i contenuti 18+ prima di confrontare questi replay.');
+      const headers = entries.map((e) => '<th scope="col">' + esc(e.title || e.result.seed) + '</th>').join('');
+      const rows = [['Arena', (r) => THEMES[r.theme].name], ['Seme', (r) => r.seed], ['Concorrenti', (r) => r.tributes.length], ['Durata', (r) => plural(r.days, 'giorno', 'giorni')],
+        ['Vittoria', (r) => r.winners.map((id) => r.tributes.find((t) => t.id === id).name).join(', ')], ['Eliminazioni attribuite', (r) => r.stats.killDeaths], ['Eliminazioni dell’arena', (r) => r.stats.envDeaths], ['Eventi', (r) => r.stats.events]];
+      $('#archiveComparison').innerHTML = '<div class="tablewrap"><table><caption>Confronto delle partite selezionate</caption><thead><tr><th scope="col">Dato</th>' + headers + '</tr></thead><tbody>' +
+        rows.map(([label, get]) => '<tr><th scope="row">' + label + '</th>' + entries.map((e) => '<td>' + esc(get(e.result)) + '</td>').join('') + '</tr>').join('') + '</tbody></table></div>';
+      $('#archiveMsg').textContent = 'Confronto aggiornato.';
+    } catch (e) { $('#archiveMsg').textContent = e.message; }
   });
 
   /* =============== ARENA =============== */
   function renderArena() {
     $('#arenaSub').textContent = 'Ogni arena ha luoghi, armi, pericoli e disastri propri. In tutto ' + COUNTS.events + ' modelli di evento e ' + COUNTS.disasters + ' disastri, più quelli che scrivi tu.';
     $('#themeList').innerHTML = D.themes.map((t) => posterHTML(t, S.settings.theme === t.id)).join('');
+    radioFocus($('#themeList'));
     AN.tilt($('#themeList'), '.poster-card');
     renderDifficulty();
     $('#maxDays').value = S.settings.maxDays; $('#maxDaysOut').textContent = S.settings.maxDays;
@@ -10746,9 +11042,10 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
     const b = e.target.closest('[data-theme]'); if (!b) return;
     S.settings.theme = b.dataset.theme; save(); setHue(S.settings.theme);
     $$('#themeList [data-theme]').forEach((x) => x.setAttribute('aria-checked', x === b));
+    radioFocus($('#themeList'));
     renderDifficulty(); renderPreview(); renderStartSum(); renderCustomForm(); renderCustomList(); renderAdult();
   });
-  $('#diffSeg').addEventListener('click', (e) => { const b = e.target.closest('button'); if (!b) return; S.settings.difficulty = b.dataset.v; save(); $$('#diffSeg button').forEach((x) => x.setAttribute('aria-checked', x === b)); renderStartSum(); });
+  $('#diffSeg').addEventListener('click', (e) => { const b = e.target.closest('button'); if (!b) return; S.settings.difficulty = b.dataset.v; save(); $$('#diffSeg button').forEach((x) => x.setAttribute('aria-checked', x === b)); radioFocus($('#diffSeg')); renderStartSum(); });
   $('#maxDays').addEventListener('input', (e) => { S.settings.maxDays = +e.target.value; $('#maxDaysOut').textContent = e.target.value; save(); });
   $('#seed').addEventListener('input', (e) => { S.settings.seed = e.target.value.slice(0, 60); save(); });
   $('#seedNew').addEventListener('click', () => { S.settings.seed = newSeed(); $('#seed').value = S.settings.seed; save(); });
@@ -10822,10 +11119,21 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
   $('#cList').addEventListener('click', (e) => { const b = e.target.closest('[data-act="cdel"]'); if (!b) return; S.custom = S.custom.filter((c) => c.id !== b.closest('.citem').dataset.id); save(); renderCustomList(); });
 
   // avvio
-  function runSim(cfg) {
+  function simulationBusy(busy) {
+    $('#simProgress').hidden = !busy;
+    $('main').setAttribute('aria-busy', busy);
+    $$('#btnStart, #quickPlay, #rAgain, button[data-quick]').forEach((b) => { b.disabled = busy || b.id === 'btnStart' && S.cast.length < 2; });
+  }
+  $('#cancelSim').addEventListener('click', () => { runGeneration++; if (RUNNER) RUNNER.cancel(); simulationBusy(false); toast('Calcolo annullato.'); });
+  async function runSim(cfg) {
+    const generation = ++runGeneration;
+    if (RUNNER) RUNNER.cancel(); stopPlay(); simulationBusy(true);
     let result;
-    try { result = L.simulate(cfg); } catch (e) { toast('Simulazione non riuscita: ' + e.message); return false; }
-    runGeneration++; stopPlay(); SIM = result;
+    try { result = RUNNER ? await RUNNER.simulate(cfg) : L.simulate(cfg); }
+    catch (e) { if (generation === runGeneration && e.name !== 'AbortError') toast('Simulazione non riuscita: ' + e.message); return false; }
+    finally { if (generation === runGeneration) simulationBusy(false); }
+    if (generation !== runGeneration) return false;
+    SIM = result;
     BY = Object.fromEntries(SIM.tributes.map((t) => [t.id, t]));
     S.run = { cfg, phase: 0, seen: 0 }; lastRendered = -1;
     persistRun(S.run, SIM); save();
@@ -10850,8 +11158,19 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
     const chip = lbl ? '<span class="cat">' + IC[cat] + (e.deaths.length > 1 && (cat === 'kill' || cat === 'death') ? e.deaths.length + ' ' + (theme.soft ? 'fuori' : 'morti') : lbl) + '</span>' : '<span></span>';
     const fix = (h) => (plain ? h.replace(/<b class="nm"[^>]*>/g, '<b>') : linkify(h));
     const why = e.test ? '<span title="Tiro ' + e.test.roll + ' contro soglia ' + e.test.dc + '">Prova di ' + esc(ATTRN[e.test.attr] || e.test.attr) + ' · <span class="dice"><span class="roll">' + e.test.roll + '</span>/' + e.test.dc + '</span> · ' + (e.test.pass ? 'superata' : 'fallita') + '</span>' : e.sponsor ? 'Sponsor' : e.whyTxt ? esc(e.whyTxt) : whyLabel(e, theme);
-    const echo = (e.echo || []).length ? '<ul class="echo">' + e.echo.map((x) => '<li class="' + (x.cls || '') + '">' + fix(x.html) + '</li>').join('') + '</ul>' : '';
+    const echo = ((e.echo || []).length ? '<ul class="echo">' + e.echo.map((x) => '<li class="' + (x.cls || '') + '">' + fix(x.html) + '</li>').join('') + '</ul>' : '') +
+      (e.reason ? '<details class="event-reason"><summary>Il contesto</summary><p>' + esc(e.reason) + '</p></details>' : '');
     return '<div class="ev' + (e.deaths.length ? ' lethal' : '') + (anim ? ' in fx-' + cat + (e.sponsor ? ' fx-sponsor' : '') : '') + '" style="--cc:var(--c-' + cat + ');--d:' + (delay || 0) + 'ms">' + avs + '<div class="evbody">' + (why ? '<span class="why' + (e.test ? (e.test.pass ? ' ok' : ' ko') : '') + '">' + why + '</span>' : '') + '<p>' + fix(e.html) + '</p>' + echo + '</div>' + chip + '</div>';
+  }
+  function timelineHTML(P, i, seenAt, hideFuture) {
+    const days = [];
+    P.forEach((p, k) => { if (hideFuture && k > seenAt + 1) return; const d = hideFuture && k > seenAt ? null : p.day || 1; let g = days.find((x) => x.d === d); if (!g) days.push((g = { d, ks: [] })); g.ks.push(k); });
+    return days.map((g) => '<div class="tday"><span>' + (g.d == null ? 'Prossima' : 'G' + g.d) + '</span><div>' + g.ks.map((k) => {
+      const p = P[k]; const dn = p.kind === 'fallen' ? p.deaths.length : p.events.reduce((s, e) => s + e.deaths.length, 0);
+      const seen = k <= (seenAt || 0);
+      const hidden = hideFuture && !seen, title = hidden ? 'Prossima fase' : p.title;
+      return '<button type="button" class="tph' + (k === i ? ' cur' : seen ? ' seen' : ' locked') + '" data-k="' + k + '"' + (k === i ? ' aria-current="step"' : '') + ' title="' + esc(title) + '" aria-label="Fase ' + (k + 1) + ': ' + esc(title) + '">' + (hidden ? '<span aria-hidden="true">?</span>' : IC[p.kind]) + (dn && seen && p.kind !== 'fallen' ? '<span class="dn">' + dn + '</span>' : '') + '</button>';
+    }).join('') + '</div></div>').join('');
   }
   function renderLive(fromRoute) {
     $('#liveEmpty').hidden = !!SIM; $('#liveBody').hidden = !SIM;
@@ -10868,7 +11187,7 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
     const prevAlive = i > 0 ? P[i - 1].snap.alive.length : total;
     AN.field(bcs, theme.id, { intensity: AN.intensityFor(ph.kind, ph.snap.alive.length / total) });
     AN.phaseFx($('.broadcast'), ph.kind, theme.id, forward, { deaths: ph.kind === 'fallen' ? ph.deaths.length : 0 });
-    $('#bcPhase').textContent = 'Fase ' + (i + 1) + ' / ' + P.length;
+    $('#bcPhase').textContent = 'Fase ' + (i + 1) + (S.settings.hideFuture && S.run.seen < P.length - 1 ? '' : ' / ' + P.length);
     $('#bcKind').textContent = KIND[ph.kind] + (ph.day ? ' · giorno ' + ph.day : '') + (ph.meteo && ph.meteo.n ? ' · ' + ph.meteo.n : '');
     $('#phTitle').textContent = ph.title; if (forward) AN.kinetic($('#phTitle'), ph.kind === 'dis' ? 'shake' : ph.kind === 'n' ? 'fade' : 'drop');
     $('#phIntro').textContent = ph.intro || '';
@@ -10878,14 +11197,7 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
     const newly = new Set(ph.kind === 'fallen' ? [] : ph.events.flatMap((e) => e.deaths));
     $('#tally').innerHTML = deadNow.map((t) => '<i class="d' + (newly.has(t.id) && forward ? ' new' : '') + '" title="' + esc(t.name) + '"></i>').join('') + '<i></i>'.repeat(total - deadNow.length);
 
-    // timeline per giorno
-    const days = [];
-    P.forEach((p, k) => { const d = p.day || 1; let g = days.find((x) => x.d === d); if (!g) days.push((g = { d, ks: [] })); g.ks.push(k); });
-    $('#timeline').innerHTML = days.map((g) => '<div class="tday"><span>G' + g.d + '</span><div>' + g.ks.map((k) => {
-      const p = P[k]; const dn = p.kind === 'fallen' ? p.deaths.length : p.events.reduce((s, e) => s + e.deaths.length, 0);
-      const seen = k <= (S.run.seen || 0);
-      return '<button type="button" class="tph' + (k === i ? ' cur' : seen ? ' seen' : ' locked') + '" data-k="' + k + '" title="' + esc(p.title) + '" aria-label="Fase ' + (k + 1) + ': ' + esc(p.title) + '">' + IC[p.kind] + (dn && seen && p.kind !== 'fallen' ? '<span class="dn">' + dn + '</span>' : '') + '</button>';
-    }).join('') + '</div></div>').join('');
+    $('#timeline').innerHTML = timelineHTML(P, i, S.run.seen, S.settings.hideFuture);
     const cur = $('#timeline .tph.cur'); if (cur) { const tl = $('#timeline'); tl.scrollLeft = Math.max(0, cur.offsetLeft - tl.clientWidth / 2); }
 
     // contenuto
@@ -10896,6 +11208,8 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
       $('#phBody').innerHTML = ph.events.map((e, k) => evHTML(e, null, theme, forward, false, Math.min(k * 90, 1800))).join('');
     }
     renderSide(i);
+    $('#phaseAnnouncement').textContent = 'Fase ' + (i + 1) + ': ' + ph.title + '. ' + plural(ph.events.length, 'evento', 'eventi') + ', ' + plural(ph.snap.alive.length, 'concorrente in gara', 'concorrenti in gara') + '.';
+    ['hideFuture', 'adaptivePlay', 'reduceMotion'].forEach((k) => { $('#' + k).checked = !!S.settings[k]; });
     if (forward && !AN.reduced && ph.kind !== 'fallen') {
       const cards = $$('#phBody .ev');
       ph.events.forEach((e, k) => {
@@ -10922,7 +11236,8 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
   }
   function renderSide(i) {
     const theme = THEMES[SIM.theme], ph = SIM.phases[i], soft = !!theme.soft;
-    $$('.stabs button').forEach((b) => b.setAttribute('aria-selected', b.dataset.s === sideTab));
+    $$('.stabs button').forEach((b) => { const active = b.dataset.s === sideTab; b.setAttribute('aria-selected', active); b.tabIndex = active ? 0 : -1; });
+    $('#sideBody').setAttribute('aria-labelledby', 'side-tab-' + sideTab);
     $('.stabs [data-s="fallen"]').textContent = soft ? (theme.id === 'ufficio' ? 'Licenziati' : 'Eliminati') : 'Caduti';
     const aliveSet = new Set(ph.snap.alive);
     let h = '';
@@ -10988,25 +11303,43 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
   $('#sideBody').addEventListener('mouseleave', () => netFocus(null));
   $('#sideBody').addEventListener('keydown', (e) => { const g = e.target.closest('.net .node'); if (g && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); openProfile(g.dataset.prof); } });
   $('.stabs').addEventListener('click', (e) => { const b = e.target.closest('button'); if (!b || !SIM) return; sideTab = b.dataset.s; renderSide(S.run.phase); });
-  function go(k) { if (!SIM) return; S.run.phase = Math.max(0, Math.min(SIM.phases.length - 1, k)); renderLive(false); }
+  function go(k) { if (!SIM) return; S.run.phase = Math.max(0, Math.min(SIM.phases.length - 1, k)); renderLive(false); if (playing) schedulePlay(); }
   function next() {
     if (!SIM) return;
     if (S.run.phase >= SIM.phases.length - 1) { stopPlay(); location.hash = '#esito'; return; }
     go(S.run.phase + 1);
     if (S.run.phase >= SIM.phases.length - 1) stopPlay();
-    if (window.scrollY > 300 && !playTimer) $('.broadcast').scrollIntoView({ behavior: reduced ? 'auto' : 'smooth' });
+    if (window.scrollY > 300 && !playTimer) $('.broadcast').scrollIntoView({ behavior: AN.reduced ? 'auto' : 'smooth' });
   }
-  function syncPlay() { $('#playIcon').innerHTML = playTimer ? IC.pause : IC.play; $('#playBtn').setAttribute('aria-label', playTimer ? 'Pausa' : 'Riproduci'); }
-  function stopPlay() { if (playTimer) { clearInterval(playTimer); playTimer = null; } if ($('#playIcon')) syncPlay(); }
-  function startPlay() { stopPlay(); playTimer = setInterval(next, SPEED[S.settings.speed] || 3800); syncPlay(); }
-  $('#nextBtn').addEventListener('click', next);
+  function phaseReadDelay(ph, speed, adaptive) {
+    if (!adaptive) return SPEED[speed] || SPEED.normale;
+    const text = [ph.title, ph.intro, ...ph.events.flatMap((e) => [e.plain, ...(e.echo || []).map((x) => x.plain)])].filter(Boolean).join(' ');
+    const words = text.trim().split(/\s+/).length + (ph.deaths || []).length * 4;
+    const factor = { lenta: 1, normale: 2, veloce: 4 }[speed] || 2;
+    return Math.min(180000, Math.max(7000, 2000 + words * 285) / factor);
+  }
+  function syncPlay() { $('#playIcon').innerHTML = playing ? IC.pause : IC.play; $('#playBtn').setAttribute('aria-label', playing ? 'Pausa' : 'Riproduci'); }
+  function stopPlay() { playing = false; if (playTimer) { clearTimeout(playTimer); playTimer = null; } if ($('#playIcon')) syncPlay(); }
+  function schedulePlay() {
+    if (playTimer) clearTimeout(playTimer);
+    playTimer = setTimeout(() => { playTimer = null; if (playing) next(); }, phaseReadDelay(SIM.phases[S.run.phase], S.settings.speed, S.settings.adaptivePlay));
+  }
+  function startPlay() { stopPlay(); if (!SIM || document.hidden || S.run.phase >= SIM.phases.length - 1) return; playing = true; schedulePlay(); syncPlay(); }
+  $('#nextBtn').addEventListener('click', () => { stopPlay(); next(); });
   $('#prevBtn').addEventListener('click', () => { stopPlay(); lastRendered = -2; go(S.run.phase - 1); });
-  $('#playBtn').addEventListener('click', () => { if (playTimer) return stopPlay(); if (S.run.phase >= SIM.phases.length - 1) go(0); startPlay(); next(); });
-  $('#speedSeg').addEventListener('click', (e) => { const b = e.target.closest('button'); if (!b) return; S.settings.speed = b.dataset.v; save(); $$('#speedSeg button').forEach((x) => x.setAttribute('aria-pressed', x === b)); if (playTimer) startPlay(); });
+  $('#playBtn').addEventListener('click', () => { if (!SIM) return; if (playing) return stopPlay(); if (S.run.phase >= SIM.phases.length - 1) go(0); startPlay(); next(); });
+  $('#speedSeg').addEventListener('click', (e) => { const b = e.target.closest('button'); if (!b) return; S.settings.speed = b.dataset.v; save(); $$('#speedSeg button').forEach((x) => x.setAttribute('aria-pressed', x === b)); if (playing) startPlay(); });
+  ['hideFuture', 'adaptivePlay', 'reduceMotion'].forEach((key) => $('#' + key).addEventListener('change', (e) => {
+    S.settings[key] = e.target.checked; save();
+    if (key === 'reduceMotion') AN.setReduced(S.settings.reduceMotion);
+    if (SIM && curView === 'diretta') renderLive(true);
+    if (playing) schedulePlay();
+  }));
+  document.addEventListener('visibilitychange', () => { if (document.hidden) { stopPlay(); stopHomeLoop(); } else if (curView === 'home') renderHome(); });
   $('#timeline').addEventListener('click', (e) => { const b = e.target.closest('.tph'); if (!b) return; stopPlay(); lastRendered = -2; go(+b.dataset.k); });
   document.addEventListener('keydown', (e) => {
-    if ($('#v-diretta').hidden || /input|textarea|select/i.test(e.target.tagName) || $$('dialog').some((d) => d.open)) return;
-    if (e.key === 'ArrowRight') { e.preventDefault(); next(); }
+    if (e.defaultPrevented || $('#v-diretta').hidden || /input|textarea|select/i.test(e.target.tagName) || $$('dialog').some((d) => d.open)) return;
+    if (e.key === 'ArrowRight') { e.preventDefault(); stopPlay(); next(); }
     else if (e.key === 'ArrowLeft') { e.preventDefault(); stopPlay(); lastRendered = -2; go(S.run.phase - 1); }
     else if (e.key === ' ' && e.target === document.body) { e.preventDefault(); $('#playBtn').click(); }
   });
@@ -11226,7 +11559,7 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
     const kbars = killers.length ? killers.map((t) => '<div class="bar"><span class="lbl">' + esc(t.name) + '</span><span class="tr"><i style="width:' + (100 * t.kills / maxK) + '%;background:' + esc(t.color) + '"></i></span><span class="v">' + t.kills + '</span></div>').join('') : '<p class="help">Nessuno ha eliminato un rivale.</p>';
 
     $('#resBody').innerHTML = hero +
-      '<div class="resactions"><button class="btn primary lg" type="button" id="rAgain">Rigioca con un nuovo seme</button><button class="btn" type="button" id="rCopy">Copia il riepilogo</button><a class="btn" href="#diretta">Rivedi la diretta</a><a class="btn" href="#cast">Nuova partita</a><span class="help mono">seme ' + esc(SIM.seed) + '</span></div>' +
+      '<div class="resactions"><button class="btn" type="button" id="rArchive">Archivio partite</button><button class="btn primary lg" type="button" id="rAgain">Rigioca con un nuovo seme</button><button class="btn" type="button" id="rCopy">Copia il riepilogo</button><a class="btn" href="#diretta">Rivedi la diretta</a><a class="btn" href="#cast">Nuova partita</a><span class="help mono">seme ' + esc(SIM.seed) + '</span></div>' +
       '<div class="resgrid"><div>' +
         (podium ? '<section class="block card"><h2>Il podio</h2>' + podium + '</section>' : '') +
         '<section class="block card"><h2>I premi della partita</h2>' + awardsH + '</section>' +
@@ -11238,6 +11571,7 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
         '<section class="block card posterbox"><h2>Locandina</h2><img id="posterImg" alt="Locandina della partita"><p class="help" style="margin-top:8px">Tieni premuto sull\'immagine, o clic destro, per salvarla.</p></section>' +
       '</div></div>';
     $('#rAgain').addEventListener('click', () => { const cfg = Object.assign({}, S.run.cfg, { seed: newSeed() }); runSim(cfg); });
+    $('#rArchive').addEventListener('click', openArchive);
     $('#rCopy').addEventListener('click', () => copyText(summaryText(), 'Riepilogo copiato negli appunti.'));
     drawPoster().then((url) => { const im = $('#posterImg'); if (im && url) im.src = url; });
     const wh = $('#resBody .winhero');
@@ -11336,7 +11670,7 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
           if (!restored || !own(THEMES, restored.theme)) throw new Error('Partita salvata non disponibile.');
         } else {
           // I salvataggi precedenti contengono soltanto le regole: si migrano una volta.
-          restored = L.simulate(run.cfg);
+          restored = RUNNER ? await RUNNER.simulate(run.cfg) : L.simulate(run.cfg);
           load.warning = [load.warning, 'La partita precedente è stata ricostruita con la versione attuale e salvata per le prossime riaperture.'].filter(Boolean).join(' ');
         }
         if (generation !== runGeneration || S.run !== run) return false;
@@ -11356,6 +11690,7 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
   }
   async function boot(hot) {
     const had = load();
+    AN.setReduced(S.settings.reduceMotion);
     if (!had) { S.cast = L.randomCast(24, 'benvenuto', 2).map(sanitizeTribute); S.settings.seed = 'benvenuto-2026'; }
     if (!S.settings.seed) S.settings.seed = newSeed();
     applyUi();

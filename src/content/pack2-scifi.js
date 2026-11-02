@@ -64,7 +64,7 @@
 `,
     },
     dis: `
-La falla nello scafo | Un modulo intero si apre verso lo spazio. | {A} viene risucchiat[A:o/a] nel vuoto. | {A} si aggrappa a una maniglia e perde lo zaino. | {A} chiude il portellone con un piede, appena in tempo. | affamato
+La falla nello scafo | Un modulo intero si apre verso lo spazio. | {A} attraversa la falla insieme agli ultimi metri cubi di ossigeno. | {A} si aggrappa a una maniglia e perde lo zaino. | {A} chiude il portellone con un piede, appena in tempo. | affamato
 L'intelligenza artificiale ribelle | Il computer di bordo decide che gli esseri umani sono un errore di sistema. | {A} entra in un ascensore. L'ascensore non si ferma più. | {A} viene colpit[A:o/a] da un braccio robotico impazzito. | {A} chiede gentilmente al computer di smettere. Funziona, chissà perché. | ferito
 Lo sciame di nanobot | Nanobot difettosi si diffondono nei condotti mangiando tutto quello che trovano. | {A} viene smontat[A:o/a] atomo per atomo. | {A} perde i capelli, le sopracciglia e un'unghia. | {A} si chiude in una cella frigorifera finché i nanobot non si spengono. | ferito
 La gravità invertita | La gravità della stazione si inverte all'improvviso. | {A} cade verso il soffitto del Reattore. | {A} si rompe un polso atterrando sul soffitto. | {A} si aggrappa a un tubo e aspetta che passi. | ferito

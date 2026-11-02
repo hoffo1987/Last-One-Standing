@@ -49,7 +49,7 @@
     dis: `
 Tempesta solare | Una tempesta solare investe la stazione: le schermature cedono. | {A} assorbe una dose letale di radiazioni. | {A} si ritrova con la pelle arrossata e la nausea. | {A} si chiude nel modulo schermato. | malato
 Pioggia di micrometeoriti | Una pioggia di micrometeoriti crivella lo scafo. | {A} viene trapassat[A:o/a] da un frammento. | {A} viene ferit[A:o/a] da schegge di metallo. | {A} si rifugia nel nucleo centrale.
-Incendio nella Serra | Le piante della Serra idroponica prendono fuoco. | {A} resta intrappolat[A:o/a] tra le fiamme. | {A} riporta ustioni sulle braccia. | {A} attiva gli estintori in tempo.
+Incendio nella Serra | Le piante della Serra idroponica prendono fuoco. | {A} resta nella Serra mentre le porte tagliafuoco si chiudono. | {A} riporta ustioni sulle braccia. | {A} attiva gli estintori in tempo.
 Blackout totale | La stazione resta senza energia: buio, freddo e niente ossigeno nuovo. | {A} soffoca in un modulo sigillato. | {A} sviene per la mancanza d'aria, ma si risveglia. | {A} trova una bombola d'emergenza. | malato
 Virus nell'IA | L'intelligenza artificiale della stazione impazzisce e chiude le porte a caso. | {A} resta chius[A:o/a] in un modulo che viene depressurizzato. | {A} resta schiacciat[A:o/a] per un braccio da una porta automatica. | {A} disattiva il proprio badge e diventa invisibile ai sensori.
 Spore aliene | Un container della Serra si apre e libera spore aliene. | {A} respira le spore e non si sveglia più. | {A} comincia a tossire una polvere verde. | {A} indossa una tuta sigillata. | avvelenato

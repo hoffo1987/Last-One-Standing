@@ -48,7 +48,7 @@
     },
     dis: `
 La porta rossa | Una porta rossa compare in fondo al corridoio. | {A} la apre ed entra: non torna più. | {A} la apre appena e qualcosa [A:gli/le] graffia la mano. | {A} la chiude con un chiodo e un crocifisso.
-Il ritratto | Uno dei ritratti del salone si stacca dalla parete. | {A} viene trascinat[A:o/a] dentro il quadro. | {A} si ferisce cercando di distruggerlo. | {A} gira tutti i ritratti verso il muro.
+Il ritratto | Uno dei ritratti del salone si stacca dalla parete. | {A} viene trascinat[A:o/a] dentro il quadro. | {A} si ferisce cercando di distruggerlo. | {A} copre il quadro con un lenzuolo. Da sotto si sente protestare.
 La pioggia di sangue | Dal soffitto comincia a gocciolare sangue. | {A} scivola sulle scale e si rompe il collo. | {A} si ammala dopo esserne stat[A:o/a] toccat[A:o/a]. | {A} si chiude in Biblioteca. | malato
 Il pozzo | Dal pozzo del giardino sale un canto. | {A} si sporge troppo e cade nel pozzo. | {A} viene graffiat[A:o/a] da mani che escono dal pozzo. | {A} copre il pozzo con una lastra di pietra.
 Gli insetti | Uno sciame di mosche invade la villa. | {A} viene soffocat[A:o/a] dallo sciame. | {A} viene punt[A:o/a] da centinaia di insetti. | {A} accende un fuoco e lo sciame se ne va. | avvelenato

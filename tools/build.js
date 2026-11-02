@@ -24,17 +24,20 @@ function assetsFor(uri) {
   const sagome = fs.readdirSync(path.join(A, 'sagome')).filter((f) => f.endsWith('.webp')).sort().map((f) => uri('sagome/' + f, 'image/webp'));
   return 'window.LOS_ASSETS = ' + JSON.stringify({ logo: uri('logo.webp', 'image/webp'), icona: uri('icona.webp', 'image/webp'), favicon: uri('favicon.png', 'image/png'), panoramica: uri('panoramica.webp', 'image/webp'), sagome, arene }) + ';';
 }
-const scripts = ['data-core.js', 'data-themes.js', ...content, 'engine.js', 'art.js', 'anim.js', 'replay.js', 'ui.js'];
+const engineScripts = ['data-core.js', 'data-themes.js', ...content, 'engine.js'];
+const appScripts = ['art.js', 'anim.js', 'simulator.js', 'replay.js', 'ui.js'];
+const scripts = [...engineScripts, ...appScripts];
 // Impronta dei sorgenti, indipendente dai fine riga del checkout e dagli output generati.
 const buildHash = require('crypto').createHash('sha256');
 for (const f of [...scripts, 'style.css', 'shell.html']) buildHash.update(f + '\0' + src(f).replace(/\r\n/g, '\n') + '\0');
 buildHash.update(fs.readFileSync(__filename, 'utf8').replace(/\r\n/g, '\n'));
 const buildId = buildHash.digest('hex');
-const code = 'window.LOS_BUILD = ' + JSON.stringify(buildId) + ';\n;\n' + scripts.map(src).join('\n;\n');
+const engineCode = engineScripts.map(src).join('\n;\n');
+const code = 'window.LOS_BUILD = ' + JSON.stringify(buildId) + ';\n;\n' + appScripts.map(src).join('\n;\n');
 const page = (assetsJs) => {
   const js = assetsJs + '\n;\n' + code;
-  if (/<\/script/i.test(js)) throw new Error('Il JS contiene </script>');
-  return src('shell.html').replace('/*@CSS@*/', () => src('style.css')).replace('/*@JS@*/', () => js);
+  if (/<\/script/i.test(js + engineCode)) throw new Error('Il JS contiene </script>');
+  return src('shell.html').replace('/*@CSS@*/', () => src('style.css')).replace('/*@ENGINE@*/', () => engineCode).replace('/*@JS@*/', () => js);
 };
 fs.rmSync(path.join(DOCS, 'img'), { recursive: true, force: true });
 const html = page(assetsFor(inline));

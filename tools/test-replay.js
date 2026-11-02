@@ -7,7 +7,7 @@ for (const f of ['data-core.js', 'data-themes.js', ...fs.readdirSync(path.join(s
 const L = globalThis.LOS, D = globalThis.LOS_DATA, code = fs.readFileSync(path.join(src, 'replay.js'), 'utf8');
 function storage() {
   const data = new Map();
-  return { data, quota: Infinity, getItem: (k) => data.has(k) ? data.get(k) : null,
+  return { data, quota: Infinity, get length() { return data.size; }, key: (i) => [...data.keys()][i] || null, getItem: (k) => data.has(k) ? data.get(k) : null,
     setItem(k, v) { if (Buffer.byteLength(v) > this.quota) throw new Error('QuotaExceededError'); data.set(k, String(v)); } };
 }
 function indexedDB() {
@@ -31,6 +31,8 @@ function indexedDB() {
       }); return req;
     };
     tx.objectStore = () => ({ get: (id) => request(() => data.has(id) ? structuredClone(data.get(id)) : undefined),
+      getAll: () => request(() => [...data.values()].map((x) => structuredClone(x))),
+      put: (value, id) => request(() => { pending.set(id, structuredClone(value)); return id; }),
       add: (value, id) => request(() => { if (data.has(id) || pending.has(id)) throw new Error('ConstraintError'); pending.set(id, structuredClone(value)); return id; }) });
     return tx;
   } };
@@ -151,6 +153,38 @@ async function test(name, run) { await run(); passed++; console.log('  OK ' + na
       (r) => { r.stats.stories = [null]; },
     ];
     for (const change of changes) { const r = structuredClone(original); change(r); assert.equal(replay.validate(r), false); await assert.rejects(replay.save(replay.createId(), r), /non è valido/); }
+  });
+  await test('L’archivio elenca e rinomina senza modificare risultato, regole o impronta', async () => {
+    const idb = indexedDB(), { replay } = context({ idb }), id = replay.createId();
+    const configuration = { theme: 'classico', seed: original.seed, custom: [], difficulty: 'alta', teamWin: true };
+    await replay.save(id, original, { title: 'Prima partita', configuration, createdAt: 123 });
+    await replay.save(replay.createId(), result('scifi'), { title: 'Seconda partita', createdAt: 456 });
+    const entries = await replay.list(); assert.equal(entries.length, 2); assert.equal(entries[0].title, 'Seconda partita');
+    await replay.rename(id, 'La mia partita');
+    assert.equal((await replay.list())[1].title, 'La mia partita'); assert.deepEqual(await replay.load(id), original);
+    assert.deepEqual((await replay.entry(id)).configuration, configuration); assert.equal((await replay.entry(id)).createdAt, 123);
+    idb.failWrites = true; await assert.rejects(replay.rename(id, 'Non salvato'));
+    assert.equal((await replay.entry(id)).title, 'La mia partita');
+  });
+  await test('Il replay esportato si importa con un nuovo ID conservando la storia completa', async () => {
+    const first = context({ idb: indexedDB() }).replay, id = first.createId();
+    await first.save(id, original, { title: 'Viaggio', createdAt: 123, buildId: 'origine', configuration: { custom: [], seed: original.seed } });
+    const raw = await first.exportReplay(id), second = context({ idb: indexedDB() }).replay;
+    const importedId = await second.importReplay(raw); assert.notEqual(importedId, id);
+    assert.deepEqual(await second.load(importedId), original);
+    const e = await second.entry(importedId); assert.equal(e.title, 'Viaggio'); assert.equal(e.buildId, 'origine'); assert.equal(e.createdAt, 123);
+    const corrupt = JSON.parse(raw); corrupt.snapshot.result.phases[0].events[0].html = '<img src=x onerror=alert(1)>';
+    await assert.rejects(second.importReplay(JSON.stringify(corrupt)), /non valido/);
+    await assert.rejects(second.importReplay('null'), /non valido/);
+    assert.equal((await second.list()).length, 1); assert.deepEqual(await second.load(importedId), original);
+  });
+  await test('Elenco, nome ed esportazione funzionano anche nel ripiego locale', async () => {
+    const { replay, local } = context(), id = replay.createId(); await replay.save(id, original);
+    assert.equal((await replay.list()).length, 1); await replay.rename(id, 'Portatile');
+    assert.equal((await replay.entry(id)).title, 'Portatile');
+    const imported = await replay.importReplay(await replay.exportReplay(id)); assert.deepEqual(await replay.load(imported), original);
+    assert.equal((await replay.list()).length, 2);
+    local.data.set('last-one-standing:replay:v1:rotto', '{'); assert.equal((await replay.list()).length, 2);
   });
   await test('Il digest di build precede il modulo replay, che precede l’interfaccia', () => {
     const build = fs.readFileSync(path.join(__dirname, 'build.js'), 'utf8');

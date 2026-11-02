@@ -14,7 +14,7 @@ function fixture() {
   const original = result();
   const c = {
     S: { run: { cfg: { seed: 'originale' }, phase: 3, seen: 5, replayId: 'r-originale' }, cast: ['cast conservato'], settings: { theme: 'classico' } },
-    SIM: null, BY: {}, runGeneration: 0, THEMES: { classico: {} },
+    SIM: null, BY: {}, runGeneration: 0, RUNNER: null, THEMES: { classico: {} },
     own: (o, k) => Object.prototype.hasOwnProperty.call(o, k), load: { warning: '' }, saves: 0, simulations: 0, stored: [], messages: [],
     save: () => c.saves++, toast: (s) => c.messages.push(s),
     REPLAY: { createId: () => 'r-nuovo', load: async () => structuredClone(original), save: async (id, value) => { c.stored.push({ id, value }); } },

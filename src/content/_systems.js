@@ -268,7 +268,7 @@
 2 save:A>B | {A} trascina {B} al sicuro mentre tutto crolla.
 2 couple:AB | {A} e {B} si stringono e aspettano che passi. Passa.
 2 grudge:A>B k:A>B *2 | Nel caos generale, {A} ne approfitta per regolare i conti con {B}. Per {caro:A}.
-2 hit:A>B | Nel fuggi fuggi, {A} spinge {B} a terra per passare per prim[A:o/a].
+2 hit:A>B | Nel caos della fuga, {A} spinge {B} a terra per passare per prim[A:o/a].
 `,
       sponsor: `
 1 +med:A @gift | Un drone degli sponsor recapita a {A} un kit medico con un biglietto: "Siamo tutti con te".

@@ -52,6 +52,7 @@
     <div class="wrap">
       <div class="facts" id="facts"></div>
       <div class="resume" id="resume" hidden></div>
+      <div class="archive-launch"><button class="btn" type="button" id="btnArchive">Archivio partite e replay</button></div>
       <div class="howto">
         <div class="how"><span class="hn">1</span><h3>Crea il cast</h3><p>Nomi, genere, squadre, tratti e foto. Puoi incollare un elenco di nomi o generarne uno.</p></div>
         <div class="how"><span class="hn">2</span><h3>Scegli l'arena</h3><p>Nove mondi con armi, luoghi, mostri e disastri propri. Decidi la difficoltà e il seme.</p></div>
@@ -134,10 +135,10 @@
       </div>
       <aside class="rules card" aria-labelledby="h-rules">
         <h2 id="h-rules">Regole</h2>
-        <div class="field"><span>Difficoltà</span><div class="diffs" id="diffSeg" role="radiogroup" aria-label="Difficoltà"></div></div>
+        <div class="field"><span>Difficoltà</span><div class="diffs" id="diffSeg" role="radiogroup" aria-label="Difficoltà" aria-describedby="difficultyHelp"></div><p class="help" id="difficultyHelp">Regola soprattutto la frequenza delle eliminazioni e dei disastri. Le caratteristiche del cast continuano a contare.</p></div>
         <label class="field" for="maxDays"><span>Durata massima · <b id="maxDaysOut"></b> giorni</span><input type="range" id="maxDays" min="5" max="40" step="1"><small class="help">Allo scadere scatta lo scontro finale.</small></label>
-        <label class="switch" for="teamsAllied"><input type="checkbox" id="teamsAllied" role="switch"><span class="sw" aria-hidden="true"></span><span>Compagni di squadra alleati<small>All'inizio chi è nella stessa squadra forma un'alleanza.</small></span></label>
-        <label class="switch" for="teamWin"><input type="checkbox" id="teamWin" role="switch"><span class="sw" aria-hidden="true"></span><span>Vittoria di squadra<small>Si vince quando restano solo membri della stessa squadra.</small></span></label>
+        <label class="switch" for="teamsAllied"><input type="checkbox" id="teamsAllied" role="switch"><span class="sw" aria-hidden="true"></span><span>Compagni di squadra alleati<small>Chi è nella stessa squadra comincia in alleanza. Le alleanze possono cambiare durante la partita; la squadra rimane la stessa.</small></span></label>
+        <label class="switch" for="teamWin"><input type="checkbox" id="teamWin" role="switch"><span class="sw" aria-hidden="true"></span><span>Vittoria di squadra<small>La partita termina quando restano solo membri della stessa squadra, anche se le alleanze sono cambiate. Con una sola squadra termina subito.</small></span></label>
         <div class="adultbox" id="adultBox">
           <label class="switch" for="adult"><input type="checkbox" id="adult" role="switch"><span class="sw adult" aria-hidden="true"></span><span>Contenuti 18+ <span class="tag18">18+</span><small id="adultNote">Violenza esplicita, linguaggio volgare, alcol e sostanze, allusioni sessuali tra adulti.</small></span></label>
           <div class="confirm18" id="adultConfirm" hidden>
@@ -182,13 +183,21 @@
         <div class="tally" id="tally" aria-hidden="true"></div>
       </div>
       <div class="timeline" id="timeline" aria-label="Fasi della partita"></div>
+      <details class="reading-options card">
+        <summary>Opzioni di lettura</summary>
+        <label><input type="checkbox" id="hideFuture"> Nascondi gli eventi futuri e la durata totale</label>
+        <label><input type="checkbox" id="adaptivePlay"> Adatta la riproduzione alla quantità di testo</label>
+        <label><input type="checkbox" id="reduceMotion"> Riduci le animazioni</label>
+        <p class="help" id="motionNote">Le preferenze del sistema sulle animazioni vengono sempre rispettate.</p>
+      </details>
+      <div id="phaseAnnouncement" class="sr-only" role="status" aria-live="polite" aria-atomic="true"></div>
       <div class="livegrid">
-        <div class="livefeed" id="phBody" aria-live="polite"></div>
+        <div class="livefeed" id="phBody" role="region" aria-labelledby="phTitle"></div>
         <aside class="sidepanel card">
           <div class="stabs" role="tablist" aria-label="Pannello laterale">
-            <button role="tab" type="button" data-s="map">Mappa</button><button role="tab" type="button" data-s="fallen">Caduti</button><button role="tab" type="button" data-s="alive">In gara</button><button role="tab" type="button" data-s="allies">Legami</button>
+            <button role="tab" type="button" id="side-tab-map" aria-controls="sideBody" aria-selected="true" data-s="map">Mappa</button><button role="tab" type="button" id="side-tab-fallen" aria-controls="sideBody" aria-selected="false" tabindex="-1" data-s="fallen">Caduti</button><button role="tab" type="button" id="side-tab-alive" aria-controls="sideBody" aria-selected="false" tabindex="-1" data-s="alive">In gara</button><button role="tab" type="button" id="side-tab-allies" aria-controls="sideBody" aria-selected="false" tabindex="-1" data-s="allies">Legami</button>
           </div>
-          <div class="sbody" id="sideBody"></div>
+          <div class="sbody" id="sideBody" role="tabpanel" aria-labelledby="side-tab-map" tabindex="0"></div>
         </aside>
       </div>
       <div class="player">
@@ -242,6 +251,22 @@
 
 <dialog id="editDlg" class="drawer" aria-labelledby="h-edit"><div id="editBody"></div></dialog>
 <dialog id="profDlg" class="drawer" aria-labelledby="h-prof"><div id="profBody"></div></dialog>
+<dialog id="archiveDlg" aria-labelledby="h-archive">
+  <div class="dlgbody archive-dialog">
+    <div class="row between"><h2 id="h-archive">Archivio partite</h2><button class="iconbtn" type="button" data-close aria-label="Chiudi archivio">✕</button></div>
+    <p class="help">Le partite restano su questo browser. Esporta un replay completo per conservarlo altrove o riaprirlo su un altro dispositivo.</p>
+    <div id="archiveList"></div>
+    <button class="btn sm" type="button" id="archiveCompare">Confronta le due partite selezionate</button>
+    <div id="archiveComparison"></div>
+    <details id="replayIO"><summary>Importa o esporta un replay completo</summary>
+      <label for="replayText">JSON del replay</label><textarea id="replayText" rows="7" spellcheck="false" placeholder="Incolla qui un replay esportato da questo gioco"></textarea>
+      <div class="row"><button class="btn" type="button" id="archiveImport">Importa replay</button><button class="btn" type="button" id="archiveCopy">Copia JSON</button><button class="btn" type="button" id="archiveDownload">Scarica JSON</button></div>
+    </details>
+    <p id="archiveMsg" class="help" role="status"></p>
+  </div>
+</dialog>
 <div class="toast" id="toast" hidden role="status"></div>
+<div class="sim-progress card" id="simProgress" hidden role="status"><span>La partita prende forma…</span><button class="btn sm" type="button" id="cancelSim">Annulla il calcolo</button></div>
 
+<script id="simulation-source">/*@ENGINE@*/</script>
 <script>/*@JS@*/</script>
