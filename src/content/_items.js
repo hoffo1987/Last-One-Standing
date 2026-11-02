@@ -80,15 +80,15 @@
     rel: { amore: 'Amore', cotta: 'Cotta segreta', vendetta: 'Vendetta', amico: 'Amico fidato', simpatia: 'Simpatia', alleato: 'Alleato', debito: 'In debito', nemico: 'Nemico', diffida: 'Diffidenza', conoscente: 'Conoscente', complotto: 'Bersaglio segreto' },
     /* ricordi dei rapporti, in prima persona (dal punto di vista di chi ricorda) */
     mem: {
-      saved: 'Mi ha salvato la vita.', cured: 'Mi ha curato.', shared: 'Ha diviso il cibo con me.', denied: 'Mi ha negato il cibo.', robbed: 'Mi ha derubato.',
-      hit: 'Mi ha ferito.', killedDear: 'Ha ucciso {2}.', allied: 'Abbiamo stretto un\'alleanza.', betrayed: 'Mi ha tradito.', gift: 'Mi ha fatto un regalo.',
+      saved: 'Mi ha salvato la vita.', cured: 'Mi ha permesso di riprendermi.', shared: 'Ha diviso il cibo con me.', denied: 'Mi ha negato il cibo.', robbed: 'Ha rubato le mie cose.',
+      hit: 'Mi ha fatto del male.', killedDear: 'Ha ucciso {2}.', allied: 'Abbiamo stretto un\'alleanza.', betrayed: 'Ha tradito la mia fiducia.', gift: 'Mi ha fatto un regalo.',
       love: 'Tra noi è nato un amore.', repaid: 'Ha saldato il suo debito.', forgave: 'Ho deciso di perdonare.', traded: 'Abbiamo fatto affari.', fleeced: 'Mi ha spennato.',
-      warned: 'Mi ha avvisato di un tradimento.', exposed: 'Ha svelato il mio piano.', mediated: 'Ha messo pace tra noi.', trap: 'La sua trappola mi ha quasi ucciso.',
-      expelled: 'Mi ha cacciato dal gruppo.', comforted: 'Mi ha confortato nel momento peggiore.', tried: 'Ha cercato di uccidermi.', bullied: 'Mi ha preso le cose con la forza.',
-      brawl: 'Ci siamo presi a botte.', rejected: 'Mi ha detto di no.', healedStranger: 'Mi ha aiutato senza chiedere niente.', letter: 'Mi ha scritto una lettera.',
-      jealous: 'Sta con la persona che amo.', nightTheft: 'Mi ha svuotato lo zaino di notte.', oath: 'Ha giurato di proteggermi.', recruited: 'Mi ha voluto nel suo gruppo.',
+      warned: 'Mi ha dato notizia di un tradimento.', exposed: 'Ha svelato il mio piano.', mediated: 'Ha messo pace tra noi.', trap: 'La sua trappola ha quasi messo fine alla mia vita.',
+      expelled: 'Ha deciso la mia espulsione dal gruppo.', comforted: 'Mi ha dato conforto nel momento peggiore.', tried: 'Ha cercato di uccidermi.', bullied: 'Mi ha preso le cose con la forza.',
+      brawl: 'Abbiamo fatto a botte.', rejected: 'Mi ha detto di no.', healedStranger: 'Ha offerto aiuto senza chiedere niente.', letter: 'Mi ha scritto una lettera.',
+      jealous: 'Sta con la persona che amo.', nightTheft: 'Mi ha svuotato lo zaino di notte.', oath: 'Ha giurato di proteggermi.', recruited: 'Mi ha offerto un posto nel suo gruppo.',
     },
-    memSoft: { hit: 'Mi ha umiliato.', killedDear: 'Ha fatto fuori {2}.', tried: 'Ha cercato di farmi fuori.', brawl: 'Abbiamo litigato davanti a tutti.', trap: 'Ho abboccato in pieno.' },
+    memSoft: { hit: 'Ha infangato la mia reputazione.', killedDear: 'Ha fatto fuori {2}.', tried: 'Ha cercato di farmi fuori.', brawl: 'Abbiamo litigato davanti a tutti.', trap: 'Ho abboccato in pieno.' },
 
     /* azioni notturne guidate da tratti e caratteristiche */
     acts: {

@@ -136,8 +136,8 @@
     const m = (snap.mind || {})[t.id]; const v = (snap.vit || {})[t.id]; const st = snap.st[t.id] || [];
     const zone = theme.lex.luogo[snap.zones[t.id]] || '';
     const bits = [];
-    if (v) { if (v[0] < 25) bits.push('ridott' + G3(t.gender, 'o', 'a', 'ə') + ' male'); else if (v[0] < 55) bits.push('ferit' + G3(t.gender, 'o', 'a', 'ə')); if (v[3] < 25) bits.push('affamat' + G3(t.gender, 'o', 'a', 'ə')); if (v[1] < 22) bits.push('sfinit' + G3(t.gender, 'o', 'a', 'ə')); if (v[2] < 22) bits.push('a pezzi'); else if (v[2] >= 80) bits.push('carichissim' + G3(t.gender, 'o', 'a', 'ə')); }
-    if (st.includes('ubriaco')) bits.push('ubriac' + G3(t.gender, 'o', 'a', 'ə'));
+    if (v) { if (v[0] < 25) bits.push(theme.soft ? 'con la reputazione a pezzi' : 'ridott' + G3(t.gender, 'o', 'a', 'ə') + ' male'); else if (v[0] < 55) bits.push(statusLabel('ferito', t, theme).toLowerCase()); if (v[3] < 25) bits.push('affamat' + G3(t.gender, 'o', 'a', 'ə')); if (v[1] < 22) bits.push('sfinit' + G3(t.gender, 'o', 'a', 'ə')); if (v[2] < 22) bits.push('a pezzi'); else if (v[2] >= 80) bits.push('carichissim' + G3(t.gender, 'o', 'a', 'ə')); }
+    if (st.includes('ubriaco')) bits.push(statusLabel('ubriaco', t, theme).toLowerCase());
     const allies = snap.allies[t.id] != null ? snap.alive.filter((x) => x !== t.id && snap.allies[x] === snap.allies[t.id]).length : 0;
     const where = zone ? zone.replace(/^(il |lo |la |l'|i |gli |le )/i, (a) => a.toLowerCase()) : '';
     const lead = (where ? 'A ' + where : 'In gara') + (bits.length ? ', ' + bits.join(', ') : '') + (allies ? ', con ' + plural(allies, 'alleato', 'alleati') : ', da sol' + G3(t.gender, 'o', 'a', 'ə')) + '.';

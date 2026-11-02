@@ -1331,7 +1331,7 @@ img.scene { object-fit: cover; object-position: center; user-select: none; }
 
 <script>window.LOS_ASSETS = {"logo":"img/logo.f2d5175789.webp","icona":"img/icona.8b02ddeb49.webp","favicon":"img/favicon.86774dc7cf.png","panoramica":"img/panoramica.66c4c27255.webp","sagome":["img/sagome-cappuccio.e8876ba986.webp","img/sagome-esploratore.9a99fd13f8.webp","img/sagome-viaggiatore.5e36435604.webp"],"arene":{"classico":"img/arene-classico.42c6ba42ee.webp","fantasy":"img/arene-fantasy.75b7fb0d32.webp","horror":"img/arene-horror.48052d80b4.webp","liceo":"img/arene-liceo.05ed578a90.webp","royale":"img/arene-royale.36c9952cd7.webp","scifi":"img/arene-scifi.403694f00f.webp","ufficio":"img/arene-ufficio.67b271bea3.webp","wasteland":"img/arene-wasteland.889002ace8.webp","zombie":"img/arene-zombie.36c9135a12.webp"}};
 ;
-window.LOS_BUILD = "b9285574464fc37af371fb8886b12c073e83e3058ef61ab257f6c8f2f1713ed1";
+window.LOS_BUILD = "4fe15ce6efb4ae8e931c63dc120c9ac9f4b2e0271d18f6aa96c23ebb05ca65b1";
 ;
 /* Last One Standing — eventi di base (italiano).
  * Formato riga:  <n> <tag...> | <testo>
@@ -2750,15 +2750,15 @@ window.LOS_BUILD = "b9285574464fc37af371fb8886b12c073e83e3058ef61ab257f6c8f2f171
     rel: { amore: 'Amore', cotta: 'Cotta segreta', vendetta: 'Vendetta', amico: 'Amico fidato', simpatia: 'Simpatia', alleato: 'Alleato', debito: 'In debito', nemico: 'Nemico', diffida: 'Diffidenza', conoscente: 'Conoscente', complotto: 'Bersaglio segreto' },
     /* ricordi dei rapporti, in prima persona (dal punto di vista di chi ricorda) */
     mem: {
-      saved: 'Mi ha salvato la vita.', cured: 'Mi ha curato.', shared: 'Ha diviso il cibo con me.', denied: 'Mi ha negato il cibo.', robbed: 'Mi ha derubato.',
-      hit: 'Mi ha ferito.', killedDear: 'Ha ucciso {2}.', allied: 'Abbiamo stretto un\'alleanza.', betrayed: 'Mi ha tradito.', gift: 'Mi ha fatto un regalo.',
+      saved: 'Mi ha salvato la vita.', cured: 'Mi ha permesso di riprendermi.', shared: 'Ha diviso il cibo con me.', denied: 'Mi ha negato il cibo.', robbed: 'Ha rubato le mie cose.',
+      hit: 'Mi ha fatto del male.', killedDear: 'Ha ucciso {2}.', allied: 'Abbiamo stretto un\'alleanza.', betrayed: 'Ha tradito la mia fiducia.', gift: 'Mi ha fatto un regalo.',
       love: 'Tra noi è nato un amore.', repaid: 'Ha saldato il suo debito.', forgave: 'Ho deciso di perdonare.', traded: 'Abbiamo fatto affari.', fleeced: 'Mi ha spennato.',
-      warned: 'Mi ha avvisato di un tradimento.', exposed: 'Ha svelato il mio piano.', mediated: 'Ha messo pace tra noi.', trap: 'La sua trappola mi ha quasi ucciso.',
-      expelled: 'Mi ha cacciato dal gruppo.', comforted: 'Mi ha confortato nel momento peggiore.', tried: 'Ha cercato di uccidermi.', bullied: 'Mi ha preso le cose con la forza.',
-      brawl: 'Ci siamo presi a botte.', rejected: 'Mi ha detto di no.', healedStranger: 'Mi ha aiutato senza chiedere niente.', letter: 'Mi ha scritto una lettera.',
-      jealous: 'Sta con la persona che amo.', nightTheft: 'Mi ha svuotato lo zaino di notte.', oath: 'Ha giurato di proteggermi.', recruited: 'Mi ha voluto nel suo gruppo.',
+      warned: 'Mi ha dato notizia di un tradimento.', exposed: 'Ha svelato il mio piano.', mediated: 'Ha messo pace tra noi.', trap: 'La sua trappola ha quasi messo fine alla mia vita.',
+      expelled: 'Ha deciso la mia espulsione dal gruppo.', comforted: 'Mi ha dato conforto nel momento peggiore.', tried: 'Ha cercato di uccidermi.', bullied: 'Mi ha preso le cose con la forza.',
+      brawl: 'Abbiamo fatto a botte.', rejected: 'Mi ha detto di no.', healedStranger: 'Ha offerto aiuto senza chiedere niente.', letter: 'Mi ha scritto una lettera.',
+      jealous: 'Sta con la persona che amo.', nightTheft: 'Mi ha svuotato lo zaino di notte.', oath: 'Ha giurato di proteggermi.', recruited: 'Mi ha offerto un posto nel suo gruppo.',
     },
-    memSoft: { hit: 'Mi ha umiliato.', killedDear: 'Ha fatto fuori {2}.', tried: 'Ha cercato di farmi fuori.', brawl: 'Abbiamo litigato davanti a tutti.', trap: 'Ho abboccato in pieno.' },
+    memSoft: { hit: 'Ha infangato la mia reputazione.', killedDear: 'Ha fatto fuori {2}.', tried: 'Ha cercato di farmi fuori.', brawl: 'Abbiamo litigato davanti a tutti.', trap: 'Ho abboccato in pieno.' },
 
     /* azioni notturne guidate da tratti e caratteristiche */
     acts: {
@@ -2943,11 +2943,11 @@ window.LOS_BUILD = "b9285574464fc37af371fb8886b12c073e83e3058ef61ab257f6c8f2f171
     /* nuovi ricordi, in prima persona */
     mem: {
       sawKill: 'Ho visto questa persona uccidere {2}.', sawSave: 'Ho visto questa persona salvare {2}.', rumorBad: 'Ho sentito cose brutte sul suo conto.', rumorGood: 'Tutti ne parlano bene.',
-      rumorFear: 'Mi hanno detto di starle alla larga.', promise: 'Ci siamo fatti una promessa.', promiseKept: 'Ha mantenuto la promessa.', promiseBroken: 'Mi aveva promesso una cosa. Non l\'ha mantenuta.',
+      rumorFear: 'Mi hanno detto di starle alla larga.', promise: 'Abbiamo fatto una promessa.', promiseKept: 'Ha mantenuto la promessa.', promiseBroken: 'Mi aveva promesso una cosa. Non l\'ha mantenuta.',
       spared: 'Poteva uccidermi. Non l\'ha fatto.', sparedThem: 'Ho avuto la sua vita in mano. L\'ho lasciata andare.', breakup: 'La nostra storia è finita.', reunion: 'La nostra coppia si è ricomposta.',
-      rivalLove: 'Ci piace la stessa persona.', coalition: 'Ci siamo uniti contro {2}.', mentor: 'Mi ha insegnato come sopravvivere.', student: 'Ho insegnato tutto quello che so.',
+      rivalLove: 'Ci piace la stessa persona.', coalition: 'Abbiamo fatto fronte comune contro {2}.', mentor: 'Mi ha insegnato come sopravvivere.', student: 'Ho insegnato tutto quello che so.',
       fought: 'Abbiamo combattuto fianco a fianco.', submitted: 'Ho chiesto la sua protezione.', protector: 'Mi ha chiesto protezione.', liedTo: 'Mi ha raccontato una bugia.',
-      hardship: 'Siamo sopravvissuti insieme al peggio.', split: 'Per colpa sua il gruppo si è spaccato.', guilt: 'Il male che ho fatto non me lo perdono.',
+      hardship: 'Abbiamo superato insieme il peggio.', split: 'Per colpa sua il gruppo si è spaccato.', guilt: 'Il male che ho fatto non me lo perdono.',
     },
     memSoft: { sawKill: 'Ho visto questa persona far fuori {2}.', spared: 'Poteva farmi fuori. Non l\'ha fatto.', sparedThem: 'Potevo mettere fine alla sua gara. Ho scelto di fermarmi.', fought: 'Ci siamo coperti a vicenda.' },
 
@@ -10033,8 +10033,8 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
     const m = (snap.mind || {})[t.id]; const v = (snap.vit || {})[t.id]; const st = snap.st[t.id] || [];
     const zone = theme.lex.luogo[snap.zones[t.id]] || '';
     const bits = [];
-    if (v) { if (v[0] < 25) bits.push('ridott' + G3(t.gender, 'o', 'a', 'ə') + ' male'); else if (v[0] < 55) bits.push('ferit' + G3(t.gender, 'o', 'a', 'ə')); if (v[3] < 25) bits.push('affamat' + G3(t.gender, 'o', 'a', 'ə')); if (v[1] < 22) bits.push('sfinit' + G3(t.gender, 'o', 'a', 'ə')); if (v[2] < 22) bits.push('a pezzi'); else if (v[2] >= 80) bits.push('carichissim' + G3(t.gender, 'o', 'a', 'ə')); }
-    if (st.includes('ubriaco')) bits.push('ubriac' + G3(t.gender, 'o', 'a', 'ə'));
+    if (v) { if (v[0] < 25) bits.push(theme.soft ? 'con la reputazione a pezzi' : 'ridott' + G3(t.gender, 'o', 'a', 'ə') + ' male'); else if (v[0] < 55) bits.push(statusLabel('ferito', t, theme).toLowerCase()); if (v[3] < 25) bits.push('affamat' + G3(t.gender, 'o', 'a', 'ə')); if (v[1] < 22) bits.push('sfinit' + G3(t.gender, 'o', 'a', 'ə')); if (v[2] < 22) bits.push('a pezzi'); else if (v[2] >= 80) bits.push('carichissim' + G3(t.gender, 'o', 'a', 'ə')); }
+    if (st.includes('ubriaco')) bits.push(statusLabel('ubriaco', t, theme).toLowerCase());
     const allies = snap.allies[t.id] != null ? snap.alive.filter((x) => x !== t.id && snap.allies[x] === snap.allies[t.id]).length : 0;
     const where = zone ? zone.replace(/^(il |lo |la |l'|i |gli |le )/i, (a) => a.toLowerCase()) : '';
     const lead = (where ? 'A ' + where : 'In gara') + (bits.length ? ', ' + bits.join(', ') : '') + (allies ? ', con ' + plural(allies, 'alleato', 'alleati') : ', da sol' + G3(t.gender, 'o', 'a', 'ə')) + '.';

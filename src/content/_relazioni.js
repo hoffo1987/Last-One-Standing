@@ -55,11 +55,11 @@
     /* nuovi ricordi, in prima persona */
     mem: {
       sawKill: 'Ho visto questa persona uccidere {2}.', sawSave: 'Ho visto questa persona salvare {2}.', rumorBad: 'Ho sentito cose brutte sul suo conto.', rumorGood: 'Tutti ne parlano bene.',
-      rumorFear: 'Mi hanno detto di starle alla larga.', promise: 'Ci siamo fatti una promessa.', promiseKept: 'Ha mantenuto la promessa.', promiseBroken: 'Mi aveva promesso una cosa. Non l\'ha mantenuta.',
+      rumorFear: 'Mi hanno detto di starle alla larga.', promise: 'Abbiamo fatto una promessa.', promiseKept: 'Ha mantenuto la promessa.', promiseBroken: 'Mi aveva promesso una cosa. Non l\'ha mantenuta.',
       spared: 'Poteva uccidermi. Non l\'ha fatto.', sparedThem: 'Ho avuto la sua vita in mano. L\'ho lasciata andare.', breakup: 'La nostra storia è finita.', reunion: 'La nostra coppia si è ricomposta.',
-      rivalLove: 'Ci piace la stessa persona.', coalition: 'Ci siamo uniti contro {2}.', mentor: 'Mi ha insegnato come sopravvivere.', student: 'Ho insegnato tutto quello che so.',
+      rivalLove: 'Ci piace la stessa persona.', coalition: 'Abbiamo fatto fronte comune contro {2}.', mentor: 'Mi ha insegnato come sopravvivere.', student: 'Ho insegnato tutto quello che so.',
       fought: 'Abbiamo combattuto fianco a fianco.', submitted: 'Ho chiesto la sua protezione.', protector: 'Mi ha chiesto protezione.', liedTo: 'Mi ha raccontato una bugia.',
-      hardship: 'Siamo sopravvissuti insieme al peggio.', split: 'Per colpa sua il gruppo si è spaccato.', guilt: 'Il male che ho fatto non me lo perdono.',
+      hardship: 'Abbiamo superato insieme il peggio.', split: 'Per colpa sua il gruppo si è spaccato.', guilt: 'Il male che ho fatto non me lo perdono.',
     },
     memSoft: { sawKill: 'Ho visto questa persona far fuori {2}.', spared: 'Poteva farmi fuori. Non l\'ha fatto.', sparedThem: 'Potevo mettere fine alla sua gara. Ho scelto di fermarmi.', fought: 'Ci siamo coperti a vicenda.' },
 

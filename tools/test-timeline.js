@@ -12,6 +12,20 @@ const definitions = part('  function promisesHTML(', '  function nowHTML(') +
   part('  function attrHTML(', '  function relHTML(');
 let checks = 0;
 function test(name, fn) { fn(); checks++; console.log('  OK ' + name); }
+test('Il riepilogo Adesso usa le stesse condizioni delle etichette, secondo arena e genere', () => {
+  const c = { own: (o, k) => Object.prototype.hasOwnProperty.call(o, k),
+    G3: (g, m, f, n) => g === 'F' ? f : g === 'N' ? n : m,
+    plural: (n, s, p) => n + ' ' + (n === 1 ? s : p), esc: String, linkify: String, MND: { goals: {} }, L: { STATUS_LABEL: {} } };
+  vm.createContext(c); vm.runInContext(part('  function nowHTML(', '  function peopleHTML(') + part('  function statusLabel(', '  function vbars('), c);
+  const person = { id: 'a', gender: 'F' }, theme = { lex: { luogo: ['la Biblioteca'] }, soft: true };
+  const snapshot = { mind: {}, vit: { a: [45, 60, 50, 80, -1] }, st: { a: ['ubriaco'] }, zones: { a: 0 }, allies: {}, alive: ['a'] };
+  const soft = c.nowHTML(person, snapshot, 0, theme);
+  assert.match(soft, /in difficoltà/); assert.match(soft, /poca lucidità/); assert.doesNotMatch(soft, /ferita|ubriaca/);
+  const hard = c.nowHTML(person, snapshot, 0, { ...theme, soft: false });
+  assert.match(hard, /ferita/); assert.match(hard, /ubriaca/);
+  snapshot.vit.a[0] = 20;
+  assert.match(c.nowHTML(person, snapshot, 0, theme), /reputazione a pezzi/);
+});
 function fixture() {
   const a = { id: 'a', name: 'Alice', gender: 'F', team: 1, traits: [], attr: { int: 8 }, tests: 3, testsPassed: 2, alive: true, deathPhase: -1, deathDay: 0, promises: [], kills: 7, killerIds: [], diary: [] };
   const b = { ...a, id: 'b', name: 'Bruno', gender: 'M', promises: [] };
