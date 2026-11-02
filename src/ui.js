@@ -1223,14 +1223,14 @@
     if (st.shared) bits.push(plural(st.shared, 'pasto condiviso', 'pasti condivisi'));
     if (st.nursed) bits.push(plural(st.nursed, 'concorrente aiutato', 'concorrenti aiutati'));
     if (st.foraged) bits.push(plural(st.foraged, 'ricerca di cibo riuscita', 'ricerche di cibo riuscite'));
-    if (st.trapsSet) bits.push(plural(st.trapsSet, 'trappola piazzata', 'trappole piazzate') + ' (' + (st.trapHits || 0) + ' scattate)');
+    if (st.trapsSet) bits.push(plural(st.trapsSet, 'trappola piazzata', 'trappole piazzate') + ' (' + plural(st.trapHits || 0, 'scatto', 'scatti') + ')');
     if (st.beasts) bits.push(plural(st.beasts, 'aggressione notturna', 'aggressioni notturne'));
     if (st.infected) bits.push(plural(st.infected, 'contagio', 'contagi') + ', ' + plural(st.cured || 0, 'cura riuscita', 'cure riuscite'));
     if (st.tough) bits.push(plural(st.tough, 'eliminazione evitata per un soffio', 'eliminazioni evitate per un soffio'));
     if (st.broken) bits.push(plural(st.broken, 'arma rotta', 'armi rotte'));
     if (st.looted) bits.push(plural(st.looted, 'oggetto razziato', 'oggetti razziati'));
     if (st.trades) bits.push(plural(st.trades, 'scambio', 'scambi'));
-    if (st.promises) bits.push(plural(st.promises, 'promessa', 'promesse') + ' (' + (st.promisesKept || 0) + ' mantenute, ' + (st.promisesBroken || 0) + ' tradite)');
+    if (st.promises) bits.push(plural(st.promises, 'promessa', 'promesse') + ' (' + plural(st.promisesKept || 0, 'mantenuta', 'mantenute') + ', ' + plural(st.promisesBroken || 0, 'tradita', 'tradite') + ')');
     if (st.spared) bits.push(plural(st.spared, theme.soft ? 'rivale risparmiato' : 'vita risparmiata', theme.soft ? 'rivali risparmiati' : 'vite risparmiate'));
     if (st.gossip) bits.push(plural(st.gossip, 'voce di corridoio', 'voci di corridoio'));
     if (st.breakups) bits.push(plural(st.breakups, 'rottura', 'rotture'));
@@ -1238,6 +1238,17 @@
     const met = (st.meteo || []).map((x) => 'G' + x.day + ' ' + x.n);
     if (!c.length && !bits.length && !met.length) return '';
     return '<p class="help eco-sum">' + (c.length ? '<b>Cause registrate:</b> ' + esc(c.join(', ')) + '. ' : '') + (bits.length ? '<b>Conseguenze:</b> ' + esc(bits.join(' · ')) + '. ' : '') + (met.length ? '<b>Meteo:</b> ' + esc(met.join(' · ')) + '.' : '') + '</p>';
+  }
+  function resultStats(st, soft) {
+    const ends = plural(st.killDeaths, soft ? 'eliminazione attribuita a un rivale' : 'morte per mano altrui', soft ? 'eliminazioni attribuite a un rivale' : 'morti per mano altrui') + ', ' +
+      plural(st.envDeaths, soft ? 'eliminazione dovuta all\'arena' : 'morte dovuta all\'arena', soft ? 'eliminazioni dovute all\'arena' : 'morti dovute all\'arena');
+    const counters = [
+      ['alliances', 'alleanza', 'alleanze'], ['betrayals', 'tradimento', 'tradimenti'], ['revenges', 'vendetta', 'vendette'],
+      ['couples', 'coppia', 'coppie'], ['debtsRepaid', 'debito saldato', 'debiti saldati'], ['amulets', 'salvataggio miracoloso', 'salvataggi miracolosi'],
+      ['sponsors', 'dono degli sponsor', 'doni degli sponsor'],
+    ].map(([k, single, many]) => plural(st[k] || 0, single, many));
+    counters.push(plural(st.testsPassed || 0, 'prova superata', 'prove superate') + ' su ' + (st.tests || 0), plural(st.events, 'evento', 'eventi'));
+    return [ends, ...counters].join(' · ') + '.';
   }
   function renderResults() {
     $('#resEmpty').hidden = !!SIM; $('#resBody').hidden = !SIM;
@@ -1325,7 +1336,7 @@
         '<section class="block card"><h2>Momenti salienti</h2>' + hlH + '</section>' +
         '<section class="block card"><h2>Classifica completa</h2><div class="tablewrap"><table><thead><tr><th>Pos.</th><th>Concorrente</th><th>Sq.</th><th>' + (soft ? 'Elim.' : 'Ucc.') + '</th><th>' + (soft ? 'Eliminazione attribuita a' : 'Per mano di') + '</th><th>Giorno</th><th>Come è andata</th></tr></thead><tbody>' + rows + '</tbody></table></div></section>' +
       '</div><div>' +
-        '<section class="block card"><h2>Concorrenti in gara nel tempo</h2>' + chart + '<p class="help" style="margin-top:8px">' + st.killDeaths + ' ' + (soft ? 'eliminati da un rivale' : 'morti per mano altrui') + ', ' + st.envDeaths + ' per colpa dell\'arena · ' + st.alliances + ' alleanze · ' + st.betrayals + ' tradimenti · ' + (st.revenges || 0) + ' vendette · ' + (st.couples || 0) + ' coppie · ' + (st.debtsRepaid || 0) + ' debiti saldati · ' + (st.amulets || 0) + ' salvataggi miracolosi · ' + (st.sponsors || 0) + ' doni degli sponsor · ' + (st.testsPassed || 0) + ' prove superate su ' + (st.tests || 0) + ' · ' + st.events + ' eventi.</p>' + ecoSummary(st, theme) + '</section>' + storiesHTML(st, soft) +
+        '<section class="block card"><h2>Concorrenti in gara nel tempo</h2>' + chart + '<p class="help" style="margin-top:8px">' + esc(resultStats(st, soft)) + '</p>' + ecoSummary(st, theme) + '</section>' + storiesHTML(st, soft) +
         '<section class="block card"><h2>' + (soft ? 'Chi ha eliminato di più' : 'Chi ha ucciso di più') + '</h2><div class="bars">' + kbars + '</div></section>' +
         '<section class="block card posterbox"><h2>Locandina</h2><img id="posterImg" alt="Locandina della partita"><p class="help" style="margin-top:8px">Tieni premuto sull\'immagine, o clic destro, per salvarla.</p></section>' +
       '</div></div>';
@@ -1346,7 +1357,7 @@
   }
   function summaryText() {
     const theme = THEMES[SIM.theme], W = SIM.winners.map((id) => BY[id]);
-    const lines = ['LAST ONE STANDING · ' + theme.name, SIM.tributes.length + ' concorrenti · ' + SIM.days + ' giorni · seme ' + SIM.seed, ''];
+    const lines = ['LAST ONE STANDING · ' + theme.name, SIM.tributes.length + ' concorrenti · ' + plural(SIM.days, 'giorno', 'giorni') + ' · seme ' + SIM.seed, ''];
     if (W.length === 1) lines.push(G3(W[0].gender, 'Ultimo', 'Ultima', 'Ultimə') + ' in piedi: ' + W[0].name + ' (' + W[0].kills + ')');
     else if (W.length) lines.push('Vince la squadra ' + W[0].team + ': ' + W.map((w) => w.name).join(', '));
     lines.push('', 'Classifica:');
@@ -1372,7 +1383,7 @@
     g.globalAlpha = 1;
     const disp = '"Big Shoulders Display", "Arial Narrow", sans-serif', mono = '"JetBrains Mono", monospace', body = 'Barlow, sans-serif';
     g.fillStyle = mute; g.font = '500 26px ' + mono; g.textAlign = 'left';
-    g.fillText((theme.name + ' · ' + SIM.days + ' giorni · ' + total + ' concorrenti').toUpperCase(), 90, 120);
+    g.fillText((theme.name + ' · ' + plural(SIM.days, 'giorno', 'giorni') + ' · ' + total + ' concorrenti').toUpperCase(), 90, 120);
     g.fillStyle = acc; g.font = '900 118px ' + disp;
     g.fillText(W.length === 1 ? G3(W[0].gender, 'ULTIMO IN PIEDI', 'ULTIMA IN PIEDI', 'ULTIMƏ IN PIEDI') : W.length ? 'SQUADRA ' + W[0].team : 'NESSUN SUPERSTITE', 84, 236);
     const loadImg = (src) => new Promise((res) => { const im = new Image(); im.onload = () => res(im); im.onerror = () => res(null); im.src = src; });
