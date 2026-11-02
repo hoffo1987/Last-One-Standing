@@ -11,6 +11,7 @@ descrive la provenienza documentata, senza attribuire una licenza alle immagini.
 | `assets/panoramica.webp`, `anteprima.jpg` | Illustrazione della home e anteprima per i link generate con imagegen per il progetto. |
 | `assets/sagome/*.webp` | Tre sagome generiche generate con imagegen per il progetto. |
 | SVG e icone prodotti da `src/art.js` e `src/ui.js` | Disegnati e conservati nel codice del progetto. |
+| `assets/arene/<arena>/<sezione>/*.webp` | Immagini della guida delle arene (luoghi, pericoli, armi, meteo, disastri, oggetti), da fornire; l'elenco completo è in [docs-dev/immagini-arene.md](docs-dev/immagini-arene.md). Finché mancano, `src/atlas.js` disegna illustrazioni vettoriali provvisorie. |
 
 Il registro di lavorazione dei pacchetti di immagini documenta la creazione il
 1 novembre 2026, con prompt conservati negli archivi originali di consegna. La
@@ -18,7 +19,7 @@ repo contiene le versioni ottimizzate usate dal sito, non tutti gli originali.
 L'origine e gli eventuali diritti delle immagini di riferimento non sono
 documentati nel repository; non viene dichiarata un'attribuzione non verificata.
 
-Barlow, Big Shoulders Display e JetBrains Mono vengono richiesti a Google Fonts
+Bricolage Grotesque, Figtree e JetBrains Mono vengono richiesti a Google Fonts
 dal markup del sito. Nessun file di questi caratteri è incluso nella repo.
 Le foto caricate dai giocatori restano nei loro browser e nei replay che
 decidono di esportare; non sono risorse distribuite con il gioco.

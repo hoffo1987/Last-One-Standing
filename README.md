@@ -119,7 +119,13 @@ Un interruttore nella sezione Arena, attivo solo dopo la conferma dell'età, agg
 - **Home** con partita lampo (24 concorrenti casuali, arena a sorpresa) e un tabellone dimostrativo animato.
 - **Concorrenti**: griglia o vista per squadra, nome modificabile sul posto, scheda laterale per tratti, caratteristiche e foto, elenco da incollare.
 - **Arena**: ogni arena ha la sua tinta che colora tutta l'app. Le nove locandine stanno in una griglia 3×3 (sul telefono in un carosello da sfogliare con il dito o con le frecce, che porta la scelta al centro).
-- **Scheda dell'arena**: intestazione illustrata, i numeri principali in grande (eventi, disastri, luoghi, tipi di oggetto) e cinque linguette navigabili con le frecce: *Il luogo* (luoghi, armi, pericoli), *Regole e meteo* (regola speciale, caratteristiche che contano, indicatore, ogni meteo con la sua descrizione), *Disastri* (con la loro descrizione), *Zaino* (i tredici tipi di oggetto) e *Assaggio* (tre momenti di una partita breve col tuo cast, con «Un altro assaggio»). Cambiando arena la linguetta resta quella scelta e i numeri scorrono al nuovo valore.
+- **Guida all'arena**: copertina illustrata, i numeri principali in grande e cinque capitoli navigabili anche con le frecce:
+  - *Mappa*: le zone con immagine e barre di risorse, pericolo e riparo (con «più ricca», «più pericolosa», «miglior riparo»), la regola speciale con il suo indicatore a lancetta e le caratteristiche che contano, l'armeria e i pericoli appesi come manifesti «ricercato».
+  - *Clima*: ogni meteo con illustrazione, descrizione ed effetti veri sul gioco (più cibo, più fatica, agguati più facili, l'indicatore che sale…).
+  - *Minacce*: i disastri con illustrazione e ricerca; toccandone uno si aprono i tre destini (non sopravvive, ne esce ferito, si salva) raccontati con un concorrente del tuo cast.
+  - *Zaino*: un inventario a caselle; ogni oggetto ha la sua scheda con i nomi che prende in quell'arena.
+  - *Anteprima*: una mini diretta con tre momenti di una partita breve e «Un altro assaggio».
+- **Immagini della guida**: ogni luogo, pericolo, arma, meteo, disastro e oggetto può avere un'immagine vera in `assets/arene/<arena>/<sezione>/<nome>.webp`; finché manca, `src/atlas.js` disegna un'illustrazione con i colori dell'arena, scelta per famiglia (fuoco, acqua, gelo, fulmini, bestie, sciami, magia, tecnologia, burocrazia, spettacolo…). `node tools/atlas-slots.js` scrive l'elenco completo dei file attesi, con formati, dimensioni, priorità e tracce, in [docs-dev/immagini-arene.md](docs-dev/immagini-arene.md) e in un CSV.
 - **Regole della partita**: difficoltà con un misuratore a tacche, durata con cursore e valore a parte, interruttori per le squadre e i contenuti 18+; seme e Laboratorio di bilanciamento sono raccolti in «Seme e strumenti».
 - **Barra di avvio** sempre visibile in basso: arena scelta, concorrenti, difficoltà e durata, con il pulsante «Avvia la simulazione».
 - **Diretta**: regia in stile televisivo, linea del tempo per giorni, mappa, caduti, alleanze, scheda di ogni concorrente con la sua storia, riproduzione automatica e tasti freccia.
@@ -152,6 +158,7 @@ src/content/pack-*.js    pacchetti per arena (eventi, disastri, 18+), condivisi 
 src/content/*.js         eventi aggiuntivi e disastri della versione precedente
 src/engine.js        motore di simulazione (funziona anche in Node)
 src/art.js           usa logo e illustrazioni da assets/ (con ripiego in SVG), icone, coriandoli
+src/atlas.js         immagini della guida delle arene: file in assets/arene/<arena>/ o illustrazioni vettoriali per famiglia
 assets/              logo, icona, panoramica, anteprima dei link, sagome dei concorrenti e illustrazioni delle 9 arene (ottimizzati e incorporati dalla build)
 src/anim.js          motore delle animazioni: atmosfere per arena, effetti degli eventi, transizioni, coriandoli
 src/replay.js        risultati immutabili nel browser, con IndexedDB e ripiego su localStorage
@@ -165,6 +172,7 @@ tools/build.js       crea dist/last-one-standing.html (file unico con immagini i
 tools/test-engine.js test del motore senza browser
 tools/lint-content.js controllo statico dei contenuti
 tools/fuzz.js        collaudo con partite casuali
+tools/atlas-slots.js elenca le immagini attese per la guida delle arene (docs-dev/immagini-arene.md e .csv)
 docs-dev/eventi.md   guida completa ai requisiti, effetti e testi degli eventi
 .github/workflows/quality.yml CI con regressioni, determinismo, fuzz e verifica della build
 ```

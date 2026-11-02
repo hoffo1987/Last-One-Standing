@@ -22,10 +22,23 @@ function assetsFor(uri) {
   const arene = {};
   fs.readdirSync(path.join(A, 'arene')).filter((f) => f.endsWith('.webp')).forEach((f) => (arene[f.replace('.webp', '')] = uri('arene/' + f, 'image/webp')));
   const sagome = fs.readdirSync(path.join(A, 'sagome')).filter((f) => f.endsWith('.webp')).sort().map((f) => uri('sagome/' + f, 'image/webp'));
-  return 'window.LOS_ASSETS = ' + JSON.stringify({ logo: uri('logo.webp', 'image/webp'), icona: uri('icona.webp', 'image/webp'), favicon: uri('favicon.png', 'image/png'), panoramica: uri('panoramica.webp', 'image/webp'), sagome, arene }) + ';';
+  // atlante: assets/arene/<arena>/<sezione>/<nome>.webp — solo nel sito, per non gonfiare il file unico
+  const atlas = {};
+  const MIME = { webp: 'image/webp', png: 'image/png', jpg: 'image/jpeg', jpeg: 'image/jpeg', avif: 'image/avif' };
+  if (uri === linked) {
+    fs.readdirSync(path.join(A, 'arene'), { withFileTypes: true }).filter((d) => d.isDirectory()).forEach((th) => {
+      fs.readdirSync(path.join(A, 'arene', th.name), { withFileTypes: true }).filter((d) => d.isDirectory()).forEach((kd) => {
+        fs.readdirSync(path.join(A, 'arene', th.name, kd.name)).forEach((f) => {
+          const m = f.match(/^(.+)\.(webp|png|jpe?g|avif)$/i); if (!m) return;
+          ((atlas[th.name] = atlas[th.name] || {})[kd.name] = atlas[th.name][kd.name] || {})[m[1].toLowerCase()] = uri('arene/' + th.name + '/' + kd.name + '/' + f, MIME[m[2].toLowerCase()]);
+        });
+      });
+    });
+  }
+  return 'window.LOS_ASSETS = ' + JSON.stringify({ logo: uri('logo.webp', 'image/webp'), icona: uri('icona.webp', 'image/webp'), favicon: uri('favicon.png', 'image/png'), panoramica: uri('panoramica.webp', 'image/webp'), sagome, arene, atlas }) + ';';
 }
 const engineScripts = ['data-core.js', 'data-themes.js', ...content, 'engine.js'];
-const appScripts = ['art.js', 'anim.js', 'simulator.js', 'replay.js', 'studio.js', 'ui.js'];
+const appScripts = ['art.js', 'atlas.js', 'anim.js', 'simulator.js', 'replay.js', 'studio.js', 'ui.js'];
 const scripts = [...engineScripts, ...appScripts];
 // Impronta dei sorgenti, indipendente dai fine riga del checkout e dagli output generati.
 const buildHash = require('crypto').createHash('sha256');

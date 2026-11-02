@@ -1136,87 +1136,211 @@
     renderPreview(); renderCustomForm(); renderCustomList(); renderStartSum();
     requestAnimationFrame(() => centerPoster($('#themeList [aria-checked="true"]'), false));
   }
-  // la scheda dell'arena: intestazione illustrata, numeri chiari e schede a linguette
-  let apvTab = 'luogo', sampleN = 0;
-  const APV_TABS = [['luogo', 'Il luogo', 'Luogo'], ['regole', 'Regole e meteo', 'Regole'], ['disastri', 'Disastri'], ['zaino', 'Zaino'], ['assaggio', 'Assaggio']];
+  // la guida dell'arena: intestazione illustrata e cinque capitoli (mappa, clima, minacce, zaino, anteprima)
+  const ATL = window.LOS_ATLAS;
+  let dxCh = 'mappa', sampleN = 0, dzOpen = null, dzAll = false, dzQuery = '', invSel = 'arma';
+  const CH_ICON = {
+    mappa: '<path d="M4 6.5 9 4l6 2.5L20 4v13.5L15 20l-6-2.5L4 20z"/><path d="M9 4v13.5M15 6.5V20"/>',
+    clima: '<path d="M7 17.5h10a4 4 0 0 0 .6-7.95A6 6 0 0 0 6.2 9.6 4 4 0 0 0 7 17.5z"/><path d="M12 2v1.5M4.2 4.7l1 1M19.8 4.7l-1 1"/>',
+    minacce: '<path d="M12 3c1 4 5 5.5 5 10a5 5 0 0 1-10 0c0-2.4 1.3-3.7 2.4-4.8.3 1.7 1.2 2.6 2.1 2.8C11 8.6 11 5.6 12 3z"/>',
+    zaino: '<path d="M8 6V5a4 4 0 0 1 8 0v1"/><rect x="5" y="6" width="14" height="15" rx="4"/><path d="M9 13h6v3H9z"/>',
+    anteprima: '<rect x="3" y="5" width="18" height="13" rx="3"/><path d="M10.5 9.2v5.6l4.6-2.8z"/><path d="M8 21h8"/>',
+  };
+  const CHAPTERS = [['mappa', 'Mappa'], ['clima', 'Clima'], ['minacce', 'Minacce'], ['zaino', 'Zaino'], ['anteprima', 'Anteprima']];
   const stripArt = (x) => x.replace(/^(il |lo |la |l'|i |gli |le |un |uno |una |un'|delle |dei |degli |del |della |dell')/i, '');
+  const capFirst = (x) => x.charAt(0).toUpperCase() + x.slice(1);
+  const chIcon = (k) => '<svg viewBox="0 0 24 24" aria-hidden="true">' + CH_ICON[k] + '</svg>';
   function renderPreview() {
-    const t = THEMES[S.settings.theme], pt = COUNTS.perTheme[t.id];
+    const t = THEMES[S.settings.theme], pt = COUNTS.perTheme[t.id], A = arenaOf(t.id);
     const adult = S.settings.adult && !t.noAdult;
-    const stat = (v, l) => '<div class="apv-stat"><b>' + v + '</b><span>' + l + '</span></div>';
-    const prev = $$('#arenaPreview .apv-stat b').map((x) => parseInt(x.textContent, 10));
+    const prev = $$('#arenaPreview .dx-stat b').map((x) => parseInt(x.textContent, 10));
+    const stat = (v, l) => '<div class="dx-stat"><b>' + v + '</b><span>' + l + '</span></div>';
+    dzOpen = null; dzAll = false; dzQuery = '';
     $('#arenaPreview').innerHTML =
-      '<div class="apv-hero"><div class="apv-banner" aria-hidden="true">' + ART.scene(t.id) + '</div>' +
-        '<div class="apv-title"><span class="gl" aria-hidden="true">' + ART.icon(t.id, 24) + '</span><div><h2>' + esc(t.name) + '</h2><p>' + esc(t.tag) + '</p></div>' + (t.soft ? '<span class="apv-soft">Nessuno muore</span>' : '') + '</div></div>' +
-      '<div class="apv-stats">' + stat(pt.events + (adult ? pt.adultEvents : 0), 'Eventi') + stat(pt.disasters + (adult ? pt.adultDisasters : 0), 'Disastri') + stat(t.lex.luogo.length, 'Luoghi') + stat((ITM.order || []).length, 'Tipi di oggetto') + '</div>' +
-      '<p class="apv-intro">' + esc(t.intro.b) + '</p>' +
-      '<div class="apv-tabs" role="tablist" aria-label="Dettagli dell\'arena">' + APV_TABS.map(([k, l, sh]) => '<button type="button" role="tab" id="apvt-' + k + '" data-apv="' + k + '" aria-controls="apvp-' + k + '" aria-selected="' + (apvTab === k) + '" tabindex="' + (apvTab === k ? 0 : -1) + '"' + (sh ? ' aria-label="' + l + '"><span class="tl">' + l + '</span><span class="ts" aria-hidden="true">' + sh + '</span>' : '>' + l) + '</button>').join('') + '</div>' +
-      APV_TABS.map(([k]) => '<div class="apv-panel" role="tabpanel" tabindex="0" id="apvp-' + k + '" aria-labelledby="apvt-' + k + '"' + (apvTab === k ? '' : ' hidden') + '>' + (apvTab === k ? apvPanel(k, t) : '') + '</div>').join('');
+      '<header class="dx-hero"><div class="apv-banner" aria-hidden="true">' + ART.scene(t.id) + '</div>' +
+        '<div class="dx-title"><span class="dx-kicker">Guida all\'arena</span><h2>' + esc(t.name) + '</h2><p>' + esc(t.tag) + '</p>' + (t.soft ? '<span class="dx-soft">Nessuno muore: si esce dai giochi</span>' : '') + '</div></header>' +
+      '<div class="dx-stats">' + stat(pt.events + (adult ? pt.adultEvents : 0), 'Eventi') + stat(pt.disasters + (adult ? pt.adultDisasters : 0), 'Disastri') + stat(t.lex.luogo.length, 'Zone') + stat((A.meteo || []).length, 'Tipi di meteo') + '</div>' +
+      '<nav class="dx-nav" role="tablist" aria-label="Capitoli della guida">' + CHAPTERS.map(([k, l]) => '<button type="button" role="tab" id="dxt-' + k + '" data-dx="' + k + '" aria-controls="dxp-' + k + '" aria-selected="' + (dxCh === k) + '" tabindex="' + (dxCh === k ? 0 : -1) + '">' + chIcon(k) + '<span>' + l + '</span></button>').join('') + '</nav>' +
+      CHAPTERS.map(([k]) => '<section class="dx-panel" role="tabpanel" id="dxp-' + k + '" aria-labelledby="dxt-' + k + '"' + (dxCh === k ? '' : ' hidden') + '>' + (dxCh === k ? chapter(k, t) : '') + '</section>').join('');
     AN.field($('#arenaPreview .apv-banner'), t.id, { intensity: 1.2 });
     const ap = $('#arenaPreview'); ap.classList.remove('swap'); void ap.offsetWidth; ap.classList.add('swap');
-    // i numeri scorrono dal valore dell'arena precedente
-    if (prev.length && !AN.reduced) $$('#arenaPreview .apv-stat b').forEach((b, i) => { const n = parseInt(b.textContent, 10); if (!isNaN(prev[i]) && prev[i] !== n) AN.countTo(b, n, { from: prev[i], dur: 600 }); });
+    if (prev.length && !AN.reduced) $$('#arenaPreview .dx-stat b').forEach((b, i) => { const n = parseInt(b.textContent, 10); if (!isNaN(prev[i]) && prev[i] !== n) AN.countTo(b, n, { from: prev[i], dur: 600 }); });
   }
-  function apvPanel(k, t) {
-    if (k === 'luogo') {
-      const col = (h, xs) => '<div class="apv-col"><h3>' + h + '</h3><ul class="apv-list">' + xs.map((x) => '<li>' + esc(stripArt(x)) + '</li>').join('') + '</ul></div>';
-      return '<div class="apv-grid">' + col('Luoghi', t.lex.luogo) + col(t.soft ? 'Armi improprie' : 'Armi', t.lex.arma.slice(0, 8)) + col('Pericoli', t.lex.mostro) + '</div>';
-    }
-    if (k === 'regole') return rulesHTML(t) || '<p class="help">Questa arena segue le regole classiche, senza condizioni speciali.</p>';
-    if (k === 'disastri') {
-      const dz = L.buildPools(t, [], S.settings.adult && !t.noAdult).disasters;
-      return '<div class="dz-grid">' + dz.slice(0, 8).map((d) => '<div class="dz"><b>' + esc(d.n) + '</b><p>' + esc(d.intro || '') + '</p></div>').join('') + '</div>' +
-        (dz.length > 8 ? '<p class="help dz-more">E altri ' + (dz.length - 8) + ' disastri, scelti a caso durante la partita.</p>' : '');
-    }
-    if (k === 'zaino') return itemsHTML(t);
-    if (k === 'assaggio') return sampleHTML(t);
+  const chHead = (title, text, extra) => '<div class="ch-head"><div><h3>' + title + '</h3><p>' + text + '</p></div>' + (extra || '') + '</div>';
+  function chapter(k, t) {
+    if (k === 'mappa') return chMap(t);
+    if (k === 'clima') return chClimate(t);
+    if (k === 'minacce') return chThreats(t);
+    if (k === 'zaino') return chBag(t);
+    if (k === 'anteprima') return chSample(t);
     return '';
   }
-  function sampleHTML(t) {
-    let sample = '';
-    try {
-      const cast = (S.cast.length >= 4 ? S.cast.slice(0, 8) : L.randomCast(8, 'anteprima', 2));
-      const r = L.simulate({ cast, theme: t.id, seed: 'anteprima-' + t.id + (sampleN ? '-' + sampleN : ''), difficulty: 'normale', teamsAllied: false });
-      const evs = r.phases.flatMap((p) => p.events).filter((e) => !e.note);
-      const pick = [evs.find((e) => e.cat === 'kill' || e.cat === 'death'), evs.find((e) => e.cat === 'ally'), evs.find((e) => e.cat === 'item' || e.cat === 'none')].filter(Boolean);
-      sample = pick.map((e) => evHTML(e, r.tributes, t, false, true)).join('');
-    } catch (e) { sample = ''; }
-    return '<div class="sample"><p class="help">' + (S.cast.length >= 4 ? 'Tre momenti da una partita breve con i primi concorrenti del tuo cast.' : 'Tre momenti da una partita breve con concorrenti casuali.') + '</p>' +
-      (sample || '<p class="help">Nessun assaggio disponibile per questa arena.</p>') +
-      '<div><button class="btn sm" type="button" data-apv-again>Un altro assaggio</button></div></div>';
+
+  /* ----- Mappa: zone, regola speciale, armeria, pericoli ----- */
+  const LEVEL = (v, hi, mid) => (v >= hi ? 2 : v >= mid ? 1 : 0);
+  function meterRow(label, v, max, words, tone) {
+    const pc = Math.max(8, Math.min(100, v / max * 100));
+    return '<div class="zm ' + tone + '"><span>' + label + '</span><i><b style="width:' + pc.toFixed(0) + '%"></b></i><em>' + words + '</em></div>';
   }
-  function showApvTab(k, focus) {
-    apvTab = k; const t = THEMES[S.settings.theme];
-    $$('#arenaPreview [data-apv]').forEach((b) => { const on = b.dataset.apv === k; b.setAttribute('aria-selected', on); b.tabIndex = on ? 0 : -1; if (on && focus) b.focus(); if (on) b.scrollIntoView({ block: 'nearest', inline: 'nearest', behavior: AN.reduced ? 'auto' : 'smooth' }); });
-    $$('#arenaPreview .apv-panel').forEach((p) => { const on = p.id === 'apvp-' + k; p.hidden = !on; if (on) { p.innerHTML = apvPanel(k, t); if (!AN.reduced) p.animate([{ opacity: 0, transform: 'translateY(6px)' }, { opacity: 1, transform: 'none' }], { duration: 260, easing: 'ease-out' }); } });
+  function chMap(t) {
+    const A = arenaOf(t.id), Z = t.lex.luogo.map((_, i) => (A.zones && A.zones[i]) || [1, 1, 0.5]);
+    const best = (j, dir) => Z.reduce((bi, z, i) => (dir * z[j] > dir * Z[bi][j] ? i : bi), 0);
+    const rich = best(0, 1), risk = best(1, 1), safe = best(2, 1);
+    const zones = t.lex.luogo.map((name, i) => {
+      const z = Z[i], nm = capFirst(stripArt(name));
+      const tags = [i === rich ? '<span class="ztg good">Più ricca</span>' : '', i === risk ? '<span class="ztg bad">Più pericolosa</span>' : '', i === safe ? '<span class="ztg calm">Miglior riparo</span>' : ''].join('');
+      return '<article class="zc" style="--i:' + i + '">' + ATL.pic(t.id, 'luoghi', name, t.hue, { index: i }) +
+        '<div class="zc-body"><h4>' + esc(nm) + '</h4>' + (tags ? '<div class="ztgs">' + tags + '</div>' : '') +
+        meterRow('Risorse', z[0], 1.8, ['Scarse', 'Medie', 'Ricche'][LEVEL(z[0], 1.35, 0.95)], 'res') +
+        meterRow('Pericolo', z[1], 1.8, ['Basso', 'Medio', 'Alto'][LEVEL(z[1], 1.35, 0.95)], 'dng') +
+        meterRow('Riparo', z[2], 1, ['Scarso', 'Discreto', 'Buono'][LEVEL(z[2], 0.7, 0.45)], 'shl') + '</div></article>';
+    }).join('');
+    const m = A.meter, lb = vitLabels(t);
+    const gauge = m ? '<div class="gauge" aria-hidden="true"><svg viewBox="0 0 120 72"><path d="M10 64 A50 50 0 0 1 110 64" fill="none" stroke="currentColor" stroke-opacity=".15" stroke-width="12" stroke-linecap="round"/><path class="gz" d="M10 64 A50 50 0 0 1 110 64" fill="none" stroke-width="12" stroke-linecap="round" pathLength="100" stroke-dasharray="100" stroke-dashoffset="' + (100 - (m.thr || 60)) + '"/><path class="gn" d="M60 64 L60 22" stroke-width="3.5" stroke-linecap="round" style="transform:rotate(' + (((m.thr || 60) / 100) * 180 - 90) + 'deg)"/><circle cx="60" cy="64" r="6"/></svg><b>' + esc(m.name) + '</b><span>Diventa grave oltre ' + (m.thr || 60) + '</span></div>' : '';
+    const plaque = A.rule ? '<section class="plaque">' + gauge + '<div class="pl-body"><span class="dx-kicker">Regola speciale</span><h4>' + esc(A.rule) + '</h4><p>' + esc(A.desc) + '</p>' +
+      (m ? '<p class="pl-meter"><b>' + esc(m.name) + '.</b> ' + esc(m.desc) + '</p>' : '') +
+      '<div class="pl-cols"><div><h5>Contano di più</h5><ol class="pl-keys">' + (A.key || []).map((k) => '<li>' + esc(ECO.attrNames[k] || k) + '</li>').join('') + '</ol></div>' +
+      '<div><h5>Da tenere d\'occhio</h5><div class="chips">' + [lb.hp, lb.en, lb.mo, lb.food].map((x) => '<span class="chip dim">' + esc(x) + '</span>').join('') + (m ? '<span class="chip st">' + esc(m.name) + '</span>' : '') + '</div></div></div></div></section>' : '';
+    const arms = t.lex.arma.slice(0, 10).map((x) => '<li class="arm">' + ATL.pic(t.id, 'armi', x, t.hue) + '<span>' + esc(capFirst(stripArt(x))) + '</span></li>').join('');
+    const beasts = t.lex.mostro.map((x, i) => '<article class="wanted" style="--r:' + ((i % 2 ? 1 : -1) * (1 + i % 3)) + 'deg">' + ATL.pic(t.id, 'pericoli', x, t.hue) + '<div class="wd-body"><span class="wd-tag">' + (t.soft ? 'Attenzione' : 'Pericolo') + '</span><h4>' + esc(capFirst(stripArt(x))) + '</h4></div></article>').join('');
+    return chHead('Il campo di gioco', plural(Z.length, 'zona', 'zone') + ' dove si muovono i concorrenti. Le zone ricche danno più cibo, quelle pericolose più agguati; di notte conta il riparo.') +
+      '<div class="zboard">' + zones + '</div>' + plaque +
+      '<div class="dx-split"><section class="arsenal"><div class="ch-sub"><h4>' + (t.soft ? 'Armi improprie' : 'Armeria') + '</h4><p>' + (t.soft ? 'Con queste si fanno fuori i rivali, senza versare sangue.' : 'Si raccolgono in giro, si rubano agli altri o arrivano dagli sponsor.') + '</p></div><ul class="rack">' + arms + '</ul></section>' +
+      '<section class="bestiary"><div class="ch-sub"><h4>' + (t.soft ? 'Da evitare' : 'Pericoli') + '</h4><p>' + (t.soft ? 'Girano per i corridoi: chi resta da solo rischia di finire nei guai.' : 'Di notte attaccano chi dorme da solo, soprattutto nelle zone pericolose.') + '</p></div><div class="wanted-grid">' + beasts + '</div></section></div>';
   }
-  $('#arenaPreview').addEventListener('click', (e) => {
-    const tb = e.target.closest('[data-apv]'); if (tb) return showApvTab(tb.dataset.apv);
-    if (e.target.closest('[data-apv-again]')) { sampleN++; showApvTab('assaggio'); const b = $('#arenaPreview [data-apv-again]'); if (b) b.focus(); }
-  });
-  $('#arenaPreview').addEventListener('keydown', (e) => {
-    const tb = e.target.closest('[data-apv]'); if (!tb || !['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(e.key)) return;
-    const ks = APV_TABS.map((x) => x[0]), i = ks.indexOf(tb.dataset.apv);
-    const n = e.key === 'Home' ? 0 : e.key === 'End' ? ks.length - 1 : (i + (e.key === 'ArrowLeft' ? -1 : 1) + ks.length) % ks.length;
-    e.preventDefault(); showApvTab(ks[n], true);
-  });
-  function itemsHTML(t) {
+
+  /* ----- Clima: ogni meteo con i suoi effetti veri ----- */
+  function fxChips(fx, m) {
+    const out = [], add = (txt, tone) => out.push('<li class="fx ' + tone + '">' + (tone === 'good' ? '↑' : tone === 'bad' ? '↓' : '•') + ' ' + txt + '</li>');
+    const f = fx || {};
+    if (f.forage) f.forage > 1 ? add('Più cibo da trovare', 'good') : add('Cibo più scarso', 'bad');
+    if (f.food) f.food > 1 ? add('La fame cresce in fretta', 'bad') : add('La fame si sente meno', 'good');
+    if (f.en) f.en > 1 ? add('Si fa più fatica', 'bad') : add('Ci si riposa meglio', 'good');
+    if (f.heal) f.heal > 1 ? add('Le ferite guariscono meglio', 'good') : add('Le ferite guariscono peggio', 'bad');
+    if (f.lethal) f.lethal > 1 ? add('Scontri più letali', 'bad') : add('Scontri meno letali', 'good');
+    if (f.stl) f.stl > 1 ? add('Agguati più facili', 'neutral') : add('Difficile nascondersi', 'neutral');
+    if (f.beast) f.beast > 1 ? add('Pericoli più attivi', 'bad') : add('Pericoli più tranquilli', 'good');
+    if (f.trap) add('Trappole più efficaci', 'neutral');
+    if (f.fame) f.fame > 1 ? add('Più attenzione del pubblico', 'good') : add('Il pubblico guarda altrove', 'neutral');
+    if (f.storm) add('Tempesta nelle zone aperte', 'bad');
+    if (f.pr && m) f.pr > 0 ? add(m.name + ' in salita', 'bad') : add(m.name + ' in calo', 'good');
+    if (f.tb) Object.entries(f.tb).forEach(([a, v]) => add('Prove di ' + (ECO.attrNames[a] || a) + (v > 0 ? ' più facili' : ' più difficili'), v > 0 ? 'good' : 'bad'));
+    return out.length ? '<ul class="fxs">' + out.join('') + '</ul>' : '<ul class="fxs"><li class="fx neutral">• Nessun effetto particolare</li></ul>';
+  }
+  function chClimate(t) {
+    const A = arenaOf(t.id);
+    const cards = (A.meteo || []).map((w, i) => '<article class="wxc" style="--i:' + i + '">' + ATL.pic(t.id, 'meteo', w.n, t.hue, { extra: w.d }) + '<div class="wxc-body"><h4>' + esc(w.n) + '</h4><p>' + esc(w.d) + '</p>' + fxChips(w.fx, A.meter) + '</div></article>').join('');
+    return chHead('Il meteo dell\'arena', 'Ogni giorno il cielo può cambiare. Ecco cosa può capitare e cosa cambia davvero per i concorrenti.') + '<div class="wx-board">' + (cards || '<p class="help">In questa arena il tempo non cambia mai.</p>') + '</div>';
+  }
+
+  /* ----- Minacce: i disastri e i tre destini ----- */
+  const dzList = (t) => L.buildPools(t, [], S.settings.adult && !t.noAdult).disasters;
+  function sampleName(text, t) {
+    const who = S.cast[0] || { name: 'Alfa', gender: 'F' }, other = S.cast[1] || { name: 'Beta' };
+    return esc(L.renderSample(text, t.id, who.gender || 'M')).replace(/\bAlfa\b/g, '<b>' + esc(who.name) + '</b>').replace(/\bBeta\b/g, '<b>' + esc(other.name) + '</b>');
+  }
+  function fates(d, t) {
+    const pick = (c) => d.out.find((o) => o.cat === c);
+    const dead = pick('death'), hurt = pick('hurt'), safe = pick('none');
+    const st = hurt && (hurt.fx || []).find((f) => f.t === 'status');
+    const row = (cls, icon, label, o) => o ? '<li class="fate ' + cls + '"><span class="fi" aria-hidden="true">' + icon + '</span><div><b>' + label + '</b><p>' + sampleName(o.text, t) + '</p></div></li>' : '';
+    return '<ol class="fates">' +
+      row('f-dead', '✕', t.soft ? 'Fuori dai giochi' : 'Non sopravvive', dead) +
+      row('f-hurt', '!', 'Ne esce ' + (st ? (L.STATUS_LABEL[st.s] || st.s).toLowerCase() : 'malconcio'), hurt) +
+      row('f-safe', '✓', 'Si salva', safe) + '</ol>';
+  }
+  function dzCard(d, i, t) {
+    const open = dzOpen === d.n;
+    return '<article class="dzc' + (open ? ' open' : '') + '" style="--i:' + i + '">' +
+      '<button type="button" class="dzc-btn" data-dz="' + esc(d.n) + '" aria-expanded="' + open + '">' + ATL.pic(t.id, 'disastri', d.n, t.hue, { extra: d.intro }) +
+      '<span class="dzc-txt"><b>' + esc(d.n) + '</b><span>' + esc(d.intro || '') + '</span><em>' + (open ? 'Chiudi' : 'Vedi come può finire') + '</em></span></button>' +
+      (open ? '<div class="dzc-more">' + fates(d, t) + '</div>' : '') + '</article>';
+  }
+  function dzGrid(t) {
+    const all = dzList(t), q = norm(dzQuery.trim());
+    const list = q ? all.filter((d) => norm(d.n + ' ' + (d.intro || '')).includes(q)) : all;
+    const shown = q || dzAll ? list : list.slice(0, 9);
+    return '<div class="dz-board">' + (shown.map((d, i) => dzCard(d, i, t)).join('') || '<p class="help">Nessun disastro corrisponde a «' + esc(dzQuery.trim()) + '».</p>') + '</div>' +
+      (!q && !dzAll && list.length > 9 ? '<div class="dz-more"><button type="button" class="btn" data-dz-all>Mostra tutti i ' + list.length + ' disastri</button></div>' : '');
+  }
+  const norm = (s) => String(s).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+  function chThreats(t) {
+    return chHead('I disastri', 'Quando arriva un disastro, ognuno può ' + (t.soft ? 'finire fuori dai giochi' : 'morire') + ', uscirne malconcio o salvarsi: decidono caratteristiche, oggetti e un po\' di fortuna. Tocca un disastro per vedere i tre destini.',
+      '<label class="dz-search"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4.5 4.5"/></svg><input type="search" id="dzSearch" placeholder="Cerca un disastro" aria-label="Cerca tra i disastri" autocomplete="off" value="' + esc(dzQuery) + '"></label>') +
+      '<div id="dzWrap">' + dzGrid(t) + '</div>';
+  }
+
+  /* ----- Zaino: inventario a caselle con la scheda dell'oggetto ----- */
+  function bagNames(t) {
     const names = Object.assign({}, (ITM.names || {})._ || {}, (ITM.names || {})[t.id] || {});
     const lex = Object.assign({}, D.lexDefault || {}, t.lex || {});
     (D.packs || []).forEach((pk) => { if (pk.lex && (pk.theme === t.id)) Object.assign(lex, pk.lex); });
-    const ex = (k) => (names[k] || (k === 'med' ? ['un kit medico'] : k === 'trap' ? ['una trappola'] : lex[k]) || []).slice(0, 2).map((x) => x.replace(/^(il |lo |la |l'|i |gli |le |un |uno |una |un'|delle |dei |degli |del |della |dell')/i, '')).join(', ');
-    return '<p class="help">' + (t.soft ? 'Gli oggetti aiutano a restare in gara: si trovano, si scambiano e si rubano.' : 'Gli oggetti si trovano, si scambiano e si rubano: possono decidere uno scontro.') + '</p><div class="ia-grid">' +
-      (ITM.order || []).map((k) => { const ty = (t.soft && (ITM.typesSoft || {})[k]) || ITM.types[k]; return '<div class="ia"><span class="bic">' + (ITIC[k] || '') + '</span><div><b>' + esc(ty.label) + '</b>' + (ex(k) ? '<span class="iaex">' + esc(ex(k)) + '</span>' : '') + '<p>' + esc(ty.desc) + '</p></div></div>'; }).join('') + '</div>';
+    return (k) => (names[k] || (k === 'med' ? ['un kit medico'] : k === 'trap' ? ['una trappola'] : lex[k]) || []).slice(0, 4).map((x) => capFirst(stripArt(x)));
   }
-  function rulesHTML(t) {
-    const A = arenaOf(t.id); if (!A.rule) return '';
-    const m = A.meter, lb = vitLabels(t);
-    return '<div class="rules-arena"><div class="ra-head"><span class="eyebrow">Regola speciale</span><h3>' + esc(A.rule) + '</h3></div><p>' + esc(A.desc) + '</p>' +
-      '<div class="ra-grid"><div><h4>Contano di più</h4><div class="chips">' + (A.key || []).map((k, i) => '<span class="chip' + (i === 0 ? ' st' : '') + '">' + esc(ECO.attrNames[k] || k) + '</span>').join('') + '</div></div>' +
-      '<div><h4>Da tenere d\'occhio</h4><div class="chips"><span class="chip dim">' + esc(lb.hp) + '</span><span class="chip dim">' + esc(lb.en) + '</span><span class="chip dim">' + esc(lb.mo) + '</span><span class="chip dim">' + esc(lb.food) + '</span>' + (m ? '<span class="chip st" title="' + esc(m.desc) + '">' + esc(m.name) + '</span>' : '') + '</div></div></div>' +
-      (m ? '<p class="help"><b>' + esc(m.name) + ':</b> ' + esc(m.desc) + '</p>' : '') +
-      '</div>' + ((A.meteo || []).length ? '<div class="wx"><h4>Meteo possibile</h4><div class="wx-grid">' + A.meteo.map((x) => '<div class="wxi"><b>' + esc(x.n) + '</b><span>' + esc(x.d) + '</span></div>').join('') + '</div></div>' : '');
+  const itemType = (t, k) => (t.soft && (ITM.typesSoft || {})[k]) || ITM.types[k] || { label: k, desc: '' };
+  function bagDetail(t) {
+    const ty = itemType(t, invSel), ex = bagNames(t)(invSel);
+    return '<div class="inv-art">' + ATL.pic(t.id, 'oggetti', invSel, t.hue) + '</div><div class="inv-txt"><span class="dx-kicker">Nello zaino</span><h4>' + esc(ty.label) + '</h4>' +
+      (ex.length ? '<div class="inv-ex"><span>In questa arena</span><div class="chips">' + ex.map((x) => '<span class="chip">' + esc(x) + '</span>').join('') + '</div></div>' : '') + '<p>' + esc(ty.desc) + '</p></div>';
   }
+  function chBag(t) {
+    const slots = (ITM.order || []).map((k, i) => '<button type="button" class="slot" data-inv="' + k + '" aria-pressed="' + (invSel === k) + '" style="--i:' + i + '">' + ATL.pic(t.id, 'oggetti', k, t.hue) + '<span>' + esc(itemType(t, k).label) + '</span></button>').join('');
+    return chHead('Lo zaino', (ITM.order || []).length + ' tipi di oggetto, ognuno con nomi propri in questa arena. ' + (t.soft ? 'Aiutano a restare in gara' : 'Possono decidere uno scontro') + ': si trovano, si scambiano e si rubano.') +
+      '<div class="inv"><div class="inv-grid" role="group" aria-label="Oggetti">' + slots + '</div><div class="inv-detail" id="invDetail" aria-live="polite">' + bagDetail(t) + '</div></div>';
+  }
+
+  /* ----- Anteprima: una mini diretta ----- */
+  function chSample(t) {
+    let evs = [];
+    try {
+      const cast = (S.cast.length >= 4 ? S.cast.slice(0, 8) : L.randomCast(8, 'anteprima', 2));
+      const r = L.simulate({ cast, theme: t.id, seed: 'anteprima-' + t.id + (sampleN ? '-' + sampleN : ''), difficulty: 'normale', teamsAllied: false });
+      const all = r.phases.flatMap((p) => p.events).filter((e) => !e.note);
+      evs = [all.find((e) => e.cat === 'kill' || e.cat === 'death'), all.find((e) => e.cat === 'ally'), all.find((e) => e.cat === 'item' || e.cat === 'none')].filter(Boolean).map((e) => evHTML(e, r.tributes, t, false, true));
+    } catch (e) { evs = []; }
+    return chHead('Un assaggio', S.cast.length >= 4 ? 'Tre momenti da una partita breve con i primi concorrenti del tuo cast.' : 'Tre momenti da una partita breve con concorrenti casuali.') +
+      '<div class="tv"><div class="tv-top"><span class="onair"><span class="rec"></span>In diretta</span><span class="tv-arena">' + ART.icon(t.id, 14) + ' ' + esc(t.name) + '</span></div>' +
+      '<div class="tv-feed">' + (evs.length ? evs.map((h, i) => h.replace('class="ev', 'style="--d:' + (i * 420) + 'ms" class="ev in')).join('') : '<p class="help">Nessun assaggio disponibile per questa arena.</p>') + '</div>' +
+      '<div class="tv-actions"><button class="btn primary sm" type="button" data-sample-again><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 11a8 8 0 1 0-2.3 5.7"/><path d="M20 4v7h-7"/></svg>Un altro assaggio</button></div></div>';
+  }
+
+  function showChapter(k, focus) {
+    dxCh = k; const t = THEMES[S.settings.theme];
+    $$('#arenaPreview [data-dx]').forEach((b) => { const on = b.dataset.dx === k; b.setAttribute('aria-selected', on); b.tabIndex = on ? 0 : -1; if (on && focus) b.focus(); if (on) b.scrollIntoView({ block: 'nearest', inline: 'nearest', behavior: AN.reduced ? 'auto' : 'smooth' }); });
+    $$('#arenaPreview .dx-panel').forEach((p) => { const on = p.id === 'dxp-' + k; p.hidden = !on; p.innerHTML = on ? chapter(k, t) : ''; });
+  }
+  function refreshThreats(focusSel) {
+    const w = $('#dzWrap'); if (!w) return;
+    w.innerHTML = dzGrid(THEMES[S.settings.theme]);
+    if (focusSel) { const el = w.querySelector(focusSel); if (el) el.focus({ preventScroll: true }); }
+  }
+  $('#arenaPreview').addEventListener('click', (e) => {
+    const t = THEMES[S.settings.theme];
+    const ch = e.target.closest('[data-dx]'); if (ch) return showChapter(ch.dataset.dx);
+    const dz = e.target.closest('[data-dz]');
+    if (dz) {
+      dzOpen = dzOpen === dz.dataset.dz ? null : dz.dataset.dz; refreshThreats('[data-dz="' + CSS.escape(dz.dataset.dz) + '"]');
+      const card = $('#dzWrap .dzc.open'); if (card) { if (!AN.reduced) card.querySelector('.dzc-more').animate([{ opacity: 0, transform: 'translateY(-6px)' }, { opacity: 1, transform: 'none' }], { duration: 280, easing: 'ease-out' }); card.scrollIntoView({ block: 'nearest', behavior: AN.reduced ? 'auto' : 'smooth' }); }
+      return;
+    }
+    if (e.target.closest('[data-dz-all]')) { dzAll = true; refreshThreats(); return; }
+    const sl = e.target.closest('[data-inv]');
+    if (sl) {
+      invSel = sl.dataset.inv; $$('#arenaPreview [data-inv]').forEach((b) => b.setAttribute('aria-pressed', b === sl));
+      const d = $('#invDetail'); d.innerHTML = bagDetail(t);
+      if (!AN.reduced) d.animate([{ opacity: 0, transform: 'scale(.97)' }, { opacity: 1, transform: 'none' }], { duration: 260, easing: 'cubic-bezier(.2,.8,.3,1.2)' });
+      if (matchMedia('(max-width: 760px)').matches) d.scrollIntoView({ block: 'nearest', behavior: AN.reduced ? 'auto' : 'smooth' });
+      return;
+    }
+    if (e.target.closest('[data-sample-again]')) { sampleN++; showChapter('anteprima'); const b = $('#arenaPreview [data-sample-again]'); if (b) b.focus(); }
+  });
+  $('#arenaPreview').addEventListener('input', (e) => { if (e.target.id === 'dzSearch') { dzQuery = e.target.value; dzOpen = null; refreshThreats(); } });
+  $('#arenaPreview').addEventListener('keydown', (e) => {
+    const tb = e.target.closest('[data-dx]'); if (!tb || !['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(e.key)) return;
+    const ks = CHAPTERS.map((x) => x[0]), i = ks.indexOf(tb.dataset.dx);
+    const n = e.key === 'Home' ? 0 : e.key === 'End' ? ks.length - 1 : (i + (e.key === 'ArrowLeft' ? -1 : 1) + ks.length) % ks.length;
+    e.preventDefault(); showChapter(ks[n], true);
+  });
   function renderStartSum() {
     const t = THEMES[S.settings.theme];
     $('#startSum').innerHTML = '<span class="ss-icon" aria-hidden="true">' + ART.icon(t.id, 20) + '</span><span class="ss-text"><b>' + esc(t.name) + '</b><span class="ss-chips"><span>' + plural(S.cast.length, 'concorrente', 'concorrenti') + '</span><span>' + esc(difficultyCopy(S.settings.difficulty, t)[1]) + '</span><span>Fino a ' + plural(S.settings.maxDays, 'giorno', 'giorni') + '</span>' + (S.settings.adult && !t.noAdult ? '<span class="tag18">18+</span>' : '') + '</span></span>';
