@@ -102,6 +102,16 @@ Un interruttore nella sezione Arena, attivo solo dopo la conferma dell'età, agg
 - **Sezioni**: panoramica con parallasse e braci nella home, locandine che si inclinano seguendo il mouse, schede che entrano a cascata, cerimonia del vincitore con podio che sale, grafico che si disegna e coriandoli a tema con l'arena.
 - Tutto si ferma se il sistema chiede di ridurre le animazioni.
 
+## La sezione Concorrenti
+- **Schede ricche**: volto grande con anello del colore di squadra, numero d'ordine, squadra e media delle caratteristiche, un profilo in miniatura delle dieci caratteristiche (verde i punti forti, rosso quelli deboli) con il punto forte e il punto debole scritti in parole, tratti e un invito a aggiungerne.
+- **Modifiche sul posto**: il nome si scrive direttamente sulla scheda, il genere si cambia con un selettore che scivola, il volto si tocca per caricare una foto.
+- **Menu delle azioni** (⋯) su ogni scheda: sposta prima o dopo, duplica, caratteristiche casuali, elimina. Eliminare (anche tutto il cast) si può **annullare** dal messaggio che compare.
+- **Panoramica del cast** con ricerca per nome, tratto o squadra, numero di concorrenti e squadre (con i colori), lui/lei/neutri, media generale, foto e tratti più diffusi.
+- **Vista per squadra** con media di ogni squadra e un **+** per aggiungere un concorrente direttamente in quella squadra.
+- **Scheda di modifica** con radar delle caratteristiche che si aggiorna dal vivo, profili pronti (Combattente, Stratega, Sopravvissuto, Ombra, Leader, Cuore d'oro, Fortunato), descrizione della caratteristica sotto il cursore e tratti incompatibili bloccati con la spiegazione (Leale e Traditore, Pacifista e Spietato, Fortunato e Sfortunato…).
+- **Animazioni**: le schede vengono distribuite come carte quando si genera un cast, scivolano al loro posto quando si riordinano, trascinano o si ricompongono le squadre, entrano con un alone quando si aggiungono o duplicano, svaniscono quando si eliminano; il profilo in miniatura si rimescola con i valori casuali, il radar si trasforma da un profilo all'altro, il conteggio dei concorrenti scorre. Tutto rispetta l'impostazione «riduci movimento».
+- **Sul telefono** le opzioni secondarie (squadre, vista, importa, svuota) si aprono con «Altre opzioni» e la panoramica si compatta.
+
 ## Interfaccia
 - **Home** con partita lampo (24 concorrenti casuali, arena a sorpresa) e un tabellone dimostrativo animato.
 - **Concorrenti**: griglia o vista per squadra, nome modificabile sul posto, scheda laterale per tratti, caratteristiche e foto, elenco da incollare.

@@ -84,7 +84,7 @@
   <section class="view wrap" id="v-cast" hidden aria-labelledby="h-cast">
     <div class="pagehead">
       <div><div class="eyebrow">Passo 1 di 4</div><h1 id="h-cast">I concorrenti</h1>
-        <p>Tocca un nome per modificarlo. Apri la scheda con <b>Modifica</b> per tratti, caratteristiche e foto. Trascina le schede per riordinarle.</p></div>
+        <p>Scrivi direttamente sul nome per cambiarlo, tocca il volto per caricare una foto e apri <b>Modifica</b> per tratti e caratteristiche. Trascina le schede per riordinarle.</p></div>
     </div>
     <div class="toolbar">
       <div class="tgroup">
@@ -95,7 +95,8 @@
           <select id="presetSize" aria-label="Numero di concorrenti da generare"><option value="12">12</option><option value="24" selected>24</option><option value="36">36</option><option value="48">48</option></select>
         </div>
       </div>
-      <div class="tgroup">
+      <button class="btn toolmore" id="toolMore" type="button" aria-expanded="false" aria-controls="toolSecondary">Altre opzioni<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      <div class="tgroup tsecondary" id="toolSecondary">
         <label class="mini" for="teamSize">Squadre da
           <select id="teamSize"><option value="1">1</option><option value="2" selected>2</option><option value="3">3</option><option value="4">4</option></select>
         </label>
@@ -112,6 +113,7 @@
       <div class="row"><label>Da<select id="relationFrom"></select></label><label>Verso<select id="relationTo"></select></label><label>Legame<select id="relationType"><option value="amicizia">Amicizia</option><option value="rivalita">Rivalità</option><option value="coppia">Coppia</option><option value="fiducia">Fiducia →</option><option value="attrazione">Attrazione →</option></select></label><button class="btn" id="relationAdd" type="button">Aggiungi legame</button></div>
       <div id="relationsList"></div><p class="help" id="relationMsg" role="status"></p>
     </details>
+    <div class="castov" id="castOverview" hidden></div>
     <div id="clearConfirm" hidden class="confirm">Eliminare tutti i concorrenti? <button class="btn danger" id="clearYes" type="button">Elimina tutti</button> <button class="btn" id="clearNo" type="button">Annulla</button></div>
     <div id="castList"></div>
     <input type="file" id="avatarFile" accept="image/*" hidden>

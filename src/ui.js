@@ -397,9 +397,12 @@
   function silIndex(id) { let h = 0; for (const c of String(id)) h = (h * 31 + c.charCodeAt(0)) >>> 0; return h % ART.assets.sagome.length; }
   const linkify = (html) => html.replace(/<b class="nm" data-id="/g, '<button type="button" class="nm" data-prof="').replace(/<\/b>/g, '</button>');
   let toastTimer;
-  function toast(msg) {
-    const el = $('#toast'); el.textContent = msg; el.hidden = false;
-    clearTimeout(toastTimer); toastTimer = setTimeout(() => (el.hidden = true), 3400);
+  // un messaggio breve, con un'azione facoltativa (per esempio «Annulla»)
+  function toast(msg, action) {
+    const el = $('#toast'); el.textContent = msg; el.classList.toggle('withact', !!action);
+    if (action) { const b = document.createElement('button'); b.type = 'button'; b.className = 'tact'; b.textContent = action.label; b.addEventListener('click', () => { el.hidden = true; action.fn(); }); el.appendChild(b); }
+    el.hidden = false; if (!AN.reduced) el.animate([{ opacity: 0, transform: 'translate(-50%, 12px)' }, { opacity: 1, transform: 'translate(-50%, 0)' }], { duration: 220, easing: 'ease-out' });
+    clearTimeout(toastTimer); toastTimer = setTimeout(() => (el.hidden = true), action ? 6000 : 3400);
   }
   function copyText(text, okMsg) {
     const fallback = () => {
@@ -540,31 +543,76 @@
   $('#quickPlay').addEventListener('click', quickPlay);
 
   /* =============== CONCORRENTI =============== */
+  const ATTR_SHORT = { for: 'FOR', agi: 'AGI', int: 'INT', car: 'CAR', fort: 'FRT', res: 'RES', furt: 'FUR', cor: 'COR', emp: 'EMP', sop: 'SOP' };
+  // il punto forte e il punto debole, in parole
+  function profileLine(t) {
+    const a = D.attrs.map((x) => [x, t.attr[x.id] != null ? t.attr[x.id] : 5]);
+    const hi = a.slice().sort((x, y) => y[1] - x[1])[0], lo = a.slice().sort((x, y) => x[1] - y[1])[0];
+    const avg = a.reduce((s2, x) => s2 + x[1], 0) / a.length;
+    if (hi[1] - lo[1] <= 2) return { txt: 'Equilibrat' + G3(t.gender, 'o', 'a', 'ə') + ' in tutto', avg };
+    return { txt: 'Forte in <b>' + esc(hi[0].name) + '</b>' + (lo[1] <= 4 ? ' · debole in <b>' + esc(lo[0].name) + '</b>' : ''), avg };
+  }
+  function attrStrip(t) {
+    return '<span class="astrip" aria-hidden="true">' + D.attrs.map((a) => { const v = t.attr[a.id] != null ? t.attr[a.id] : 5; return '<i class="' + (v >= 8 ? 'hi' : v <= 3 ? 'lo' : '') + '" style="--v:' + v + '" title="' + esc(a.name) + ' ' + v + '"></i>'; }).join('') + '</span>';
+  }
   function tileHTML(t, i, showOrder) {
-    const traits = t.traits.length ? t.traits.map((id) => '<span class="chip" title="' + esc(TRAITS[id].desc) + '">' + esc(TRAITS[id].name) + '</span>').join('') : '<span class="chip dim">Nessun tratto</span>';
-    return '<article class="tile" data-id="' + esc(t.id) + '" style="--ti:' + Math.min(i, 24) + '">' +
+    const traits = t.traits.map((id) => '<span class="chip" title="' + esc(TRAITS[id].desc) + '">' + esc(TRAITS[id].name) + '</span>').join('') +
+      (t.traits.length < 3 ? '<button type="button" class="chip addtrait" data-act="edit">+ ' + (t.traits.length ? 'tratto' : 'Aggiungi un tratto') + '</button>' : '');
+    const pf = profileLine(t);
+    const gi = { M: 0, F: 1, N: 2 }[t.gender] || 0;
+    return '<article class="tile" data-id="' + esc(t.id) + '" style="--ti:' + Math.min(i, 30) + ';--c:' + esc(t.color || teamColor(t.team)) + '">' +
+      '<span class="tnum" aria-hidden="true">' + (i + 1) + '</span>' +
       '<button class="grip" type="button" aria-label="Trascina per riordinare" title="Trascina per riordinare">' + GRIP + '</button>' +
       '<div class="thead">' +
-        '<button class="avbtn" type="button" data-act="photo" aria-label="Carica una foto per ' + esc(t.name || 'questo concorrente') + '">' + avHTML(t) + '<span class="cam">' + IC.cam + '</span></button>' +
-        '<div style="min-width:0;flex:1"><input class="tname" type="text" id="name-' + esc(t.id) + '" data-f="name" value="' + esc(t.name) + '" placeholder="Nome" aria-label="Nome" maxlength="40">' +
-        '<div class="tsub"><span class="teamchip" style="--c:' + esc(t.color) + '"><i></i>Squadra ' + t.team + '</span></div></div>' +
+        '<button class="avbtn" type="button" data-act="photo" aria-label="' + (t.img ? 'Cambia la foto di ' : 'Carica una foto per ') + esc(t.name || 'questo concorrente') + '">' + avHTML(t) + '<span class="cam">' + IC.cam + '</span></button>' +
+        '<div class="tid"><input class="tname" type="text" id="name-' + esc(t.id) + '" data-f="name" value="' + esc(t.name) + '" placeholder="Nome" aria-label="Nome" maxlength="40" autocomplete="off">' +
+        '<div class="tsub"><span class="teamchip"><i></i>Squadra ' + t.team + '</span><span class="tavg" title="Media delle caratteristiche">media ' + pf.avg.toFixed(1).replace('.', ',') + '</span></div></div>' +
       '</div>' +
+      '<div class="tprofile">' + attrStrip(t) + '<span class="tpl">' + pf.txt + '</span></div>' +
       '<div class="chips">' + traits + '</div>' +
       '<div class="tfoot">' +
-        '<div class="gsel" role="group" aria-label="Genere">' + ['M', 'F', 'N'].map((g) => '<button type="button" data-act="g" data-v="' + g + '" aria-pressed="' + (t.gender === g) + '">' + G3(g, 'Lui', 'Lei', 'Neutro') + '</button>').join('') + '</div>' +
-        '<div class="tacts">' +
-          '<button class="btn sm tedit" type="button" data-act="edit"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M14 6l4 4"/></svg>Modifica</button>' +
-          (showOrder ? '<div class="ord"><button type="button" data-act="up" aria-label="Sposta prima"' + (i === 0 ? ' disabled' : '') + '>↑</button><button type="button" data-act="down" aria-label="Sposta dopo"' + (i === S.cast.length - 1 ? ' disabled' : '') + '>↓</button></div>' : '') +
-        '</div>' +
+        '<div class="gsel" role="group" aria-label="Genere" style="--gi:' + gi + '">' + ['M', 'F', 'N'].map((g) => '<button type="button" data-act="g" data-v="' + g + '" aria-pressed="' + (t.gender === g) + '">' + G3(g, 'Lui', 'Lei', 'Neutro') + '</button>').join('') + '</div>' +
+        '<button class="btn sm tedit" type="button" data-act="edit"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M14 6l4 4"/></svg>Modifica</button>' +
+        '<button class="tmenu" type="button" data-act="menu" aria-haspopup="menu" aria-expanded="false" aria-label="Altre azioni per ' + esc(t.name || 'questo concorrente') + '"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="5" cy="12" r="1.8"/><circle cx="12" cy="12" r="1.8"/><circle cx="19" cy="12" r="1.8"/></svg></button>' +
+      '</div>' +
+      '<div class="tpop" role="menu" hidden>' +
+        (showOrder ? '<button type="button" role="menuitem" data-act="up"' + (i === 0 ? ' disabled' : '') + '>↑ Sposta prima</button><button type="button" role="menuitem" data-act="down"' + (i === S.cast.length - 1 ? ' disabled' : '') + '>↓ Sposta dopo</button>' : '') +
+        '<button type="button" role="menuitem" data-act="dup">Duplica</button>' +
+        '<button type="button" role="menuitem" data-act="rand">Caratteristiche casuali</button>' +
+        '<button type="button" role="menuitem" data-act="del" class="danger">Elimina</button>' +
       '</div>' +
     '</article>';
+  }
+  // animazioni della griglia: chi si sposta scivola, chi arriva entra, chi esce svanisce
+  function castRects() { const m = new Map(); $$('#castList .tile').forEach((el) => m.set(el.dataset.id, el.getBoundingClientRect())); return m; }
+  function castFlip(before, fresh) {
+    if (AN.reduced || !before) return;
+    $$('#castList .tile').forEach((el) => {
+      const a = before.get(el.dataset.id), b = el.getBoundingClientRect();
+      if (a) {
+        const dx = a.left - b.left, dy = a.top - b.top;
+        if (Math.abs(dx) > 1 || Math.abs(dy) > 1) el.animate([{ transform: 'translate(' + dx + 'px,' + dy + 'px)' }, { transform: 'none' }], { duration: 420, easing: 'cubic-bezier(.2,.8,.2,1)' });
+      } else if (!fresh || fresh.has(el.dataset.id)) {
+        el.animate([{ opacity: 0, transform: 'scale(.86) translateY(10px)' }, { opacity: 1, transform: 'none' }], { duration: 420, easing: 'cubic-bezier(.2,.9,.3,1.25)' });
+        el.classList.add('fresh'); setTimeout(() => el.classList.remove('fresh'), 1400);
+      }
+    });
+  }
+  function rerender(fresh) { const before = castRects(); renderCast(); castFlip(before, fresh); }
+  function castLeave(id, done) {
+    const el = $('#castList .tile[data-id="' + CSS.escape(id) + '"]');
+    if (!el || AN.reduced) return done();
+    el.style.pointerEvents = 'none';
+    el.animate([{ opacity: 1, transform: 'none' }, { opacity: 0, transform: 'scale(.85) rotate(-2deg)' }], { duration: 260, easing: 'ease-in', fill: 'forwards' }).onfinish = done;
   }
   function renderCast() {
     if (typeof studio !== 'undefined' && studio) studio.renderRelations();
     $$('#viewSeg button').forEach((b) => b.setAttribute('aria-pressed', b.dataset.v === S.settings.view));
     $('#teamSize').value = String(S.settings.teamSize || 2);
-    const add = '<button class="addtile" type="button" id="addOne"><span>+ Aggiungi concorrente</span></button>';
+    const add = '<button class="addtile" type="button" id="addOne"><span class="plus" aria-hidden="true">+</span><span>Aggiungi concorrente</span></button>';
+    closeMenus();
     if (!S.cast.length) {
+      $('#castOverview').hidden = true;
       $('#castList').innerHTML = '<div class="castempty card"><div class="ce-art" aria-hidden="true">' + (ART.assets.sagome || []).slice(0, 3).map((u, k) => '<i class="sil sil-' + k + '"></i>').join('') + '</div><h2>Ancora nessun concorrente</h2><p>Genera un cast casuale, incolla un elenco di nomi oppure aggiungili uno alla volta.</p>' +
         '<div class="row center"><button class="btn primary lg" type="button" data-empty="gen">Genera ' + $('#presetSize').value + ' concorrenti</button><button class="btn lg" type="button" data-empty="bulk">Incolla un elenco</button><button class="btn lg" type="button" data-empty="add">Aggiungi a mano</button></div></div>';
       updateCounts(); return;
@@ -572,16 +620,58 @@
     if (S.settings.view === 'team') {
       const teams = {};
       S.cast.forEach((t, i) => (teams[t.team] = teams[t.team] || []).push([t, i]));
-      $('#castList').innerHTML = '<div class="teamwrap">' + Object.keys(teams).sort((a, b) => a - b).map((k) => '<section class="teamblock card" style="--c:' + teamColor(+k) + '"><h3><i></i>Squadra ' + k + ' <span>' + plural(teams[k].length, 'concorrente', 'concorrenti') + '</span></h3><div class="castgrid">' + teams[k].map(([t, i]) => tileHTML(t, i, false)).join('') + '</div></section>').join('') + '</div><div class="castgrid" style="margin-top:14px">' + add + '</div>';
+      $('#castList').innerHTML = '<div class="teamwrap">' + Object.keys(teams).sort((a, b) => a - b).map((k) => {
+        const ms = teams[k].map((x) => x[0]);
+        const avg = ms.reduce((s2, t) => s2 + D.attrs.reduce((q, a) => q + (t.attr[a.id] || 5), 0) / D.attrs.length, 0) / ms.length;
+        return '<section class="teamblock card" style="--c:' + teamColor(+k) + '"><h3><i></i><b>Squadra ' + k + '</b><span>' + plural(ms.length, 'concorrente', 'concorrenti') + ' · media ' + avg.toFixed(1).replace('.', ',') + '</span>' +
+          '<button type="button" class="teamadd" data-team="' + k + '" aria-label="Aggiungi un concorrente alla squadra ' + k + '">+</button></h3><div class="castgrid">' + teams[k].map(([t, i]) => tileHTML(t, i, false)).join('') + '</div></section>';
+      }).join('') + '</div><div class="castgrid" style="margin-top:14px">' + add + '</div>';
     } else {
       $('#castList').innerHTML = '<div class="castgrid">' + S.cast.map((t, i) => tileHTML(t, i, true)).join('') + add + '</div>';
     }
-    updateCounts();
+    updateCounts(); renderOverview(); applySearch();
   }
+  let castQuery = '';
+  // la panoramica del cast: numeri, generi, squadre, tratti, ricerca
+  function renderOverview() {
+    const n = S.cast.length, el = $('#castOverview'); el.hidden = !n; if (!n) return;
+    const g = { M: 0, F: 0, N: 0 }; S.cast.forEach((t) => g[t.gender]++);
+    const photos = S.cast.filter((t) => t.img).length;
+    const tc = {}; S.cast.forEach((t) => t.traits.forEach((x) => (tc[x] = (tc[x] || 0) + 1)));
+    const topT = Object.entries(tc).sort((a, b) => b[1] - a[1]).slice(0, 3);
+    const teams = [...new Set(S.cast.map((t) => t.team))].sort((a, b) => a - b);
+    const avg = S.cast.reduce((s2, t) => s2 + D.attrs.reduce((q, a) => q + (t.attr[a.id] || 5), 0) / D.attrs.length, 0) / n;
+    const had = !!$('#ovSearch');
+    if (!had) el.innerHTML = '<label class="ovsearch"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4.5 4.5"/></svg><input type="search" id="ovSearch" placeholder="Cerca per nome, tratto o squadra" aria-label="Cerca tra i concorrenti" autocomplete="off"></label><div class="ovstats" id="ovStats"></div>';
+    $('#ovStats').innerHTML =
+      '<span class="ovs"><b data-n="' + n + '">' + n + '</b>' + (n === 1 ? 'concorrente' : 'concorrenti') + '</span>' +
+      '<span class="ovs"><b>' + teams.length + '</b>' + (teams.length === 1 ? 'squadra' : 'squadre') + '<span class="ovteams" aria-hidden="true">' + teams.slice(0, 16).map((k) => '<i style="--c:' + teamColor(k) + '"></i>').join('') + '</span></span>' +
+      '<span class="ovs"><b>' + g.M + '</b>lui · <b>' + g.F + '</b>lei' + (g.N ? ' · <b>' + g.N + '</b>neutri' : '') + '</span>' +
+      '<span class="ovs"><b>' + avg.toFixed(1).replace('.', ',') + '</b>media</span>' +
+      (photos ? '<span class="ovs"><b>' + photos + '</b>con foto</span>' : '') +
+      (topT.length ? '<span class="ovs ovtr">Tratti più diffusi: ' + topT.map(([x, c]) => esc(TRAITS[x].name) + '&nbsp;<b>×' + c + '</b>').join(' · ') + '</span>' : '<span class="ovs ovtr">Nessun tratto assegnato: aprite <b>Modifica</b> per dare un carattere ai concorrenti.</span>');
+  }
+  function applySearch() {
+    const q = castQuery.trim().toLowerCase();
+    let shown = 0;
+    $$('#castList .tile').forEach((el) => {
+      const t = S.cast.find((x) => x.id === el.dataset.id); if (!t) return;
+      const hay = (t.name + ' squadra ' + t.team + ' ' + t.traits.map((x) => TRAITS[x].name).join(' ')).toLowerCase();
+      const ok = !q || hay.includes(q); el.classList.toggle('nomatch', !ok); if (ok) shown++;
+    });
+    $$('#castList .teamblock').forEach((b) => b.classList.toggle('nomatch', !!q && !b.querySelector('.tile:not(.nomatch)')));
+    let nr = $('#castNoRes');
+    if (q && !shown) { if (!nr) { nr = document.createElement('p'); nr.id = 'castNoRes'; nr.className = 'help noresult'; $('#castList').prepend(nr); } nr.textContent = 'Nessun concorrente corrisponde a «' + castQuery.trim() + '».'; }
+    else if (nr) nr.remove();
+  }
+  $('#castOverview').addEventListener('input', (e) => { if (e.target.id === 'ovSearch') { castQuery = e.target.value; applySearch(); } });
+  let lastCount = null;
   function updateCounts() {
     const n = S.cast.length;
     $('#tabCount').textContent = n || '';
-    $('#castSummary').innerHTML = '<b>' + n + '</b> ' + (n === 1 ? 'concorrente' : 'concorrenti') + ' · ' + plural(nTeams(), 'squadra', 'squadre');
+    $('#castSummary').innerHTML = '<b id="dockN">' + n + '</b> ' + (n === 1 ? 'concorrente' : 'concorrenti') + ' · ' + plural(nTeams(), 'squadra', 'squadre');
+    if (lastCount != null && lastCount !== n && curView === 'cast') { AN.countTo($('#dockN'), n, { from: lastCount, dur: 500 }); const d = $('.dockin'); if (d && !AN.reduced) d.animate([{ transform: 'scale(1)' }, { transform: 'scale(1.015)' }, { transform: 'scale(1)' }], { duration: 300 }); }
+    lastCount = n;
     const names = S.cast.map((t) => t.name.trim().toLowerCase()).filter(Boolean);
     const dup = names.filter((x, i) => names.indexOf(x) !== i);
     const empty = S.cast.filter((t) => !t.name.trim()).length;
@@ -598,33 +688,71 @@
     if (i < 0 || !el) return renderCast();
     const tmp = document.createElement('div'); tmp.innerHTML = tileHTML(S.cast[i], i, S.settings.view !== 'team');
     el.replaceWith(tmp.firstChild);
+    renderOverview(); applySearch();
   }
-  function addTribute(open) {
-    const used = new Set(S.cast.map((t) => t.name));
+  function newName(g) { const used = new Set(S.cast.map((t) => t.name)); return D.names[g].find((x) => !used.has(x)) || 'Concorrente ' + (S.cast.length + 1); }
+  function addTribute(open, team) {
     const g = S.cast.length % 2 ? 'M' : 'F';
-    const name = D.names[g].find((x) => !used.has(x)) || 'Concorrente ' + (S.cast.length + 1);
     const ts = +S.settings.teamSize || 1;
-    const team = Math.floor(S.cast.length / ts) + 1;
-    const t = sanitizeTribute({ name, gender: g, team, traits: [], attr: {} });
+    const t = sanitizeTribute({ name: newName(g), gender: g, team: team || Math.floor(S.cast.length / ts) + 1, traits: [], attr: {} });
     D.attrs.forEach((a) => (t.attr[a.id] = 3 + Math.floor(Math.random() * 6)));
-    S.cast.push(t); renderCast(); save();
+    if (team) { const last = S.cast.map((x) => x.team).lastIndexOf(team); S.cast.splice(last + 1, 0, t); } else S.cast.push(t);
+    rerender(new Set([t.id])); save();
+    const el = $('.tile[data-id="' + CSS.escape(t.id) + '"]'); if (el) el.scrollIntoView({ block: 'nearest', behavior: AN.reduced ? 'auto' : 'smooth' });
     if (open) openEditor(t.id);
-    else { const inp = $('#name-' + CSS.escape(t.id)); if (inp) { inp.focus(); inp.select(); } }
+    else { const inp = $('#name-' + CSS.escape(t.id)); if (inp) { inp.focus({ preventScroll: true }); inp.select(); } }
   }
+  // menu delle azioni di ogni scheda
+  function closeMenus(except) { $$('#castList .tpop:not([hidden])').forEach((m) => { if (m !== except) { m.hidden = true; const b = m.parentElement.querySelector('.tmenu'); if (b) b.setAttribute('aria-expanded', 'false'); m.parentElement.classList.remove('menuopen'); } }); }
+  document.addEventListener('click', (e) => { if (!e.target.closest('.tpop') && !e.target.closest('.tmenu')) closeMenus(); });
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') { const open = $('#castList .tpop:not([hidden])'); if (open) { closeMenus(); const b = open.parentElement.querySelector('.tmenu'); if (b) b.focus(); } } });
+  let undoCast = null;
   $('#btnAdd').addEventListener('click', () => addTribute(true));
   $('#castList').addEventListener('click', (e) => {
     const em = e.target.closest('[data-empty]');
     if (em) { if (em.dataset.empty === 'gen') $('#btnRandom').click(); else if (em.dataset.empty === 'bulk') $('#btnBulk').click(); else addTribute(true); return; }
     if (e.target.closest('#addOne')) return addTribute(false);
+    const ta = e.target.closest('.teamadd'); if (ta) return addTribute(false, +ta.dataset.team);
     const b = e.target.closest('[data-act]'); if (!b) return;
     const t = findT(b); if (!t) return;
     const i = S.cast.indexOf(t);
+    const tile = b.closest('.tile');
     switch (b.dataset.act) {
       case 'edit': return openEditor(t.id);
       case 'photo': photoTarget = t.id; $('#avatarFile').click(); return;
-      case 'g': t.gender = b.dataset.v; refreshTile(t.id); break;
-      case 'up': if (i > 0) { [S.cast[i - 1], S.cast[i]] = [S.cast[i], S.cast[i - 1]]; renderCast(); $('.tile[data-id="' + CSS.escape(t.id) + '"] [data-act="up"]')?.focus(); } break;
-      case 'down': if (i < S.cast.length - 1) { [S.cast[i + 1], S.cast[i]] = [S.cast[i], S.cast[i + 1]]; renderCast(); $('.tile[data-id="' + CSS.escape(t.id) + '"] [data-act="down"]')?.focus(); } break;
+      case 'menu': {
+        const m = tile.querySelector('.tpop'); const open = m.hidden;
+        closeMenus(m); m.hidden = !open; b.setAttribute('aria-expanded', String(open)); tile.classList.toggle('menuopen', open);
+        if (open) { const f = m.querySelector('button:not([disabled])'); if (f) f.focus(); if (!AN.reduced) m.animate([{ opacity: 0, transform: 'translateY(6px) scale(.97)' }, { opacity: 1, transform: 'none' }], { duration: 160, easing: 'ease-out' }); }
+        return;
+      }
+      case 'g': {
+        // il genere cambia sul posto: l'indicatore scivola
+        t.gender = b.dataset.v; const gs = b.closest('.gsel');
+        gs.style.setProperty('--gi', { M: 0, F: 1, N: 2 }[t.gender]);
+        $$('button', gs).forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
+        const pl = tile.querySelector('.tpl'); if (pl) pl.innerHTML = profileLine(t).txt;
+        renderOverview(); break;
+      }
+      case 'up': if (i > 0) { [S.cast[i - 1], S.cast[i]] = [S.cast[i], S.cast[i - 1]]; rerender(); $('.tile[data-id="' + CSS.escape(t.id) + '"] .tmenu')?.focus(); } break;
+      case 'down': if (i < S.cast.length - 1) { [S.cast[i + 1], S.cast[i]] = [S.cast[i], S.cast[i + 1]]; rerender(); $('.tile[data-id="' + CSS.escape(t.id) + '"] .tmenu')?.focus(); } break;
+      case 'dup': {
+        const c = sanitizeTribute(JSON.parse(JSON.stringify(Object.assign({}, t, { id: undefined, name: (t.name + ' bis').slice(0, 40) }))));
+        S.cast.splice(i + 1, 0, c); rerender(new Set([c.id])); toast(t.name + ' duplicat' + G3(t.gender, 'o', 'a', 'ə') + '.');
+        break;
+      }
+      case 'rand': {
+        D.attrs.forEach((a) => (t.attr[a.id] = 1 + Math.floor(Math.random() * 10)));
+        refreshTile(t.id);
+        const nt = $('.tile[data-id="' + CSS.escape(t.id) + '"]'); if (nt && !AN.reduced) { nt.classList.add('rolled'); setTimeout(() => nt.classList.remove('rolled'), 900); }
+        break;
+      }
+      case 'del': {
+        undoCast = { t, i }; closeMenus();
+        castLeave(t.id, () => { S.cast = S.cast.filter((x) => x !== t); rerender(); save(); });
+        toast(t.name + ' eliminat' + G3(t.gender, 'o', 'a', 'ə') + '.', { label: 'Annulla', fn: () => { if (!undoCast) return; S.cast.splice(Math.min(undoCast.i, S.cast.length), 0, undoCast.t); const id = undoCast.t.id; undoCast = null; rerender(new Set([id])); save(); } });
+        return;
+      }
       default: return;
     }
     save();
@@ -633,10 +761,11 @@
     if (e.target.dataset.f !== 'name') return;
     const t = findT(e.target); if (!t) return;
     t.name = e.target.value.slice(0, 40);
-    const av = e.target.closest('.tile').querySelector('.avbtn .av'); if (av && !t.img) av.textContent = initials(t.name);
+    const av = e.target.closest('.tile').querySelector('.avbtn .av');
+    if (av && !t.img) { const ini = av.querySelector('.ini'); if (ini) ini.textContent = initials(t.name); else av.textContent = initials(t.name); }
     save();
   });
-  $('#castList').addEventListener('change', (e) => { if (e.target.dataset.f === 'name') updateCounts(); });
+  $('#castList').addEventListener('change', (e) => { if (e.target.dataset.f === 'name') { updateCounts(); renderOverview(); } });
   // trascinamento
   let dragId = null;
   $('#castList').addEventListener('pointerdown', (e) => { const g = e.target.closest('.grip'); if (g) g.closest('.tile').draggable = true; });
@@ -662,7 +791,7 @@
     if (e.clientX > rect.left + rect.width / 2) to += 1;
     if (S.settings.view === 'team' && target) { m.team = target.team; m.color = teamColor(m.team); }
     S.cast.splice(to, 0, m);
-    renderCast(); save();
+    rerender(); save();
   });
   $('#castList').addEventListener('dragend', () => { dragId = null; $$('.tile').forEach((c) => { c.draggable = false; c.classList.remove('dragging', 'over'); }); });
   // foto
@@ -679,6 +808,7 @@
         cv.getContext('2d').drawImage(img, (s - w) / 2, (s - h) / 2, w, h);
         t.img = cv.toDataURL('image/jpeg', 0.82);
         save(); if ($('#editDlg').open && editId === t.id) renderEditor(); refreshTile(t.id);
+        const nt = $('.tile[data-id="' + CSS.escape(t.id) + '"] .avbtn'); if (nt && !AN.reduced) nt.animate([{ transform: 'scale(.6) rotate(-12deg)' }, { transform: 'scale(1.12)' }, { transform: 'none' }], { duration: 520, easing: 'cubic-bezier(.2,.9,.3,1.3)' });
       };
       img.onerror = () => toast('Non riesco a leggere questa immagine.');
       img.src = rd.result;
@@ -688,45 +818,80 @@
   // barra strumenti
   $('#btnRandom').addEventListener('click', () => {
     S.cast = L.randomCast(+$('#presetSize').value, Math.random().toString(36), +S.settings.teamSize || 2).map(sanitizeTribute);
+    castQuery = ''; if ($('#ovSearch')) $('#ovSearch').value = '';
     renderCast(); save(); toast('Cast generato: ' + S.cast.length + ' concorrenti.');
-    const cl = $('#castList'); cl.classList.remove('castenter'); void cl.offsetWidth; cl.classList.add('castenter');
+    const cl = $('#castList'); cl.classList.remove('castenter', 'castdeal'); void cl.offsetWidth; cl.classList.add('castdeal');
   });
   $('#teamSize').addEventListener('change', (e) => { S.settings.teamSize = +e.target.value; save(); });
   $('#btnRegroup').addEventListener('click', () => {
     const ts = +S.settings.teamSize || 1;
     S.cast.forEach((t, i) => { t.team = Math.floor(i / ts) + 1; t.color = teamColor(t.team); });
-    renderCast(); save(); toast('Squadre ricomposte in ordine, da ' + ts + '.');
+    rerender(); save(); toast('Squadre ricomposte in ordine, da ' + ts + '.');
   });
-  $('#viewSeg').addEventListener('click', (e) => { const b = e.target.closest('button'); if (!b) return; S.settings.view = b.dataset.v; save(); renderCast(); });
+  $('#viewSeg').addEventListener('click', (e) => { const b = e.target.closest('button'); if (!b || S.settings.view === b.dataset.v) return; S.settings.view = b.dataset.v; save(); rerender(); });
+  // sul telefono le opzioni secondarie si aprono a richiesta
+  $('#toolMore').addEventListener('click', () => { const g = $('#toolSecondary'), open = !g.classList.contains('open'); g.classList.toggle('open', open); $('#toolMore').setAttribute('aria-expanded', String(open)); if (open && !AN.reduced) g.animate([{ opacity: 0, transform: 'translateY(-6px)' }, { opacity: 1, transform: 'none' }], { duration: 200, easing: 'ease-out' }); });
   $('#btnClear').addEventListener('click', () => ($('#clearConfirm').hidden = false));
   $('#clearNo').addEventListener('click', () => ($('#clearConfirm').hidden = true));
-  $('#clearYes').addEventListener('click', () => { S.cast = []; $('#clearConfirm').hidden = true; renderCast(); save(); });
+  $('#clearYes').addEventListener('click', () => {
+    const old = S.cast.slice(); $('#clearConfirm').hidden = true;
+    const done = () => { S.cast = []; renderCast(); save(); toast(plural(old.length, 'concorrente eliminato', 'concorrenti eliminati') + '.', { label: 'Annulla', fn: () => { S.cast = old; renderCast(); save(); const cl = $('#castList'); cl.classList.remove('castdeal'); void cl.offsetWidth; cl.classList.add('castdeal'); } }); };
+    const tiles = $$('#castList .tile'); if (AN.reduced || !tiles.length) return done();
+    tiles.forEach((el, k) => el.animate([{ opacity: 1, transform: 'none' }, { opacity: 0, transform: 'translateY(18px) scale(.9)' }], { duration: 260, delay: Math.min(k, 20) * 14, easing: 'ease-in', fill: 'forwards' }));
+    setTimeout(done, 260 + Math.min(tiles.length, 20) * 14);
+  });
 
   // scheda di modifica
   function openEditor(id) { editId = id; renderEditor(); if (!$('#editDlg').open) $('#editDlg').showModal(); }
+  // tratti che si contraddicono: non si possono avere insieme
+  const CLASH = [['leale', 'traditore'], ['pacifista', 'spietato'], ['pacifista', 'bruto'], ['fortunato', 'sfortunato'], ['clemente', 'vendicativo'], ['generoso', 'avido'], ['leader', 'solitario'], ['codardo', 'impulsivo']];
+  const clashOf = (t, id) => { for (const [a, b] of CLASH) { if (a === id && t.traits.includes(b)) return b; if (b === id && t.traits.includes(a)) return a; } return null; };
+  const PRESETS = [
+    ['Combattente', { for: 9, agi: 8, cor: 8, res: 7 }], ['Stratega', { int: 9, furt: 7, car: 6, sop: 6 }], ['Sopravvissuto', { sop: 9, res: 8, fort: 6, agi: 6 }],
+    ['Ombra', { furt: 9, agi: 8, int: 6 }], ['Leader', { car: 9, cor: 7, emp: 7, int: 6 }], ['Cuore d\'oro', { emp: 9, car: 7, res: 6 }], ['Fortunato', { fort: 10, agi: 6 }],
+  ];
+  // il radar delle dieci caratteristiche
+  function radarPts(t, R) { const n = D.attrs.length; return D.attrs.map((a, k) => { const ang = -Math.PI / 2 + (2 * Math.PI * k) / n, v = (t.attr[a.id] || 5) / 10; return [110 + Math.cos(ang) * R * v, 110 + Math.sin(ang) * R * v]; }); }
+  function radarHTML(t) {
+    const n = D.attrs.length, R = 84;
+    const ring = (f) => D.attrs.map((a, k) => { const ang = -Math.PI / 2 + (2 * Math.PI * k) / n; return (110 + Math.cos(ang) * R * f).toFixed(1) + ',' + (110 + Math.sin(ang) * R * f).toFixed(1); }).join(' ');
+    const axes = D.attrs.map((a, k) => { const ang = -Math.PI / 2 + (2 * Math.PI * k) / n, x = 110 + Math.cos(ang) * (R + 15), y = 110 + Math.sin(ang) * (R + 15); return '<line x1="110" y1="110" x2="' + (110 + Math.cos(ang) * R).toFixed(1) + '" y2="' + (110 + Math.sin(ang) * R).toFixed(1) + '"/><text x="' + x.toFixed(1) + '" y="' + (y + 3).toFixed(1) + '">' + ATTR_SHORT[a.id] + '</text>'; }).join('');
+    return '<svg class="radar" viewBox="0 0 220 220" role="img" aria-label="Profilo delle caratteristiche"><g class="rg">' + [0.25, 0.5, 0.75, 1].map((f) => '<polygon points="' + ring(f) + '"/>').join('') + axes + '</g><polygon class="rv" id="radarPoly" points="' + radarPts(t, R).map((p) => p.map((x) => x.toFixed(1)).join(',')).join(' ') + '"/>' + radarPts(t, R).map((p, k) => '<circle class="rp" data-k="' + D.attrs[k].id + '" cx="' + p[0].toFixed(1) + '" cy="' + p[1].toFixed(1) + '" r="3"/>').join('') + '</svg>';
+  }
+  function updateRadar(t) {
+    const pts = radarPts(t, 84), poly = $('#radarPoly'); if (!poly) return;
+    poly.setAttribute('points', pts.map((p) => p.map((x) => x.toFixed(1)).join(',')).join(' '));
+    $$('#editBody .rp').forEach((c, k) => { c.setAttribute('cx', pts[k][0].toFixed(1)); c.setAttribute('cy', pts[k][1].toFixed(1)); });
+    const pl = $('#editProfile'); if (pl) pl.innerHTML = profileLine(t).txt;
+  }
   function renderEditor() {
     const t = S.cast.find((x) => x.id === editId); if (!t) return $('#editDlg').close();
-    const sum = D.attrs.reduce((s, a) => s + t.attr[a.id], 0);
+    const sum = D.attrs.reduce((s2, a) => s2 + t.attr[a.id], 0);
+    const idx = S.cast.indexOf(t) + 1;
     $('#editBody').innerHTML =
       '<div class="dh"><h2 id="h-edit">' + esc(t.name || 'Senza nome') + '</h2><button class="iconbtn" data-close type="button" aria-label="Chiudi">✕</button></div>' +
       '<div class="db">' +
-        '<div class="profhead"><button class="avbtn" type="button" data-e="photo" aria-label="Carica una foto">' + avHTML(t) + '<span class="cam">' + IC.cam + '</span></button>' +
-          '<div class="ps"><div class="row">' + (t.img ? '<button class="btn sm" type="button" data-e="rmphoto">Togli la foto</button>' : '<button class="btn sm" type="button" data-e="photo">Carica una foto</button>') + '</div><small class="help">La foto resta solo in questo browser.</small></div></div>' +
-        '<label class="field" for="e-name"><span>Nome</span><input type="text" id="e-name" value="' + esc(t.name) + '" maxlength="40"></label>' +
+        '<div class="profhead edhead" style="--c:' + esc(t.color) + '"><button class="avbtn" type="button" data-e="photo" aria-label="Carica una foto">' + avHTML(t) + '<span class="cam">' + IC.cam + '</span></button>' +
+          '<div class="ps"><span class="edmeta">N. ' + idx + ' · Squadra ' + t.team + '</span><span class="edprof" id="editProfile">' + profileLine(t).txt + '</span><div class="row">' + (t.img ? '<button class="btn sm" type="button" data-e="rmphoto">Togli la foto</button><button class="btn sm" type="button" data-e="photo">Cambia foto</button>' : '<button class="btn sm" type="button" data-e="photo">Carica una foto</button>') + '</div><small class="help">La foto resta solo in questo browser.</small></div></div>' +
+        '<label class="field" for="e-name"><span>Nome</span><input type="text" id="e-name" value="' + esc(t.name) + '" maxlength="40" autocomplete="off"></label>' +
         '<div class="row" style="gap:16px;align-items:flex-end">' +
           '<div class="field"><span>Genere (per le frasi)</span><div class="seg" role="group" aria-label="Genere">' + ['M', 'F', 'N'].map((g) => '<button type="button" data-e="g" data-v="' + g + '" aria-pressed="' + (t.gender === g) + '">' + G3(g, 'Lui', 'Lei', 'Neutro') + '</button>').join('') + '</div></div>' +
           '<label class="field" for="e-team" style="width:110px"><span>Squadra</span><input type="number" id="e-team" min="1" max="99" value="' + t.team + '"></label>' +
         '</div>' +
-        '<div class="field"><span>Tratti · ' + t.traits.length + ' di 3</span><div class="traitpick">' + D.traits.map((x) => '<button type="button" data-e="trait" data-v="' + x.id + '" aria-pressed="' + t.traits.includes(x.id) + '"' + (!t.traits.includes(x.id) && t.traits.length >= 3 ? ' disabled' : '') + ' title="' + esc(x.desc) + '">' + esc(x.name) + '</button>').join('') + '</div><p class="help traitdesc" id="traitDesc">' + (t.traits.length ? t.traits.map((x) => '<b>' + esc(TRAITS[x].name) + '</b>: ' + esc(TRAITS[x].desc)).join(' ') : 'Passa sopra un tratto per leggerne l\'effetto.') + '</p></div>' +
-        '<div class="field"><span>Caratteristiche · totale <b id="attrSum">' + sum + '</b></span><div class="attrgrid">' + D.attrs.map((a) => '<label for="ea-' + a.id + '" title="' + esc((D.attrDesc || {})[a.id] || '') + '">' + a.name + '</label><input type="range" min="1" max="10" id="ea-' + a.id + '" data-k="' + a.id + '" value="' + t.attr[a.id] + '"><output>' + t.attr[a.id] + '</output>').join('') + '</div>' +
-          '<div class="row" style="margin-top:6px"><button class="btn sm" type="button" data-e="rattr">Valori casuali</button><button class="btn sm" type="button" data-e="avg">Tutti a 5</button></div></div>' +
+        '<div class="field"><span>Tratti · ' + t.traits.length + ' di 3</span><div class="traitpick">' + D.traits.map((x) => { const on = t.traits.includes(x.id), cl = !on && clashOf(t, x.id); const off = !on && (t.traits.length >= 3 || cl); return '<button type="button" data-e="trait" data-v="' + x.id + '" aria-pressed="' + on + '"' + (off ? ' disabled' : '') + ' title="' + esc(cl ? 'In contrasto con ' + TRAITS[cl].name : x.desc) + '"' + (cl ? ' class="clash"' : '') + '>' + esc(x.name) + '</button>'; }).join('') + '</div><p class="help traitdesc" id="traitDesc">' + (t.traits.length ? t.traits.map((x) => '<b>' + esc(TRAITS[x].name) + '</b>: ' + esc(TRAITS[x].desc)).join(' ') : 'Passa sopra un tratto per leggerne l\'effetto. Alcuni tratti si escludono a vicenda.') + '</p></div>' +
+        '<div class="field"><span>Caratteristiche · totale <b id="attrSum">' + sum + '</b> · media <b id="attrAvg">' + (sum / D.attrs.length).toFixed(1).replace('.', ',') + '</b></span>' +
+          '<div class="edstats">' + radarHTML(t) + '<div class="presets"><span class="help">Profili pronti</span>' + PRESETS.map(([n], k) => '<button class="btn sm" type="button" data-e="preset" data-v="' + k + '">' + esc(n) + '</button>').join('') + '<button class="btn sm" type="button" data-e="avg">Tutti a 5</button><button class="btn sm" type="button" data-e="rattr">Casuali</button></div></div>' +
+          '<div class="attrgrid">' + D.attrs.map((a) => '<label for="ea-' + a.id + '" title="' + esc((D.attrDesc || {})[a.id] || '') + '">' + a.name + '</label><input type="range" min="1" max="10" id="ea-' + a.id + '" data-k="' + a.id + '" value="' + t.attr[a.id] + '" style="--v:' + t.attr[a.id] + '"><output class="' + (t.attr[a.id] >= 8 ? 'hi' : t.attr[a.id] <= 3 ? 'lo' : '') + '">' + t.attr[a.id] + '</output>').join('') + '</div>' +
+          '<p class="help" id="attrHelp">' + esc((D.attrDesc || {}).for || '') + '</p></div>' +
         '<div class="row" style="justify-content:space-between;border-top:1px solid var(--line);padding-top:14px"><button class="btn danger ghost" type="button" data-e="del">Elimina concorrente</button><button class="btn primary" type="button" data-close>Fatto</button></div>' +
         '<div class="confirm" id="delConfirm" hidden>Eliminare ' + esc(t.name || 'questo concorrente') + '? <button class="btn danger sm" type="button" data-e="delyes">Elimina</button></div>' +
       '</div>';
   }
+  let prevAttr = {};
   $('#editDlg').addEventListener('click', (e) => {
     const b = e.target.closest('[data-e]'); if (!b) return;
     const t = S.cast.find((x) => x.id === editId); if (!t) return;
+    prevAttr = Object.assign({}, t.attr);
     switch (b.dataset.e) {
       case 'photo': photoTarget = t.id; $('#avatarFile').click(); return;
       case 'rmphoto': t.img = ''; break;
@@ -734,23 +899,41 @@
       case 'trait': t.traits.includes(b.dataset.v) ? (t.traits = t.traits.filter((x) => x !== b.dataset.v)) : t.traits.length < 3 && t.traits.push(b.dataset.v); break;
       case 'rattr': D.attrs.forEach((a) => (t.attr[a.id] = 1 + Math.floor(Math.random() * 10))); break;
       case 'avg': D.attrs.forEach((a) => (t.attr[a.id] = 5)); break;
+      case 'preset': { const pr = PRESETS[+b.dataset.v][1]; D.attrs.forEach((a) => (t.attr[a.id] = pr[a.id] || 4)); break; }
       case 'del': $('#delConfirm').hidden = false; return;
-      case 'delyes': S.cast = S.cast.filter((x) => x.id !== t.id); save(); $('#editDlg').close(); renderCast(); return;
+      case 'delyes': { const i0 = S.cast.indexOf(t); S.cast = S.cast.filter((x) => x.id !== t.id); save(); $('#editDlg').close(); renderCast(); toast(t.name + ' eliminat' + G3(t.gender, 'o', 'a', 'ə') + '.', { label: 'Annulla', fn: () => { S.cast.splice(Math.min(i0, S.cast.length), 0, t); rerender(new Set([t.id])); save(); } }); return; }
       default: return;
     }
+    // i valori cambiano con un'animazione del radar, invece di saltare
+    const old = /preset|avg|rattr/.test(b.dataset.e) ? radarPts(Object.assign({}, t, { attr: Object.assign({}, prevAttr) }), 84) : null;
     save(); renderEditor();
+    if (old && !AN.reduced) {
+      const to = radarPts(t, 84), poly = $('#radarPoly'), dots = $$('#editBody .rp'), t0 = performance.now();
+      const step = (now) => { const k = Math.min(1, (now - t0) / 420), e2 = 1 - Math.pow(1 - k, 3); const pts = to.map((p, j) => [old[j][0] + (p[0] - old[j][0]) * e2, old[j][1] + (p[1] - old[j][1]) * e2]); if (poly) poly.setAttribute('points', pts.map((p) => p.map((x) => x.toFixed(1)).join(',')).join(' ')); dots.forEach((c, j) => { c.setAttribute('cx', pts[j][0].toFixed(1)); c.setAttribute('cy', pts[j][1].toFixed(1)); }); if (k < 1) requestAnimationFrame(step); };
+      requestAnimationFrame(step);
+      $$('#editBody .attrgrid output').forEach((o, k) => o.animate([{ transform: 'scale(1.35)' }, { transform: 'none' }], { duration: 300, delay: k * 18 }));
+    }
     const again = $('#editBody [data-e="' + b.dataset.e + '"]' + (b.dataset.v ? '[data-v="' + b.dataset.v + '"]' : '')); if (again) again.focus();
   });
   $('#editDlg').addEventListener('input', (e) => {
     const t = S.cast.find((x) => x.id === editId); if (!t) return;
     if (e.target.id === 'e-name') { t.name = e.target.value.slice(0, 40); $('#h-edit').textContent = t.name || 'Senza nome'; }
     else if (e.target.id === 'e-team') { const v = Math.round(+e.target.value); if (v >= 1 && v <= 99) { t.team = v; t.color = teamColor(v); const av = $('#editBody .profhead .av'); if (av) av.style.setProperty('--c', t.color); } }
-    else if (e.target.dataset.k) { t.attr[e.target.dataset.k] = +e.target.value; e.target.nextElementSibling.textContent = e.target.value; $('#attrSum').textContent = D.attrs.reduce((s, a) => s + t.attr[a.id], 0); }
+    else if (e.target.dataset.k) {
+      const v = +e.target.value, o = e.target.nextElementSibling; t.attr[e.target.dataset.k] = v; o.textContent = v; o.className = v >= 8 ? 'hi' : v <= 3 ? 'lo' : '';
+      e.target.style.setProperty('--v', v);
+      const sm = D.attrs.reduce((s2, a) => s2 + t.attr[a.id], 0); $('#attrSum').textContent = sm; $('#attrAvg').textContent = (sm / D.attrs.length).toFixed(1).replace('.', ',');
+      updateRadar(t); const dot = $('#editBody .rp[data-k="' + e.target.dataset.k + '"]'); if (dot && !AN.reduced) dot.animate([{ r: 3 }, { r: 6 }, { r: 3 }], { duration: 260 });
+      $('#attrHelp').textContent = (D.attrDesc || {})[e.target.dataset.k] || '';
+    }
     save();
   });
-  $('#editDlg').addEventListener('mouseover', (e) => { const b = e.target.closest('[data-e="trait"]'); if (b) { const x = TRAITS[b.dataset.v]; $('#traitDesc').innerHTML = '<b>' + esc(x.name) + '</b>: ' + esc(x.desc); } });
+  $('#editDlg').addEventListener('mouseover', (e) => {
+    const b = e.target.closest('[data-e="trait"]'); if (b) { const x = TRAITS[b.dataset.v], t = S.cast.find((y) => y.id === editId), cl = t && !t.traits.includes(x.id) && clashOf(t, x.id); $('#traitDesc').innerHTML = '<b>' + esc(x.name) + '</b>: ' + esc(x.desc) + (cl ? ' <span class="clashnote">In contrasto con ' + esc(TRAITS[cl].name) + '.</span>' : ''); }
+    const r = e.target.closest('.attrgrid input, .attrgrid label'); if (r) { const k = r.dataset.k || (r.getAttribute('for') || '').replace('ea-', ''); if ((D.attrDesc || {})[k]) $('#attrHelp').textContent = D.attrDesc[k]; }
+  });
   $('#editDlg').addEventListener('focusin', (e) => { const b = e.target.closest('[data-e="trait"]'); if (b) { const x = TRAITS[b.dataset.v]; $('#traitDesc').innerHTML = '<b>' + esc(x.name) + '</b>: ' + esc(x.desc); } });
-  $('#editDlg').addEventListener('close', () => { if (curView === 'cast') renderCast(); });
+  $('#editDlg').addEventListener('close', () => { if (curView === 'cast') { renderCast(); const el = editId && $('.tile[data-id="' + CSS.escape(editId) + '"]'); if (el && !AN.reduced) { el.classList.add('fresh'); setTimeout(() => el.classList.remove('fresh'), 1200); } } });
 
   // elenco incollato
   $('#btnBulk').addEventListener('click', () => { $('#bulkMsg').textContent = ''; $('#bulkDlg').showModal(); $('#bulkText').focus(); });
