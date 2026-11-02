@@ -103,16 +103,19 @@ Un interruttore nella sezione Arena, attivo solo dopo la conferma dell'età, agg
 - Tutto si ferma se il sistema chiede di ridurre le animazioni.
 
 ## La sezione Concorrenti
-- **Schede ricche**: volto grande con anello del colore di squadra, numero d'ordine, squadra e media delle caratteristiche, un profilo in miniatura delle dieci caratteristiche (verde i punti forti, rosso quelli deboli) con il punto forte e il punto debole scritti in parole, tratti e un invito a aggiungerne.
+- **Schede ricche**: volto grande con anello del colore di squadra, squadra, un profilo in miniatura delle dieci caratteristiche (verde i punti forti, rosso quelli deboli) con «Forte in…» e «Debole in…» su due righe, tratti e un invito a aggiungerne.
 - **Modifiche sul posto**: il nome si scrive direttamente sulla scheda, il genere si cambia con un selettore che scivola, il volto si tocca per caricare una foto.
 - **Menu delle azioni** (⋯) su ogni scheda: sposta prima o dopo, duplica, caratteristiche casuali, elimina. Eliminare (anche tutto il cast) si può **annullare** dal messaggio che compare.
-- **Panoramica del cast** con ricerca per nome, tratto o squadra, numero di concorrenti e squadre (con i colori), lui/lei/neutri, media generale, foto e tratti più diffusi.
+- **Panoramica del cast**: un pannello con i numeri grandi e la loro parola sotto (concorrenti, squadre con i colori, lui, lei, neutri, media, foto), i tratti più diffusi con il conteggio a parte, e la ricerca per nome, tratto o squadra.
 - **Vista per squadra** con media di ogni squadra e un **+** per aggiungere un concorrente direttamente in quella squadra.
 - **Scheda di modifica** con radar delle caratteristiche che si aggiorna dal vivo, profili pronti (Combattente, Stratega, Sopravvissuto, Ombra, Leader, Cuore d'oro, Fortunato), descrizione della caratteristica sotto il cursore e tratti incompatibili bloccati con la spiegazione (Leale e Traditore, Pacifista e Spietato, Fortunato e Sfortunato…).
+- **Aggiornamenti sul posto**: aggiungere un concorrente o chiudere la scheda di modifica cambia solo la scheda interessata; le altre restano ferme, senza ricaricarsi né rifare l'animazione d'ingresso.
 - **Animazioni**: le schede vengono distribuite come carte quando si genera un cast, scivolano al loro posto quando si riordinano, trascinano o si ricompongono le squadre, entrano con un alone quando si aggiungono o duplicano, svaniscono quando si eliminano; il profilo in miniatura si rimescola con i valori casuali, il radar si trasforma da un profilo all'altro, il conteggio dei concorrenti scorre. Tutto rispetta l'impostazione «riduci movimento».
 - **Sul telefono** le opzioni secondarie (squadre, vista, importa, svuota) si aprono con «Altre opzioni» e la panoramica si compatta.
 
 ## Interfaccia
+- **Caratteri**: Bricolage Grotesque per titoli e numeri, Figtree per il testo; JetBrains Mono resta solo per il seme e il codice. Niente maiuscolo forzato né lettere spaziate: le etichette sono frasi normali, i numeri stanno sopra la loro parola invece di essere ammassati in una riga.
+- **Riquadri**: angoli più morbidi, bordi chiari e ombre leggere; meno pannelli grigi annidati.
 - **Home** con partita lampo (24 concorrenti casuali, arena a sorpresa) e un tabellone dimostrativo animato.
 - **Concorrenti**: griglia o vista per squadra, nome modificabile sul posto, scheda laterale per tratti, caratteristiche e foto, elenco da incollare.
 - **Arena**: ogni arena ha la sua tinta che colora tutta l'app; anteprima con luoghi, armi, pericoli, disastri ed eventi d'esempio con il tuo cast.

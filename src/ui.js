@@ -459,7 +459,7 @@
     if (v === 'home' && ART.assets.logo) document.documentElement.style.setProperty('--h', 162);
     else setHue((v === 'diretta' || v === 'esito') && SIM ? SIM.theme : S.settings.theme);
     if (v === 'home') renderHome();
-    if (v === 'cast') { renderCast(); if (changed) { const cl = $('#castList'); cl.classList.remove('castenter'); void cl.offsetWidth; cl.classList.add('castenter'); } }
+    if (v === 'cast') { renderCast(); if (changed) playEntrance('castenter'); }
     if (v === 'arena') renderArena();
     if (v === 'diretta') renderLive(true);
     if (v === 'esito') renderResults();
@@ -524,7 +524,7 @@
       const deadSoFar = new Set();
       for (let k = 0; k <= demoI; k++) evs[k].e.deaths.forEach((id) => deadSoFar.add(id));
       $('#hbAlive').textContent = total - deadSoFar.size;
-      $('#hbDay').textContent = (KIND[p.kind] === 'Apertura' ? 'APERTURA' : 'GIORNO ' + p.day);
+      $('#hbDay').textContent = (KIND[p.kind] === 'Apertura' ? 'Apertura' : 'Giorno ' + p.day);
       $('#hbTally').innerHTML = '<i class="d"></i>'.repeat(deadSoFar.size) + '<i></i>'.repeat(total - deadSoFar.size);
       $('#hbLine').innerHTML = e.html.replace(/<b class="nm"[^>]*>/g, '<b>');
       demoI++;
@@ -549,8 +549,8 @@
     const a = D.attrs.map((x) => [x, t.attr[x.id] != null ? t.attr[x.id] : 5]);
     const hi = a.slice().sort((x, y) => y[1] - x[1])[0], lo = a.slice().sort((x, y) => x[1] - y[1])[0];
     const avg = a.reduce((s2, x) => s2 + x[1], 0) / a.length;
-    if (hi[1] - lo[1] <= 2) return { txt: 'Equilibrat' + G3(t.gender, 'o', 'a', 'ə') + ' in tutto', avg };
-    return { txt: 'Forte in <b>' + esc(hi[0].name) + '</b>' + (lo[1] <= 4 ? ' · debole in <b>' + esc(lo[0].name) + '</b>' : ''), avg };
+    if (hi[1] - lo[1] <= 2) return { txt: '<span class="pl-eq">Equilibrat' + G3(t.gender, 'o', 'a', 'ə') + ' in tutto</span>', avg };
+    return { txt: '<span class="pl-hi">Forte in <b>' + esc(hi[0].name) + '</b></span>' + (lo[1] <= 4 ? '<span class="pl-lo">Debole in <b>' + esc(lo[0].name) + '</b></span>' : ''), avg };
   }
   function attrStrip(t) {
     return '<span class="astrip" aria-hidden="true">' + D.attrs.map((a) => { const v = t.attr[a.id] != null ? t.attr[a.id] : 5; return '<i class="' + (v >= 8 ? 'hi' : v <= 3 ? 'lo' : '') + '" style="--v:' + v + '" title="' + esc(a.name) + ' ' + v + '"></i>'; }).join('') + '</span>';
@@ -561,12 +561,11 @@
     const pf = profileLine(t);
     const gi = { M: 0, F: 1, N: 2 }[t.gender] || 0;
     return '<article class="tile" data-id="' + esc(t.id) + '" style="--ti:' + Math.min(i, 30) + ';--c:' + esc(t.color || teamColor(t.team)) + '">' +
-      '<span class="tnum" aria-hidden="true">' + (i + 1) + '</span>' +
       '<button class="grip" type="button" aria-label="Trascina per riordinare" title="Trascina per riordinare">' + GRIP + '</button>' +
       '<div class="thead">' +
         '<button class="avbtn" type="button" data-act="photo" aria-label="' + (t.img ? 'Cambia la foto di ' : 'Carica una foto per ') + esc(t.name || 'questo concorrente') + '">' + avHTML(t) + '<span class="cam">' + IC.cam + '</span></button>' +
         '<div class="tid"><input class="tname" type="text" id="name-' + esc(t.id) + '" data-f="name" value="' + esc(t.name) + '" placeholder="Nome" aria-label="Nome" maxlength="40" autocomplete="off">' +
-        '<div class="tsub"><span class="teamchip"><i></i>Squadra ' + t.team + '</span><span class="tavg" title="Media delle caratteristiche">media ' + pf.avg.toFixed(1).replace('.', ',') + '</span></div></div>' +
+        '<div class="tsub"><span class="teamchip"><i></i>Squadra ' + t.team + '</span></div></div>' +
       '</div>' +
       '<div class="tprofile">' + attrStrip(t) + '<span class="tpl">' + pf.txt + '</span></div>' +
       '<div class="chips">' + traits + '</div>' +
@@ -582,6 +581,32 @@
         '<button type="button" role="menuitem" data-act="del" class="danger">Elimina</button>' +
       '</div>' +
     '</article>';
+  }
+  // aggiorna il DOM sul posto: le schede già presenti restano gli stessi nodi
+  // (niente foto ricaricate, niente animazioni ripartite), cambiano solo i pezzi diversi
+  function morph(a, b) {
+    if (a.isEqualNode(b)) return;
+    for (const at of [...a.attributes]) if (!b.hasAttribute(at.name)) a.removeAttribute(at.name);
+    for (const at of [...b.attributes]) if (a.getAttribute(at.name) !== at.value) a.setAttribute(at.name, at.value);
+    if (a.tagName === 'INPUT' || a.tagName === 'TEXTAREA') { if (a !== document.activeElement && a.value !== b.value) a.value = b.value; return; }
+    morphKids(a, b);
+  }
+  function morphKids(a, b) {
+    const ac = [...a.childNodes], bc = [...b.childNodes];
+    const keyed = bc.some((n) => n.nodeType === 1 && n.dataset.id);
+    if (keyed) {
+      const old = new Map(); ac.forEach((n) => { if (n.nodeType === 1 && n.dataset && n.dataset.id) old.set(n.dataset.id, n); });
+      const next = bc.map((n) => { const o = n.nodeType === 1 && n.dataset.id && old.get(n.dataset.id); if (o) { old.delete(n.dataset.id); morph(o, n); return o; } return n; });
+      // sposta solo i nodi fuori posto, così chi resta fermo non viene staccato
+      ac.forEach((n) => { if (!next.includes(n)) n.remove(); });
+      next.forEach((n, k) => { if (a.childNodes[k] !== n) a.insertBefore(n, a.childNodes[k] || null); });
+      return;
+    }
+    if (ac.length !== bc.length || ac.some((n, k) => n.nodeType !== bc[k].nodeType || n.nodeName !== bc[k].nodeName || (n.nodeType === 1 && n.className !== bc[k].className && !n.classList.contains('tile')))) { a.replaceChildren(...bc); return; }
+    ac.forEach((n, k) => { if (n.nodeType === 1) morph(n, bc[k]); else if (n.data !== bc[k].data) n.data = bc[k].data; });
+  }
+  function patchHTML(el, html) {
+    const tmp = document.createElement(el.tagName); tmp.innerHTML = html; morphKids(el, tmp);
   }
   // animazioni della griglia: chi si sposta scivola, chi arriva entra, chi esce svanisce
   function castRects() { const m = new Map(); $$('#castList .tile').forEach((el) => m.set(el.dataset.id, el.getBoundingClientRect())); return m; }
@@ -599,6 +624,16 @@
     });
   }
   function rerender(fresh) { const before = castRects(); renderCast(); castFlip(before, fresh); }
+  // l'ingresso delle schede si vede una volta sola: poi la classe sparisce,
+  // così le schede ridisegnate più tardi non rifanno l'animazione
+  let entranceTimer = null;
+  function playEntrance(cls) {
+    const cl = $('#castList'); clearTimeout(entranceTimer);
+    cl.classList.remove('castenter', 'castdeal');
+    if (AN.reduced) return;
+    void cl.offsetWidth; cl.classList.add(cls);
+    entranceTimer = setTimeout(() => cl.classList.remove(cls), 1400 + Math.min(S.cast.length, 30) * 35);
+  }
   function castLeave(id, done) {
     const el = $('#castList .tile[data-id="' + CSS.escape(id) + '"]');
     if (!el || AN.reduced) return done();
@@ -620,14 +655,14 @@
     if (S.settings.view === 'team') {
       const teams = {};
       S.cast.forEach((t, i) => (teams[t.team] = teams[t.team] || []).push([t, i]));
-      $('#castList').innerHTML = '<div class="teamwrap">' + Object.keys(teams).sort((a, b) => a - b).map((k) => {
+      patchHTML($('#castList'), '<div class="teamwrap">' + Object.keys(teams).sort((a, b) => a - b).map((k) => {
         const ms = teams[k].map((x) => x[0]);
         const avg = ms.reduce((s2, t) => s2 + D.attrs.reduce((q, a) => q + (t.attr[a.id] || 5), 0) / D.attrs.length, 0) / ms.length;
-        return '<section class="teamblock card" style="--c:' + teamColor(+k) + '"><h3><i></i><b>Squadra ' + k + '</b><span>' + plural(ms.length, 'concorrente', 'concorrenti') + ' · media ' + avg.toFixed(1).replace('.', ',') + '</span>' +
+        return '<section class="teamblock card" style="--c:' + teamColor(+k) + '"><h3><i></i><b>Squadra ' + k + '</b><span class="tbcount"><em class="fcount">' + plural(ms.length, 'concorrente', 'concorrenti') + '</em><em class="fcount">Media <b>' + avg.toFixed(1).replace('.', ',') + '</b></em></span>' +
           '<button type="button" class="teamadd" data-team="' + k + '" aria-label="Aggiungi un concorrente alla squadra ' + k + '">+</button></h3><div class="castgrid">' + teams[k].map(([t, i]) => tileHTML(t, i, false)).join('') + '</div></section>';
-      }).join('') + '</div><div class="castgrid" style="margin-top:14px">' + add + '</div>';
+      }).join('') + '</div><div class="castgrid" style="margin-top:14px">' + add + '</div>');
     } else {
-      $('#castList').innerHTML = '<div class="castgrid">' + S.cast.map((t, i) => tileHTML(t, i, true)).join('') + add + '</div>';
+      patchHTML($('#castList'), '<div class="castgrid">' + S.cast.map((t, i) => tileHTML(t, i, true)).join('') + add + '</div>');
     }
     updateCounts(); renderOverview(); applySearch();
   }
@@ -643,13 +678,16 @@
     const avg = S.cast.reduce((s2, t) => s2 + D.attrs.reduce((q, a) => q + (t.attr[a.id] || 5), 0) / D.attrs.length, 0) / n;
     const had = !!$('#ovSearch');
     if (!had) el.innerHTML = '<label class="ovsearch"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4.5 4.5"/></svg><input type="search" id="ovSearch" placeholder="Cerca per nome, tratto o squadra" aria-label="Cerca tra i concorrenti" autocomplete="off"></label><div class="ovstats" id="ovStats"></div>';
+    const stat = (v, l, extra) => '<div class="ovs"><b>' + v + '</b><span>' + l + '</span>' + (extra || '') + '</div>';
     $('#ovStats').innerHTML =
-      '<span class="ovs"><b data-n="' + n + '">' + n + '</b>' + (n === 1 ? 'concorrente' : 'concorrenti') + '</span>' +
-      '<span class="ovs"><b>' + teams.length + '</b>' + (teams.length === 1 ? 'squadra' : 'squadre') + '<span class="ovteams" aria-hidden="true">' + teams.slice(0, 16).map((k) => '<i style="--c:' + teamColor(k) + '"></i>').join('') + '</span></span>' +
-      '<span class="ovs"><b>' + g.M + '</b>lui · <b>' + g.F + '</b>lei' + (g.N ? ' · <b>' + g.N + '</b>neutri' : '') + '</span>' +
-      '<span class="ovs"><b>' + avg.toFixed(1).replace('.', ',') + '</b>media</span>' +
-      (photos ? '<span class="ovs"><b>' + photos + '</b>con foto</span>' : '') +
-      (topT.length ? '<span class="ovs ovtr">Tratti più diffusi: ' + topT.map(([x, c]) => esc(TRAITS[x].name) + '&nbsp;<b>×' + c + '</b>').join(' · ') + '</span>' : '<span class="ovs ovtr">Nessun tratto assegnato: aprite <b>Modifica</b> per dare un carattere ai concorrenti.</span>');
+      '<div class="ovnums">' +
+        stat(n, n === 1 ? 'Concorrente' : 'Concorrenti') +
+        stat(teams.length, teams.length === 1 ? 'Squadra' : 'Squadre', '<span class="ovteams" aria-hidden="true">' + teams.slice(0, 16).map((k) => '<i style="--c:' + teamColor(k) + '"></i>').join('') + '</span>') +
+        stat(g.M, 'Lui') + stat(g.F, 'Lei') + (g.N ? stat(g.N, g.N === 1 ? 'Neutro' : 'Neutri') : '') +
+        stat(avg.toFixed(1).replace('.', ','), 'Media caratteristiche') +
+        (photos ? stat(photos, 'Con foto') : '') +
+      '</div>' +
+      '<div class="ovtr">' + (topT.length ? '<span>Tratti più diffusi</span>' + topT.map(([x, c]) => '<span class="ovchip">' + esc(TRAITS[x].name) + '<i>' + c + '</i></span>').join('') : '<span>Nessun tratto assegnato: aprite <b>Modifica</b> per dare un carattere ai concorrenti.</span>') + '</div>';
   }
   function applySearch() {
     const q = castQuery.trim().toLowerCase();
@@ -687,7 +725,7 @@
     const el = $('.tile[data-id="' + CSS.escape(id) + '"]');
     if (i < 0 || !el) return renderCast();
     const tmp = document.createElement('div'); tmp.innerHTML = tileHTML(S.cast[i], i, S.settings.view !== 'team');
-    el.replaceWith(tmp.firstChild);
+    morph(el, tmp.firstChild);
     renderOverview(); applySearch();
   }
   function newName(g) { const used = new Set(S.cast.map((t) => t.name)); return D.names[g].find((x) => !used.has(x)) || 'Concorrente ' + (S.cast.length + 1); }
@@ -697,7 +735,8 @@
     const t = sanitizeTribute({ name: newName(g), gender: g, team: team || Math.floor(S.cast.length / ts) + 1, traits: [], attr: {} });
     D.attrs.forEach((a) => (t.attr[a.id] = 3 + Math.floor(Math.random() * 6)));
     if (team) { const last = S.cast.map((x) => x.team).lastIndexOf(team); S.cast.splice(last + 1, 0, t); } else S.cast.push(t);
-    rerender(new Set([t.id])); save();
+    rerender(new Set([t.id]));
+    save();
     const el = $('.tile[data-id="' + CSS.escape(t.id) + '"]'); if (el) el.scrollIntoView({ block: 'nearest', behavior: AN.reduced ? 'auto' : 'smooth' });
     if (open) openEditor(t.id);
     else { const inp = $('#name-' + CSS.escape(t.id)); if (inp) { inp.focus({ preventScroll: true }); inp.select(); } }
@@ -820,7 +859,7 @@
     S.cast = L.randomCast(+$('#presetSize').value, Math.random().toString(36), +S.settings.teamSize || 2).map(sanitizeTribute);
     castQuery = ''; if ($('#ovSearch')) $('#ovSearch').value = '';
     renderCast(); save(); toast('Cast generato: ' + S.cast.length + ' concorrenti.');
-    const cl = $('#castList'); cl.classList.remove('castenter', 'castdeal'); void cl.offsetWidth; cl.classList.add('castdeal');
+    playEntrance('castdeal');
   });
   $('#teamSize').addEventListener('change', (e) => { S.settings.teamSize = +e.target.value; save(); });
   $('#btnRegroup').addEventListener('click', () => {
@@ -835,14 +874,14 @@
   $('#clearNo').addEventListener('click', () => ($('#clearConfirm').hidden = true));
   $('#clearYes').addEventListener('click', () => {
     const old = S.cast.slice(); $('#clearConfirm').hidden = true;
-    const done = () => { S.cast = []; renderCast(); save(); toast(plural(old.length, 'concorrente eliminato', 'concorrenti eliminati') + '.', { label: 'Annulla', fn: () => { S.cast = old; renderCast(); save(); const cl = $('#castList'); cl.classList.remove('castdeal'); void cl.offsetWidth; cl.classList.add('castdeal'); } }); };
+    const done = () => { S.cast = []; renderCast(); save(); toast(plural(old.length, 'concorrente eliminato', 'concorrenti eliminati') + '.', { label: 'Annulla', fn: () => { S.cast = old; renderCast(); save(); playEntrance('castdeal'); } }); };
     const tiles = $$('#castList .tile'); if (AN.reduced || !tiles.length) return done();
     tiles.forEach((el, k) => el.animate([{ opacity: 1, transform: 'none' }, { opacity: 0, transform: 'translateY(18px) scale(.9)' }], { duration: 260, delay: Math.min(k, 20) * 14, easing: 'ease-in', fill: 'forwards' }));
     setTimeout(done, 260 + Math.min(tiles.length, 20) * 14);
   });
 
   // scheda di modifica
-  function openEditor(id) { editId = id; renderEditor(); if (!$('#editDlg').open) $('#editDlg').showModal(); }
+  function openEditor(id) { editId = id; const t0 = S.cast.find((x) => x.id === id); editTeam0 = t0 ? t0.team : null; renderEditor(); if (!$('#editDlg').open) $('#editDlg').showModal(); }
   // tratti che si contraddicono: non si possono avere insieme
   const CLASH = [['leale', 'traditore'], ['pacifista', 'spietato'], ['pacifista', 'bruto'], ['fortunato', 'sfortunato'], ['clemente', 'vendicativo'], ['generoso', 'avido'], ['leader', 'solitario'], ['codardo', 'impulsivo']];
   const clashOf = (t, id) => { for (const [a, b] of CLASH) { if (a === id && t.traits.includes(b)) return b; if (b === id && t.traits.includes(a)) return a; } return null; };
@@ -867,19 +906,18 @@
   function renderEditor() {
     const t = S.cast.find((x) => x.id === editId); if (!t) return $('#editDlg').close();
     const sum = D.attrs.reduce((s2, a) => s2 + t.attr[a.id], 0);
-    const idx = S.cast.indexOf(t) + 1;
     $('#editBody').innerHTML =
       '<div class="dh"><h2 id="h-edit">' + esc(t.name || 'Senza nome') + '</h2><button class="iconbtn" data-close type="button" aria-label="Chiudi">✕</button></div>' +
       '<div class="db">' +
         '<div class="profhead edhead" style="--c:' + esc(t.color) + '"><button class="avbtn" type="button" data-e="photo" aria-label="Carica una foto">' + avHTML(t) + '<span class="cam">' + IC.cam + '</span></button>' +
-          '<div class="ps"><span class="edmeta">N. ' + idx + ' · Squadra ' + t.team + '</span><span class="edprof" id="editProfile">' + profileLine(t).txt + '</span><div class="row">' + (t.img ? '<button class="btn sm" type="button" data-e="rmphoto">Togli la foto</button><button class="btn sm" type="button" data-e="photo">Cambia foto</button>' : '<button class="btn sm" type="button" data-e="photo">Carica una foto</button>') + '</div><small class="help">La foto resta solo in questo browser.</small></div></div>' +
+          '<div class="ps"><span class="edmeta"><i style="background:' + esc(t.color || teamColor(t.team)) + '"></i>Squadra ' + t.team + '</span><span class="edprof" id="editProfile">' + profileLine(t).txt + '</span><div class="row">' + (t.img ? '<button class="btn sm" type="button" data-e="rmphoto">Togli la foto</button><button class="btn sm" type="button" data-e="photo">Cambia foto</button>' : '<button class="btn sm" type="button" data-e="photo">Carica una foto</button>') + '</div><small class="help">La foto resta solo in questo browser.</small></div></div>' +
         '<label class="field" for="e-name"><span>Nome</span><input type="text" id="e-name" value="' + esc(t.name) + '" maxlength="40" autocomplete="off"></label>' +
         '<div class="row" style="gap:16px;align-items:flex-end">' +
           '<div class="field"><span>Genere (per le frasi)</span><div class="seg" role="group" aria-label="Genere">' + ['M', 'F', 'N'].map((g) => '<button type="button" data-e="g" data-v="' + g + '" aria-pressed="' + (t.gender === g) + '">' + G3(g, 'Lui', 'Lei', 'Neutro') + '</button>').join('') + '</div></div>' +
           '<label class="field" for="e-team" style="width:110px"><span>Squadra</span><input type="number" id="e-team" min="1" max="99" value="' + t.team + '"></label>' +
         '</div>' +
-        '<div class="field"><span>Tratti · ' + t.traits.length + ' di 3</span><div class="traitpick">' + D.traits.map((x) => { const on = t.traits.includes(x.id), cl = !on && clashOf(t, x.id); const off = !on && (t.traits.length >= 3 || cl); return '<button type="button" data-e="trait" data-v="' + x.id + '" aria-pressed="' + on + '"' + (off ? ' disabled' : '') + ' title="' + esc(cl ? 'In contrasto con ' + TRAITS[cl].name : x.desc) + '"' + (cl ? ' class="clash"' : '') + '>' + esc(x.name) + '</button>'; }).join('') + '</div><p class="help traitdesc" id="traitDesc">' + (t.traits.length ? t.traits.map((x) => '<b>' + esc(TRAITS[x].name) + '</b>: ' + esc(TRAITS[x].desc)).join(' ') : 'Passa sopra un tratto per leggerne l\'effetto. Alcuni tratti si escludono a vicenda.') + '</p></div>' +
-        '<div class="field"><span>Caratteristiche · totale <b id="attrSum">' + sum + '</b> · media <b id="attrAvg">' + (sum / D.attrs.length).toFixed(1).replace('.', ',') + '</b></span>' +
+        '<div class="field"><span class="fhead">Tratti <em class="fcount">' + t.traits.length + ' su 3</em></span><div class="traitpick">' + D.traits.map((x) => { const on = t.traits.includes(x.id), cl = !on && clashOf(t, x.id); const off = !on && (t.traits.length >= 3 || cl); return '<button type="button" data-e="trait" data-v="' + x.id + '" aria-pressed="' + on + '"' + (off ? ' disabled' : '') + ' title="' + esc(cl ? 'In contrasto con ' + TRAITS[cl].name : x.desc) + '"' + (cl ? ' class="clash"' : '') + '>' + esc(x.name) + '</button>'; }).join('') + '</div><p class="help traitdesc" id="traitDesc">' + (t.traits.length ? t.traits.map((x) => '<b>' + esc(TRAITS[x].name) + '</b>: ' + esc(TRAITS[x].desc)).join(' ') : 'Passa sopra un tratto per leggerne l\'effetto. Alcuni tratti si escludono a vicenda.') + '</p></div>' +
+        '<div class="field"><span class="fhead">Caratteristiche <em class="fcount">Totale <b id="attrSum">' + sum + '</b></em><em class="fcount">Media <b id="attrAvg">' + (sum / D.attrs.length).toFixed(1).replace('.', ',') + '</b></em></span>' +
           '<div class="edstats">' + radarHTML(t) + '<div class="presets"><span class="help">Profili pronti</span>' + PRESETS.map(([n], k) => '<button class="btn sm" type="button" data-e="preset" data-v="' + k + '">' + esc(n) + '</button>').join('') + '<button class="btn sm" type="button" data-e="avg">Tutti a 5</button><button class="btn sm" type="button" data-e="rattr">Casuali</button></div></div>' +
           '<div class="attrgrid">' + D.attrs.map((a) => '<label for="ea-' + a.id + '" title="' + esc((D.attrDesc || {})[a.id] || '') + '">' + a.name + '</label><input type="range" min="1" max="10" id="ea-' + a.id + '" data-k="' + a.id + '" value="' + t.attr[a.id] + '" style="--v:' + t.attr[a.id] + '"><output class="' + (t.attr[a.id] >= 8 ? 'hi' : t.attr[a.id] <= 3 ? 'lo' : '') + '">' + t.attr[a.id] + '</output>').join('') + '</div>' +
           '<p class="help" id="attrHelp">' + esc((D.attrDesc || {}).for || '') + '</p></div>' +
@@ -933,7 +971,17 @@
     const r = e.target.closest('.attrgrid input, .attrgrid label'); if (r) { const k = r.dataset.k || (r.getAttribute('for') || '').replace('ea-', ''); if ((D.attrDesc || {})[k]) $('#attrHelp').textContent = D.attrDesc[k]; }
   });
   $('#editDlg').addEventListener('focusin', (e) => { const b = e.target.closest('[data-e="trait"]'); if (b) { const x = TRAITS[b.dataset.v]; $('#traitDesc').innerHTML = '<b>' + esc(x.name) + '</b>: ' + esc(x.desc); } });
-  $('#editDlg').addEventListener('close', () => { if (curView === 'cast') { renderCast(); const el = editId && $('.tile[data-id="' + CSS.escape(editId) + '"]'); if (el && !AN.reduced) { el.classList.add('fresh'); setTimeout(() => el.classList.remove('fresh'), 1200); } } });
+  let editTeam0 = null;
+  $('#editDlg').addEventListener('close', () => {
+    if (curView !== 'cast') return;
+    const t = S.cast.find((x) => x.id === editId);
+    const tile = t && $('.tile[data-id="' + CSS.escape(t.id) + '"]');
+    // se è cambiata la squadra nella vista per squadra la scheda deve spostarsi; altrimenti basta aggiornarla
+    if (!t || !tile) renderCast();
+    else if (S.settings.view === 'team' && t.team !== editTeam0) rerender(new Set([t.id]));
+    else { refreshTile(t.id); updateCounts(); }
+    const el = t && $('.tile[data-id="' + CSS.escape(t.id) + '"]'); if (el && !AN.reduced) { el.classList.add('fresh'); setTimeout(() => el.classList.remove('fresh'), 1200); }
+  });
 
   // elenco incollato
   $('#btnBulk').addEventListener('click', () => { $('#bulkMsg').textContent = ''; $('#bulkDlg').showModal(); $('#bulkText').focus(); });
@@ -1299,7 +1347,11 @@
     AN.field(bcs, theme.id, { intensity: AN.intensityFor(ph.kind, ph.snap.alive.length / total) });
     AN.phaseFx($('.broadcast'), ph.kind, theme.id, forward, { deaths: ph.kind === 'fallen' ? ph.deaths.length : 0 });
     $('#bcPhase').textContent = 'Fase ' + (i + 1) + (S.settings.hideFuture && S.run.seen < P.length - 1 ? '' : ' / ' + P.length);
-    $('#bcKind').textContent = KIND[ph.kind] + (ph.day ? ' · giorno ' + ph.day : '') + (ph.meteo && ph.meteo.n ? ' · ' + ph.meteo.n : '');
+    const kparts = [];
+    if (!ph.title.toLowerCase().includes(KIND[ph.kind].toLowerCase())) kparts.push(KIND[ph.kind]);
+    if (ph.day && !ph.title.includes(String(ph.day))) kparts.push('Giorno ' + ph.day);
+    if (ph.meteo && ph.meteo.n) kparts.push(ph.meteo.n);
+    $('#bcKind').textContent = kparts.join(' · ');
     $('#phTitle').textContent = ph.title; if (forward) AN.kinetic($('#phTitle'), ph.kind === 'dis' ? 'shake' : ph.kind === 'n' ? 'fade' : 'drop');
     $('#phIntro').textContent = ph.intro || '';
     if (forward) AN.countTo($('#aliveBig'), ph.snap.alive.length, { from: prevAlive, dur: 1100 }); else $('#aliveBig').textContent = ph.snap.alive.length; $('#aliveTot').textContent = '/' + total;
@@ -1362,7 +1414,7 @@
         const here = ph.snap.alive.filter((id) => ph.snap.zones[id] === zi);
         const p = ZP[zi] || [1, 1, 0.5];
         return '<div class="zone' + (hot[zi] ? ' hot' : '') + (shut.has(zi) ? ' closed' : '') + '"><span class="zn"><span>' + esc(z) + '</span></span><div class="dots">' + here.map((id) => avHTML(BY[id], { btn: true })).join('') + '</div>' +
-          '<span class="zprops" title="Risorse e pericolo della zona"><span>risorse ' + dots(p[0]) + '</span><span>pericolo ' + dots(p[1]) + '</span>' + (shut.has(zi) ? '<span class="ztag">tempesta</span>' : '') + '</span></div>';
+          '<span class="zprops" title="Risorse e pericolo della zona"><span>Risorse ' + dots(p[0]) + '</span><span>Pericolo ' + dots(p[1]) + '</span>' + (shut.has(zi) ? '<span class="ztag">tempesta</span>' : '') + '</span></div>';
       }).join('') + '</div><p class="help" style="margin-top:10px">Le zone ricche danno più cibo, quelle pericolose più agguati' + (shut.size ? '; in grigio quelle inghiottite dalla tempesta' : '') + '. Tocca un volto per aprire la scheda.</p>';
     } else if (sideTab === 'fallen') {
       const dead = SIM.tributes.filter((t) => !t.alive && t.deathPhase <= i).sort((a, b) => b.order - a.order);
@@ -1577,20 +1629,22 @@
     if (st.gossip) bits.push(plural(st.gossip, 'voce di corridoio', 'voci di corridoio'));
     if (st.breakups) bits.push(plural(st.breakups, 'rottura', 'rotture'));
     if (st.coalitions) bits.push(plural(st.coalitions, 'coalizione', 'coalizioni'));
-    const met = (st.meteo || []).map((x) => 'G' + x.day + ' ' + x.n);
+    const met = (st.meteo || []).map((x) => x.n + ' (giorno ' + x.day + ')');
     if (!c.length && !bits.length && !met.length) return '';
-    return '<p class="help eco-sum">' + (c.length ? '<b>Cause registrate:</b> ' + esc(c.join(', ')) + '. ' : '') + (bits.length ? '<b>Conseguenze:</b> ' + esc(bits.join(' · ')) + '. ' : '') + (met.length ? '<b>Meteo:</b> ' + esc(met.join(' · ')) + '.' : '') + '</p>';
+    return '<div class="help eco-sum">' + (c.length ? '<p><b>Cause registrate</b>' + esc(c.join(', ')) + '</p>' : '') + (bits.length ? '<p><b>Conseguenze</b>' + esc(bits.join(', ')) + '</p>' : '') + (met.length ? '<p><b>Meteo</b>' + esc(met.join(', ')) + '</p>' : '') + '</div>';
   }
   function resultStats(st, soft) {
-    const ends = plural(st.killDeaths, soft ? 'eliminazione attribuita a un rivale' : 'morte per mano altrui', soft ? 'eliminazioni attribuite a un rivale' : 'morti per mano altrui') + ', ' +
-      plural(st.envDeaths, soft ? 'eliminazione dovuta all\'arena' : 'morte dovuta all\'arena', soft ? 'eliminazioni dovute all\'arena' : 'morti dovute all\'arena');
-    const counters = [
-      ['alliances', 'alleanza', 'alleanze'], ['betrayals', 'tradimento', 'tradimenti'], ['revenges', 'vendetta', 'vendette'],
-      ['couples', 'coppia', 'coppie'], ['debtsRepaid', 'debito saldato', 'debiti saldati'], ['amulets', 'salvataggio miracoloso', 'salvataggi miracolosi'],
-      ['sponsors', 'dono degli sponsor', 'doni degli sponsor'],
-    ].map(([k, single, many]) => plural(st[k] || 0, single, many));
-    counters.push(plural(st.testsPassed || 0, 'prova superata', 'prove superate') + ' su ' + (st.tests || 0), plural(st.events, 'evento', 'eventi'));
-    return [ends, ...counters].join(' · ') + '.';
+    const cap = (x) => x.charAt(0).toUpperCase() + x.slice(1);
+    const items = [
+      [st.killDeaths, soft ? 'eliminazioni attribuite a un rivale' : 'morti per mano altrui', soft ? 'eliminazione attribuita a un rivale' : 'morte per mano altrui', true],
+      [st.envDeaths, soft ? 'eliminazioni dovute all\'arena' : 'morti dovute all\'arena', soft ? 'eliminazione dovuta all\'arena' : 'morte dovuta all\'arena', true],
+      [st.alliances, 'alleanze', 'alleanza'], [st.betrayals, 'tradimenti', 'tradimento'], [st.revenges, 'vendette', 'vendetta'],
+      [st.couples, 'coppie', 'coppia'], [st.debtsRepaid, 'debiti saldati', 'debito saldato'], [st.amulets, 'salvataggi miracolosi', 'salvataggio miracoloso'],
+      [st.sponsors, 'doni degli sponsor', 'dono degli sponsor'],
+    ].filter((x) => x[3] || x[0]).map(([v, many, one]) => [v || 0, cap((v || 0) === 1 ? one : many)]);
+    if (st.tests) items.push([(st.testsPassed || 0) + '<small>/' + st.tests + '</small>', 'Prove superate']);
+    items.push([st.events, 'Eventi']);
+    return '<div class="kstats">' + items.map(([v, l]) => '<div class="kstat"><b>' + v + '</b><span>' + l + '</span></div>').join('') + '</div>';
   }
   function renderResults() {
     $('#resEmpty').hidden = !!SIM; $('#resBody').hidden = !SIM;
@@ -1678,7 +1732,7 @@
         '<section class="block card"><h2>Momenti salienti</h2>' + hlH + '</section>' +
         '<section class="block card"><h2>Classifica completa</h2><div class="tablewrap"><table><thead><tr><th>Pos.</th><th>Concorrente</th><th>Sq.</th><th>' + (soft ? 'Elim.' : 'Ucc.') + '</th><th>' + (soft ? 'Eliminazione attribuita a' : 'Per mano di') + '</th><th>Giorno</th><th>Come è andata</th></tr></thead><tbody>' + rows + '</tbody></table></div></section>' +
       '</div><div>' +
-        '<section class="block card"><h2>Concorrenti in gara nel tempo</h2>' + chart + '<p class="help" style="margin-top:8px">' + esc(resultStats(st, soft)) + '</p>' + ecoSummary(st, theme) + '</section>' + storiesHTML(st, soft) +
+        '<section class="block card"><h2>Concorrenti in gara nel tempo</h2>' + chart + resultStats(st, soft) + ecoSummary(st, theme) + '</section>' + storiesHTML(st, soft) +
         '<section class="block card"><h2>' + (soft ? 'Chi ha eliminato di più' : 'Chi ha ucciso di più') + '</h2><div class="bars">' + kbars + '</div></section>' +
         '<section class="block card posterbox"><h2>Locandina</h2><img id="posterImg" alt="Locandina della partita"><p class="help" style="margin-top:8px">Tieni premuto sull\'immagine, o clic destro, per salvarla.</p></section>' +
       '</div></div>';
@@ -1725,11 +1779,11 @@
     const total = SIM.tributes.length, tw = Math.min(20, 900 / total);
     SIM.tributes.slice().sort((a, b) => (a.alive ? 1 : 0) - (b.alive ? 1 : 0) || a.order - b.order).forEach((t, i) => { g.fillStyle = t.alive ? acc : '#ff5b4b'; g.globalAlpha = t.alive ? 1 : 0.7; g.fillRect(90 + i * tw, 1172, Math.max(3, tw - 5), 46); });
     g.globalAlpha = 1;
-    const disp = '"Big Shoulders Display", "Arial Narrow", sans-serif', mono = '"JetBrains Mono", monospace', body = 'Barlow, sans-serif';
-    g.fillStyle = mute; g.font = '500 26px ' + mono; g.textAlign = 'left';
-    g.fillText((theme.name + ' · ' + plural(SIM.days, 'giorno', 'giorni') + ' · ' + total + ' concorrenti').toUpperCase(), 90, 120);
-    g.fillStyle = acc; g.font = '900 118px ' + disp;
-    g.fillText(W.length === 1 ? G3(W[0].gender, 'ULTIMO IN PIEDI', 'ULTIMA IN PIEDI', 'ULTIMƏ IN PIEDI') : W.length ? 'SQUADRA ' + W[0].team : 'NESSUN SUPERSTITE', 84, 236);
+    const disp = '"Bricolage Grotesque", Figtree, sans-serif', mono = 'Figtree, sans-serif', body = 'Figtree, sans-serif';
+    g.fillStyle = mute; g.font = '600 30px ' + mono; g.textAlign = 'left';
+    g.fillText(theme.name + ' · ' + plural(SIM.days, 'giorno', 'giorni') + ' · ' + total + ' concorrenti', 90, 120);
+    g.fillStyle = acc; g.font = '800 92px ' + disp;
+    g.fillText(W.length === 1 ? G3(W[0].gender, 'Ultimo in piedi', 'Ultima in piedi', 'Ultimə in piedi') : W.length ? 'Squadra ' + W[0].team : 'Nessun superstite', 84, 226);
     const loadImg = (src) => new Promise((res) => { const im = new Image(); im.onload = () => res(im); im.onerror = () => res(null); im.src = src; });
     async function avatar(t, x, y, r) {
       g.save(); g.beginPath(); g.arc(x, y, r, 0, Math.PI * 2); g.closePath(); g.fillStyle = t.color || '#888'; g.fill(); g.clip();
@@ -1742,23 +1796,23 @@
       const w = W[0];
       g.strokeStyle = acc; g.lineWidth = 12; g.beginPath(); g.arc(540, 560, 240, 0, Math.PI * 2); g.stroke();
       await avatar(w, 540, 560, 224);
-      g.fillStyle = ink; g.textAlign = 'center'; g.font = '900 ' + (w.name.length > 14 ? 96 : 132) + 'px ' + disp;
-      g.fillText(w.name.toUpperCase(), 540, 935);
+      g.fillStyle = ink; g.textAlign = 'center'; g.font = '800 ' + (w.name.length > 14 ? 78 : 108) + 'px ' + disp;
+      g.fillText(w.name, 540, 935);
       g.fillStyle = mute; g.font = '500 38px ' + body;
       g.fillText(w.kills + ' ' + (theme.soft ? (w.kills === 1 ? 'eliminazione' : 'eliminazioni') : (w.kills === 1 ? 'uccisione' : 'uccisioni')) + ' · squadra ' + w.team, 540, 998);
     } else if (W.length) {
       const r = Math.min(150, 420 / W.length);
       for (let k = 0; k < W.length; k++) await avatar(W[k], 540 + (k - (W.length - 1) / 2) * (r * 2.2), 560, r);
-      g.fillStyle = ink; g.textAlign = 'center'; g.font = '800 64px ' + disp;
-      g.fillText(W.map((w) => w.name).join(' · ').toUpperCase().slice(0, 40), 540, 900);
+      g.fillStyle = ink; g.textAlign = 'center'; g.font = '800 56px ' + disp;
+      g.fillText(W.map((w) => w.name).join(' · ').slice(0, 40), 540, 900);
     }
     g.textAlign = 'left';
     const top = SIM.tributes.filter((t) => t.kills > 0 && !t.alive).sort((a, b) => b.kills - a.kills).slice(0, 3);
-    if (top.length) { g.fillStyle = mute; g.font = '500 23px ' + mono; g.fillText('I PIÙ PERICOLOSI TRA GLI SCONFITTI', 90, 1076); g.fillStyle = ink; g.font = '700 34px ' + body; g.fillText(top.map((t) => t.name + ' ' + t.kills).join('   ·   '), 90, 1124); }
+    if (top.length) { g.fillStyle = mute; g.font = '600 26px ' + mono; g.fillText('I più pericolosi tra gli sconfitti', 90, 1076); g.fillStyle = ink; g.font = '700 34px ' + body; g.fillText(top.map((t) => t.name + ' ' + t.kills).join('   ·   '), 90, 1124); }
     g.fillStyle = mute; g.font = '500 23px ' + mono;
     const wm = ART.assets.logo ? await loadImg(ART.assets.logo) : null;
-    if (wm) { g.drawImage(wm, 660, 1236, 330, 330 * wm.height / wm.width); g.fillText('SEME ' + String(SIM.seed).toUpperCase().slice(0, 24), 90, 1282); }
-    else g.fillText('LAST ONE STANDING · SEME ' + String(SIM.seed).toUpperCase().slice(0, 30), 90, 1282);
+    if (wm) { g.drawImage(wm, 660, 1236, 330, 330 * wm.height / wm.width); g.fillText('Seme ' + String(SIM.seed).slice(0, 24), 90, 1282); }
+    else g.fillText('Last One Standing · seme ' + String(SIM.seed).slice(0, 30), 90, 1282);
     try { return cv.toDataURL('image/png'); } catch (e) { return ''; }
   }
 
