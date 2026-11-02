@@ -1363,6 +1363,189 @@ details.card > summary { font-size: 16px; }
 .fhead .fcount:first-of-type { margin-left: auto; }
 .teamblock h3 .tbcount { display: inline-flex; gap: 6px; flex-wrap: wrap; font-size: 13px; }
 .teamblock h3 .tbcount .fcount { letter-spacing: 0; }
+
+/* =====================================================================
+   ARENA: scelta, scheda dell'arena, regole e barra di avvio
+   ===================================================================== */
+#v-arena { padding-bottom: 24px; }
+.arenalayout { grid-template-columns: minmax(0, 1fr) 340px; gap: 24px; }
+.arenamain { display: grid; gap: 22px; min-width: 0; }
+.sec2 { font-size: 20px; letter-spacing: -.01em; }
+.apick { display: grid; gap: 12px; min-width: 0; }
+.apick-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.apick-nav { display: none; gap: 6px; }
+.pnav { width: 36px; height: 36px; border-radius: 50%; border: 1px solid var(--line); background: var(--panel); color: var(--ink); display: grid; place-items: center; cursor: pointer; box-shadow: var(--shadow-sm); }
+.pnav svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+
+/* locandine: griglia 3×3 ordinata */
+.themes { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+.themes .poster-card { min-height: 214px; padding: 18px; gap: 4px; border-radius: var(--r); }
+.themes .poster-card b { font-size: 21px; font-weight: 800; letter-spacing: -.01em; line-height: 1.1; }
+.themes .poster-card small { font-size: 13.5px; line-height: 1.4; color: rgba(255,255,255,.82); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.poster-card .psoft { left: auto; right: 12px; top: 12px; border-radius: 999px; padding: 3px 10px; font-size: 12.5px; }
+.poster-card[aria-checked="true"] .psoft { right: 48px; }
+.poster-card .pcheck { width: 30px; height: 30px; font-size: 15px; box-shadow: 0 4px 12px rgba(0,0,0,.3); }
+.poster-card[aria-checked="true"] { box-shadow: 0 0 0 3px var(--bg), 0 0 0 6px hsl(var(--ph) 80% 55%), 0 18px 34px -18px hsl(var(--ph) 70% 25%); }
+.themes .poster-card[aria-checked="false"] { filter: saturate(.85); }
+.themes .poster-card[aria-checked="false"]:hover { filter: none; }
+
+/* scheda dell'arena */
+.arenapreview { padding: 0; gap: 0; overflow: hidden; box-shadow: var(--shadow-sm); }
+.apv-hero { position: relative; }
+.arenapreview .apv-banner { height: 220px; margin: 0; border-radius: 0; box-shadow: none; }
+.arenapreview .apv-banner::after { background: linear-gradient(180deg, rgba(0,0,0,0) 30%, rgba(0,0,0,.72) 100%); }
+.apv-title { position: absolute; left: 0; right: 0; bottom: 0; z-index: 2; display: flex; align-items: flex-end; gap: 14px; padding: 18px 22px; color: #fff; }
+.apv-title .gl { width: 46px; height: 46px; border-radius: 14px; display: grid; place-items: center; flex: none; background: rgba(0,0,0,.4); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); border: 1px solid rgba(255,255,255,.18); color: #fff; }
+.apv-title > div { min-width: 0; flex: 1; }
+.apv-title h2 { font-size: 32px; color: #fff; text-shadow: 0 2px 14px rgba(0,0,0,.5); }
+.apv-title p { margin-top: 4px; font-size: 15px; color: rgba(255,255,255,.85); }
+.apv-soft { flex: none; align-self: center; font-size: 13px; font-weight: 700; padding: 5px 12px; border-radius: 999px; background: rgba(255,255,255,.16); border: 1px solid rgba(255,255,255,.3); backdrop-filter: blur(6px); }
+.apv-stats { display: flex; flex-wrap: wrap; border-bottom: 1px solid var(--line); }
+.apv-stat { position: relative; flex: 1 1 110px; padding: 14px 22px; display: grid; gap: 2px; }
+.apv-stat + .apv-stat::before { content: ""; position: absolute; left: 0; top: 16px; bottom: 16px; width: 1px; background: var(--line); }
+.apv-stat b { font-family: var(--f-display); font-size: 26px; font-weight: 700; line-height: 1.1; letter-spacing: -.02em; font-variant-numeric: tabular-nums; }
+.apv-stat span { font-size: 14px; color: var(--muted); }
+.apv-intro { padding: 16px 22px 4px; font-size: 16px; line-height: 1.55; color: var(--ink); }
+.apv-tabs { display: flex; gap: 4px; padding: 12px 18px 0; overflow-x: auto; scrollbar-width: none; border-bottom: 1px solid var(--line); }
+.apv-tabs::-webkit-scrollbar { display: none; }
+.apv-tabs button { flex: none; border: 0; background: none; padding: 10px 12px 12px; font-size: 14.5px; font-weight: 600; color: var(--muted); cursor: pointer; position: relative; border-radius: 10px 10px 0 0; transition: color .2s, background .2s; }
+@media (hover: hover) { .apv-tabs button:hover { color: var(--ink); background: color-mix(in srgb, var(--panel-2) 60%, transparent); } }
+.apv-tabs button[aria-selected="true"] { color: var(--ink); }
+.apv-tabs button[aria-selected="true"]::after { content: ""; position: absolute; left: 10px; right: 10px; bottom: -1px; height: 3px; border-radius: 3px 3px 0 0; background: var(--accent); }
+.apv-panel { padding: 18px 22px 22px; display: grid; gap: 14px; }
+.apv-panel:focus-visible { outline-offset: -4px; }
+.apv-grid { gap: 20px; }
+.apv-col h3 { font-family: var(--f-body); font-size: 14px; font-weight: 700; color: var(--ink); margin-bottom: 10px; letter-spacing: 0; }
+.apv-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+.apv-list li { display: flex; align-items: center; gap: 9px; font-size: 14.5px; line-height: 1.35; }
+.apv-list li::before { content: ""; width: 6px; height: 6px; border-radius: 50%; flex: none; background: var(--accent); opacity: .7; }
+.rules-arena { padding: 16px 18px; border-radius: 14px; gap: 12px; }
+.rules-arena h3 { font-size: 18px; }
+.rules-arena h4, .wx h4 { font-size: 14px; font-weight: 700; color: var(--ink); margin: 0 0 8px; }
+.rules-arena .chip { white-space: nowrap; }
+.wx { display: grid; gap: 4px; }
+.wx-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 200px), 1fr)); gap: 8px; }
+.wxi { display: grid; gap: 2px; padding: 10px 12px; border-radius: 12px; border: 1px solid var(--line); background: var(--panel); }
+.wxi b { font-size: 14px; }
+.wxi span { font-size: 13px; line-height: 1.4; color: var(--muted); }
+.dz-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 240px), 1fr)); gap: 10px; }
+.dz { padding: 12px 14px; border-radius: 12px; background: color-mix(in srgb, var(--dead-soft) 35%, var(--panel)); border: 1px solid color-mix(in srgb, var(--dead) 14%, var(--line)); display: grid; gap: 4px; }
+.dz b { font-size: 14.5px; }
+.dz p { font-size: 13.5px; line-height: 1.45; color: var(--muted); }
+.ia-grid { margin-top: 0; gap: 12px; }
+.ia { padding: 12px; border-radius: 12px; border: 1px solid var(--line); }
+.ia p { font-size: 13px; }
+.sample { gap: 10px; }
+
+/* regole della partita */
+.rules { padding: 22px; gap: 20px; top: calc(env(safe-area-inset-top, 0px) + 80px); }
+.rules h2 { font-size: 22px; }
+.rules .field > span, .rules .fhead { font-size: 14px; font-weight: 700; }
+.diffs { gap: 8px; }
+.diffs button { padding: 10px 12px; gap: 4px; border-radius: 12px; background: var(--panel); transition: border-color .2s, background .2s, transform .15s; }
+.diffs button:hover { border-color: color-mix(in srgb, var(--accent) 45%, var(--line)); }
+.diffs button:active { transform: scale(.98); }
+.diffs .dtop { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.diffs .dtop b { font-size: 15px; }
+.dmeter { display: inline-flex; gap: 3px; align-items: flex-end; }
+.dmeter i { width: 5px; border-radius: 2px; background: color-mix(in srgb, var(--muted) 30%, transparent); }
+.dmeter i:nth-child(1) { height: 6px; } .dmeter i:nth-child(2) { height: 9px; } .dmeter i:nth-child(3) { height: 12px; } .dmeter i:nth-child(4) { height: 15px; }
+.dmeter i.on { background: var(--dead); }
+.diffs button[aria-checked="true"] .dmeter i.on { background: color-mix(in srgb, var(--dead) 80%, var(--accent)); }
+.diffs button small { line-height: 1.35; }
+.rangeends { display: flex; justify-content: space-between; font-size: 13px; color: var(--muted); margin-top: -2px; }
+#maxDays { -webkit-appearance: none; appearance: none; height: 6px; border-radius: 999px; background: linear-gradient(90deg, var(--accent) var(--p, 50%), var(--panel-2) var(--p, 50%)); margin: 10px 0 4px; }
+#maxDays::-webkit-slider-thumb { -webkit-appearance: none; width: 22px; height: 22px; border-radius: 50%; background: #fff; border: 2px solid var(--accent); box-shadow: 0 2px 6px rgba(0,0,0,.2); cursor: pointer; }
+#maxDays::-moz-range-thumb { width: 18px; height: 18px; border-radius: 50%; background: #fff; border: 2px solid var(--accent); box-shadow: 0 2px 6px rgba(0,0,0,.2); cursor: pointer; }
+.rules .switch { font-size: 15px; }
+.rules .switch small { font-size: 13.5px; line-height: 1.45; margin-top: 2px; }
+.adultbox { border-radius: 14px; padding: 14px; }
+.rules-adv { border-top: 1px solid var(--line); padding-top: 14px; }
+.rules-adv > summary { list-style: none; cursor: pointer; display: flex; justify-content: space-between; align-items: center; font-size: 15px; font-weight: 700; }
+.rules-adv > summary::-webkit-details-marker { display: none; }
+.rules-adv[open] .chev { transform: rotate(180deg); }
+.rules-adv .chev { transition: transform .2s; color: var(--muted); }
+.rules-advbody { display: grid; gap: 12px; padding-top: 12px; }
+.rules-advbody .field { margin: 0; }
+
+/* barra di avvio */
+.arenadock .dockin { gap: 16px; }
+.startsum { display: flex; align-items: center; gap: 12px; min-width: 0; font-size: 14px; color: var(--muted); }
+.ss-icon { width: 42px; height: 42px; border-radius: 12px; flex: none; display: grid; place-items: center; background: var(--accent-soft); color: var(--accent-text); }
+.ss-text { display: grid; gap: 3px; min-width: 0; }
+.ss-text > b { font-family: var(--f-display); font-size: 18px; font-weight: 700; color: var(--ink); line-height: 1.15; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ss-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.ss-chips > span:not(.tag18) { font-size: 13px; font-weight: 600; color: var(--muted); background: var(--panel-2); border-radius: 999px; padding: 1px 9px; }
+.startgo { display: flex; align-items: center; gap: 14px; flex: none; }
+.startgo .help:empty { display: none; }
+.startgo .help { max-width: 320px; text-align: right; }
+.arenadock #btnStart { padding: 12px 22px; font-size: 16px; }
+.custom { box-shadow: var(--shadow-sm); }
+.custom > summary { padding: 18px 20px; }
+
+@media (max-width: 980px) {
+  .arenalayout { grid-template-columns: minmax(0, 1fr); }
+  .rules { position: static; }
+}
+@media (max-width: 760px) {
+  /* locandine in carosello orizzontale */
+  .apick-nav { display: inline-flex; }
+  .themes { display: grid; grid-auto-flow: column; grid-template-columns: none; grid-auto-columns: 78%; overflow-x: auto; scroll-snap-type: x mandatory; scroll-padding: 0 16px; margin: 0 -16px; padding: 6px 16px 12px; scrollbar-width: none; }
+  .themes::-webkit-scrollbar { display: none; }
+  .themes .poster-card { scroll-snap-align: center; min-height: 200px; }
+  .arenapreview .apv-banner { height: 170px; }
+  .apv-title { padding: 14px 16px; gap: 10px; }
+  .apv-title h2 { font-size: 24px; }
+  .apv-title p { font-size: 14px; }
+  .apv-title .gl { width: 38px; height: 38px; }
+  .apv-stat { flex: 1 1 45%; padding: 10px 16px; }
+  .apv-stat:nth-child(3)::before { display: none; }
+  .apv-stat:nth-child(n+3) { border-top: 1px solid var(--line); }
+  .apv-stat b { font-size: 22px; }
+  .apv-intro { padding: 14px 16px 2px; font-size: 15px; }
+  .apv-tabs { padding: 8px 10px 0; }
+  .apv-panel { padding: 16px; }
+  .rules { padding: 18px; }
+  .ss-chips { display: none; }
+  .ss-icon { width: 36px; height: 36px; }
+  .ss-text > b { font-size: 16px; }
+  .startgo .help { display: none; }
+  .arenadock #btnStart { padding: 11px 16px; font-size: 15px; }
+  .arenadock .bl { display: none; }
+  .ss-text > b { white-space: normal; }
+}
+.apv-grid .apv-list { display: grid; gap: 7px; }
+.apv-grid .apv-list li { background: none; padding: 0; border-radius: 0; font-size: 14.5px; }
+.rules .field > .rangeends { font-weight: 500; font-size: 13px; }
+.dz, .wxi, .ia { align-content: start; }
+/* animazioni della scheda dell'arena */
+.arenapreview.swap .apv-title { animation: viewIn .55s cubic-bezier(.2,.7,.3,1) both; }
+.arenapreview.swap .apv-stat { animation: viewIn .5s cubic-bezier(.2,.7,.3,1) both; }
+.arenapreview.swap .apv-stat:nth-child(2) { animation-delay: .05s; } .arenapreview.swap .apv-stat:nth-child(3) { animation-delay: .1s; } .arenapreview.swap .apv-stat:nth-child(4) { animation-delay: .15s; }
+.arenapreview.swap .apv-intro { animation: viewIn .5s .12s cubic-bezier(.2,.7,.3,1) both; }
+.arenapreview.swap .apv-panel { animation: viewIn .5s .18s cubic-bezier(.2,.7,.3,1) both; }
+.diffs button[aria-checked="true"] .dmeter i.on { transform-origin: bottom; animation: barUp .4s cubic-bezier(.2,.9,.3,1.4) both; }
+.diffs button[aria-checked="true"] .dmeter i.on:nth-child(2) { animation-delay: .05s; } .diffs button[aria-checked="true"] .dmeter i.on:nth-child(3) { animation-delay: .1s; } .diffs button[aria-checked="true"] .dmeter i.on:nth-child(4) { animation-delay: .15s; }
+.apv-tabs button[aria-selected="true"]::after { animation: tabLine .3s cubic-bezier(.2,.8,.3,1) both; }
+@keyframes tabLine { from { transform: scaleX(.3); opacity: 0; } }
+.dz, .wxi, .ia { transition: transform .2s, box-shadow .2s, border-color .2s; }
+@media (hover: hover) { .dz:hover, .wxi:hover, .ia:hover { transform: translateY(-2px); box-shadow: var(--shadow-sm); } }
+@media (prefers-reduced-motion: reduce) { .arenapreview.swap *, .diffs .dmeter i, .apv-tabs button::after { animation: none !important; } .dz:hover, .wxi:hover, .ia:hover { transform: none; } }
+@media (max-width: 980px) {
+  .arenamain { display: contents; }
+  .arenalayout > .rules { order: 3; }
+  .arenamain > .apick { order: 1; } .arenamain > .arenapreview { order: 2; } .arenamain > .custom { order: 4; }
+}
+@media (max-width: 760px) {
+  .apv-grid .apv-list { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 7px 12px; }
+}
+.apv-tabs .ts { display: none; }
+@media (max-width: 760px) {
+  .apv-tabs { gap: 0; padding: 6px 8px 0; justify-content: space-between; }
+  .apv-tabs button { padding: 10px 8px 12px; font-size: 14px; }
+  .apv-tabs .tl { display: none; }
+  .apv-tabs .ts { display: inline; }
+}
 </style>
 
 <header class="top">
@@ -1484,8 +1667,11 @@ details.card > summary { font-size: 16px; }
     <div class="pagehead"><div><div class="eyebrow">Passo 2 di 4</div><h1 id="h-arena">L'arena</h1><p id="arenaSub"></p></div></div>
     <div class="arenalayout">
       <div class="arenamain">
-        <div class="themes" id="themeList" role="radiogroup" aria-label="Arena"></div>
-        <div class="arenapreview" id="arenaPreview"></div>
+        <div class="apick">
+          <div class="apick-head"><h2 class="sec2" id="h-pick">Scegli dove si gioca</h2><span class="apick-nav" aria-hidden="true"><button type="button" class="pnav" data-dir="-1" tabindex="-1"><svg viewBox="0 0 24 24"><path d="m15 5-7 7 7 7"/></svg></button><button type="button" class="pnav" data-dir="1" tabindex="-1"><svg viewBox="0 0 24 24"><path d="m9 5 7 7-7 7"/></svg></button></span></div>
+          <div class="themes" id="themeList" role="radiogroup" aria-labelledby="h-pick"></div>
+        </div>
+        <div class="arenapreview" id="arenaPreview" aria-live="polite"></div>
         <details class="custom card" id="customBox">
           <summary><span><b>Eventi personalizzati</b> <span class="muted" id="customCount"></span></span><span class="chev" aria-hidden="true">▾</span></summary>
           <div class="custombody">
@@ -1511,10 +1697,9 @@ details.card > summary { font-size: 16px; }
         </details>
       </div>
       <aside class="rules card" aria-labelledby="h-rules">
-        <h2 id="h-rules">Regole</h2>
-        <button class="btn" id="labOpen" type="button">Laboratorio di bilanciamento</button>
+        <h2 id="h-rules">Regole della partita</h2>
         <div class="field"><span>Difficoltà</span><div class="diffs" id="diffSeg" role="radiogroup" aria-label="Difficoltà" aria-describedby="difficultyHelp"></div><p class="help" id="difficultyHelp">Regola soprattutto la frequenza delle eliminazioni e dei disastri. Le caratteristiche del cast continuano a contare.</p></div>
-        <label class="field" for="maxDays"><span>Durata massima · <b id="maxDaysOut"></b> giorni</span><input type="range" id="maxDays" min="5" max="40" step="1"><small class="help">Allo scadere scatta lo scontro finale.</small></label>
+        <label class="field" for="maxDays"><span class="fhead">Durata massima <em class="fcount"><b id="maxDaysOut"></b> giorni</em></span><input type="range" id="maxDays" min="5" max="40" step="1"><span class="rangeends" aria-hidden="true"><span>Breve</span><span>Lunga</span></span><small class="help">Allo scadere scatta lo scontro finale.</small></label>
         <label class="switch" for="teamsAllied"><input type="checkbox" id="teamsAllied" role="switch"><span class="sw" aria-hidden="true"></span><span>Compagni di squadra alleati<small>Chi è nella stessa squadra comincia in alleanza. Le alleanze possono cambiare durante la partita; la squadra rimane la stessa.</small></span></label>
         <label class="switch" for="teamWin"><input type="checkbox" id="teamWin" role="switch"><span class="sw" aria-hidden="true"></span><span>Vittoria di squadra<small>La partita termina quando restano solo membri della stessa squadra, anche se le alleanze sono cambiate. Con una sola squadra termina subito.</small></span></label>
         <div class="adultbox" id="adultBox">
@@ -1524,16 +1709,19 @@ details.card > summary { font-size: 16px; }
             <div class="row"><button class="btn danger" id="adultYes" type="button">Ho almeno 18 anni, attiva</button><button class="btn" id="adultNo" type="button">Annulla</button></div>
           </div>
         </div>
+        <details class="rules-adv">
+          <summary><span>Seme e strumenti</span><span class="chev" aria-hidden="true">▾</span></summary>
+          <div class="rules-advbody">
         <label class="field" for="seed"><span>Seme della partita</span>
-          <div class="seedrow"><input type="text" id="seed" autocomplete="off" spellcheck="false"><button class="btn" id="seedNew" type="button" title="Nuovo seme casuale" aria-label="Nuovo seme casuale"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="3.5" width="17" height="17" rx="4" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="8.5" cy="8.5" r="1.6" fill="currentColor"/><circle cx="15.5" cy="15.5" r="1.6" fill="currentColor"/><circle cx="12" cy="12" r="1.6" fill="currentColor"/></svg></button></div>
-          <small class="help">Stesso seme, cast e regole danno la stessa storia nella stessa versione del gioco.</small></label>
-        <div class="startbox">
-          <div class="startsum" id="startSum"></div>
-          <button class="btn primary xl" id="btnStart" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4.5v15l12-7.5z" fill="currentColor"/></svg>Avvia la simulazione</button>
-          <p class="help" id="startMsg" role="status"></p>
-        </div>
+              <div class="seedrow"><input type="text" id="seed" autocomplete="off" spellcheck="false"><button class="btn" id="seedNew" type="button" title="Nuovo seme casuale" aria-label="Nuovo seme casuale"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="3.5" width="17" height="17" rx="4" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="8.5" cy="8.5" r="1.6" fill="currentColor"/><circle cx="15.5" cy="15.5" r="1.6" fill="currentColor"/><circle cx="12" cy="12" r="1.6" fill="currentColor"/></svg></button></div>
+              <small class="help">Stesso seme, cast e regole danno la stessa storia nella stessa versione del gioco.</small></label>
+            <button class="btn" id="labOpen" type="button">Laboratorio di bilanciamento</button>
+            <small class="help">Simula molte partite con queste regole e guarda chi vince più spesso.</small>
+          </div>
+        </details>
       </aside>
     </div>
+    <div class="dock arenadock"><div class="dockin"><div class="startsum" id="startSum"></div><div class="startgo"><p class="help" id="startMsg" role="status"></p><button class="btn primary lg" id="btnStart" type="button" aria-label="Avvia la simulazione"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4.5v15l12-7.5z" fill="currentColor"/></svg><span>Avvia<span class="bl"> la simulazione</span></span></button></div></div></div>
   </section>
 
   <!-- DIRETTA -->
@@ -9692,7 +9880,7 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
 </script>
 <script>window.LOS_ASSETS = {"logo":"img/logo.f2d5175789.webp","icona":"img/icona.8b02ddeb49.webp","favicon":"img/favicon.86774dc7cf.png","panoramica":"img/panoramica.66c4c27255.webp","sagome":["img/sagome-cappuccio.e8876ba986.webp","img/sagome-esploratore.9a99fd13f8.webp","img/sagome-viaggiatore.5e36435604.webp"],"arene":{"classico":"img/arene-classico.42c6ba42ee.webp","fantasy":"img/arene-fantasy.75b7fb0d32.webp","horror":"img/arene-horror.48052d80b4.webp","liceo":"img/arene-liceo.05ed578a90.webp","royale":"img/arene-royale.36c9952cd7.webp","scifi":"img/arene-scifi.403694f00f.webp","ufficio":"img/arene-ufficio.67b271bea3.webp","wasteland":"img/arene-wasteland.889002ace8.webp","zombie":"img/arene-zombie.36c9135a12.webp"}};
 ;
-window.LOS_BUILD = "ccb0d15a771fe4d02dcc1be320acfd3d89c28c67b9d4a1f7fc57b7cf03757ceb";
+window.LOS_BUILD = "82efad9413dbe2285621ace91ebafefc11aef0d26f5fcb2d6ca2da210d888017";
 ;
 /* Last One Standing — grafica vettoriale: logo, icone delle arene, illustrazioni.
  * Tutto è SVG generato in codice: nessuna immagine esterna. */
@@ -10849,7 +11037,7 @@ window.LOS_BUILD = "ccb0d15a771fe4d02dcc1be320acfd3d89c28c67b9d4a1f7fc57b7cf0375
     return [base[0], v === 'massacro' ? 'Spietata' : base[1], { bassa: 'Poche eliminazioni, ritmo tranquillo', normale: 'L\'equilibrio classico', alta: 'La competizione non perdona', massacro: 'Eliminazioni più frequenti' }[base[0]], base[3]];
   }
   function renderDifficulty() {
-    $('#diffSeg').innerHTML = DIFFS.map(([v]) => difficultyCopy(v, THEMES[S.settings.theme])).map(([v, n, d, k]) => '<button type="button" role="radio" data-v="' + v + '" aria-checked="' + (S.settings.difficulty === v) + '"><b>' + n + ' <span class="sk" aria-hidden="true">' + '✖'.repeat(k) + '</span></b><small>' + d + '</small></button>').join('');
+    $('#diffSeg').innerHTML = DIFFS.map(([v]) => difficultyCopy(v, THEMES[S.settings.theme])).map(([v, n, d, k]) => '<button type="button" role="radio" data-v="' + v + '" aria-checked="' + (S.settings.difficulty === v) + '"><span class="dtop"><b>' + n + '</b><span class="dmeter" aria-hidden="true">' + [1, 2, 3, 4].map((x) => '<i' + (x <= k ? ' class="on"' : '') + '></i>').join('') + '</span></span><small>' + d + '</small></button>').join('');
     radioFocus($('#diffSeg'));
   }
 
@@ -11137,9 +11325,8 @@ window.LOS_BUILD = "ccb0d15a771fe4d02dcc1be320acfd3d89c28c67b9d4a1f7fc57b7cf0375
     AN.reveal($$('#v-home .how, #v-home .story, #v-home .pillar, #v-home .poster-card, #v-home .stories-head'));
   }
   function posterHTML(t, selectable, tag) {
-    const pt = COUNTS.perTheme[t.id];
     const inner = '<span class="pscene" aria-hidden="true">' + ART.scene(t.id) + '</span><span class="pcheck" aria-hidden="true">✓</span><span class="picon" aria-hidden="true">' + ART.icon(t.id, 18) + '</span>' +
-      (t.soft ? '<span class="psoft">Senza morti</span>' : '') + '<span class="pmeta">' + (pt.events + (S.settings.adult ? pt.adultEvents : 0)) + ' eventi · ' + (pt.disasters + (S.settings.adult ? pt.adultDisasters : 0)) + ' disastri</span><b>' + esc(t.name) + '</b><small>' + esc(t.tag) + '</small>';
+      (t.soft ? '<span class="psoft">Senza morti</span>' : '') + '<b>' + esc(t.name) + '</b><small>' + esc(t.tag) + '</small>';
     if (tag === 'a') return '<a class="poster-card" href="#arena" data-theme="' + t.id + '" style="--ph:' + t.hue + '">' + inner + '</a>';
     return '<button type="button" class="poster-card" role="radio" aria-checked="' + !!selectable + '" data-theme="' + t.id + '" style="--ph:' + t.hue + '">' + inner + '</button>';
   }
@@ -11771,60 +11958,97 @@ window.LOS_BUILD = "ccb0d15a771fe4d02dcc1be320acfd3d89c28c67b9d4a1f7fc57b7cf0375
     radioFocus($('#themeList'));
     AN.tilt($('#themeList'), '.poster-card');
     renderDifficulty();
-    $('#maxDays').value = S.settings.maxDays; $('#maxDaysOut').textContent = S.settings.maxDays;
+    $('#maxDays').value = S.settings.maxDays; $('#maxDaysOut').textContent = S.settings.maxDays; rangeFill($('#maxDays'));
     $('#seed').value = S.settings.seed;
     $('#teamsAllied').checked = !!S.settings.teamsAllied; $('#teamWin').checked = !!S.settings.teamWin;
     renderAdult();
     renderPreview(); renderCustomForm(); renderCustomList(); renderStartSum();
+    requestAnimationFrame(() => centerPoster($('#themeList [aria-checked="true"]'), false));
   }
+  // la scheda dell'arena: intestazione illustrata, numeri chiari e schede a linguette
+  let apvTab = 'luogo', sampleN = 0;
+  const APV_TABS = [['luogo', 'Il luogo', 'Luogo'], ['regole', 'Regole e meteo', 'Regole'], ['disastri', 'Disastri'], ['zaino', 'Zaino'], ['assaggio', 'Assaggio']];
+  const stripArt = (x) => x.replace(/^(il |lo |la |l'|i |gli |le |un |uno |una |un'|delle |dei |degli |del |della |dell')/i, '');
   function renderPreview() {
     const t = THEMES[S.settings.theme], pt = COUNTS.perTheme[t.id];
-    const strip = (s) => s.replace(/^(il |lo |la |l'|i |gli |le |un |uno |una |un'|delle |dei |degli |del |della |dell')/i, '');
-    const pools = L.buildPools(t, []);
-    const dz = pools.disasters.map((d) => d.n);
+    const adult = S.settings.adult && !t.noAdult;
+    const stat = (v, l) => '<div class="apv-stat"><b>' + v + '</b><span>' + l + '</span></div>';
+    const prev = $$('#arenaPreview .apv-stat b').map((x) => parseInt(x.textContent, 10));
+    $('#arenaPreview').innerHTML =
+      '<div class="apv-hero"><div class="apv-banner" aria-hidden="true">' + ART.scene(t.id) + '</div>' +
+        '<div class="apv-title"><span class="gl" aria-hidden="true">' + ART.icon(t.id, 24) + '</span><div><h2>' + esc(t.name) + '</h2><p>' + esc(t.tag) + '</p></div>' + (t.soft ? '<span class="apv-soft">Nessuno muore</span>' : '') + '</div></div>' +
+      '<div class="apv-stats">' + stat(pt.events + (adult ? pt.adultEvents : 0), 'Eventi') + stat(pt.disasters + (adult ? pt.adultDisasters : 0), 'Disastri') + stat(t.lex.luogo.length, 'Luoghi') + stat((ITM.order || []).length, 'Tipi di oggetto') + '</div>' +
+      '<p class="apv-intro">' + esc(t.intro.b) + '</p>' +
+      '<div class="apv-tabs" role="tablist" aria-label="Dettagli dell\'arena">' + APV_TABS.map(([k, l, sh]) => '<button type="button" role="tab" id="apvt-' + k + '" data-apv="' + k + '" aria-controls="apvp-' + k + '" aria-selected="' + (apvTab === k) + '" tabindex="' + (apvTab === k ? 0 : -1) + '"' + (sh ? ' aria-label="' + l + '"><span class="tl">' + l + '</span><span class="ts" aria-hidden="true">' + sh + '</span>' : '>' + l) + '</button>').join('') + '</div>' +
+      APV_TABS.map(([k]) => '<div class="apv-panel" role="tabpanel" tabindex="0" id="apvp-' + k + '" aria-labelledby="apvt-' + k + '"' + (apvTab === k ? '' : ' hidden') + '>' + (apvTab === k ? apvPanel(k, t) : '') + '</div>').join('');
+    AN.field($('#arenaPreview .apv-banner'), t.id, { intensity: 1.2 });
+    const ap = $('#arenaPreview'); ap.classList.remove('swap'); void ap.offsetWidth; ap.classList.add('swap');
+    // i numeri scorrono dal valore dell'arena precedente
+    if (prev.length && !AN.reduced) $$('#arenaPreview .apv-stat b').forEach((b, i) => { const n = parseInt(b.textContent, 10); if (!isNaN(prev[i]) && prev[i] !== n) AN.countTo(b, n, { from: prev[i], dur: 600 }); });
+  }
+  function apvPanel(k, t) {
+    if (k === 'luogo') {
+      const col = (h, xs) => '<div class="apv-col"><h3>' + h + '</h3><ul class="apv-list">' + xs.map((x) => '<li>' + esc(stripArt(x)) + '</li>').join('') + '</ul></div>';
+      return '<div class="apv-grid">' + col('Luoghi', t.lex.luogo) + col(t.soft ? 'Armi improprie' : 'Armi', t.lex.arma.slice(0, 8)) + col('Pericoli', t.lex.mostro) + '</div>';
+    }
+    if (k === 'regole') return rulesHTML(t) || '<p class="help">Questa arena segue le regole classiche, senza condizioni speciali.</p>';
+    if (k === 'disastri') {
+      const dz = L.buildPools(t, [], S.settings.adult && !t.noAdult).disasters;
+      return '<div class="dz-grid">' + dz.slice(0, 8).map((d) => '<div class="dz"><b>' + esc(d.n) + '</b><p>' + esc(d.intro || '') + '</p></div>').join('') + '</div>' +
+        (dz.length > 8 ? '<p class="help dz-more">E altri ' + (dz.length - 8) + ' disastri, scelti a caso durante la partita.</p>' : '');
+    }
+    if (k === 'zaino') return itemsHTML(t);
+    if (k === 'assaggio') return sampleHTML(t);
+    return '';
+  }
+  function sampleHTML(t) {
     let sample = '';
     try {
       const cast = (S.cast.length >= 4 ? S.cast.slice(0, 8) : L.randomCast(8, 'anteprima', 2));
-      const r = L.simulate({ cast, theme: t.id, seed: 'anteprima-' + t.id, difficulty: 'normale', teamsAllied: false });
+      const r = L.simulate({ cast, theme: t.id, seed: 'anteprima-' + t.id + (sampleN ? '-' + sampleN : ''), difficulty: 'normale', teamsAllied: false });
       const evs = r.phases.flatMap((p) => p.events).filter((e) => !e.note);
       const pick = [evs.find((e) => e.cat === 'kill' || e.cat === 'death'), evs.find((e) => e.cat === 'ally'), evs.find((e) => e.cat === 'item' || e.cat === 'none')].filter(Boolean);
       sample = pick.map((e) => evHTML(e, r.tributes, t, false, true)).join('');
     } catch (e) { sample = ''; }
-    $('#arenaPreview').innerHTML =
-      '<div class="apv-banner" aria-hidden="true">' + ART.scene(t.id) + '</div>' +
-      '<div class="apv-head"><span class="gl" aria-hidden="true">' + ART.icon(t.id, 28) + '</span><div><div class="eyebrow">' + pt.events + ' eventi · ' + pt.disasters + ' disastri' + (t.soft ? ' · nessuno muore' : '') + '</div><h2>' + esc(t.name) + '</h2></div></div>' +
-      '<p class="muted">' + esc(t.intro.b) + ' ' + esc(t.tag) + '</p>' +
-      '<div class="apv-grid">' +
-        '<div><h3>Luoghi</h3><ul>' + t.lex.luogo.map((x) => '<li>' + esc(strip(x)) + '</li>').join('') + '</ul></div>' +
-        '<div><h3>' + (t.soft ? 'Armi improprie' : 'Armi') + '</h3><ul>' + t.lex.arma.slice(0, 6).map((x) => '<li>' + esc(strip(x)) + '</li>').join('') + '</ul></div>' +
-        '<div><h3>Pericoli</h3><ul>' + t.lex.mostro.map((x) => '<li>' + esc(strip(x)) + '</li>').join('') + '</ul></div>' +
-      '</div>' +
-      rulesHTML(t) + itemsHTML(t) +
-      '<div><h3 class="sub" style="margin-bottom:8px">Alcuni disastri</h3><div class="chips">' + dz.slice(0, 10).map((x) => '<span class="chip dim">' + esc(x) + '</span>').join('') + '<span class="chip dim">e altri ' + Math.max(0, dz.length - 10) + '</span></div></div>' +
-      (sample ? '<div class="sample"><h3 class="sub">Un assaggio' + (S.cast.length >= 4 ? ' con il tuo cast' : '') + '</h3>' + sample + '</div>' : '');
-    AN.field($('#arenaPreview .apv-banner'), t.id, { intensity: 1.2 });
-    const ap = $('#arenaPreview'); ap.classList.remove('swap'); void ap.offsetWidth; ap.classList.add('swap');
+    return '<div class="sample"><p class="help">' + (S.cast.length >= 4 ? 'Tre momenti da una partita breve con i primi concorrenti del tuo cast.' : 'Tre momenti da una partita breve con concorrenti casuali.') + '</p>' +
+      (sample || '<p class="help">Nessun assaggio disponibile per questa arena.</p>') +
+      '<div><button class="btn sm" type="button" data-apv-again>Un altro assaggio</button></div></div>';
   }
+  function showApvTab(k, focus) {
+    apvTab = k; const t = THEMES[S.settings.theme];
+    $$('#arenaPreview [data-apv]').forEach((b) => { const on = b.dataset.apv === k; b.setAttribute('aria-selected', on); b.tabIndex = on ? 0 : -1; if (on && focus) b.focus(); if (on) b.scrollIntoView({ block: 'nearest', inline: 'nearest', behavior: AN.reduced ? 'auto' : 'smooth' }); });
+    $$('#arenaPreview .apv-panel').forEach((p) => { const on = p.id === 'apvp-' + k; p.hidden = !on; if (on) { p.innerHTML = apvPanel(k, t); if (!AN.reduced) p.animate([{ opacity: 0, transform: 'translateY(6px)' }, { opacity: 1, transform: 'none' }], { duration: 260, easing: 'ease-out' }); } });
+  }
+  $('#arenaPreview').addEventListener('click', (e) => {
+    const tb = e.target.closest('[data-apv]'); if (tb) return showApvTab(tb.dataset.apv);
+    if (e.target.closest('[data-apv-again]')) { sampleN++; showApvTab('assaggio'); const b = $('#arenaPreview [data-apv-again]'); if (b) b.focus(); }
+  });
+  $('#arenaPreview').addEventListener('keydown', (e) => {
+    const tb = e.target.closest('[data-apv]'); if (!tb || !['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(e.key)) return;
+    const ks = APV_TABS.map((x) => x[0]), i = ks.indexOf(tb.dataset.apv);
+    const n = e.key === 'Home' ? 0 : e.key === 'End' ? ks.length - 1 : (i + (e.key === 'ArrowLeft' ? -1 : 1) + ks.length) % ks.length;
+    e.preventDefault(); showApvTab(ks[n], true);
+  });
   function itemsHTML(t) {
     const names = Object.assign({}, (ITM.names || {})._ || {}, (ITM.names || {})[t.id] || {});
     const lex = Object.assign({}, D.lexDefault || {}, t.lex || {});
     (D.packs || []).forEach((pk) => { if (pk.lex && (pk.theme === t.id)) Object.assign(lex, pk.lex); });
     const ex = (k) => (names[k] || (k === 'med' ? ['un kit medico'] : k === 'trap' ? ['una trappola'] : lex[k]) || []).slice(0, 2).map((x) => x.replace(/^(il |lo |la |l'|i |gli |le |un |uno |una |un'|delle |dei |degli |del |della |dell')/i, '')).join(', ');
-    return '<details class="items-arena"><summary><span class="eyebrow">Zaino</span><b>Gli oggetti e a cosa servono</b><span class="help">' + (ITM.order || []).length + ' tipi</span></summary><div class="ia-grid">' +
-      (ITM.order || []).map((k) => { const ty = (t.soft && (ITM.typesSoft || {})[k]) || ITM.types[k]; return '<div class="ia"><span class="bic">' + (ITIC[k] || '') + '</span><div><b>' + esc(ty.label) + '</b>' + (ex(k) ? '<span class="iaex">' + esc(ex(k)) + '</span>' : '') + '<p>' + esc(ty.desc) + '</p></div></div>'; }).join('') + '</div></details>';
+    return '<p class="help">' + (t.soft ? 'Gli oggetti aiutano a restare in gara: si trovano, si scambiano e si rubano.' : 'Gli oggetti si trovano, si scambiano e si rubano: possono decidere uno scontro.') + '</p><div class="ia-grid">' +
+      (ITM.order || []).map((k) => { const ty = (t.soft && (ITM.typesSoft || {})[k]) || ITM.types[k]; return '<div class="ia"><span class="bic">' + (ITIC[k] || '') + '</span><div><b>' + esc(ty.label) + '</b>' + (ex(k) ? '<span class="iaex">' + esc(ex(k)) + '</span>' : '') + '<p>' + esc(ty.desc) + '</p></div></div>'; }).join('') + '</div>';
   }
   function rulesHTML(t) {
     const A = arenaOf(t.id); if (!A.rule) return '';
     const m = A.meter, lb = vitLabels(t);
-    return '<div class="rules-arena"><div class="ra-head"><span class="eyebrow">Regole dell\'arena</span><h3>' + esc(A.rule) + '</h3></div><p>' + esc(A.desc) + '</p>' +
+    return '<div class="rules-arena"><div class="ra-head"><span class="eyebrow">Regola speciale</span><h3>' + esc(A.rule) + '</h3></div><p>' + esc(A.desc) + '</p>' +
       '<div class="ra-grid"><div><h4>Contano di più</h4><div class="chips">' + (A.key || []).map((k, i) => '<span class="chip' + (i === 0 ? ' st' : '') + '">' + esc(ECO.attrNames[k] || k) + '</span>').join('') + '</div></div>' +
       '<div><h4>Da tenere d\'occhio</h4><div class="chips"><span class="chip dim">' + esc(lb.hp) + '</span><span class="chip dim">' + esc(lb.en) + '</span><span class="chip dim">' + esc(lb.mo) + '</span><span class="chip dim">' + esc(lb.food) + '</span>' + (m ? '<span class="chip st" title="' + esc(m.desc) + '">' + esc(m.name) + '</span>' : '') + '</div></div></div>' +
       (m ? '<p class="help"><b>' + esc(m.name) + ':</b> ' + esc(m.desc) + '</p>' : '') +
-      ((A.meteo || []).length ? '<div><h4>Meteo possibile</h4><div class="chips">' + A.meteo.map((x) => '<span class="chip dim" title="' + esc(x.d) + '">' + esc(x.n) + '</span>').join('') + '</div></div>' : '') + '</div>';
+      '</div>' + ((A.meteo || []).length ? '<div class="wx"><h4>Meteo possibile</h4><div class="wx-grid">' + A.meteo.map((x) => '<div class="wxi"><b>' + esc(x.n) + '</b><span>' + esc(x.d) + '</span></div>').join('') + '</div></div>' : '');
   }
   function renderStartSum() {
     const t = THEMES[S.settings.theme];
-    $('#startSum').innerHTML = '<b>' + S.cast.length + '</b> concorrenti · <b>' + esc(t.name) + '</b> · difficoltà <b>' + difficultyCopy(S.settings.difficulty, t)[1].toLowerCase() + '</b>' + (S.settings.adult && !t.noAdult ? ' · <span class="tag18">18+</span>' : '');
+    $('#startSum').innerHTML = '<span class="ss-icon" aria-hidden="true">' + ART.icon(t.id, 20) + '</span><span class="ss-text"><b>' + esc(t.name) + '</b><span class="ss-chips"><span>' + plural(S.cast.length, 'concorrente', 'concorrenti') + '</span><span>' + esc(difficultyCopy(S.settings.difficulty, t)[1]) + '</span><span>Fino a ' + plural(S.settings.maxDays, 'giorno', 'giorni') + '</span>' + (S.settings.adult && !t.noAdult ? '<span class="tag18">18+</span>' : '') + '</span></span>';
     $('#startMsg').textContent = S.cast.length < 2 ? 'Servono almeno 2 concorrenti: aggiungili nella sezione Concorrenti, oppure prova una partita lampo.' : '';
     $('#btnStart').disabled = S.cast.length < 2;
   }
@@ -11834,9 +12058,22 @@ window.LOS_BUILD = "ccb0d15a771fe4d02dcc1be320acfd3d89c28c67b9d4a1f7fc57b7cf0375
     $$('#themeList [data-theme]').forEach((x) => x.setAttribute('aria-checked', x === b));
     radioFocus($('#themeList'));
     renderDifficulty(); renderPreview(); renderStartSum(); renderCustomForm(); renderCustomList(); renderAdult();
+    centerPoster(b, true);
+    if (!AN.reduced) b.animate([{ scale: '1' }, { scale: '.96' }, { scale: '1.02' }, { scale: '1' }], { duration: 420, easing: 'cubic-bezier(.2,.8,.3,1.3)' });
+  });
+  // sul telefono le locandine scorrono in orizzontale: la scelta resta al centro
+  function centerPoster(el, smooth) {
+    const box = $('#themeList'); if (!el || box.scrollWidth <= box.clientWidth + 2) return;
+    box.scrollTo({ left: el.offsetLeft - (box.clientWidth - el.offsetWidth) / 2, behavior: smooth && !AN.reduced ? 'smooth' : 'auto' });
+  }
+  $('.apick-nav').addEventListener('click', (e) => {
+    const b = e.target.closest('[data-dir]'); if (!b) return;
+    const box = $('#themeList'), card = box.querySelector('.poster-card');
+    box.scrollBy({ left: +b.dataset.dir * (card ? card.offsetWidth + 12 : box.clientWidth * 0.8), behavior: AN.reduced ? 'auto' : 'smooth' });
   });
   $('#diffSeg').addEventListener('click', (e) => { const b = e.target.closest('button'); if (!b) return; S.settings.difficulty = b.dataset.v; save(); $$('#diffSeg button').forEach((x) => x.setAttribute('aria-checked', x === b)); radioFocus($('#diffSeg')); renderStartSum(); });
-  $('#maxDays').addEventListener('input', (e) => { S.settings.maxDays = +e.target.value; $('#maxDaysOut').textContent = e.target.value; save(); });
+  $('#maxDays').addEventListener('input', (e) => { S.settings.maxDays = +e.target.value; $('#maxDaysOut').textContent = e.target.value; rangeFill(e.target); save(); renderStartSum(); });
+  function rangeFill(r) { r.style.setProperty('--p', ((r.value - r.min) / (r.max - r.min) * 100) + '%'); }
   $('#seed').addEventListener('input', (e) => { S.settings.seed = e.target.value.slice(0, 60); save(); });
   $('#seedNew').addEventListener('click', () => { S.settings.seed = newSeed(); $('#seed').value = S.settings.seed; save(); });
   $('#teamsAllied').addEventListener('change', (e) => { S.settings.teamsAllied = e.target.checked; save(); });

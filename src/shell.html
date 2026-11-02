@@ -125,8 +125,11 @@
     <div class="pagehead"><div><div class="eyebrow">Passo 2 di 4</div><h1 id="h-arena">L'arena</h1><p id="arenaSub"></p></div></div>
     <div class="arenalayout">
       <div class="arenamain">
-        <div class="themes" id="themeList" role="radiogroup" aria-label="Arena"></div>
-        <div class="arenapreview" id="arenaPreview"></div>
+        <div class="apick">
+          <div class="apick-head"><h2 class="sec2" id="h-pick">Scegli dove si gioca</h2><span class="apick-nav" aria-hidden="true"><button type="button" class="pnav" data-dir="-1" tabindex="-1"><svg viewBox="0 0 24 24"><path d="m15 5-7 7 7 7"/></svg></button><button type="button" class="pnav" data-dir="1" tabindex="-1"><svg viewBox="0 0 24 24"><path d="m9 5 7 7-7 7"/></svg></button></span></div>
+          <div class="themes" id="themeList" role="radiogroup" aria-labelledby="h-pick"></div>
+        </div>
+        <div class="arenapreview" id="arenaPreview" aria-live="polite"></div>
         <details class="custom card" id="customBox">
           <summary><span><b>Eventi personalizzati</b> <span class="muted" id="customCount"></span></span><span class="chev" aria-hidden="true">▾</span></summary>
           <div class="custombody">
@@ -152,10 +155,9 @@
         </details>
       </div>
       <aside class="rules card" aria-labelledby="h-rules">
-        <h2 id="h-rules">Regole</h2>
-        <button class="btn" id="labOpen" type="button">Laboratorio di bilanciamento</button>
+        <h2 id="h-rules">Regole della partita</h2>
         <div class="field"><span>Difficoltà</span><div class="diffs" id="diffSeg" role="radiogroup" aria-label="Difficoltà" aria-describedby="difficultyHelp"></div><p class="help" id="difficultyHelp">Regola soprattutto la frequenza delle eliminazioni e dei disastri. Le caratteristiche del cast continuano a contare.</p></div>
-        <label class="field" for="maxDays"><span>Durata massima · <b id="maxDaysOut"></b> giorni</span><input type="range" id="maxDays" min="5" max="40" step="1"><small class="help">Allo scadere scatta lo scontro finale.</small></label>
+        <label class="field" for="maxDays"><span class="fhead">Durata massima <em class="fcount"><b id="maxDaysOut"></b> giorni</em></span><input type="range" id="maxDays" min="5" max="40" step="1"><span class="rangeends" aria-hidden="true"><span>Breve</span><span>Lunga</span></span><small class="help">Allo scadere scatta lo scontro finale.</small></label>
         <label class="switch" for="teamsAllied"><input type="checkbox" id="teamsAllied" role="switch"><span class="sw" aria-hidden="true"></span><span>Compagni di squadra alleati<small>Chi è nella stessa squadra comincia in alleanza. Le alleanze possono cambiare durante la partita; la squadra rimane la stessa.</small></span></label>
         <label class="switch" for="teamWin"><input type="checkbox" id="teamWin" role="switch"><span class="sw" aria-hidden="true"></span><span>Vittoria di squadra<small>La partita termina quando restano solo membri della stessa squadra, anche se le alleanze sono cambiate. Con una sola squadra termina subito.</small></span></label>
         <div class="adultbox" id="adultBox">
@@ -165,16 +167,19 @@
             <div class="row"><button class="btn danger" id="adultYes" type="button">Ho almeno 18 anni, attiva</button><button class="btn" id="adultNo" type="button">Annulla</button></div>
           </div>
         </div>
+        <details class="rules-adv">
+          <summary><span>Seme e strumenti</span><span class="chev" aria-hidden="true">▾</span></summary>
+          <div class="rules-advbody">
         <label class="field" for="seed"><span>Seme della partita</span>
-          <div class="seedrow"><input type="text" id="seed" autocomplete="off" spellcheck="false"><button class="btn" id="seedNew" type="button" title="Nuovo seme casuale" aria-label="Nuovo seme casuale"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="3.5" width="17" height="17" rx="4" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="8.5" cy="8.5" r="1.6" fill="currentColor"/><circle cx="15.5" cy="15.5" r="1.6" fill="currentColor"/><circle cx="12" cy="12" r="1.6" fill="currentColor"/></svg></button></div>
-          <small class="help">Stesso seme, cast e regole danno la stessa storia nella stessa versione del gioco.</small></label>
-        <div class="startbox">
-          <div class="startsum" id="startSum"></div>
-          <button class="btn primary xl" id="btnStart" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4.5v15l12-7.5z" fill="currentColor"/></svg>Avvia la simulazione</button>
-          <p class="help" id="startMsg" role="status"></p>
-        </div>
+              <div class="seedrow"><input type="text" id="seed" autocomplete="off" spellcheck="false"><button class="btn" id="seedNew" type="button" title="Nuovo seme casuale" aria-label="Nuovo seme casuale"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="3.5" width="17" height="17" rx="4" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="8.5" cy="8.5" r="1.6" fill="currentColor"/><circle cx="15.5" cy="15.5" r="1.6" fill="currentColor"/><circle cx="12" cy="12" r="1.6" fill="currentColor"/></svg></button></div>
+              <small class="help">Stesso seme, cast e regole danno la stessa storia nella stessa versione del gioco.</small></label>
+            <button class="btn" id="labOpen" type="button">Laboratorio di bilanciamento</button>
+            <small class="help">Simula molte partite con queste regole e guarda chi vince più spesso.</small>
+          </div>
+        </details>
       </aside>
     </div>
+    <div class="dock arenadock"><div class="dockin"><div class="startsum" id="startSum"></div><div class="startgo"><p class="help" id="startMsg" role="status"></p><button class="btn primary lg" id="btnStart" type="button" aria-label="Avvia la simulazione"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4.5v15l12-7.5z" fill="currentColor"/></svg><span>Avvia<span class="bl"> la simulazione</span></span></button></div></div></div>
   </section>
 
   <!-- DIRETTA -->

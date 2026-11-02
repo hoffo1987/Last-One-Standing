@@ -208,7 +208,7 @@
     return [base[0], v === 'massacro' ? 'Spietata' : base[1], { bassa: 'Poche eliminazioni, ritmo tranquillo', normale: 'L\'equilibrio classico', alta: 'La competizione non perdona', massacro: 'Eliminazioni più frequenti' }[base[0]], base[3]];
   }
   function renderDifficulty() {
-    $('#diffSeg').innerHTML = DIFFS.map(([v]) => difficultyCopy(v, THEMES[S.settings.theme])).map(([v, n, d, k]) => '<button type="button" role="radio" data-v="' + v + '" aria-checked="' + (S.settings.difficulty === v) + '"><b>' + n + ' <span class="sk" aria-hidden="true">' + '✖'.repeat(k) + '</span></b><small>' + d + '</small></button>').join('');
+    $('#diffSeg').innerHTML = DIFFS.map(([v]) => difficultyCopy(v, THEMES[S.settings.theme])).map(([v, n, d, k]) => '<button type="button" role="radio" data-v="' + v + '" aria-checked="' + (S.settings.difficulty === v) + '"><span class="dtop"><b>' + n + '</b><span class="dmeter" aria-hidden="true">' + [1, 2, 3, 4].map((x) => '<i' + (x <= k ? ' class="on"' : '') + '></i>').join('') + '</span></span><small>' + d + '</small></button>').join('');
     radioFocus($('#diffSeg'));
   }
 
@@ -496,9 +496,8 @@
     AN.reveal($$('#v-home .how, #v-home .story, #v-home .pillar, #v-home .poster-card, #v-home .stories-head'));
   }
   function posterHTML(t, selectable, tag) {
-    const pt = COUNTS.perTheme[t.id];
     const inner = '<span class="pscene" aria-hidden="true">' + ART.scene(t.id) + '</span><span class="pcheck" aria-hidden="true">✓</span><span class="picon" aria-hidden="true">' + ART.icon(t.id, 18) + '</span>' +
-      (t.soft ? '<span class="psoft">Senza morti</span>' : '') + '<span class="pmeta">' + (pt.events + (S.settings.adult ? pt.adultEvents : 0)) + ' eventi · ' + (pt.disasters + (S.settings.adult ? pt.adultDisasters : 0)) + ' disastri</span><b>' + esc(t.name) + '</b><small>' + esc(t.tag) + '</small>';
+      (t.soft ? '<span class="psoft">Senza morti</span>' : '') + '<b>' + esc(t.name) + '</b><small>' + esc(t.tag) + '</small>';
     if (tag === 'a') return '<a class="poster-card" href="#arena" data-theme="' + t.id + '" style="--ph:' + t.hue + '">' + inner + '</a>';
     return '<button type="button" class="poster-card" role="radio" aria-checked="' + !!selectable + '" data-theme="' + t.id + '" style="--ph:' + t.hue + '">' + inner + '</button>';
   }
@@ -1130,60 +1129,97 @@
     radioFocus($('#themeList'));
     AN.tilt($('#themeList'), '.poster-card');
     renderDifficulty();
-    $('#maxDays').value = S.settings.maxDays; $('#maxDaysOut').textContent = S.settings.maxDays;
+    $('#maxDays').value = S.settings.maxDays; $('#maxDaysOut').textContent = S.settings.maxDays; rangeFill($('#maxDays'));
     $('#seed').value = S.settings.seed;
     $('#teamsAllied').checked = !!S.settings.teamsAllied; $('#teamWin').checked = !!S.settings.teamWin;
     renderAdult();
     renderPreview(); renderCustomForm(); renderCustomList(); renderStartSum();
+    requestAnimationFrame(() => centerPoster($('#themeList [aria-checked="true"]'), false));
   }
+  // la scheda dell'arena: intestazione illustrata, numeri chiari e schede a linguette
+  let apvTab = 'luogo', sampleN = 0;
+  const APV_TABS = [['luogo', 'Il luogo', 'Luogo'], ['regole', 'Regole e meteo', 'Regole'], ['disastri', 'Disastri'], ['zaino', 'Zaino'], ['assaggio', 'Assaggio']];
+  const stripArt = (x) => x.replace(/^(il |lo |la |l'|i |gli |le |un |uno |una |un'|delle |dei |degli |del |della |dell')/i, '');
   function renderPreview() {
     const t = THEMES[S.settings.theme], pt = COUNTS.perTheme[t.id];
-    const strip = (s) => s.replace(/^(il |lo |la |l'|i |gli |le |un |uno |una |un'|delle |dei |degli |del |della |dell')/i, '');
-    const pools = L.buildPools(t, []);
-    const dz = pools.disasters.map((d) => d.n);
+    const adult = S.settings.adult && !t.noAdult;
+    const stat = (v, l) => '<div class="apv-stat"><b>' + v + '</b><span>' + l + '</span></div>';
+    const prev = $$('#arenaPreview .apv-stat b').map((x) => parseInt(x.textContent, 10));
+    $('#arenaPreview').innerHTML =
+      '<div class="apv-hero"><div class="apv-banner" aria-hidden="true">' + ART.scene(t.id) + '</div>' +
+        '<div class="apv-title"><span class="gl" aria-hidden="true">' + ART.icon(t.id, 24) + '</span><div><h2>' + esc(t.name) + '</h2><p>' + esc(t.tag) + '</p></div>' + (t.soft ? '<span class="apv-soft">Nessuno muore</span>' : '') + '</div></div>' +
+      '<div class="apv-stats">' + stat(pt.events + (adult ? pt.adultEvents : 0), 'Eventi') + stat(pt.disasters + (adult ? pt.adultDisasters : 0), 'Disastri') + stat(t.lex.luogo.length, 'Luoghi') + stat((ITM.order || []).length, 'Tipi di oggetto') + '</div>' +
+      '<p class="apv-intro">' + esc(t.intro.b) + '</p>' +
+      '<div class="apv-tabs" role="tablist" aria-label="Dettagli dell\'arena">' + APV_TABS.map(([k, l, sh]) => '<button type="button" role="tab" id="apvt-' + k + '" data-apv="' + k + '" aria-controls="apvp-' + k + '" aria-selected="' + (apvTab === k) + '" tabindex="' + (apvTab === k ? 0 : -1) + '"' + (sh ? ' aria-label="' + l + '"><span class="tl">' + l + '</span><span class="ts" aria-hidden="true">' + sh + '</span>' : '>' + l) + '</button>').join('') + '</div>' +
+      APV_TABS.map(([k]) => '<div class="apv-panel" role="tabpanel" tabindex="0" id="apvp-' + k + '" aria-labelledby="apvt-' + k + '"' + (apvTab === k ? '' : ' hidden') + '>' + (apvTab === k ? apvPanel(k, t) : '') + '</div>').join('');
+    AN.field($('#arenaPreview .apv-banner'), t.id, { intensity: 1.2 });
+    const ap = $('#arenaPreview'); ap.classList.remove('swap'); void ap.offsetWidth; ap.classList.add('swap');
+    // i numeri scorrono dal valore dell'arena precedente
+    if (prev.length && !AN.reduced) $$('#arenaPreview .apv-stat b').forEach((b, i) => { const n = parseInt(b.textContent, 10); if (!isNaN(prev[i]) && prev[i] !== n) AN.countTo(b, n, { from: prev[i], dur: 600 }); });
+  }
+  function apvPanel(k, t) {
+    if (k === 'luogo') {
+      const col = (h, xs) => '<div class="apv-col"><h3>' + h + '</h3><ul class="apv-list">' + xs.map((x) => '<li>' + esc(stripArt(x)) + '</li>').join('') + '</ul></div>';
+      return '<div class="apv-grid">' + col('Luoghi', t.lex.luogo) + col(t.soft ? 'Armi improprie' : 'Armi', t.lex.arma.slice(0, 8)) + col('Pericoli', t.lex.mostro) + '</div>';
+    }
+    if (k === 'regole') return rulesHTML(t) || '<p class="help">Questa arena segue le regole classiche, senza condizioni speciali.</p>';
+    if (k === 'disastri') {
+      const dz = L.buildPools(t, [], S.settings.adult && !t.noAdult).disasters;
+      return '<div class="dz-grid">' + dz.slice(0, 8).map((d) => '<div class="dz"><b>' + esc(d.n) + '</b><p>' + esc(d.intro || '') + '</p></div>').join('') + '</div>' +
+        (dz.length > 8 ? '<p class="help dz-more">E altri ' + (dz.length - 8) + ' disastri, scelti a caso durante la partita.</p>' : '');
+    }
+    if (k === 'zaino') return itemsHTML(t);
+    if (k === 'assaggio') return sampleHTML(t);
+    return '';
+  }
+  function sampleHTML(t) {
     let sample = '';
     try {
       const cast = (S.cast.length >= 4 ? S.cast.slice(0, 8) : L.randomCast(8, 'anteprima', 2));
-      const r = L.simulate({ cast, theme: t.id, seed: 'anteprima-' + t.id, difficulty: 'normale', teamsAllied: false });
+      const r = L.simulate({ cast, theme: t.id, seed: 'anteprima-' + t.id + (sampleN ? '-' + sampleN : ''), difficulty: 'normale', teamsAllied: false });
       const evs = r.phases.flatMap((p) => p.events).filter((e) => !e.note);
       const pick = [evs.find((e) => e.cat === 'kill' || e.cat === 'death'), evs.find((e) => e.cat === 'ally'), evs.find((e) => e.cat === 'item' || e.cat === 'none')].filter(Boolean);
       sample = pick.map((e) => evHTML(e, r.tributes, t, false, true)).join('');
     } catch (e) { sample = ''; }
-    $('#arenaPreview').innerHTML =
-      '<div class="apv-banner" aria-hidden="true">' + ART.scene(t.id) + '</div>' +
-      '<div class="apv-head"><span class="gl" aria-hidden="true">' + ART.icon(t.id, 28) + '</span><div><div class="eyebrow">' + pt.events + ' eventi · ' + pt.disasters + ' disastri' + (t.soft ? ' · nessuno muore' : '') + '</div><h2>' + esc(t.name) + '</h2></div></div>' +
-      '<p class="muted">' + esc(t.intro.b) + ' ' + esc(t.tag) + '</p>' +
-      '<div class="apv-grid">' +
-        '<div><h3>Luoghi</h3><ul>' + t.lex.luogo.map((x) => '<li>' + esc(strip(x)) + '</li>').join('') + '</ul></div>' +
-        '<div><h3>' + (t.soft ? 'Armi improprie' : 'Armi') + '</h3><ul>' + t.lex.arma.slice(0, 6).map((x) => '<li>' + esc(strip(x)) + '</li>').join('') + '</ul></div>' +
-        '<div><h3>Pericoli</h3><ul>' + t.lex.mostro.map((x) => '<li>' + esc(strip(x)) + '</li>').join('') + '</ul></div>' +
-      '</div>' +
-      rulesHTML(t) + itemsHTML(t) +
-      '<div><h3 class="sub" style="margin-bottom:8px">Alcuni disastri</h3><div class="chips">' + dz.slice(0, 10).map((x) => '<span class="chip dim">' + esc(x) + '</span>').join('') + '<span class="chip dim">e altri ' + Math.max(0, dz.length - 10) + '</span></div></div>' +
-      (sample ? '<div class="sample"><h3 class="sub">Un assaggio' + (S.cast.length >= 4 ? ' con il tuo cast' : '') + '</h3>' + sample + '</div>' : '');
-    AN.field($('#arenaPreview .apv-banner'), t.id, { intensity: 1.2 });
-    const ap = $('#arenaPreview'); ap.classList.remove('swap'); void ap.offsetWidth; ap.classList.add('swap');
+    return '<div class="sample"><p class="help">' + (S.cast.length >= 4 ? 'Tre momenti da una partita breve con i primi concorrenti del tuo cast.' : 'Tre momenti da una partita breve con concorrenti casuali.') + '</p>' +
+      (sample || '<p class="help">Nessun assaggio disponibile per questa arena.</p>') +
+      '<div><button class="btn sm" type="button" data-apv-again>Un altro assaggio</button></div></div>';
   }
+  function showApvTab(k, focus) {
+    apvTab = k; const t = THEMES[S.settings.theme];
+    $$('#arenaPreview [data-apv]').forEach((b) => { const on = b.dataset.apv === k; b.setAttribute('aria-selected', on); b.tabIndex = on ? 0 : -1; if (on && focus) b.focus(); if (on) b.scrollIntoView({ block: 'nearest', inline: 'nearest', behavior: AN.reduced ? 'auto' : 'smooth' }); });
+    $$('#arenaPreview .apv-panel').forEach((p) => { const on = p.id === 'apvp-' + k; p.hidden = !on; if (on) { p.innerHTML = apvPanel(k, t); if (!AN.reduced) p.animate([{ opacity: 0, transform: 'translateY(6px)' }, { opacity: 1, transform: 'none' }], { duration: 260, easing: 'ease-out' }); } });
+  }
+  $('#arenaPreview').addEventListener('click', (e) => {
+    const tb = e.target.closest('[data-apv]'); if (tb) return showApvTab(tb.dataset.apv);
+    if (e.target.closest('[data-apv-again]')) { sampleN++; showApvTab('assaggio'); const b = $('#arenaPreview [data-apv-again]'); if (b) b.focus(); }
+  });
+  $('#arenaPreview').addEventListener('keydown', (e) => {
+    const tb = e.target.closest('[data-apv]'); if (!tb || !['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(e.key)) return;
+    const ks = APV_TABS.map((x) => x[0]), i = ks.indexOf(tb.dataset.apv);
+    const n = e.key === 'Home' ? 0 : e.key === 'End' ? ks.length - 1 : (i + (e.key === 'ArrowLeft' ? -1 : 1) + ks.length) % ks.length;
+    e.preventDefault(); showApvTab(ks[n], true);
+  });
   function itemsHTML(t) {
     const names = Object.assign({}, (ITM.names || {})._ || {}, (ITM.names || {})[t.id] || {});
     const lex = Object.assign({}, D.lexDefault || {}, t.lex || {});
     (D.packs || []).forEach((pk) => { if (pk.lex && (pk.theme === t.id)) Object.assign(lex, pk.lex); });
     const ex = (k) => (names[k] || (k === 'med' ? ['un kit medico'] : k === 'trap' ? ['una trappola'] : lex[k]) || []).slice(0, 2).map((x) => x.replace(/^(il |lo |la |l'|i |gli |le |un |uno |una |un'|delle |dei |degli |del |della |dell')/i, '')).join(', ');
-    return '<details class="items-arena"><summary><span class="eyebrow">Zaino</span><b>Gli oggetti e a cosa servono</b><span class="help">' + (ITM.order || []).length + ' tipi</span></summary><div class="ia-grid">' +
-      (ITM.order || []).map((k) => { const ty = (t.soft && (ITM.typesSoft || {})[k]) || ITM.types[k]; return '<div class="ia"><span class="bic">' + (ITIC[k] || '') + '</span><div><b>' + esc(ty.label) + '</b>' + (ex(k) ? '<span class="iaex">' + esc(ex(k)) + '</span>' : '') + '<p>' + esc(ty.desc) + '</p></div></div>'; }).join('') + '</div></details>';
+    return '<p class="help">' + (t.soft ? 'Gli oggetti aiutano a restare in gara: si trovano, si scambiano e si rubano.' : 'Gli oggetti si trovano, si scambiano e si rubano: possono decidere uno scontro.') + '</p><div class="ia-grid">' +
+      (ITM.order || []).map((k) => { const ty = (t.soft && (ITM.typesSoft || {})[k]) || ITM.types[k]; return '<div class="ia"><span class="bic">' + (ITIC[k] || '') + '</span><div><b>' + esc(ty.label) + '</b>' + (ex(k) ? '<span class="iaex">' + esc(ex(k)) + '</span>' : '') + '<p>' + esc(ty.desc) + '</p></div></div>'; }).join('') + '</div>';
   }
   function rulesHTML(t) {
     const A = arenaOf(t.id); if (!A.rule) return '';
     const m = A.meter, lb = vitLabels(t);
-    return '<div class="rules-arena"><div class="ra-head"><span class="eyebrow">Regole dell\'arena</span><h3>' + esc(A.rule) + '</h3></div><p>' + esc(A.desc) + '</p>' +
+    return '<div class="rules-arena"><div class="ra-head"><span class="eyebrow">Regola speciale</span><h3>' + esc(A.rule) + '</h3></div><p>' + esc(A.desc) + '</p>' +
       '<div class="ra-grid"><div><h4>Contano di più</h4><div class="chips">' + (A.key || []).map((k, i) => '<span class="chip' + (i === 0 ? ' st' : '') + '">' + esc(ECO.attrNames[k] || k) + '</span>').join('') + '</div></div>' +
       '<div><h4>Da tenere d\'occhio</h4><div class="chips"><span class="chip dim">' + esc(lb.hp) + '</span><span class="chip dim">' + esc(lb.en) + '</span><span class="chip dim">' + esc(lb.mo) + '</span><span class="chip dim">' + esc(lb.food) + '</span>' + (m ? '<span class="chip st" title="' + esc(m.desc) + '">' + esc(m.name) + '</span>' : '') + '</div></div></div>' +
       (m ? '<p class="help"><b>' + esc(m.name) + ':</b> ' + esc(m.desc) + '</p>' : '') +
-      ((A.meteo || []).length ? '<div><h4>Meteo possibile</h4><div class="chips">' + A.meteo.map((x) => '<span class="chip dim" title="' + esc(x.d) + '">' + esc(x.n) + '</span>').join('') + '</div></div>' : '') + '</div>';
+      '</div>' + ((A.meteo || []).length ? '<div class="wx"><h4>Meteo possibile</h4><div class="wx-grid">' + A.meteo.map((x) => '<div class="wxi"><b>' + esc(x.n) + '</b><span>' + esc(x.d) + '</span></div>').join('') + '</div></div>' : '');
   }
   function renderStartSum() {
     const t = THEMES[S.settings.theme];
-    $('#startSum').innerHTML = '<b>' + S.cast.length + '</b> concorrenti · <b>' + esc(t.name) + '</b> · difficoltà <b>' + difficultyCopy(S.settings.difficulty, t)[1].toLowerCase() + '</b>' + (S.settings.adult && !t.noAdult ? ' · <span class="tag18">18+</span>' : '');
+    $('#startSum').innerHTML = '<span class="ss-icon" aria-hidden="true">' + ART.icon(t.id, 20) + '</span><span class="ss-text"><b>' + esc(t.name) + '</b><span class="ss-chips"><span>' + plural(S.cast.length, 'concorrente', 'concorrenti') + '</span><span>' + esc(difficultyCopy(S.settings.difficulty, t)[1]) + '</span><span>Fino a ' + plural(S.settings.maxDays, 'giorno', 'giorni') + '</span>' + (S.settings.adult && !t.noAdult ? '<span class="tag18">18+</span>' : '') + '</span></span>';
     $('#startMsg').textContent = S.cast.length < 2 ? 'Servono almeno 2 concorrenti: aggiungili nella sezione Concorrenti, oppure prova una partita lampo.' : '';
     $('#btnStart').disabled = S.cast.length < 2;
   }
@@ -1193,9 +1229,22 @@
     $$('#themeList [data-theme]').forEach((x) => x.setAttribute('aria-checked', x === b));
     radioFocus($('#themeList'));
     renderDifficulty(); renderPreview(); renderStartSum(); renderCustomForm(); renderCustomList(); renderAdult();
+    centerPoster(b, true);
+    if (!AN.reduced) b.animate([{ scale: '1' }, { scale: '.96' }, { scale: '1.02' }, { scale: '1' }], { duration: 420, easing: 'cubic-bezier(.2,.8,.3,1.3)' });
+  });
+  // sul telefono le locandine scorrono in orizzontale: la scelta resta al centro
+  function centerPoster(el, smooth) {
+    const box = $('#themeList'); if (!el || box.scrollWidth <= box.clientWidth + 2) return;
+    box.scrollTo({ left: el.offsetLeft - (box.clientWidth - el.offsetWidth) / 2, behavior: smooth && !AN.reduced ? 'smooth' : 'auto' });
+  }
+  $('.apick-nav').addEventListener('click', (e) => {
+    const b = e.target.closest('[data-dir]'); if (!b) return;
+    const box = $('#themeList'), card = box.querySelector('.poster-card');
+    box.scrollBy({ left: +b.dataset.dir * (card ? card.offsetWidth + 12 : box.clientWidth * 0.8), behavior: AN.reduced ? 'auto' : 'smooth' });
   });
   $('#diffSeg').addEventListener('click', (e) => { const b = e.target.closest('button'); if (!b) return; S.settings.difficulty = b.dataset.v; save(); $$('#diffSeg button').forEach((x) => x.setAttribute('aria-checked', x === b)); radioFocus($('#diffSeg')); renderStartSum(); });
-  $('#maxDays').addEventListener('input', (e) => { S.settings.maxDays = +e.target.value; $('#maxDaysOut').textContent = e.target.value; save(); });
+  $('#maxDays').addEventListener('input', (e) => { S.settings.maxDays = +e.target.value; $('#maxDaysOut').textContent = e.target.value; rangeFill(e.target); save(); renderStartSum(); });
+  function rangeFill(r) { r.style.setProperty('--p', ((r.value - r.min) / (r.max - r.min) * 100) + '%'); }
   $('#seed').addEventListener('input', (e) => { S.settings.seed = e.target.value.slice(0, 60); save(); });
   $('#seedNew').addEventListener('click', () => { S.settings.seed = newSeed(); $('#seed').value = S.settings.seed; save(); });
   $('#teamsAllied').addEventListener('change', (e) => { S.settings.teamsAllied = e.target.checked; save(); });

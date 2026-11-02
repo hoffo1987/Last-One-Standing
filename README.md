@@ -118,7 +118,10 @@ Un interruttore nella sezione Arena, attivo solo dopo la conferma dell'età, agg
 - **Riquadri**: angoli più morbidi, bordi chiari e ombre leggere; meno pannelli grigi annidati.
 - **Home** con partita lampo (24 concorrenti casuali, arena a sorpresa) e un tabellone dimostrativo animato.
 - **Concorrenti**: griglia o vista per squadra, nome modificabile sul posto, scheda laterale per tratti, caratteristiche e foto, elenco da incollare.
-- **Arena**: ogni arena ha la sua tinta che colora tutta l'app; anteprima con luoghi, armi, pericoli, disastri ed eventi d'esempio con il tuo cast.
+- **Arena**: ogni arena ha la sua tinta che colora tutta l'app. Le nove locandine stanno in una griglia 3×3 (sul telefono in un carosello da sfogliare con il dito o con le frecce, che porta la scelta al centro).
+- **Scheda dell'arena**: intestazione illustrata, i numeri principali in grande (eventi, disastri, luoghi, tipi di oggetto) e cinque linguette navigabili con le frecce: *Il luogo* (luoghi, armi, pericoli), *Regole e meteo* (regola speciale, caratteristiche che contano, indicatore, ogni meteo con la sua descrizione), *Disastri* (con la loro descrizione), *Zaino* (i tredici tipi di oggetto) e *Assaggio* (tre momenti di una partita breve col tuo cast, con «Un altro assaggio»). Cambiando arena la linguetta resta quella scelta e i numeri scorrono al nuovo valore.
+- **Regole della partita**: difficoltà con un misuratore a tacche, durata con cursore e valore a parte, interruttori per le squadre e i contenuti 18+; seme e Laboratorio di bilanciamento sono raccolti in «Seme e strumenti».
+- **Barra di avvio** sempre visibile in basso: arena scelta, concorrenti, difficoltà e durata, con il pulsante «Avvia la simulazione».
 - **Diretta**: regia in stile televisivo, linea del tempo per giorni, mappa, caduti, alleanze, scheda di ogni concorrente con la sua storia, riproduzione automatica e tasti freccia.
 - **Esito**: podio, premi, momenti salienti, grafico dei superstiti, classifica e locandina.
 
