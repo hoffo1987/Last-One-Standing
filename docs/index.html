@@ -1098,7 +1098,12 @@ img.scene { object-fit: cover; object-position: center; user-select: none; }
 .reading-options .help { margin-top: 10px; }
 .sim-progress { position: fixed; inset: auto 16px 90px auto; z-index: 100; padding: 16px; display: flex; align-items: center; gap: 16px; max-width: calc(100% - 32px); box-shadow: 0 6px 30px #0006; }
 .archive-launch { margin: 16px 0; }
-.archive-dialog { width: min(820px, calc(100vw - 48px)); }
+.modal.tool-dialog { width: min(860px, calc(100% - 32px)); }
+.tool-dialog .db { grid-template-columns: minmax(0, 1fr); gap: 12px; }
+.tool-dialog .row.between { flex-wrap: nowrap; justify-content: space-between; align-items: flex-start; }
+.tool-dialog .row.between h2 { min-width: 0; overflow-wrap: anywhere; }
+.tool-dialog .iconbtn { flex-shrink: 0; }
+.archive-dialog { width: 100%; min-width: 0; }
 .archive-dialog #archiveList { display: grid; gap: 12px; margin: 18px 0; }
 .archive-entry { padding: 14px; border: 1px solid var(--line); border-radius: 12px; }
 .archive-entry > label:not(.archive-select) { display: grid; gap: 6px; }
@@ -1114,7 +1119,7 @@ img.scene { object-fit: cover; object-position: center; user-select: none; }
 .studio-panel .row { flex-wrap: wrap; align-items: end; }
 .studio-panel select { max-width: 100%; }
 .studio-list { padding-left: 20px; display: grid; gap: 9px; margin: 12px 0; }
-.studio-dialog { width: min(820px, calc(100vw - 48px)); }
+.studio-dialog { width: 100%; min-width: 0; }
 .studio-dialog progress { width: 100%; margin-top: 16px; }
 #advancedEditor { margin-top: 20px; border-top: 1px solid var(--line); padding-top: 14px; }
 #advancedEditor textarea { width: 100%; font-family: var(--f-mono); }
@@ -1182,7 +1187,7 @@ img.scene { object-fit: cover; object-position: center; user-select: none; }
       <div class="archive-launch"><button class="btn" type="button" id="btnArchive">Archivio partite e replay</button></div>
       <section class="card studio-panel" aria-labelledby="h-seasons"><h2 id="h-seasons">Stagioni e tornei</h2>
         <p class="help">Conserva un cast per più round: 1 punto per la partecipazione, 3 per la vittoria e 1 per ogni eliminazione attribuita.</p>
-        <div class="row"><label>Nome della stagione<input id="seasonName" maxlength="80" placeholder="La mia stagione"></label><button class="btn" id="seasonCreate" type="button">Crea con il cast attuale</button></div>
+        <div class="row"><label>Nome della stagione<input id="seasonName" type="text" maxlength="80" placeholder="La mia stagione"></label><button class="btn" id="seasonCreate" type="button">Crea con il cast attuale</button></div>
         <label>Stagione<select id="seasonSelect"></select></label><div id="seasonBoard"></div><p class="help" id="seasonMsg" role="status"></p>
       </section>
       <div class="howto">
@@ -1396,8 +1401,8 @@ img.scene { object-fit: cover; object-position: center; user-select: none; }
 
 <dialog id="editDlg" class="drawer" aria-labelledby="h-edit"><div id="editBody"></div></dialog>
 <dialog id="profDlg" class="drawer" aria-labelledby="h-prof"><div id="profBody"></div></dialog>
-<dialog id="archiveDlg" aria-labelledby="h-archive">
-  <div class="dlgbody archive-dialog">
+<dialog id="archiveDlg" class="modal tool-dialog" aria-labelledby="h-archive">
+  <div class="db archive-dialog">
     <div class="row between"><h2 id="h-archive">Archivio partite</h2><button class="iconbtn" type="button" data-close aria-label="Chiudi archivio">✕</button></div>
     <p class="help">Le partite restano su questo browser. Esporta un replay completo per conservarlo altrove o riaprirlo su un altro dispositivo.</p>
     <div id="archiveList"></div>
@@ -1410,7 +1415,7 @@ img.scene { object-fit: cover; object-position: center; user-select: none; }
     <p id="archiveMsg" class="help" role="status"></p>
   </div>
 </dialog>
-<dialog id="labDlg" aria-labelledby="h-lab"><div class="dlgbody studio-dialog">
+<dialog id="labDlg" class="modal tool-dialog" aria-labelledby="h-lab"><div class="db studio-dialog">
   <div class="row between"><h2 id="h-lab">Laboratorio di bilanciamento</h2><button class="iconbtn" data-close type="button" aria-label="Chiudi laboratorio">✕</button></div>
   <p class="help">Usa cast, legami e regole attuali su molti semi. La partita aperta resta intatta. Ogni componente della squadra vincente conta una vittoria.</p>
   <label>Partite nel campione<input id="labCount" type="number" min="5" max="200" value="30"></label>
@@ -9458,7 +9463,7 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
 </script>
 <script>window.LOS_ASSETS = {"logo":"img/logo.f2d5175789.webp","icona":"img/icona.8b02ddeb49.webp","favicon":"img/favicon.86774dc7cf.png","panoramica":"img/panoramica.66c4c27255.webp","sagome":["img/sagome-cappuccio.e8876ba986.webp","img/sagome-esploratore.9a99fd13f8.webp","img/sagome-viaggiatore.5e36435604.webp"],"arene":{"classico":"img/arene-classico.42c6ba42ee.webp","fantasy":"img/arene-fantasy.75b7fb0d32.webp","horror":"img/arene-horror.48052d80b4.webp","liceo":"img/arene-liceo.05ed578a90.webp","royale":"img/arene-royale.36c9952cd7.webp","scifi":"img/arene-scifi.403694f00f.webp","ufficio":"img/arene-ufficio.67b271bea3.webp","wasteland":"img/arene-wasteland.889002ace8.webp","zombie":"img/arene-zombie.36c9135a12.webp"}};
 ;
-window.LOS_BUILD = "3491c58551ead507796438ad43cb9fdedcc94e1aceac6ef3c03188b654a6fcdd";
+window.LOS_BUILD = "07cc8e5f03e060065b2e409c84b3c4dc26d138c271a3b793d2935f01c9f64777";
 ;
 /* Last One Standing — grafica vettoriale: logo, icone delle arene, illustrazioni.
  * Tutto è SVG generato in codice: nessuna immagine esterna. */

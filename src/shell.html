@@ -55,7 +55,7 @@
       <div class="archive-launch"><button class="btn" type="button" id="btnArchive">Archivio partite e replay</button></div>
       <section class="card studio-panel" aria-labelledby="h-seasons"><h2 id="h-seasons">Stagioni e tornei</h2>
         <p class="help">Conserva un cast per più round: 1 punto per la partecipazione, 3 per la vittoria e 1 per ogni eliminazione attribuita.</p>
-        <div class="row"><label>Nome della stagione<input id="seasonName" maxlength="80" placeholder="La mia stagione"></label><button class="btn" id="seasonCreate" type="button">Crea con il cast attuale</button></div>
+        <div class="row"><label>Nome della stagione<input id="seasonName" type="text" maxlength="80" placeholder="La mia stagione"></label><button class="btn" id="seasonCreate" type="button">Crea con il cast attuale</button></div>
         <label>Stagione<select id="seasonSelect"></select></label><div id="seasonBoard"></div><p class="help" id="seasonMsg" role="status"></p>
       </section>
       <div class="howto">
@@ -269,8 +269,8 @@
 
 <dialog id="editDlg" class="drawer" aria-labelledby="h-edit"><div id="editBody"></div></dialog>
 <dialog id="profDlg" class="drawer" aria-labelledby="h-prof"><div id="profBody"></div></dialog>
-<dialog id="archiveDlg" aria-labelledby="h-archive">
-  <div class="dlgbody archive-dialog">
+<dialog id="archiveDlg" class="modal tool-dialog" aria-labelledby="h-archive">
+  <div class="db archive-dialog">
     <div class="row between"><h2 id="h-archive">Archivio partite</h2><button class="iconbtn" type="button" data-close aria-label="Chiudi archivio">✕</button></div>
     <p class="help">Le partite restano su questo browser. Esporta un replay completo per conservarlo altrove o riaprirlo su un altro dispositivo.</p>
     <div id="archiveList"></div>
@@ -283,7 +283,7 @@
     <p id="archiveMsg" class="help" role="status"></p>
   </div>
 </dialog>
-<dialog id="labDlg" aria-labelledby="h-lab"><div class="dlgbody studio-dialog">
+<dialog id="labDlg" class="modal tool-dialog" aria-labelledby="h-lab"><div class="db studio-dialog">
   <div class="row between"><h2 id="h-lab">Laboratorio di bilanciamento</h2><button class="iconbtn" data-close type="button" aria-label="Chiudi laboratorio">✕</button></div>
   <p class="help">Usa cast, legami e regole attuali su molti semi. La partita aperta resta intatta. Ogni componente della squadra vincente conta una vittoria.</p>
   <label>Partite nel campione<input id="labCount" type="number" min="5" max="200" value="30"></label>
