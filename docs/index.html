@@ -9458,7 +9458,7 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
 </script>
 <script>window.LOS_ASSETS = {"logo":"img/logo.f2d5175789.webp","icona":"img/icona.8b02ddeb49.webp","favicon":"img/favicon.86774dc7cf.png","panoramica":"img/panoramica.66c4c27255.webp","sagome":["img/sagome-cappuccio.e8876ba986.webp","img/sagome-esploratore.9a99fd13f8.webp","img/sagome-viaggiatore.5e36435604.webp"],"arene":{"classico":"img/arene-classico.42c6ba42ee.webp","fantasy":"img/arene-fantasy.75b7fb0d32.webp","horror":"img/arene-horror.48052d80b4.webp","liceo":"img/arene-liceo.05ed578a90.webp","royale":"img/arene-royale.36c9952cd7.webp","scifi":"img/arene-scifi.403694f00f.webp","ufficio":"img/arene-ufficio.67b271bea3.webp","wasteland":"img/arene-wasteland.889002ace8.webp","zombie":"img/arene-zombie.36c9135a12.webp"}};
 ;
-window.LOS_BUILD = "62ebdcdd154e9988a05aa6ab7abddb73d65511757f4ba26a80022560a8b6a48c";
+window.LOS_BUILD = "3491c58551ead507796438ad43cb9fdedcc94e1aceac6ef3c03188b654a6fcdd";
 ;
 /* Last One Standing — grafica vettoriale: logo, icone delle arene, illustrazioni.
  * Tutto è SVG generato in codice: nessuna immagine esterna. */
@@ -10258,7 +10258,9 @@ window.LOS_BUILD = "62ebdcdd154e9988a05aa6ab7abddb73d65511757f4ba26a80022560a8b6
       }).join('');
       $('#resBody .resgrid').insertAdjacentHTML('beforebegin', '<section class="block card studio-panel" id="causalReport"><h2>Le svolte della vittoria</h2><p class="help">Eventi e condizioni realmente registrati. Le tappe raccontano il percorso, senza attribuire un effetto decisivo che il motore non ha misurato.</p>' + html + '</section>');
     }
-    $('#resBody').addEventListener('click', (e) => { const b = e.target.closest('[data-story-phase]'); if (!b) return; A.go(+b.dataset.storyPhase); if (location.hash !== '#diretta') location.hash = '#diretta'; });
+    $('#resBody').addEventListener('click', (e) => { const b = e.target.closest('[data-story-phase]'); if (!b) return;
+      if (S.settings.followOnly) { S.settings.followOnly = false; A.save(); A.toast('Filtro dei seguiti disattivato per mostrare tutta la fase.'); }
+      A.go(+b.dataset.storyPhase); if (location.hash !== '#diretta') location.hash = '#diretta'; });
 
     // Lo stesso validatore dell'importazione è usato per modifiche e pacchetti.
     const candidateEvent = () => ({ id: editing || A.inputId('e'), phase: $('#advancedPhase').value, raw: $('#advancedLine').value.trim() });
@@ -10544,7 +10546,7 @@ window.LOS_BUILD = "62ebdcdd154e9988a05aa6ab7abddb73d65511757f4ba26a80022560a8b6
     if (st.includes('ubriaco')) bits.push(statusLabel('ubriaco', t, theme).toLowerCase());
     const allies = snap.allies[t.id] != null ? snap.alive.filter((x) => x !== t.id && snap.allies[x] === snap.allies[t.id]).length : 0;
     const where = zone ? zone.replace(/^(il |lo |la |l'|i |gli |le )/i, (a) => a.toLowerCase()) : '';
-    const lead = (where ? 'A ' + where : 'In gara') + (bits.length ? ', ' + bits.join(', ') : '') + (allies ? ', con ' + plural(allies, 'alleato', 'alleati') : ', da sol' + G3(t.gender, 'o', 'a', 'ə')) + '.';
+    const lead = (where ? 'A ' + where : 'In gara') + (bits.length ? ', ' + bits.join(', ') : '') + (allies ? ', in alleanza con ' + plural(allies, 'alleato', 'alleati') : ', senza alleati') + '.';
     const g = m ? (MND.goals || {})[m.g] : null;
     return '<div class="nowcard"><div class="sub">Adesso</div><p class="nowlead">' + esc(fixA(lead)) + '</p>' +
       (m && g ? '<div class="goal' + (g.secret ? ' secret' : '') + '"><span class="glbl">Obiettivo</span><b>' + esc(goalLabel(m)) + '</b>' + (g.secret ? '<span class="gsec" title="Gli altri concorrenti non lo sanno">segreto</span>' : '') + (m.since != null && m.since < i ? '<span class="gsince">da G' + (SIM.phases[m.since] ? SIM.phases[m.since].day || 1 : 1) + '</span>' : '') + '</div>' : '') +

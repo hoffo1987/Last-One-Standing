@@ -25,6 +25,10 @@ test('Il riepilogo Adesso usa le stesse condizioni delle etichette, secondo aren
   assert.match(hard, /ferita/); assert.match(hard, /ubriaca/);
   snapshot.vit.a[0] = 20;
   assert.match(c.nowHTML(person, snapshot, 0, theme), /reputazione a pezzi/);
+  assert.match(c.nowHTML(person, snapshot, 0, theme), /senza alleati/);
+  assert.doesNotMatch(c.nowHTML(person, snapshot, 0, theme), /da sola/);
+  snapshot.alive = ['a', 'b']; snapshot.allies = { a: 1, b: 1 };
+  assert.match(c.nowHTML(person, snapshot, 0, theme), /in alleanza con 1 alleato/);
 });
 function fixture() {
   const a = { id: 'a', name: 'Alice', gender: 'F', team: 1, traits: [], attr: { int: 8 }, tests: 3, testsPassed: 2, alive: true, deathPhase: -1, deathDay: 0, promises: [], kills: 7, killerIds: [], diary: [] };

@@ -139,7 +139,7 @@
     if (st.includes('ubriaco')) bits.push(statusLabel('ubriaco', t, theme).toLowerCase());
     const allies = snap.allies[t.id] != null ? snap.alive.filter((x) => x !== t.id && snap.allies[x] === snap.allies[t.id]).length : 0;
     const where = zone ? zone.replace(/^(il |lo |la |l'|i |gli |le )/i, (a) => a.toLowerCase()) : '';
-    const lead = (where ? 'A ' + where : 'In gara') + (bits.length ? ', ' + bits.join(', ') : '') + (allies ? ', con ' + plural(allies, 'alleato', 'alleati') : ', da sol' + G3(t.gender, 'o', 'a', 'ə')) + '.';
+    const lead = (where ? 'A ' + where : 'In gara') + (bits.length ? ', ' + bits.join(', ') : '') + (allies ? ', in alleanza con ' + plural(allies, 'alleato', 'alleati') : ', senza alleati') + '.';
     const g = m ? (MND.goals || {})[m.g] : null;
     return '<div class="nowcard"><div class="sub">Adesso</div><p class="nowlead">' + esc(fixA(lead)) + '</p>' +
       (m && g ? '<div class="goal' + (g.secret ? ' secret' : '') + '"><span class="glbl">Obiettivo</span><b>' + esc(goalLabel(m)) + '</b>' + (g.secret ? '<span class="gsec" title="Gli altri concorrenti non lo sanno">segreto</span>' : '') + (m.since != null && m.since < i ? '<span class="gsince">da G' + (SIM.phases[m.since] ? SIM.phases[m.since].day || 1 : 1) + '</span>' : '') + '</div>' : '') +

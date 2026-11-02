@@ -90,5 +90,11 @@ function uiFixture() {
     const steps = Studio.causalSteps(original, original.winners[0]);
     for (const step of steps) { assert.equal(step.plain, original.phases[step.phase].events[step.event].plain); assert.equal(step.reason, original.phases[step.phase].events[step.event].reason || ''); }
   });
+  await test('rivedere una svolta mostra tutta la fase anche con il filtro dei seguiti attivo', () => {
+    const f = uiFixture(); let phase;
+    f.state.settings.followOnly = true; f.api.go = value => { phase = value; };
+    f.handlers['#resBody:click']({ target: { closest: () => ({ dataset: { storyPhase: '2' } }) } });
+    assert.equal(f.state.settings.followOnly, false); assert.equal(phase, 2);
+  });
   console.log('\nOK: ' + passed + ' gruppi di regressioni degli strumenti di gioco');
 })().catch(e => { console.error(e); process.exitCode = 1; });

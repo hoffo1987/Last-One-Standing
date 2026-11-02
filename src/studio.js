@@ -67,7 +67,9 @@
       }).join('');
       $('#resBody .resgrid').insertAdjacentHTML('beforebegin', '<section class="block card studio-panel" id="causalReport"><h2>Le svolte della vittoria</h2><p class="help">Eventi e condizioni realmente registrati. Le tappe raccontano il percorso, senza attribuire un effetto decisivo che il motore non ha misurato.</p>' + html + '</section>');
     }
-    $('#resBody').addEventListener('click', (e) => { const b = e.target.closest('[data-story-phase]'); if (!b) return; A.go(+b.dataset.storyPhase); if (location.hash !== '#diretta') location.hash = '#diretta'; });
+    $('#resBody').addEventListener('click', (e) => { const b = e.target.closest('[data-story-phase]'); if (!b) return;
+      if (S.settings.followOnly) { S.settings.followOnly = false; A.save(); A.toast('Filtro dei seguiti disattivato per mostrare tutta la fase.'); }
+      A.go(+b.dataset.storyPhase); if (location.hash !== '#diretta') location.hash = '#diretta'; });
 
     // Lo stesso validatore dell'importazione è usato per modifiche e pacchetti.
     const candidateEvent = () => ({ id: editing || A.inputId('e'), phase: $('#advancedPhase').value, raw: $('#advancedLine').value.trim() });
