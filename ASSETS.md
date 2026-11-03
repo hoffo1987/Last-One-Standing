@@ -11,7 +11,7 @@ descrive la provenienza documentata, senza attribuire una licenza alle immagini.
 | `assets/panoramica.webp`, `anteprima.jpg` | Illustrazione della home e anteprima per i link generate con imagegen per il progetto. |
 | `assets/sagome/*.webp` | Tre sagome generiche generate con imagegen per il progetto. |
 | SVG e icone prodotti da `src/art.js` e `src/ui.js` | Disegnati e conservati nel codice del progetto. |
-| `assets/arene/<arena>/<sezione>/*.webp` | Immagini della guida delle arene (luoghi, pericoli, armi, meteo, disastri, oggetti), da fornire; l'elenco completo è in [docs-dev/immagini-arene.md](docs-dev/immagini-arene.md). Finché mancano, `src/atlas.js` disegna illustrazioni vettoriali provvisorie. |
+| `assets/arene/<arena>/<sezione>/*.webp` | Immagini della guida delle arene, da fornire. Specifiche, nomi dei file e prompt di luoghi, pericoli e armi sono in [docs-dev/immagini-arene.md](docs-dev/immagini-arene.md); meteo, disastri e oggetti seguiranno. Finché mancano, `src/atlas.js` disegna illustrazioni vettoriali provvisorie. |
 
 Il registro di lavorazione dei pacchetti di immagini documenta la creazione il
 1 novembre 2026, con prompt conservati negli archivi originali di consegna. La

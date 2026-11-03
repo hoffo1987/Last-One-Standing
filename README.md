@@ -125,7 +125,7 @@ Un interruttore nella sezione Arena, attivo solo dopo la conferma dell'età, agg
   - *Minacce*: i disastri con illustrazione e ricerca; toccandone uno si aprono i tre destini (non sopravvive, ne esce ferito, si salva) raccontati con un concorrente del tuo cast.
   - *Zaino*: un inventario a caselle; ogni oggetto ha la sua scheda con i nomi che prende in quell'arena.
   - *Anteprima*: una mini diretta con tre momenti di una partita breve e «Un altro assaggio».
-- **Immagini della guida**: ogni luogo, pericolo, arma, meteo, disastro e oggetto può avere un'immagine vera in `assets/arene/<arena>/<sezione>/<nome>.webp`; finché manca, `src/atlas.js` disegna un'illustrazione con i colori dell'arena, scelta per famiglia (fuoco, acqua, gelo, fulmini, bestie, sciami, magia, tecnologia, burocrazia, spettacolo…). `node tools/atlas-slots.js` scrive l'elenco completo dei file attesi, con formati, dimensioni, priorità e tracce, in [docs-dev/immagini-arene.md](docs-dev/immagini-arene.md) e in un CSV.
+- **Immagini della guida**: ogni luogo, pericolo, arma, meteo, disastro e oggetto può avere un'immagine vera in `assets/arene/<arena>/<sezione>/<nome>.webp`; finché manca, `src/atlas.js` disegna un'illustrazione con i colori dell'arena, scelta per famiglia (fuoco, acqua, gelo, fulmini, bestie, sciami, magia, tecnologia, burocrazia, spettacolo…). Per luoghi, pericoli e armi c'è un brief scritto voce per voce (`tools/atlas-brief.js`): `node tools/atlas-slots.js` lo trasforma in [docs-dev/immagini-arene.md](docs-dev/immagini-arene.md) (regole di formato e composizione, atmosfera di ogni arena, nome del file, cosa mostrare, prompt breve e completo) e in un CSV; `tools/test-atlas-brief.js` controlla che nessuna voce resti senza brief. Meteo, disastri e oggetti seguiranno.
 - **Regole della partita**: difficoltà con un misuratore a tacche, durata con cursore e valore a parte, interruttori per le squadre e i contenuti 18+; seme e Laboratorio di bilanciamento sono raccolti in «Seme e strumenti».
 - **Barra di avvio** sempre visibile in basso: arena scelta, concorrenti, difficoltà e durata, con il pulsante «Avvia la simulazione».
 - **Diretta**: regia in stile televisivo, linea del tempo per giorni, mappa, caduti, alleanze, scheda di ogni concorrente con la sua storia, riproduzione automatica e tasti freccia.
@@ -172,7 +172,7 @@ tools/build.js       crea dist/last-one-standing.html (file unico con immagini i
 tools/test-engine.js test del motore senza browser
 tools/lint-content.js controllo statico dei contenuti
 tools/fuzz.js        collaudo con partite casuali
-tools/atlas-slots.js elenca le immagini attese per la guida delle arene (docs-dev/immagini-arene.md e .csv)
+tools/atlas-slots.js documentazione delle immagini della guida (docs-dev/immagini-arene.md e .csv) dal brief in tools/atlas-brief.js
 docs-dev/eventi.md   guida completa ai requisiti, effetti e testi degli eventi
 .github/workflows/quality.yml CI con regressioni, determinismo, fuzz e verifica della build
 ```

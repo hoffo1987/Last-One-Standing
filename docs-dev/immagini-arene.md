@@ -1,1413 +1,3288 @@
-# Immagini delle arene
+# Immagini delle arene: luoghi, pericoli e armi
 
-_File generato da `node tools/atlas-slots.js`: non modificarlo a mano._
+_Generato da `node tools/atlas-slots.js` a partire da `tools/atlas-brief.js`: per cambiare un testo o un prompt modifica il brief e rigenera, non questo file._
 
-La guida di ogni arena mostra un'immagine per ogni luogo, pericolo, arma, meteo, disastro e oggetto. Se il file esiste, il sito usa quello; altrimenti disegna un'illustrazione provvisoria con i colori dell'arena. Basta mettere i file nella cartella indicata e ricostruire (`node tools/build.js`): non serve toccare il codice.
+**Presenti: 0 su 156** (luoghi 0/54, pericoli 0/35, armi 0/67). Meteo, disastri e oggetti arriveranno in un secondo momento.
 
-**Presenti: 0 su 1058.**
+## In breve
 
-## Regole per tutti i file
+1. Genera l'immagine con il prompt della voce (in inglese, perché i generatori lo seguono meglio; sopra c'è sempre la descrizione in italiano).
+2. Esportala in **WebP** con le dimensioni della sua sezione e salvala con il **nome esatto** indicato, nella cartella indicata.
+3. Lancia `node tools/build.js`: il sito la usa al posto dell'illustrazione provvisoria. `node tools/atlas-slots.js` aggiorna i conteggi qui sopra (✓ accanto alle voci presenti).
 
-- **Formato**: WebP (qualità 80–85). Vanno bene anche PNG, JPG o AVIF con lo stesso nome; per gli sfondi trasparenti usare WebP o PNG con canale alfa.
-- **Colore**: sRGB, senza profili strani. Nessun testo, logo o filigrana dentro l'immagine (i nomi li scrive il sito).
-- **Nomi**: esattamente quelli dell'elenco, tutto minuscolo, senza accenti, parole separate da trattini.
-- **Stile**: Illustrazione digitale pittorica nello stile dei banner di Last One Standing (assets/arene/<arena>.webp): pennellate morbide, luce drammatica, contorni puliti, nessun testo, nessun logo, nessuna persona realistica riconoscibile.
-- **Il file unico** `dist/last-one-standing.html` non incorpora queste immagini (resterebbe troppo pesante): le mostra solo il sito.
+## Regole comuni
 
-| Sezione | Proporzioni | Dimensioni consigliate | Sfondo | Peso | Note |
-| --- | --- | --- | --- | --- | --- |
-| luoghi | 16:9 | 1280×720 | pieno | ≤ 150 KB | Veduta del luogo, soggetto al centro: sul telefono si vede una striscia verticale centrale. |
-| pericoli | 4:3 | 960×720 | pieno, scuro | ≤ 120 KB | Ritratto da manifesto «ricercato»: soggetto centrato, sguardo verso chi guarda. |
-| armi | 1:1 | 512×512 | trasparente | ≤ 60 KB | Oggetto singolo, centrato, con circa il 12% di margine; leggibile anche a 60 px. |
-| meteo | 16:10 | 1200×750 | pieno | ≤ 120 KB | Paesaggio dell'arena con quel tempo: deve leggersi a colpo d'occhio anche piccolo. |
-| disastri | 16:9 | 1280×720 | pieno | ≤ 150 KB | Il momento del disastro, drammatico; tenere il soggetto nella fascia centrale. |
-| oggetti | 1:1 | 512×512 | trasparente | ≤ 60 KB | Oggetto singolo in versione dell'arena, centrato, con circa il 12% di margine; viene mostrato su un alone colorato. |
+- **Formato**: WebP con qualità 80–85. Si accettano anche PNG, JPG o AVIF con lo stesso nome (prevale il primo trovato tra webp, png, jpg, jpeg, avif). Profilo colore sRGB.
+- **Nomi**: minuscolo, senza accenti né apostrofi, parole separate da trattini, proprio come nell'elenco. Un nome diverso non viene trovato.
+- **Niente testo** dentro le immagini: niente scritte, cartelli leggibili, loghi o filigrane. I nomi li scrive il sito.
+- **Stile**: lo stesso dei banner delle arene (`assets/arene/<arena>.webp`). Il modo più sicuro per restare coerenti è dare al generatore **il banner dell'arena come immagine di riferimento** e creare tutte le immagini di un'arena nella stessa sessione.
+- **Persone**: nessuna persona reale riconoscibile. Nel Liceo e nell'Ufficio i pericoli sono caricature comiche.
+- **Peso**: entro i limiti della tabella; il sito carica le immagini solo quando servono, ma pesi alti rallentano il telefono.
+- **Il file unico** `dist/last-one-standing.html` non incorpora queste immagini (diventerebbe enorme): le mostra il sito.
 
-### Scorciatoia per i disastri
+| Sezione | Proporzioni | Dimensioni | Minimo | Sfondo | Peso massimo | Quante |
+| --- | --- | --- | --- | --- | --- | --- |
+| Luoghi | 16:9 | 1280 × 720 px | 960 × 540 px | pieno | 150 KB | 54 |
+| Pericoli | 4:3 | 960 × 720 px | 800 × 600 px | pieno e scuro | 120 KB | 35 |
+| Armi | 1:1 | 512 × 512 px | 384 × 384 px | trasparente | 60 KB | 67 |
 
-I disastri sono tanti. Oltre all'immagine del singolo disastro si può fornire un'immagine per famiglia, usata da tutti i disastri e i meteo di quella famiglia che non hanno la loro: `assets/arene/<arena>/disastri/_<famiglia>.webp` (e lo stesso in `meteo/`). Famiglie: `luce`, `luna`, `spettacolo`, `burocrazia`, `festa`, `cassa`, `fuoco`, `caldo`, `esplosione`, `acqua`, `gelo`, `sabbia`, `fulmine`, `terremoto`, `tossico`, `nebbia`, `sciame`, `bestie`, `magia`, `buio`, `tech`, `cielo`, `sangue`, `pioggia`, `vento`, `sole`. Nell'elenco qui sotto ogni disastro riporta la sua famiglia.
+### Luoghi: come appaiono e come comporle
 
-### Priorità
+Scheda della zona nel capitolo Mappa. Al computer l'immagine occupa la parte alta della scheda in 16:9, larga circa 270 px. Sul telefono diventa una colonna a sinistra di 120 × 140 px circa: si vede solo la **fascia centrale verticale**, poco meno di metà della larghezza.
 
-- **alta**: si vede subito (luoghi, pericoli, meteo, oggetti e i primi nove disastri di ogni arena).
-- **media**: armi e disastri visibili con «Mostra tutti».
-- **bassa**: disastri che compaiono solo con i contenuti 18+.
+- Il punto di riconoscimento del luogo (la Cornucopia, la torre, il bancone…) va nel **terzo centrale**.
+- Inquadratura ad altezza d'occhio, profondità con un po' di foschia sullo sfondo.
+- Nessuna persona: il luogo deve sembrare pronto per i concorrenti.
+- L'immagine si vede piccola: servono contrasti netti tra primo piano e sfondo e poche cose ben riconoscibili, non una scena affollata.
 
-## Riepilogo
+### Pericoli: come appaiono e come comporle
 
-| Arena | luoghi | pericoli | armi | meteo | disastri | oggetti | Totale |
-| --- | --- | --- | --- | --- | --- | --- | --- |
-| Arena Classica | 6 | 4 | 10 | 11 | 93 | 13 | 137 |
-| Reame Incantato | 6 | 4 | 8 | 9 | 89 | 13 | 129 |
-| Stazione Orbitale | 6 | 4 | 7 | 9 | 85 | 13 | 124 |
-| Città degli Infetti | 6 | 4 | 8 | 9 | 82 | 13 | 122 |
-| Isola Battle Royale | 6 | 3 | 8 | 9 | 80 | 13 | 119 |
-| Villa Maledetta | 6 | 4 | 7 | 9 | 82 | 13 | 121 |
-| Terre Desolate | 6 | 4 | 7 | 9 | 77 | 13 | 116 |
-| Liceo Spietato | 6 | 4 | 6 | 9 | 56 | 13 | 94 |
-| Ufficio Open Space | 6 | 4 | 6 | 9 | 58 | 13 | 96 |
-| **Tutte** | 54 | 35 | 67 | 83 | 702 | 117 | **1058** |
+Manifesto «ricercato» appeso nel capitolo Mappa: carta color avorio, puntina rossa, leggermente inclinato. L'immagine è un 4:3 largo circa 190 px al computer e 150 px sul telefono, con il nome scritto sotto dal sito.
+
+- Un solo soggetto (o un gruppo che si legge come uno), **centrato e rivolto verso chi guarda**.
+- Testa e occhi nella metà alta: il ritaglio toglie pochissimo dai bordi, ma i bordi devono essere sacrificabili.
+- Sfondo scuro che sfuma quasi al nero ai bordi: sul manifesto chiaro fa da cornice.
+- Nel Liceo e nell'Ufficio sono **caricature comiche**, mai minacciose o violente, e non devono somigliare a persone reali.
+
+### Armi: come appaiono e come comporle
+
+Rastrelliera dell'armeria nel capitolo Mappa: ogni arma sta in una piastrella arrotondata di **62 × 62 px**, sia su fondo chiaro sia su fondo scuro (tema notte).
+
+- Un solo oggetto, **sfondo completamente trasparente** (WebP o PNG con canale alfa).
+- Disposto in diagonale dal basso a sinistra all'alto a destra, con circa il **12% di margine** su ogni lato.
+- Sagoma netta con un sottile contorno scuro, così si legge su fondo chiaro e scuro; niente ombra a terra, niente mani.
+- Deve riconoscersi a 62 px: forme semplici, pochi dettagli minuti.
+
+### Come sono fatti i prompt
+
+Ogni voce ha un **prompt breve**, scritto apposta per quel soggetto. Il **prompt completo** (si apre sotto ogni voce) aggiunge, nell'ordine, lo stile dell'arena, lo stile comune del gioco, le regole della sezione (inquadratura, sfondo, margini) e i divieti (niente testo, loghi, persone reali). Puoi usare il completo così com'è, oppure impostare stile e regole una volta sola nel generatore e incollare solo i prompt brevi. Se il generatore ha un campo per il «negative prompt», sposta lì la frase dei divieti.
+
+## Indice
+
+| Arena | Cartella | Luoghi | Pericoli | Armi |
+| --- | --- | --- | --- | --- |
+| [Arena Classica](#arena-classica) | `assets/arene/classico/` | 6 | 4 | 10 |
+| [Reame Incantato](#reame-incantato) | `assets/arene/fantasy/` | 6 | 4 | 8 |
+| [Stazione Orbitale](#stazione-orbitale) | `assets/arene/scifi/` | 6 | 4 | 7 |
+| [Città degli Infetti](#città-degli-infetti) | `assets/arene/zombie/` | 6 | 4 | 8 |
+| [Isola Battle Royale](#isola-battle-royale) | `assets/arene/royale/` | 6 | 3 | 8 |
+| [Villa Maledetta](#villa-maledetta) | `assets/arene/horror/` | 6 | 4 | 7 |
+| [Terre Desolate](#terre-desolate) | `assets/arene/wasteland/` | 6 | 4 | 7 |
+| [Liceo Spietato](#liceo-spietato) | `assets/arene/liceo/` | 6 | 4 | 6 |
+| [Ufficio Open Space](#ufficio-open-space) | `assets/arene/ufficio/` | 6 | 4 | 6 |
+
+---
 
 ## Arena Classica
 
-Cartella: `assets/arene/classico/`. Palette: ambra, ocra e marroni caldi da tramonto nel bosco.
+Boschi, fiumi e una Cornucopia piena di armi.
 
-### Luoghi (16:9, 1280×720, sfondo pieno)
+- **Cartella**: `assets/arene/classico/` (con le sottocartelle `luoghi/`, `pericoli/`, `armi/`)
+- **Riferimento di stile**: `assets/arene/classico.webp`
+- **Atmosfera**: Bosco selvaggio al tramonto: ambra, ocra e marroni caldi, ombre blu fredde, luce radente arancione. Tono da sopravvivenza, avventuroso più che splatter.
+- **Stile da aggiungere a ogni prompt di questa arena** (è già incluso nei prompt completi):
 
-| | File | Soggetto | Priorità | Traccia |
-| --- | --- | --- | --- | --- |
-|  | `luoghi/cornucopia.webp` | Cornucopia | alta | Cornucopia: il luogo dell'arena visto da vicino. Arena «Arena Classica» (Boschi, fiumi e una Cornucopia piena di armi). Palette: ambra, ocra e marroni caldi da tramonto nel bosco. Formato 16:9. |
-|  | `luoghi/bosco.webp` | Bosco | alta | Bosco: il luogo dell'arena visto da vicino. Arena «Arena Classica» (Boschi, fiumi e una Cornucopia piena di armi). Palette: ambra, ocra e marroni caldi da tramonto nel bosco. Formato 16:9. |
-|  | `luoghi/fiume.webp` | Fiume | alta | Fiume: il luogo dell'arena visto da vicino. Arena «Arena Classica» (Boschi, fiumi e una Cornucopia piena di armi). Palette: ambra, ocra e marroni caldi da tramonto nel bosco. Formato 16:9. |
-|  | `luoghi/paludi.webp` | Paludi | alta | Paludi: il luogo dell'arena visto da vicino. Arena «Arena Classica» (Boschi, fiumi e una Cornucopia piena di armi). Palette: ambra, ocra e marroni caldi da tramonto nel bosco. Formato 16:9. |
-|  | `luoghi/rovine.webp` | Rovine | alta | Rovine: il luogo dell'arena visto da vicino. Arena «Arena Classica» (Boschi, fiumi e una Cornucopia piena di armi). Palette: ambra, ocra e marroni caldi da tramonto nel bosco. Formato 16:9. |
-|  | `luoghi/altopiano.webp` | Altopiano | alta | Altopiano: il luogo dell'arena visto da vicino. Arena «Arena Classica» (Boschi, fiumi e una Cornucopia piena di armi). Palette: ambra, ocra e marroni caldi da tramonto nel bosco. Formato 16:9. |
+```text
+Warm amber, ochre and brown sunset palette with cool blue shadows, wild forest survival arena. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours.
+```
 
-### Pericoli (4:3, 960×720, sfondo pieno, scuro)
+Più, a seconda della sezione:
 
-| | File | Soggetto | Priorità | Traccia |
-| --- | --- | --- | --- | --- |
-|  | `pericoli/branco-di-lupi-mutanti.webp` | Branco di lupi mutanti | alta | Branco di lupi mutanti: creatura o minaccia pronta ad attaccare. Arena «Arena Classica» (Boschi, fiumi e una Cornucopia piena di armi). Palette: ambra, ocra e marroni caldi da tramonto nel bosco. Formato 4:3. |
-|  | `pericoli/sciame-di-vespe-velenose.webp` | Sciame di vespe velenose | alta | Sciame di vespe velenose: creatura o minaccia pronta ad attaccare. Arena «Arena Classica» (Boschi, fiumi e una Cornucopia piena di armi). Palette: ambra, ocra e marroni caldi da tramonto nel bosco. Formato 4:3. |
-|  | `pericoli/orso-affamato.webp` | Orso affamato | alta | Orso affamato: creatura o minaccia pronta ad attaccare. Arena «Arena Classica» (Boschi, fiumi e una Cornucopia piena di armi). Palette: ambra, ocra e marroni caldi da tramonto nel bosco. Formato 4:3. |
-|  | `pericoli/serpente-gigante.webp` | Serpente gigante | alta | Serpente gigante: creatura o minaccia pronta ad attaccare. Arena «Arena Classica» (Boschi, fiumi e una Cornucopia piena di armi). Palette: ambra, ocra e marroni caldi da tramonto nel bosco. Formato 4:3. |
+- Luoghi: `Wide 16:9 establishing shot of the location, no people, eye-level view, the key landmark inside the central third of the frame, soft depth fog in the background.`
+- Pericoli: `4:3 wanted-poster portrait, single threat centered and facing the viewer, head and eyes in the upper middle of the frame, dark vignetted background that fades to near black at the edges.`
+- Armi: `Single object only, isolated on a fully transparent background, square 1:1, three-quarter view laid diagonally from lower left to upper right, 12% empty margin on every side, crisp silhouette with a thin dark outline so it reads on both light and dark backgrounds, no hands, no shadow on the ground.`
+- Sempre: `No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.`
 
-### Armi (1:1, 512×512, sfondo trasparente)
+### Luoghi · Arena Classica (16:9, 1280 × 720 px, sfondo pieno)
 
-| | File | Soggetto | Priorità | Traccia |
-| --- | --- | --- | --- | --- |
-|  | `armi/coltello.webp` | Coltello | media | Coltello: arma o oggetto usato come arma. Arena «Arena Classica» (Boschi, fiumi e una Cornucopia piena di armi). Palette: ambra, ocra e marroni caldi da tramonto nel bosco. Formato 1:1. Sfondo trasparente. |
-|  | `armi/arco.webp` | Arco | media | Arco: arma o oggetto usato come arma. Arena «Arena Classica» (Boschi, fiumi e una Cornucopia piena di armi). Palette: ambra, ocra e marroni caldi da tramonto nel bosco. Formato 1:1. Sfondo trasparente. |
-|  | `armi/lancia.webp` | Lancia | media | Lancia: arma o oggetto usato come arma. Arena «Arena Classica» (Boschi, fiumi e una Cornucopia piena di armi). Palette: ambra, ocra e marroni caldi da tramonto nel bosco. Formato 1:1. Sfondo trasparente. |
-|  | `armi/ascia.webp` | Ascia | media | Ascia: arma o oggetto usato come arma. Arena «Arena Classica» (Boschi, fiumi e una Cornucopia piena di armi). Palette: ambra, ocra e marroni caldi da tramonto nel bosco. Formato 1:1. Sfondo trasparente. |
-|  | `armi/machete.webp` | Machete | media | Machete: arma o oggetto usato come arma. Arena «Arena Classica» (Boschi, fiumi e una Cornucopia piena di armi). Palette: ambra, ocra e marroni caldi da tramonto nel bosco. Formato 1:1. Sfondo trasparente. |
-|  | `armi/tridente.webp` | Tridente | media | Tridente: arma o oggetto usato come arma. Arena «Arena Classica» (Boschi, fiumi e una Cornucopia piena di armi). Palette: ambra, ocra e marroni caldi da tramonto nel bosco. Formato 1:1. Sfondo trasparente. |
-|  | `armi/fionda.webp` | Fionda | media | Fionda: arma o oggetto usato come arma. Arena «Arena Classica» (Boschi, fiumi e una Cornucopia piena di armi). Palette: ambra, ocra e marroni caldi da tramonto nel bosco. Formato 1:1. Sfondo trasparente. |
-|  | `armi/spada-corta.webp` | Spada corta | media | Spada corta: arma o oggetto usato come arma. Arena «Arena Classica» (Boschi, fiumi e una Cornucopia piena di armi). Palette: ambra, ocra e marroni caldi da tramonto nel bosco. Formato 1:1. Sfondo trasparente. |
-|  | `armi/pugnale.webp` | Pugnale | media | Pugnale: arma o oggetto usato come arma. Arena «Arena Classica» (Boschi, fiumi e una Cornucopia piena di armi). Palette: ambra, ocra e marroni caldi da tramonto nel bosco. Formato 1:1. Sfondo trasparente. |
-|  | `armi/mazza.webp` | Mazza | media | Mazza: arma o oggetto usato come arma. Arena «Arena Classica» (Boschi, fiumi e una Cornucopia piena di armi). Palette: ambra, ocra e marroni caldi da tramonto nel bosco. Formato 1:1. Sfondo trasparente. |
+#### Cornucopia
 
-### Meteo (16:10, 1200×750, sfondo pieno)
+- **File**: `assets/arene/classico/luoghi/cornucopia.webp`
+- **Cosa mostrare**: La Cornucopia dorata su un poggio roccioso al centro di una radura, che trabocca di armi, zaini e casse.
 
-| | File | Soggetto | Priorità | Traccia |
-| --- | --- | --- | --- | --- |
-|  | `meteo/cielo-limpido.webp` | Cielo limpido | alta | Cielo limpido: Una giornata tersa: si vede lontano, e si viene visti da lontano.. Arena «Arena Classica» (Boschi, fiumi e una Cornucopia piena di armi). Palette: ambra, ocra e marroni caldi da tramonto nel bosco. Formato 16:10. |
-|  | `meteo/pioggia-battente.webp` | Pioggia battente | alta | Pioggia battente: Il fango rallenta tutti e cancella le tracce. Le trappole si inceppano.. Arena «Arena Classica» (Boschi, fiumi e una Cornucopia piena di armi). Palette: ambra, ocra e marroni caldi da tramonto nel bosco. Formato 16:10. |
-|  | `meteo/nebbia-fitta.webp` | Nebbia fitta | alta | Nebbia fitta: Non si vede a tre passi: perfetto per gli agguati.. Arena «Arena Classica» (Boschi, fiumi e una Cornucopia piena di armi). Palette: ambra, ocra e marroni caldi da tramonto nel bosco. Formato 16:10. |
-|  | `meteo/ondata-di-caldo.webp` | Ondata di caldo | alta | Ondata di caldo: Il sole picchia: si suda, si beve, si sviene.. Arena «Arena Classica» (Boschi, fiumi e una Cornucopia piena di armi). Palette: ambra, ocra e marroni caldi da tramonto nel bosco. Formato 16:10. |
-|  | `meteo/gelata-notturna.webp` | Gelata notturna | alta | Gelata notturna: La temperatura crolla dopo il tramonto: chi non ha un riparo rischia grosso.. Arena «Arena Classica» (Boschi, fiumi e una Cornucopia piena di armi). Palette: ambra, ocra e marroni caldi da tramonto nel bosco. Formato 16:10. |
-|  | `meteo/vento-forte.webp` | Vento forte | alta | Vento forte: Gli alberi scricchiolano e gli archi mancano il bersaglio.. Arena «Arena Classica» (Boschi, fiumi e una Cornucopia piena di armi). Palette: ambra, ocra e marroni caldi da tramonto nel bosco. Formato 16:10. |
-|  | `meteo/luna-piena.webp` | Luna piena | alta | Luna piena: Nella notte chiara i predatori si fanno coraggio.. Arena «Arena Classica» (Boschi, fiumi e una Cornucopia piena di armi). Palette: ambra, ocra e marroni caldi da tramonto nel bosco. Formato 16:10. |
-|  | `meteo/stagione-delle-bacche.webp` | Stagione delle bacche | alta | Stagione delle bacche: Il Bosco è carico di frutti: oggi non muore di fame nessuno.. Arena «Arena Classica» (Boschi, fiumi e una Cornucopia piena di armi). Palette: ambra, ocra e marroni caldi da tramonto nel bosco. Formato 16:10. |
-|  | `meteo/temporale-estivo.webp` | Temporale estivo | alta | Temporale estivo: Lampi sul Bosco e tuoni che coprono ogni passo.. Arena «Arena Classica» (Boschi, fiumi e una Cornucopia piena di armi). Palette: ambra, ocra e marroni caldi da tramonto nel bosco. Formato 16:10. |
-|  | `meteo/vento-caldo-dal-sud.webp` | Vento caldo dal sud | alta | Vento caldo dal sud: Un vento secco asciuga il Fiume e la pazienza di tutti.. Arena «Arena Classica» (Boschi, fiumi e una Cornucopia piena di armi). Palette: ambra, ocra e marroni caldi da tramonto nel bosco. Formato 16:10. |
-|  | `meteo/sciame-di-lucciole.webp` | Sciame di lucciole | alta | Sciame di lucciole: La notte si accende di lucciole: è bellissimo, e si vede tutto.. Arena «Arena Classica» (Boschi, fiumi e una Cornucopia piena di armi). Palette: ambra, ocra e marroni caldi da tramonto nel bosco. Formato 16:10. |
+**Prompt**
 
-### Disastri (16:9, 1280×720, sfondo pieno)
+```text
+A giant golden horn-shaped cornucopia resting on a rocky mound in a forest clearing, spilling weapons, backpacks and supply crates onto the grass.
+```
 
-| | File | Soggetto | Priorità | Traccia |
-| --- | --- | --- | --- | --- |
-|  | `disastri/incendio-nel-bosco.webp` | Incendio nel Bosco · famiglia `fuoco` | alta | Incendio nel Bosco: Un muro di fiamme avanza dal Bosco: gli organizzatori vogliono spingere tutti verso il centro.. Arena «Arena Classica» (Boschi, fiumi e una Cornucopia piena di armi). Palette: ambra, ocra e marroni caldi da tramonto nel bosco. Formato 16:9. |
-|  | `disastri/nebbia-velenosa.webp` | Nebbia velenosa · famiglia `tossico` | alta | Nebbia velenosa: Una nebbia lattiginosa scende dall'Altopiano e brucia la pelle al primo contatto.. Arena «Arena Classica» (Boschi, fiumi e una Cornucopia piena di armi). Palette: ambra, ocra e marroni caldi da tramonto nel bosco. Formato 16:9. |
-|  | `disastri/ibridi-scatenati.webp` | Ibridi scatenati · famiglia `bestie` | alta | Ibridi scatenati: Dalle Rovine escono decine di ibridi: bestie create in laboratorio, affamate.. Arena «Arena Classica» (Boschi, fiumi e una Cornucopia piena di armi). Palette: ambra, ocra e marroni caldi da tramonto nel bosco. Formato 16:9. |
-|  | `disastri/piena.webp` | La piena · famiglia `acqua` | alta | La piena: Le chiuse a monte vengono aperte: il Fiume esonda e trascina via tutto.. Arena «Arena Classica» (Boschi, fiumi e una Cornucopia piena di armi). Palette: ambra, ocra e marroni caldi da tramonto nel bosco. Formato 16:9. |
-|  | `disastri/grandinata.webp` | Grandinata · famiglia `gelo` | alta | Grandinata: Chicchi di ghiaccio grandi come pugni cadono sull'arena.. Arena «Arena Classica» (Boschi, fiumi e una Cornucopia piena di armi). Palette: ambra, ocra e marroni caldi da tramonto nel bosco. Formato 16:9. |
-|  | `disastri/terremoto.webp` | Terremoto · famiglia `terremoto` | alta | Terremoto: La terra trema e l'Altopiano si spacca in due.. Arena «Arena Classica» (Boschi, fiumi e una Cornucopia piena di armi). Palette: ambra, ocra e marroni caldi da tramonto nel bosco. Formato 16:9. |
-|  | `disastri/ondata-di-caldo.webp` | Ondata di caldo · famiglia `caldo` | alta | Ondata di caldo: La temperatura sale a cinquanta gradi in poche ore.. Arena «Arena Classica» (Boschi, fiumi e una Cornucopia piena di armi). Palette: ambra, ocra e marroni caldi da tramonto nel bosco. Formato 16:9. |
-|  | `disastri/gelo-improvviso.webp` | Gelo improvviso · famiglia `gelo` | alta | Gelo improvviso: In pochi minuti l'arena si copre di brina.. Arena «Arena Classica» (Boschi, fiumi e una Cornucopia piena di armi). Palette: ambra, ocra e marroni caldi da tramonto nel bosco. Formato 16:9. |
-|  | `disastri/scimmie-mutanti.webp` | Scimmie mutanti · famiglia `bestie` | alta | Scimmie mutanti: Un branco di scimmie dalle unghie d'acciaio scende dagli alberi.. Arena «Arena Classica» (Boschi, fiumi e una Cornucopia piena di armi). Palette: ambra, ocra e marroni caldi da tramonto nel bosco. Formato 16:9. |
-|  | `disastri/pioggia-acida.webp` | Pioggia acida · famiglia `tossico` | media | Pioggia acida: Nuvole giallastre scaricano una pioggia che corrode tutto.. Arena «Arena Classica» (Boschi, fiumi e una Cornucopia piena di armi). Palette: ambra, ocra e marroni caldi da tramonto nel bosco. Formato 16:9. |
-|  | `disastri/uccelli-imitatori.webp` | Uccelli imitatori · famiglia `sciame` | media | Uccelli imitatori: Stormi di uccelli ripetono le grida dei caduti.. Arena «Arena Classica» (Boschi, fiumi e una Cornucopia piena di armi). Palette: ambra, ocra e marroni caldi da tramonto nel bosco. Formato 16:9. |
-|  | `disastri/valanga.webp` | Valanga · famiglia `gelo` | media | Valanga: Dall'Altopiano si stacca una valanga di neve artificiale.. Arena «Arena Classica» (Boschi, fiumi e una Cornucopia piena di armi). Palette: ambra, ocra e marroni caldi da tramonto nel bosco. Formato 16:9. |
-|  | `disastri/tempesta-di-fulmini.webp` | Tempesta di fulmini · famiglia `fulmine` | media | Tempesta di fulmini: Un temporale scarica centinaia di fulmini sul Bosco.. Arena «Arena Classica» (Boschi, fiumi e una Cornucopia piena di armi). Palette: ambra, ocra e marroni caldi da tramonto nel bosco. Formato 16:9. |
-|  | `disastri/nebbia-allucinogena.webp` | Nebbia allucinogena · famiglia `nebbia` | media | Nebbia allucinogena: Una nebbia dolciastra fa vedere a ognuno le proprie paure.. Arena «Arena Classica» (Boschi, fiumi e una Cornucopia piena di armi). Palette: ambra, ocra e marroni caldi da tramonto nel bosco. Formato 16:9. |
-|  | `disastri/formiche-carnivore.webp` | Formiche carnivore · famiglia `sciame` | media | Formiche carnivore: Un fiume di formiche rosse divora tutto ciò che incontra.. Arena «Arena Classica» (Boschi, fiumi e una Cornucopia piena di armi). Palette: ambra, ocra e marroni caldi da tramonto nel bosco. Formato 16:9. |
-|  | `disastri/lupi-dagli-occhi-umani.webp` | Lupi dagli occhi umani · famiglia `bestie` | media | Lupi dagli occhi umani: Lupi con occhi stranamente familiari escono dalle Rovine.. Arena «Arena Classica» (Boschi, fiumi e una Cornucopia piena di armi). Palette: ambra, ocra e marroni caldi da tramonto nel bosco. Formato 16:9. |
-|  | `disastri/acqua-avvelenata.webp` | Acqua avvelenata · famiglia `acqua` | media | Acqua avvelenata: Il Fiume cambia colore: qualcuno ha avvelenato la fonte.. Arena «Arena Classica» (Boschi, fiumi e una Cornucopia piena di armi). Palette: ambra, ocra e marroni caldi da tramonto nel bosco. Formato 16:9. |
-|  | `disastri/incendio-delle-paludi.webp` | Incendio delle Paludi · famiglia `fuoco` | media | Incendio delle Paludi: Il gas delle Paludi prende fuoco.. Arena «Arena Classica» (Boschi, fiumi e una Cornucopia piena di armi). Palette: ambra, ocra e marroni caldi da tramonto nel bosco. Formato 16:9. |
-|  | `disastri/alberi-abbattuti.webp` | Alberi abbattuti · famiglia `luce` | media | Alberi abbattuti: Gli alberi del Bosco vengono abbattuti dall'alto, uno dopo l'altro.. Arena «Arena Classica» (Boschi, fiumi e una Cornucopia piena di armi). Palette: ambra, ocra e marroni caldi da tramonto nel bosco. Formato 16:9. |
-|  | `disastri/notte-infinita.webp` | Notte infinita · famiglia `buio` | media | Notte infinita: Gli organizzatori spengono il sole: l'arena resta al buio per un giorno intero.. Arena «Arena Classica» (Boschi, fiumi e una Cornucopia piena di armi). Palette: ambra, ocra e marroni caldi da tramonto nel bosco. Formato 16:9. |
-|  | `disastri/cinghiali-dacciaio.webp` | Cinghiali d'acciaio · famiglia `bestie` | media | Cinghiali d'acciaio: Una mandria di cinghiali dalle zanne d'acciaio carica attraverso il Bosco.. Arena «Arena Classica» (Boschi, fiumi e una Cornucopia piena di armi). Palette: ambra, ocra e marroni caldi da tramonto nel bosco. Formato 16:9. |
-|  | `disastri/sanguisughe-giganti.webp` | Sanguisughe giganti · famiglia `sciame` | media | Sanguisughe giganti: Il Fiume si riempie di sanguisughe lunghe come un braccio.. Arena «Arena Classica» (Boschi, fiumi e una Cornucopia piena di armi). Palette: ambra, ocra e marroni caldi da tramonto nel bosco. Formato 16:9. |
-|  | `disastri/pioggia-di-aghi.webp` | Pioggia di aghi · famiglia `cielo` | media | Pioggia di aghi: Dal cielo cadono aghi di metallo sottili come capelli.. Arena «Arena Classica» (Boschi, fiumi e una Cornucopia piena di armi). Palette: ambra, ocra e marroni caldi da tramonto nel bosco. Formato 16:9. |
-|  | `disastri/rovine-allagate.webp` | Rovine allagate · famiglia `acqua` | media | Rovine allagate: Le Rovine vengono allagate da una sorgente sotterranea.. Arena «Arena Classica» (Boschi, fiumi e una Cornucopia piena di armi). Palette: ambra, ocra e marroni caldi da tramonto nel bosco. Formato 16:9. |
-|  | `disastri/gabbia.webp` | La gabbia · famiglia `luce` | media | La gabbia: Delle sbarre si alzano dal terreno e dividono l'arena in recinti.. Arena «Arena Classica» (Boschi, fiumi e una Cornucopia piena di armi). Palette: ambra, ocra e marroni caldi da tramonto nel bosco. Formato 16:9. |
-|  | `disastri/ragni-velenosi.webp` | Ragni velenosi · famiglia `tossico` | media | Ragni velenosi: Ragni grandi come mani escono dalle tane.. Arena «Arena Classica» (Boschi, fiumi e una Cornucopia piena di armi). Palette: ambra, ocra e marroni caldi da tramonto nel bosco. Formato 16:9. |
-|  | `disastri/mine-riattivate.webp` | Mine riattivate · famiglia `esplosione` | media | Mine riattivate: Gli organizzatori riattivano le mine attorno alla Cornucopia.. Arena «Arena Classica» (Boschi, fiumi e una Cornucopia piena di armi). Palette: ambra, ocra e marroni caldi da tramonto nel bosco. Formato 16:9. |
-|  | `disastri/eco-dei-caduti.webp` | Eco dei caduti · famiglia `magia` | media | Eco dei caduti: Le voci dei caduti risuonano in tutta l'arena, giorno e notte.. Arena «Arena Classica» (Boschi, fiumi e una Cornucopia piena di armi). Palette: ambra, ocra e marroni caldi da tramonto nel bosco. Formato 16:9. |
-|  | `disastri/muro-di-vento.webp` | Muro di vento · famiglia `vento` | media | Muro di vento: Un vento fortissimo spazza l'Altopiano.. Arena «Arena Classica» (Boschi, fiumi e una Cornucopia piena di armi). Palette: ambra, ocra e marroni caldi da tramonto nel bosco. Formato 16:9. |
-|  | `disastri/frutti-trappola.webp` | Frutti trappola · famiglia `luce` | media | Frutti trappola: In tutta l'arena compaiono alberi carichi di frutti perfetti.. Arena «Arena Classica» (Boschi, fiumi e una Cornucopia piena di armi). Palette: ambra, ocra e marroni caldi da tramonto nel bosco. Formato 16:9. |
-|  | `disastri/vortice-nel-fiume.webp` | Vortice nel Fiume · famiglia `acqua` | media | Vortice nel Fiume: Il Fiume comincia a girare su se stesso in un vortice enorme.. Arena «Arena Classica» (Boschi, fiumi e una Cornucopia piena di armi). Palette: ambra, ocra e marroni caldi da tramonto nel bosco. Formato 16:9. |
-|  | `disastri/ritorno-degli-sciami.webp` | Il ritorno degli sciami · famiglia `sciame` | media | Il ritorno degli sciami: Gli organizzatori liberano dieci nidi di vespe velenose contemporaneamente.. Arena «Arena Classica» (Boschi, fiumi e una Cornucopia piena di armi). Palette: ambra, ocra e marroni caldi da tramonto nel bosco. Formato 16:9. |
-|  | `disastri/pioggia-di-frecce.webp` | Pioggia di frecce · famiglia `cielo` | media | Pioggia di frecce: Dal cielo cadono centinaia di frecce con le piume colorate. Un gesto artistico, dicono gli organizzatori.. Arena «Arena Classica» (Boschi, fiumi e una Cornucopia piena di armi). Palette: ambra, ocra e marroni caldi da tramonto nel bosco. Formato 16:9. |
-|  | `disastri/cornucopia-si-muove.webp` | La Cornucopia si muove · famiglia `luce` | media | La Cornucopia si muove: La Cornucopia si stacca dal terreno e comincia a rotolare per l'arena.. Arena «Arena Classica» (Boschi, fiumi e una Cornucopia piena di armi). Palette: ambra, ocra e marroni caldi da tramonto nel bosco. Formato 16:9. |
-|  | `disastri/notte-senza-luna.webp` | Notte senza luna · famiglia `luna` | media | Notte senza luna: Gli organizzatori spengono anche le stelle. Buio totale per dodici ore.. Arena «Arena Classica» (Boschi, fiumi e una Cornucopia piena di armi). Palette: ambra, ocra e marroni caldi da tramonto nel bosco. Formato 16:9. |
-|  | `disastri/scoiattoli-assassini.webp` | Gli scoiattoli assassini · famiglia `sciame` | media | Gli scoiattoli assassini: Gli scoiattoli dell'arena sono stati modificati. Hanno denti d'acciaio e nessun senso dell'umorismo.. Arena «Arena Classica» (Boschi, fiumi e una Cornucopia piena di armi). Palette: ambra, ocra e marroni caldi da tramonto nel bosco. Formato 16:9. |
-|  | `disastri/fiume-di-fuoco.webp` | Il Fiume di fuoco · famiglia `fuoco` | media | Il Fiume di fuoco: Il Fiume viene incendiato con il petrolio. Galleggia, e brucia.. Arena «Arena Classica» (Boschi, fiumi e una Cornucopia piena di armi). Palette: ambra, ocra e marroni caldi da tramonto nel bosco. Formato 16:9. |
-|  | `disastri/nebbia-della-verita.webp` | Nebbia della verità · famiglia `nebbia` | media | Nebbia della verità: Una nebbia rosa costringe tutti a dire la verità ad alta voce.. Arena «Arena Classica» (Boschi, fiumi e una Cornucopia piena di armi). Palette: ambra, ocra e marroni caldi da tramonto nel bosco. Formato 16:9. |
-|  | `disastri/terreno-che-affonda.webp` | Il terreno che affonda · famiglia `terremoto` | media | Il terreno che affonda: Interi pezzi di arena sprofondano nel nulla.. Arena «Arena Classica» (Boschi, fiumi e una Cornucopia piena di armi). Palette: ambra, ocra e marroni caldi da tramonto nel bosco. Formato 16:9. |
-|  | `disastri/fantasmi-dei-caduti.webp` | I fantasmi dei caduti · famiglia `magia` | media | I fantasmi dei caduti: Gli organizzatori proiettano gli ologrammi dei caduti che camminano nell'arena chiamando i vivi.. Arena «Arena Classica» (Boschi, fiumi e una Cornucopia piena di armi). Palette: ambra, ocra e marroni caldi da tramonto nel bosco. Formato 16:9. |
-|  | `disastri/api-giganti.webp` | Le api giganti · famiglia `sciame` | media | Le api giganti: Un'unica ape grande come un cavallo vola sopra l'arena. È lenta, ma convinta.. Arena «Arena Classica» (Boschi, fiumi e una Cornucopia piena di armi). Palette: ambra, ocra e marroni caldi da tramonto nel bosco. Formato 16:9. |
-|  | `disastri/gelo-flash.webp` | Gelo flash · famiglia `gelo` | media | Gelo flash: In un minuto la temperatura scende di quaranta gradi, poi torna normale.. Arena «Arena Classica» (Boschi, fiumi e una Cornucopia piena di armi). Palette: ambra, ocra e marroni caldi da tramonto nel bosco. Formato 16:9. |
-|  | `disastri/caccia-dellorso-meccanico.webp` | La caccia dell'orso meccanico · famiglia `bestie` | media | La caccia dell'orso meccanico: Un orso meccanico alto quattro metri attraversa il Bosco.. Arena «Arena Classica» (Boschi, fiumi e una Cornucopia piena di armi). Palette: ambra, ocra e marroni caldi da tramonto nel bosco. Formato 16:9. |
-|  | `disastri/sete.webp` | La sete · famiglia `caldo` | media | La sete: Tutte le fonti d'acqua vengono prosciugate per un giorno intero.. Arena «Arena Classica» (Boschi, fiumi e una Cornucopia piena di armi). Palette: ambra, ocra e marroni caldi da tramonto nel bosco. Formato 16:9. |
-|  | `disastri/sole-gigante.webp` | Il sole gigante · famiglia `fuoco` | media | Il sole gigante: Il sole artificiale dell'arena si avvicina. Troppo.. Arena «Arena Classica» (Boschi, fiumi e una Cornucopia piena di armi). Palette: ambra, ocra e marroni caldi da tramonto nel bosco. Formato 16:9. |
-|  | `disastri/richiamo-della-cornucopia.webp` | Il richiamo della Cornucopia · famiglia `luce` | media | Il richiamo della Cornucopia: Una voce annuncia che alla Cornucopia c'è cibo per tutti. È una bugia.. Arena «Arena Classica» (Boschi, fiumi e una Cornucopia piena di armi). Palette: ambra, ocra e marroni caldi da tramonto nel bosco. Formato 16:9. |
-|  | `disastri/pesci-volanti.webp` | I pesci volanti · famiglia `sciame` | media | I pesci volanti: Dal Fiume saltano pesci con le ali e i denti.. Arena «Arena Classica» (Boschi, fiumi e una Cornucopia piena di armi). Palette: ambra, ocra e marroni caldi da tramonto nel bosco. Formato 16:9. |
-|  | `disastri/vento-che-canta.webp` | Il vento che canta · famiglia `vento` | media | Il vento che canta: Un vento continuo produce una nota acutissima che fa impazzire.. Arena «Arena Classica» (Boschi, fiumi e una Cornucopia piena di armi). Palette: ambra, ocra e marroni caldi da tramonto nel bosco. Formato 16:9. |
-|  | `disastri/eruzione.webp` | L'eruzione · famiglia `fuoco` | media | L'eruzione: Un vulcano artificiale spunta in mezzo all'Altopiano.. Arena «Arena Classica» (Boschi, fiumi e una Cornucopia piena di armi). Palette: ambra, ocra e marroni caldi da tramonto nel bosco. Formato 16:9. |
-|  | `disastri/pioggia-di-sponsor.webp` | La pioggia di sponsor · famiglia `spettacolo` | media | La pioggia di sponsor: Gli sponsor lanciano migliaia di paracadute contemporaneamente, alcuni molto pesanti.. Arena «Arena Classica» (Boschi, fiumi e una Cornucopia piena di armi). Palette: ambra, ocra e marroni caldi da tramonto nel bosco. Formato 16:9. |
-|  | `disastri/notte-dei-lupi.webp` | La notte dei lupi · famiglia `bestie` | media | La notte dei lupi: Il branco di lupi mutanti esce tutto insieme sotto la luna piena.. Arena «Arena Classica» (Boschi, fiumi e una Cornucopia piena di armi). Palette: ambra, ocra e marroni caldi da tramonto nel bosco. Formato 16:9. |
-|  | `disastri/gioco-delle-porte.webp` | Il gioco delle porte · famiglia `luce` | media | Il gioco delle porte: In mezzo all'arena compaiono tre porte. Gli organizzatori obbligano tutti a sceglierne una.. Arena «Arena Classica» (Boschi, fiumi e una Cornucopia piena di armi). Palette: ambra, ocra e marroni caldi da tramonto nel bosco. Formato 16:9. |
-|  | `disastri/albero-degli-impiccati.webp` | L'albero degli impiccati · famiglia `magia` | media | L'albero degli impiccati: Le liane del Bosco si animano e si stringono attorno ai colli.. Arena «Arena Classica» (Boschi, fiumi e una Cornucopia piena di armi). Palette: ambra, ocra e marroni caldi da tramonto nel bosco. Formato 16:9. |
-|  | `disastri/diluvio.webp` | Il diluvio · famiglia `acqua` | media | Il diluvio: Piove per ventiquattro ore senza smettere.. Arena «Arena Classica» (Boschi, fiumi e una Cornucopia piena di armi). Palette: ambra, ocra e marroni caldi da tramonto nel bosco. Formato 16:9. |
-|  | `disastri/miele.webp` | Il miele · famiglia `festa` | media | Il miele: Dagli alberi cola un miele dolcissimo che attira tutti gli orsi dell'arena.. Arena «Arena Classica» (Boschi, fiumi e una Cornucopia piena di armi). Palette: ambra, ocra e marroni caldi da tramonto nel bosco. Formato 16:9. |
-|  | `disastri/acqua-afrodisiaca.webp` | L'acqua afrodisiaca · famiglia `festa` · 18+ | bassa | L'acqua afrodisiaca: Gli organizzatori aggiungono qualcosa all'acqua del Fiume. Gli ascolti salgono del trecento per cento.. Arena «Arena Classica» (Boschi, fiumi e una Cornucopia piena di armi). Palette: ambra, ocra e marroni caldi da tramonto nel bosco. Formato 16:9. |
-|  | `disastri/pioggia-di-frattaglie.webp` | La pioggia di frattaglie · famiglia `cielo` · 18+ | bassa | La pioggia di frattaglie: Dal cielo cadono interiora di animale. Gli organizzatori la chiamano "arte".. Arena «Arena Classica» (Boschi, fiumi e una Cornucopia piena di armi). Palette: ambra, ocra e marroni caldi da tramonto nel bosco. Formato 16:9. |
-|  | `disastri/zanzare-carnivore.webp` | Le zanzare carnivore · famiglia `sciame` · 18+ | bassa | Le zanzare carnivore: Zanzare grandi come passeri prosciugano il sangue di chiunque.. Arena «Arena Classica» (Boschi, fiumi e una Cornucopia piena di armi). Palette: ambra, ocra e marroni caldi da tramonto nel bosco. Formato 16:9. |
-|  | `disastri/gas-della-risata.webp` | Il gas della risata · famiglia `tossico` · 18+ | bassa | Il gas della risata: Un gas fa ridere tutti fino alle lacrime, e oltre.. Arena «Arena Classica» (Boschi, fiumi e una Cornucopia piena di armi). Palette: ambra, ocra e marroni caldi da tramonto nel bosco. Formato 16:9. |
-|  | `disastri/tritacarne.webp` | Il tritacarne · famiglia `sangue` · 18+ | bassa | Il tritacarne: Lame rotanti spuntano dal terreno della Cornucopia.. Arena «Arena Classica» (Boschi, fiumi e una Cornucopia piena di armi). Palette: ambra, ocra e marroni caldi da tramonto nel bosco. Formato 16:9. |
-|  | `disastri/orgia-dei-lupi.webp` | L'orgia dei lupi · famiglia `festa` · 18+ | bassa | L'orgia dei lupi: La luna piena manda in calore tutti i lupi mutanti. Sono distratti, ma enormi.. Arena «Arena Classica» (Boschi, fiumi e una Cornucopia piena di armi). Palette: ambra, ocra e marroni caldi da tramonto nel bosco. Formato 16:9. |
-|  | `disastri/pubblico-vota.webp` | Il pubblico vota · famiglia `spettacolo` | media | Il pubblico vota: Il pubblico vota in diretta chi colpire con un fulmine artificiale.. Arena «Arena Classica» (Boschi, fiumi e una Cornucopia piena di armi). Palette: ambra, ocra e marroni caldi da tramonto nel bosco. Formato 16:9. |
-|  | `disastri/pausa-pubblicitaria.webp` | La pausa pubblicitaria · famiglia `spettacolo` | media | La pausa pubblicitaria: Durante la pubblicità, gli organizzatori si dimenticano di sorvegliare le trappole.. Arena «Arena Classica» (Boschi, fiumi e una Cornucopia piena di armi). Palette: ambra, ocra e marroni caldi da tramonto nel bosco. Formato 16:9. |
-|  | `disastri/cambio-di-regia.webp` | Il cambio di regia · famiglia `spettacolo` | media | Il cambio di regia: Arriva un nuovo regista che vuole più azione.. Arena «Arena Classica» (Boschi, fiumi e una Cornucopia piena di armi). Palette: ambra, ocra e marroni caldi da tramonto nel bosco. Formato 16:9. |
-|  | `disastri/pioggia-di-coriandoli.webp` | La pioggia di coriandoli · famiglia `spettacolo` | media | La pioggia di coriandoli: Per festeggiare la metà della stagione, gli organizzatori fanno piovere coriandoli. Di vetro.. Arena «Arena Classica» (Boschi, fiumi e una Cornucopia piena di armi). Palette: ambra, ocra e marroni caldi da tramonto nel bosco. Formato 16:9. |
-|  | `disastri/ospite-speciale.webp` | L'ospite speciale · famiglia `spettacolo` | media | L'ospite speciale: Una celebrità entra nell'arena per un giorno, con una squadra di guardie del corpo armate.. Arena «Arena Classica» (Boschi, fiumi e una Cornucopia piena di armi). Palette: ambra, ocra e marroni caldi da tramonto nel bosco. Formato 16:9. |
-|  | `disastri/sponsor-ritirato.webp` | Lo sponsor ritirato · famiglia `spettacolo` | media | Lo sponsor ritirato: Uno sponsor si ritira e reclama indietro tutti i regali. Con i droni.. Arena «Arena Classica» (Boschi, fiumi e una Cornucopia piena di armi). Palette: ambra, ocra e marroni caldi da tramonto nel bosco. Formato 16:9. |
-|  | `disastri/gioco-a-quiz.webp` | Il gioco a quiz · famiglia `spettacolo` | media | Il gioco a quiz: Gli organizzatori interrompono tutto per un quiz di cultura generale. Chi sbaglia paga.. Arena «Arena Classica» (Boschi, fiumi e una Cornucopia piena di armi). Palette: ambra, ocra e marroni caldi da tramonto nel bosco. Formato 16:9. |
-|  | `disastri/sciopero-dei-tecnici.webp` | Lo sciopero dei tecnici · famiglia `spettacolo` | media | Lo sciopero dei tecnici: I tecnici dell'arena scioperano e nessuno controlla più i sistemi.. Arena «Arena Classica» (Boschi, fiumi e una Cornucopia piena di armi). Palette: ambra, ocra e marroni caldi da tramonto nel bosco. Formato 16:9. |
-|  | `disastri/replica.webp` | La replica · famiglia `spettacolo` | media | La replica: Per problemi tecnici, l'arena ripete il disastro di due giorni fa, ma più forte.. Arena «Arena Classica» (Boschi, fiumi e una Cornucopia piena di armi). Palette: ambra, ocra e marroni caldi da tramonto nel bosco. Formato 16:9. |
-|  | `disastri/giornata-dei-bambini.webp` | La giornata dei bambini · famiglia `spettacolo` | media | La giornata dei bambini: Gli organizzatori fanno disegnare le trappole del giorno ai bambini. Sono molto creativi.. Arena «Arena Classica» (Boschi, fiumi e una Cornucopia piena di armi). Palette: ambra, ocra e marroni caldi da tramonto nel bosco. Formato 16:9. |
-|  | `disastri/asta-dei-concorrenti.webp` | L'asta dei concorrenti · famiglia `spettacolo` | media | L'asta dei concorrenti: Il pubblico può comprare il diritto di decidere la sorte di un concorrente.. Arena «Arena Classica» (Boschi, fiumi e una Cornucopia piena di armi). Palette: ambra, ocra e marroni caldi da tramonto nel bosco. Formato 16:9. |
-|  | `disastri/terremoto-della-produzione.webp` | Il terremoto della produzione · famiglia `terremoto` | media | Il terremoto della produzione: Un camion della produzione si ribalta dentro l'arena e libera tutto quello che trasportava.. Arena «Arena Classica» (Boschi, fiumi e una Cornucopia piena di armi). Palette: ambra, ocra e marroni caldi da tramonto nel bosco. Formato 16:9. |
-|  | `disastri/blackout-delle-telecamere.webp` | Il blackout delle telecamere · famiglia `spettacolo` | media | Il blackout delle telecamere: Le telecamere si spengono per un'ora. Senza testimoni, le regole saltano.. Arena «Arena Classica» (Boschi, fiumi e una Cornucopia piena di armi). Palette: ambra, ocra e marroni caldi da tramonto nel bosco. Formato 16:9. |
-|  | `disastri/musica-a-tutto-volume.webp` | La musica a tutto volume · famiglia `spettacolo` | media | La musica a tutto volume: Gli organizzatori diffondono la stessa canzone estiva per ventiquattro ore.. Arena «Arena Classica» (Boschi, fiumi e una Cornucopia piena di armi). Palette: ambra, ocra e marroni caldi da tramonto nel bosco. Formato 16:9. |
-|  | `disastri/doppio-disastro.webp` | Il doppio disastro · famiglia `luce` | media | Il doppio disastro: Due disastri si attivano nello stesso momento per un errore di programmazione.. Arena «Arena Classica» (Boschi, fiumi e una Cornucopia piena di armi). Palette: ambra, ocra e marroni caldi da tramonto nel bosco. Formato 16:9. |
-|  | `disastri/maratona.webp` | La maratona · famiglia `spettacolo` | media | La maratona: Gli organizzatori obbligano tutti a correre per due ore. Chi si ferma viene punito.. Arena «Arena Classica» (Boschi, fiumi e una Cornucopia piena di armi). Palette: ambra, ocra e marroni caldi da tramonto nel bosco. Formato 16:9. |
-|  | `disastri/sondaggio-della-crudelta.webp` | Il sondaggio della crudeltà · famiglia `spettacolo` | media | Il sondaggio della crudeltà: Il pubblico vota il disastro più crudele. Vince "tutti insieme".. Arena «Arena Classica» (Boschi, fiumi e una Cornucopia piena di armi). Palette: ambra, ocra e marroni caldi da tramonto nel bosco. Formato 16:9. |
-|  | `disastri/invasione-dei-fan.webp` | L'invasione dei fan · famiglia `spettacolo` | media | L'invasione dei fan: Un gruppo di fan scavalca le recinzioni e invade l'arena per conoscere i propri idoli.. Arena «Arena Classica» (Boschi, fiumi e una Cornucopia piena di armi). Palette: ambra, ocra e marroni caldi da tramonto nel bosco. Formato 16:9. |
-|  | `disastri/gioco-delle-sedie.webp` | Il gioco delle sedie · famiglia `spettacolo` | media | Il gioco delle sedie: Gli organizzatori mettono al centro dell'arena una sedia in meno dei concorrenti. Chi resta in piedi viene punito.. Arena «Arena Classica» (Boschi, fiumi e una Cornucopia piena di armi). Palette: ambra, ocra e marroni caldi da tramonto nel bosco. Formato 16:9. |
-|  | `disastri/nebbia-delle-risate-registrate.webp` | La nebbia delle risate registrate · famiglia `spettacolo` | media | La nebbia delle risate registrate: Dagli altoparlanti partono risate registrate a ogni sfortuna. È psicologicamente devastante.. Arena «Arena Classica» (Boschi, fiumi e una Cornucopia piena di armi). Palette: ambra, ocra e marroni caldi da tramonto nel bosco. Formato 16:9. |
-|  | `disastri/notte-rossa.webp` | La notte rossa · famiglia `buio` · 18+ | bassa | La notte rossa: Gli organizzatori sospendono ogni regola per una notte: niente telecamere sui dettagli, niente limiti.. Arena «Arena Classica» (Boschi, fiumi e una Cornucopia piena di armi). Palette: ambra, ocra e marroni caldi da tramonto nel bosco. Formato 16:9. |
-|  | `disastri/bar-aperto.webp` | Il bar aperto · famiglia `festa` · 18+ | bassa | Il bar aperto: Un bar con alcol illimitato compare nel mezzo dell'arena. Gratis, per un'ora.. Arena «Arena Classica» (Boschi, fiumi e una Cornucopia piena di armi). Palette: ambra, ocra e marroni caldi da tramonto nel bosco. Formato 16:9. |
-|  | `disastri/pioggia-di-sangue.webp` | La pioggia di sangue · famiglia `cielo` · 18+ | bassa | La pioggia di sangue: Una pioggia di sangue animale cade sull'arena per motivi puramente estetici.. Arena «Arena Classica» (Boschi, fiumi e una Cornucopia piena di armi). Palette: ambra, ocra e marroni caldi da tramonto nel bosco. Formato 16:9. |
-|  | `disastri/spettacolo-del-pudore.webp` | Lo spettacolo del pudore · famiglia `luce` · 18+ | bassa | Lo spettacolo del pudore: Gli organizzatori fanno sparire tutti i vestiti dei concorrenti per un giorno.. Arena «Arena Classica» (Boschi, fiumi e una Cornucopia piena di armi). Palette: ambra, ocra e marroni caldi da tramonto nel bosco. Formato 16:9. |
-|  | `disastri/spore-del-desiderio.webp` | Le spore del desiderio · famiglia `festa` · 18+ | bassa | Le spore del desiderio: Le spore di un fungo rendono tutti irresistibilmente attratti dalla persona più vicina.. Arena «Arena Classica» (Boschi, fiumi e una Cornucopia piena di armi). Palette: ambra, ocra e marroni caldi da tramonto nel bosco. Formato 16:9. |
-|  | `disastri/macello.webp` | Il macello · famiglia `sangue` · 18+ | bassa | Il macello: Gli organizzatori aprono le gabbie di tutti i mostri insieme e chiamano l'evento "Il macello". Il nome è accurato.. Arena «Arena Classica» (Boschi, fiumi e una Cornucopia piena di armi). Palette: ambra, ocra e marroni caldi da tramonto nel bosco. Formato 16:9. |
-|  | `disastri/migrazione-dei-cinghiali.webp` | La migrazione dei cinghiali · famiglia `bestie` | media | La migrazione dei cinghiali: Un branco di cinghiali mutanti attraversa il Bosco, travolgendo tutto.. Arena «Arena Classica» (Boschi, fiumi e una Cornucopia piena di armi). Palette: ambra, ocra e marroni caldi da tramonto nel bosco. Formato 16:9. |
-|  | `disastri/fiume-impazzito.webp` | Il fiume impazzito · famiglia `acqua` | media | Il fiume impazzito: Gli organizzatori aprono una diga: il Fiume diventa un torrente furioso.. Arena «Arena Classica» (Boschi, fiumi e una Cornucopia piena di armi). Palette: ambra, ocra e marroni caldi da tramonto nel bosco. Formato 16:9. |
-|  | `disastri/nebbia-acida.webp` | La nebbia acida · famiglia `tossico` | media | La nebbia acida: Una nebbia gialla sale dalle Paludi e brucia gli occhi.. Arena «Arena Classica» (Boschi, fiumi e una Cornucopia piena di armi). Palette: ambra, ocra e marroni caldi da tramonto nel bosco. Formato 16:9. |
-|  | `disastri/miele-velenoso.webp` | Il miele velenoso · famiglia `festa` | media | Il miele velenoso: Gli alveari del Bosco producono un miele dolcissimo e mortale.. Arena «Arena Classica» (Boschi, fiumi e una Cornucopia piena di armi). Palette: ambra, ocra e marroni caldi da tramonto nel bosco. Formato 16:9. |
-|  | `disastri/frana-dellaltopiano.webp` | La frana dell'Altopiano · famiglia `terremoto` | media | La frana dell'Altopiano: Metà dell'Altopiano scivola a valle in un boato.. Arena «Arena Classica» (Boschi, fiumi e una Cornucopia piena di armi). Palette: ambra, ocra e marroni caldi da tramonto nel bosco. Formato 16:9. |
-|  | `disastri/notte-senza-fine.webp` | La notte senza fine · famiglia `buio` | media | La notte senza fine: Gli organizzatori spengono il sole: è notte per un giorno intero.. Arena «Arena Classica» (Boschi, fiumi e una Cornucopia piena di armi). Palette: ambra, ocra e marroni caldi da tramonto nel bosco. Formato 16:9. |
+<details><summary>Prompt completo, pronto da incollare</summary>
 
-### Oggetti (1:1, 512×512, sfondo trasparente)
+```text
+A giant golden horn-shaped cornucopia resting on a rocky mound in a forest clearing, spilling weapons, backpacks and supply crates onto the grass. Warm amber, ochre and brown sunset palette with cool blue shadows, wild forest survival arena. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Wide 16:9 establishing shot of the location, no people, eye-level view, the key landmark inside the central third of the frame, soft depth fog in the background. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
+```
 
-| | File | Soggetto | Priorità | Traccia |
-| --- | --- | --- | --- | --- |
-|  | `oggetti/arma.webp` | Arma | alta | Arma: Più forza negli scontri, in base alla qualità (★). Si consuma a ogni colpo e alla fine si rompe; con un attrezzo si può riparare. Chi è ingegnoso può intingerla nel veleno.. Arena «Arena Classica» (Boschi, fiumi e una Cornucopia piena di armi). Palette: ambra, ocra e marroni caldi da tramonto nel bosco. Formato 1:1. Sfondo trasparente. |
-|  | `oggetti/armatura.webp` | Protezione (per esempio giubbotto di cuoio, scudo di legno) | alta | Protezione (per esempio giubbotto di cuoio, scudo di legno): Riduce i danni e a volte para un colpo mortale. Si consuma a ogni colpo incassato.. Arena «Arena Classica» (Boschi, fiumi e una Cornucopia piena di armi). Palette: ambra, ocra e marroni caldi da tramonto nel bosco. Formato 1:1. Sfondo trasparente. |
-|  | `oggetti/med.webp` | Cure | alta | Cure: Si usa da soli o sugli alleati: richiude le ferite gravi, ferma veleni e infezioni presi in tempo, abbassa l'indicatore dell'arena.. Arena «Arena Classica» (Boschi, fiumi e una Cornucopia piena di armi). Palette: ambra, ocra e marroni caldi da tramonto nel bosco. Formato 1:1. Sfondo trasparente. |
-|  | `oggetti/cibo.webp` | Cibo | alta | Cibo: Si mangia quando la sazietà cala. Si può dividere con gli alleati, regalare o scambiare.. Arena «Arena Classica» (Boschi, fiumi e una Cornucopia piena di armi). Palette: ambra, ocra e marroni caldi da tramonto nel bosco. Formato 1:1. Sfondo trasparente. |
-|  | `oggetti/attrezzo.webp` | Attrezzo (per esempio corda di canapa, acciarino) | alta | Attrezzo (per esempio corda di canapa, acciarino): Più cibo trovato, fughe più facili da tempeste e trappole, difesa migliore di notte, armi riparate.. Arena «Arena Classica» (Boschi, fiumi e una Cornucopia piena di armi). Palette: ambra, ocra e marroni caldi da tramonto nel bosco. Formato 1:1. Sfondo trasparente. |
-|  | `oggetti/mappa.webp` | Mappa | alta | Mappa: Più cibo, meno disastri, trappole scoperte in anticipo e vie di fuga sicure.. Arena «Arena Classica» (Boschi, fiumi e una Cornucopia piena di armi). Palette: ambra, ocra e marroni caldi da tramonto nel bosco. Formato 1:1. Sfondo trasparente. |
-|  | `oggetti/trap.webp` | Trappola | alta | Trappola: Di notte chi la sa usare la piazza nella sua zona. Chi ci passa rischia grosso, e l'uccisione va a chi l'ha piazzata.. Arena «Arena Classica» (Boschi, fiumi e una Cornucopia piena di armi). Palette: ambra, ocra e marroni caldi da tramonto nel bosco. Formato 1:1. Sfondo trasparente. |
-|  | `oggetti/esplosivo.webp` | Esplosivo | alta | Esplosivo: Più forza negli scontri. Chi è ingegnoso ci costruisce trappole esplosive. Da ubriachi è un pessimo compagno.. Arena «Arena Classica» (Boschi, fiumi e una Cornucopia piena di armi). Palette: ambra, ocra e marroni caldi da tramonto nel bosco. Formato 1:1. Sfondo trasparente. |
-|  | `oggetti/veleno.webp` | Veleno | alta | Veleno: Apre la strada agli avvelenamenti; chi è ingegnoso ci intinge l'arma, che poi avvelena a ogni colpo.. Arena «Arena Classica» (Boschi, fiumi e una Cornucopia piena di armi). Palette: ambra, ocra e marroni caldi da tramonto nel bosco. Formato 1:1. Sfondo trasparente. |
-|  | `oggetti/amuleto.webp` | Portafortuna | alta | Portafortuna: Può evitare una morte diretta narrata da un evento: probabilità 85%, certa per chi è superstizioso. Si consuma quando salva. Non ferma i danni periodici di fame, malattie e ferite. Calma Terrore e Corruzione.. Arena «Arena Classica» (Boschi, fiumi e una Cornucopia piena di armi). Palette: ambra, ocra e marroni caldi da tramonto nel bosco. Formato 1:1. Sfondo trasparente. |
-|  | `oggetti/alcol.webp` | Alcol (per esempio fiaschetta di whisky) | alta | Alcol (per esempio fiaschetta di whisky): Scalda, fa dimenticare, disinfetta le ferite infette. E ubriaca.. Arena «Arena Classica» (Boschi, fiumi e una Cornucopia piena di armi). Palette: ambra, ocra e marroni caldi da tramonto nel bosco. Formato 1:1. Sfondo trasparente. |
-|  | `oggetti/valore.webp` | Merce di scambio (per esempio manciata di monete d'oro, orologio da taschino) | alta | Merce di scambio (per esempio manciata di monete d'oro, orologio da taschino): Non serve a niente, tranne che a comprare cibo e cure da chi ne ha.. Arena «Arena Classica» (Boschi, fiumi e una Cornucopia piena di armi). Palette: ambra, ocra e marroni caldi da tramonto nel bosco. Formato 1:1. Sfondo trasparente. |
-|  | `oggetti/ricordo.webp` | Ricordo (per esempio foto di famiglia, lettera mai spedita) | alta | Ricordo (per esempio foto di famiglia, lettera mai spedita): Un pezzo di casa: ogni notte tiene su il morale. Se è di qualcuno che non c'è più, ancora di più.. Arena «Arena Classica» (Boschi, fiumi e una Cornucopia piena di armi). Palette: ambra, ocra e marroni caldi da tramonto nel bosco. Formato 1:1. Sfondo trasparente. |
+</details>
+
+#### Bosco
+
+- **File**: `assets/arene/classico/luoghi/bosco.webp`
+- **Cosa mostrare**: Bosco fitto e antico all'imbrunire, lame di luce tra i tronchi e un sentiero nascosto.
+
+**Prompt**
+
+```text
+A dense ancient pine forest at dusk, shafts of golden light between tall trunks, ferns and a narrow hidden trail.
+```
+
+<details><summary>Prompt completo, pronto da incollare</summary>
+
+```text
+A dense ancient pine forest at dusk, shafts of golden light between tall trunks, ferns and a narrow hidden trail. Warm amber, ochre and brown sunset palette with cool blue shadows, wild forest survival arena. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Wide 16:9 establishing shot of the location, no people, eye-level view, the key landmark inside the central third of the frame, soft depth fog in the background. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
+```
+
+</details>
+
+#### Fiume
+
+- **File**: `assets/arene/classico/luoghi/fiume.webp`
+- **Cosa mostrare**: Fiume tortuoso tra massi coperti di muschio, piccole rapide e un tronco caduto che fa da ponte.
+
+**Prompt**
+
+```text
+A winding river between mossy boulders, shallow rapids reflecting the orange sky, a fallen log used as a bridge.
+```
+
+<details><summary>Prompt completo, pronto da incollare</summary>
+
+```text
+A winding river between mossy boulders, shallow rapids reflecting the orange sky, a fallen log used as a bridge. Warm amber, ochre and brown sunset palette with cool blue shadows, wild forest survival arena. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Wide 16:9 establishing shot of the location, no people, eye-level view, the key landmark inside the central third of the frame, soft depth fog in the background. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
+```
+
+</details>
+
+#### Paludi
+
+- **File**: `assets/arene/classico/luoghi/paludi.webp`
+- **Cosa mostrare**: Palude scura con canne, alberi morti contorti e nebbia bassa sull'acqua.
+
+**Prompt**
+
+```text
+A murky marsh with tall reeds, twisted dead trees and low mist over black water, a few fireflies.
+```
+
+<details><summary>Prompt completo, pronto da incollare</summary>
+
+```text
+A murky marsh with tall reeds, twisted dead trees and low mist over black water, a few fireflies. Warm amber, ochre and brown sunset palette with cool blue shadows, wild forest survival arena. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Wide 16:9 establishing shot of the location, no people, eye-level view, the key landmark inside the central third of the frame, soft depth fog in the background. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
+```
+
+</details>
+
+#### Rovine
+
+- **File**: `assets/arene/classico/luoghi/rovine.webp`
+- **Cosa mostrare**: Rovine di un antico tempio in pietra invase dai rampicanti, colonne spezzate e un arco crollato.
+
+**Prompt**
+
+```text
+Crumbling stone ruins of an ancient temple overgrown with vines, broken columns and a collapsed archway.
+```
+
+<details><summary>Prompt completo, pronto da incollare</summary>
+
+```text
+Crumbling stone ruins of an ancient temple overgrown with vines, broken columns and a collapsed archway. Warm amber, ochre and brown sunset palette with cool blue shadows, wild forest survival arena. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Wide 16:9 establishing shot of the location, no people, eye-level view, the key landmark inside the central third of the frame, soft depth fog in the background. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
+```
+
+</details>
+
+#### Altopiano
+
+- **File**: `assets/arene/classico/luoghi/altopiano.webp`
+- **Cosa mostrare**: Altopiano roccioso spazzato dal vento, erba brinata e montagne lontane: il posto più freddo dell'arena.
+
+**Prompt**
+
+```text
+A windswept rocky highland plateau with sparse frosted grass and distant mountains, cold blue shadows under a warm sky.
+```
+
+<details><summary>Prompt completo, pronto da incollare</summary>
+
+```text
+A windswept rocky highland plateau with sparse frosted grass and distant mountains, cold blue shadows under a warm sky. Warm amber, ochre and brown sunset palette with cool blue shadows, wild forest survival arena. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Wide 16:9 establishing shot of the location, no people, eye-level view, the key landmark inside the central third of the frame, soft depth fog in the background. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
+```
+
+</details>
+
+### Pericoli · Arena Classica (4:3, 960 × 720 px, sfondo pieno e scuro)
+
+#### Branco di lupi mutanti
+
+- **File**: `assets/arene/classico/pericoli/branco-di-lupi-mutanti.webp`
+- **Cosa mostrare**: Branco di lupi mutanti con occhi ambra e chiazze di pelo metallico, che escono ringhiando dagli alberi.
+
+**Prompt**
+
+```text
+A pack of three mutated wolves with glowing amber eyes and patches of metallic fur, snarling as they step out of shadowy trees.
+```
+
+<details><summary>Prompt completo, pronto da incollare</summary>
+
+```text
+A pack of three mutated wolves with glowing amber eyes and patches of metallic fur, snarling as they step out of shadowy trees. Warm amber, ochre and brown sunset palette with cool blue shadows, wild forest survival arena. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. 4:3 wanted-poster portrait, single threat centered and facing the viewer, head and eyes in the upper middle of the frame, dark vignetted background that fades to near black at the edges. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
+```
+
+</details>
+
+#### Sciame di vespe velenose
+
+- **File**: `assets/arene/classico/pericoli/sciame-di-vespe-velenose.webp`
+- **Cosa mostrare**: Sciame di vespe giganti e velenose; una in primo piano, nitida, con il pungiglione in vista.
+
+**Prompt**
+
+```text
+A menacing swarm of oversized venomous wasps with glowing yellow stripes, one wasp in sharp focus in the foreground with its stinger visible.
+```
+
+<details><summary>Prompt completo, pronto da incollare</summary>
+
+```text
+A menacing swarm of oversized venomous wasps with glowing yellow stripes, one wasp in sharp focus in the foreground with its stinger visible. Warm amber, ochre and brown sunset palette with cool blue shadows, wild forest survival arena. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. 4:3 wanted-poster portrait, single threat centered and facing the viewer, head and eyes in the upper middle of the frame, dark vignetted background that fades to near black at the edges. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
+```
+
+</details>
+
+#### Orso affamato
+
+- **File**: `assets/arene/classico/pericoli/orso-affamato.webp`
+- **Cosa mostrare**: Enorme orso bruno affamato, ritto sulle zampe posteriori, muso segnato da cicatrici.
+
+**Prompt**
+
+```text
+A huge starving brown bear rearing up on its hind legs, scarred muzzle, ribs showing, hungry eyes.
+```
+
+<details><summary>Prompt completo, pronto da incollare</summary>
+
+```text
+A huge starving brown bear rearing up on its hind legs, scarred muzzle, ribs showing, hungry eyes. Warm amber, ochre and brown sunset palette with cool blue shadows, wild forest survival arena. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. 4:3 wanted-poster portrait, single threat centered and facing the viewer, head and eyes in the upper middle of the frame, dark vignetted background that fades to near black at the edges. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
+```
+
+</details>
+
+#### Serpente gigante
+
+- **File**: `assets/arene/classico/pericoli/serpente-gigante.webp`
+- **Cosa mostrare**: Serpente gigante dalle squame smeraldo, avvolto su sé stesso con la testa alzata.
+
+**Prompt**
+
+```text
+A giant coiled serpent with emerald scales raising its head, forked tongue out, eyes catching the sunset light.
+```
+
+<details><summary>Prompt completo, pronto da incollare</summary>
+
+```text
+A giant coiled serpent with emerald scales raising its head, forked tongue out, eyes catching the sunset light. Warm amber, ochre and brown sunset palette with cool blue shadows, wild forest survival arena. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. 4:3 wanted-poster portrait, single threat centered and facing the viewer, head and eyes in the upper middle of the frame, dark vignetted background that fades to near black at the edges. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
+```
+
+</details>
+
+### Armi · Arena Classica (1:1, 512 × 512 px, sfondo trasparente)
+
+#### Coltello
+
+- **File**: `assets/arene/classico/armi/coltello.webp`
+- **Cosa mostrare**: Coltello da sopravvivenza con manico in cuoio.
+
+**Prompt**
+
+```text
+A sturdy survival knife with a leather-wrapped handle and a clip-point steel blade.
+```
+
+<details><summary>Prompt completo, pronto da incollare</summary>
+
+```text
+A sturdy survival knife with a leather-wrapped handle and a clip-point steel blade. Warm amber, ochre and brown sunset palette with cool blue shadows, wild forest survival arena. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Single object only, isolated on a fully transparent background, square 1:1, three-quarter view laid diagonally from lower left to upper right, 12% empty margin on every side, crisp silhouette with a thin dark outline so it reads on both light and dark backgrounds, no hands, no shadow on the ground. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
+```
+
+</details>
+
+#### Arco
+
+- **File**: `assets/arene/classico/armi/arco.webp`
+- **Cosa mostrare**: Arco ricurvo in legno con una freccia incoccata.
+
+**Prompt**
+
+```text
+A wooden recurve bow with a taut string and one arrow nocked.
+```
+
+<details><summary>Prompt completo, pronto da incollare</summary>
+
+```text
+A wooden recurve bow with a taut string and one arrow nocked. Warm amber, ochre and brown sunset palette with cool blue shadows, wild forest survival arena. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Single object only, isolated on a fully transparent background, square 1:1, three-quarter view laid diagonally from lower left to upper right, 12% empty margin on every side, crisp silhouette with a thin dark outline so it reads on both light and dark backgrounds, no hands, no shadow on the ground. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
+```
+
+</details>
+
+#### Lancia
+
+- **File**: `assets/arene/classico/armi/lancia.webp`
+- **Cosa mostrare**: Lancia da caccia con asta di frassino e punta a foglia.
+
+**Prompt**
+
+```text
+A hunting spear with an ash-wood shaft and a leaf-shaped steel tip bound with cord.
+```
+
+<details><summary>Prompt completo, pronto da incollare</summary>
+
+```text
+A hunting spear with an ash-wood shaft and a leaf-shaped steel tip bound with cord. Warm amber, ochre and brown sunset palette with cool blue shadows, wild forest survival arena. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Single object only, isolated on a fully transparent background, square 1:1, three-quarter view laid diagonally from lower left to upper right, 12% empty margin on every side, crisp silhouette with a thin dark outline so it reads on both light and dark backgrounds, no hands, no shadow on the ground. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
+```
+
+</details>
+
+#### Ascia
+
+- **File**: `assets/arene/classico/armi/ascia.webp`
+- **Cosa mostrare**: Ascia da boscaiolo con manico consumato.
+
+**Prompt**
+
+```text
+A woodcutter's axe with a worn wooden handle and a chipped steel head.
+```
+
+<details><summary>Prompt completo, pronto da incollare</summary>
+
+```text
+A woodcutter's axe with a worn wooden handle and a chipped steel head. Warm amber, ochre and brown sunset palette with cool blue shadows, wild forest survival arena. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Single object only, isolated on a fully transparent background, square 1:1, three-quarter view laid diagonally from lower left to upper right, 12% empty margin on every side, crisp silhouette with a thin dark outline so it reads on both light and dark backgrounds, no hands, no shadow on the ground. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
+```
+
+</details>
+
+#### Machete
+
+- **File**: `assets/arene/classico/armi/machete.webp`
+- **Cosa mostrare**: Machete lungo, lama leggermente curva.
+
+**Prompt**
+
+```text
+A long machete with a slightly curved blade and a black rubber grip.
+```
+
+<details><summary>Prompt completo, pronto da incollare</summary>
+
+```text
+A long machete with a slightly curved blade and a black rubber grip. Warm amber, ochre and brown sunset palette with cool blue shadows, wild forest survival arena. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Single object only, isolated on a fully transparent background, square 1:1, three-quarter view laid diagonally from lower left to upper right, 12% empty margin on every side, crisp silhouette with a thin dark outline so it reads on both light and dark backgrounds, no hands, no shadow on the ground. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
+```
+
+</details>
+
+#### Tridente
+
+- **File**: `assets/arene/classico/armi/tridente.webp`
+- **Cosa mostrare**: Tridente da pesca con asta di legno.
+
+**Prompt**
+
+```text
+A three-pronged fishing trident with a wooden shaft and rope binding.
+```
+
+<details><summary>Prompt completo, pronto da incollare</summary>
+
+```text
+A three-pronged fishing trident with a wooden shaft and rope binding. Warm amber, ochre and brown sunset palette with cool blue shadows, wild forest survival arena. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Single object only, isolated on a fully transparent background, square 1:1, three-quarter view laid diagonally from lower left to upper right, 12% empty margin on every side, crisp silhouette with a thin dark outline so it reads on both light and dark backgrounds, no hands, no shadow on the ground. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
+```
+
+</details>
+
+#### Fionda
+
+- **File**: `assets/arene/classico/armi/fionda.webp`
+- **Cosa mostrare**: Fionda di legno a forcella con tasca di cuoio.
+
+**Prompt**
+
+```text
+A forked wooden slingshot with rubber bands and a small leather pouch holding a pebble.
+```
+
+<details><summary>Prompt completo, pronto da incollare</summary>
+
+```text
+A forked wooden slingshot with rubber bands and a small leather pouch holding a pebble. Warm amber, ochre and brown sunset palette with cool blue shadows, wild forest survival arena. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Single object only, isolated on a fully transparent background, square 1:1, three-quarter view laid diagonally from lower left to upper right, 12% empty margin on every side, crisp silhouette with a thin dark outline so it reads on both light and dark backgrounds, no hands, no shadow on the ground. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
+```
+
+</details>
+
+#### Spada corta
+
+- **File**: `assets/arene/classico/armi/spada-corta.webp`
+- **Cosa mostrare**: Spada corta tipo gladio, guardia semplice.
+
+**Prompt**
+
+```text
+A short gladius-style sword with a simple crossguard and wrapped grip.
+```
+
+<details><summary>Prompt completo, pronto da incollare</summary>
+
+```text
+A short gladius-style sword with a simple crossguard and wrapped grip. Warm amber, ochre and brown sunset palette with cool blue shadows, wild forest survival arena. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Single object only, isolated on a fully transparent background, square 1:1, three-quarter view laid diagonally from lower left to upper right, 12% empty margin on every side, crisp silhouette with a thin dark outline so it reads on both light and dark backgrounds, no hands, no shadow on the ground. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
+```
+
+</details>
+
+#### Pugnale
+
+- **File**: `assets/arene/classico/armi/pugnale.webp`
+- **Cosa mostrare**: Pugnale sottile a doppio taglio.
+
+**Prompt**
+
+```text
+A slim double-edged dagger with a cord-wrapped hilt.
+```
+
+<details><summary>Prompt completo, pronto da incollare</summary>
+
+```text
+A slim double-edged dagger with a cord-wrapped hilt. Warm amber, ochre and brown sunset palette with cool blue shadows, wild forest survival arena. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Single object only, isolated on a fully transparent background, square 1:1, three-quarter view laid diagonally from lower left to upper right, 12% empty margin on every side, crisp silhouette with a thin dark outline so it reads on both light and dark backgrounds, no hands, no shadow on the ground. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
+```
+
+</details>
+
+#### Mazza
+
+- **File**: `assets/arene/classico/armi/mazza.webp`
+- **Cosa mostrare**: Clava di legno pesante con borchie di ferro.
+
+**Prompt**
+
+```text
+A heavy wooden war club studded with iron rivets.
+```
+
+<details><summary>Prompt completo, pronto da incollare</summary>
+
+```text
+A heavy wooden war club studded with iron rivets. Warm amber, ochre and brown sunset palette with cool blue shadows, wild forest survival arena. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Single object only, isolated on a fully transparent background, square 1:1, three-quarter view laid diagonally from lower left to upper right, 12% empty margin on every side, crisp silhouette with a thin dark outline so it reads on both light and dark backgrounds, no hands, no shadow on the ground. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
+```
+
+</details>
+
+---
 
 ## Reame Incantato
 
-Cartella: `assets/arene/fantasy/`. Palette: viola, magenta e blu notte con bagliori magici.
+Draghi, rune e foreste che sussurrano.
 
-### Luoghi (16:9, 1280×720, sfondo pieno)
+- **Cartella**: `assets/arene/fantasy/` (con le sottocartelle `luoghi/`, `pericoli/`, `armi/`)
+- **Riferimento di stile**: `assets/arene/fantasy.webp`
+- **Atmosfera**: Fiaba oscura di notte: viola, magenta e blu notte, bagliori magici turchesi e dorati, rune luminose. Meraviglia e minaccia insieme.
+- **Stile da aggiungere a ogni prompt di questa arena** (è già incluso nei prompt completi):
 
-| | File | Soggetto | Priorità | Traccia |
-| --- | --- | --- | --- | --- |
-|  | `luoghi/torre-in-rovina.webp` | Torre in rovina | alta | Torre in rovina: il luogo dell'arena visto da vicino. Arena «Reame Incantato» (Draghi, rune e foreste che sussurrano). Palette: viola, magenta e blu notte con bagliori magici. Formato 16:9. |
-|  | `luoghi/foresta-elfica.webp` | Foresta elfica | alta | Foresta elfica: il luogo dell'arena visto da vicino. Arena «Reame Incantato» (Draghi, rune e foreste che sussurrano). Palette: viola, magenta e blu notte con bagliori magici. Formato 16:9. |
-|  | `luoghi/lago-nebbioso.webp` | Lago nebbioso | alta | Lago nebbioso: il luogo dell'arena visto da vicino. Arena «Reame Incantato» (Draghi, rune e foreste che sussurrano). Palette: viola, magenta e blu notte con bagliori magici. Formato 16:9. |
-|  | `luoghi/miniere.webp` | Miniere | alta | Miniere: il luogo dell'arena visto da vicino. Arena «Reame Incantato» (Draghi, rune e foreste che sussurrano). Palette: viola, magenta e blu notte con bagliori magici. Formato 16:9. |
-|  | `luoghi/palude-stregata.webp` | Palude stregata | alta | Palude stregata: il luogo dell'arena visto da vicino. Arena «Reame Incantato» (Draghi, rune e foreste che sussurrano). Palette: viola, magenta e blu notte con bagliori magici. Formato 16:9. |
-|  | `luoghi/picco-del-drago.webp` | Picco del drago | alta | Picco del drago: il luogo dell'arena visto da vicino. Arena «Reame Incantato» (Draghi, rune e foreste che sussurrano). Palette: viola, magenta e blu notte con bagliori magici. Formato 16:9. |
+```text
+Violet, magenta and midnight blue palette with glowing turquoise and gold magic, dark fairy-tale kingdom. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours.
+```
 
-### Pericoli (4:3, 960×720, sfondo pieno, scuro)
+Più, a seconda della sezione:
 
-| | File | Soggetto | Priorità | Traccia |
-| --- | --- | --- | --- | --- |
-|  | `pericoli/troll-di-caverna.webp` | Troll di caverna | alta | Troll di caverna: creatura o minaccia pronta ad attaccare. Arena «Reame Incantato» (Draghi, rune e foreste che sussurrano). Palette: viola, magenta e blu notte con bagliori magici. Formato 4:3. |
-|  | `pericoli/viverna.webp` | Viverna | alta | Viverna: creatura o minaccia pronta ad attaccare. Arena «Reame Incantato» (Draghi, rune e foreste che sussurrano). Palette: viola, magenta e blu notte con bagliori magici. Formato 4:3. |
-|  | `pericoli/spettro-errante.webp` | Spettro errante | alta | Spettro errante: creatura o minaccia pronta ad attaccare. Arena «Reame Incantato» (Draghi, rune e foreste che sussurrano). Palette: viola, magenta e blu notte con bagliori magici. Formato 4:3. |
-|  | `pericoli/branco-di-lupi-mannari.webp` | Branco di lupi mannari | alta | Branco di lupi mannari: creatura o minaccia pronta ad attaccare. Arena «Reame Incantato» (Draghi, rune e foreste che sussurrano). Palette: viola, magenta e blu notte con bagliori magici. Formato 4:3. |
+- Luoghi: `Wide 16:9 establishing shot of the location, no people, eye-level view, the key landmark inside the central third of the frame, soft depth fog in the background.`
+- Pericoli: `4:3 wanted-poster portrait, single threat centered and facing the viewer, head and eyes in the upper middle of the frame, dark vignetted background that fades to near black at the edges.`
+- Armi: `Single object only, isolated on a fully transparent background, square 1:1, three-quarter view laid diagonally from lower left to upper right, 12% empty margin on every side, crisp silhouette with a thin dark outline so it reads on both light and dark backgrounds, no hands, no shadow on the ground.`
+- Sempre: `No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.`
 
-### Armi (1:1, 512×512, sfondo trasparente)
+### Luoghi · Reame Incantato (16:9, 1280 × 720 px, sfondo pieno)
 
-| | File | Soggetto | Priorità | Traccia |
-| --- | --- | --- | --- | --- |
-|  | `armi/spada-runica.webp` | Spada runica | media | Spada runica: arma o oggetto usato come arma. Arena «Reame Incantato» (Draghi, rune e foreste che sussurrano). Palette: viola, magenta e blu notte con bagliori magici. Formato 1:1. Sfondo trasparente. |
-|  | `armi/bastone-magico.webp` | Bastone magico | media | Bastone magico: arma o oggetto usato come arma. Arena «Reame Incantato» (Draghi, rune e foreste che sussurrano). Palette: viola, magenta e blu notte con bagliori magici. Formato 1:1. Sfondo trasparente. |
-|  | `armi/arco-elfico.webp` | Arco elfico | media | Arco elfico: arma o oggetto usato come arma. Arena «Reame Incantato» (Draghi, rune e foreste che sussurrano). Palette: viola, magenta e blu notte con bagliori magici. Formato 1:1. Sfondo trasparente. |
-|  | `armi/ascia-nanica.webp` | Ascia nanica | media | Ascia nanica: arma o oggetto usato come arma. Arena «Reame Incantato» (Draghi, rune e foreste che sussurrano). Palette: viola, magenta e blu notte con bagliori magici. Formato 1:1. Sfondo trasparente. |
-|  | `armi/pugnale-avvelenato.webp` | Pugnale avvelenato | media | Pugnale avvelenato: arma o oggetto usato come arma. Arena «Reame Incantato» (Draghi, rune e foreste che sussurrano). Palette: viola, magenta e blu notte con bagliori magici. Formato 1:1. Sfondo trasparente. |
-|  | `armi/martello-da-guerra.webp` | Martello da guerra | media | Martello da guerra: arma o oggetto usato come arma. Arena «Reame Incantato» (Draghi, rune e foreste che sussurrano). Palette: viola, magenta e blu notte con bagliori magici. Formato 1:1. Sfondo trasparente. |
-|  | `armi/balestra.webp` | Balestra | media | Balestra: arma o oggetto usato come arma. Arena «Reame Incantato» (Draghi, rune e foreste che sussurrano). Palette: viola, magenta e blu notte con bagliori magici. Formato 1:1. Sfondo trasparente. |
-|  | `armi/lancia-incantata.webp` | Lancia incantata | media | Lancia incantata: arma o oggetto usato come arma. Arena «Reame Incantato» (Draghi, rune e foreste che sussurrano). Palette: viola, magenta e blu notte con bagliori magici. Formato 1:1. Sfondo trasparente. |
+#### Torre in rovina
 
-### Meteo (16:10, 1200×750, sfondo pieno)
+- **File**: `assets/arene/fantasy/luoghi/torre-in-rovina.webp`
+- **Cosa mostrare**: Torre di uno stregone in pietra scura, mezza crollata, con rune accese sui muri, al chiaro di luna.
 
-| | File | Soggetto | Priorità | Traccia |
-| --- | --- | --- | --- | --- |
-|  | `meteo/congiunzione-astrale.webp` | Congiunzione astrale | alta | Congiunzione astrale: Le stelle si allineano: ogni magia è più forte, nel bene e nel male.. Arena «Reame Incantato» (Draghi, rune e foreste che sussurrano). Palette: viola, magenta e blu notte con bagliori magici. Formato 16:10. |
-|  | `meteo/nebbia-degli-elfi.webp` | Nebbia degli elfi | alta | Nebbia degli elfi: Una foschia argentata confonde i sensi.. Arena «Reame Incantato» (Draghi, rune e foreste che sussurrano). Palette: viola, magenta e blu notte con bagliori magici. Formato 16:10. |
-|  | `meteo/pioggia-di-cenere.webp` | Pioggia di cenere | alta | Pioggia di cenere: Il drago si è svegliato nervoso. Il cielo è grigio.. Arena «Reame Incantato» (Draghi, rune e foreste che sussurrano). Palette: viola, magenta e blu notte con bagliori magici. Formato 16:10. |
-|  | `meteo/notte-senza-luna.webp` | Notte senza luna | alta | Notte senza luna: Le creature del bosco escono a caccia.. Arena «Reame Incantato» (Draghi, rune e foreste che sussurrano). Palette: viola, magenta e blu notte con bagliori magici. Formato 16:10. |
-|  | `meteo/festa-dei-folletti.webp` | Festa dei folletti | alta | Festa dei folletti: Funghi e idromele ovunque: tutti mangiano, nessuno è lucido.. Arena «Reame Incantato» (Draghi, rune e foreste che sussurrano). Palette: viola, magenta e blu notte con bagliori magici. Formato 16:10. |
-|  | `meteo/vento-delle-rune.webp` | Vento delle rune | alta | Vento delle rune: Le rune sui sassi brillano e sussurrano consigli a chi sa leggerle.. Arena «Reame Incantato» (Draghi, rune e foreste che sussurrano). Palette: viola, magenta e blu notte con bagliori magici. Formato 16:10. |
-|  | `meteo/eclissi-di-sangue.webp` | Eclissi di sangue | alta | Eclissi di sangue: La luna diventa rossa e la magia oscura si fa più forte.. Arena «Reame Incantato» (Draghi, rune e foreste che sussurrano). Palette: viola, magenta e blu notte con bagliori magici. Formato 16:10. |
-|  | `meteo/giorno-della-fiera.webp` | Giorno della fiera | alta | Giorno della fiera: Mercanti fatati montano bancarelle ai margini della Foresta.. Arena «Reame Incantato» (Draghi, rune e foreste che sussurrano). Palette: viola, magenta e blu notte con bagliori magici. Formato 16:10. |
-|  | `meteo/pioggia-di-petali.webp` | Pioggia di petali | alta | Pioggia di petali: Petali profumati cadono dal cielo e calmano gli animi.. Arena «Reame Incantato» (Draghi, rune e foreste che sussurrano). Palette: viola, magenta e blu notte con bagliori magici. Formato 16:10. |
+**Prompt**
 
-### Disastri (16:9, 1280×720, sfondo pieno)
+```text
+A ruined wizard's tower of dark stone, half collapsed, glowing violet runes on its walls, under a huge moon.
+```
 
-| | File | Soggetto | Priorità | Traccia |
-| --- | --- | --- | --- | --- |
-|  | `disastri/risveglio-del-drago.webp` | Il risveglio del drago · famiglia `bestie` | alta | Il risveglio del drago: Un ruggito scuote il Picco: il drago si è svegliato ed è affamato.. Arena «Reame Incantato» (Draghi, rune e foreste che sussurrano). Palette: viola, magenta e blu notte con bagliori magici. Formato 16:9. |
-|  | `disastri/eclissi-di-sangue.webp` | Eclissi di sangue · famiglia `buio` | alta | Eclissi di sangue: Le lune si tingono di rosso: i morti escono dalle tombe del reame.. Arena «Reame Incantato» (Draghi, rune e foreste che sussurrano). Palette: viola, magenta e blu notte con bagliori magici. Formato 16:9. |
-|  | `disastri/foresta-si-muove.webp` | La foresta si muove · famiglia `magia` | alta | La foresta si muove: Gli alberi della Foresta elfica si sradicano e marciano contro gli intrusi.. Arena «Reame Incantato» (Draghi, rune e foreste che sussurrano). Palette: viola, magenta e blu notte con bagliori magici. Formato 16:9. |
-|  | `disastri/tempesta-arcana.webp` | Tempesta arcana · famiglia `fulmine` | alta | Tempesta arcana: Fulmini viola cadono dal cielo: la magia del reame è impazzita.. Arena «Reame Incantato» (Draghi, rune e foreste che sussurrano). Palette: viola, magenta e blu notte con bagliori magici. Formato 16:9. |
-|  | `disastri/pioggia-di-stelle.webp` | Pioggia di stelle · famiglia `cielo` | alta | Pioggia di stelle: Frammenti di stelle cadenti precipitano sul reame.. Arena «Reame Incantato» (Draghi, rune e foreste che sussurrano). Palette: viola, magenta e blu notte con bagliori magici. Formato 16:9. |
-|  | `disastri/risveglio-dei-giganti.webp` | Il risveglio dei giganti · famiglia `bestie` | alta | Il risveglio dei giganti: I giganti di pietra si alzano dalle montagne.. Arena «Reame Incantato» (Draghi, rune e foreste che sussurrano). Palette: viola, magenta e blu notte con bagliori magici. Formato 16:9. |
-|  | `disastri/strega-della-palude.webp` | La strega della palude · famiglia `magia` | alta | La strega della palude: Una strega antica reclama un tributo dal reame.. Arena «Reame Incantato» (Draghi, rune e foreste che sussurrano). Palette: viola, magenta e blu notte con bagliori magici. Formato 16:9. |
-|  | `disastri/sciame-di-pixie.webp` | Sciame di pixie · famiglia `sciame` | alta | Sciame di pixie: Migliaia di pixie dispettose invadono il cielo.. Arena «Reame Incantato» (Draghi, rune e foreste che sussurrano). Palette: viola, magenta e blu notte con bagliori magici. Formato 16:9. |
-|  | `disastri/lago-si-ghiaccia.webp` | Il lago si ghiaccia · famiglia `acqua` | alta | Il lago si ghiaccia: Il Lago nebbioso gela in un istante.. Arena «Reame Incantato» (Draghi, rune e foreste che sussurrano). Palette: viola, magenta e blu notte con bagliori magici. Formato 16:9. |
-|  | `disastri/spettri-della-torre.webp` | Spettri della Torre · famiglia `magia` | media | Spettri della Torre: Gli spettri dei vecchi re escono dalla Torre in rovina.. Arena «Reame Incantato» (Draghi, rune e foreste che sussurrano). Palette: viola, magenta e blu notte con bagliori magici. Formato 16:9. |
-|  | `disastri/idra.webp` | L'Idra · famiglia `bestie` | media | L'Idra: Un'idra a sette teste emerge dal Lago nebbioso.. Arena «Reame Incantato» (Draghi, rune e foreste che sussurrano). Palette: viola, magenta e blu notte con bagliori magici. Formato 16:9. |
-|  | `disastri/nebbia-delloblio.webp` | Nebbia dell'oblio · famiglia `nebbia` | media | Nebbia dell'oblio: Una nebbia argentea fa dimenticare a tutti il proprio nome.. Arena «Reame Incantato» (Draghi, rune e foreste che sussurrano). Palette: viola, magenta e blu notte con bagliori magici. Formato 16:9. |
-|  | `disastri/piante-strangolatrici.webp` | Piante strangolatrici · famiglia `magia` | media | Piante strangolatrici: Le radici della Foresta elfica si animano.. Arena «Reame Incantato» (Draghi, rune e foreste che sussurrano). Palette: viola, magenta e blu notte con bagliori magici. Formato 16:9. |
-|  | `disastri/incendio-del-drago.webp` | L'incendio del drago · famiglia `fuoco` | media | L'incendio del drago: Il drago sorvola la Foresta elfica sputando fuoco.. Arena «Reame Incantato» (Draghi, rune e foreste che sussurrano). Palette: viola, magenta e blu notte con bagliori magici. Formato 16:9. |
-|  | `disastri/portale.webp` | Il portale · famiglia `magia` | media | Il portale: Un portale viola si apre al centro del reame.. Arena «Reame Incantato» (Draghi, rune e foreste che sussurrano). Palette: viola, magenta e blu notte con bagliori magici. Formato 16:9. |
-|  | `disastri/basilisco.webp` | Basilisco · famiglia `bestie` | media | Basilisco: Un basilisco striscia fuori dalle Miniere.. Arena «Reame Incantato» (Draghi, rune e foreste che sussurrano). Palette: viola, magenta e blu notte con bagliori magici. Formato 16:9. |
-|  | `disastri/pioggia-di-rane.webp` | Pioggia di rane · famiglia `sciame` | media | Pioggia di rane: Il cielo si apre e cadono migliaia di rane velenose.. Arena «Reame Incantato» (Draghi, rune e foreste che sussurrano). Palette: viola, magenta e blu notte con bagliori magici. Formato 16:9. |
-|  | `disastri/campane-maledette.webp` | Le campane maledette · famiglia `magia` | media | Le campane maledette: Le campane del reame suonano senza sosta.. Arena «Reame Incantato» (Draghi, rune e foreste che sussurrano). Palette: viola, magenta e blu notte con bagliori magici. Formato 16:9. |
-|  | `disastri/sole-nero.webp` | Il sole nero · famiglia `buio` | media | Il sole nero: Un sole nero sorge sul reame e assorbe ogni luce.. Arena «Reame Incantato» (Draghi, rune e foreste che sussurrano). Palette: viola, magenta e blu notte con bagliori magici. Formato 16:9. |
-|  | `disastri/gnomi-minatori.webp` | Gli gnomi minatori · famiglia `magia` | media | Gli gnomi minatori: Un esercito di gnomi esce dalle Miniere armato di picconi.. Arena «Reame Incantato» (Draghi, rune e foreste che sussurrano). Palette: viola, magenta e blu notte con bagliori magici. Formato 16:9. |
-|  | `disastri/specchio-dacqua.webp` | Specchio d'acqua · famiglia `acqua` | media | Specchio d'acqua: Il Lago mostra a ognuno il proprio futuro.. Arena «Reame Incantato» (Draghi, rune e foreste che sussurrano). Palette: viola, magenta e blu notte con bagliori magici. Formato 16:9. |
-|  | `disastri/lupi-dombra.webp` | Lupi d'ombra · famiglia `bestie` | media | Lupi d'ombra: Lupi fatti di ombra cacciano chiunque si trovi al buio.. Arena «Reame Incantato» (Draghi, rune e foreste che sussurrano). Palette: viola, magenta e blu notte con bagliori magici. Formato 16:9. |
-|  | `disastri/terremoto-magico.webp` | Terremoto magico · famiglia `terremoto` | media | Terremoto magico: Le linee magiche del reame si spezzano.. Arena «Reame Incantato» (Draghi, rune e foreste che sussurrano). Palette: viola, magenta e blu notte con bagliori magici. Formato 16:9. |
-|  | `disastri/fuochi-fatui.webp` | Fuochi fatui · famiglia `magia` | media | Fuochi fatui: Centinaia di fuochi fatui danzano nella Palude stregata.. Arena «Reame Incantato» (Draghi, rune e foreste che sussurrano). Palette: viola, magenta e blu notte con bagliori magici. Formato 16:9. |
-|  | `disastri/re-dei-goblin.webp` | Il re dei goblin · famiglia `bestie` | media | Il re dei goblin: Il re dei goblin reclama un ostaggio.. Arena «Reame Incantato» (Draghi, rune e foreste che sussurrano). Palette: viola, magenta e blu notte con bagliori magici. Formato 16:9. |
-|  | `disastri/vento-di-cenere.webp` | Vento di cenere · famiglia `tossico` | media | Vento di cenere: Un vento di cenere bollente scende dal Picco del drago.. Arena «Reame Incantato» (Draghi, rune e foreste che sussurrano). Palette: viola, magenta e blu notte con bagliori magici. Formato 16:9. |
-|  | `disastri/sirene.webp` | Le sirene · famiglia `acqua` | media | Le sirene: Canti irresistibili si alzano dal Lago nebbioso.. Arena «Reame Incantato» (Draghi, rune e foreste che sussurrano). Palette: viola, magenta e blu notte con bagliori magici. Formato 16:9. |
-|  | `disastri/tempesta-di-rune.webp` | Tempesta di rune · famiglia `fulmine` | media | Tempesta di rune: Le rune incise sulle rocce si attivano tutte insieme.. Arena «Reame Incantato» (Draghi, rune e foreste che sussurrano). Palette: viola, magenta e blu notte con bagliori magici. Formato 16:9. |
-|  | `disastri/caccia-selvaggia.webp` | La caccia selvaggia · famiglia `bestie` | media | La caccia selvaggia: Cavalieri spettrali galoppano attraverso il reame.. Arena «Reame Incantato» (Draghi, rune e foreste che sussurrano). Palette: viola, magenta e blu notte con bagliori magici. Formato 16:9. |
-|  | `disastri/cristallo-crepato.webp` | Il cristallo crepato · famiglia `magia` | media | Il cristallo crepato: Il cristallo che protegge il reame si incrina.. Arena «Reame Incantato» (Draghi, rune e foreste che sussurrano). Palette: viola, magenta e blu notte con bagliori magici. Formato 16:9. |
-|  | `disastri/albero-antico.webp` | L'albero antico · famiglia `magia` | media | L'albero antico: L'albero più antico della Foresta elfica si risveglia e reclama sangue.. Arena «Reame Incantato» (Draghi, rune e foreste che sussurrano). Palette: viola, magenta e blu notte con bagliori magici. Formato 16:9. |
-|  | `disastri/mercato-delle-anime.webp` | Il mercato delle anime · famiglia `cassa` | media | Il mercato delle anime: Un mercante demoniaco offre potere in cambio di un anno di vita. Molti accettano.. Arena «Reame Incantato» (Draghi, rune e foreste che sussurrano). Palette: viola, magenta e blu notte con bagliori magici. Formato 16:9. |
-|  | `disastri/drago-affamato.webp` | Il drago affamato · famiglia `bestie` | media | Il drago affamato: Il drago ha deciso che oggi si mangia fuori.. Arena «Reame Incantato» (Draghi, rune e foreste che sussurrano). Palette: viola, magenta e blu notte con bagliori magici. Formato 16:9. |
-|  | `disastri/pioggia-di-rospi-parlanti.webp` | La pioggia di rospi parlanti · famiglia `sciame` | media | La pioggia di rospi parlanti: Dal cielo piovono rospi che urlano insulti.. Arena «Reame Incantato» (Draghi, rune e foreste che sussurrano). Palette: viola, magenta e blu notte con bagliori magici. Formato 16:9. |
-|  | `disastri/ballo-delle-armature.webp` | Il ballo delle armature · famiglia `festa` | media | Il ballo delle armature: Le armature vuote della Torre si animano e danzano un valzer mortale.. Arena «Reame Incantato» (Draghi, rune e foreste che sussurrano). Palette: viola, magenta e blu notte con bagliori magici. Formato 16:9. |
-|  | `disastri/incantesimo-scambiato.webp` | L'incantesimo scambiato · famiglia `magia` | media | L'incantesimo scambiato: Un mago pasticcione scambia i corpi di metà dei concorrenti per un'ora.. Arena «Reame Incantato» (Draghi, rune e foreste che sussurrano). Palette: viola, magenta e blu notte con bagliori magici. Formato 16:9. |
-|  | `disastri/sciame-di-ombre.webp` | Lo sciame di ombre · famiglia `sciame` | media | Lo sciame di ombre: Ombre senza padrone cercano un corpo da abitare.. Arena «Reame Incantato» (Draghi, rune e foreste che sussurrano). Palette: viola, magenta e blu notte con bagliori magici. Formato 16:9. |
-|  | `disastri/montagna-che-cammina.webp` | La montagna che cammina · famiglia `terremoto` | media | La montagna che cammina: Il Picco del drago si alza e si sposta di dieci chilometri.. Arena «Reame Incantato» (Draghi, rune e foreste che sussurrano). Palette: viola, magenta e blu notte con bagliori magici. Formato 16:9. |
-|  | `disastri/torneo-del-re.webp` | Il torneo del re · famiglia `magia` | media | Il torneo del re: Un re spettrale indice un torneo: chi rifiuta viene giustiziato.. Arena «Reame Incantato» (Draghi, rune e foreste che sussurrano). Palette: viola, magenta e blu notte con bagliori magici. Formato 16:9. |
-|  | `disastri/gelata-eterna.webp` | La gelata eterna · famiglia `gelo` | media | La gelata eterna: Una strega del ghiaccio congela il reame per un giorno.. Arena «Reame Incantato» (Draghi, rune e foreste che sussurrano). Palette: viola, magenta e blu notte con bagliori magici. Formato 16:9. |
-|  | `disastri/gnomi-da-giardino.webp` | Gli gnomi da giardino · famiglia `magia` | media | Gli gnomi da giardino: Migliaia di gnomi di pietra si animano e circondano gli accampamenti.. Arena «Reame Incantato» (Draghi, rune e foreste che sussurrano). Palette: viola, magenta e blu notte con bagliori magici. Formato 16:9. |
-|  | `disastri/biblioteca-infinita.webp` | La biblioteca infinita · famiglia `magia` | media | La biblioteca infinita: Un'enorme biblioteca appare e risucchia chi entra a leggere.. Arena «Reame Incantato» (Draghi, rune e foreste che sussurrano). Palette: viola, magenta e blu notte con bagliori magici. Formato 16:9. |
-|  | `disastri/fontana-dei-desideri.webp` | La fontana dei desideri · famiglia `festa` | media | La fontana dei desideri: Una fontana esaudisce i desideri, in modo molto letterale.. Arena «Reame Incantato» (Draghi, rune e foreste che sussurrano). Palette: viola, magenta e blu notte con bagliori magici. Formato 16:9. |
-|  | `disastri/buco-nel-cielo.webp` | Il buco nel cielo · famiglia `terremoto` | media | Il buco nel cielo: Il cielo si strappa e da lì cadono stelle, pezzi di luna e un pianoforte.. Arena «Reame Incantato» (Draghi, rune e foreste che sussurrano). Palette: viola, magenta e blu notte con bagliori magici. Formato 16:9. |
-|  | `disastri/maledizione-del-sonno.webp` | La maledizione del sonno · famiglia `magia` | media | La maledizione del sonno: Un incantesimo addormenta chiunque si sieda.. Arena «Reame Incantato» (Draghi, rune e foreste che sussurrano). Palette: viola, magenta e blu notte con bagliori magici. Formato 16:9. |
-|  | `disastri/ritorno-dei-lich.webp` | Il ritorno dei lich · famiglia `magia` | media | Il ritorno dei lich: Gli antichi lich si risvegliano e reclamano il reame.. Arena «Reame Incantato» (Draghi, rune e foreste che sussurrano). Palette: viola, magenta e blu notte con bagliori magici. Formato 16:9. |
-|  | `disastri/stagno-delle-sirene.webp` | Lo stagno delle sirene · famiglia `acqua` | media | Lo stagno delle sirene: Uno stagno compare in mezzo alla foresta, con dentro sirene molto affascinanti.. Arena «Reame Incantato» (Draghi, rune e foreste che sussurrano). Palette: viola, magenta e blu notte con bagliori magici. Formato 16:9. |
-|  | `disastri/pozione-nel-pozzo.webp` | La pozione nel pozzo · famiglia `acqua` | media | La pozione nel pozzo: Qualcuno versa una pozione di gigantismo nel pozzo.. Arena «Reame Incantato» (Draghi, rune e foreste che sussurrano). Palette: viola, magenta e blu notte con bagliori magici. Formato 16:9. |
-|  | `disastri/tempesta-di-petali.webp` | La tempesta di petali · famiglia `luce` | media | La tempesta di petali: Petali di rosa taglienti come rasoi turbinano nel vento.. Arena «Reame Incantato» (Draghi, rune e foreste che sussurrano). Palette: viola, magenta e blu notte con bagliori magici. Formato 16:9. |
-|  | `disastri/re-dei-ratti.webp` | Il re dei ratti · famiglia `sciame` | media | Il re dei ratti: Un re dei ratti con sette code guida un esercito di ratti contro i concorrenti.. Arena «Reame Incantato» (Draghi, rune e foreste che sussurrano). Palette: viola, magenta e blu notte con bagliori magici. Formato 16:9. |
-|  | `disastri/mimic.webp` | Il mimic · famiglia `bestie` | media | Il mimic: I forzieri del reame si rivelano mimic affamati.. Arena «Reame Incantato» (Draghi, rune e foreste che sussurrano). Palette: viola, magenta e blu notte con bagliori magici. Formato 16:9. |
-|  | `disastri/eclissi-delle-due-lune.webp` | L'eclissi delle due lune · famiglia `buio` | media | L'eclissi delle due lune: Le due lune si sovrappongono e la magia impazzisce.. Arena «Reame Incantato» (Draghi, rune e foreste che sussurrano). Palette: viola, magenta e blu notte con bagliori magici. Formato 16:9. |
-|  | `disastri/festa-dei-satiri.webp` | La festa dei satiri · famiglia `festa` · 18+ | bassa | La festa dei satiri: Una banda di satiri ubriachi organizza un baccanale nella foresta.. Arena «Reame Incantato» (Draghi, rune e foreste che sussurrano). Palette: viola, magenta e blu notte con bagliori magici. Formato 16:9. |
-|  | `disastri/succube.webp` | La succube · famiglia `festa` · 18+ | bassa | La succube: Una succube visita l'accampamento più vicino.. Arena «Reame Incantato» (Draghi, rune e foreste che sussurrano). Palette: viola, magenta e blu notte con bagliori magici. Formato 16:9. |
-|  | `disastri/macellaio-orco.webp` | Il macellaio orco · famiglia `bestie` · 18+ | bassa | Il macellaio orco: Un orco macellaio apre bottega in mezzo al reame, e cerca carne fresca.. Arena «Reame Incantato» (Draghi, rune e foreste che sussurrano). Palette: viola, magenta e blu notte con bagliori magici. Formato 16:9. |
-|  | `disastri/piante-vogliose.webp` | Le piante vogliose · famiglia `magia` · 18+ | bassa | Le piante vogliose: Le liane della Palude stregata diventano molto, molto affettuose.. Arena «Reame Incantato» (Draghi, rune e foreste che sussurrano). Palette: viola, magenta e blu notte con bagliori magici. Formato 16:9. |
-|  | `disastri/pubblico-vota.webp` | Il pubblico vota · famiglia `spettacolo` | media | Il pubblico vota: Il pubblico vota in diretta chi colpire con un fulmine artificiale.. Arena «Reame Incantato» (Draghi, rune e foreste che sussurrano). Palette: viola, magenta e blu notte con bagliori magici. Formato 16:9. |
-|  | `disastri/pausa-pubblicitaria.webp` | La pausa pubblicitaria · famiglia `spettacolo` | media | La pausa pubblicitaria: Durante la pubblicità, gli organizzatori si dimenticano di sorvegliare le trappole.. Arena «Reame Incantato» (Draghi, rune e foreste che sussurrano). Palette: viola, magenta e blu notte con bagliori magici. Formato 16:9. |
-|  | `disastri/cambio-di-regia.webp` | Il cambio di regia · famiglia `spettacolo` | media | Il cambio di regia: Arriva un nuovo regista che vuole più azione.. Arena «Reame Incantato» (Draghi, rune e foreste che sussurrano). Palette: viola, magenta e blu notte con bagliori magici. Formato 16:9. |
-|  | `disastri/pioggia-di-coriandoli.webp` | La pioggia di coriandoli · famiglia `spettacolo` | media | La pioggia di coriandoli: Per festeggiare la metà della stagione, gli organizzatori fanno piovere coriandoli. Di vetro.. Arena «Reame Incantato» (Draghi, rune e foreste che sussurrano). Palette: viola, magenta e blu notte con bagliori magici. Formato 16:9. |
-|  | `disastri/ospite-speciale.webp` | L'ospite speciale · famiglia `spettacolo` | media | L'ospite speciale: Una celebrità entra nell'arena per un giorno, con una squadra di guardie del corpo armate.. Arena «Reame Incantato» (Draghi, rune e foreste che sussurrano). Palette: viola, magenta e blu notte con bagliori magici. Formato 16:9. |
-|  | `disastri/sponsor-ritirato.webp` | Lo sponsor ritirato · famiglia `spettacolo` | media | Lo sponsor ritirato: Uno sponsor si ritira e reclama indietro tutti i regali. Con i droni.. Arena «Reame Incantato» (Draghi, rune e foreste che sussurrano). Palette: viola, magenta e blu notte con bagliori magici. Formato 16:9. |
-|  | `disastri/gioco-a-quiz.webp` | Il gioco a quiz · famiglia `spettacolo` | media | Il gioco a quiz: Gli organizzatori interrompono tutto per un quiz di cultura generale. Chi sbaglia paga.. Arena «Reame Incantato» (Draghi, rune e foreste che sussurrano). Palette: viola, magenta e blu notte con bagliori magici. Formato 16:9. |
-|  | `disastri/sciopero-dei-tecnici.webp` | Lo sciopero dei tecnici · famiglia `spettacolo` | media | Lo sciopero dei tecnici: I tecnici dell'arena scioperano e nessuno controlla più i sistemi.. Arena «Reame Incantato» (Draghi, rune e foreste che sussurrano). Palette: viola, magenta e blu notte con bagliori magici. Formato 16:9. |
-|  | `disastri/replica.webp` | La replica · famiglia `spettacolo` | media | La replica: Per problemi tecnici, l'arena ripete il disastro di due giorni fa, ma più forte.. Arena «Reame Incantato» (Draghi, rune e foreste che sussurrano). Palette: viola, magenta e blu notte con bagliori magici. Formato 16:9. |
-|  | `disastri/giornata-dei-bambini.webp` | La giornata dei bambini · famiglia `spettacolo` | media | La giornata dei bambini: Gli organizzatori fanno disegnare le trappole del giorno ai bambini. Sono molto creativi.. Arena «Reame Incantato» (Draghi, rune e foreste che sussurrano). Palette: viola, magenta e blu notte con bagliori magici. Formato 16:9. |
-|  | `disastri/asta-dei-concorrenti.webp` | L'asta dei concorrenti · famiglia `spettacolo` | media | L'asta dei concorrenti: Il pubblico può comprare il diritto di decidere la sorte di un concorrente.. Arena «Reame Incantato» (Draghi, rune e foreste che sussurrano). Palette: viola, magenta e blu notte con bagliori magici. Formato 16:9. |
-|  | `disastri/terremoto-della-produzione.webp` | Il terremoto della produzione · famiglia `terremoto` | media | Il terremoto della produzione: Un camion della produzione si ribalta dentro l'arena e libera tutto quello che trasportava.. Arena «Reame Incantato» (Draghi, rune e foreste che sussurrano). Palette: viola, magenta e blu notte con bagliori magici. Formato 16:9. |
-|  | `disastri/blackout-delle-telecamere.webp` | Il blackout delle telecamere · famiglia `spettacolo` | media | Il blackout delle telecamere: Le telecamere si spengono per un'ora. Senza testimoni, le regole saltano.. Arena «Reame Incantato» (Draghi, rune e foreste che sussurrano). Palette: viola, magenta e blu notte con bagliori magici. Formato 16:9. |
-|  | `disastri/musica-a-tutto-volume.webp` | La musica a tutto volume · famiglia `spettacolo` | media | La musica a tutto volume: Gli organizzatori diffondono la stessa canzone estiva per ventiquattro ore.. Arena «Reame Incantato» (Draghi, rune e foreste che sussurrano). Palette: viola, magenta e blu notte con bagliori magici. Formato 16:9. |
-|  | `disastri/doppio-disastro.webp` | Il doppio disastro · famiglia `magia` | media | Il doppio disastro: Due disastri si attivano nello stesso momento per un errore di programmazione.. Arena «Reame Incantato» (Draghi, rune e foreste che sussurrano). Palette: viola, magenta e blu notte con bagliori magici. Formato 16:9. |
-|  | `disastri/maratona.webp` | La maratona · famiglia `spettacolo` | media | La maratona: Gli organizzatori obbligano tutti a correre per due ore. Chi si ferma viene punito.. Arena «Reame Incantato» (Draghi, rune e foreste che sussurrano). Palette: viola, magenta e blu notte con bagliori magici. Formato 16:9. |
-|  | `disastri/sondaggio-della-crudelta.webp` | Il sondaggio della crudeltà · famiglia `spettacolo` | media | Il sondaggio della crudeltà: Il pubblico vota il disastro più crudele. Vince "tutti insieme".. Arena «Reame Incantato» (Draghi, rune e foreste che sussurrano). Palette: viola, magenta e blu notte con bagliori magici. Formato 16:9. |
-|  | `disastri/invasione-dei-fan.webp` | L'invasione dei fan · famiglia `spettacolo` | media | L'invasione dei fan: Un gruppo di fan scavalca le recinzioni e invade l'arena per conoscere i propri idoli.. Arena «Reame Incantato» (Draghi, rune e foreste che sussurrano). Palette: viola, magenta e blu notte con bagliori magici. Formato 16:9. |
-|  | `disastri/gioco-delle-sedie.webp` | Il gioco delle sedie · famiglia `spettacolo` | media | Il gioco delle sedie: Gli organizzatori mettono al centro dell'arena una sedia in meno dei concorrenti. Chi resta in piedi viene punito.. Arena «Reame Incantato» (Draghi, rune e foreste che sussurrano). Palette: viola, magenta e blu notte con bagliori magici. Formato 16:9. |
-|  | `disastri/nebbia-delle-risate-registrate.webp` | La nebbia delle risate registrate · famiglia `spettacolo` | media | La nebbia delle risate registrate: Dagli altoparlanti partono risate registrate a ogni sfortuna. È psicologicamente devastante.. Arena «Reame Incantato» (Draghi, rune e foreste che sussurrano). Palette: viola, magenta e blu notte con bagliori magici. Formato 16:9. |
-|  | `disastri/notte-rossa.webp` | La notte rossa · famiglia `buio` · 18+ | bassa | La notte rossa: Gli organizzatori sospendono ogni regola per una notte: niente telecamere sui dettagli, niente limiti.. Arena «Reame Incantato» (Draghi, rune e foreste che sussurrano). Palette: viola, magenta e blu notte con bagliori magici. Formato 16:9. |
-|  | `disastri/bar-aperto.webp` | Il bar aperto · famiglia `festa` · 18+ | bassa | Il bar aperto: Un bar con alcol illimitato compare nel mezzo dell'arena. Gratis, per un'ora.. Arena «Reame Incantato» (Draghi, rune e foreste che sussurrano). Palette: viola, magenta e blu notte con bagliori magici. Formato 16:9. |
-|  | `disastri/pioggia-di-sangue.webp` | La pioggia di sangue · famiglia `cielo` · 18+ | bassa | La pioggia di sangue: Una pioggia di sangue animale cade sull'arena per motivi puramente estetici.. Arena «Reame Incantato» (Draghi, rune e foreste che sussurrano). Palette: viola, magenta e blu notte con bagliori magici. Formato 16:9. |
-|  | `disastri/spettacolo-del-pudore.webp` | Lo spettacolo del pudore · famiglia `magia` · 18+ | bassa | Lo spettacolo del pudore: Gli organizzatori fanno sparire tutti i vestiti dei concorrenti per un giorno.. Arena «Reame Incantato» (Draghi, rune e foreste che sussurrano). Palette: viola, magenta e blu notte con bagliori magici. Formato 16:9. |
-|  | `disastri/spore-del-desiderio.webp` | Le spore del desiderio · famiglia `festa` · 18+ | bassa | Le spore del desiderio: Le spore di un fungo rendono tutti irresistibilmente attratti dalla persona più vicina.. Arena «Reame Incantato» (Draghi, rune e foreste che sussurrano). Palette: viola, magenta e blu notte con bagliori magici. Formato 16:9. |
-|  | `disastri/macello.webp` | Il macello · famiglia `sangue` · 18+ | bassa | Il macello: Gli organizzatori aprono le gabbie di tutti i mostri insieme e chiamano l'evento "Il macello". Il nome è accurato.. Arena «Reame Incantato» (Draghi, rune e foreste che sussurrano). Palette: viola, magenta e blu notte con bagliori magici. Formato 16:9. |
-|  | `disastri/notte-delle-streghe.webp` | La notte delle streghe · famiglia `magia` | media | La notte delle streghe: Tre streghe sorvolano l'arena lanciando maledizioni a caso.. Arena «Reame Incantato» (Draghi, rune e foreste che sussurrano). Palette: viola, magenta e blu notte con bagliori magici. Formato 16:9. |
-|  | `disastri/risveglio-del-golem.webp` | Il risveglio del golem · famiglia `bestie` | media | Il risveglio del golem: Le statue della Torre si animano e cominciano a camminare.. Arena «Reame Incantato» (Draghi, rune e foreste che sussurrano). Palette: viola, magenta e blu notte con bagliori magici. Formato 16:9. |
-|  | `disastri/canto-delle-sirene.webp` | Il canto delle sirene · famiglia `acqua` | media | Il canto delle sirene: Dal Lago nebbioso sale un canto irresistibile.. Arena «Reame Incantato» (Draghi, rune e foreste che sussurrano). Palette: viola, magenta e blu notte con bagliori magici. Formato 16:9. |
-|  | `disastri/marea-di-funghi.webp` | La marea di funghi · famiglia `acqua` | media | La marea di funghi: I funghi luminosi crescono ovunque, e liberano spore allucinogene.. Arena «Reame Incantato» (Draghi, rune e foreste che sussurrano). Palette: viola, magenta e blu notte con bagliori magici. Formato 16:9. |
-|  | `disastri/specchio-delle-anime.webp` | Lo specchio delle anime · famiglia `magia` | media | Lo specchio delle anime: Uno specchio gigante appare nella Foresta e mostra a ognuno la propria paura.. Arena «Reame Incantato» (Draghi, rune e foreste che sussurrano). Palette: viola, magenta e blu notte con bagliori magici. Formato 16:9. |
-|  | `disastri/mercante-di-anime.webp` | Il mercante di anime · famiglia `cassa` | media | Il mercante di anime: Un mercante incappucciato offre a tutti un desiderio, in cambio di qualcosa.. Arena «Reame Incantato» (Draghi, rune e foreste che sussurrano). Palette: viola, magenta e blu notte con bagliori magici. Formato 16:9. |
-|  | `disastri/radici-affamate.webp` | Le radici affamate · famiglia `magia` | media | Le radici affamate: Gli alberi della Foresta allungano le radici in cerca di cibo.. Arena «Reame Incantato» (Draghi, rune e foreste che sussurrano). Palette: viola, magenta e blu notte con bagliori magici. Formato 16:9. |
+<details><summary>Prompt completo, pronto da incollare</summary>
 
-### Oggetti (1:1, 512×512, sfondo trasparente)
+```text
+A ruined wizard's tower of dark stone, half collapsed, glowing violet runes on its walls, under a huge moon. Violet, magenta and midnight blue palette with glowing turquoise and gold magic, dark fairy-tale kingdom. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Wide 16:9 establishing shot of the location, no people, eye-level view, the key landmark inside the central third of the frame, soft depth fog in the background. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
+```
 
-| | File | Soggetto | Priorità | Traccia |
-| --- | --- | --- | --- | --- |
-|  | `oggetti/arma.webp` | Arma | alta | Arma: Più forza negli scontri, in base alla qualità (★). Si consuma a ogni colpo e alla fine si rompe; con un attrezzo si può riparare. Chi è ingegnoso può intingerla nel veleno.. Arena «Reame Incantato» (Draghi, rune e foreste che sussurrano). Palette: viola, magenta e blu notte con bagliori magici. Formato 1:1. Sfondo trasparente. |
-|  | `oggetti/armatura.webp` | Protezione (per esempio cotta di maglia elfica, scudo runico) | alta | Protezione (per esempio cotta di maglia elfica, scudo runico): Riduce i danni e a volte para un colpo mortale. Si consuma a ogni colpo incassato.. Arena «Reame Incantato» (Draghi, rune e foreste che sussurrano). Palette: viola, magenta e blu notte con bagliori magici. Formato 1:1. Sfondo trasparente. |
-|  | `oggetti/med.webp` | Cure | alta | Cure: Si usa da soli o sugli alleati: richiude le ferite gravi, ferma veleni e infezioni presi in tempo, abbassa l'indicatore dell'arena.. Arena «Reame Incantato» (Draghi, rune e foreste che sussurrano). Palette: viola, magenta e blu notte con bagliori magici. Formato 1:1. Sfondo trasparente. |
-|  | `oggetti/cibo.webp` | Cibo | alta | Cibo: Si mangia quando la sazietà cala. Si può dividere con gli alleati, regalare o scambiare.. Arena «Reame Incantato» (Draghi, rune e foreste che sussurrano). Palette: viola, magenta e blu notte con bagliori magici. Formato 1:1. Sfondo trasparente. |
-|  | `oggetti/attrezzo.webp` | Attrezzo (per esempio lanterna fatata, corda incantata) | alta | Attrezzo (per esempio lanterna fatata, corda incantata): Più cibo trovato, fughe più facili da tempeste e trappole, difesa migliore di notte, armi riparate.. Arena «Reame Incantato» (Draghi, rune e foreste che sussurrano). Palette: viola, magenta e blu notte con bagliori magici. Formato 1:1. Sfondo trasparente. |
-|  | `oggetti/mappa.webp` | Mappa | alta | Mappa: Più cibo, meno disastri, trappole scoperte in anticipo e vie di fuga sicure.. Arena «Reame Incantato» (Draghi, rune e foreste che sussurrano). Palette: viola, magenta e blu notte con bagliori magici. Formato 1:1. Sfondo trasparente. |
-|  | `oggetti/trap.webp` | Trappola | alta | Trappola: Di notte chi la sa usare la piazza nella sua zona. Chi ci passa rischia grosso, e l'uccisione va a chi l'ha piazzata.. Arena «Reame Incantato» (Draghi, rune e foreste che sussurrano). Palette: viola, magenta e blu notte con bagliori magici. Formato 1:1. Sfondo trasparente. |
-|  | `oggetti/esplosivo.webp` | Esplosivo | alta | Esplosivo: Più forza negli scontri. Chi è ingegnoso ci costruisce trappole esplosive. Da ubriachi è un pessimo compagno.. Arena «Reame Incantato» (Draghi, rune e foreste che sussurrano). Palette: viola, magenta e blu notte con bagliori magici. Formato 1:1. Sfondo trasparente. |
-|  | `oggetti/veleno.webp` | Veleno | alta | Veleno: Apre la strada agli avvelenamenti; chi è ingegnoso ci intinge l'arma, che poi avvelena a ogni colpo.. Arena «Reame Incantato» (Draghi, rune e foreste che sussurrano). Palette: viola, magenta e blu notte con bagliori magici. Formato 1:1. Sfondo trasparente. |
-|  | `oggetti/amuleto.webp` | Portafortuna | alta | Portafortuna: Può evitare una morte diretta narrata da un evento: probabilità 85%, certa per chi è superstizioso. Si consuma quando salva. Non ferma i danni periodici di fame, malattie e ferite. Calma Terrore e Corruzione.. Arena «Reame Incantato» (Draghi, rune e foreste che sussurrano). Palette: viola, magenta e blu notte con bagliori magici. Formato 1:1. Sfondo trasparente. |
-|  | `oggetti/alcol.webp` | Alcol (per esempio fiaschetta di idromele, pozione di coraggio liquido) | alta | Alcol (per esempio fiaschetta di idromele, pozione di coraggio liquido): Scalda, fa dimenticare, disinfetta le ferite infette. E ubriaca.. Arena «Reame Incantato» (Draghi, rune e foreste che sussurrano). Palette: viola, magenta e blu notte con bagliori magici. Formato 1:1. Sfondo trasparente. |
-|  | `oggetti/valore.webp` | Merce di scambio (per esempio sacchetto di monete d'argento, gemma che canta) | alta | Merce di scambio (per esempio sacchetto di monete d'argento, gemma che canta): Non serve a niente, tranne che a comprare cibo e cure da chi ne ha.. Arena «Reame Incantato» (Draghi, rune e foreste che sussurrano). Palette: viola, magenta e blu notte con bagliori magici. Formato 1:1. Sfondo trasparente. |
-|  | `oggetti/ricordo.webp` | Ricordo (per esempio foto di famiglia, lettera mai spedita) | alta | Ricordo (per esempio foto di famiglia, lettera mai spedita): Un pezzo di casa: ogni notte tiene su il morale. Se è di qualcuno che non c'è più, ancora di più.. Arena «Reame Incantato» (Draghi, rune e foreste che sussurrano). Palette: viola, magenta e blu notte con bagliori magici. Formato 1:1. Sfondo trasparente. |
+</details>
+
+#### Foresta elfica
+
+- **File**: `assets/arene/fantasy/luoghi/foresta-elfica.webp`
+- **Cosa mostrare**: Foresta elfica di alberi giganti dalla corteccia argentata, lanterne appese e lucine sospese.
+
+**Prompt**
+
+```text
+An elven forest of giant silver-barked trees, hanging lanterns and floating motes of light.
+```
+
+<details><summary>Prompt completo, pronto da incollare</summary>
+
+```text
+An elven forest of giant silver-barked trees, hanging lanterns and floating motes of light. Violet, magenta and midnight blue palette with glowing turquoise and gold magic, dark fairy-tale kingdom. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Wide 16:9 establishing shot of the location, no people, eye-level view, the key landmark inside the central third of the frame, soft depth fog in the background. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
+```
+
+</details>
+
+#### Lago nebbioso
+
+- **File**: `assets/arene/fantasy/luoghi/lago-nebbioso.webp`
+- **Cosa mostrare**: Lago incantato di notte, acqua a specchio, pontile di pietra e una statua mezza sommersa.
+
+**Prompt**
+
+```text
+A misty enchanted lake at night, glassy water, a small stone pier and a half-sunken statue.
+```
+
+<details><summary>Prompt completo, pronto da incollare</summary>
+
+```text
+A misty enchanted lake at night, glassy water, a small stone pier and a half-sunken statue. Violet, magenta and midnight blue palette with glowing turquoise and gold magic, dark fairy-tale kingdom. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Wide 16:9 establishing shot of the location, no people, eye-level view, the key landmark inside the central third of the frame, soft depth fog in the background. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
+```
+
+</details>
+
+#### Miniere
+
+- **File**: `assets/arene/fantasy/luoghi/miniere.webp`
+- **Cosa mostrare**: Miniere naniche scavate nella montagna, impalcature, binari con carrello e vene di cristallo luminose.
+
+**Prompt**
+
+```text
+Dwarven mines carved into a mountain, wooden scaffolding, minecart rails and glowing crystal veins in the rock.
+```
+
+<details><summary>Prompt completo, pronto da incollare</summary>
+
+```text
+Dwarven mines carved into a mountain, wooden scaffolding, minecart rails and glowing crystal veins in the rock. Violet, magenta and midnight blue palette with glowing turquoise and gold magic, dark fairy-tale kingdom. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Wide 16:9 establishing shot of the location, no people, eye-level view, the key landmark inside the central third of the frame, soft depth fog in the background. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
+```
+
+</details>
+
+#### Palude stregata
+
+- **File**: `assets/arene/fantasy/luoghi/palude-stregata.webp`
+- **Cosa mostrare**: Palude stregata con alberi storti, muschio pendente, una capanna su palafitte e fuochi fatui verdi.
+
+**Prompt**
+
+```text
+A haunted swamp with crooked trees, hanging moss, a witch's hut on stilts and green will-o'-wisps.
+```
+
+<details><summary>Prompt completo, pronto da incollare</summary>
+
+```text
+A haunted swamp with crooked trees, hanging moss, a witch's hut on stilts and green will-o'-wisps. Violet, magenta and midnight blue palette with glowing turquoise and gold magic, dark fairy-tale kingdom. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Wide 16:9 establishing shot of the location, no people, eye-level view, the key landmark inside the central third of the frame, soft depth fog in the background. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
+```
+
+</details>
+
+#### Picco del drago
+
+- **File**: `assets/arene/fantasy/luoghi/picco-del-drago.webp`
+- **Cosa mostrare**: Picco frastagliato con la tana del drago: rocce bruciate, mucchi d'oro e fumo che sale.
+
+**Prompt**
+
+```text
+A jagged mountain peak with a dragon's lair, scorched rocks, heaps of gold coins and smoke rising into the night.
+```
+
+<details><summary>Prompt completo, pronto da incollare</summary>
+
+```text
+A jagged mountain peak with a dragon's lair, scorched rocks, heaps of gold coins and smoke rising into the night. Violet, magenta and midnight blue palette with glowing turquoise and gold magic, dark fairy-tale kingdom. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Wide 16:9 establishing shot of the location, no people, eye-level view, the key landmark inside the central third of the frame, soft depth fog in the background. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
+```
+
+</details>
+
+### Pericoli · Reame Incantato (4:3, 960 × 720 px, sfondo pieno e scuro)
+
+#### Troll di caverna
+
+- **File**: `assets/arene/fantasy/pericoli/troll-di-caverna.webp`
+- **Cosa mostrare**: Troll di caverna enorme, pelle grigia bitorzoluta, clava di pietra, occhi piccoli e luminosi.
+
+**Prompt**
+
+```text
+A hulking cave troll with grey warty skin and a stone club, small glowing eyes, stooping in a cave mouth.
+```
+
+<details><summary>Prompt completo, pronto da incollare</summary>
+
+```text
+A hulking cave troll with grey warty skin and a stone club, small glowing eyes, stooping in a cave mouth. Violet, magenta and midnight blue palette with glowing turquoise and gold magic, dark fairy-tale kingdom. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. 4:3 wanted-poster portrait, single threat centered and facing the viewer, head and eyes in the upper middle of the frame, dark vignetted background that fades to near black at the edges. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
+```
+
+</details>
+
+#### Viverna
+
+- **File**: `assets/arene/fantasy/pericoli/viverna.webp`
+- **Cosa mostrare**: Viverna con ali membranose spalancate e coda uncinata, appollaiata su una rupe mentre ruggisce.
+
+**Prompt**
+
+```text
+A wyvern with leathery wings spread wide and a barbed tail, perched on a cliff edge, roaring.
+```
+
+<details><summary>Prompt completo, pronto da incollare</summary>
+
+```text
+A wyvern with leathery wings spread wide and a barbed tail, perched on a cliff edge, roaring. Violet, magenta and midnight blue palette with glowing turquoise and gold magic, dark fairy-tale kingdom. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. 4:3 wanted-poster portrait, single threat centered and facing the viewer, head and eyes in the upper middle of the frame, dark vignetted background that fades to near black at the edges. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
+```
+
+</details>
+
+#### Spettro errante
+
+- **File**: `assets/arene/fantasy/pericoli/spettro-errante.webp`
+- **Cosa mostrare**: Spettro traslucido in vesti a brandelli, bagliore azzurro, occhi vuoti, nella nebbia.
+
+**Prompt**
+
+```text
+A wandering translucent wraith in tattered robes, faint blue glow, hollow eyes, drifting through mist.
+```
+
+<details><summary>Prompt completo, pronto da incollare</summary>
+
+```text
+A wandering translucent wraith in tattered robes, faint blue glow, hollow eyes, drifting through mist. Violet, magenta and midnight blue palette with glowing turquoise and gold magic, dark fairy-tale kingdom. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. 4:3 wanted-poster portrait, single threat centered and facing the viewer, head and eyes in the upper middle of the frame, dark vignetted background that fades to near black at the edges. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
+```
+
+</details>
+
+#### Branco di lupi mannari
+
+- **File**: `assets/arene/fantasy/pericoli/branco-di-lupi-mannari.webp`
+- **Cosa mostrare**: Branco di lupi mannari sotto la luna piena, il capobranco in primo piano.
+
+**Prompt**
+
+```text
+A pack of werewolves under the full moon, the alpha in front with bristling fur and bared fangs.
+```
+
+<details><summary>Prompt completo, pronto da incollare</summary>
+
+```text
+A pack of werewolves under the full moon, the alpha in front with bristling fur and bared fangs. Violet, magenta and midnight blue palette with glowing turquoise and gold magic, dark fairy-tale kingdom. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. 4:3 wanted-poster portrait, single threat centered and facing the viewer, head and eyes in the upper middle of the frame, dark vignetted background that fades to near black at the edges. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
+```
+
+</details>
+
+### Armi · Reame Incantato (1:1, 512 × 512 px, sfondo trasparente)
+
+#### Spada runica
+
+- **File**: `assets/arene/fantasy/armi/spada-runica.webp`
+- **Cosa mostrare**: Spada lunga con rune viola luminose sulla lama.
+
+**Prompt**
+
+```text
+A longsword with glowing violet runes running along the blade.
+```
+
+<details><summary>Prompt completo, pronto da incollare</summary>
+
+```text
+A longsword with glowing violet runes running along the blade. Violet, magenta and midnight blue palette with glowing turquoise and gold magic, dark fairy-tale kingdom. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Single object only, isolated on a fully transparent background, square 1:1, three-quarter view laid diagonally from lower left to upper right, 12% empty margin on every side, crisp silhouette with a thin dark outline so it reads on both light and dark backgrounds, no hands, no shadow on the ground. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
+```
+
+</details>
+
+#### Bastone magico
+
+- **File**: `assets/arene/fantasy/armi/bastone-magico.webp`
+- **Cosa mostrare**: Bastone da mago nodoso con un cristallo luminoso sospeso in cima.
+
+**Prompt**
+
+```text
+A gnarled wizard staff topped with a floating glowing crystal.
+```
+
+<details><summary>Prompt completo, pronto da incollare</summary>
+
+```text
+A gnarled wizard staff topped with a floating glowing crystal. Violet, magenta and midnight blue palette with glowing turquoise and gold magic, dark fairy-tale kingdom. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Single object only, isolated on a fully transparent background, square 1:1, three-quarter view laid diagonally from lower left to upper right, 12% empty margin on every side, crisp silhouette with a thin dark outline so it reads on both light and dark backgrounds, no hands, no shadow on the ground. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
+```
+
+</details>
+
+#### Arco elfico
+
+- **File**: `assets/arene/fantasy/armi/arco-elfico.webp`
+- **Cosa mostrare**: Arco lungo elfico in legno chiaro con intarsi d'argento a foglia.
+
+**Prompt**
+
+```text
+An elegant elven longbow of pale wood with leaf-shaped silver inlays.
+```
+
+<details><summary>Prompt completo, pronto da incollare</summary>
+
+```text
+An elegant elven longbow of pale wood with leaf-shaped silver inlays. Violet, magenta and midnight blue palette with glowing turquoise and gold magic, dark fairy-tale kingdom. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Single object only, isolated on a fully transparent background, square 1:1, three-quarter view laid diagonally from lower left to upper right, 12% empty margin on every side, crisp silhouette with a thin dark outline so it reads on both light and dark backgrounds, no hands, no shadow on the ground. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
+```
+
+</details>
+
+#### Ascia nanica
+
+- **File**: `assets/arene/fantasy/armi/ascia-nanica.webp`
+- **Cosa mostrare**: Ascia nanica a doppia lama con incisioni a intreccio.
+
+**Prompt**
+
+```text
+A heavy double-bladed dwarven axe with engraved knotwork and a leather grip.
+```
+
+<details><summary>Prompt completo, pronto da incollare</summary>
+
+```text
+A heavy double-bladed dwarven axe with engraved knotwork and a leather grip. Violet, magenta and midnight blue palette with glowing turquoise and gold magic, dark fairy-tale kingdom. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Single object only, isolated on a fully transparent background, square 1:1, three-quarter view laid diagonally from lower left to upper right, 12% empty margin on every side, crisp silhouette with a thin dark outline so it reads on both light and dark backgrounds, no hands, no shadow on the ground. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
+```
+
+</details>
+
+#### Pugnale avvelenato
+
+- **File**: `assets/arene/fantasy/armi/pugnale-avvelenato.webp`
+- **Cosa mostrare**: Pugnale ricurvo che gocciola veleno verde.
+
+**Prompt**
+
+```text
+A curved dagger dripping bright green poison.
+```
+
+<details><summary>Prompt completo, pronto da incollare</summary>
+
+```text
+A curved dagger dripping bright green poison. Violet, magenta and midnight blue palette with glowing turquoise and gold magic, dark fairy-tale kingdom. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Single object only, isolated on a fully transparent background, square 1:1, three-quarter view laid diagonally from lower left to upper right, 12% empty margin on every side, crisp silhouette with a thin dark outline so it reads on both light and dark backgrounds, no hands, no shadow on the ground. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
+```
+
+</details>
+
+#### Martello da guerra
+
+- **File**: `assets/arene/fantasy/armi/martello-da-guerra.webp`
+- **Cosa mostrare**: Martello da guerra massiccio con testa in ferro incisa di rune.
+
+**Prompt**
+
+```text
+A massive war hammer with a rune-carved iron head.
+```
+
+<details><summary>Prompt completo, pronto da incollare</summary>
+
+```text
+A massive war hammer with a rune-carved iron head. Violet, magenta and midnight blue palette with glowing turquoise and gold magic, dark fairy-tale kingdom. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Single object only, isolated on a fully transparent background, square 1:1, three-quarter view laid diagonally from lower left to upper right, 12% empty margin on every side, crisp silhouette with a thin dark outline so it reads on both light and dark backgrounds, no hands, no shadow on the ground. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
+```
+
+</details>
+
+#### Balestra
+
+- **File**: `assets/arene/fantasy/armi/balestra.webp`
+- **Cosa mostrare**: Balestra fantasy in legno scuro e ottone.
+
+**Prompt**
+
+```text
+A fantasy crossbow of dark wood with brass fittings and a loaded bolt.
+```
+
+<details><summary>Prompt completo, pronto da incollare</summary>
+
+```text
+A fantasy crossbow of dark wood with brass fittings and a loaded bolt. Violet, magenta and midnight blue palette with glowing turquoise and gold magic, dark fairy-tale kingdom. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Single object only, isolated on a fully transparent background, square 1:1, three-quarter view laid diagonally from lower left to upper right, 12% empty margin on every side, crisp silhouette with a thin dark outline so it reads on both light and dark backgrounds, no hands, no shadow on the ground. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
+```
+
+</details>
+
+#### Lancia incantata
+
+- **File**: `assets/arene/fantasy/armi/lancia-incantata.webp`
+- **Cosa mostrare**: Lancia sottile con la punta avvolta da una luce pallida.
+
+**Prompt**
+
+```text
+A slender spear with an enchanted blade wreathed in pale light.
+```
+
+<details><summary>Prompt completo, pronto da incollare</summary>
+
+```text
+A slender spear with an enchanted blade wreathed in pale light. Violet, magenta and midnight blue palette with glowing turquoise and gold magic, dark fairy-tale kingdom. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Single object only, isolated on a fully transparent background, square 1:1, three-quarter view laid diagonally from lower left to upper right, 12% empty margin on every side, crisp silhouette with a thin dark outline so it reads on both light and dark backgrounds, no hands, no shadow on the ground. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
+```
+
+</details>
+
+---
 
 ## Stazione Orbitale
 
-Cartella: `assets/arene/scifi/`. Palette: blu, ciano e acciaio con luci al neon.
+Ossigeno limitato, droni e un reattore instabile.
 
-### Luoghi (16:9, 1280×720, sfondo pieno)
+- **Cartella**: `assets/arene/scifi/` (con le sottocartelle `luoghi/`, `pericoli/`, `armi/`)
+- **Riferimento di stile**: `assets/arene/scifi.webp`
+- **Atmosfera**: Stazione orbitale: blu, ciano e acciaio spazzolato, neon freddi, spie rosse di allarme, la Terra o le stelle dai finestrini.
+- **Stile da aggiungere a ogni prompt di questa arena** (è già incluso nei prompt completi):
 
-| | File | Soggetto | Priorità | Traccia |
-| --- | --- | --- | --- | --- |
-|  | `luoghi/hangar.webp` | Hangar | alta | Hangar: il luogo dell'arena visto da vicino. Arena «Stazione Orbitale» (Ossigeno limitato, droni e un reattore instabile). Palette: blu, ciano e acciaio con luci al neon. Formato 16:9. |
-|  | `luoghi/serra-idroponica.webp` | Serra idroponica | alta | Serra idroponica: il luogo dell'arena visto da vicino. Arena «Stazione Orbitale» (Ossigeno limitato, droni e un reattore instabile). Palette: blu, ciano e acciaio con luci al neon. Formato 16:9. |
-|  | `luoghi/reattore.webp` | Reattore | alta | Reattore: il luogo dell'arena visto da vicino. Arena «Stazione Orbitale» (Ossigeno limitato, droni e un reattore instabile). Palette: blu, ciano e acciaio con luci al neon. Formato 16:9. |
-|  | `luoghi/ponte-di-comando.webp` | Ponte di comando | alta | Ponte di comando: il luogo dell'arena visto da vicino. Arena «Stazione Orbitale» (Ossigeno limitato, droni e un reattore instabile). Palette: blu, ciano e acciaio con luci al neon. Formato 16:9. |
-|  | `luoghi/moduli-abitativi.webp` | Moduli abitativi | alta | Moduli abitativi: il luogo dell'arena visto da vicino. Arena «Stazione Orbitale» (Ossigeno limitato, droni e un reattore instabile). Palette: blu, ciano e acciaio con luci al neon. Formato 16:9. |
-|  | `luoghi/condotti-di-servizio.webp` | Condotti di servizio | alta | Condotti di servizio: il luogo dell'arena visto da vicino. Arena «Stazione Orbitale» (Ossigeno limitato, droni e un reattore instabile). Palette: blu, ciano e acciaio con luci al neon. Formato 16:9. |
+```text
+Cold blue and cyan neon on brushed steel with red warning lights, orbital space station. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours.
+```
 
-### Pericoli (4:3, 960×720, sfondo pieno, scuro)
+Più, a seconda della sezione:
 
-| | File | Soggetto | Priorità | Traccia |
-| --- | --- | --- | --- | --- |
-|  | `pericoli/drone-di-sicurezza-impazzito.webp` | Drone di sicurezza impazzito | alta | Drone di sicurezza impazzito: creatura o minaccia pronta ad attaccare. Arena «Stazione Orbitale» (Ossigeno limitato, droni e un reattore instabile). Palette: blu, ciano e acciaio con luci al neon. Formato 4:3. |
-|  | `pericoli/sciame-di-nanobot.webp` | Sciame di nanobot | alta | Sciame di nanobot: creatura o minaccia pronta ad attaccare. Arena «Stazione Orbitale» (Ossigeno limitato, droni e un reattore instabile). Palette: blu, ciano e acciaio con luci al neon. Formato 4:3. |
-|  | `pericoli/creatura-aliena-dai-tentacoli.webp` | Creatura aliena dai tentacoli | alta | Creatura aliena dai tentacoli: creatura o minaccia pronta ad attaccare. Arena «Stazione Orbitale» (Ossigeno limitato, droni e un reattore instabile). Palette: blu, ciano e acciaio con luci al neon. Formato 4:3. |
-|  | `pericoli/androide-da-combattimento.webp` | Androide da combattimento | alta | Androide da combattimento: creatura o minaccia pronta ad attaccare. Arena «Stazione Orbitale» (Ossigeno limitato, droni e un reattore instabile). Palette: blu, ciano e acciaio con luci al neon. Formato 4:3. |
+- Luoghi: `Wide 16:9 establishing shot of the location, no people, eye-level view, the key landmark inside the central third of the frame, soft depth fog in the background.`
+- Pericoli: `4:3 wanted-poster portrait, single threat centered and facing the viewer, head and eyes in the upper middle of the frame, dark vignetted background that fades to near black at the edges.`
+- Armi: `Single object only, isolated on a fully transparent background, square 1:1, three-quarter view laid diagonally from lower left to upper right, 12% empty margin on every side, crisp silhouette with a thin dark outline so it reads on both light and dark backgrounds, no hands, no shadow on the ground.`
+- Sempre: `No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.`
 
-### Armi (1:1, 512×512, sfondo trasparente)
+### Luoghi · Stazione Orbitale (16:9, 1280 × 720 px, sfondo pieno)
 
-| | File | Soggetto | Priorità | Traccia |
-| --- | --- | --- | --- | --- |
-|  | `armi/fucile-al-plasma.webp` | Fucile al plasma | media | Fucile al plasma: arma o oggetto usato come arma. Arena «Stazione Orbitale» (Ossigeno limitato, droni e un reattore instabile). Palette: blu, ciano e acciaio con luci al neon. Formato 1:1. Sfondo trasparente. |
-|  | `armi/lama-vibrante.webp` | Lama vibrante | media | Lama vibrante: arma o oggetto usato come arma. Arena «Stazione Orbitale» (Ossigeno limitato, droni e un reattore instabile). Palette: blu, ciano e acciaio con luci al neon. Formato 1:1. Sfondo trasparente. |
-|  | `armi/pistola-laser.webp` | Pistola laser | media | Pistola laser: arma o oggetto usato come arma. Arena «Stazione Orbitale» (Ossigeno limitato, droni e un reattore instabile). Palette: blu, ciano e acciaio con luci al neon. Formato 1:1. Sfondo trasparente. |
-|  | `armi/granata-emp.webp` | Granata EMP | media | Granata EMP: arma o oggetto usato come arma. Arena «Stazione Orbitale» (Ossigeno limitato, droni e un reattore instabile). Palette: blu, ciano e acciaio con luci al neon. Formato 1:1. Sfondo trasparente. |
-|  | `armi/frusta-monofilamento.webp` | Frusta monofilamento | media | Frusta monofilamento: arma o oggetto usato come arma. Arena «Stazione Orbitale» (Ossigeno limitato, droni e un reattore instabile). Palette: blu, ciano e acciaio con luci al neon. Formato 1:1. Sfondo trasparente. |
-|  | `armi/taser-a-impulsi.webp` | Taser a impulsi | media | Taser a impulsi: arma o oggetto usato come arma. Arena «Stazione Orbitale» (Ossigeno limitato, droni e un reattore instabile). Palette: blu, ciano e acciaio con luci al neon. Formato 1:1. Sfondo trasparente. |
-|  | `armi/cannone-a-rotaia-portatile.webp` | Cannone a rotaia portatile | media | Cannone a rotaia portatile: arma o oggetto usato come arma. Arena «Stazione Orbitale» (Ossigeno limitato, droni e un reattore instabile). Palette: blu, ciano e acciaio con luci al neon. Formato 1:1. Sfondo trasparente. |
+#### Hangar
 
-### Meteo (16:10, 1200×750, sfondo pieno)
+- **File**: `assets/arene/scifi/luoghi/hangar.webp`
+- **Cosa mostrare**: Hangar enorme con una navetta attraccata, container e il portellone aperto sulle stelle.
 
-| | File | Soggetto | Priorità | Traccia |
-| --- | --- | --- | --- | --- |
-|  | `meteo/tempesta-solare.webp` | Tempesta solare | alta | Tempesta solare: Radiazioni dalla stella vicina: l'elettronica impazzisce.. Arena «Stazione Orbitale» (Ossigeno limitato, droni e un reattore instabile). Palette: blu, ciano e acciaio con luci al neon. Formato 16:10. |
-|  | `meteo/gravita-instabile.webp` | Gravità instabile | alta | Gravità instabile: La gravità artificiale va e viene. Si cade verso l'alto.. Arena «Stazione Orbitale» (Ossigeno limitato, droni e un reattore instabile). Palette: blu, ciano e acciaio con luci al neon. Formato 16:10. |
-|  | `meteo/manutenzione-automatica.webp` | Manutenzione automatica | alta | Manutenzione automatica: I droni riparano i ricircolatori: oggi si respira.. Arena «Stazione Orbitale» (Ossigeno limitato, droni e un reattore instabile). Palette: blu, ciano e acciaio con luci al neon. Formato 16:10. |
-|  | `meteo/blackout.webp` | Blackout | alta | Blackout: Luci spente e porte bloccate: si combatte al buio.. Arena «Stazione Orbitale» (Ossigeno limitato, droni e un reattore instabile). Palette: blu, ciano e acciaio con luci al neon. Formato 16:10. |
-|  | `meteo/pioggia-di-micrometeoriti.webp` | Pioggia di micrometeoriti | alta | Pioggia di micrometeoriti: Lo scafo trema. Qualche modulo perde pressione.. Arena «Stazione Orbitale» (Ossigeno limitato, droni e un reattore instabile). Palette: blu, ciano e acciaio con luci al neon. Formato 16:10. |
-|  | `meteo/rifornimento-in-orbita.webp` | Rifornimento in orbita | alta | Rifornimento in orbita: Una navetta cargo ha lasciato casse ovunque.. Arena «Stazione Orbitale» (Ossigeno limitato, droni e un reattore instabile). Palette: blu, ciano e acciaio con luci al neon. Formato 16:10. |
-|  | `meteo/allineamento-planetario.webp` | Allineamento planetario | alta | Allineamento planetario: I pianeti vicini si allineano e la stazione vibra.. Arena «Stazione Orbitale» (Ossigeno limitato, droni e un reattore instabile). Palette: blu, ciano e acciaio con luci al neon. Formato 16:10. |
-|  | `meteo/sole-artificiale.webp` | Sole artificiale | alta | Sole artificiale: I pannelli della Serra lavorano al massimo: cibo e ossigeno per tutti.. Arena «Stazione Orbitale» (Ossigeno limitato, droni e un reattore instabile). Palette: blu, ciano e acciaio con luci al neon. Formato 16:10. |
-|  | `meteo/silenzio-radio.webp` | Silenzio radio | alta | Silenzio radio: Le comunicazioni sono interrotte: nessuno sa dove sono gli altri.. Arena «Stazione Orbitale» (Ossigeno limitato, droni e un reattore instabile). Palette: blu, ciano e acciaio con luci al neon. Formato 16:10. |
+**Prompt**
 
-### Disastri (16:9, 1280×720, sfondo pieno)
+```text
+A vast spaceship hangar with a docked shuttle, cargo containers and an open bay door showing the stars.
+```
 
-| | File | Soggetto | Priorità | Traccia |
-| --- | --- | --- | --- | --- |
-|  | `disastri/breccia-nello-scafo.webp` | Breccia nello scafo · famiglia `terremoto` | alta | Breccia nello scafo: Un meteorite perfora lo scafo: l'aria comincia a uscire con un sibilo.. Arena «Stazione Orbitale» (Ossigeno limitato, droni e un reattore instabile). Palette: blu, ciano e acciaio con luci al neon. Formato 16:9. |
-|  | `disastri/reattore-in-fusione.webp` | Il reattore in fusione · famiglia `fuoco` | alta | Il reattore in fusione: Allarme rosso: il nucleo del Reattore è instabile e le radiazioni dilagano.. Arena «Stazione Orbitale» (Ossigeno limitato, droni e un reattore instabile). Palette: blu, ciano e acciaio con luci al neon. Formato 16:9. |
-|  | `disastri/rivolta-dei-droni.webp` | Rivolta dei droni · famiglia `sciame` | alta | Rivolta dei droni: Un virus si diffonde nella rete: tutti i droni di sicurezza attaccano a vista.. Arena «Stazione Orbitale» (Ossigeno limitato, droni e un reattore instabile). Palette: blu, ciano e acciaio con luci al neon. Formato 16:9. |
-|  | `disastri/gravita-zero.webp` | Gravità zero · famiglia `terremoto` | alta | Gravità zero: Il generatore di gravità si spegne: tutto e tutti cominciano a fluttuare.. Arena «Stazione Orbitale» (Ossigeno limitato, droni e un reattore instabile). Palette: blu, ciano e acciaio con luci al neon. Formato 16:9. |
-|  | `disastri/tempesta-solare.webp` | Tempesta solare · famiglia `fulmine` | alta | Tempesta solare: Una tempesta solare investe la stazione: le schermature cedono.. Arena «Stazione Orbitale» (Ossigeno limitato, droni e un reattore instabile). Palette: blu, ciano e acciaio con luci al neon. Formato 16:9. |
-|  | `disastri/pioggia-di-micrometeoriti.webp` | Pioggia di micrometeoriti · famiglia `cielo` | alta | Pioggia di micrometeoriti: Una pioggia di micrometeoriti crivella lo scafo.. Arena «Stazione Orbitale» (Ossigeno limitato, droni e un reattore instabile). Palette: blu, ciano e acciaio con luci al neon. Formato 16:9. |
-|  | `disastri/incendio-nella-serra.webp` | Incendio nella Serra · famiglia `fuoco` | alta | Incendio nella Serra: Le piante della Serra idroponica prendono fuoco.. Arena «Stazione Orbitale» (Ossigeno limitato, droni e un reattore instabile). Palette: blu, ciano e acciaio con luci al neon. Formato 16:9. |
-|  | `disastri/blackout-totale.webp` | Blackout totale · famiglia `buio` | alta | Blackout totale: La stazione resta senza energia: buio, freddo e niente ossigeno nuovo.. Arena «Stazione Orbitale» (Ossigeno limitato, droni e un reattore instabile). Palette: blu, ciano e acciaio con luci al neon. Formato 16:9. |
-|  | `disastri/virus-nellia.webp` | Virus nell'IA · famiglia `tossico` | alta | Virus nell'IA: L'intelligenza artificiale della stazione impazzisce e chiude le porte a caso.. Arena «Stazione Orbitale» (Ossigeno limitato, droni e un reattore instabile). Palette: blu, ciano e acciaio con luci al neon. Formato 16:9. |
-|  | `disastri/spore-aliene.webp` | Spore aliene · famiglia `tossico` | media | Spore aliene: Un container della Serra si apre e libera spore aliene.. Arena «Stazione Orbitale» (Ossigeno limitato, droni e un reattore instabile). Palette: blu, ciano e acciaio con luci al neon. Formato 16:9. |
-|  | `disastri/parassita.webp` | Il parassita · famiglia `bestie` | media | Il parassita: Un parassita alieno cerca un ospite.. Arena «Stazione Orbitale» (Ossigeno limitato, droni e un reattore instabile). Palette: blu, ciano e acciaio con luci al neon. Formato 16:9. |
-|  | `disastri/rotazione-impazzita.webp` | Rotazione impazzita · famiglia `terremoto` | media | Rotazione impazzita: La stazione inizia a ruotare troppo velocemente.. Arena «Stazione Orbitale» (Ossigeno limitato, droni e un reattore instabile). Palette: blu, ciano e acciaio con luci al neon. Formato 16:9. |
-|  | `disastri/collisione.webp` | Collisione · famiglia `terremoto` | media | Collisione: Un satellite abbandonato si schianta contro il modulo abitativo.. Arena «Stazione Orbitale» (Ossigeno limitato, droni e un reattore instabile). Palette: blu, ciano e acciaio con luci al neon. Formato 16:9. |
-|  | `disastri/androidi-ribelli.webp` | Androidi ribelli · famiglia `tech` | media | Androidi ribelli: Gli androidi di servizio si rivoltano contro gli umani.. Arena «Stazione Orbitale» (Ossigeno limitato, droni e un reattore instabile). Palette: blu, ciano e acciaio con luci al neon. Formato 16:9. |
-|  | `disastri/perdita-di-plasma.webp` | Perdita di plasma · famiglia `fuoco` | media | Perdita di plasma: Una conduttura di plasma si rompe nei Condotti di servizio.. Arena «Stazione Orbitale» (Ossigeno limitato, droni e un reattore instabile). Palette: blu, ciano e acciaio con luci al neon. Formato 16:9. |
-|  | `disastri/allarme-quarantena.webp` | Allarme quarantena · famiglia `tossico` | media | Allarme quarantena: Il computer di bordo dichiara la quarantena e spara gas sterilizzante.. Arena «Stazione Orbitale» (Ossigeno limitato, droni e un reattore instabile). Palette: blu, ciano e acciaio con luci al neon. Formato 16:9. |
-|  | `disastri/pioggia-di-detriti.webp` | Pioggia di detriti · famiglia `cielo` | media | Pioggia di detriti: Un'esplosione esterna proietta detriti contro le finestre.. Arena «Stazione Orbitale» (Ossigeno limitato, droni e un reattore instabile). Palette: blu, ciano e acciaio con luci al neon. Formato 16:9. |
-|  | `disastri/reattore-a-gravita.webp` | Reattore a gravità · famiglia `fuoco` | media | Reattore a gravità: Il reattore a gravità crea un buco nero in miniatura.. Arena «Stazione Orbitale» (Ossigeno limitato, droni e un reattore instabile). Palette: blu, ciano e acciaio con luci al neon. Formato 16:9. |
-|  | `disastri/nanobot-affamati.webp` | Nanobot affamati · famiglia `sciame` | media | Nanobot affamati: Uno sciame di nanobot comincia a smontare tutto ciò che è metallico.. Arena «Stazione Orbitale» (Ossigeno limitato, droni e un reattore instabile). Palette: blu, ciano e acciaio con luci al neon. Formato 16:9. |
-|  | `disastri/clone.webp` | Il clone · famiglia `bestie` | media | Il clone: Le vasche di clonazione si aprono e ne escono copie dei concorrenti.. Arena «Stazione Orbitale» (Ossigeno limitato, droni e un reattore instabile). Palette: blu, ciano e acciaio con luci al neon. Formato 16:9. |
-|  | `disastri/cortocircuito.webp` | Cortocircuito · famiglia `fulmine` | media | Cortocircuito: Un cortocircuito elettrifica tutti i pavimenti metallici.. Arena «Stazione Orbitale» (Ossigeno limitato, droni e un reattore instabile). Palette: blu, ciano e acciaio con luci al neon. Formato 16:9. |
-|  | `disastri/ghiaccio-criogenico.webp` | Ghiaccio criogenico · famiglia `gelo` | media | Ghiaccio criogenico: Il sistema criogenico si guasta e congela i corridoi.. Arena «Stazione Orbitale» (Ossigeno limitato, droni e un reattore instabile). Palette: blu, ciano e acciaio con luci al neon. Formato 16:9. |
-|  | `disastri/crollo-di-pressione.webp` | Crollo di pressione · famiglia `terremoto` | media | Crollo di pressione: La pressione dell'intera stazione crolla di colpo.. Arena «Stazione Orbitale» (Ossigeno limitato, droni e un reattore instabile). Palette: blu, ciano e acciaio con luci al neon. Formato 16:9. |
-|  | `disastri/sciame-di-droni.webp` | Sciame di droni · famiglia `sciame` | media | Sciame di droni: Il sistema di sicurezza lancia tutti i droni contro gli intrusi.. Arena «Stazione Orbitale» (Ossigeno limitato, droni e un reattore instabile). Palette: blu, ciano e acciaio con luci al neon. Formato 16:9. |
-|  | `disastri/esperimento-fuggito.webp` | Esperimento fuggito · famiglia `bestie` | media | Esperimento fuggito: Dal laboratorio scappa un esperimento genetico.. Arena «Stazione Orbitale» (Ossigeno limitato, droni e un reattore instabile). Palette: blu, ciano e acciaio con luci al neon. Formato 16:9. |
-|  | `disastri/navetta-impazzita.webp` | Navetta impazzita · famiglia `tech` | media | Navetta impazzita: Una navetta senza pilota sfreccia nell'Hangar.. Arena «Stazione Orbitale» (Ossigeno limitato, droni e un reattore instabile). Palette: blu, ciano e acciaio con luci al neon. Formato 16:9. |
-|  | `disastri/allucinazioni-da-isolamento.webp` | Allucinazioni da isolamento · famiglia `nebbia` | media | Allucinazioni da isolamento: Dopo giorni di buio e silenzio, tutti iniziano a vedere cose.. Arena «Stazione Orbitale» (Ossigeno limitato, droni e un reattore instabile). Palette: blu, ciano e acciaio con luci al neon. Formato 16:9. |
-|  | `disastri/campo-magnetico.webp` | Il campo magnetico · famiglia `fulmine` | media | Il campo magnetico: Il campo magnetico della stazione si inverte.. Arena «Stazione Orbitale» (Ossigeno limitato, droni e un reattore instabile). Palette: blu, ciano e acciaio con luci al neon. Formato 16:9. |
-|  | `disastri/infestazione.webp` | Infestazione · famiglia `tossico` | media | Infestazione: Delle creature simili a insetti escono dalle tubature.. Arena «Stazione Orbitale» (Ossigeno limitato, droni e un reattore instabile). Palette: blu, ciano e acciaio con luci al neon. Formato 16:9. |
-|  | `disastri/fuga-di-idrogeno.webp` | Fuga di idrogeno · famiglia `tech` | media | Fuga di idrogeno: Una fuga di idrogeno riempie i Moduli abitativi.. Arena «Stazione Orbitale» (Ossigeno limitato, droni e un reattore instabile). Palette: blu, ciano e acciaio con luci al neon. Formato 16:9. |
-|  | `disastri/sabotaggio.webp` | Sabotaggio · famiglia `tech` | media | Sabotaggio: Qualcuno ha sabotato i sistemi di supporto vitale.. Arena «Stazione Orbitale» (Ossigeno limitato, droni e un reattore instabile). Palette: blu, ciano e acciaio con luci al neon. Formato 16:9. |
-|  | `disastri/buco-nel-pavimento.webp` | Il buco nel pavimento · famiglia `terremoto` | media | Il buco nel pavimento: Il pavimento dell'Hangar si apre sullo spazio aperto.. Arena «Stazione Orbitale» (Ossigeno limitato, droni e un reattore instabile). Palette: blu, ciano e acciaio con luci al neon. Formato 16:9. |
-|  | `disastri/ia-si-innamora.webp` | L'IA si innamora · famiglia `tech` | media | L'IA si innamora: L'intelligenza artificiale della stazione si innamora di un concorrente e diventa gelosissima di tutti gli altri.. Arena «Stazione Orbitale» (Ossigeno limitato, droni e un reattore instabile). Palette: blu, ciano e acciaio con luci al neon. Formato 16:9. |
-|  | `disastri/bagno-quantico.webp` | Il bagno quantico · famiglia `acqua` | media | Il bagno quantico: Il bagno della stazione apre un varco su un universo parallelo.. Arena «Stazione Orbitale» (Ossigeno limitato, droni e un reattore instabile). Palette: blu, ciano e acciaio con luci al neon. Formato 16:9. |
-|  | `disastri/pioggia-di-bulloni.webp` | La pioggia di bulloni · famiglia `cielo` | media | La pioggia di bulloni: I sistemi di riparazione impazziscono e lanciano bulloni a velocità supersonica.. Arena «Stazione Orbitale» (Ossigeno limitato, droni e un reattore instabile). Palette: blu, ciano e acciaio con luci al neon. Formato 16:9. |
-|  | `disastri/alieni-turisti.webp` | Gli alieni turisti · famiglia `bestie` | media | Gli alieni turisti: Una navetta di turisti alieni attracca e comincia a "fare foto" con un flash che disintegra.. Arena «Stazione Orbitale» (Ossigeno limitato, droni e un reattore instabile). Palette: blu, ciano e acciaio con luci al neon. Formato 16:9. |
-|  | `disastri/gas-esilarante.webp` | Il gas esilarante · famiglia `tossico` | media | Il gas esilarante: Un guasto riempie le condotte di gas esilarante.. Arena «Stazione Orbitale» (Ossigeno limitato, droni e un reattore instabile). Palette: blu, ciano e acciaio con luci al neon. Formato 16:9. |
-|  | `disastri/spazzino.webp` | Lo spazzino · famiglia `tech` | media | Lo spazzino: Il robot spazzino della stazione decide che i concorrenti sono spazzatura.. Arena «Stazione Orbitale» (Ossigeno limitato, droni e un reattore instabile). Palette: blu, ciano e acciaio con luci al neon. Formato 16:9. |
-|  | `disastri/doccia-di-plasma.webp` | La doccia di plasma · famiglia `fuoco` | media | La doccia di plasma: Le docce dei Moduli abitativi erogano plasma invece di acqua.. Arena «Stazione Orbitale» (Ossigeno limitato, droni e un reattore instabile). Palette: blu, ciano e acciaio con luci al neon. Formato 16:9. |
-|  | `disastri/conto-alla-rovescia.webp` | Il conto alla rovescia · famiglia `esplosione` | media | Il conto alla rovescia: Una voce annuncia l'autodistruzione della stazione tra dieci minuti. Poi la annulla. Poi la riattiva.. Arena «Stazione Orbitale» (Ossigeno limitato, droni e un reattore instabile). Palette: blu, ciano e acciaio con luci al neon. Formato 16:9. |
-|  | `disastri/bozzolo.webp` | Il bozzolo · famiglia `sciame` | media | Il bozzolo: Qualcosa ha deposto bozzoli nei Condotti di servizio. Ora si aprono.. Arena «Stazione Orbitale» (Ossigeno limitato, droni e un reattore instabile). Palette: blu, ciano e acciaio con luci al neon. Formato 16:9. |
-|  | `disastri/musica-dattesa.webp` | La musica d'attesa · famiglia `spettacolo` | media | La musica d'attesa: L'IA mette in loop una musica d'attesa a volume massimo per diciotto ore.. Arena «Stazione Orbitale» (Ossigeno limitato, droni e un reattore instabile). Palette: blu, ciano e acciaio con luci al neon. Formato 16:9. |
-|  | `disastri/magnete-gigante.webp` | Il magnete gigante · famiglia `fulmine` | media | Il magnete gigante: Il reattore attiva un campo magnetico enorme. Tutto ciò che è metallo vola.. Arena «Stazione Orbitale» (Ossigeno limitato, droni e un reattore instabile). Palette: blu, ciano e acciaio con luci al neon. Formato 16:9. |
-|  | `disastri/cloni-difettosi.webp` | I cloni difettosi · famiglia `tech` | media | I cloni difettosi: La clonazione produce copie di tutti, ma leggermente sbagliate.. Arena «Stazione Orbitale» (Ossigeno limitato, droni e un reattore instabile). Palette: blu, ciano e acciaio con luci al neon. Formato 16:9. |
-|  | `disastri/lavanderia.webp` | La lavanderia · famiglia `acqua` | media | La lavanderia: La lavatrice industriale della stazione aspira chiunque passi vicino.. Arena «Stazione Orbitale» (Ossigeno limitato, droni e un reattore instabile). Palette: blu, ciano e acciaio con luci al neon. Formato 16:9. |
-|  | `disastri/tempesta-di-neutrini.webp` | La tempesta di neutrini · famiglia `fulmine` | media | La tempesta di neutrini: Una tempesta di neutrini attraversa la stazione. Nessuno sa bene cosa faccia.. Arena «Stazione Orbitale» (Ossigeno limitato, droni e un reattore instabile). Palette: blu, ciano e acciaio con luci al neon. Formato 16:9. |
-|  | `disastri/mercato-nero.webp` | Il mercato nero · famiglia `cassa` | media | Il mercato nero: Contrabbandieri alieni vendono armi per cibo. Alcuni pagano con la vita.. Arena «Stazione Orbitale» (Ossigeno limitato, droni e un reattore instabile). Palette: blu, ciano e acciaio con luci al neon. Formato 16:9. |
-|  | `disastri/uova.webp` | Le uova · famiglia `sciame` | media | Le uova: Nella Serra si schiudono uova di una specie sconosciuta. Le creature sono carine per circa due minuti.. Arena «Stazione Orbitale» (Ossigeno limitato, droni e un reattore instabile). Palette: blu, ciano e acciaio con luci al neon. Formato 16:9. |
-|  | `disastri/ascensore-impazzito.webp` | Ascensore impazzito · famiglia `terremoto` | media | Ascensore impazzito: Tutti gli ascensori della stazione salgono e scendono senza controllo.. Arena «Stazione Orbitale» (Ossigeno limitato, droni e un reattore instabile). Palette: blu, ciano e acciaio con luci al neon. Formato 16:9. |
-|  | `disastri/virus-dellamore.webp` | Il virus dell'amore · famiglia `tossico` · 18+ | bassa | Il virus dell'amore: Un virus alieno rende tutti irresistibilmente attratti dalla persona più vicina.. Arena «Stazione Orbitale» (Ossigeno limitato, droni e un reattore instabile). Palette: blu, ciano e acciaio con luci al neon. Formato 16:9. |
-|  | `disastri/esplosione-del-bagno.webp` | L'esplosione del bagno · famiglia `esplosione` · 18+ | bassa | L'esplosione del bagno: Lo scarico sottovuoto del bagno va in sovrapressione.. Arena «Stazione Orbitale» (Ossigeno limitato, droni e un reattore instabile). Palette: blu, ciano e acciaio con luci al neon. Formato 16:9. |
-|  | `disastri/carneficina-dei-droni.webp` | La carneficina dei droni · famiglia `sciame` · 18+ | bassa | La carneficina dei droni: I droni di sicurezza passano alla modalità "smembramento".. Arena «Stazione Orbitale» (Ossigeno limitato, droni e un reattore instabile). Palette: blu, ciano e acciaio con luci al neon. Formato 16:9. |
-|  | `disastri/pubblico-vota.webp` | Il pubblico vota · famiglia `spettacolo` | media | Il pubblico vota: Il pubblico vota in diretta chi colpire con un fulmine artificiale.. Arena «Stazione Orbitale» (Ossigeno limitato, droni e un reattore instabile). Palette: blu, ciano e acciaio con luci al neon. Formato 16:9. |
-|  | `disastri/pausa-pubblicitaria.webp` | La pausa pubblicitaria · famiglia `spettacolo` | media | La pausa pubblicitaria: Durante la pubblicità, gli organizzatori si dimenticano di sorvegliare le trappole.. Arena «Stazione Orbitale» (Ossigeno limitato, droni e un reattore instabile). Palette: blu, ciano e acciaio con luci al neon. Formato 16:9. |
-|  | `disastri/cambio-di-regia.webp` | Il cambio di regia · famiglia `spettacolo` | media | Il cambio di regia: Arriva un nuovo regista che vuole più azione.. Arena «Stazione Orbitale» (Ossigeno limitato, droni e un reattore instabile). Palette: blu, ciano e acciaio con luci al neon. Formato 16:9. |
-|  | `disastri/pioggia-di-coriandoli.webp` | La pioggia di coriandoli · famiglia `spettacolo` | media | La pioggia di coriandoli: Per festeggiare la metà della stagione, gli organizzatori fanno piovere coriandoli. Di vetro.. Arena «Stazione Orbitale» (Ossigeno limitato, droni e un reattore instabile). Palette: blu, ciano e acciaio con luci al neon. Formato 16:9. |
-|  | `disastri/ospite-speciale.webp` | L'ospite speciale · famiglia `spettacolo` | media | L'ospite speciale: Una celebrità entra nell'arena per un giorno, con una squadra di guardie del corpo armate.. Arena «Stazione Orbitale» (Ossigeno limitato, droni e un reattore instabile). Palette: blu, ciano e acciaio con luci al neon. Formato 16:9. |
-|  | `disastri/sponsor-ritirato.webp` | Lo sponsor ritirato · famiglia `spettacolo` | media | Lo sponsor ritirato: Uno sponsor si ritira e reclama indietro tutti i regali. Con i droni.. Arena «Stazione Orbitale» (Ossigeno limitato, droni e un reattore instabile). Palette: blu, ciano e acciaio con luci al neon. Formato 16:9. |
-|  | `disastri/gioco-a-quiz.webp` | Il gioco a quiz · famiglia `spettacolo` | media | Il gioco a quiz: Gli organizzatori interrompono tutto per un quiz di cultura generale. Chi sbaglia paga.. Arena «Stazione Orbitale» (Ossigeno limitato, droni e un reattore instabile). Palette: blu, ciano e acciaio con luci al neon. Formato 16:9. |
-|  | `disastri/sciopero-dei-tecnici.webp` | Lo sciopero dei tecnici · famiglia `spettacolo` | media | Lo sciopero dei tecnici: I tecnici dell'arena scioperano e nessuno controlla più i sistemi.. Arena «Stazione Orbitale» (Ossigeno limitato, droni e un reattore instabile). Palette: blu, ciano e acciaio con luci al neon. Formato 16:9. |
-|  | `disastri/replica.webp` | La replica · famiglia `spettacolo` | media | La replica: Per problemi tecnici, l'arena ripete il disastro di due giorni fa, ma più forte.. Arena «Stazione Orbitale» (Ossigeno limitato, droni e un reattore instabile). Palette: blu, ciano e acciaio con luci al neon. Formato 16:9. |
-|  | `disastri/giornata-dei-bambini.webp` | La giornata dei bambini · famiglia `spettacolo` | media | La giornata dei bambini: Gli organizzatori fanno disegnare le trappole del giorno ai bambini. Sono molto creativi.. Arena «Stazione Orbitale» (Ossigeno limitato, droni e un reattore instabile). Palette: blu, ciano e acciaio con luci al neon. Formato 16:9. |
-|  | `disastri/asta-dei-concorrenti.webp` | L'asta dei concorrenti · famiglia `spettacolo` | media | L'asta dei concorrenti: Il pubblico può comprare il diritto di decidere la sorte di un concorrente.. Arena «Stazione Orbitale» (Ossigeno limitato, droni e un reattore instabile). Palette: blu, ciano e acciaio con luci al neon. Formato 16:9. |
-|  | `disastri/terremoto-della-produzione.webp` | Il terremoto della produzione · famiglia `terremoto` | media | Il terremoto della produzione: Un camion della produzione si ribalta dentro l'arena e libera tutto quello che trasportava.. Arena «Stazione Orbitale» (Ossigeno limitato, droni e un reattore instabile). Palette: blu, ciano e acciaio con luci al neon. Formato 16:9. |
-|  | `disastri/blackout-delle-telecamere.webp` | Il blackout delle telecamere · famiglia `spettacolo` | media | Il blackout delle telecamere: Le telecamere si spengono per un'ora. Senza testimoni, le regole saltano.. Arena «Stazione Orbitale» (Ossigeno limitato, droni e un reattore instabile). Palette: blu, ciano e acciaio con luci al neon. Formato 16:9. |
-|  | `disastri/musica-a-tutto-volume.webp` | La musica a tutto volume · famiglia `spettacolo` | media | La musica a tutto volume: Gli organizzatori diffondono la stessa canzone estiva per ventiquattro ore.. Arena «Stazione Orbitale» (Ossigeno limitato, droni e un reattore instabile). Palette: blu, ciano e acciaio con luci al neon. Formato 16:9. |
-|  | `disastri/doppio-disastro.webp` | Il doppio disastro · famiglia `tech` | media | Il doppio disastro: Due disastri si attivano nello stesso momento per un errore di programmazione.. Arena «Stazione Orbitale» (Ossigeno limitato, droni e un reattore instabile). Palette: blu, ciano e acciaio con luci al neon. Formato 16:9. |
-|  | `disastri/maratona.webp` | La maratona · famiglia `spettacolo` | media | La maratona: Gli organizzatori obbligano tutti a correre per due ore. Chi si ferma viene punito.. Arena «Stazione Orbitale» (Ossigeno limitato, droni e un reattore instabile). Palette: blu, ciano e acciaio con luci al neon. Formato 16:9. |
-|  | `disastri/sondaggio-della-crudelta.webp` | Il sondaggio della crudeltà · famiglia `spettacolo` | media | Il sondaggio della crudeltà: Il pubblico vota il disastro più crudele. Vince "tutti insieme".. Arena «Stazione Orbitale» (Ossigeno limitato, droni e un reattore instabile). Palette: blu, ciano e acciaio con luci al neon. Formato 16:9. |
-|  | `disastri/invasione-dei-fan.webp` | L'invasione dei fan · famiglia `spettacolo` | media | L'invasione dei fan: Un gruppo di fan scavalca le recinzioni e invade l'arena per conoscere i propri idoli.. Arena «Stazione Orbitale» (Ossigeno limitato, droni e un reattore instabile). Palette: blu, ciano e acciaio con luci al neon. Formato 16:9. |
-|  | `disastri/gioco-delle-sedie.webp` | Il gioco delle sedie · famiglia `spettacolo` | media | Il gioco delle sedie: Gli organizzatori mettono al centro dell'arena una sedia in meno dei concorrenti. Chi resta in piedi viene punito.. Arena «Stazione Orbitale» (Ossigeno limitato, droni e un reattore instabile). Palette: blu, ciano e acciaio con luci al neon. Formato 16:9. |
-|  | `disastri/nebbia-delle-risate-registrate.webp` | La nebbia delle risate registrate · famiglia `spettacolo` | media | La nebbia delle risate registrate: Dagli altoparlanti partono risate registrate a ogni sfortuna. È psicologicamente devastante.. Arena «Stazione Orbitale» (Ossigeno limitato, droni e un reattore instabile). Palette: blu, ciano e acciaio con luci al neon. Formato 16:9. |
-|  | `disastri/notte-rossa.webp` | La notte rossa · famiglia `buio` · 18+ | bassa | La notte rossa: Gli organizzatori sospendono ogni regola per una notte: niente telecamere sui dettagli, niente limiti.. Arena «Stazione Orbitale» (Ossigeno limitato, droni e un reattore instabile). Palette: blu, ciano e acciaio con luci al neon. Formato 16:9. |
-|  | `disastri/bar-aperto.webp` | Il bar aperto · famiglia `festa` · 18+ | bassa | Il bar aperto: Un bar con alcol illimitato compare nel mezzo dell'arena. Gratis, per un'ora.. Arena «Stazione Orbitale» (Ossigeno limitato, droni e un reattore instabile). Palette: blu, ciano e acciaio con luci al neon. Formato 16:9. |
-|  | `disastri/pioggia-di-sangue.webp` | La pioggia di sangue · famiglia `cielo` · 18+ | bassa | La pioggia di sangue: Una pioggia di sangue animale cade sull'arena per motivi puramente estetici.. Arena «Stazione Orbitale» (Ossigeno limitato, droni e un reattore instabile). Palette: blu, ciano e acciaio con luci al neon. Formato 16:9. |
-|  | `disastri/spettacolo-del-pudore.webp` | Lo spettacolo del pudore · famiglia `tech` · 18+ | bassa | Lo spettacolo del pudore: Gli organizzatori fanno sparire tutti i vestiti dei concorrenti per un giorno.. Arena «Stazione Orbitale» (Ossigeno limitato, droni e un reattore instabile). Palette: blu, ciano e acciaio con luci al neon. Formato 16:9. |
-|  | `disastri/spore-del-desiderio.webp` | Le spore del desiderio · famiglia `festa` · 18+ | bassa | Le spore del desiderio: Le spore di un fungo rendono tutti irresistibilmente attratti dalla persona più vicina.. Arena «Stazione Orbitale» (Ossigeno limitato, droni e un reattore instabile). Palette: blu, ciano e acciaio con luci al neon. Formato 16:9. |
-|  | `disastri/macello.webp` | Il macello · famiglia `sangue` · 18+ | bassa | Il macello: Gli organizzatori aprono le gabbie di tutti i mostri insieme e chiamano l'evento "Il macello". Il nome è accurato.. Arena «Stazione Orbitale» (Ossigeno limitato, droni e un reattore instabile). Palette: blu, ciano e acciaio con luci al neon. Formato 16:9. |
-|  | `disastri/falla-nello-scafo.webp` | La falla nello scafo · famiglia `terremoto` | media | La falla nello scafo: Un modulo intero si apre verso lo spazio.. Arena «Stazione Orbitale» (Ossigeno limitato, droni e un reattore instabile). Palette: blu, ciano e acciaio con luci al neon. Formato 16:9. |
-|  | `disastri/intelligenza-artificiale-ribelle.webp` | L'intelligenza artificiale ribelle · famiglia `tech` | media | L'intelligenza artificiale ribelle: Il computer di bordo decide che gli esseri umani sono un errore di sistema.. Arena «Stazione Orbitale» (Ossigeno limitato, droni e un reattore instabile). Palette: blu, ciano e acciaio con luci al neon. Formato 16:9. |
-|  | `disastri/sciame-di-nanobot.webp` | Lo sciame di nanobot · famiglia `sciame` | media | Lo sciame di nanobot: Nanobot difettosi si diffondono nei condotti mangiando tutto quello che trovano.. Arena «Stazione Orbitale» (Ossigeno limitato, droni e un reattore instabile). Palette: blu, ciano e acciaio con luci al neon. Formato 16:9. |
-|  | `disastri/gravita-invertita.webp` | La gravità invertita · famiglia `terremoto` | media | La gravità invertita: La gravità della stazione si inverte all'improvviso.. Arena «Stazione Orbitale» (Ossigeno limitato, droni e un reattore instabile). Palette: blu, ciano e acciaio con luci al neon. Formato 16:9. |
-|  | `disastri/reattore-in-surriscaldamento.webp` | Il reattore in surriscaldamento · famiglia `fuoco` | media | Il reattore in surriscaldamento: Il Reattore va in sovraccarico: le temperature salgono.. Arena «Stazione Orbitale» (Ossigeno limitato, droni e un reattore instabile). Palette: blu, ciano e acciaio con luci al neon. Formato 16:9. |
-|  | `disastri/invasione-di-spore.webp` | L'invasione di spore · famiglia `tossico` | media | L'invasione di spore: Una pianta aliena della Serra libera spore in tutta la stazione.. Arena «Stazione Orbitale» (Ossigeno limitato, droni e un reattore instabile). Palette: blu, ciano e acciaio con luci al neon. Formato 16:9. |
-|  | `disastri/asteroide.webp` | L'asteroide · famiglia `cielo` | media | L'asteroide: Un asteroide si schianta contro i Moduli abitativi.. Arena «Stazione Orbitale» (Ossigeno limitato, droni e un reattore instabile). Palette: blu, ciano e acciaio con luci al neon. Formato 16:9. |
+<details><summary>Prompt completo, pronto da incollare</summary>
 
-### Oggetti (1:1, 512×512, sfondo trasparente)
+```text
+A vast spaceship hangar with a docked shuttle, cargo containers and an open bay door showing the stars. Cold blue and cyan neon on brushed steel with red warning lights, orbital space station. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Wide 16:9 establishing shot of the location, no people, eye-level view, the key landmark inside the central third of the frame, soft depth fog in the background. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
+```
 
-| | File | Soggetto | Priorità | Traccia |
-| --- | --- | --- | --- | --- |
-|  | `oggetti/arma.webp` | Arma | alta | Arma: Più forza negli scontri, in base alla qualità (★). Si consuma a ogni colpo e alla fine si rompe; con un attrezzo si può riparare. Chi è ingegnoso può intingerla nel veleno.. Arena «Stazione Orbitale» (Ossigeno limitato, droni e un reattore instabile). Palette: blu, ciano e acciaio con luci al neon. Formato 1:1. Sfondo trasparente. |
-|  | `oggetti/armatura.webp` | Protezione (per esempio tuta corazzata, scudo energetico portatile) | alta | Protezione (per esempio tuta corazzata, scudo energetico portatile): Riduce i danni e a volte para un colpo mortale. Si consuma a ogni colpo incassato.. Arena «Stazione Orbitale» (Ossigeno limitato, droni e un reattore instabile). Palette: blu, ciano e acciaio con luci al neon. Formato 1:1. Sfondo trasparente. |
-|  | `oggetti/med.webp` | Cure | alta | Cure: Si usa da soli o sugli alleati: richiude le ferite gravi, ferma veleni e infezioni presi in tempo, abbassa l'indicatore dell'arena.. Arena «Stazione Orbitale» (Ossigeno limitato, droni e un reattore instabile). Palette: blu, ciano e acciaio con luci al neon. Formato 1:1. Sfondo trasparente. |
-|  | `oggetti/cibo.webp` | Cibo | alta | Cibo: Si mangia quando la sazietà cala. Si può dividere con gli alleati, regalare o scambiare.. Arena «Stazione Orbitale» (Ossigeno limitato, droni e un reattore instabile). Palette: blu, ciano e acciaio con luci al neon. Formato 1:1. Sfondo trasparente. |
-|  | `oggetti/attrezzo.webp` | Attrezzo (per esempio multiattrezzo, torcia al plasma) | alta | Attrezzo (per esempio multiattrezzo, torcia al plasma): Più cibo trovato, fughe più facili da tempeste e trappole, difesa migliore di notte, armi riparate.. Arena «Stazione Orbitale» (Ossigeno limitato, droni e un reattore instabile). Palette: blu, ciano e acciaio con luci al neon. Formato 1:1. Sfondo trasparente. |
-|  | `oggetti/mappa.webp` | Mappa | alta | Mappa: Più cibo, meno disastri, trappole scoperte in anticipo e vie di fuga sicure.. Arena «Stazione Orbitale» (Ossigeno limitato, droni e un reattore instabile). Palette: blu, ciano e acciaio con luci al neon. Formato 1:1. Sfondo trasparente. |
-|  | `oggetti/trap.webp` | Trappola | alta | Trappola: Di notte chi la sa usare la piazza nella sua zona. Chi ci passa rischia grosso, e l'uccisione va a chi l'ha piazzata.. Arena «Stazione Orbitale» (Ossigeno limitato, droni e un reattore instabile). Palette: blu, ciano e acciaio con luci al neon. Formato 1:1. Sfondo trasparente. |
-|  | `oggetti/esplosivo.webp` | Esplosivo | alta | Esplosivo: Più forza negli scontri. Chi è ingegnoso ci costruisce trappole esplosive. Da ubriachi è un pessimo compagno.. Arena «Stazione Orbitale» (Ossigeno limitato, droni e un reattore instabile). Palette: blu, ciano e acciaio con luci al neon. Formato 1:1. Sfondo trasparente. |
-|  | `oggetti/veleno.webp` | Veleno | alta | Veleno: Apre la strada agli avvelenamenti; chi è ingegnoso ci intinge l'arma, che poi avvelena a ogni colpo.. Arena «Stazione Orbitale» (Ossigeno limitato, droni e un reattore instabile). Palette: blu, ciano e acciaio con luci al neon. Formato 1:1. Sfondo trasparente. |
-|  | `oggetti/amuleto.webp` | Portafortuna | alta | Portafortuna: Può evitare una morte diretta narrata da un evento: probabilità 85%, certa per chi è superstizioso. Si consuma quando salva. Non ferma i danni periodici di fame, malattie e ferite. Calma Terrore e Corruzione.. Arena «Stazione Orbitale» (Ossigeno limitato, droni e un reattore instabile). Palette: blu, ciano e acciaio con luci al neon. Formato 1:1. Sfondo trasparente. |
-|  | `oggetti/alcol.webp` | Alcol (per esempio bottiglia di vodka sintetica) | alta | Alcol (per esempio bottiglia di vodka sintetica): Scalda, fa dimenticare, disinfetta le ferite infette. E ubriaca.. Arena «Stazione Orbitale» (Ossigeno limitato, droni e un reattore instabile). Palette: blu, ciano e acciaio con luci al neon. Formato 1:1. Sfondo trasparente. |
-|  | `oggetti/valore.webp` | Merce di scambio (per esempio chiavetta di crediti, chip di accesso dorato) | alta | Merce di scambio (per esempio chiavetta di crediti, chip di accesso dorato): Non serve a niente, tranne che a comprare cibo e cure da chi ne ha.. Arena «Stazione Orbitale» (Ossigeno limitato, droni e un reattore instabile). Palette: blu, ciano e acciaio con luci al neon. Formato 1:1. Sfondo trasparente. |
-|  | `oggetti/ricordo.webp` | Ricordo (per esempio foto di famiglia, lettera mai spedita) | alta | Ricordo (per esempio foto di famiglia, lettera mai spedita): Un pezzo di casa: ogni notte tiene su il morale. Se è di qualcuno che non c'è più, ancora di più.. Arena «Stazione Orbitale» (Ossigeno limitato, droni e un reattore instabile). Palette: blu, ciano e acciaio con luci al neon. Formato 1:1. Sfondo trasparente. |
+</details>
+
+#### Serra idroponica
+
+- **File**: `assets/arene/scifi/luoghi/serra-idroponica.webp`
+- **Cosa mostrare**: Modulo serra idroponica: file di piante sotto luci viola, tubi d'acqua e una cupola di vetro.
+
+**Prompt**
+
+```text
+A hydroponic greenhouse module, rows of plants under purple grow lights, water pipes and a glass dome.
+```
+
+<details><summary>Prompt completo, pronto da incollare</summary>
+
+```text
+A hydroponic greenhouse module, rows of plants under purple grow lights, water pipes and a glass dome. Cold blue and cyan neon on brushed steel with red warning lights, orbital space station. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Wide 16:9 establishing shot of the location, no people, eye-level view, the key landmark inside the central third of the frame, soft depth fog in the background. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
+```
+
+</details>
+
+#### Reattore
+
+- **File**: `assets/arene/scifi/luoghi/reattore.webp`
+- **Cosa mostrare**: Il nucleo del reattore: una sfera ciano incandescente dentro un anello d'acciaio, passerelle e luci d'allarme.
+
+**Prompt**
+
+```text
+The station's reactor core, a glowing cyan sphere inside a steel ring, catwalks and warning lights.
+```
+
+<details><summary>Prompt completo, pronto da incollare</summary>
+
+```text
+The station's reactor core, a glowing cyan sphere inside a steel ring, catwalks and warning lights. Cold blue and cyan neon on brushed steel with red warning lights, orbital space station. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Wide 16:9 establishing shot of the location, no people, eye-level view, the key landmark inside the central third of the frame, soft depth fog in the background. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
+```
+
+</details>
+
+#### Ponte di comando
+
+- **File**: `assets/arene/scifi/luoghi/ponte-di-comando.webp`
+- **Cosa mostrare**: Ponte di comando con console olografiche curve e una vetrata enorme sulla Terra.
+
+**Prompt**
+
+```text
+The command bridge with curved holographic consoles and a huge window looking down on Earth.
+```
+
+<details><summary>Prompt completo, pronto da incollare</summary>
+
+```text
+The command bridge with curved holographic consoles and a huge window looking down on Earth. Cold blue and cyan neon on brushed steel with red warning lights, orbital space station. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Wide 16:9 establishing shot of the location, no people, eye-level view, the key landmark inside the central third of the frame, soft depth fog in the background. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
+```
+
+</details>
+
+#### Moduli abitativi
+
+- **File**: `assets/arene/scifi/luoghi/moduli-abitativi.webp`
+- **Cosa mostrare**: Moduli dell'equipaggio stretti: cuccette, armadietti e un piccolo oblò rotondo.
+
+**Prompt**
+
+```text
+Cramped crew living modules with bunks, personal lockers and a small round porthole.
+```
+
+<details><summary>Prompt completo, pronto da incollare</summary>
+
+```text
+Cramped crew living modules with bunks, personal lockers and a small round porthole. Cold blue and cyan neon on brushed steel with red warning lights, orbital space station. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Wide 16:9 establishing shot of the location, no people, eye-level view, the key landmark inside the central third of the frame, soft depth fog in the background. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
+```
+
+</details>
+
+#### Condotti di servizio
+
+- **File**: `assets/arene/scifi/luoghi/condotti-di-servizio.webp`
+- **Cosa mostrare**: Condotti di servizio angusti con cavi, sfiati di vapore e luci d'emergenza tremolanti.
+
+**Prompt**
+
+```text
+Narrow service ducts packed with cables, steam vents and flickering red emergency lights.
+```
+
+<details><summary>Prompt completo, pronto da incollare</summary>
+
+```text
+Narrow service ducts packed with cables, steam vents and flickering red emergency lights. Cold blue and cyan neon on brushed steel with red warning lights, orbital space station. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Wide 16:9 establishing shot of the location, no people, eye-level view, the key landmark inside the central third of the frame, soft depth fog in the background. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
+```
+
+</details>
+
+### Pericoli · Stazione Orbitale (4:3, 960 × 720 px, sfondo pieno e scuro)
+
+#### Drone di sicurezza impazzito
+
+- **File**: `assets/arene/scifi/pericoli/drone-di-sicurezza-impazzito.webp`
+- **Cosa mostrare**: Drone di sicurezza fuori controllo con un solo occhio rosso e rotori danneggiati che sprizzano scintille.
+
+**Prompt**
+
+```text
+A rogue security drone with a single red eye and damaged rotors throwing sparks.
+```
+
+<details><summary>Prompt completo, pronto da incollare</summary>
+
+```text
+A rogue security drone with a single red eye and damaged rotors throwing sparks. Cold blue and cyan neon on brushed steel with red warning lights, orbital space station. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. 4:3 wanted-poster portrait, single threat centered and facing the viewer, head and eyes in the upper middle of the frame, dark vignetted background that fades to near black at the edges. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
+```
+
+</details>
+
+#### Sciame di nanobot
+
+- **File**: `assets/arene/scifi/pericoli/sciame-di-nanobot.webp`
+- **Cosa mostrare**: Sciame argentato di nanobot che si avvita formando una sagoma minacciosa.
+
+**Prompt**
+
+```text
+A swirling silver swarm of nanobots forming a menacing face-like shape.
+```
+
+<details><summary>Prompt completo, pronto da incollare</summary>
+
+```text
+A swirling silver swarm of nanobots forming a menacing face-like shape. Cold blue and cyan neon on brushed steel with red warning lights, orbital space station. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. 4:3 wanted-poster portrait, single threat centered and facing the viewer, head and eyes in the upper middle of the frame, dark vignetted background that fades to near black at the edges. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
+```
+
+</details>
+
+#### Creatura aliena dai tentacoli
+
+- **File**: `assets/arene/scifi/pericoli/creatura-aliena-dai-tentacoli.webp`
+- **Cosa mostrare**: Creatura aliena con tentacoli lucidi e macchie bioluminescenti che esce da una grata.
+
+**Prompt**
+
+```text
+An alien creature with glossy tentacles and bioluminescent spots squeezing out of a vent grate.
+```
+
+<details><summary>Prompt completo, pronto da incollare</summary>
+
+```text
+An alien creature with glossy tentacles and bioluminescent spots squeezing out of a vent grate. Cold blue and cyan neon on brushed steel with red warning lights, orbital space station. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. 4:3 wanted-poster portrait, single threat centered and facing the viewer, head and eyes in the upper middle of the frame, dark vignetted background that fades to near black at the edges. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
+```
+
+</details>
+
+#### Androide da combattimento
+
+- **File**: `assets/arene/scifi/pericoli/androide-da-combattimento.webp`
+- **Cosa mostrare**: Androide da combattimento corazzato, visore acceso, pelle sintetica strappata.
+
+**Prompt**
+
+```text
+A battle android with an armoured chassis, glowing visor and torn synthetic skin.
+```
+
+<details><summary>Prompt completo, pronto da incollare</summary>
+
+```text
+A battle android with an armoured chassis, glowing visor and torn synthetic skin. Cold blue and cyan neon on brushed steel with red warning lights, orbital space station. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. 4:3 wanted-poster portrait, single threat centered and facing the viewer, head and eyes in the upper middle of the frame, dark vignetted background that fades to near black at the edges. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
+```
+
+</details>
+
+### Armi · Stazione Orbitale (1:1, 512 × 512 px, sfondo trasparente)
+
+#### Fucile al plasma
+
+- **File**: `assets/arene/scifi/armi/fucile-al-plasma.webp`
+- **Cosa mostrare**: Fucile al plasma affusolato con celle d'energia ciano.
+
+**Prompt**
+
+```text
+A sleek plasma rifle with glowing cyan energy cells.
+```
+
+<details><summary>Prompt completo, pronto da incollare</summary>
+
+```text
+A sleek plasma rifle with glowing cyan energy cells. Cold blue and cyan neon on brushed steel with red warning lights, orbital space station. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Single object only, isolated on a fully transparent background, square 1:1, three-quarter view laid diagonally from lower left to upper right, 12% empty margin on every side, crisp silhouette with a thin dark outline so it reads on both light and dark backgrounds, no hands, no shadow on the ground. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
+```
+
+</details>
+
+#### Lama vibrante
+
+- **File**: `assets/arene/scifi/armi/lama-vibrante.webp`
+- **Cosa mostrare**: Lama vibrante con il filo traslucido che ronza.
+
+**Prompt**
+
+```text
+A vibro-blade with a humming translucent edge and a ribbed grip.
+```
+
+<details><summary>Prompt completo, pronto da incollare</summary>
+
+```text
+A vibro-blade with a humming translucent edge and a ribbed grip. Cold blue and cyan neon on brushed steel with red warning lights, orbital space station. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Single object only, isolated on a fully transparent background, square 1:1, three-quarter view laid diagonally from lower left to upper right, 12% empty margin on every side, crisp silhouette with a thin dark outline so it reads on both light and dark backgrounds, no hands, no shadow on the ground. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
+```
+
+</details>
+
+#### Pistola laser
+
+- **File**: `assets/arene/scifi/armi/pistola-laser.webp`
+- **Cosa mostrare**: Pistola laser compatta con emettitore rosso.
+
+**Prompt**
+
+```text
+A compact laser pistol with a red emitter tip.
+```
+
+<details><summary>Prompt completo, pronto da incollare</summary>
+
+```text
+A compact laser pistol with a red emitter tip. Cold blue and cyan neon on brushed steel with red warning lights, orbital space station. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Single object only, isolated on a fully transparent background, square 1:1, three-quarter view laid diagonally from lower left to upper right, 12% empty margin on every side, crisp silhouette with a thin dark outline so it reads on both light and dark backgrounds, no hands, no shadow on the ground. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
+```
+
+</details>
+
+#### Granata EMP
+
+- **File**: `assets/arene/scifi/armi/granata-emp.webp`
+- **Cosa mostrare**: Granata EMP sferica con archi elettrici blu.
+
+**Prompt**
+
+```text
+A spherical EMP grenade with crackling blue electric arcs.
+```
+
+<details><summary>Prompt completo, pronto da incollare</summary>
+
+```text
+A spherical EMP grenade with crackling blue electric arcs. Cold blue and cyan neon on brushed steel with red warning lights, orbital space station. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Single object only, isolated on a fully transparent background, square 1:1, three-quarter view laid diagonally from lower left to upper right, 12% empty margin on every side, crisp silhouette with a thin dark outline so it reads on both light and dark backgrounds, no hands, no shadow on the ground. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
+```
+
+</details>
+
+#### Frusta monofilamento
+
+- **File**: `assets/arene/scifi/armi/frusta-monofilamento.webp`
+- **Cosa mostrare**: Frusta a monofilamento: impugnatura metallica e un filo luminoso quasi invisibile.
+
+**Prompt**
+
+```text
+A monofilament whip, a metal handle with a nearly invisible glowing line coiled around it.
+```
+
+<details><summary>Prompt completo, pronto da incollare</summary>
+
+```text
+A monofilament whip, a metal handle with a nearly invisible glowing line coiled around it. Cold blue and cyan neon on brushed steel with red warning lights, orbital space station. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Single object only, isolated on a fully transparent background, square 1:1, three-quarter view laid diagonally from lower left to upper right, 12% empty margin on every side, crisp silhouette with a thin dark outline so it reads on both light and dark backgrounds, no hands, no shadow on the ground. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
+```
+
+</details>
+
+#### Taser a impulsi
+
+- **File**: `assets/arene/scifi/armi/taser-a-impulsi.webp`
+- **Cosa mostrare**: Taser a impulsi con elettrodi che crepitano.
+
+**Prompt**
+
+```text
+A pulse taser with crackling electrodes.
+```
+
+<details><summary>Prompt completo, pronto da incollare</summary>
+
+```text
+A pulse taser with crackling electrodes. Cold blue and cyan neon on brushed steel with red warning lights, orbital space station. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Single object only, isolated on a fully transparent background, square 1:1, three-quarter view laid diagonally from lower left to upper right, 12% empty margin on every side, crisp silhouette with a thin dark outline so it reads on both light and dark backgrounds, no hands, no shadow on the ground. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
+```
+
+</details>
+
+#### Cannone a rotaia portatile
+
+- **File**: `assets/arene/scifi/armi/cannone-a-rotaia-portatile.webp`
+- **Cosa mostrare**: Cannone a rotaia portatile con binari magnetici e calcio pesante.
+
+**Prompt**
+
+```text
+A portable railgun with twin magnetic rails and a heavy stock.
+```
+
+<details><summary>Prompt completo, pronto da incollare</summary>
+
+```text
+A portable railgun with twin magnetic rails and a heavy stock. Cold blue and cyan neon on brushed steel with red warning lights, orbital space station. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Single object only, isolated on a fully transparent background, square 1:1, three-quarter view laid diagonally from lower left to upper right, 12% empty margin on every side, crisp silhouette with a thin dark outline so it reads on both light and dark backgrounds, no hands, no shadow on the ground. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
+```
+
+</details>
+
+---
 
 ## Città degli Infetti
 
-Cartella: `assets/arene/zombie/`. Palette: verdi malati, grigi e ruggine di città abbandonata.
+Ospedali vuoti, orde affamate e radio gracchianti.
 
-### Luoghi (16:9, 1280×720, sfondo pieno)
+- **Cartella**: `assets/arene/zombie/` (con le sottocartelle `luoghi/`, `pericoli/`, `armi/`)
+- **Riferimento di stile**: `assets/arene/zombie.webp`
+- **Atmosfera**: Città abbandonata dopo il contagio: verdi malati, grigi, ruggine, cielo coperto, luci tremolanti. Inquietante più che splatter.
+- **Stile da aggiungere a ogni prompt di questa arena** (è già incluso nei prompt completi):
 
-| | File | Soggetto | Priorità | Traccia |
-| --- | --- | --- | --- | --- |
-|  | `luoghi/ospedale.webp` | Ospedale | alta | Ospedale: il luogo dell'arena visto da vicino. Arena «Città degli Infetti» (Ospedali vuoti, orde affamate e radio gracchianti). Palette: verdi malati, grigi e ruggine di città abbandonata. Formato 16:9. |
-|  | `luoghi/centro-commerciale.webp` | Centro commerciale | alta | Centro commerciale: il luogo dell'arena visto da vicino. Arena «Città degli Infetti» (Ospedali vuoti, orde affamate e radio gracchianti). Palette: verdi malati, grigi e ruggine di città abbandonata. Formato 16:9. |
-|  | `luoghi/metropolitana.webp` | Metropolitana | alta | Metropolitana: il luogo dell'arena visto da vicino. Arena «Città degli Infetti» (Ospedali vuoti, orde affamate e radio gracchianti). Palette: verdi malati, grigi e ruggine di città abbandonata. Formato 16:9. |
-|  | `luoghi/scuola.webp` | Scuola | alta | Scuola: il luogo dell'arena visto da vicino. Arena «Città degli Infetti» (Ospedali vuoti, orde affamate e radio gracchianti). Palette: verdi malati, grigi e ruggine di città abbandonata. Formato 16:9. |
-|  | `luoghi/stazione-di-polizia.webp` | Stazione di polizia | alta | Stazione di polizia: il luogo dell'arena visto da vicino. Arena «Città degli Infetti» (Ospedali vuoti, orde affamate e radio gracchianti). Palette: verdi malati, grigi e ruggine di città abbandonata. Formato 16:9. |
-|  | `luoghi/periferia.webp` | Periferia | alta | Periferia: il luogo dell'arena visto da vicino. Arena «Città degli Infetti» (Ospedali vuoti, orde affamate e radio gracchianti). Palette: verdi malati, grigi e ruggine di città abbandonata. Formato 16:9. |
+```text
+Sickly green, grey and rust palette under an overcast sky, abandoned post-outbreak city. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours.
+```
 
-### Pericoli (4:3, 960×720, sfondo pieno, scuro)
+Più, a seconda della sezione:
 
-| | File | Soggetto | Priorità | Traccia |
-| --- | --- | --- | --- | --- |
-|  | `pericoli/orda-di-zombi.webp` | Orda di zombi | alta | Orda di zombi: creatura o minaccia pronta ad attaccare. Arena «Città degli Infetti» (Ospedali vuoti, orde affamate e radio gracchianti). Palette: verdi malati, grigi e ruggine di città abbandonata. Formato 4:3. |
-|  | `pericoli/infetto-corridore.webp` | Infetto corridore | alta | Infetto corridore: creatura o minaccia pronta ad attaccare. Arena «Città degli Infetti» (Ospedali vuoti, orde affamate e radio gracchianti). Palette: verdi malati, grigi e ruggine di città abbandonata. Formato 4:3. |
-|  | `pericoli/cane-infetto.webp` | Cane infetto | alta | Cane infetto: creatura o minaccia pronta ad attaccare. Arena «Città degli Infetti» (Ospedali vuoti, orde affamate e radio gracchianti). Palette: verdi malati, grigi e ruggine di città abbandonata. Formato 4:3. |
-|  | `pericoli/gigante-mutato.webp` | Gigante mutato | alta | Gigante mutato: creatura o minaccia pronta ad attaccare. Arena «Città degli Infetti» (Ospedali vuoti, orde affamate e radio gracchianti). Palette: verdi malati, grigi e ruggine di città abbandonata. Formato 4:3. |
+- Luoghi: `Wide 16:9 establishing shot of the location, no people, eye-level view, the key landmark inside the central third of the frame, soft depth fog in the background.`
+- Pericoli: `4:3 wanted-poster portrait, single threat centered and facing the viewer, head and eyes in the upper middle of the frame, dark vignetted background that fades to near black at the edges.`
+- Armi: `Single object only, isolated on a fully transparent background, square 1:1, three-quarter view laid diagonally from lower left to upper right, 12% empty margin on every side, crisp silhouette with a thin dark outline so it reads on both light and dark backgrounds, no hands, no shadow on the ground.`
+- Sempre: `No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.`
 
-### Armi (1:1, 512×512, sfondo trasparente)
+### Luoghi · Città degli Infetti (16:9, 1280 × 720 px, sfondo pieno)
 
-| | File | Soggetto | Priorità | Traccia |
-| --- | --- | --- | --- | --- |
-|  | `armi/mazza-chiodata.webp` | Mazza chiodata | media | Mazza chiodata: arma o oggetto usato come arma. Arena «Città degli Infetti» (Ospedali vuoti, orde affamate e radio gracchianti). Palette: verdi malati, grigi e ruggine di città abbandonata. Formato 1:1. Sfondo trasparente. |
-|  | `armi/fucile-a-pompa.webp` | Fucile a pompa | media | Fucile a pompa: arma o oggetto usato come arma. Arena «Città degli Infetti» (Ospedali vuoti, orde affamate e radio gracchianti). Palette: verdi malati, grigi e ruggine di città abbandonata. Formato 1:1. Sfondo trasparente. |
-|  | `armi/piede-di-porco.webp` | Piede di porco | media | Piede di porco: arma o oggetto usato come arma. Arena «Città degli Infetti» (Ospedali vuoti, orde affamate e radio gracchianti). Palette: verdi malati, grigi e ruggine di città abbandonata. Formato 1:1. Sfondo trasparente. |
-|  | `armi/motosega.webp` | Motosega | media | Motosega: arma o oggetto usato come arma. Arena «Città degli Infetti» (Ospedali vuoti, orde affamate e radio gracchianti). Palette: verdi malati, grigi e ruggine di città abbandonata. Formato 1:1. Sfondo trasparente. |
-|  | `armi/katana.webp` | Katana | media | Katana: arma o oggetto usato come arma. Arena «Città degli Infetti» (Ospedali vuoti, orde affamate e radio gracchianti). Palette: verdi malati, grigi e ruggine di città abbandonata. Formato 1:1. Sfondo trasparente. |
-|  | `armi/balestra.webp` | Balestra | media | Balestra: arma o oggetto usato come arma. Arena «Città degli Infetti» (Ospedali vuoti, orde affamate e radio gracchianti). Palette: verdi malati, grigi e ruggine di città abbandonata. Formato 1:1. Sfondo trasparente. |
-|  | `armi/pistola.webp` | Pistola | media | Pistola: arma o oggetto usato come arma. Arena «Città degli Infetti» (Ospedali vuoti, orde affamate e radio gracchianti). Palette: verdi malati, grigi e ruggine di città abbandonata. Formato 1:1. Sfondo trasparente. |
-|  | `armi/accetta.webp` | Accetta | media | Accetta: arma o oggetto usato come arma. Arena «Città degli Infetti» (Ospedali vuoti, orde affamate e radio gracchianti). Palette: verdi malati, grigi e ruggine di città abbandonata. Formato 1:1. Sfondo trasparente. |
+#### Ospedale
 
-### Meteo (16:10, 1200×750, sfondo pieno)
+- **File**: `assets/arene/zombie/luoghi/ospedale.webp`
+- **Cosa mostrare**: Corridoio d'ospedale abbandonato con barelle rovesciate, luci tremolanti e porte barricate.
 
-| | File | Soggetto | Priorità | Traccia |
-| --- | --- | --- | --- | --- |
-|  | `meteo/orda-in-migrazione.webp` | Orda in migrazione | alta | Orda in migrazione: Migliaia di infetti attraversano la città. Meglio non fare rumore.. Arena «Città degli Infetti» (Ospedali vuoti, orde affamate e radio gracchianti). Palette: verdi malati, grigi e ruggine di città abbandonata. Formato 16:10. |
-|  | `meteo/pioggia-acida.webp` | Pioggia acida | alta | Pioggia acida: L'acqua brucia e copre l'odore dei vivi.. Arena «Città degli Infetti» (Ospedali vuoti, orde affamate e radio gracchianti). Palette: verdi malati, grigi e ruggine di città abbandonata. Formato 16:10. |
-|  | `meteo/silenzio-inquietante.webp` | Silenzio inquietante | alta | Silenzio inquietante: Non si sente un lamento. Nessuno sa se sia un buon segno.. Arena «Città degli Infetti» (Ospedali vuoti, orde affamate e radio gracchianti). Palette: verdi malati, grigi e ruggine di città abbandonata. Formato 16:10. |
-|  | `meteo/lancio-di-provviste.webp` | Lancio di provviste | alta | Lancio di provviste: Un aereo militare sgancia casse sui tetti.. Arena «Città degli Infetti» (Ospedali vuoti, orde affamate e radio gracchianti). Palette: verdi malati, grigi e ruggine di città abbandonata. Formato 16:10. |
-|  | `meteo/blackout-cittadino.webp` | Blackout cittadino | alta | Blackout cittadino: La rete elettrica cede: buio totale.. Arena «Città degli Infetti» (Ospedali vuoti, orde affamate e radio gracchianti). Palette: verdi malati, grigi e ruggine di città abbandonata. Formato 16:10. |
-|  | `meteo/caldo-afoso.webp` | Caldo afoso | alta | Caldo afoso: Il caldo accelera tutto: la fame, la sete, la decomposizione.. Arena «Città degli Infetti» (Ospedali vuoti, orde affamate e radio gracchianti). Palette: verdi malati, grigi e ruggine di città abbandonata. Formato 16:10. |
-|  | `meteo/nebbia-del-porto.webp` | Nebbia del porto | alta | Nebbia del porto: Una nebbia densa sale dal mare e nasconde vivi e morti.. Arena «Città degli Infetti» (Ospedali vuoti, orde affamate e radio gracchianti). Palette: verdi malati, grigi e ruggine di città abbandonata. Formato 16:10. |
-|  | `meteo/trasmissione-radio.webp` | Trasmissione radio | alta | Trasmissione radio: Una radio annuncia un rifugio sicuro. Forse è vero.. Arena «Città degli Infetti» (Ospedali vuoti, orde affamate e radio gracchianti). Palette: verdi malati, grigi e ruggine di città abbandonata. Formato 16:10. |
-|  | `meteo/notte-dei-lamenti.webp` | Notte dei lamenti | alta | Notte dei lamenti: L'orda geme tutta la notte. Nessuno dorme.. Arena «Città degli Infetti» (Ospedali vuoti, orde affamate e radio gracchianti). Palette: verdi malati, grigi e ruggine di città abbandonata. Formato 16:10. |
+**Prompt**
 
-### Disastri (16:9, 1280×720, sfondo pieno)
+```text
+An abandoned hospital corridor with overturned gurneys, flickering lights and barricaded doors.
+```
 
-| | File | Soggetto | Priorità | Traccia |
-| --- | --- | --- | --- | --- |
-|  | `disastri/grande-orda.webp` | La grande orda · famiglia `bestie` | alta | La grande orda: Migliaia di infetti attraversano la città in un'unica marea.. Arena «Città degli Infetti» (Ospedali vuoti, orde affamate e radio gracchianti). Palette: verdi malati, grigi e ruggine di città abbandonata. Formato 16:9. |
-|  | `disastri/bombardamento.webp` | Bombardamento · famiglia `esplosione` | alta | Bombardamento: L'esercito sgancia bombe incendiarie per contenere il contagio.. Arena «Città degli Infetti» (Ospedali vuoti, orde affamate e radio gracchianti). Palette: verdi malati, grigi e ruggine di città abbandonata. Formato 16:9. |
-|  | `disastri/gas-nella-metro.webp` | Gas nella metro · famiglia `tossico` | alta | Gas nella metro: I militari saturano i tunnel della Metropolitana di gas.. Arena «Città degli Infetti» (Ospedali vuoti, orde affamate e radio gracchianti). Palette: verdi malati, grigi e ruggine di città abbandonata. Formato 16:9. |
-|  | `disastri/mutato.webp` | Il mutato · famiglia `bestie` | alta | Il mutato: Un infetto gigantesco, alto il doppio di un uomo, inizia a cacciare.. Arena «Città degli Infetti» (Ospedali vuoti, orde affamate e radio gracchianti). Palette: verdi malati, grigi e ruggine di città abbandonata. Formato 16:9. |
-|  | `disastri/orda-di-notte.webp` | L'orda di notte · famiglia `bestie` | alta | L'orda di notte: Al calare del sole l'orda raddoppia.. Arena «Città degli Infetti» (Ospedali vuoti, orde affamate e radio gracchianti). Palette: verdi malati, grigi e ruggine di città abbandonata. Formato 16:9. |
-|  | `disastri/incendio-del-quartiere.webp` | Incendio del quartiere · famiglia `fuoco` | alta | Incendio del quartiere: Un intero quartiere prende fuoco.. Arena «Città degli Infetti» (Ospedali vuoti, orde affamate e radio gracchianti). Palette: verdi malati, grigi e ruggine di città abbandonata. Formato 16:9. |
-|  | `disastri/diga-crolla.webp` | La diga crolla · famiglia `acqua` | alta | La diga crolla: La diga a monte della città cede.. Arena «Città degli Infetti» (Ospedali vuoti, orde affamate e radio gracchianti). Palette: verdi malati, grigi e ruggine di città abbandonata. Formato 16:9. |
-|  | `disastri/infetti-evolvono.webp` | Gli infetti evolvono · famiglia `bestie` | alta | Gli infetti evolvono: Gli infetti diventano più veloci e cominciano a cacciare in branco.. Arena «Città degli Infetti» (Ospedali vuoti, orde affamate e radio gracchianti). Palette: verdi malati, grigi e ruggine di città abbandonata. Formato 16:9. |
-|  | `disastri/sirene-dellallarme.webp` | Sirene dell'allarme · famiglia `acqua` | alta | Sirene dell'allarme: Tutte le sirene della città si accendono insieme.. Arena «Città degli Infetti» (Ospedali vuoti, orde affamate e radio gracchianti). Palette: verdi malati, grigi e ruggine di città abbandonata. Formato 16:9. |
-|  | `disastri/cecchino-sul-campanile.webp` | Il cecchino sul campanile · famiglia `esplosione` | media | Il cecchino sul campanile: Un sopravvissuto impazzito spara dal campanile.. Arena «Città degli Infetti» (Ospedali vuoti, orde affamate e radio gracchianti). Palette: verdi malati, grigi e ruggine di città abbandonata. Formato 16:9. |
-|  | `disastri/gas-nervino.webp` | Gas nervino · famiglia `tossico` | media | Gas nervino: L'esercito rilascia gas nervino per fermare il contagio.. Arena «Città degli Infetti» (Ospedali vuoti, orde affamate e radio gracchianti). Palette: verdi malati, grigi e ruggine di città abbandonata. Formato 16:9. |
-|  | `disastri/convoglio-in-fiamme.webp` | Il convoglio in fiamme · famiglia `fuoco` | media | Il convoglio in fiamme: Un convoglio carico di benzina esplode in Periferia.. Arena «Città degli Infetti» (Ospedali vuoti, orde affamate e radio gracchianti). Palette: verdi malati, grigi e ruggine di città abbandonata. Formato 16:9. |
-|  | `disastri/topi-infetti.webp` | Topi infetti · famiglia `sciame` | media | Topi infetti: Migliaia di topi infetti escono dalle fogne.. Arena «Città degli Infetti» (Ospedali vuoti, orde affamate e radio gracchianti). Palette: verdi malati, grigi e ruggine di città abbandonata. Formato 16:9. |
-|  | `disastri/crollo-del-ponte.webp` | Crollo del ponte · famiglia `terremoto` | media | Crollo del ponte: Il ponte principale crolla sotto il peso degli infetti.. Arena «Città degli Infetti» (Ospedali vuoti, orde affamate e radio gracchianti). Palette: verdi malati, grigi e ruggine di città abbandonata. Formato 16:9. |
-|  | `disastri/corridore.webp` | Il corridore · famiglia `bestie` | media | Il corridore: Un infetto velocissimo dà la caccia a chiunque corra.. Arena «Città degli Infetti» (Ospedali vuoti, orde affamate e radio gracchianti). Palette: verdi malati, grigi e ruggine di città abbandonata. Formato 16:9. |
-|  | `disastri/bombardamento-al-napalm.webp` | Bombardamento al napalm · famiglia `fuoco` | media | Bombardamento al napalm: Gli aerei sganciano napalm sul Centro commerciale.. Arena «Città degli Infetti» (Ospedali vuoti, orde affamate e radio gracchianti). Palette: verdi malati, grigi e ruggine di città abbandonata. Formato 16:9. |
-|  | `disastri/contaminazione-dellacqua.webp` | Contaminazione dell'acqua · famiglia `acqua` | media | Contaminazione dell'acqua: L'acquedotto è contaminato.. Arena «Città degli Infetti» (Ospedali vuoti, orde affamate e radio gracchianti). Palette: verdi malati, grigi e ruggine di città abbandonata. Formato 16:9. |
-|  | `disastri/nido.webp` | Il nido · famiglia `sciame` | media | Il nido: Gli infetti hanno creato un nido nella Metropolitana.. Arena «Città degli Infetti» (Ospedali vuoti, orde affamate e radio gracchianti). Palette: verdi malati, grigi e ruggine di città abbandonata. Formato 16:9. |
-|  | `disastri/ospedale-invaso.webp` | Ospedale invaso · famiglia `bestie` | media | Ospedale invaso: L'Ospedale viene invaso da centinaia di pazienti infetti.. Arena «Città degli Infetti» (Ospedali vuoti, orde affamate e radio gracchianti). Palette: verdi malati, grigi e ruggine di città abbandonata. Formato 16:9. |
-|  | `disastri/nebbia-fitta.webp` | Nebbia fitta · famiglia `nebbia` | media | Nebbia fitta: Una nebbia densa copre la città: gli infetti si sentono, ma non si vedono.. Arena «Città degli Infetti» (Ospedali vuoti, orde affamate e radio gracchianti). Palette: verdi malati, grigi e ruggine di città abbandonata. Formato 16:9. |
-|  | `disastri/cani-infetti.webp` | Cani infetti · famiglia `bestie` | media | Cani infetti: Un branco di cani infetti corre per le strade.. Arena «Città degli Infetti» (Ospedali vuoti, orde affamate e radio gracchianti). Palette: verdi malati, grigi e ruggine di città abbandonata. Formato 16:9. |
-|  | `disastri/ultima-trasmissione.webp` | L'ultima trasmissione · famiglia `tech` | media | L'ultima trasmissione: La radio annuncia che non verranno più soccorsi.. Arena «Città degli Infetti» (Ospedali vuoti, orde affamate e radio gracchianti). Palette: verdi malati, grigi e ruggine di città abbandonata. Formato 16:9. |
-|  | `disastri/gigante.webp` | Il gigante · famiglia `bestie` | media | Il gigante: Un infetto mutato abbatte i muri come se fossero di carta.. Arena «Città degli Infetti» (Ospedali vuoti, orde affamate e radio gracchianti). Palette: verdi malati, grigi e ruggine di città abbandonata. Formato 16:9. |
-|  | `disastri/sciacallo.webp` | Lo sciacallo · famiglia `bestie` | media | Lo sciacallo: Una banda di sciacalli armati saccheggia la città.. Arena «Città degli Infetti» (Ospedali vuoti, orde affamate e radio gracchianti). Palette: verdi malati, grigi e ruggine di città abbandonata. Formato 16:9. |
-|  | `disastri/treno-fantasma.webp` | Il treno fantasma · famiglia `magia` | media | Il treno fantasma: Un treno della metro senza conducente sfreccia nei tunnel.. Arena «Città degli Infetti» (Ospedali vuoti, orde affamate e radio gracchianti). Palette: verdi malati, grigi e ruggine di città abbandonata. Formato 16:9. |
-|  | `disastri/tempesta-elettrica.webp` | Tempesta elettrica · famiglia `fulmine` | media | Tempesta elettrica: Una tempesta fa saltare tutta la corrente che restava.. Arena «Città degli Infetti» (Ospedali vuoti, orde affamate e radio gracchianti). Palette: verdi malati, grigi e ruggine di città abbandonata. Formato 16:9. |
-|  | `disastri/mutazione-dellaria.webp` | Mutazione dell'aria · famiglia `tossico` | media | Mutazione dell'aria: L'infezione si diffonde anche per via aerea.. Arena «Città degli Infetti» (Ospedali vuoti, orde affamate e radio gracchianti). Palette: verdi malati, grigi e ruggine di città abbandonata. Formato 16:9. |
-|  | `disastri/caccia-dellesercito.webp` | La caccia dell'esercito · famiglia `bestie` | media | La caccia dell'esercito: I soldati sparano a chiunque abbia l'aria infetta.. Arena «Città degli Infetti» (Ospedali vuoti, orde affamate e radio gracchianti). Palette: verdi malati, grigi e ruggine di città abbandonata. Formato 16:9. |
-|  | `disastri/stadio.webp` | Lo stadio · famiglia `bestie` | media | Lo stadio: L'orda si raduna nello stadio e rompe le recinzioni.. Arena «Città degli Infetti» (Ospedali vuoti, orde affamate e radio gracchianti). Palette: verdi malati, grigi e ruggine di città abbandonata. Formato 16:9. |
-|  | `disastri/pioggia-nera.webp` | Pioggia nera · famiglia `tossico` | media | Pioggia nera: Una pioggia nera e oleosa cade sulla città.. Arena «Città degli Infetti» (Ospedali vuoti, orde affamate e radio gracchianti). Palette: verdi malati, grigi e ruggine di città abbandonata. Formato 16:9. |
-|  | `disastri/laboratorio.webp` | Il laboratorio · famiglia `bestie` | media | Il laboratorio: Un laboratorio militare esplode e libera una nuova variante.. Arena «Città degli Infetti» (Ospedali vuoti, orde affamate e radio gracchianti). Palette: verdi malati, grigi e ruggine di città abbandonata. Formato 16:9. |
-|  | `disastri/pubblico-vota.webp` | Il pubblico vota · famiglia `spettacolo` | media | Il pubblico vota: Il pubblico vota in diretta chi colpire con un fulmine artificiale.. Arena «Città degli Infetti» (Ospedali vuoti, orde affamate e radio gracchianti). Palette: verdi malati, grigi e ruggine di città abbandonata. Formato 16:9. |
-|  | `disastri/pausa-pubblicitaria.webp` | La pausa pubblicitaria · famiglia `spettacolo` | media | La pausa pubblicitaria: Durante la pubblicità, gli organizzatori si dimenticano di sorvegliare le trappole.. Arena «Città degli Infetti» (Ospedali vuoti, orde affamate e radio gracchianti). Palette: verdi malati, grigi e ruggine di città abbandonata. Formato 16:9. |
-|  | `disastri/cambio-di-regia.webp` | Il cambio di regia · famiglia `spettacolo` | media | Il cambio di regia: Arriva un nuovo regista che vuole più azione.. Arena «Città degli Infetti» (Ospedali vuoti, orde affamate e radio gracchianti). Palette: verdi malati, grigi e ruggine di città abbandonata. Formato 16:9. |
-|  | `disastri/pioggia-di-coriandoli.webp` | La pioggia di coriandoli · famiglia `spettacolo` | media | La pioggia di coriandoli: Per festeggiare la metà della stagione, gli organizzatori fanno piovere coriandoli. Di vetro.. Arena «Città degli Infetti» (Ospedali vuoti, orde affamate e radio gracchianti). Palette: verdi malati, grigi e ruggine di città abbandonata. Formato 16:9. |
-|  | `disastri/ospite-speciale.webp` | L'ospite speciale · famiglia `spettacolo` | media | L'ospite speciale: Una celebrità entra nell'arena per un giorno, con una squadra di guardie del corpo armate.. Arena «Città degli Infetti» (Ospedali vuoti, orde affamate e radio gracchianti). Palette: verdi malati, grigi e ruggine di città abbandonata. Formato 16:9. |
-|  | `disastri/sponsor-ritirato.webp` | Lo sponsor ritirato · famiglia `spettacolo` | media | Lo sponsor ritirato: Uno sponsor si ritira e reclama indietro tutti i regali. Con i droni.. Arena «Città degli Infetti» (Ospedali vuoti, orde affamate e radio gracchianti). Palette: verdi malati, grigi e ruggine di città abbandonata. Formato 16:9. |
-|  | `disastri/gioco-a-quiz.webp` | Il gioco a quiz · famiglia `spettacolo` | media | Il gioco a quiz: Gli organizzatori interrompono tutto per un quiz di cultura generale. Chi sbaglia paga.. Arena «Città degli Infetti» (Ospedali vuoti, orde affamate e radio gracchianti). Palette: verdi malati, grigi e ruggine di città abbandonata. Formato 16:9. |
-|  | `disastri/sciopero-dei-tecnici.webp` | Lo sciopero dei tecnici · famiglia `spettacolo` | media | Lo sciopero dei tecnici: I tecnici dell'arena scioperano e nessuno controlla più i sistemi.. Arena «Città degli Infetti» (Ospedali vuoti, orde affamate e radio gracchianti). Palette: verdi malati, grigi e ruggine di città abbandonata. Formato 16:9. |
-|  | `disastri/replica.webp` | La replica · famiglia `spettacolo` | media | La replica: Per problemi tecnici, l'arena ripete il disastro di due giorni fa, ma più forte.. Arena «Città degli Infetti» (Ospedali vuoti, orde affamate e radio gracchianti). Palette: verdi malati, grigi e ruggine di città abbandonata. Formato 16:9. |
-|  | `disastri/giornata-dei-bambini.webp` | La giornata dei bambini · famiglia `spettacolo` | media | La giornata dei bambini: Gli organizzatori fanno disegnare le trappole del giorno ai bambini. Sono molto creativi.. Arena «Città degli Infetti» (Ospedali vuoti, orde affamate e radio gracchianti). Palette: verdi malati, grigi e ruggine di città abbandonata. Formato 16:9. |
-|  | `disastri/asta-dei-concorrenti.webp` | L'asta dei concorrenti · famiglia `spettacolo` | media | L'asta dei concorrenti: Il pubblico può comprare il diritto di decidere la sorte di un concorrente.. Arena «Città degli Infetti» (Ospedali vuoti, orde affamate e radio gracchianti). Palette: verdi malati, grigi e ruggine di città abbandonata. Formato 16:9. |
-|  | `disastri/terremoto-della-produzione.webp` | Il terremoto della produzione · famiglia `terremoto` | media | Il terremoto della produzione: Un camion della produzione si ribalta dentro l'arena e libera tutto quello che trasportava.. Arena «Città degli Infetti» (Ospedali vuoti, orde affamate e radio gracchianti). Palette: verdi malati, grigi e ruggine di città abbandonata. Formato 16:9. |
-|  | `disastri/blackout-delle-telecamere.webp` | Il blackout delle telecamere · famiglia `spettacolo` | media | Il blackout delle telecamere: Le telecamere si spengono per un'ora. Senza testimoni, le regole saltano.. Arena «Città degli Infetti» (Ospedali vuoti, orde affamate e radio gracchianti). Palette: verdi malati, grigi e ruggine di città abbandonata. Formato 16:9. |
-|  | `disastri/musica-a-tutto-volume.webp` | La musica a tutto volume · famiglia `spettacolo` | media | La musica a tutto volume: Gli organizzatori diffondono la stessa canzone estiva per ventiquattro ore.. Arena «Città degli Infetti» (Ospedali vuoti, orde affamate e radio gracchianti). Palette: verdi malati, grigi e ruggine di città abbandonata. Formato 16:9. |
-|  | `disastri/doppio-disastro.webp` | Il doppio disastro · famiglia `bestie` | media | Il doppio disastro: Due disastri si attivano nello stesso momento per un errore di programmazione.. Arena «Città degli Infetti» (Ospedali vuoti, orde affamate e radio gracchianti). Palette: verdi malati, grigi e ruggine di città abbandonata. Formato 16:9. |
-|  | `disastri/maratona.webp` | La maratona · famiglia `spettacolo` | media | La maratona: Gli organizzatori obbligano tutti a correre per due ore. Chi si ferma viene punito.. Arena «Città degli Infetti» (Ospedali vuoti, orde affamate e radio gracchianti). Palette: verdi malati, grigi e ruggine di città abbandonata. Formato 16:9. |
-|  | `disastri/sondaggio-della-crudelta.webp` | Il sondaggio della crudeltà · famiglia `spettacolo` | media | Il sondaggio della crudeltà: Il pubblico vota il disastro più crudele. Vince "tutti insieme".. Arena «Città degli Infetti» (Ospedali vuoti, orde affamate e radio gracchianti). Palette: verdi malati, grigi e ruggine di città abbandonata. Formato 16:9. |
-|  | `disastri/invasione-dei-fan.webp` | L'invasione dei fan · famiglia `spettacolo` | media | L'invasione dei fan: Un gruppo di fan scavalca le recinzioni e invade l'arena per conoscere i propri idoli.. Arena «Città degli Infetti» (Ospedali vuoti, orde affamate e radio gracchianti). Palette: verdi malati, grigi e ruggine di città abbandonata. Formato 16:9. |
-|  | `disastri/gioco-delle-sedie.webp` | Il gioco delle sedie · famiglia `spettacolo` | media | Il gioco delle sedie: Gli organizzatori mettono al centro dell'arena una sedia in meno dei concorrenti. Chi resta in piedi viene punito.. Arena «Città degli Infetti» (Ospedali vuoti, orde affamate e radio gracchianti). Palette: verdi malati, grigi e ruggine di città abbandonata. Formato 16:9. |
-|  | `disastri/nebbia-delle-risate-registrate.webp` | La nebbia delle risate registrate · famiglia `spettacolo` | media | La nebbia delle risate registrate: Dagli altoparlanti partono risate registrate a ogni sfortuna. È psicologicamente devastante.. Arena «Città degli Infetti» (Ospedali vuoti, orde affamate e radio gracchianti). Palette: verdi malati, grigi e ruggine di città abbandonata. Formato 16:9. |
-|  | `disastri/notte-rossa.webp` | La notte rossa · famiglia `buio` · 18+ | bassa | La notte rossa: Gli organizzatori sospendono ogni regola per una notte: niente telecamere sui dettagli, niente limiti.. Arena «Città degli Infetti» (Ospedali vuoti, orde affamate e radio gracchianti). Palette: verdi malati, grigi e ruggine di città abbandonata. Formato 16:9. |
-|  | `disastri/bar-aperto.webp` | Il bar aperto · famiglia `festa` · 18+ | bassa | Il bar aperto: Un bar con alcol illimitato compare nel mezzo dell'arena. Gratis, per un'ora.. Arena «Città degli Infetti» (Ospedali vuoti, orde affamate e radio gracchianti). Palette: verdi malati, grigi e ruggine di città abbandonata. Formato 16:9. |
-|  | `disastri/pioggia-di-sangue.webp` | La pioggia di sangue · famiglia `cielo` · 18+ | bassa | La pioggia di sangue: Una pioggia di sangue animale cade sull'arena per motivi puramente estetici.. Arena «Città degli Infetti» (Ospedali vuoti, orde affamate e radio gracchianti). Palette: verdi malati, grigi e ruggine di città abbandonata. Formato 16:9. |
-|  | `disastri/spettacolo-del-pudore.webp` | Lo spettacolo del pudore · famiglia `bestie` · 18+ | bassa | Lo spettacolo del pudore: Gli organizzatori fanno sparire tutti i vestiti dei concorrenti per un giorno.. Arena «Città degli Infetti» (Ospedali vuoti, orde affamate e radio gracchianti). Palette: verdi malati, grigi e ruggine di città abbandonata. Formato 16:9. |
-|  | `disastri/spore-del-desiderio.webp` | Le spore del desiderio · famiglia `festa` · 18+ | bassa | Le spore del desiderio: Le spore di un fungo rendono tutti irresistibilmente attratti dalla persona più vicina.. Arena «Città degli Infetti» (Ospedali vuoti, orde affamate e radio gracchianti). Palette: verdi malati, grigi e ruggine di città abbandonata. Formato 16:9. |
-|  | `disastri/macello.webp` | Il macello · famiglia `sangue` · 18+ | bassa | Il macello: Gli organizzatori aprono le gabbie di tutti i mostri insieme e chiamano l'evento "Il macello". Il nome è accurato.. Arena «Città degli Infetti» (Ospedali vuoti, orde affamate e radio gracchianti). Palette: verdi malati, grigi e ruggine di città abbandonata. Formato 16:9. |
-|  | `disastri/corridori-notturni.webp` | I corridori notturni · famiglia `bestie` | media | I corridori notturni: Al buio gli infetti diventano velocissimi.. Arena «Città degli Infetti» (Ospedali vuoti, orde affamate e radio gracchianti). Palette: verdi malati, grigi e ruggine di città abbandonata. Formato 16:9. |
-|  | `disastri/zoo-infetto.webp` | Lo zoo infetto · famiglia `bestie` | media | Lo zoo infetto: Gli animali dello zoo sono stati infettati. Anche la giraffa.. Arena «Città degli Infetti» (Ospedali vuoti, orde affamate e radio gracchianti). Palette: verdi malati, grigi e ruggine di città abbandonata. Formato 16:9. |
-|  | `disastri/parata.webp` | La parata · famiglia `festa` | media | La parata: Un'orda gigantesca attraversa il centro con una banda musicale zombie in testa.. Arena «Città degli Infetti» (Ospedali vuoti, orde affamate e radio gracchianti). Palette: verdi malati, grigi e ruggine di città abbandonata. Formato 16:9. |
-|  | `disastri/pioggia-di-volantini.webp` | La pioggia di volantini · famiglia `cielo` | media | La pioggia di volantini: Un aereo lancia volantini con scritto "Mantenete la calma". Fa anche un rumore infernale.. Arena «Città degli Infetti» (Ospedali vuoti, orde affamate e radio gracchianti). Palette: verdi malati, grigi e ruggine di città abbandonata. Formato 16:9. |
-|  | `disastri/ospedale-crolla.webp` | L'ospedale crolla · famiglia `terremoto` | media | L'ospedale crolla: L'Ospedale cede e libera i pazienti del reparto di isolamento.. Arena «Città degli Infetti» (Ospedali vuoti, orde affamate e radio gracchianti). Palette: verdi malati, grigi e ruggine di città abbandonata. Formato 16:9. |
-|  | `disastri/nebbia-tossica.webp` | La nebbia tossica · famiglia `tossico` | media | La nebbia tossica: Una fabbrica chimica esplode e copre la città di nebbia gialla.. Arena «Città degli Infetti» (Ospedali vuoti, orde affamate e radio gracchianti). Palette: verdi malati, grigi e ruggine di città abbandonata. Formato 16:9. |
-|  | `disastri/centro-commerciale-chiude.webp` | Il centro commerciale chiude · famiglia `bestie` | media | Il centro commerciale chiude: Le saracinesche del centro commerciale si abbassano tutte contemporaneamente.. Arena «Città degli Infetti» (Ospedali vuoti, orde affamate e radio gracchianti). Palette: verdi malati, grigi e ruggine di città abbandonata. Formato 16:9. |
-|  | `disastri/sangue-in-acqua.webp` | Il sangue in acqua · famiglia `acqua` | media | Il sangue in acqua: Le acque del fiume diventano rosse: gli squali si sono infettati.. Arena «Città degli Infetti» (Ospedali vuoti, orde affamate e radio gracchianti). Palette: verdi malati, grigi e ruggine di città abbandonata. Formato 16:9. |
-|  | `disastri/rivolta-dei-sopravvissuti.webp` | La rivolta dei sopravvissuti · famiglia `bestie` | media | La rivolta dei sopravvissuti: Un gruppo di sopravvissuti armati decide che i concorrenti sono una minaccia.. Arena «Città degli Infetti» (Ospedali vuoti, orde affamate e radio gracchianti). Palette: verdi malati, grigi e ruggine di città abbandonata. Formato 16:9. |
-|  | `disastri/neonati.webp` | I neonati · famiglia `bestie` | media | I neonati: Una scuola materna infetta si apre. Sono piccoli, sono veloci, sono tantissimi.. Arena «Città degli Infetti» (Ospedali vuoti, orde affamate e radio gracchianti). Palette: verdi malati, grigi e ruggine di città abbandonata. Formato 16:9. |
-|  | `disastri/blackout-eterno.webp` | Il blackout eterno · famiglia `buio` | media | Il blackout eterno: La città perde l'elettricità per sempre.. Arena «Città degli Infetti» (Ospedali vuoti, orde affamate e radio gracchianti). Palette: verdi malati, grigi e ruggine di città abbandonata. Formato 16:9. |
-|  | `disastri/mutante-corazzato.webp` | Il mutante corazzato · famiglia `bestie` | media | Il mutante corazzato: Un infetto ricoperto da piastre d'osso attraversa la città distruggendo auto.. Arena «Città degli Infetti» (Ospedali vuoti, orde affamate e radio gracchianti). Palette: verdi malati, grigi e ruggine di città abbandonata. Formato 16:9. |
-|  | `disastri/sirena-del-gelataio.webp` | La sirena del gelataio · famiglia `festa` | media | La sirena del gelataio: Un furgone dei gelati con la musica a tutto volume attraversa la città. Il conducente è infetto.. Arena «Città degli Infetti» (Ospedali vuoti, orde affamate e radio gracchianti). Palette: verdi malati, grigi e ruggine di città abbandonata. Formato 16:9. |
-|  | `disastri/uccelli-infetti.webp` | Gli uccelli infetti · famiglia `sciame` | media | Gli uccelli infetti: Stormi di piccioni infetti calano sulla città.. Arena «Città degli Infetti» (Ospedali vuoti, orde affamate e radio gracchianti). Palette: verdi malati, grigi e ruggine di città abbandonata. Formato 16:9. |
-|  | `disastri/sciopero-dei-militari.webp` | Lo sciopero dei militari · famiglia `bestie` | media | Lo sciopero dei militari: I soldati smettono di sparare agli infetti per protesta sindacale.. Arena «Città degli Infetti» (Ospedali vuoti, orde affamate e radio gracchianti). Palette: verdi malati, grigi e ruggine di città abbandonata. Formato 16:9. |
-|  | `disastri/metro-allagata.webp` | La metro allagata · famiglia `acqua` | media | La metro allagata: Le gallerie della metropolitana si allagano con acqua e infetti che galleggiano.. Arena «Città degli Infetti» (Ospedali vuoti, orde affamate e radio gracchianti). Palette: verdi malati, grigi e ruggine di città abbandonata. Formato 16:9. |
-|  | `disastri/orda-arrapata.webp` | L'orda arrapata · famiglia `bestie` · 18+ | bassa | L'orda arrapata: Un'improbabile mutazione rende gli infetti molto affettuosi. Il bacio, purtroppo, è ancora un morso.. Arena «Città degli Infetti» (Ospedali vuoti, orde affamate e radio gracchianti). Palette: verdi malati, grigi e ruggine di città abbandonata. Formato 16:9. |
-|  | `disastri/mattatoio.webp` | Il mattatoio · famiglia `sangue` · 18+ | bassa | Il mattatoio: Gli infetti si radunano nel mattatoio cittadino e lo trasformano in un inferno di carne.. Arena «Città degli Infetti» (Ospedali vuoti, orde affamate e radio gracchianti). Palette: verdi malati, grigi e ruggine di città abbandonata. Formato 16:9. |
-|  | `disastri/festa-dellultimo-giorno.webp` | La festa dell'ultimo giorno · famiglia `festa` · 18+ | bassa | La festa dell'ultimo giorno: Un gruppo di sopravvissuti organizza una festa con alcol e musica a tutto volume, convinto che sia la fine.. Arena «Città degli Infetti» (Ospedali vuoti, orde affamate e radio gracchianti). Palette: verdi malati, grigi e ruggine di città abbandonata. Formato 16:9. |
-|  | `disastri/orda-gigante.webp` | L'orda gigante · famiglia `bestie` | media | L'orda gigante: Centomila infetti invadono la città da nord.. Arena «Città degli Infetti» (Ospedali vuoti, orde affamate e radio gracchianti). Palette: verdi malati, grigi e ruggine di città abbandonata. Formato 16:9. |
-|  | `disastri/mutante.webp` | Il mutante · famiglia `bestie` | media | Il mutante: Un infetto enorme, grosso come un furgone, sfonda le pareti della Scuola.. Arena «Città degli Infetti» (Ospedali vuoti, orde affamate e radio gracchianti). Palette: verdi malati, grigi e ruggine di città abbandonata. Formato 16:9. |
-|  | `disastri/acqua-contaminata.webp` | L'acqua contaminata · famiglia `acqua` | media | L'acqua contaminata: L'acquedotto è contaminato: chi beve si ammala.. Arena «Città degli Infetti» (Ospedali vuoti, orde affamate e radio gracchianti). Palette: verdi malati, grigi e ruggine di città abbandonata. Formato 16:9. |
-|  | `disastri/incendio-dei-palazzi.webp` | L'incendio dei palazzi · famiglia `fuoco` | media | L'incendio dei palazzi: Un incendio si propaga da un palazzo all'altro.. Arena «Città degli Infetti» (Ospedali vuoti, orde affamate e radio gracchianti). Palette: verdi malati, grigi e ruggine di città abbandonata. Formato 16:9. |
-|  | `disastri/infetti-corridori.webp` | Gli infetti corridori · famiglia `bestie` | media | Gli infetti corridori: Una nuova varietà di infetti, velocissimi, esce dalla Metropolitana.. Arena «Città degli Infetti» (Ospedali vuoti, orde affamate e radio gracchianti). Palette: verdi malati, grigi e ruggine di città abbandonata. Formato 16:9. |
-|  | `disastri/sirena-dei-militari.webp` | La sirena dei militari · famiglia `bestie` | media | La sirena dei militari: Gli altoparlanti annunciano un'evacuazione falsa: tutti verso la piazza.. Arena «Città degli Infetti» (Ospedali vuoti, orde affamate e radio gracchianti). Palette: verdi malati, grigi e ruggine di città abbandonata. Formato 16:9. |
+<details><summary>Prompt completo, pronto da incollare</summary>
 
-### Oggetti (1:1, 512×512, sfondo trasparente)
+```text
+An abandoned hospital corridor with overturned gurneys, flickering lights and barricaded doors. Sickly green, grey and rust palette under an overcast sky, abandoned post-outbreak city. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Wide 16:9 establishing shot of the location, no people, eye-level view, the key landmark inside the central third of the frame, soft depth fog in the background. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
+```
 
-| | File | Soggetto | Priorità | Traccia |
-| --- | --- | --- | --- | --- |
-|  | `oggetti/arma.webp` | Arma | alta | Arma: Più forza negli scontri, in base alla qualità (★). Si consuma a ogni colpo e alla fine si rompe; con un attrezzo si può riparare. Chi è ingegnoso può intingerla nel veleno.. Arena «Città degli Infetti» (Ospedali vuoti, orde affamate e radio gracchianti). Palette: verdi malati, grigi e ruggine di città abbandonata. Formato 1:1. Sfondo trasparente. |
-|  | `oggetti/armatura.webp` | Protezione (per esempio giubbotto antiproiettile, protezioni da hockey) | alta | Protezione (per esempio giubbotto antiproiettile, protezioni da hockey): Riduce i danni e a volte para un colpo mortale. Si consuma a ogni colpo incassato.. Arena «Città degli Infetti» (Ospedali vuoti, orde affamate e radio gracchianti). Palette: verdi malati, grigi e ruggine di città abbandonata. Formato 1:1. Sfondo trasparente. |
-|  | `oggetti/med.webp` | Cure | alta | Cure: Si usa da soli o sugli alleati: richiude le ferite gravi, ferma veleni e infezioni presi in tempo, abbassa l'indicatore dell'arena.. Arena «Città degli Infetti» (Ospedali vuoti, orde affamate e radio gracchianti). Palette: verdi malati, grigi e ruggine di città abbandonata. Formato 1:1. Sfondo trasparente. |
-|  | `oggetti/cibo.webp` | Cibo | alta | Cibo: Si mangia quando la sazietà cala. Si può dividere con gli alleati, regalare o scambiare.. Arena «Città degli Infetti» (Ospedali vuoti, orde affamate e radio gracchianti). Palette: verdi malati, grigi e ruggine di città abbandonata. Formato 1:1. Sfondo trasparente. |
-|  | `oggetti/attrezzo.webp` | Attrezzo (per esempio torcia a manovella, piede di porco) | alta | Attrezzo (per esempio torcia a manovella, piede di porco): Più cibo trovato, fughe più facili da tempeste e trappole, difesa migliore di notte, armi riparate.. Arena «Città degli Infetti» (Ospedali vuoti, orde affamate e radio gracchianti). Palette: verdi malati, grigi e ruggine di città abbandonata. Formato 1:1. Sfondo trasparente. |
-|  | `oggetti/mappa.webp` | Mappa | alta | Mappa: Più cibo, meno disastri, trappole scoperte in anticipo e vie di fuga sicure.. Arena «Città degli Infetti» (Ospedali vuoti, orde affamate e radio gracchianti). Palette: verdi malati, grigi e ruggine di città abbandonata. Formato 1:1. Sfondo trasparente. |
-|  | `oggetti/trap.webp` | Trappola | alta | Trappola: Di notte chi la sa usare la piazza nella sua zona. Chi ci passa rischia grosso, e l'uccisione va a chi l'ha piazzata.. Arena «Città degli Infetti» (Ospedali vuoti, orde affamate e radio gracchianti). Palette: verdi malati, grigi e ruggine di città abbandonata. Formato 1:1. Sfondo trasparente. |
-|  | `oggetti/esplosivo.webp` | Esplosivo | alta | Esplosivo: Più forza negli scontri. Chi è ingegnoso ci costruisce trappole esplosive. Da ubriachi è un pessimo compagno.. Arena «Città degli Infetti» (Ospedali vuoti, orde affamate e radio gracchianti). Palette: verdi malati, grigi e ruggine di città abbandonata. Formato 1:1. Sfondo trasparente. |
-|  | `oggetti/veleno.webp` | Veleno | alta | Veleno: Apre la strada agli avvelenamenti; chi è ingegnoso ci intinge l'arma, che poi avvelena a ogni colpo.. Arena «Città degli Infetti» (Ospedali vuoti, orde affamate e radio gracchianti). Palette: verdi malati, grigi e ruggine di città abbandonata. Formato 1:1. Sfondo trasparente. |
-|  | `oggetti/amuleto.webp` | Portafortuna | alta | Portafortuna: Può evitare una morte diretta narrata da un evento: probabilità 85%, certa per chi è superstizioso. Si consuma quando salva. Non ferma i danni periodici di fame, malattie e ferite. Calma Terrore e Corruzione.. Arena «Città degli Infetti» (Ospedali vuoti, orde affamate e radio gracchianti). Palette: verdi malati, grigi e ruggine di città abbandonata. Formato 1:1. Sfondo trasparente. |
-|  | `oggetti/alcol.webp` | Alcol (per esempio bottiglia di vodka) | alta | Alcol (per esempio bottiglia di vodka): Scalda, fa dimenticare, disinfetta le ferite infette. E ubriaca.. Arena «Città degli Infetti» (Ospedali vuoti, orde affamate e radio gracchianti). Palette: verdi malati, grigi e ruggine di città abbandonata. Formato 1:1. Sfondo trasparente. |
-|  | `oggetti/valore.webp` | Merce di scambio (per esempio stecca di sigarette, scatola di batterie) | alta | Merce di scambio (per esempio stecca di sigarette, scatola di batterie): Non serve a niente, tranne che a comprare cibo e cure da chi ne ha.. Arena «Città degli Infetti» (Ospedali vuoti, orde affamate e radio gracchianti). Palette: verdi malati, grigi e ruggine di città abbandonata. Formato 1:1. Sfondo trasparente. |
-|  | `oggetti/ricordo.webp` | Ricordo (per esempio foto di famiglia, lettera mai spedita) | alta | Ricordo (per esempio foto di famiglia, lettera mai spedita): Un pezzo di casa: ogni notte tiene su il morale. Se è di qualcuno che non c'è più, ancora di più.. Arena «Città degli Infetti» (Ospedali vuoti, orde affamate e radio gracchianti). Palette: verdi malati, grigi e ruggine di città abbandonata. Formato 1:1. Sfondo trasparente. |
+</details>
+
+#### Centro commerciale
+
+- **File**: `assets/arene/zombie/luoghi/centro-commerciale.webp`
+- **Cosa mostrare**: Atrio di un centro commerciale saccheggiato, scale mobili rotte, carrelli sparsi, lucernari.
+
+**Prompt**
+
+```text
+A looted shopping mall atrium with broken escalators, scattered trolleys and dusty skylights.
+```
+
+<details><summary>Prompt completo, pronto da incollare</summary>
+
+```text
+A looted shopping mall atrium with broken escalators, scattered trolleys and dusty skylights. Sickly green, grey and rust palette under an overcast sky, abandoned post-outbreak city. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Wide 16:9 establishing shot of the location, no people, eye-level view, the key landmark inside the central third of the frame, soft depth fog in the background. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
+```
+
+</details>
+
+#### Metropolitana
+
+- **File**: `assets/arene/zombie/luoghi/metropolitana.webp`
+- **Cosa mostrare**: Banchina della metro al buio, un treno deragliato, binari allagati e lampade d'emergenza.
+
+**Prompt**
+
+```text
+A dark subway platform with a derailed train, flooded tracks and emergency lamps.
+```
+
+<details><summary>Prompt completo, pronto da incollare</summary>
+
+```text
+A dark subway platform with a derailed train, flooded tracks and emergency lamps. Sickly green, grey and rust palette under an overcast sky, abandoned post-outbreak city. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Wide 16:9 establishing shot of the location, no people, eye-level view, the key landmark inside the central third of the frame, soft depth fog in the background. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
+```
+
+</details>
+
+#### Scuola
+
+- **File**: `assets/arene/zombie/luoghi/scuola.webp`
+- **Cosa mostrare**: Corridoio di scuola vuoto, armadietti, fogli a terra e finestre sbarrate con assi.
+
+**Prompt**
+
+```text
+An empty school hallway with lockers, papers on the floor and windows boarded up with planks.
+```
+
+<details><summary>Prompt completo, pronto da incollare</summary>
+
+```text
+An empty school hallway with lockers, papers on the floor and windows boarded up with planks. Sickly green, grey and rust palette under an overcast sky, abandoned post-outbreak city. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Wide 16:9 establishing shot of the location, no people, eye-level view, the key landmark inside the central third of the frame, soft depth fog in the background. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
+```
+
+</details>
+
+#### Stazione di polizia
+
+- **File**: `assets/arene/zombie/luoghi/stazione-di-polizia.webp`
+- **Cosa mostrare**: Stazione di polizia fortificata con sacchi di sabbia, un furgone blindato e fari.
+
+**Prompt**
+
+```text
+A fortified police station with sandbags, an armoured van and searchlights.
+```
+
+<details><summary>Prompt completo, pronto da incollare</summary>
+
+```text
+A fortified police station with sandbags, an armoured van and searchlights. Sickly green, grey and rust palette under an overcast sky, abandoned post-outbreak city. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Wide 16:9 establishing shot of the location, no people, eye-level view, the key landmark inside the central third of the frame, soft depth fog in the background. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
+```
+
+</details>
+
+#### Periferia
+
+- **File**: `assets/arene/zombie/luoghi/periferia.webp`
+- **Cosa mostrare**: Strada di periferia con auto abbandonate, prati incolti e fumo all'orizzonte.
+
+**Prompt**
+
+```text
+A suburban street with abandoned cars, overgrown lawns and smoke on the horizon.
+```
+
+<details><summary>Prompt completo, pronto da incollare</summary>
+
+```text
+A suburban street with abandoned cars, overgrown lawns and smoke on the horizon. Sickly green, grey and rust palette under an overcast sky, abandoned post-outbreak city. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Wide 16:9 establishing shot of the location, no people, eye-level view, the key landmark inside the central third of the frame, soft depth fog in the background. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
+```
+
+</details>
+
+### Pericoli · Città degli Infetti (4:3, 960 × 720 px, sfondo pieno e scuro)
+
+#### Orda di zombi
+
+- **File**: `assets/arene/zombie/pericoli/orda-di-zombi.webp`
+- **Cosa mostrare**: Orda fitta di zombi che riempie una strada, tante mani protese in avanti.
+
+**Prompt**
+
+```text
+A dense horde of shambling zombies filling a city street, many hands reaching forward.
+```
+
+<details><summary>Prompt completo, pronto da incollare</summary>
+
+```text
+A dense horde of shambling zombies filling a city street, many hands reaching forward. Sickly green, grey and rust palette under an overcast sky, abandoned post-outbreak city. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. 4:3 wanted-poster portrait, single threat centered and facing the viewer, head and eyes in the upper middle of the frame, dark vignetted background that fades to near black at the edges. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
+```
+
+</details>
+
+#### Infetto corridore
+
+- **File**: `assets/arene/zombie/pericoli/infetto-corridore.webp`
+- **Cosa mostrare**: Infetto corridore colto a metà scatto, vestiti strappati, occhi folli.
+
+**Prompt**
+
+```text
+A fast infected runner caught mid-sprint, torn clothes, wild eyes, motion frozen.
+```
+
+<details><summary>Prompt completo, pronto da incollare</summary>
+
+```text
+A fast infected runner caught mid-sprint, torn clothes, wild eyes, motion frozen. Sickly green, grey and rust palette under an overcast sky, abandoned post-outbreak city. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. 4:3 wanted-poster portrait, single threat centered and facing the viewer, head and eyes in the upper middle of the frame, dark vignetted background that fades to near black at the edges. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
+```
+
+</details>
+
+#### Cane infetto
+
+- **File**: `assets/arene/zombie/pericoli/cane-infetto.webp`
+- **Cosa mostrare**: Cane infetto con pelo a chiazze, denti scoperti e occhi lattiginosi.
+
+**Prompt**
+
+```text
+An infected dog with patchy fur, bared teeth and milky eyes.
+```
+
+<details><summary>Prompt completo, pronto da incollare</summary>
+
+```text
+An infected dog with patchy fur, bared teeth and milky eyes. Sickly green, grey and rust palette under an overcast sky, abandoned post-outbreak city. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. 4:3 wanted-poster portrait, single threat centered and facing the viewer, head and eyes in the upper middle of the frame, dark vignetted background that fades to near black at the edges. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
+```
+
+</details>
+
+#### Gigante mutato
+
+- **File**: `assets/arene/zombie/pericoli/gigante-mutato.webp`
+- **Cosa mostrare**: Gigante mutato con muscoli gonfi e escrescenze ossee che sfonda un muro.
+
+**Prompt**
+
+```text
+A towering mutated giant with swollen muscles and bone growths, smashing through a brick wall.
+```
+
+<details><summary>Prompt completo, pronto da incollare</summary>
+
+```text
+A towering mutated giant with swollen muscles and bone growths, smashing through a brick wall. Sickly green, grey and rust palette under an overcast sky, abandoned post-outbreak city. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. 4:3 wanted-poster portrait, single threat centered and facing the viewer, head and eyes in the upper middle of the frame, dark vignetted background that fades to near black at the edges. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
+```
+
+</details>
+
+### Armi · Città degli Infetti (1:1, 512 × 512 px, sfondo trasparente)
+
+#### Mazza chiodata
+
+- **File**: `assets/arene/zombie/armi/mazza-chiodata.webp`
+- **Cosa mostrare**: Mazza da baseball avvolta nel filo spinato e nei chiodi.
+
+**Prompt**
+
+```text
+A baseball bat wrapped in barbed wire and studded with nails.
+```
+
+<details><summary>Prompt completo, pronto da incollare</summary>
+
+```text
+A baseball bat wrapped in barbed wire and studded with nails. Sickly green, grey and rust palette under an overcast sky, abandoned post-outbreak city. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Single object only, isolated on a fully transparent background, square 1:1, three-quarter view laid diagonally from lower left to upper right, 12% empty margin on every side, crisp silhouette with a thin dark outline so it reads on both light and dark backgrounds, no hands, no shadow on the ground. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
+```
+
+</details>
+
+#### Fucile a pompa
+
+- **File**: `assets/arene/zombie/armi/fucile-a-pompa.webp`
+- **Cosa mostrare**: Fucile a pompa con il calcio rattoppato col nastro.
+
+**Prompt**
+
+```text
+A pump-action shotgun with a duct-taped stock.
+```
+
+<details><summary>Prompt completo, pronto da incollare</summary>
+
+```text
+A pump-action shotgun with a duct-taped stock. Sickly green, grey and rust palette under an overcast sky, abandoned post-outbreak city. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Single object only, isolated on a fully transparent background, square 1:1, three-quarter view laid diagonally from lower left to upper right, 12% empty margin on every side, crisp silhouette with a thin dark outline so it reads on both light and dark backgrounds, no hands, no shadow on the ground. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
+```
+
+</details>
+
+#### Piede di porco
+
+- **File**: `assets/arene/zombie/armi/piede-di-porco.webp`
+- **Cosa mostrare**: Piede di porco in acciaio rosso.
+
+**Prompt**
+
+```text
+A red steel crowbar, scuffed paint.
+```
+
+<details><summary>Prompt completo, pronto da incollare</summary>
+
+```text
+A red steel crowbar, scuffed paint. Sickly green, grey and rust palette under an overcast sky, abandoned post-outbreak city. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Single object only, isolated on a fully transparent background, square 1:1, three-quarter view laid diagonally from lower left to upper right, 12% empty margin on every side, crisp silhouette with a thin dark outline so it reads on both light and dark backgrounds, no hands, no shadow on the ground. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
+```
+
+</details>
+
+#### Motosega
+
+- **File**: `assets/arene/zombie/armi/motosega.webp`
+- **Cosa mostrare**: Motosega con il corpo arancione graffiato.
+
+**Prompt**
+
+```text
+A chainsaw with a scratched orange body.
+```
+
+<details><summary>Prompt completo, pronto da incollare</summary>
+
+```text
+A chainsaw with a scratched orange body. Sickly green, grey and rust palette under an overcast sky, abandoned post-outbreak city. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Single object only, isolated on a fully transparent background, square 1:1, three-quarter view laid diagonally from lower left to upper right, 12% empty margin on every side, crisp silhouette with a thin dark outline so it reads on both light and dark backgrounds, no hands, no shadow on the ground. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
+```
+
+</details>
+
+#### Katana
+
+- **File**: `assets/arene/zombie/armi/katana.webp`
+- **Cosa mostrare**: Katana con l'impugnatura consumata.
+
+**Prompt**
+
+```text
+A katana with a worn wrapped handle.
+```
+
+<details><summary>Prompt completo, pronto da incollare</summary>
+
+```text
+A katana with a worn wrapped handle. Sickly green, grey and rust palette under an overcast sky, abandoned post-outbreak city. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Single object only, isolated on a fully transparent background, square 1:1, three-quarter view laid diagonally from lower left to upper right, 12% empty margin on every side, crisp silhouette with a thin dark outline so it reads on both light and dark backgrounds, no hands, no shadow on the ground. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
+```
+
+</details>
+
+#### Balestra
+
+- **File**: `assets/arene/zombie/armi/balestra.webp`
+- **Cosa mostrare**: Balestra moderna da caccia con mirino.
+
+**Prompt**
+
+```text
+A modern hunting crossbow with a scope.
+```
+
+<details><summary>Prompt completo, pronto da incollare</summary>
+
+```text
+A modern hunting crossbow with a scope. Sickly green, grey and rust palette under an overcast sky, abandoned post-outbreak city. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Single object only, isolated on a fully transparent background, square 1:1, three-quarter view laid diagonally from lower left to upper right, 12% empty margin on every side, crisp silhouette with a thin dark outline so it reads on both light and dark backgrounds, no hands, no shadow on the ground. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
+```
+
+</details>
+
+#### Pistola
+
+- **File**: `assets/arene/zombie/armi/pistola.webp`
+- **Cosa mostrare**: Pistola semiautomatica malridotta.
+
+**Prompt**
+
+```text
+A battered semi-automatic pistol.
+```
+
+<details><summary>Prompt completo, pronto da incollare</summary>
+
+```text
+A battered semi-automatic pistol. Sickly green, grey and rust palette under an overcast sky, abandoned post-outbreak city. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Single object only, isolated on a fully transparent background, square 1:1, three-quarter view laid diagonally from lower left to upper right, 12% empty margin on every side, crisp silhouette with a thin dark outline so it reads on both light and dark backgrounds, no hands, no shadow on the ground. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
+```
+
+</details>
+
+#### Accetta
+
+- **File**: `assets/arene/zombie/armi/accetta.webp`
+- **Cosa mostrare**: Accetta con impugnatura in gomma.
+
+**Prompt**
+
+```text
+A hatchet with a rubber grip.
+```
+
+<details><summary>Prompt completo, pronto da incollare</summary>
+
+```text
+A hatchet with a rubber grip. Sickly green, grey and rust palette under an overcast sky, abandoned post-outbreak city. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Single object only, isolated on a fully transparent background, square 1:1, three-quarter view laid diagonally from lower left to upper right, 12% empty margin on every side, crisp silhouette with a thin dark outline so it reads on both light and dark backgrounds, no hands, no shadow on the ground. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
+```
+
+</details>
+
+---
 
 ## Isola Battle Royale
 
-Cartella: `assets/arene/royale/`. Palette: blu tropicale, verde giungla e arancio da tramonto.
+Un aereo, cento casse e una zona che si stringe.
 
-### Luoghi (16:9, 1280×720, sfondo pieno)
+- **Cartella**: `assets/arene/royale/` (con le sottocartelle `luoghi/`, `pericoli/`, `armi/`)
+- **Riferimento di stile**: `assets/arene/royale.webp`
+- **Atmosfera**: Isola tropicale da battle royale videoludico: blu mare, verde giungla, arancio di tramonto, contrasti puliti, un po' «da videogioco».
+- **Stile da aggiungere a ogni prompt di questa arena** (è già incluso nei prompt completi):
 
-| | File | Soggetto | Priorità | Traccia |
-| --- | --- | --- | --- | --- |
-|  | `luoghi/aeroporto.webp` | Aeroporto | alta | Aeroporto: il luogo dell'arena visto da vicino. Arena «Isola Battle Royale» (Un aereo, cento casse e una zona che si stringe). Palette: blu tropicale, verde giungla e arancio da tramonto. Formato 16:9. |
-|  | `luoghi/base-militare.webp` | Base militare | alta | Base militare: il luogo dell'arena visto da vicino. Arena «Isola Battle Royale» (Un aereo, cento casse e una zona che si stringe). Palette: blu tropicale, verde giungla e arancio da tramonto. Formato 16:9. |
-|  | `luoghi/villaggio-costiero.webp` | Villaggio costiero | alta | Villaggio costiero: il luogo dell'arena visto da vicino. Arena «Isola Battle Royale» (Un aereo, cento casse e una zona che si stringe). Palette: blu tropicale, verde giungla e arancio da tramonto. Formato 16:9. |
-|  | `luoghi/centrale-elettrica.webp` | Centrale elettrica | alta | Centrale elettrica: il luogo dell'arena visto da vicino. Arena «Isola Battle Royale» (Un aereo, cento casse e una zona che si stringe). Palette: blu tropicale, verde giungla e arancio da tramonto. Formato 16:9. |
-|  | `luoghi/fattoria.webp` | Fattoria | alta | Fattoria: il luogo dell'arena visto da vicino. Arena «Isola Battle Royale» (Un aereo, cento casse e una zona che si stringe). Palette: blu tropicale, verde giungla e arancio da tramonto. Formato 16:9. |
-|  | `luoghi/foresta.webp` | Foresta | alta | Foresta: il luogo dell'arena visto da vicino. Arena «Isola Battle Royale» (Un aereo, cento casse e una zona che si stringe). Palette: blu tropicale, verde giungla e arancio da tramonto. Formato 16:9. |
+```text
+Tropical island palette of deep sea blue, jungle green and orange sunset, clean stylised battle-royale video game look. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours.
+```
 
-### Pericoli (4:3, 960×720, sfondo pieno, scuro)
+Più, a seconda della sezione:
 
-| | File | Soggetto | Priorità | Traccia |
-| --- | --- | --- | --- | --- |
-|  | `pericoli/drone-armato.webp` | Drone armato | alta | Drone armato: creatura o minaccia pronta ad attaccare. Arena «Isola Battle Royale» (Un aereo, cento casse e una zona che si stringe). Palette: blu tropicale, verde giungla e arancio da tramonto. Formato 4:3. |
-|  | `pericoli/elicottero-da-caccia.webp` | Elicottero da caccia | alta | Elicottero da caccia: creatura o minaccia pronta ad attaccare. Arena «Isola Battle Royale» (Un aereo, cento casse e una zona che si stringe). Palette: blu tropicale, verde giungla e arancio da tramonto. Formato 4:3. |
-|  | `pericoli/cane-da-guardia-addestrato.webp` | Cane da guardia addestrato | alta | Cane da guardia addestrato: creatura o minaccia pronta ad attaccare. Arena «Isola Battle Royale» (Un aereo, cento casse e una zona che si stringe). Palette: blu tropicale, verde giungla e arancio da tramonto. Formato 4:3. |
+- Luoghi: `Wide 16:9 establishing shot of the location, no people, eye-level view, the key landmark inside the central third of the frame, soft depth fog in the background.`
+- Pericoli: `4:3 wanted-poster portrait, single threat centered and facing the viewer, head and eyes in the upper middle of the frame, dark vignetted background that fades to near black at the edges.`
+- Armi: `Single object only, isolated on a fully transparent background, square 1:1, three-quarter view laid diagonally from lower left to upper right, 12% empty margin on every side, crisp silhouette with a thin dark outline so it reads on both light and dark backgrounds, no hands, no shadow on the ground.`
+- Sempre: `No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.`
 
-### Armi (1:1, 512×512, sfondo trasparente)
+### Luoghi · Isola Battle Royale (16:9, 1280 × 720 px, sfondo pieno)
 
-| | File | Soggetto | Priorità | Traccia |
-| --- | --- | --- | --- | --- |
-|  | `armi/fucile-dassalto.webp` | Fucile d'assalto | media | Fucile d'assalto: arma o oggetto usato come arma. Arena «Isola Battle Royale» (Un aereo, cento casse e una zona che si stringe). Palette: blu tropicale, verde giungla e arancio da tramonto. Formato 1:1. Sfondo trasparente. |
-|  | `armi/pistola.webp` | Pistola | media | Pistola: arma o oggetto usato come arma. Arena «Isola Battle Royale» (Un aereo, cento casse e una zona che si stringe). Palette: blu tropicale, verde giungla e arancio da tramonto. Formato 1:1. Sfondo trasparente. |
-|  | `armi/fucile-da-cecchino.webp` | Fucile da cecchino | media | Fucile da cecchino: arma o oggetto usato come arma. Arena «Isola Battle Royale» (Un aereo, cento casse e una zona che si stringe). Palette: blu tropicale, verde giungla e arancio da tramonto. Formato 1:1. Sfondo trasparente. |
-|  | `armi/fucile-a-pompa.webp` | Fucile a pompa | media | Fucile a pompa: arma o oggetto usato come arma. Arena «Isola Battle Royale» (Un aereo, cento casse e una zona che si stringe). Palette: blu tropicale, verde giungla e arancio da tramonto. Formato 1:1. Sfondo trasparente. |
-|  | `armi/granata.webp` | Granata | media | Granata: arma o oggetto usato come arma. Arena «Isola Battle Royale» (Un aereo, cento casse e una zona che si stringe). Palette: blu tropicale, verde giungla e arancio da tramonto. Formato 1:1. Sfondo trasparente. |
-|  | `armi/mitraglietta.webp` | Mitraglietta | media | Mitraglietta: arma o oggetto usato come arma. Arena «Isola Battle Royale» (Un aereo, cento casse e una zona che si stringe). Palette: blu tropicale, verde giungla e arancio da tramonto. Formato 1:1. Sfondo trasparente. |
-|  | `armi/coltello-da-combattimento.webp` | Coltello da combattimento | media | Coltello da combattimento: arma o oggetto usato come arma. Arena «Isola Battle Royale» (Un aereo, cento casse e una zona che si stringe). Palette: blu tropicale, verde giungla e arancio da tramonto. Formato 1:1. Sfondo trasparente. |
-|  | `armi/balestra.webp` | Balestra | media | Balestra: arma o oggetto usato come arma. Arena «Isola Battle Royale» (Un aereo, cento casse e una zona che si stringe). Palette: blu tropicale, verde giungla e arancio da tramonto. Formato 1:1. Sfondo trasparente. |
+#### Aeroporto
 
-### Meteo (16:10, 1200×750, sfondo pieno)
+- **File**: `assets/arene/royale/luoghi/aeroporto.webp`
+- **Cosa mostrare**: Piccolo aeroporto dell'isola con pista, un cargo arrugginito e la torre di controllo.
 
-| | File | Soggetto | Priorità | Traccia |
-| --- | --- | --- | --- | --- |
-|  | `meteo/cassa-leggendaria.webp` | Cassa leggendaria | alta | Cassa leggendaria: Un aereo sgancia una cassa d'oro: tutti la vedono, tutti la vogliono.. Arena «Isola Battle Royale» (Un aereo, cento casse e una zona che si stringe). Palette: blu tropicale, verde giungla e arancio da tramonto. Formato 16:10. |
-|  | `meteo/pioggia-tropicale.webp` | Pioggia tropicale | alta | Pioggia tropicale: Rumore di pioggia sui tetti: perfetto per avvicinarsi senza essere sentiti.. Arena «Isola Battle Royale» (Un aereo, cento casse e una zona che si stringe). Palette: blu tropicale, verde giungla e arancio da tramonto. Formato 16:10. |
-|  | `meteo/visibilita-perfetta.webp` | Visibilità perfetta | alta | Visibilità perfetta: I cecchini festeggiano.. Arena «Isola Battle Royale» (Un aereo, cento casse e una zona che si stringe). Palette: blu tropicale, verde giungla e arancio da tramonto. Formato 16:10. |
-|  | `meteo/doppia-fama.webp` | Doppia fama | alta | Doppia fama: Gli spettatori sono il doppio: ogni gesto vale il doppio.. Arena «Isola Battle Royale» (Un aereo, cento casse e una zona che si stringe). Palette: blu tropicale, verde giungla e arancio da tramonto. Formato 16:10. |
-|  | `meteo/tempesta-accelerata.webp` | Tempesta accelerata | alta | Tempesta accelerata: La zona si stringe più in fretta del previsto.. Arena «Isola Battle Royale» (Un aereo, cento casse e una zona che si stringe). Palette: blu tropicale, verde giungla e arancio da tramonto. Formato 16:10. |
-|  | `meteo/tramonto-dorato.webp` | Tramonto dorato | alta | Tramonto dorato: Una luce perfetta per le inquadrature: tutti si mettono in posa.. Arena «Isola Battle Royale» (Un aereo, cento casse e una zona che si stringe). Palette: blu tropicale, verde giungla e arancio da tramonto. Formato 16:10. |
-|  | `meteo/evento-a-tempo.webp` | Evento a tempo | alta | Evento a tempo: Per un giorno, le armi d'oro sono ovunque.. Arena «Isola Battle Royale» (Un aereo, cento casse e una zona che si stringe). Palette: blu tropicale, verde giungla e arancio da tramonto. Formato 16:10. |
-|  | `meteo/nebbia-sullisola.webp` | Nebbia sull'isola | alta | Nebbia sull'isola: La nebbia copre l'isola: i cecchini restano a mani vuote.. Arena «Isola Battle Royale» (Un aereo, cento casse e una zona che si stringe). Palette: blu tropicale, verde giungla e arancio da tramonto. Formato 16:10. |
-|  | `meteo/diretta-speciale.webp` | Diretta speciale | alta | Diretta speciale: Il torneo viene trasmesso in prima serata: tutti vogliono farsi notare.. Arena «Isola Battle Royale» (Un aereo, cento casse e una zona che si stringe). Palette: blu tropicale, verde giungla e arancio da tramonto. Formato 16:10. |
+**Prompt**
 
-### Disastri (16:9, 1280×720, sfondo pieno)
+```text
+A small island airport with a runway, a rusty cargo plane and a control tower.
+```
 
-| | File | Soggetto | Priorità | Traccia |
-| --- | --- | --- | --- | --- |
-|  | `disastri/zona-rossa.webp` | Zona rossa · famiglia `esplosione` | alta | Zona rossa: Una zona rossa viene bombardata a tappeto senza preavviso.. Arena «Isola Battle Royale» (Un aereo, cento casse e una zona che si stringe). Palette: blu tropicale, verde giungla e arancio da tramonto. Formato 16:9. |
-|  | `disastri/zona-si-chiude.webp` | La zona si chiude · famiglia `esplosione` | alta | La zona si chiude: Il cerchio si restringe a velocità doppia.. Arena «Isola Battle Royale» (Un aereo, cento casse e una zona che si stringe). Palette: blu tropicale, verde giungla e arancio da tramonto. Formato 16:9. |
-|  | `disastri/caccia-del-drone.webp` | Caccia del drone · famiglia `bestie` | alta | Caccia del drone: Un drone armato sorvola l'isola e marca chiunque si muova.. Arena «Isola Battle Royale» (Un aereo, cento casse e una zona che si stringe). Palette: blu tropicale, verde giungla e arancio da tramonto. Formato 16:9. |
-|  | `disastri/tempesta-tropicale.webp` | Tempesta tropicale · famiglia `fulmine` | alta | Tempesta tropicale: Una tempesta improvvisa spazza l'isola: niente visibilità, niente suoni.. Arena «Isola Battle Royale» (Un aereo, cento casse e una zona che si stringe). Palette: blu tropicale, verde giungla e arancio da tramonto. Formato 16:9. |
-|  | `disastri/bombardamento-di-artiglieria.webp` | Bombardamento di artiglieria · famiglia `esplosione` | alta | Bombardamento di artiglieria: L'artiglieria colpisce a caso una zona dell'isola.. Arena «Isola Battle Royale» (Un aereo, cento casse e una zona che si stringe). Palette: blu tropicale, verde giungla e arancio da tramonto. Formato 16:9. |
-|  | `disastri/uragano.webp` | Uragano · famiglia `fulmine` | alta | Uragano: Un uragano si abbatte sull'isola.. Arena «Isola Battle Royale» (Un aereo, cento casse e una zona che si stringe). Palette: blu tropicale, verde giungla e arancio da tramonto. Formato 16:9. |
-|  | `disastri/gas-tossico.webp` | Gas tossico · famiglia `tossico` | alta | Gas tossico: Un gas tossico si diffonde dalla Centrale elettrica.. Arena «Isola Battle Royale» (Un aereo, cento casse e una zona che si stringe). Palette: blu tropicale, verde giungla e arancio da tramonto. Formato 16:9. |
-|  | `disastri/tsunami.webp` | Tsunami · famiglia `acqua` | alta | Tsunami: Un'onda gigante colpisce il Villaggio costiero.. Arena «Isola Battle Royale» (Un aereo, cento casse e una zona che si stringe). Palette: blu tropicale, verde giungla e arancio da tramonto. Formato 16:9. |
-|  | `disastri/cerchio-rosso.webp` | Il cerchio rosso · famiglia `esplosione` | alta | Il cerchio rosso: Un cerchio rosso compare sulla mappa: bombardamento in arrivo.. Arena «Isola Battle Royale» (Un aereo, cento casse e una zona che si stringe). Palette: blu tropicale, verde giungla e arancio da tramonto. Formato 16:9. |
-|  | `disastri/incendio-nella-foresta.webp` | Incendio nella Foresta · famiglia `fuoco` | media | Incendio nella Foresta: Un incendio si propaga nella Foresta.. Arena «Isola Battle Royale» (Un aereo, cento casse e una zona che si stringe). Palette: blu tropicale, verde giungla e arancio da tramonto. Formato 16:9. |
-|  | `disastri/elicotteri-dassalto.webp` | Elicotteri d'assalto · famiglia `esplosione` | media | Elicotteri d'assalto: Elicotteri armati pattugliano l'isola.. Arena «Isola Battle Royale» (Un aereo, cento casse e una zona che si stringe). Palette: blu tropicale, verde giungla e arancio da tramonto. Formato 16:9. |
-|  | `disastri/black-out-del-radar.webp` | Black-out del radar · famiglia `buio` | media | Black-out del radar: Il radar si spegne e nessuno sa più dov'è la zona sicura.. Arena «Isola Battle Royale» (Un aereo, cento casse e una zona che si stringe). Palette: blu tropicale, verde giungla e arancio da tramonto. Formato 16:9. |
-|  | `disastri/cecchini-automatici.webp` | Cecchini automatici · famiglia `esplosione` | media | Cecchini automatici: Delle torrette automatiche si attivano sui tetti.. Arena «Isola Battle Royale» (Un aereo, cento casse e una zona che si stringe). Palette: blu tropicale, verde giungla e arancio da tramonto. Formato 16:9. |
-|  | `disastri/nebbia-fitta.webp` | Nebbia fitta · famiglia `nebbia` | media | Nebbia fitta: Una nebbia densa scende sull'isola.. Arena «Isola Battle Royale» (Un aereo, cento casse e una zona che si stringe). Palette: blu tropicale, verde giungla e arancio da tramonto. Formato 16:9. |
-|  | `disastri/terremoto.webp` | Terremoto · famiglia `terremoto` | media | Terremoto: Un terremoto scuote l'isola.. Arena «Isola Battle Royale» (Un aereo, cento casse e una zona che si stringe). Palette: blu tropicale, verde giungla e arancio da tramonto. Formato 16:9. |
-|  | `disastri/squali.webp` | Squali · famiglia `acqua` | media | Squali: Gli squali circondano l'isola e il mare diventa un pericolo.. Arena «Isola Battle Royale» (Un aereo, cento casse e una zona che si stringe). Palette: blu tropicale, verde giungla e arancio da tramonto. Formato 16:9. |
-|  | `disastri/mine-nel-campo.webp` | Mine nel campo · famiglia `esplosione` | media | Mine nel campo: Un campo minato si rivela sotto il grano della Fattoria.. Arena «Isola Battle Royale» (Un aereo, cento casse e una zona che si stringe). Palette: blu tropicale, verde giungla e arancio da tramonto. Formato 16:9. |
-|  | `disastri/pioggia-di-casse.webp` | Pioggia di casse · famiglia `pioggia` | media | Pioggia di casse: Le casse di rifornimento cadono a decine.. Arena «Isola Battle Royale» (Un aereo, cento casse e una zona che si stringe). Palette: blu tropicale, verde giungla e arancio da tramonto. Formato 16:9. |
-|  | `disastri/cani-da-guardia.webp` | Cani da guardia · famiglia `bestie` | media | Cani da guardia: I cani della Base militare vengono liberati.. Arena «Isola Battle Royale» (Un aereo, cento casse e una zona che si stringe). Palette: blu tropicale, verde giungla e arancio da tramonto. Formato 16:9. |
-|  | `disastri/zona-ridotta.webp` | Zona ridotta · famiglia `spettacolo` | media | Zona ridotta: La zona si riduce a metà in un minuto.. Arena «Isola Battle Royale» (Un aereo, cento casse e una zona che si stringe). Palette: blu tropicale, verde giungla e arancio da tramonto. Formato 16:9. |
-|  | `disastri/esplosione-della-centrale.webp` | Esplosione della Centrale · famiglia `esplosione` | media | Esplosione della Centrale: La Centrale elettrica esplode.. Arena «Isola Battle Royale» (Un aereo, cento casse e una zona che si stringe). Palette: blu tropicale, verde giungla e arancio da tramonto. Formato 16:9. |
-|  | `disastri/cecchino-fantasma.webp` | Il cecchino fantasma · famiglia `esplosione` | media | Il cecchino fantasma: Un cecchino controllato dagli organizzatori colpisce chi resta fermo.. Arena «Isola Battle Royale» (Un aereo, cento casse e una zona che si stringe). Palette: blu tropicale, verde giungla e arancio da tramonto. Formato 16:9. |
-|  | `disastri/interferenza.webp` | Interferenza · famiglia `tech` | media | Interferenza: Un'interferenza disattiva i visori e le radio.. Arena «Isola Battle Royale» (Un aereo, cento casse e una zona che si stringe). Palette: blu tropicale, verde giungla e arancio da tramonto. Formato 16:9. |
-|  | `disastri/ponte-crolla.webp` | Il ponte crolla · famiglia `terremoto` | media | Il ponte crolla: Il ponte che collega le due metà dell'isola crolla.. Arena «Isola Battle Royale» (Un aereo, cento casse e una zona che si stringe). Palette: blu tropicale, verde giungla e arancio da tramonto. Formato 16:9. |
-|  | `disastri/ondata-di-calore.webp` | Ondata di calore · famiglia `sole` | media | Ondata di calore: Il sole picchia sull'isola senza un filo d'ombra.. Arena «Isola Battle Royale» (Un aereo, cento casse e una zona che si stringe). Palette: blu tropicale, verde giungla e arancio da tramonto. Formato 16:9. |
-|  | `disastri/squadra-di-bot.webp` | Squadra di bot · famiglia `spettacolo` | media | Squadra di bot: Una squadra di bot armati entra in gioco.. Arena «Isola Battle Royale» (Un aereo, cento casse e una zona che si stringe). Palette: blu tropicale, verde giungla e arancio da tramonto. Formato 16:9. |
-|  | `disastri/allagamento.webp` | Allagamento · famiglia `pioggia` | media | Allagamento: La pioggia allaga le zone basse dell'isola.. Arena «Isola Battle Royale» (Un aereo, cento casse e una zona che si stringe). Palette: blu tropicale, verde giungla e arancio da tramonto. Formato 16:9. |
-|  | `disastri/granate-a-grappolo.webp` | Granate a grappolo · famiglia `esplosione` | media | Granate a grappolo: Dal cielo cadono granate a grappolo.. Arena «Isola Battle Royale» (Un aereo, cento casse e una zona che si stringe). Palette: blu tropicale, verde giungla e arancio da tramonto. Formato 16:9. |
-|  | `disastri/drone-kamikaze.webp` | Il drone kamikaze · famiglia `tech` | media | Il drone kamikaze: Un drone kamikaze punta il giocatore più vicino.. Arena «Isola Battle Royale» (Un aereo, cento casse e una zona che si stringe). Palette: blu tropicale, verde giungla e arancio da tramonto. Formato 16:9. |
-|  | `disastri/faro.webp` | Il faro · famiglia `buio` | media | Il faro: Il faro dell'isola illumina chiunque si trovi all'aperto di notte.. Arena «Isola Battle Royale» (Un aereo, cento casse e una zona che si stringe). Palette: blu tropicale, verde giungla e arancio da tramonto. Formato 16:9. |
-|  | `disastri/tempesta-di-sabbia.webp` | Tempesta di sabbia · famiglia `sabbia` | media | Tempesta di sabbia: Una tempesta di sabbia avvolge l'Aeroporto.. Arena «Isola Battle Royale» (Un aereo, cento casse e una zona che si stringe). Palette: blu tropicale, verde giungla e arancio da tramonto. Formato 16:9. |
-|  | `disastri/zona-che-si-espande.webp` | La zona che si espande · famiglia `spettacolo` | media | La zona che si espande: Per errore, la zona sicura si allarga invece di stringersi. Poi si ristringe di colpo.. Arena «Isola Battle Royale» (Un aereo, cento casse e una zona che si stringe). Palette: blu tropicale, verde giungla e arancio da tramonto. Formato 16:9. |
-|  | `disastri/bot-di-livello-massimo.webp` | I bot di livello massimo · famiglia `spettacolo` | media | I bot di livello massimo: Entrano in gioco bot con mira perfetta.. Arena «Isola Battle Royale» (Un aereo, cento casse e una zona che si stringe). Palette: blu tropicale, verde giungla e arancio da tramonto. Formato 16:9. |
-|  | `disastri/pioggia-di-granate.webp` | La pioggia di granate · famiglia `esplosione` | media | La pioggia di granate: Granate cadono dal cielo come confetti.. Arena «Isola Battle Royale» (Un aereo, cento casse e una zona che si stringe). Palette: blu tropicale, verde giungla e arancio da tramonto. Formato 16:9. |
-|  | `disastri/lag.webp` | Il lag · famiglia `spettacolo` | media | Il lag: La realtà dell'isola rallenta per un'ora, poi accelera di colpo.. Arena «Isola Battle Royale» (Un aereo, cento casse e una zona che si stringe). Palette: blu tropicale, verde giungla e arancio da tramonto. Formato 16:9. |
-|  | `disastri/camion-dei-rifornimenti.webp` | Il camion dei rifornimenti · famiglia `spettacolo` | media | Il camion dei rifornimenti: Un camion senza conducente attraversa l'isola a tutta velocità.. Arena «Isola Battle Royale» (Un aereo, cento casse e una zona che si stringe). Palette: blu tropicale, verde giungla e arancio da tramonto. Formato 16:9. |
-|  | `disastri/stagione-degli-uragani.webp` | La stagione degli uragani · famiglia `spettacolo` | media | La stagione degli uragani: Tre uragani contemporaneamente attraversano l'isola.. Arena «Isola Battle Royale» (Un aereo, cento casse e una zona che si stringe). Palette: blu tropicale, verde giungla e arancio da tramonto. Formato 16:9. |
-|  | `disastri/notte-dei-visori-rotti.webp` | La notte dei visori rotti · famiglia `buio` | media | La notte dei visori rotti: I visori notturni smettono di funzionare tutti insieme.. Arena «Isola Battle Royale» (Un aereo, cento casse e una zona che si stringe). Palette: blu tropicale, verde giungla e arancio da tramonto. Formato 16:9. |
-|  | `disastri/evento-speciale.webp` | L'evento speciale · famiglia `spettacolo` | media | L'evento speciale: Gli organizzatori lanciano un evento a tempo con armi dorate e trappole ovunque.. Arena «Isola Battle Royale» (Un aereo, cento casse e una zona che si stringe). Palette: blu tropicale, verde giungla e arancio da tramonto. Formato 16:9. |
-|  | `disastri/gas-della-centrale.webp` | Il gas della Centrale · famiglia `tossico` | media | Il gas della Centrale: La Centrale elettrica rilascia un gas verde.. Arena «Isola Battle Royale» (Un aereo, cento casse e una zona che si stringe). Palette: blu tropicale, verde giungla e arancio da tramonto. Formato 16:9. |
-|  | `disastri/squalo-di-terra.webp` | Squalo di terra · famiglia `spettacolo` | media | Squalo di terra: Uno squalo meccanico nuota sotto il terreno dell'isola.. Arena «Isola Battle Royale» (Un aereo, cento casse e una zona che si stringe). Palette: blu tropicale, verde giungla e arancio da tramonto. Formato 16:9. |
-|  | `disastri/pioggia-di-monete.webp` | La pioggia di monete · famiglia `pioggia` | media | La pioggia di monete: Il cielo piove monete d'oro. Pesanti.. Arena «Isola Battle Royale» (Un aereo, cento casse e una zona che si stringe). Palette: blu tropicale, verde giungla e arancio da tramonto. Formato 16:9. |
-|  | `disastri/cancellazione.webp` | La cancellazione · famiglia `spettacolo` | media | La cancellazione: Una parte dell'isola viene cancellata per un aggiornamento.. Arena «Isola Battle Royale» (Un aereo, cento casse e una zona che si stringe). Palette: blu tropicale, verde giungla e arancio da tramonto. Formato 16:9. |
-|  | `disastri/torneo-di-emote.webp` | Il torneo di emote · famiglia `spettacolo` | media | Il torneo di emote: Gli organizzatori premiano chi balla meglio. Ma chi balla, si ferma.. Arena «Isola Battle Royale» (Un aereo, cento casse e una zona che si stringe). Palette: blu tropicale, verde giungla e arancio da tramonto. Formato 16:9. |
-|  | `disastri/terremoto-della-base.webp` | Il terremoto della Base · famiglia `terremoto` | media | Il terremoto della Base: La Base militare collassa su se stessa.. Arena «Isola Battle Royale» (Un aereo, cento casse e una zona che si stringe). Palette: blu tropicale, verde giungla e arancio da tramonto. Formato 16:9. |
-|  | `disastri/elicotteri-giocattolo.webp` | Gli elicotteri giocattolo · famiglia `esplosione` | media | Gli elicotteri giocattolo: Migliaia di droni giocattolo invadono l'isola. Sono armati.. Arena «Isola Battle Royale» (Un aereo, cento casse e una zona che si stringe). Palette: blu tropicale, verde giungla e arancio da tramonto. Formato 16:9. |
-|  | `disastri/isola-galleggiante.webp` | L'isola galleggiante · famiglia `spettacolo` | media | L'isola galleggiante: L'isola si stacca dal fondale e comincia a ondeggiare.. Arena «Isola Battle Royale» (Un aereo, cento casse e una zona che si stringe). Palette: blu tropicale, verde giungla e arancio da tramonto. Formato 16:9. |
-|  | `disastri/festival.webp` | Il festival · famiglia `spettacolo` · 18+ | bassa | Il festival: Gli organizzatori aprono un festival musicale al centro dell'isola, con alcol gratis.. Arena «Isola Battle Royale» (Un aereo, cento casse e una zona che si stringe). Palette: blu tropicale, verde giungla e arancio da tramonto. Formato 16:9. |
-|  | `disastri/pioggia-di-sangue.webp` | La pioggia di sangue · famiglia `cielo` · 18+ | bassa | La pioggia di sangue: Una tempesta artificiale rende rosso il mare e le strade. Pura scena.. Arena «Isola Battle Royale» (Un aereo, cento casse e una zona che si stringe). Palette: blu tropicale, verde giungla e arancio da tramonto. Formato 16:9. |
-|  | `disastri/pubblico-vota.webp` | Il pubblico vota · famiglia `spettacolo` | media | Il pubblico vota: Il pubblico vota in diretta chi colpire con un fulmine artificiale.. Arena «Isola Battle Royale» (Un aereo, cento casse e una zona che si stringe). Palette: blu tropicale, verde giungla e arancio da tramonto. Formato 16:9. |
-|  | `disastri/pausa-pubblicitaria.webp` | La pausa pubblicitaria · famiglia `spettacolo` | media | La pausa pubblicitaria: Durante la pubblicità, gli organizzatori si dimenticano di sorvegliare le trappole.. Arena «Isola Battle Royale» (Un aereo, cento casse e una zona che si stringe). Palette: blu tropicale, verde giungla e arancio da tramonto. Formato 16:9. |
-|  | `disastri/cambio-di-regia.webp` | Il cambio di regia · famiglia `spettacolo` | media | Il cambio di regia: Arriva un nuovo regista che vuole più azione.. Arena «Isola Battle Royale» (Un aereo, cento casse e una zona che si stringe). Palette: blu tropicale, verde giungla e arancio da tramonto. Formato 16:9. |
-|  | `disastri/pioggia-di-coriandoli.webp` | La pioggia di coriandoli · famiglia `spettacolo` | media | La pioggia di coriandoli: Per festeggiare la metà della stagione, gli organizzatori fanno piovere coriandoli. Di vetro.. Arena «Isola Battle Royale» (Un aereo, cento casse e una zona che si stringe). Palette: blu tropicale, verde giungla e arancio da tramonto. Formato 16:9. |
-|  | `disastri/ospite-speciale.webp` | L'ospite speciale · famiglia `spettacolo` | media | L'ospite speciale: Una celebrità entra nell'arena per un giorno, con una squadra di guardie del corpo armate.. Arena «Isola Battle Royale» (Un aereo, cento casse e una zona che si stringe). Palette: blu tropicale, verde giungla e arancio da tramonto. Formato 16:9. |
-|  | `disastri/sponsor-ritirato.webp` | Lo sponsor ritirato · famiglia `spettacolo` | media | Lo sponsor ritirato: Uno sponsor si ritira e reclama indietro tutti i regali. Con i droni.. Arena «Isola Battle Royale» (Un aereo, cento casse e una zona che si stringe). Palette: blu tropicale, verde giungla e arancio da tramonto. Formato 16:9. |
-|  | `disastri/gioco-a-quiz.webp` | Il gioco a quiz · famiglia `spettacolo` | media | Il gioco a quiz: Gli organizzatori interrompono tutto per un quiz di cultura generale. Chi sbaglia paga.. Arena «Isola Battle Royale» (Un aereo, cento casse e una zona che si stringe). Palette: blu tropicale, verde giungla e arancio da tramonto. Formato 16:9. |
-|  | `disastri/sciopero-dei-tecnici.webp` | Lo sciopero dei tecnici · famiglia `spettacolo` | media | Lo sciopero dei tecnici: I tecnici dell'arena scioperano e nessuno controlla più i sistemi.. Arena «Isola Battle Royale» (Un aereo, cento casse e una zona che si stringe). Palette: blu tropicale, verde giungla e arancio da tramonto. Formato 16:9. |
-|  | `disastri/replica.webp` | La replica · famiglia `spettacolo` | media | La replica: Per problemi tecnici, l'arena ripete il disastro di due giorni fa, ma più forte.. Arena «Isola Battle Royale» (Un aereo, cento casse e una zona che si stringe). Palette: blu tropicale, verde giungla e arancio da tramonto. Formato 16:9. |
-|  | `disastri/giornata-dei-bambini.webp` | La giornata dei bambini · famiglia `spettacolo` | media | La giornata dei bambini: Gli organizzatori fanno disegnare le trappole del giorno ai bambini. Sono molto creativi.. Arena «Isola Battle Royale» (Un aereo, cento casse e una zona che si stringe). Palette: blu tropicale, verde giungla e arancio da tramonto. Formato 16:9. |
-|  | `disastri/asta-dei-concorrenti.webp` | L'asta dei concorrenti · famiglia `spettacolo` | media | L'asta dei concorrenti: Il pubblico può comprare il diritto di decidere la sorte di un concorrente.. Arena «Isola Battle Royale» (Un aereo, cento casse e una zona che si stringe). Palette: blu tropicale, verde giungla e arancio da tramonto. Formato 16:9. |
-|  | `disastri/terremoto-della-produzione.webp` | Il terremoto della produzione · famiglia `terremoto` | media | Il terremoto della produzione: Un camion della produzione si ribalta dentro l'arena e libera tutto quello che trasportava.. Arena «Isola Battle Royale» (Un aereo, cento casse e una zona che si stringe). Palette: blu tropicale, verde giungla e arancio da tramonto. Formato 16:9. |
-|  | `disastri/blackout-delle-telecamere.webp` | Il blackout delle telecamere · famiglia `spettacolo` | media | Il blackout delle telecamere: Le telecamere si spengono per un'ora. Senza testimoni, le regole saltano.. Arena «Isola Battle Royale» (Un aereo, cento casse e una zona che si stringe). Palette: blu tropicale, verde giungla e arancio da tramonto. Formato 16:9. |
-|  | `disastri/musica-a-tutto-volume.webp` | La musica a tutto volume · famiglia `spettacolo` | media | La musica a tutto volume: Gli organizzatori diffondono la stessa canzone estiva per ventiquattro ore.. Arena «Isola Battle Royale» (Un aereo, cento casse e una zona che si stringe). Palette: blu tropicale, verde giungla e arancio da tramonto. Formato 16:9. |
-|  | `disastri/doppio-disastro.webp` | Il doppio disastro · famiglia `spettacolo` | media | Il doppio disastro: Due disastri si attivano nello stesso momento per un errore di programmazione.. Arena «Isola Battle Royale» (Un aereo, cento casse e una zona che si stringe). Palette: blu tropicale, verde giungla e arancio da tramonto. Formato 16:9. |
-|  | `disastri/maratona.webp` | La maratona · famiglia `spettacolo` | media | La maratona: Gli organizzatori obbligano tutti a correre per due ore. Chi si ferma viene punito.. Arena «Isola Battle Royale» (Un aereo, cento casse e una zona che si stringe). Palette: blu tropicale, verde giungla e arancio da tramonto. Formato 16:9. |
-|  | `disastri/sondaggio-della-crudelta.webp` | Il sondaggio della crudeltà · famiglia `spettacolo` | media | Il sondaggio della crudeltà: Il pubblico vota il disastro più crudele. Vince "tutti insieme".. Arena «Isola Battle Royale» (Un aereo, cento casse e una zona che si stringe). Palette: blu tropicale, verde giungla e arancio da tramonto. Formato 16:9. |
-|  | `disastri/invasione-dei-fan.webp` | L'invasione dei fan · famiglia `spettacolo` | media | L'invasione dei fan: Un gruppo di fan scavalca le recinzioni e invade l'arena per conoscere i propri idoli.. Arena «Isola Battle Royale» (Un aereo, cento casse e una zona che si stringe). Palette: blu tropicale, verde giungla e arancio da tramonto. Formato 16:9. |
-|  | `disastri/gioco-delle-sedie.webp` | Il gioco delle sedie · famiglia `spettacolo` | media | Il gioco delle sedie: Gli organizzatori mettono al centro dell'arena una sedia in meno dei concorrenti. Chi resta in piedi viene punito.. Arena «Isola Battle Royale» (Un aereo, cento casse e una zona che si stringe). Palette: blu tropicale, verde giungla e arancio da tramonto. Formato 16:9. |
-|  | `disastri/nebbia-delle-risate-registrate.webp` | La nebbia delle risate registrate · famiglia `spettacolo` | media | La nebbia delle risate registrate: Dagli altoparlanti partono risate registrate a ogni sfortuna. È psicologicamente devastante.. Arena «Isola Battle Royale» (Un aereo, cento casse e una zona che si stringe). Palette: blu tropicale, verde giungla e arancio da tramonto. Formato 16:9. |
-|  | `disastri/notte-rossa.webp` | La notte rossa · famiglia `buio` · 18+ | bassa | La notte rossa: Gli organizzatori sospendono ogni regola per una notte: niente telecamere sui dettagli, niente limiti.. Arena «Isola Battle Royale» (Un aereo, cento casse e una zona che si stringe). Palette: blu tropicale, verde giungla e arancio da tramonto. Formato 16:9. |
-|  | `disastri/bar-aperto.webp` | Il bar aperto · famiglia `festa` · 18+ | bassa | Il bar aperto: Un bar con alcol illimitato compare nel mezzo dell'arena. Gratis, per un'ora.. Arena «Isola Battle Royale» (Un aereo, cento casse e una zona che si stringe). Palette: blu tropicale, verde giungla e arancio da tramonto. Formato 16:9. |
-|  | `disastri/spettacolo-del-pudore.webp` | Lo spettacolo del pudore · famiglia `spettacolo` · 18+ | bassa | Lo spettacolo del pudore: Gli organizzatori fanno sparire tutti i vestiti dei concorrenti per un giorno.. Arena «Isola Battle Royale» (Un aereo, cento casse e una zona che si stringe). Palette: blu tropicale, verde giungla e arancio da tramonto. Formato 16:9. |
-|  | `disastri/spore-del-desiderio.webp` | Le spore del desiderio · famiglia `festa` · 18+ | bassa | Le spore del desiderio: Le spore di un fungo rendono tutti irresistibilmente attratti dalla persona più vicina.. Arena «Isola Battle Royale» (Un aereo, cento casse e una zona che si stringe). Palette: blu tropicale, verde giungla e arancio da tramonto. Formato 16:9. |
-|  | `disastri/macello.webp` | Il macello · famiglia `sangue` · 18+ | bassa | Il macello: Gli organizzatori aprono le gabbie di tutti i mostri insieme e chiamano l'evento "Il macello". Il nome è accurato.. Arena «Isola Battle Royale» (Un aereo, cento casse e una zona che si stringe). Palette: blu tropicale, verde giungla e arancio da tramonto. Formato 16:9. |
-|  | `disastri/bombardamento-a-tappeto.webp` | Il bombardamento a tappeto · famiglia `esplosione` | media | Il bombardamento a tappeto: Una zona rossa compare sulla mappa: arrivano le bombe.. Arena «Isola Battle Royale» (Un aereo, cento casse e una zona che si stringe). Palette: blu tropicale, verde giungla e arancio da tramonto. Formato 16:9. |
-|  | `disastri/elicottero-da-caccia.webp` | L'elicottero da caccia · famiglia `esplosione` | media | L'elicottero da caccia: Un elicottero degli organizzatori sorvola l'isola sparando a caso.. Arena «Isola Battle Royale» (Un aereo, cento casse e una zona che si stringe). Palette: blu tropicale, verde giungla e arancio da tramonto. Formato 16:9. |
-|  | `disastri/lupi-bionici.webp` | I lupi bionici · famiglia `bestie` | media | I lupi bionici: Branchi di lupi con occhi rossi escono dalla Foresta.. Arena «Isola Battle Royale» (Un aereo, cento casse e una zona che si stringe). Palette: blu tropicale, verde giungla e arancio da tramonto. Formato 16:9. |
-|  | `disastri/zona-tossica.webp` | La zona tossica · famiglia `tossico` | media | La zona tossica: Una nube verde copre la Fattoria.. Arena «Isola Battle Royale» (Un aereo, cento casse e una zona che si stringe). Palette: blu tropicale, verde giungla e arancio da tramonto. Formato 16:9. |
-|  | `disastri/crollo-del-ponte.webp` | Il crollo del ponte · famiglia `terremoto` | media | Il crollo del ponte: Il ponte principale dell'isola crolla mentre tutti lo attraversano.. Arena «Isola Battle Royale» (Un aereo, cento casse e una zona che si stringe). Palette: blu tropicale, verde giungla e arancio da tramonto. Formato 16:9. |
-|  | `disastri/blackout-del-server.webp` | Il blackout del server · famiglia `buio` | media | Il blackout del server: L'arena «laggha»: per qualche minuto tutto si muove a scatti.. Arena «Isola Battle Royale» (Un aereo, cento casse e una zona che si stringe). Palette: blu tropicale, verde giungla e arancio da tramonto. Formato 16:9. |
+<details><summary>Prompt completo, pronto da incollare</summary>
 
-### Oggetti (1:1, 512×512, sfondo trasparente)
+```text
+A small island airport with a runway, a rusty cargo plane and a control tower. Tropical island palette of deep sea blue, jungle green and orange sunset, clean stylised battle-royale video game look. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Wide 16:9 establishing shot of the location, no people, eye-level view, the key landmark inside the central third of the frame, soft depth fog in the background. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
+```
 
-| | File | Soggetto | Priorità | Traccia |
-| --- | --- | --- | --- | --- |
-|  | `oggetti/arma.webp` | Arma | alta | Arma: Più forza negli scontri, in base alla qualità (★). Si consuma a ogni colpo e alla fine si rompe; con un attrezzo si può riparare. Chi è ingegnoso può intingerla nel veleno.. Arena «Isola Battle Royale» (Un aereo, cento casse e una zona che si stringe). Palette: blu tropicale, verde giungla e arancio da tramonto. Formato 1:1. Sfondo trasparente. |
-|  | `oggetti/armatura.webp` | Protezione (per esempio giubbotto tattico di livello 2, elmetto da paracadutista) | alta | Protezione (per esempio giubbotto tattico di livello 2, elmetto da paracadutista): Riduce i danni e a volte para un colpo mortale. Si consuma a ogni colpo incassato.. Arena «Isola Battle Royale» (Un aereo, cento casse e una zona che si stringe). Palette: blu tropicale, verde giungla e arancio da tramonto. Formato 1:1. Sfondo trasparente. |
-|  | `oggetti/med.webp` | Cure | alta | Cure: Si usa da soli o sugli alleati: richiude le ferite gravi, ferma veleni e infezioni presi in tempo, abbassa l'indicatore dell'arena.. Arena «Isola Battle Royale» (Un aereo, cento casse e una zona che si stringe). Palette: blu tropicale, verde giungla e arancio da tramonto. Formato 1:1. Sfondo trasparente. |
-|  | `oggetti/cibo.webp` | Cibo | alta | Cibo: Si mangia quando la sazietà cala. Si può dividere con gli alleati, regalare o scambiare.. Arena «Isola Battle Royale» (Un aereo, cento casse e una zona che si stringe). Palette: blu tropicale, verde giungla e arancio da tramonto. Formato 1:1. Sfondo trasparente. |
-|  | `oggetti/attrezzo.webp` | Attrezzo (per esempio drone esploratore, binocolo) | alta | Attrezzo (per esempio drone esploratore, binocolo): Più cibo trovato, fughe più facili da tempeste e trappole, difesa migliore di notte, armi riparate.. Arena «Isola Battle Royale» (Un aereo, cento casse e una zona che si stringe). Palette: blu tropicale, verde giungla e arancio da tramonto. Formato 1:1. Sfondo trasparente. |
-|  | `oggetti/mappa.webp` | Mappa | alta | Mappa: Più cibo, meno disastri, trappole scoperte in anticipo e vie di fuga sicure.. Arena «Isola Battle Royale» (Un aereo, cento casse e una zona che si stringe). Palette: blu tropicale, verde giungla e arancio da tramonto. Formato 1:1. Sfondo trasparente. |
-|  | `oggetti/trap.webp` | Trappola | alta | Trappola: Di notte chi la sa usare la piazza nella sua zona. Chi ci passa rischia grosso, e l'uccisione va a chi l'ha piazzata.. Arena «Isola Battle Royale» (Un aereo, cento casse e una zona che si stringe). Palette: blu tropicale, verde giungla e arancio da tramonto. Formato 1:1. Sfondo trasparente. |
-|  | `oggetti/esplosivo.webp` | Esplosivo | alta | Esplosivo: Più forza negli scontri. Chi è ingegnoso ci costruisce trappole esplosive. Da ubriachi è un pessimo compagno.. Arena «Isola Battle Royale» (Un aereo, cento casse e una zona che si stringe). Palette: blu tropicale, verde giungla e arancio da tramonto. Formato 1:1. Sfondo trasparente. |
-|  | `oggetti/veleno.webp` | Veleno | alta | Veleno: Apre la strada agli avvelenamenti; chi è ingegnoso ci intinge l'arma, che poi avvelena a ogni colpo.. Arena «Isola Battle Royale» (Un aereo, cento casse e una zona che si stringe). Palette: blu tropicale, verde giungla e arancio da tramonto. Formato 1:1. Sfondo trasparente. |
-|  | `oggetti/amuleto.webp` | Portafortuna | alta | Portafortuna: Può evitare una morte diretta narrata da un evento: probabilità 85%, certa per chi è superstizioso. Si consuma quando salva. Non ferma i danni periodici di fame, malattie e ferite. Calma Terrore e Corruzione.. Arena «Isola Battle Royale» (Un aereo, cento casse e una zona che si stringe). Palette: blu tropicale, verde giungla e arancio da tramonto. Formato 1:1. Sfondo trasparente. |
-|  | `oggetti/alcol.webp` | Alcol (per esempio lattina di birra calda) | alta | Alcol (per esempio lattina di birra calda): Scalda, fa dimenticare, disinfetta le ferite infette. E ubriaca.. Arena «Isola Battle Royale» (Un aereo, cento casse e una zona che si stringe). Palette: blu tropicale, verde giungla e arancio da tramonto. Formato 1:1. Sfondo trasparente. |
-|  | `oggetti/valore.webp` | Merce di scambio (per esempio sacchetto di monete dell'evento, skin leggendaria) | alta | Merce di scambio (per esempio sacchetto di monete dell'evento, skin leggendaria): Non serve a niente, tranne che a comprare cibo e cure da chi ne ha.. Arena «Isola Battle Royale» (Un aereo, cento casse e una zona che si stringe). Palette: blu tropicale, verde giungla e arancio da tramonto. Formato 1:1. Sfondo trasparente. |
-|  | `oggetti/ricordo.webp` | Ricordo (per esempio foto di famiglia, lettera mai spedita) | alta | Ricordo (per esempio foto di famiglia, lettera mai spedita): Un pezzo di casa: ogni notte tiene su il morale. Se è di qualcuno che non c'è più, ancora di più.. Arena «Isola Battle Royale» (Un aereo, cento casse e una zona che si stringe). Palette: blu tropicale, verde giungla e arancio da tramonto. Formato 1:1. Sfondo trasparente. |
+</details>
+
+#### Base militare
+
+- **File**: `assets/arene/royale/luoghi/base-militare.webp`
+- **Cosa mostrare**: Base militare con tende, torrette di guardia, casse di rifornimento ed eliporto.
+
+**Prompt**
+
+```text
+A military base with tents, watchtowers, supply crates and a helipad.
+```
+
+<details><summary>Prompt completo, pronto da incollare</summary>
+
+```text
+A military base with tents, watchtowers, supply crates and a helipad. Tropical island palette of deep sea blue, jungle green and orange sunset, clean stylised battle-royale video game look. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Wide 16:9 establishing shot of the location, no people, eye-level view, the key landmark inside the central third of the frame, soft depth fog in the background. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
+```
+
+</details>
+
+#### Villaggio costiero
+
+- **File**: `assets/arene/royale/luoghi/villaggio-costiero.webp`
+- **Cosa mostrare**: Villaggio di pescatori con case colorate, pontile di legno e barche.
+
+**Prompt**
+
+```text
+A coastal fishing village with colourful houses, a wooden pier and boats.
+```
+
+<details><summary>Prompt completo, pronto da incollare</summary>
+
+```text
+A coastal fishing village with colourful houses, a wooden pier and boats. Tropical island palette of deep sea blue, jungle green and orange sunset, clean stylised battle-royale video game look. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Wide 16:9 establishing shot of the location, no people, eye-level view, the key landmark inside the central third of the frame, soft depth fog in the background. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
+```
+
+</details>
+
+#### Centrale elettrica
+
+- **File**: `assets/arene/royale/luoghi/centrale-elettrica.webp`
+- **Cosa mostrare**: Centrale elettrica con torri di raffreddamento, tralicci e trasformatori.
+
+**Prompt**
+
+```text
+A power plant with cooling towers, pylons and humming transformers.
+```
+
+<details><summary>Prompt completo, pronto da incollare</summary>
+
+```text
+A power plant with cooling towers, pylons and humming transformers. Tropical island palette of deep sea blue, jungle green and orange sunset, clean stylised battle-royale video game look. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Wide 16:9 establishing shot of the location, no people, eye-level view, the key landmark inside the central third of the frame, soft depth fog in the background. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
+```
+
+</details>
+
+#### Fattoria
+
+- **File**: `assets/arene/royale/luoghi/fattoria.webp`
+- **Cosa mostrare**: Fattoria con fienile rosso, balle di fieno, silos e campi di grano.
+
+**Prompt**
+
+```text
+A farm with a red barn, hay bales, a silo and golden wheat fields.
+```
+
+<details><summary>Prompt completo, pronto da incollare</summary>
+
+```text
+A farm with a red barn, hay bales, a silo and golden wheat fields. Tropical island palette of deep sea blue, jungle green and orange sunset, clean stylised battle-royale video game look. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Wide 16:9 establishing shot of the location, no people, eye-level view, the key landmark inside the central third of the frame, soft depth fog in the background. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
+```
+
+</details>
+
+#### Foresta
+
+- **File**: `assets/arene/royale/luoghi/foresta.webp`
+- **Cosa mostrare**: Foresta tropicale rigogliosa con palme, felci e una cassa di rifornimento nascosta.
+
+**Prompt**
+
+```text
+A lush tropical forest with palm trees, ferns and a hidden glowing supply crate.
+```
+
+<details><summary>Prompt completo, pronto da incollare</summary>
+
+```text
+A lush tropical forest with palm trees, ferns and a hidden glowing supply crate. Tropical island palette of deep sea blue, jungle green and orange sunset, clean stylised battle-royale video game look. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Wide 16:9 establishing shot of the location, no people, eye-level view, the key landmark inside the central third of the frame, soft depth fog in the background. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
+```
+
+</details>
+
+### Pericoli · Isola Battle Royale (4:3, 960 × 720 px, sfondo pieno e scuro)
+
+#### Drone armato
+
+- **File**: `assets/arene/royale/pericoli/drone-armato.webp`
+- **Cosa mostrare**: Drone quadricottero armato con mitragliatrice e laser di puntamento rosso.
+
+**Prompt**
+
+```text
+An armed quadcopter drone with a mounted gun and a red targeting laser.
+```
+
+<details><summary>Prompt completo, pronto da incollare</summary>
+
+```text
+An armed quadcopter drone with a mounted gun and a red targeting laser. Tropical island palette of deep sea blue, jungle green and orange sunset, clean stylised battle-royale video game look. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. 4:3 wanted-poster portrait, single threat centered and facing the viewer, head and eyes in the upper middle of the frame, dark vignetted background that fades to near black at the edges. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
+```
+
+</details>
+
+#### Elicottero da caccia
+
+- **File**: `assets/arene/royale/pericoli/elicottero-da-caccia.webp`
+- **Cosa mostrare**: Elicottero d'attacco in volo basso con il faro acceso.
+
+**Prompt**
+
+```text
+An attack helicopter hovering low with its searchlight on.
+```
+
+<details><summary>Prompt completo, pronto da incollare</summary>
+
+```text
+An attack helicopter hovering low with its searchlight on. Tropical island palette of deep sea blue, jungle green and orange sunset, clean stylised battle-royale video game look. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. 4:3 wanted-poster portrait, single threat centered and facing the viewer, head and eyes in the upper middle of the frame, dark vignetted background that fades to near black at the edges. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
+```
+
+</details>
+
+#### Cane da guardia addestrato
+
+- **File**: `assets/arene/royale/pericoli/cane-da-guardia-addestrato.webp`
+- **Cosa mostrare**: Pastore tedesco da guardia con giubbotto tattico, che abbaia.
+
+**Prompt**
+
+```text
+A trained German shepherd guard dog in a tactical vest, barking.
+```
+
+<details><summary>Prompt completo, pronto da incollare</summary>
+
+```text
+A trained German shepherd guard dog in a tactical vest, barking. Tropical island palette of deep sea blue, jungle green and orange sunset, clean stylised battle-royale video game look. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. 4:3 wanted-poster portrait, single threat centered and facing the viewer, head and eyes in the upper middle of the frame, dark vignetted background that fades to near black at the edges. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
+```
+
+</details>
+
+### Armi · Isola Battle Royale (1:1, 512 × 512 px, sfondo trasparente)
+
+#### Fucile d'assalto
+
+- **File**: `assets/arene/royale/armi/fucile-dassalto.webp`
+- **Cosa mostrare**: Fucile d'assalto con mirino a punto rosso.
+
+**Prompt**
+
+```text
+An assault rifle with a red-dot sight.
+```
+
+<details><summary>Prompt completo, pronto da incollare</summary>
+
+```text
+An assault rifle with a red-dot sight. Tropical island palette of deep sea blue, jungle green and orange sunset, clean stylised battle-royale video game look. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Single object only, isolated on a fully transparent background, square 1:1, three-quarter view laid diagonally from lower left to upper right, 12% empty margin on every side, crisp silhouette with a thin dark outline so it reads on both light and dark backgrounds, no hands, no shadow on the ground. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
+```
+
+</details>
+
+#### Pistola
+
+- **File**: `assets/arene/royale/armi/pistola.webp`
+- **Cosa mostrare**: Pistola semiautomatica nera.
+
+**Prompt**
+
+```text
+A black semi-automatic pistol.
+```
+
+<details><summary>Prompt completo, pronto da incollare</summary>
+
+```text
+A black semi-automatic pistol. Tropical island palette of deep sea blue, jungle green and orange sunset, clean stylised battle-royale video game look. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Single object only, isolated on a fully transparent background, square 1:1, three-quarter view laid diagonally from lower left to upper right, 12% empty margin on every side, crisp silhouette with a thin dark outline so it reads on both light and dark backgrounds, no hands, no shadow on the ground. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
+```
+
+</details>
+
+#### Fucile da cecchino
+
+- **File**: `assets/arene/royale/armi/fucile-da-cecchino.webp`
+- **Cosa mostrare**: Fucile da cecchino con cannocchiale lungo e bipiede.
+
+**Prompt**
+
+```text
+A sniper rifle with a long scope and a folded bipod.
+```
+
+<details><summary>Prompt completo, pronto da incollare</summary>
+
+```text
+A sniper rifle with a long scope and a folded bipod. Tropical island palette of deep sea blue, jungle green and orange sunset, clean stylised battle-royale video game look. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Single object only, isolated on a fully transparent background, square 1:1, three-quarter view laid diagonally from lower left to upper right, 12% empty margin on every side, crisp silhouette with a thin dark outline so it reads on both light and dark backgrounds, no hands, no shadow on the ground. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
+```
+
+</details>
+
+#### Fucile a pompa
+
+- **File**: `assets/arene/royale/armi/fucile-a-pompa.webp`
+- **Cosa mostrare**: Fucile a pompa tattico.
+
+**Prompt**
+
+```text
+A tactical pump shotgun.
+```
+
+<details><summary>Prompt completo, pronto da incollare</summary>
+
+```text
+A tactical pump shotgun. Tropical island palette of deep sea blue, jungle green and orange sunset, clean stylised battle-royale video game look. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Single object only, isolated on a fully transparent background, square 1:1, three-quarter view laid diagonally from lower left to upper right, 12% empty margin on every side, crisp silhouette with a thin dark outline so it reads on both light and dark backgrounds, no hands, no shadow on the ground. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
+```
+
+</details>
+
+#### Granata
+
+- **File**: `assets/arene/royale/armi/granata.webp`
+- **Cosa mostrare**: Granata a frammentazione con la spoletta.
+
+**Prompt**
+
+```text
+A fragmentation grenade with its pin.
+```
+
+<details><summary>Prompt completo, pronto da incollare</summary>
+
+```text
+A fragmentation grenade with its pin. Tropical island palette of deep sea blue, jungle green and orange sunset, clean stylised battle-royale video game look. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Single object only, isolated on a fully transparent background, square 1:1, three-quarter view laid diagonally from lower left to upper right, 12% empty margin on every side, crisp silhouette with a thin dark outline so it reads on both light and dark backgrounds, no hands, no shadow on the ground. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
+```
+
+</details>
+
+#### Mitraglietta
+
+- **File**: `assets/arene/royale/armi/mitraglietta.webp`
+- **Cosa mostrare**: Mitraglietta compatta.
+
+**Prompt**
+
+```text
+A compact submachine gun.
+```
+
+<details><summary>Prompt completo, pronto da incollare</summary>
+
+```text
+A compact submachine gun. Tropical island palette of deep sea blue, jungle green and orange sunset, clean stylised battle-royale video game look. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Single object only, isolated on a fully transparent background, square 1:1, three-quarter view laid diagonally from lower left to upper right, 12% empty margin on every side, crisp silhouette with a thin dark outline so it reads on both light and dark backgrounds, no hands, no shadow on the ground. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
+```
+
+</details>
+
+#### Coltello da combattimento
+
+- **File**: `assets/arene/royale/armi/coltello-da-combattimento.webp`
+- **Cosa mostrare**: Coltello da combattimento con dorso seghettato.
+
+**Prompt**
+
+```text
+A combat knife with a serrated spine.
+```
+
+<details><summary>Prompt completo, pronto da incollare</summary>
+
+```text
+A combat knife with a serrated spine. Tropical island palette of deep sea blue, jungle green and orange sunset, clean stylised battle-royale video game look. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Single object only, isolated on a fully transparent background, square 1:1, three-quarter view laid diagonally from lower left to upper right, 12% empty margin on every side, crisp silhouette with a thin dark outline so it reads on both light and dark backgrounds, no hands, no shadow on the ground. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
+```
+
+</details>
+
+#### Balestra
+
+- **File**: `assets/arene/royale/armi/balestra.webp`
+- **Cosa mostrare**: Balestra tattica mimetica.
+
+**Prompt**
+
+```text
+A tactical crossbow with a camouflage pattern.
+```
+
+<details><summary>Prompt completo, pronto da incollare</summary>
+
+```text
+A tactical crossbow with a camouflage pattern. Tropical island palette of deep sea blue, jungle green and orange sunset, clean stylised battle-royale video game look. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Single object only, isolated on a fully transparent background, square 1:1, three-quarter view laid diagonally from lower left to upper right, 12% empty margin on every side, crisp silhouette with a thin dark outline so it reads on both light and dark backgrounds, no hands, no shadow on the ground. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
+```
+
+</details>
+
+---
 
 ## Villa Maledetta
 
-Cartella: `assets/arene/horror/`. Palette: cremisi, nero e oro di candela.
+Specchi che sussurrano e porte che si chiudono da sole.
 
-### Luoghi (16:9, 1280×720, sfondo pieno)
+- **Cartella**: `assets/arene/horror/` (con le sottocartelle `luoghi/`, `pericoli/`, `armi/`)
+- **Riferimento di stile**: `assets/arene/horror.webp`
+- **Atmosfera**: Villa gotica maledetta: cremisi, nero e oro di candela, nebbia, luna rossa. Paura sottile e atmosfera, niente sangue esplicito.
+- **Stile da aggiungere a ogni prompt di questa arena** (è già incluso nei prompt completi):
 
-| | File | Soggetto | Priorità | Traccia |
-| --- | --- | --- | --- | --- |
-|  | `luoghi/cantina.webp` | Cantina | alta | Cantina: il luogo dell'arena visto da vicino. Arena «Villa Maledetta» (Specchi che sussurrano e porte che si chiudono da sole). Palette: cremisi, nero e oro di candela. Formato 16:9. |
-|  | `luoghi/soffitta.webp` | Soffitta | alta | Soffitta: il luogo dell'arena visto da vicino. Arena «Villa Maledetta» (Specchi che sussurrano e porte che si chiudono da sole). Palette: cremisi, nero e oro di candela. Formato 16:9. |
-|  | `luoghi/cappella.webp` | Cappella | alta | Cappella: il luogo dell'arena visto da vicino. Arena «Villa Maledetta» (Specchi che sussurrano e porte che si chiudono da sole). Palette: cremisi, nero e oro di candela. Formato 16:9. |
-|  | `luoghi/cimitero.webp` | Cimitero | alta | Cimitero: il luogo dell'arena visto da vicino. Arena «Villa Maledetta» (Specchi che sussurrano e porte che si chiudono da sole). Palette: cremisi, nero e oro di candela. Formato 16:9. |
-|  | `luoghi/biblioteca.webp` | Biblioteca | alta | Biblioteca: il luogo dell'arena visto da vicino. Arena «Villa Maledetta» (Specchi che sussurrano e porte che si chiudono da sole). Palette: cremisi, nero e oro di candela. Formato 16:9. |
-|  | `luoghi/serra.webp` | Serra | alta | Serra: il luogo dell'arena visto da vicino. Arena «Villa Maledetta» (Specchi che sussurrano e porte che si chiudono da sole). Palette: cremisi, nero e oro di candela. Formato 16:9. |
+```text
+Crimson, black and candlelight gold palette, eerie mist, gothic haunted mansion. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours.
+```
 
-### Pericoli (4:3, 960×720, sfondo pieno, scuro)
+Più, a seconda della sezione:
 
-| | File | Soggetto | Priorità | Traccia |
-| --- | --- | --- | --- | --- |
-|  | `pericoli/spettro-urlante.webp` | Spettro urlante | alta | Spettro urlante: creatura o minaccia pronta ad attaccare. Arena «Villa Maledetta» (Specchi che sussurrano e porte che si chiudono da sole). Palette: cremisi, nero e oro di candela. Formato 4:3. |
-|  | `pericoli/bambola-posseduta.webp` | Bambola posseduta | alta | Bambola posseduta: creatura o minaccia pronta ad attaccare. Arena «Villa Maledetta» (Specchi che sussurrano e porte che si chiudono da sole). Palette: cremisi, nero e oro di candela. Formato 4:3. |
-|  | `pericoli/entita-senza-volto.webp` | Entità senza volto | alta | Entità senza volto: creatura o minaccia pronta ad attaccare. Arena «Villa Maledetta» (Specchi che sussurrano e porte che si chiudono da sole). Palette: cremisi, nero e oro di candela. Formato 4:3. |
-|  | `pericoli/stormo-di-corvi.webp` | Stormo di corvi | alta | Stormo di corvi: creatura o minaccia pronta ad attaccare. Arena «Villa Maledetta» (Specchi che sussurrano e porte che si chiudono da sole). Palette: cremisi, nero e oro di candela. Formato 4:3. |
+- Luoghi: `Wide 16:9 establishing shot of the location, no people, eye-level view, the key landmark inside the central third of the frame, soft depth fog in the background.`
+- Pericoli: `4:3 wanted-poster portrait, single threat centered and facing the viewer, head and eyes in the upper middle of the frame, dark vignetted background that fades to near black at the edges.`
+- Armi: `Single object only, isolated on a fully transparent background, square 1:1, three-quarter view laid diagonally from lower left to upper right, 12% empty margin on every side, crisp silhouette with a thin dark outline so it reads on both light and dark backgrounds, no hands, no shadow on the ground.`
+- Sempre: `No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.`
 
-### Armi (1:1, 512×512, sfondo trasparente)
+### Luoghi · Villa Maledetta (16:9, 1280 × 720 px, sfondo pieno)
 
-| | File | Soggetto | Priorità | Traccia |
-| --- | --- | --- | --- | --- |
-|  | `armi/candelabro-dargento.webp` | Candelabro d'argento | media | Candelabro d'argento: arma o oggetto usato come arma. Arena «Villa Maledetta» (Specchi che sussurrano e porte che si chiudono da sole). Palette: cremisi, nero e oro di candela. Formato 1:1. Sfondo trasparente. |
-|  | `armi/ascia.webp` | Ascia | media | Ascia: arma o oggetto usato come arma. Arena «Villa Maledetta» (Specchi che sussurrano e porte che si chiudono da sole). Palette: cremisi, nero e oro di candela. Formato 1:1. Sfondo trasparente. |
-|  | `armi/fucile-da-caccia.webp` | Fucile da caccia | media | Fucile da caccia: arma o oggetto usato come arma. Arena «Villa Maledetta» (Specchi che sussurrano e porte che si chiudono da sole). Palette: cremisi, nero e oro di candela. Formato 1:1. Sfondo trasparente. |
-|  | `armi/pugnale-rituale.webp` | Pugnale rituale | media | Pugnale rituale: arma o oggetto usato come arma. Arena «Villa Maledetta» (Specchi che sussurrano e porte che si chiudono da sole). Palette: cremisi, nero e oro di candela. Formato 1:1. Sfondo trasparente. |
-|  | `armi/crocifisso-appuntito.webp` | Crocifisso appuntito | media | Crocifisso appuntito: arma o oggetto usato come arma. Arena «Villa Maledetta» (Specchi che sussurrano e porte che si chiudono da sole). Palette: cremisi, nero e oro di candela. Formato 1:1. Sfondo trasparente. |
-|  | `armi/attizzatoio.webp` | Attizzatoio | media | Attizzatoio: arma o oggetto usato come arma. Arena «Villa Maledetta» (Specchi che sussurrano e porte che si chiudono da sole). Palette: cremisi, nero e oro di candela. Formato 1:1. Sfondo trasparente. |
-|  | `armi/falce.webp` | Falce | media | Falce: arma o oggetto usato come arma. Arena «Villa Maledetta» (Specchi che sussurrano e porte che si chiudono da sole). Palette: cremisi, nero e oro di candela. Formato 1:1. Sfondo trasparente. |
+#### Cantina
 
-### Meteo (16:10, 1200×750, sfondo pieno)
+- **File**: `assets/arene/horror/luoghi/cantina.webp`
+- **Cosa mostrare**: Cantina umida con botti piene di ragnatele, una lampadina che oscilla e una porta socchiusa.
 
-| | File | Soggetto | Priorità | Traccia |
-| --- | --- | --- | --- | --- |
-|  | `meteo/temporale.webp` | Temporale | alta | Temporale: Tuoni, lampi e la corrente che salta ogni dieci minuti.. Arena «Villa Maledetta» (Specchi che sussurrano e porte che si chiudono da sole). Palette: cremisi, nero e oro di candela. Formato 16:10. |
-|  | `meteo/notte-delle-candele.webp` | Notte delle candele | alta | Notte delle candele: Le candele si accendono da sole in ogni stanza. Nessuno le ha accese.. Arena «Villa Maledetta» (Specchi che sussurrano e porte che si chiudono da sole). Palette: cremisi, nero e oro di candela. Formato 16:10. |
-|  | `meteo/silenzio-assoluto.webp` | Silenzio assoluto | alta | Silenzio assoluto: Gli orologi della villa si fermano tutti insieme.. Arena «Villa Maledetta» (Specchi che sussurrano e porte che si chiudono da sole). Palette: cremisi, nero e oro di candela. Formato 16:10. |
-|  | `meteo/alba-rossa.webp` | Alba rossa | alta | Alba rossa: Il sole sorge color sangue: di giorno, almeno, gli spiriti dormono.. Arena «Villa Maledetta» (Specchi che sussurrano e porte che si chiudono da sole). Palette: cremisi, nero e oro di candela. Formato 16:10. |
-|  | `meteo/luna-nuova.webp` | Luna nuova | alta | Luna nuova: Il buio è totale. Qualcosa cammina nei corridoi.. Arena «Villa Maledetta» (Specchi che sussurrano e porte che si chiudono da sole). Palette: cremisi, nero e oro di candela. Formato 16:10. |
-|  | `meteo/visita-del-notaio.webp` | Visita del notaio | alta | Visita del notaio: Un notaio spettrale legge il testamento: c'è cibo in dispensa per tutti.. Arena «Villa Maledetta» (Specchi che sussurrano e porte che si chiudono da sole). Palette: cremisi, nero e oro di candela. Formato 16:10. |
-|  | `meteo/notte-di-ognissanti.webp` | Notte di Ognissanti | alta | Notte di Ognissanti: I morti escono dalle tombe del Cimitero per una notte.. Arena «Villa Maledetta» (Specchi che sussurrano e porte che si chiudono da sole). Palette: cremisi, nero e oro di candela. Formato 16:10. |
-|  | `meteo/mattina-di-sole.webp` | Mattina di sole | alta | Mattina di sole: Il sole entra dalle finestre e la villa, per qualche ora, è solo una casa.. Arena «Villa Maledetta» (Specchi che sussurrano e porte che si chiudono da sole). Palette: cremisi, nero e oro di candela. Formato 16:10. |
-|  | `meteo/sussurri-nei-muri.webp` | Sussurri nei muri | alta | Sussurri nei muri: I muri parlano. Dicono cose vere.. Arena «Villa Maledetta» (Specchi che sussurrano e porte che si chiudono da sole). Palette: cremisi, nero e oro di candela. Formato 16:10. |
+**Prompt**
 
-### Disastri (16:9, 1280×720, sfondo pieno)
+```text
+A damp wine cellar with cobwebbed barrels, a single swinging light bulb and a door left ajar.
+```
 
-| | File | Soggetto | Priorità | Traccia |
-| --- | --- | --- | --- | --- |
-|  | `disastri/notte-dei-morti.webp` | La notte dei morti · famiglia `buio` | alta | La notte dei morti: Le tombe del Cimitero si spalancano.. Arena «Villa Maledetta» (Specchi che sussurrano e porte che si chiudono da sole). Palette: cremisi, nero e oro di candela. Formato 16:9. |
-|  | `disastri/specchi.webp` | Gli specchi · famiglia `buio` | alta | Gli specchi: Tutti gli specchi della villa si incrinano nello stesso istante.. Arena «Villa Maledetta» (Specchi che sussurrano e porte che si chiudono da sole). Palette: cremisi, nero e oro di candela. Formato 16:9. |
-|  | `disastri/incendio-della-serra.webp` | L'incendio della Serra · famiglia `fuoco` | alta | L'incendio della Serra: Le piante della Serra prendono fuoco e il fumo invade la villa.. Arena «Villa Maledetta» (Specchi che sussurrano e porte che si chiudono da sole). Palette: cremisi, nero e oro di candela. Formato 16:9. |
-|  | `disastri/bambola.webp` | La bambola · famiglia `buio` | alta | La bambola: Una bambola di porcellana compare in ogni stanza. Ride.. Arena «Villa Maledetta» (Specchi che sussurrano e porte che si chiudono da sole). Palette: cremisi, nero e oro di candela. Formato 16:9. |
-|  | `disastri/porta-rossa.webp` | La porta rossa · famiglia `sangue` | alta | La porta rossa: Una porta rossa compare in fondo al corridoio.. Arena «Villa Maledetta» (Specchi che sussurrano e porte che si chiudono da sole). Palette: cremisi, nero e oro di candela. Formato 16:9. |
-|  | `disastri/ritratto.webp` | Il ritratto · famiglia `buio` | alta | Il ritratto: Uno dei ritratti del salone si stacca dalla parete.. Arena «Villa Maledetta» (Specchi che sussurrano e porte che si chiudono da sole). Palette: cremisi, nero e oro di candela. Formato 16:9. |
-|  | `disastri/pioggia-di-sangue.webp` | La pioggia di sangue · famiglia `cielo` | alta | La pioggia di sangue: Dal soffitto comincia a gocciolare sangue.. Arena «Villa Maledetta» (Specchi che sussurrano e porte che si chiudono da sole). Palette: cremisi, nero e oro di candela. Formato 16:9. |
-|  | `disastri/pozzo.webp` | Il pozzo · famiglia `acqua` | alta | Il pozzo: Dal pozzo del giardino sale un canto.. Arena «Villa Maledetta» (Specchi che sussurrano e porte che si chiudono da sole). Palette: cremisi, nero e oro di candela. Formato 16:9. |
-|  | `disastri/insetti.webp` | Gli insetti · famiglia `sciame` | alta | Gli insetti: Uno sciame di mosche invade la villa.. Arena «Villa Maledetta» (Specchi che sussurrano e porte che si chiudono da sole). Palette: cremisi, nero e oro di candela. Formato 16:9. |
-|  | `disastri/manichini.webp` | I manichini · famiglia `buio` | media | I manichini: I manichini della soffitta si muovono quando nessuno guarda.. Arena «Villa Maledetta» (Specchi che sussurrano e porte che si chiudono da sole). Palette: cremisi, nero e oro di candela. Formato 16:9. |
-|  | `disastri/carillon.webp` | Il carillon · famiglia `buio` | media | Il carillon: Un carillon suona una melodia che fa addormentare.. Arena «Villa Maledetta» (Specchi che sussurrano e porte che si chiudono da sole). Palette: cremisi, nero e oro di candela. Formato 16:9. |
-|  | `disastri/bambino.webp` | Il bambino · famiglia `buio` | media | Il bambino: Un bambino pallido gira per i corridoi chiedendo di giocare.. Arena «Villa Maledetta» (Specchi che sussurrano e porte che si chiudono da sole). Palette: cremisi, nero e oro di candela. Formato 16:9. |
-|  | `disastri/alluvione-della-cantina.webp` | L'alluvione della Cantina · famiglia `acqua` | media | L'alluvione della Cantina: La Cantina si allaga con acqua nera.. Arena «Villa Maledetta» (Specchi che sussurrano e porte che si chiudono da sole). Palette: cremisi, nero e oro di candela. Formato 16:9. |
-|  | `disastri/lista.webp` | La lista · famiglia `buio` | media | La lista: Sul tavolo compare una lista di nomi, alcuni barrati.. Arena «Villa Maledetta» (Specchi che sussurrano e porte che si chiudono da sole). Palette: cremisi, nero e oro di candela. Formato 16:9. |
-|  | `disastri/fuoco-blu.webp` | Il fuoco blu · famiglia `fuoco` | media | Il fuoco blu: Un fuoco blu si accende in tutti i camini e non scalda.. Arena «Villa Maledetta» (Specchi che sussurrano e porte che si chiudono da sole). Palette: cremisi, nero e oro di candela. Formato 16:9. |
-|  | `disastri/giardiniere.webp` | Il giardiniere · famiglia `buio` | media | Il giardiniere: Un giardiniere senza volto pota le siepi del labirinto.. Arena «Villa Maledetta» (Specchi che sussurrano e porte che si chiudono da sole). Palette: cremisi, nero e oro di candela. Formato 16:9. |
-|  | `disastri/ombre.webp` | Le ombre · famiglia `buio` | media | Le ombre: Le ombre si staccano dai corpi e si muovono da sole.. Arena «Villa Maledetta» (Specchi che sussurrano e porte che si chiudono da sole). Palette: cremisi, nero e oro di candela. Formato 16:9. |
-|  | `disastri/terremoto.webp` | Il terremoto · famiglia `terremoto` | media | Il terremoto: La villa trema e i pavimenti si spaccano.. Arena «Villa Maledetta» (Specchi che sussurrano e porte che si chiudono da sole). Palette: cremisi, nero e oro di candela. Formato 16:9. |
-|  | `disastri/voce-al-telefono.webp` | La voce al telefono · famiglia `buio` | media | La voce al telefono: Il vecchio telefono squilla: una voce dice a ognuno dove trovare la salvezza.. Arena «Villa Maledetta» (Specchi che sussurrano e porte che si chiudono da sole). Palette: cremisi, nero e oro di candela. Formato 16:9. |
-|  | `disastri/corvi.webp` | I corvi · famiglia `sciame` | media | I corvi: Uno stormo di corvi sfonda le finestre.. Arena «Villa Maledetta» (Specchi che sussurrano e porte che si chiudono da sole). Palette: cremisi, nero e oro di candela. Formato 16:9. |
-|  | `disastri/nebbia-del-giardino.webp` | La nebbia del giardino · famiglia `nebbia` | media | La nebbia del giardino: Una nebbia densa sale dal cimitero e avvolge la villa.. Arena «Villa Maledetta» (Specchi che sussurrano e porte che si chiudono da sole). Palette: cremisi, nero e oro di candela. Formato 16:9. |
-|  | `disastri/specchio-infranto.webp` | Lo specchio infranto · famiglia `magia` | media | Lo specchio infranto: Tutti gli specchi della villa esplodono.. Arena «Villa Maledetta» (Specchi che sussurrano e porte che si chiudono da sole). Palette: cremisi, nero e oro di candela. Formato 16:9. |
-|  | `disastri/banchetto-dei-morti.webp` | Il banchetto dei morti · famiglia `buio` | media | Il banchetto dei morti: I morti si siedono a tavola e invitano i vivi.. Arena «Villa Maledetta» (Specchi che sussurrano e porte che si chiudono da sole). Palette: cremisi, nero e oro di candela. Formato 16:9. |
-|  | `disastri/serra-carnivora.webp` | La serra carnivora · famiglia `magia` | media | La serra carnivora: Le piante della Serra si nutrono di chi entra.. Arena «Villa Maledetta» (Specchi che sussurrano e porte che si chiudono da sole). Palette: cremisi, nero e oro di candela. Formato 16:9. |
-|  | `disastri/prete.webp` | Il prete · famiglia `buio` | media | Il prete: Un prete compare per un esorcismo, ma non ha riflesso.. Arena «Villa Maledetta» (Specchi che sussurrano e porte che si chiudono da sole). Palette: cremisi, nero e oro di candela. Formato 16:9. |
-|  | `disastri/orologio.webp` | L'orologio · famiglia `buio` | media | L'orologio: L'orologio a pendolo si ferma: il tempo nella villa si blocca.. Arena «Villa Maledetta» (Specchi che sussurrano e porte che si chiudono da sole). Palette: cremisi, nero e oro di candela. Formato 16:9. |
-|  | `disastri/bambole.webp` | Le bambole · famiglia `buio` | media | Le bambole: Decine di bambole di porcellana aprono gli occhi.. Arena «Villa Maledetta» (Specchi che sussurrano e porte che si chiudono da sole). Palette: cremisi, nero e oro di candela. Formato 16:9. |
-|  | `disastri/cripta.webp` | La cripta · famiglia `buio` | media | La cripta: La cripta si apre e i sepolti si alzano.. Arena «Villa Maledetta» (Specchi che sussurrano e porte che si chiudono da sole). Palette: cremisi, nero e oro di candela. Formato 16:9. |
-|  | `disastri/gas.webp` | Il gas · famiglia `tossico` | media | Il gas: Un odore dolciastro sale dalle tubature.. Arena «Villa Maledetta» (Specchi che sussurrano e porte che si chiudono da sole). Palette: cremisi, nero e oro di candela. Formato 16:9. |
-|  | `disastri/notte-senza-fine.webp` | La notte senza fine · famiglia `buio` | media | La notte senza fine: Fuori dalle finestre il sole non sorge più.. Arena «Villa Maledetta» (Specchi che sussurrano e porte che si chiudono da sole). Palette: cremisi, nero e oro di candela. Formato 16:9. |
-|  | `disastri/padrone-di-casa.webp` | Il padrone di casa · famiglia `buio` | media | Il padrone di casa: Il padrone di casa scende finalmente a salutare i suoi ospiti.. Arena «Villa Maledetta» (Specchi che sussurrano e porte che si chiudono da sole). Palette: cremisi, nero e oro di candela. Formato 16:9. |
-|  | `disastri/cena-dei-dimenticati.webp` | La cena dei dimenticati · famiglia `buio` | media | La cena dei dimenticati: La tavola si apparecchia da sola per gli ospiti morti negli anni passati.. Arena «Villa Maledetta» (Specchi che sussurrano e porte che si chiudono da sole). Palette: cremisi, nero e oro di candela. Formato 16:9. |
-|  | `disastri/scale-infinite.webp` | Le scale infinite · famiglia `buio` | media | Le scale infinite: La scala principale diventa infinita: si sale e si sale e non si arriva mai.. Arena «Villa Maledetta» (Specchi che sussurrano e porte che si chiudono da sole). Palette: cremisi, nero e oro di candela. Formato 16:9. |
-|  | `disastri/giardino-dinverno.webp` | Il giardino d'inverno · famiglia `gelo` | media | Il giardino d'inverno: La neve cade dentro la villa, solo dentro.. Arena «Villa Maledetta» (Specchi che sussurrano e porte che si chiudono da sole). Palette: cremisi, nero e oro di candela. Formato 16:9. |
-|  | `disastri/circo.webp` | Il circo · famiglia `magia` | media | Il circo: Un circo fantasma si accampa nel parco. I clown hanno i denti troppo lunghi.. Arena «Villa Maledetta» (Specchi che sussurrano e porte che si chiudono da sole). Palette: cremisi, nero e oro di candela. Formato 16:9. |
-|  | `disastri/ragnatela.webp` | La ragnatela · famiglia `sciame` | media | La ragnatela: Ragni grandi come gatti tessono una tela su tutta l'ala ovest.. Arena «Villa Maledetta» (Specchi che sussurrano e porte che si chiudono da sole). Palette: cremisi, nero e oro di candela. Formato 16:9. |
-|  | `disastri/telefono-senza-fili.webp` | Il telefono senza fili · famiglia `buio` | media | Il telefono senza fili: Un vecchio telefono squilla in ogni stanza contemporaneamente.. Arena «Villa Maledetta» (Specchi che sussurrano e porte che si chiudono da sole). Palette: cremisi, nero e oro di candela. Formato 16:9. |
-|  | `disastri/villa-si-allunga.webp` | La villa si allunga · famiglia `buio` | media | La villa si allunga: I corridoi si allungano di notte e di giorno non tornano più.. Arena «Villa Maledetta» (Specchi che sussurrano e porte che si chiudono da sole). Palette: cremisi, nero e oro di candela. Formato 16:9. |
-|  | `disastri/ritratto-di-famiglia.webp` | Il ritratto di famiglia · famiglia `buio` | media | Il ritratto di famiglia: Tutti i concorrenti compaiono in un ritratto di famiglia appeso nel salone. Uno di loro è sbiadito.. Arena «Villa Maledetta» (Specchi che sussurrano e porte che si chiudono da sole). Palette: cremisi, nero e oro di candela. Formato 16:9. |
-|  | `disastri/processione.webp` | La processione · famiglia `buio` | media | La processione: Una processione di monaci incappucciati attraversa la villa cantando in latino.. Arena «Villa Maledetta» (Specchi che sussurrano e porte che si chiudono da sole). Palette: cremisi, nero e oro di candela. Formato 16:9. |
-|  | `disastri/giardiniere-ritorna.webp` | Il giardiniere ritorna · famiglia `buio` | media | Il giardiniere ritorna: Il giardiniere senza volto è tornato e ha affilato le cesoie.. Arena «Villa Maledetta» (Specchi che sussurrano e porte che si chiudono da sole). Palette: cremisi, nero e oro di candela. Formato 16:9. |
-|  | `disastri/campane-del-cimitero.webp` | Le campane del cimitero · famiglia `magia` | media | Le campane del cimitero: Le campane del cimitero suonano a morto per ognuno dei vivi.. Arena «Villa Maledetta» (Specchi che sussurrano e porte che si chiudono da sole). Palette: cremisi, nero e oro di candela. Formato 16:9. |
-|  | `disastri/pozzo-dei-desideri.webp` | Il pozzo dei desideri · famiglia `festa` | media | Il pozzo dei desideri: Il pozzo esaudisce un desiderio a chi ci getta una moneta. Solo che è un pozzo maledetto.. Arena «Villa Maledetta» (Specchi che sussurrano e porte che si chiudono da sole). Palette: cremisi, nero e oro di candela. Formato 16:9. |
-|  | `disastri/cantina-dei-vini.webp` | La cantina dei vini · famiglia `sangue` | media | La cantina dei vini: La cantina si apre: i vini hanno duecento anni e un retrogusto di sangue.. Arena «Villa Maledetta» (Specchi che sussurrano e porte che si chiudono da sole). Palette: cremisi, nero e oro di candela. Formato 16:9. |
-|  | `disastri/notte-di-valpurga.webp` | La notte di Valpurga · famiglia `buio` | media | La notte di Valpurga: Streghe in volo sorvolano la villa e lanciano maledizioni a caso.. Arena «Villa Maledetta» (Specchi che sussurrano e porte che si chiudono da sole). Palette: cremisi, nero e oro di candela. Formato 16:9. |
-|  | `disastri/specchi-parlanti.webp` | Gli specchi parlanti · famiglia `magia` | media | Gli specchi parlanti: Ogni specchio comincia a parlare e a dire verità crudeli.. Arena «Villa Maledetta» (Specchi che sussurrano e porte che si chiudono da sole). Palette: cremisi, nero e oro di candela. Formato 16:9. |
-|  | `disastri/ballo-dei-morti.webp` | Il ballo dei morti · famiglia `festa` | media | Il ballo dei morti: I morti si alzano e chiedono un ballo. Rifiutare è scortese.. Arena «Villa Maledetta» (Specchi che sussurrano e porte che si chiudono da sole). Palette: cremisi, nero e oro di candela. Formato 16:9. |
-|  | `disastri/incubo.webp` | L'incubo · famiglia `buio` · 18+ | bassa | L'incubo: La villa entra nei sogni di tutti con le paure più intime e più sporche.. Arena «Villa Maledetta» (Specchi che sussurrano e porte che si chiudono da sole). Palette: cremisi, nero e oro di candela. Formato 16:9. |
-|  | `disastri/macellaio-della-cucina.webp` | Il macellaio della cucina · famiglia `sangue` · 18+ | bassa | Il macellaio della cucina: La cucina si riempie di ganci e di un uomo grasso con un grembiule insanguinato.. Arena «Villa Maledetta» (Specchi che sussurrano e porte che si chiudono da sole). Palette: cremisi, nero e oro di candela. Formato 16:9. |
-|  | `disastri/bordello-dei-fantasmi.webp` | Il bordello dei fantasmi · famiglia `magia` · 18+ | bassa | Il bordello dei fantasmi: L'ala est della villa torna a essere ciò che era cento anni fa: una casa di piacere per spiriti.. Arena «Villa Maledetta» (Specchi che sussurrano e porte che si chiudono da sole). Palette: cremisi, nero e oro di candela. Formato 16:9. |
-|  | `disastri/pubblico-vota.webp` | Il pubblico vota · famiglia `spettacolo` | media | Il pubblico vota: Il pubblico vota in diretta chi colpire con un fulmine artificiale.. Arena «Villa Maledetta» (Specchi che sussurrano e porte che si chiudono da sole). Palette: cremisi, nero e oro di candela. Formato 16:9. |
-|  | `disastri/pausa-pubblicitaria.webp` | La pausa pubblicitaria · famiglia `spettacolo` | media | La pausa pubblicitaria: Durante la pubblicità, gli organizzatori si dimenticano di sorvegliare le trappole.. Arena «Villa Maledetta» (Specchi che sussurrano e porte che si chiudono da sole). Palette: cremisi, nero e oro di candela. Formato 16:9. |
-|  | `disastri/cambio-di-regia.webp` | Il cambio di regia · famiglia `spettacolo` | media | Il cambio di regia: Arriva un nuovo regista che vuole più azione.. Arena «Villa Maledetta» (Specchi che sussurrano e porte che si chiudono da sole). Palette: cremisi, nero e oro di candela. Formato 16:9. |
-|  | `disastri/pioggia-di-coriandoli.webp` | La pioggia di coriandoli · famiglia `spettacolo` | media | La pioggia di coriandoli: Per festeggiare la metà della stagione, gli organizzatori fanno piovere coriandoli. Di vetro.. Arena «Villa Maledetta» (Specchi che sussurrano e porte che si chiudono da sole). Palette: cremisi, nero e oro di candela. Formato 16:9. |
-|  | `disastri/ospite-speciale.webp` | L'ospite speciale · famiglia `spettacolo` | media | L'ospite speciale: Una celebrità entra nell'arena per un giorno, con una squadra di guardie del corpo armate.. Arena «Villa Maledetta» (Specchi che sussurrano e porte che si chiudono da sole). Palette: cremisi, nero e oro di candela. Formato 16:9. |
-|  | `disastri/sponsor-ritirato.webp` | Lo sponsor ritirato · famiglia `spettacolo` | media | Lo sponsor ritirato: Uno sponsor si ritira e reclama indietro tutti i regali. Con i droni.. Arena «Villa Maledetta» (Specchi che sussurrano e porte che si chiudono da sole). Palette: cremisi, nero e oro di candela. Formato 16:9. |
-|  | `disastri/gioco-a-quiz.webp` | Il gioco a quiz · famiglia `spettacolo` | media | Il gioco a quiz: Gli organizzatori interrompono tutto per un quiz di cultura generale. Chi sbaglia paga.. Arena «Villa Maledetta» (Specchi che sussurrano e porte che si chiudono da sole). Palette: cremisi, nero e oro di candela. Formato 16:9. |
-|  | `disastri/sciopero-dei-tecnici.webp` | Lo sciopero dei tecnici · famiglia `spettacolo` | media | Lo sciopero dei tecnici: I tecnici dell'arena scioperano e nessuno controlla più i sistemi.. Arena «Villa Maledetta» (Specchi che sussurrano e porte che si chiudono da sole). Palette: cremisi, nero e oro di candela. Formato 16:9. |
-|  | `disastri/replica.webp` | La replica · famiglia `spettacolo` | media | La replica: Per problemi tecnici, l'arena ripete il disastro di due giorni fa, ma più forte.. Arena «Villa Maledetta» (Specchi che sussurrano e porte che si chiudono da sole). Palette: cremisi, nero e oro di candela. Formato 16:9. |
-|  | `disastri/giornata-dei-bambini.webp` | La giornata dei bambini · famiglia `spettacolo` | media | La giornata dei bambini: Gli organizzatori fanno disegnare le trappole del giorno ai bambini. Sono molto creativi.. Arena «Villa Maledetta» (Specchi che sussurrano e porte che si chiudono da sole). Palette: cremisi, nero e oro di candela. Formato 16:9. |
-|  | `disastri/asta-dei-concorrenti.webp` | L'asta dei concorrenti · famiglia `spettacolo` | media | L'asta dei concorrenti: Il pubblico può comprare il diritto di decidere la sorte di un concorrente.. Arena «Villa Maledetta» (Specchi che sussurrano e porte che si chiudono da sole). Palette: cremisi, nero e oro di candela. Formato 16:9. |
-|  | `disastri/terremoto-della-produzione.webp` | Il terremoto della produzione · famiglia `terremoto` | media | Il terremoto della produzione: Un camion della produzione si ribalta dentro l'arena e libera tutto quello che trasportava.. Arena «Villa Maledetta» (Specchi che sussurrano e porte che si chiudono da sole). Palette: cremisi, nero e oro di candela. Formato 16:9. |
-|  | `disastri/blackout-delle-telecamere.webp` | Il blackout delle telecamere · famiglia `spettacolo` | media | Il blackout delle telecamere: Le telecamere si spengono per un'ora. Senza testimoni, le regole saltano.. Arena «Villa Maledetta» (Specchi che sussurrano e porte che si chiudono da sole). Palette: cremisi, nero e oro di candela. Formato 16:9. |
-|  | `disastri/musica-a-tutto-volume.webp` | La musica a tutto volume · famiglia `spettacolo` | media | La musica a tutto volume: Gli organizzatori diffondono la stessa canzone estiva per ventiquattro ore.. Arena «Villa Maledetta» (Specchi che sussurrano e porte che si chiudono da sole). Palette: cremisi, nero e oro di candela. Formato 16:9. |
-|  | `disastri/doppio-disastro.webp` | Il doppio disastro · famiglia `buio` | media | Il doppio disastro: Due disastri si attivano nello stesso momento per un errore di programmazione.. Arena «Villa Maledetta» (Specchi che sussurrano e porte che si chiudono da sole). Palette: cremisi, nero e oro di candela. Formato 16:9. |
-|  | `disastri/maratona.webp` | La maratona · famiglia `spettacolo` | media | La maratona: Gli organizzatori obbligano tutti a correre per due ore. Chi si ferma viene punito.. Arena «Villa Maledetta» (Specchi che sussurrano e porte che si chiudono da sole). Palette: cremisi, nero e oro di candela. Formato 16:9. |
-|  | `disastri/sondaggio-della-crudelta.webp` | Il sondaggio della crudeltà · famiglia `spettacolo` | media | Il sondaggio della crudeltà: Il pubblico vota il disastro più crudele. Vince "tutti insieme".. Arena «Villa Maledetta» (Specchi che sussurrano e porte che si chiudono da sole). Palette: cremisi, nero e oro di candela. Formato 16:9. |
-|  | `disastri/invasione-dei-fan.webp` | L'invasione dei fan · famiglia `spettacolo` | media | L'invasione dei fan: Un gruppo di fan scavalca le recinzioni e invade l'arena per conoscere i propri idoli.. Arena «Villa Maledetta» (Specchi che sussurrano e porte che si chiudono da sole). Palette: cremisi, nero e oro di candela. Formato 16:9. |
-|  | `disastri/gioco-delle-sedie.webp` | Il gioco delle sedie · famiglia `spettacolo` | media | Il gioco delle sedie: Gli organizzatori mettono al centro dell'arena una sedia in meno dei concorrenti. Chi resta in piedi viene punito.. Arena «Villa Maledetta» (Specchi che sussurrano e porte che si chiudono da sole). Palette: cremisi, nero e oro di candela. Formato 16:9. |
-|  | `disastri/nebbia-delle-risate-registrate.webp` | La nebbia delle risate registrate · famiglia `spettacolo` | media | La nebbia delle risate registrate: Dagli altoparlanti partono risate registrate a ogni sfortuna. È psicologicamente devastante.. Arena «Villa Maledetta» (Specchi che sussurrano e porte che si chiudono da sole). Palette: cremisi, nero e oro di candela. Formato 16:9. |
-|  | `disastri/notte-rossa.webp` | La notte rossa · famiglia `buio` · 18+ | bassa | La notte rossa: Gli organizzatori sospendono ogni regola per una notte: niente telecamere sui dettagli, niente limiti.. Arena «Villa Maledetta» (Specchi che sussurrano e porte che si chiudono da sole). Palette: cremisi, nero e oro di candela. Formato 16:9. |
-|  | `disastri/bar-aperto.webp` | Il bar aperto · famiglia `festa` · 18+ | bassa | Il bar aperto: Un bar con alcol illimitato compare nel mezzo dell'arena. Gratis, per un'ora.. Arena «Villa Maledetta» (Specchi che sussurrano e porte che si chiudono da sole). Palette: cremisi, nero e oro di candela. Formato 16:9. |
-|  | `disastri/spettacolo-del-pudore.webp` | Lo spettacolo del pudore · famiglia `buio` · 18+ | bassa | Lo spettacolo del pudore: Gli organizzatori fanno sparire tutti i vestiti dei concorrenti per un giorno.. Arena «Villa Maledetta» (Specchi che sussurrano e porte che si chiudono da sole). Palette: cremisi, nero e oro di candela. Formato 16:9. |
-|  | `disastri/spore-del-desiderio.webp` | Le spore del desiderio · famiglia `festa` · 18+ | bassa | Le spore del desiderio: Le spore di un fungo rendono tutti irresistibilmente attratti dalla persona più vicina.. Arena «Villa Maledetta» (Specchi che sussurrano e porte che si chiudono da sole). Palette: cremisi, nero e oro di candela. Formato 16:9. |
-|  | `disastri/macello.webp` | Il macello · famiglia `sangue` · 18+ | bassa | Il macello: Gli organizzatori aprono le gabbie di tutti i mostri insieme e chiamano l'evento "Il macello". Il nome è accurato.. Arena «Villa Maledetta» (Specchi che sussurrano e porte che si chiudono da sole). Palette: cremisi, nero e oro di candela. Formato 16:9. |
-|  | `disastri/notte-dei-ritratti.webp` | La notte dei ritratti · famiglia `buio` | media | La notte dei ritratti: I ritratti della villa scendono dalle cornici.. Arena «Villa Maledetta» (Specchi che sussurrano e porte che si chiudono da sole). Palette: cremisi, nero e oro di candela. Formato 16:9. |
-|  | `disastri/allagamento-della-cantina.webp` | L'allagamento della Cantina · famiglia `acqua` | media | L'allagamento della Cantina: La Cantina si riempie di un'acqua nera e gelida.. Arena «Villa Maledetta» (Specchi che sussurrano e porte che si chiudono da sole). Palette: cremisi, nero e oro di candela. Formato 16:9. |
-|  | `disastri/danza-delle-bambole.webp` | La danza delle bambole · famiglia `buio` | media | La danza delle bambole: Le bambole della Soffitta prendono vita e cantano una filastrocca.. Arena «Villa Maledetta» (Specchi che sussurrano e porte che si chiudono da sole). Palette: cremisi, nero e oro di candela. Formato 16:9. |
-|  | `disastri/campana-della-cappella.webp` | La campana della Cappella · famiglia `buio` | media | La campana della Cappella: La campana suona tredici colpi. A ogni colpo, qualcuno sparisce.. Arena «Villa Maledetta» (Specchi che sussurrano e porte che si chiudono da sole). Palette: cremisi, nero e oro di candela. Formato 16:9. |
-|  | `disastri/nebbia-del-cimitero.webp` | La nebbia del Cimitero · famiglia `nebbia` | media | La nebbia del Cimitero: Dal Cimitero sale una nebbia che parla.. Arena «Villa Maledetta» (Specchi che sussurrano e porte che si chiudono da sole). Palette: cremisi, nero e oro di candela. Formato 16:9. |
-|  | `disastri/pareti-che-si-stringono.webp` | Le pareti che si stringono · famiglia `buio` | media | Le pareti che si stringono: I corridoi della villa si restringono lentamente.. Arena «Villa Maledetta» (Specchi che sussurrano e porte che si chiudono da sole). Palette: cremisi, nero e oro di candela. Formato 16:9. |
-|  | `disastri/pianoforte-maledetto.webp` | Il pianoforte maledetto · famiglia `buio` | media | Il pianoforte maledetto: Il pianoforte suona una melodia che fa ballare chiunque la senta.. Arena «Villa Maledetta» (Specchi che sussurrano e porte che si chiudono da sole). Palette: cremisi, nero e oro di candela. Formato 16:9. |
+<details><summary>Prompt completo, pronto da incollare</summary>
 
-### Oggetti (1:1, 512×512, sfondo trasparente)
+```text
+A damp wine cellar with cobwebbed barrels, a single swinging light bulb and a door left ajar. Crimson, black and candlelight gold palette, eerie mist, gothic haunted mansion. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Wide 16:9 establishing shot of the location, no people, eye-level view, the key landmark inside the central third of the frame, soft depth fog in the background. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
+```
 
-| | File | Soggetto | Priorità | Traccia |
-| --- | --- | --- | --- | --- |
-|  | `oggetti/arma.webp` | Arma | alta | Arma: Più forza negli scontri, in base alla qualità (★). Si consuma a ogni colpo e alla fine si rompe; con un attrezzo si può riparare. Chi è ingegnoso può intingerla nel veleno.. Arena «Villa Maledetta» (Specchi che sussurrano e porte che si chiudono da sole). Palette: cremisi, nero e oro di candela. Formato 1:1. Sfondo trasparente. |
-|  | `oggetti/armatura.webp` | Protezione (per esempio armatura del cavaliere nel salone, vassoio d'argento usato come scudo) | alta | Protezione (per esempio armatura del cavaliere nel salone, vassoio d'argento usato come scudo): Riduce i danni e a volte para un colpo mortale. Si consuma a ogni colpo incassato.. Arena «Villa Maledetta» (Specchi che sussurrano e porte che si chiudono da sole). Palette: cremisi, nero e oro di candela. Formato 1:1. Sfondo trasparente. |
-|  | `oggetti/med.webp` | Cure | alta | Cure: Si usa da soli o sugli alleati: richiude le ferite gravi, ferma veleni e infezioni presi in tempo, abbassa l'indicatore dell'arena.. Arena «Villa Maledetta» (Specchi che sussurrano e porte che si chiudono da sole). Palette: cremisi, nero e oro di candela. Formato 1:1. Sfondo trasparente. |
-|  | `oggetti/cibo.webp` | Cibo | alta | Cibo: Si mangia quando la sazietà cala. Si può dividere con gli alleati, regalare o scambiare.. Arena «Villa Maledetta» (Specchi che sussurrano e porte che si chiudono da sole). Palette: cremisi, nero e oro di candela. Formato 1:1. Sfondo trasparente. |
-|  | `oggetti/attrezzo.webp` | Attrezzo (per esempio candelabro, chiave che apre tutte le porte) | alta | Attrezzo (per esempio candelabro, chiave che apre tutte le porte): Più cibo trovato, fughe più facili da tempeste e trappole, difesa migliore di notte, armi riparate.. Arena «Villa Maledetta» (Specchi che sussurrano e porte che si chiudono da sole). Palette: cremisi, nero e oro di candela. Formato 1:1. Sfondo trasparente. |
-|  | `oggetti/mappa.webp` | Mappa | alta | Mappa: Più cibo, meno disastri, trappole scoperte in anticipo e vie di fuga sicure.. Arena «Villa Maledetta» (Specchi che sussurrano e porte che si chiudono da sole). Palette: cremisi, nero e oro di candela. Formato 1:1. Sfondo trasparente. |
-|  | `oggetti/trap.webp` | Trappola | alta | Trappola: Di notte chi la sa usare la piazza nella sua zona. Chi ci passa rischia grosso, e l'uccisione va a chi l'ha piazzata.. Arena «Villa Maledetta» (Specchi che sussurrano e porte che si chiudono da sole). Palette: cremisi, nero e oro di candela. Formato 1:1. Sfondo trasparente. |
-|  | `oggetti/esplosivo.webp` | Esplosivo | alta | Esplosivo: Più forza negli scontri. Chi è ingegnoso ci costruisce trappole esplosive. Da ubriachi è un pessimo compagno.. Arena «Villa Maledetta» (Specchi che sussurrano e porte che si chiudono da sole). Palette: cremisi, nero e oro di candela. Formato 1:1. Sfondo trasparente. |
-|  | `oggetti/veleno.webp` | Veleno | alta | Veleno: Apre la strada agli avvelenamenti; chi è ingegnoso ci intinge l'arma, che poi avvelena a ogni colpo.. Arena «Villa Maledetta» (Specchi che sussurrano e porte che si chiudono da sole). Palette: cremisi, nero e oro di candela. Formato 1:1. Sfondo trasparente. |
-|  | `oggetti/amuleto.webp` | Portafortuna | alta | Portafortuna: Può evitare una morte diretta narrata da un evento: probabilità 85%, certa per chi è superstizioso. Si consuma quando salva. Non ferma i danni periodici di fame, malattie e ferite. Calma Terrore e Corruzione.. Arena «Villa Maledetta» (Specchi che sussurrano e porte che si chiudono da sole). Palette: cremisi, nero e oro di candela. Formato 1:1. Sfondo trasparente. |
-|  | `oggetti/alcol.webp` | Alcol (per esempio bottiglia di vino del 1890) | alta | Alcol (per esempio bottiglia di vino del 1890): Scalda, fa dimenticare, disinfetta le ferite infette. E ubriaca.. Arena «Villa Maledetta» (Specchi che sussurrano e porte che si chiudono da sole). Palette: cremisi, nero e oro di candela. Formato 1:1. Sfondo trasparente. |
-|  | `oggetti/valore.webp` | Merce di scambio (per esempio gioielli di famiglia, anello con lo stemma della villa) | alta | Merce di scambio (per esempio gioielli di famiglia, anello con lo stemma della villa): Non serve a niente, tranne che a comprare cibo e cure da chi ne ha.. Arena «Villa Maledetta» (Specchi che sussurrano e porte che si chiudono da sole). Palette: cremisi, nero e oro di candela. Formato 1:1. Sfondo trasparente. |
-|  | `oggetti/ricordo.webp` | Ricordo (per esempio foto di famiglia, lettera mai spedita) | alta | Ricordo (per esempio foto di famiglia, lettera mai spedita): Un pezzo di casa: ogni notte tiene su il morale. Se è di qualcuno che non c'è più, ancora di più.. Arena «Villa Maledetta» (Specchi che sussurrano e porte che si chiudono da sole). Palette: cremisi, nero e oro di candela. Formato 1:1. Sfondo trasparente. |
+</details>
+
+#### Soffitta
+
+- **File**: `assets/arene/horror/luoghi/soffitta.webp`
+- **Cosa mostrare**: Soffitta polverosa con mobili coperti da teli, un vecchio cavallo a dondolo e luna da un oblò.
+
+**Prompt**
+
+```text
+A dusty attic with sheet-covered furniture, an old rocking horse and moonlight through a round window.
+```
+
+<details><summary>Prompt completo, pronto da incollare</summary>
+
+```text
+A dusty attic with sheet-covered furniture, an old rocking horse and moonlight through a round window. Crimson, black and candlelight gold palette, eerie mist, gothic haunted mansion. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Wide 16:9 establishing shot of the location, no people, eye-level view, the key landmark inside the central third of the frame, soft depth fog in the background. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
+```
+
+</details>
+
+#### Cappella
+
+- **File**: `assets/arene/horror/luoghi/cappella.webp`
+- **Cosa mostrare**: Cappella gotica privata con candele, vetrate rotte e panche vuote.
+
+**Prompt**
+
+```text
+A private gothic chapel with candles, broken stained glass and empty pews.
+```
+
+<details><summary>Prompt completo, pronto da incollare</summary>
+
+```text
+A private gothic chapel with candles, broken stained glass and empty pews. Crimson, black and candlelight gold palette, eerie mist, gothic haunted mansion. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Wide 16:9 establishing shot of the location, no people, eye-level view, the key landmark inside the central third of the frame, soft depth fog in the background. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
+```
+
+</details>
+
+#### Cimitero
+
+- **File**: `assets/arene/horror/luoghi/cimitero.webp`
+- **Cosa mostrare**: Cimitero incolto con lapidi storte, cancello di ferro e nebbia sotto una luna rossa.
+
+**Prompt**
+
+```text
+An overgrown cemetery with leaning tombstones, an iron gate and fog under a red moon.
+```
+
+<details><summary>Prompt completo, pronto da incollare</summary>
+
+```text
+An overgrown cemetery with leaning tombstones, an iron gate and fog under a red moon. Crimson, black and candlelight gold palette, eerie mist, gothic haunted mansion. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Wide 16:9 establishing shot of the location, no people, eye-level view, the key landmark inside the central third of the frame, soft depth fog in the background. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
+```
+
+</details>
+
+#### Biblioteca
+
+- **File**: `assets/arene/horror/luoghi/biblioteca.webp`
+- **Cosa mostrare**: Biblioteca antica con scaffali altissimi, polvere sospesa e un libro aperto sul leggio.
+
+**Prompt**
+
+```text
+A grand old library with towering shelves, floating dust and a book lying open on a lectern.
+```
+
+<details><summary>Prompt completo, pronto da incollare</summary>
+
+```text
+A grand old library with towering shelves, floating dust and a book lying open on a lectern. Crimson, black and candlelight gold palette, eerie mist, gothic haunted mansion. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Wide 16:9 establishing shot of the location, no people, eye-level view, the key landmark inside the central third of the frame, soft depth fog in the background. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
+```
+
+</details>
+
+#### Serra
+
+- **File**: `assets/arene/horror/luoghi/serra.webp`
+- **Cosa mostrare**: Serra vittoriana in rovina con vetri rotti, piante carnivore e rampicanti.
+
+**Prompt**
+
+```text
+A derelict Victorian greenhouse with shattered glass, carnivorous plants and creeping vines.
+```
+
+<details><summary>Prompt completo, pronto da incollare</summary>
+
+```text
+A derelict Victorian greenhouse with shattered glass, carnivorous plants and creeping vines. Crimson, black and candlelight gold palette, eerie mist, gothic haunted mansion. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Wide 16:9 establishing shot of the location, no people, eye-level view, the key landmark inside the central third of the frame, soft depth fog in the background. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
+```
+
+</details>
+
+### Pericoli · Villa Maledetta (4:3, 960 × 720 px, sfondo pieno e scuro)
+
+#### Spettro urlante
+
+- **File**: `assets/arene/horror/pericoli/spettro-urlante.webp`
+- **Cosa mostrare**: Fantasma che urla con la bocca innaturalmente allungata e capelli pallidi fluttuanti.
+
+**Prompt**
+
+```text
+A screaming ghost with an unnaturally stretched mouth and pale floating hair, glowing white.
+```
+
+<details><summary>Prompt completo, pronto da incollare</summary>
+
+```text
+A screaming ghost with an unnaturally stretched mouth and pale floating hair, glowing white. Crimson, black and candlelight gold palette, eerie mist, gothic haunted mansion. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. 4:3 wanted-poster portrait, single threat centered and facing the viewer, head and eyes in the upper middle of the frame, dark vignetted background that fades to near black at the edges. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
+```
+
+</details>
+
+#### Bambola posseduta
+
+- **File**: `assets/arene/horror/pericoli/bambola-posseduta.webp`
+- **Cosa mostrare**: Bambola di porcellana col viso incrinato e un occhio di vetro, seduta su una sedia, troppo viva.
+
+**Prompt**
+
+```text
+A porcelain doll with a cracked face and one glass eye, sitting in a chair, slightly too alive.
+```
+
+<details><summary>Prompt completo, pronto da incollare</summary>
+
+```text
+A porcelain doll with a cracked face and one glass eye, sitting in a chair, slightly too alive. Crimson, black and candlelight gold palette, eerie mist, gothic haunted mansion. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. 4:3 wanted-poster portrait, single threat centered and facing the viewer, head and eyes in the upper middle of the frame, dark vignetted background that fades to near black at the edges. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
+```
+
+</details>
+
+#### Entità senza volto
+
+- **File**: `assets/arene/horror/pericoli/entita-senza-volto.webp`
+- **Cosa mostrare**: Entità alta e senza volto in un corridoio buio, braccia troppo lunghe.
+
+**Prompt**
+
+```text
+A tall faceless entity in a dark corridor, unnaturally long arms, black suit.
+```
+
+<details><summary>Prompt completo, pronto da incollare</summary>
+
+```text
+A tall faceless entity in a dark corridor, unnaturally long arms, black suit. Crimson, black and candlelight gold palette, eerie mist, gothic haunted mansion. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. 4:3 wanted-poster portrait, single threat centered and facing the viewer, head and eyes in the upper middle of the frame, dark vignetted background that fades to near black at the edges. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
+```
+
+</details>
+
+#### Stormo di corvi
+
+- **File**: `assets/arene/horror/pericoli/stormo-di-corvi.webp`
+- **Cosa mostrare**: Stormo di corvi che esplode da un albero morto; uno fissa chi guarda.
+
+**Prompt**
+
+```text
+A flock of crows bursting from a dead tree, one crow staring straight at the viewer.
+```
+
+<details><summary>Prompt completo, pronto da incollare</summary>
+
+```text
+A flock of crows bursting from a dead tree, one crow staring straight at the viewer. Crimson, black and candlelight gold palette, eerie mist, gothic haunted mansion. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. 4:3 wanted-poster portrait, single threat centered and facing the viewer, head and eyes in the upper middle of the frame, dark vignetted background that fades to near black at the edges. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
+```
+
+</details>
+
+### Armi · Villa Maledetta (1:1, 512 × 512 px, sfondo trasparente)
+
+#### Candelabro d'argento
+
+- **File**: `assets/arene/horror/armi/candelabro-dargento.webp`
+- **Cosa mostrare**: Candelabro d'argento pesante con tre candele che colano.
+
+**Prompt**
+
+```text
+A heavy silver candelabra with three dripping candles.
+```
+
+<details><summary>Prompt completo, pronto da incollare</summary>
+
+```text
+A heavy silver candelabra with three dripping candles. Crimson, black and candlelight gold palette, eerie mist, gothic haunted mansion. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Single object only, isolated on a fully transparent background, square 1:1, three-quarter view laid diagonally from lower left to upper right, 12% empty margin on every side, crisp silhouette with a thin dark outline so it reads on both light and dark backgrounds, no hands, no shadow on the ground. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
+```
+
+</details>
+
+#### Ascia
+
+- **File**: `assets/arene/horror/armi/ascia.webp`
+- **Cosa mostrare**: Vecchia ascia arrugginita.
+
+**Prompt**
+
+```text
+An old rusted axe with a cracked wooden handle.
+```
+
+<details><summary>Prompt completo, pronto da incollare</summary>
+
+```text
+An old rusted axe with a cracked wooden handle. Crimson, black and candlelight gold palette, eerie mist, gothic haunted mansion. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Single object only, isolated on a fully transparent background, square 1:1, three-quarter view laid diagonally from lower left to upper right, 12% empty margin on every side, crisp silhouette with a thin dark outline so it reads on both light and dark backgrounds, no hands, no shadow on the ground. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
+```
+
+</details>
+
+#### Fucile da caccia
+
+- **File**: `assets/arene/horror/armi/fucile-da-caccia.webp`
+- **Cosa mostrare**: Doppietta da caccia con calcio in legno.
+
+**Prompt**
+
+```text
+A double-barrelled hunting shotgun with a wooden stock.
+```
+
+<details><summary>Prompt completo, pronto da incollare</summary>
+
+```text
+A double-barrelled hunting shotgun with a wooden stock. Crimson, black and candlelight gold palette, eerie mist, gothic haunted mansion. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Single object only, isolated on a fully transparent background, square 1:1, three-quarter view laid diagonally from lower left to upper right, 12% empty margin on every side, crisp silhouette with a thin dark outline so it reads on both light and dark backgrounds, no hands, no shadow on the ground. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
+```
+
+</details>
+
+#### Pugnale rituale
+
+- **File**: `assets/arene/horror/armi/pugnale-rituale.webp`
+- **Cosa mostrare**: Pugnale rituale con elsa d'osso e simboli incisi.
+
+**Prompt**
+
+```text
+A ritual dagger with a bone hilt and engraved occult symbols.
+```
+
+<details><summary>Prompt completo, pronto da incollare</summary>
+
+```text
+A ritual dagger with a bone hilt and engraved occult symbols. Crimson, black and candlelight gold palette, eerie mist, gothic haunted mansion. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Single object only, isolated on a fully transparent background, square 1:1, three-quarter view laid diagonally from lower left to upper right, 12% empty margin on every side, crisp silhouette with a thin dark outline so it reads on both light and dark backgrounds, no hands, no shadow on the ground. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
+```
+
+</details>
+
+#### Crocifisso appuntito
+
+- **File**: `assets/arene/horror/armi/crocifisso-appuntito.webp`
+- **Cosa mostrare**: Crocifisso di legno appuntito come un paletto.
+
+**Prompt**
+
+```text
+A wooden crucifix sharpened into a stake at the bottom.
+```
+
+<details><summary>Prompt completo, pronto da incollare</summary>
+
+```text
+A wooden crucifix sharpened into a stake at the bottom. Crimson, black and candlelight gold palette, eerie mist, gothic haunted mansion. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Single object only, isolated on a fully transparent background, square 1:1, three-quarter view laid diagonally from lower left to upper right, 12% empty margin on every side, crisp silhouette with a thin dark outline so it reads on both light and dark backgrounds, no hands, no shadow on the ground. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
+```
+
+</details>
+
+#### Attizzatoio
+
+- **File**: `assets/arene/horror/armi/attizzatoio.webp`
+- **Cosa mostrare**: Attizzatoio da camino in ferro battuto.
+
+**Prompt**
+
+```text
+A wrought iron fireplace poker with a hooked tip.
+```
+
+<details><summary>Prompt completo, pronto da incollare</summary>
+
+```text
+A wrought iron fireplace poker with a hooked tip. Crimson, black and candlelight gold palette, eerie mist, gothic haunted mansion. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Single object only, isolated on a fully transparent background, square 1:1, three-quarter view laid diagonally from lower left to upper right, 12% empty margin on every side, crisp silhouette with a thin dark outline so it reads on both light and dark backgrounds, no hands, no shadow on the ground. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
+```
+
+</details>
+
+#### Falce
+
+- **File**: `assets/arene/horror/armi/falce.webp`
+- **Cosa mostrare**: Falce da contadino con la lama lunga e curva.
+
+**Prompt**
+
+```text
+A farmer's scythe with a long curved blade.
+```
+
+<details><summary>Prompt completo, pronto da incollare</summary>
+
+```text
+A farmer's scythe with a long curved blade. Crimson, black and candlelight gold palette, eerie mist, gothic haunted mansion. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Single object only, isolated on a fully transparent background, square 1:1, three-quarter view laid diagonally from lower left to upper right, 12% empty margin on every side, crisp silhouette with a thin dark outline so it reads on both light and dark backgrounds, no hands, no shadow on the ground. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
+```
+
+</details>
+
+---
 
 ## Terre Desolate
 
-Cartella: `assets/arene/wasteland/`. Palette: ocra, ruggine e sabbia sotto un sole bruciato.
+Polvere radioattiva, predoni e motori truccati.
 
-### Luoghi (16:9, 1280×720, sfondo pieno)
+- **Cartella**: `assets/arene/wasteland/` (con le sottocartelle `luoghi/`, `pericoli/`, `armi/`)
+- **Riferimento di stile**: `assets/arene/wasteland.webp`
+- **Atmosfera**: Deserto post-atomico: ocra, ruggine e sabbia sotto un sole bruciato, foschia di polvere, lamiere e motori truccati.
+- **Stile da aggiungere a ogni prompt di questa arena** (è già incluso nei prompt completi):
 
-| | File | Soggetto | Priorità | Traccia |
-| --- | --- | --- | --- | --- |
-|  | `luoghi/discarica.webp` | Discarica | alta | Discarica: il luogo dell'arena visto da vicino. Arena «Terre Desolate» (Polvere radioattiva, predoni e motori truccati). Palette: ocra, ruggine e sabbia sotto un sole bruciato. Formato 16:9. |
-|  | `luoghi/autostrada-spezzata.webp` | Autostrada spezzata | alta | Autostrada spezzata: il luogo dell'arena visto da vicino. Arena «Terre Desolate» (Polvere radioattiva, predoni e motori truccati). Palette: ocra, ruggine e sabbia sotto un sole bruciato. Formato 16:9. |
-|  | `luoghi/raffineria.webp` | Raffineria | alta | Raffineria: il luogo dell'arena visto da vicino. Arena «Terre Desolate» (Polvere radioattiva, predoni e motori truccati). Palette: ocra, ruggine e sabbia sotto un sole bruciato. Formato 16:9. |
-|  | `luoghi/citta-fantasma.webp` | Città fantasma | alta | Città fantasma: il luogo dell'arena visto da vicino. Arena «Terre Desolate» (Polvere radioattiva, predoni e motori truccati). Palette: ocra, ruggine e sabbia sotto un sole bruciato. Formato 16:9. |
-|  | `luoghi/cratere.webp` | Cratere | alta | Cratere: il luogo dell'arena visto da vicino. Arena «Terre Desolate» (Polvere radioattiva, predoni e motori truccati). Palette: ocra, ruggine e sabbia sotto un sole bruciato. Formato 16:9. |
-|  | `luoghi/diga.webp` | Diga | alta | Diga: il luogo dell'arena visto da vicino. Arena «Terre Desolate» (Polvere radioattiva, predoni e motori truccati). Palette: ocra, ruggine e sabbia sotto un sole bruciato. Formato 16:9. |
+```text
+Ochre, rust and sand palette under a scorched hazy sun, dusty post-apocalyptic desert wasteland. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours.
+```
 
-### Pericoli (4:3, 960×720, sfondo pieno, scuro)
+Più, a seconda della sezione:
 
-| | File | Soggetto | Priorità | Traccia |
-| --- | --- | --- | --- | --- |
-|  | `pericoli/banda-di-predoni.webp` | Banda di predoni | alta | Banda di predoni: creatura o minaccia pronta ad attaccare. Arena «Terre Desolate» (Polvere radioattiva, predoni e motori truccati). Palette: ocra, ruggine e sabbia sotto un sole bruciato. Formato 4:3. |
-|  | `pericoli/scorpione-gigante.webp` | Scorpione gigante | alta | Scorpione gigante: creatura o minaccia pronta ad attaccare. Arena «Terre Desolate» (Polvere radioattiva, predoni e motori truccati). Palette: ocra, ruggine e sabbia sotto un sole bruciato. Formato 4:3. |
-|  | `pericoli/branco-di-cani-mutati.webp` | Branco di cani mutati | alta | Branco di cani mutati: creatura o minaccia pronta ad attaccare. Arena «Terre Desolate» (Polvere radioattiva, predoni e motori truccati). Palette: ocra, ruggine e sabbia sotto un sole bruciato. Formato 4:3. |
-|  | `pericoli/verme-delle-sabbie.webp` | Verme delle sabbie | alta | Verme delle sabbie: creatura o minaccia pronta ad attaccare. Arena «Terre Desolate» (Polvere radioattiva, predoni e motori truccati). Palette: ocra, ruggine e sabbia sotto un sole bruciato. Formato 4:3. |
+- Luoghi: `Wide 16:9 establishing shot of the location, no people, eye-level view, the key landmark inside the central third of the frame, soft depth fog in the background.`
+- Pericoli: `4:3 wanted-poster portrait, single threat centered and facing the viewer, head and eyes in the upper middle of the frame, dark vignetted background that fades to near black at the edges.`
+- Armi: `Single object only, isolated on a fully transparent background, square 1:1, three-quarter view laid diagonally from lower left to upper right, 12% empty margin on every side, crisp silhouette with a thin dark outline so it reads on both light and dark backgrounds, no hands, no shadow on the ground.`
+- Sempre: `No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.`
 
-### Armi (1:1, 512×512, sfondo trasparente)
+### Luoghi · Terre Desolate (16:9, 1280 × 720 px, sfondo pieno)
 
-| | File | Soggetto | Priorità | Traccia |
-| --- | --- | --- | --- | --- |
-|  | `armi/fucile-arrugginito.webp` | Fucile arrugginito | media | Fucile arrugginito: arma o oggetto usato come arma. Arena «Terre Desolate» (Polvere radioattiva, predoni e motori truccati). Palette: ocra, ruggine e sabbia sotto un sole bruciato. Formato 1:1. Sfondo trasparente. |
-|  | `armi/lancia-ricavata-da-un-tubo.webp` | Lancia ricavata da un tubo | media | Lancia ricavata da un tubo: arma o oggetto usato come arma. Arena «Terre Desolate» (Polvere radioattiva, predoni e motori truccati). Palette: ocra, ruggine e sabbia sotto un sole bruciato. Formato 1:1. Sfondo trasparente. |
-|  | `armi/balestra-artigianale.webp` | Balestra artigianale | media | Balestra artigianale: arma o oggetto usato come arma. Arena «Terre Desolate» (Polvere radioattiva, predoni e motori truccati). Palette: ocra, ruggine e sabbia sotto un sole bruciato. Formato 1:1. Sfondo trasparente. |
-|  | `armi/molotov.webp` | Molotov | media | Molotov: arma o oggetto usato come arma. Arena «Terre Desolate» (Polvere radioattiva, predoni e motori truccati). Palette: ocra, ruggine e sabbia sotto un sole bruciato. Formato 1:1. Sfondo trasparente. |
-|  | `armi/catena.webp` | Catena | media | Catena: arma o oggetto usato come arma. Arena «Terre Desolate» (Polvere radioattiva, predoni e motori truccati). Palette: ocra, ruggine e sabbia sotto un sole bruciato. Formato 1:1. Sfondo trasparente. |
-|  | `armi/mannaia.webp` | Mannaia | media | Mannaia: arma o oggetto usato come arma. Arena «Terre Desolate» (Polvere radioattiva, predoni e motori truccati). Palette: ocra, ruggine e sabbia sotto un sole bruciato. Formato 1:1. Sfondo trasparente. |
-|  | `armi/lanciachiodi.webp` | Lanciachiodi | media | Lanciachiodi: arma o oggetto usato come arma. Arena «Terre Desolate» (Polvere radioattiva, predoni e motori truccati). Palette: ocra, ruggine e sabbia sotto un sole bruciato. Formato 1:1. Sfondo trasparente. |
+#### Discarica
 
-### Meteo (16:10, 1200×750, sfondo pieno)
+- **File**: `assets/arene/wasteland/luoghi/discarica.webp`
+- **Cosa mostrare**: Enorme sfasciacarrozze di auto arrugginite, pneumatici e rottami sotto un sole velato.
 
-| | File | Soggetto | Priorità | Traccia |
-| --- | --- | --- | --- | --- |
-|  | `meteo/tempesta-di-sabbia-radioattiva.webp` | Tempesta di sabbia radioattiva | alta | Tempesta di sabbia radioattiva: La polvere verde entra ovunque, anche nei denti.. Arena «Terre Desolate» (Polvere radioattiva, predoni e motori truccati). Palette: ocra, ruggine e sabbia sotto un sole bruciato. Formato 16:10. |
-|  | `meteo/calura-assassina.webp` | Calura assassina | alta | Calura assassina: Cinquantadue gradi all'ombra. Non c'è ombra.. Arena «Terre Desolate» (Polvere radioattiva, predoni e motori truccati). Palette: ocra, ruggine e sabbia sotto un sole bruciato. Formato 16:10. |
-|  | `meteo/pioggia-rara.webp` | Pioggia rara | alta | Pioggia rara: Piove acqua quasi pulita: tutti corrono fuori con le bocche aperte.. Arena «Terre Desolate» (Polvere radioattiva, predoni e motori truccati). Palette: ocra, ruggine e sabbia sotto un sole bruciato. Formato 16:10. |
-|  | `meteo/carovana-di-mercanti.webp` | Carovana di mercanti | alta | Carovana di mercanti: Una carovana attraversa la zona: si baratta di tutto.. Arena «Terre Desolate» (Polvere radioattiva, predoni e motori truccati). Palette: ocra, ruggine e sabbia sotto un sole bruciato. Formato 16:10. |
-|  | `meteo/notte-gelida-del-deserto.webp` | Notte gelida del deserto | alta | Notte gelida del deserto: Di giorno si cuoce, di notte si gela.. Arena «Terre Desolate» (Polvere radioattiva, predoni e motori truccati). Palette: ocra, ruggine e sabbia sotto un sole bruciato. Formato 16:10. |
-|  | `meteo/raid-dei-predoni.webp` | Raid dei predoni | alta | Raid dei predoni: Motori truccati all'orizzonte: i predoni sono in caccia.. Arena «Terre Desolate» (Polvere radioattiva, predoni e motori truccati). Palette: ocra, ruggine e sabbia sotto un sole bruciato. Formato 16:10. |
-|  | `meteo/aurora-radioattiva.webp` | Aurora radioattiva | alta | Aurora radioattiva: Il cielo si accende di verde e di viola. Bellissimo e letale.. Arena «Terre Desolate» (Polvere radioattiva, predoni e motori truccati). Palette: ocra, ruggine e sabbia sotto un sole bruciato. Formato 16:10. |
-|  | `meteo/vento-fresco.webp` | Vento fresco | alta | Vento fresco: Un raro vento fresco porta via la polvere per un giorno.. Arena «Terre Desolate» (Polvere radioattiva, predoni e motori truccati). Palette: ocra, ruggine e sabbia sotto un sole bruciato. Formato 16:10. |
-|  | `meteo/gara-dei-motori.webp` | Gara dei motori | alta | Gara dei motori: I predoni organizzano una gara: tutti guardano, nessuno spara. Quasi.. Arena «Terre Desolate» (Polvere radioattiva, predoni e motori truccati). Palette: ocra, ruggine e sabbia sotto un sole bruciato. Formato 16:10. |
+**Prompt**
 
-### Disastri (16:9, 1280×720, sfondo pieno)
+```text
+A vast scrapyard of rusted cars, tyres and piled junk under a hazy sun.
+```
 
-| | File | Soggetto | Priorità | Traccia |
-| --- | --- | --- | --- | --- |
-|  | `disastri/tempesta-di-sabbia-radioattiva.webp` | Tempesta di sabbia radioattiva · famiglia `sabbia` | alta | Tempesta di sabbia radioattiva: Un muro di sabbia verde avanza dall'orizzonte.. Arena «Terre Desolate» (Polvere radioattiva, predoni e motori truccati). Palette: ocra, ruggine e sabbia sotto un sole bruciato. Formato 16:9. |
-|  | `disastri/raid-dei-predoni.webp` | Il raid dei predoni · famiglia `esplosione` | alta | Il raid dei predoni: Una banda di predoni su moto rombanti attraversa le Terre Desolate.. Arena «Terre Desolate» (Polvere radioattiva, predoni e motori truccati). Palette: ocra, ruggine e sabbia sotto un sole bruciato. Formato 16:9. |
-|  | `disastri/esplosione-della-raffineria.webp` | L'esplosione della Raffineria · famiglia `esplosione` | alta | L'esplosione della Raffineria: La Raffineria salta in aria in una palla di fuoco.. Arena «Terre Desolate» (Polvere radioattiva, predoni e motori truccati). Palette: ocra, ruggine e sabbia sotto un sole bruciato. Formato 16:9. |
-|  | `disastri/siccita.webp` | La siccità · famiglia `caldo` | alta | La siccità: Tutte le fonti d'acqua si prosciugano nello stesso giorno.. Arena «Terre Desolate» (Polvere radioattiva, predoni e motori truccati). Palette: ocra, ruggine e sabbia sotto un sole bruciato. Formato 16:9. |
-|  | `disastri/pioggia-acida.webp` | Pioggia acida · famiglia `tossico` | alta | Pioggia acida: Una pioggia giallastra corrode metallo e pelle.. Arena «Terre Desolate» (Polvere radioattiva, predoni e motori truccati). Palette: ocra, ruggine e sabbia sotto un sole bruciato. Formato 16:9. |
-|  | `disastri/onda-di-calore.webp` | Onda di calore · famiglia `sabbia` | alta | Onda di calore: Il termometro supera i sessanta gradi.. Arena «Terre Desolate» (Polvere radioattiva, predoni e motori truccati). Palette: ocra, ruggine e sabbia sotto un sole bruciato. Formato 16:9. |
-|  | `disastri/sciame-di-locuste.webp` | Sciame di locuste · famiglia `sciame` | alta | Sciame di locuste: Uno sciame di locuste mutanti oscura il cielo.. Arena «Terre Desolate» (Polvere radioattiva, predoni e motori truccati). Palette: ocra, ruggine e sabbia sotto un sole bruciato. Formato 16:9. |
-|  | `disastri/vecchio-reattore.webp` | Il vecchio reattore · famiglia `fuoco` | alta | Il vecchio reattore: Un vecchio reattore nucleare sotterraneo si risveglia.. Arena «Terre Desolate» (Polvere radioattiva, predoni e motori truccati). Palette: ocra, ruggine e sabbia sotto un sole bruciato. Formato 16:9. |
-|  | `disastri/terremoto.webp` | Terremoto · famiglia `terremoto` | alta | Terremoto: Un terremoto apre voragini nella sabbia.. Arena «Terre Desolate» (Polvere radioattiva, predoni e motori truccati). Palette: ocra, ruggine e sabbia sotto un sole bruciato. Formato 16:9. |
-|  | `disastri/esplosione-della-diga.webp` | Esplosione della Diga · famiglia `esplosione` | media | Esplosione della Diga: La Diga cede e un muro d'acqua attraversa la valle.. Arena «Terre Desolate» (Polvere radioattiva, predoni e motori truccati). Palette: ocra, ruggine e sabbia sotto un sole bruciato. Formato 16:9. |
-|  | `disastri/tempesta-elettrica.webp` | La tempesta elettrica · famiglia `fulmine` | media | La tempesta elettrica: Fulmini violacei colpiscono il deserto.. Arena «Terre Desolate» (Polvere radioattiva, predoni e motori truccati). Palette: ocra, ruggine e sabbia sotto un sole bruciato. Formato 16:9. |
-|  | `disastri/mutanti.webp` | I mutanti · famiglia `bestie` | media | I mutanti: Una tribù di mutanti scende dalle colline.. Arena «Terre Desolate» (Polvere radioattiva, predoni e motori truccati). Palette: ocra, ruggine e sabbia sotto un sole bruciato. Formato 16:9. |
-|  | `disastri/verme-gigante.webp` | Il verme gigante · famiglia `bestie` | media | Il verme gigante: Un verme delle sabbie lungo cento metri emerge dal terreno.. Arena «Terre Desolate» (Polvere radioattiva, predoni e motori truccati). Palette: ocra, ruggine e sabbia sotto un sole bruciato. Formato 16:9. |
-|  | `disastri/gas-dalla-raffineria.webp` | Gas dalla Raffineria · famiglia `tossico` | media | Gas dalla Raffineria: Una nube tossica esce dalla Raffineria.. Arena «Terre Desolate» (Polvere radioattiva, predoni e motori truccati). Palette: ocra, ruggine e sabbia sotto un sole bruciato. Formato 16:9. |
-|  | `disastri/fuoco-sullautostrada.webp` | Fuoco sull'Autostrada · famiglia `fuoco` | media | Fuoco sull'Autostrada: Un'autocisterna esplode sull'Autostrada spezzata.. Arena «Terre Desolate» (Polvere radioattiva, predoni e motori truccati). Palette: ocra, ruggine e sabbia sotto un sole bruciato. Formato 16:9. |
-|  | `disastri/carovana-degli-schiavisti.webp` | La carovana degli schiavisti · famiglia `cassa` | media | La carovana degli schiavisti: Gli schiavisti setacciano il deserto.. Arena «Terre Desolate» (Polvere radioattiva, predoni e motori truccati). Palette: ocra, ruggine e sabbia sotto un sole bruciato. Formato 16:9. |
-|  | `disastri/sole-nero.webp` | Il sole nero · famiglia `buio` | media | Il sole nero: Un'eclisse totale oscura il deserto per ore.. Arena «Terre Desolate» (Polvere radioattiva, predoni e motori truccati). Palette: ocra, ruggine e sabbia sotto un sole bruciato. Formato 16:9. |
-|  | `disastri/tempesta-di-vetro.webp` | Tempesta di vetro · famiglia `fulmine` | media | Tempesta di vetro: Il vento solleva milioni di schegge di vetro dalla Città fantasma.. Arena «Terre Desolate» (Polvere radioattiva, predoni e motori truccati). Palette: ocra, ruggine e sabbia sotto un sole bruciato. Formato 16:9. |
-|  | `disastri/avvoltoi.webp` | Gli avvoltoi · famiglia `bestie` | media | Gli avvoltoi: Stormi di avvoltoi giganti scendono su chi è debole.. Arena «Terre Desolate» (Polvere radioattiva, predoni e motori truccati). Palette: ocra, ruggine e sabbia sotto un sole bruciato. Formato 16:9. |
-|  | `disastri/sabbie-mobili.webp` | Le sabbie mobili · famiglia `sabbia` | media | Le sabbie mobili: Le dune si trasformano in sabbie mobili.. Arena «Terre Desolate» (Polvere radioattiva, predoni e motori truccati). Palette: ocra, ruggine e sabbia sotto un sole bruciato. Formato 16:9. |
-|  | `disastri/pioggia-di-cenere.webp` | La pioggia di cenere · famiglia `tossico` | media | La pioggia di cenere: Un vulcano lontano copre il cielo di cenere.. Arena «Terre Desolate» (Polvere radioattiva, predoni e motori truccati). Palette: ocra, ruggine e sabbia sotto un sole bruciato. Formato 16:9. |
-|  | `disastri/acqua-finisce.webp` | L'acqua finisce · famiglia `acqua` | media | L'acqua finisce: Ogni pozzo conosciuto si prosciuga.. Arena «Terre Desolate» (Polvere radioattiva, predoni e motori truccati). Palette: ocra, ruggine e sabbia sotto un sole bruciato. Formato 16:9. |
-|  | `disastri/banda-dei-motociclisti.webp` | La banda dei motociclisti · famiglia `sabbia` | media | La banda dei motociclisti: Una banda di motociclisti armati attraversa la zona.. Arena «Terre Desolate» (Polvere radioattiva, predoni e motori truccati). Palette: ocra, ruggine e sabbia sotto un sole bruciato. Formato 16:9. |
-|  | `disastri/gelo-notturno.webp` | Il gelo notturno · famiglia `gelo` | media | Il gelo notturno: Di notte la temperatura scende a meno trenta.. Arena «Terre Desolate» (Polvere radioattiva, predoni e motori truccati). Palette: ocra, ruggine e sabbia sotto un sole bruciato. Formato 16:9. |
-|  | `disastri/cani-mutati.webp` | I cani mutati · famiglia `bestie` | media | I cani mutati: Un branco di cani a due teste caccia nel deserto.. Arena «Terre Desolate» (Polvere radioattiva, predoni e motori truccati). Palette: ocra, ruggine e sabbia sotto un sole bruciato. Formato 16:9. |
-|  | `disastri/pioggia-di-rottami.webp` | La pioggia di rottami · famiglia `pioggia` | media | La pioggia di rottami: Un vecchio satellite precipita in pezzi sul deserto.. Arena «Terre Desolate» (Polvere radioattiva, predoni e motori truccati). Palette: ocra, ruggine e sabbia sotto un sole bruciato. Formato 16:9. |
-|  | `disastri/fungo-atomico.webp` | Il fungo atomico · famiglia `sabbia` | media | Il fungo atomico: All'orizzonte si alza un fungo atomico.. Arena «Terre Desolate» (Polvere radioattiva, predoni e motori truccati). Palette: ocra, ruggine e sabbia sotto un sole bruciato. Formato 16:9. |
-|  | `disastri/nebbia-verde.webp` | La nebbia verde · famiglia `nebbia` | media | La nebbia verde: Una nebbia verdognola esce dal Cratere.. Arena «Terre Desolate» (Polvere radioattiva, predoni e motori truccati). Palette: ocra, ruggine e sabbia sotto un sole bruciato. Formato 16:9. |
-|  | `disastri/banditi-della-diga.webp` | I banditi della Diga · famiglia `acqua` | media | I banditi della Diga: I banditi della Diga chiedono un pedaggio di sangue.. Arena «Terre Desolate» (Polvere radioattiva, predoni e motori truccati). Palette: ocra, ruggine e sabbia sotto un sole bruciato. Formato 16:9. |
-|  | `disastri/tornado.webp` | Il tornado · famiglia `sabbia` | media | Il tornado: Un tornado di sabbia attraversa le Terre Desolate.. Arena «Terre Desolate» (Polvere radioattiva, predoni e motori truccati). Palette: ocra, ruggine e sabbia sotto un sole bruciato. Formato 16:9. |
-|  | `disastri/miniera.webp` | La miniera · famiglia `terremoto` | media | La miniera: Una vecchia miniera crolla sotto i piedi di chi ci cammina sopra.. Arena «Terre Desolate» (Polvere radioattiva, predoni e motori truccati). Palette: ocra, ruggine e sabbia sotto un sole bruciato. Formato 16:9. |
-|  | `disastri/pubblico-vota.webp` | Il pubblico vota · famiglia `spettacolo` | media | Il pubblico vota: Il pubblico vota in diretta chi colpire con un fulmine artificiale.. Arena «Terre Desolate» (Polvere radioattiva, predoni e motori truccati). Palette: ocra, ruggine e sabbia sotto un sole bruciato. Formato 16:9. |
-|  | `disastri/pausa-pubblicitaria.webp` | La pausa pubblicitaria · famiglia `spettacolo` | media | La pausa pubblicitaria: Durante la pubblicità, gli organizzatori si dimenticano di sorvegliare le trappole.. Arena «Terre Desolate» (Polvere radioattiva, predoni e motori truccati). Palette: ocra, ruggine e sabbia sotto un sole bruciato. Formato 16:9. |
-|  | `disastri/cambio-di-regia.webp` | Il cambio di regia · famiglia `spettacolo` | media | Il cambio di regia: Arriva un nuovo regista che vuole più azione.. Arena «Terre Desolate» (Polvere radioattiva, predoni e motori truccati). Palette: ocra, ruggine e sabbia sotto un sole bruciato. Formato 16:9. |
-|  | `disastri/pioggia-di-coriandoli.webp` | La pioggia di coriandoli · famiglia `spettacolo` | media | La pioggia di coriandoli: Per festeggiare la metà della stagione, gli organizzatori fanno piovere coriandoli. Di vetro.. Arena «Terre Desolate» (Polvere radioattiva, predoni e motori truccati). Palette: ocra, ruggine e sabbia sotto un sole bruciato. Formato 16:9. |
-|  | `disastri/ospite-speciale.webp` | L'ospite speciale · famiglia `spettacolo` | media | L'ospite speciale: Una celebrità entra nell'arena per un giorno, con una squadra di guardie del corpo armate.. Arena «Terre Desolate» (Polvere radioattiva, predoni e motori truccati). Palette: ocra, ruggine e sabbia sotto un sole bruciato. Formato 16:9. |
-|  | `disastri/sponsor-ritirato.webp` | Lo sponsor ritirato · famiglia `spettacolo` | media | Lo sponsor ritirato: Uno sponsor si ritira e reclama indietro tutti i regali. Con i droni.. Arena «Terre Desolate» (Polvere radioattiva, predoni e motori truccati). Palette: ocra, ruggine e sabbia sotto un sole bruciato. Formato 16:9. |
-|  | `disastri/gioco-a-quiz.webp` | Il gioco a quiz · famiglia `spettacolo` | media | Il gioco a quiz: Gli organizzatori interrompono tutto per un quiz di cultura generale. Chi sbaglia paga.. Arena «Terre Desolate» (Polvere radioattiva, predoni e motori truccati). Palette: ocra, ruggine e sabbia sotto un sole bruciato. Formato 16:9. |
-|  | `disastri/sciopero-dei-tecnici.webp` | Lo sciopero dei tecnici · famiglia `spettacolo` | media | Lo sciopero dei tecnici: I tecnici dell'arena scioperano e nessuno controlla più i sistemi.. Arena «Terre Desolate» (Polvere radioattiva, predoni e motori truccati). Palette: ocra, ruggine e sabbia sotto un sole bruciato. Formato 16:9. |
-|  | `disastri/replica.webp` | La replica · famiglia `spettacolo` | media | La replica: Per problemi tecnici, l'arena ripete il disastro di due giorni fa, ma più forte.. Arena «Terre Desolate» (Polvere radioattiva, predoni e motori truccati). Palette: ocra, ruggine e sabbia sotto un sole bruciato. Formato 16:9. |
-|  | `disastri/giornata-dei-bambini.webp` | La giornata dei bambini · famiglia `spettacolo` | media | La giornata dei bambini: Gli organizzatori fanno disegnare le trappole del giorno ai bambini. Sono molto creativi.. Arena «Terre Desolate» (Polvere radioattiva, predoni e motori truccati). Palette: ocra, ruggine e sabbia sotto un sole bruciato. Formato 16:9. |
-|  | `disastri/asta-dei-concorrenti.webp` | L'asta dei concorrenti · famiglia `spettacolo` | media | L'asta dei concorrenti: Il pubblico può comprare il diritto di decidere la sorte di un concorrente.. Arena «Terre Desolate» (Polvere radioattiva, predoni e motori truccati). Palette: ocra, ruggine e sabbia sotto un sole bruciato. Formato 16:9. |
-|  | `disastri/terremoto-della-produzione.webp` | Il terremoto della produzione · famiglia `terremoto` | media | Il terremoto della produzione: Un camion della produzione si ribalta dentro l'arena e libera tutto quello che trasportava.. Arena «Terre Desolate» (Polvere radioattiva, predoni e motori truccati). Palette: ocra, ruggine e sabbia sotto un sole bruciato. Formato 16:9. |
-|  | `disastri/blackout-delle-telecamere.webp` | Il blackout delle telecamere · famiglia `spettacolo` | media | Il blackout delle telecamere: Le telecamere si spengono per un'ora. Senza testimoni, le regole saltano.. Arena «Terre Desolate» (Polvere radioattiva, predoni e motori truccati). Palette: ocra, ruggine e sabbia sotto un sole bruciato. Formato 16:9. |
-|  | `disastri/musica-a-tutto-volume.webp` | La musica a tutto volume · famiglia `spettacolo` | media | La musica a tutto volume: Gli organizzatori diffondono la stessa canzone estiva per ventiquattro ore.. Arena «Terre Desolate» (Polvere radioattiva, predoni e motori truccati). Palette: ocra, ruggine e sabbia sotto un sole bruciato. Formato 16:9. |
-|  | `disastri/doppio-disastro.webp` | Il doppio disastro · famiglia `sabbia` | media | Il doppio disastro: Due disastri si attivano nello stesso momento per un errore di programmazione.. Arena «Terre Desolate» (Polvere radioattiva, predoni e motori truccati). Palette: ocra, ruggine e sabbia sotto un sole bruciato. Formato 16:9. |
-|  | `disastri/maratona.webp` | La maratona · famiglia `spettacolo` | media | La maratona: Gli organizzatori obbligano tutti a correre per due ore. Chi si ferma viene punito.. Arena «Terre Desolate» (Polvere radioattiva, predoni e motori truccati). Palette: ocra, ruggine e sabbia sotto un sole bruciato. Formato 16:9. |
-|  | `disastri/sondaggio-della-crudelta.webp` | Il sondaggio della crudeltà · famiglia `spettacolo` | media | Il sondaggio della crudeltà: Il pubblico vota il disastro più crudele. Vince "tutti insieme".. Arena «Terre Desolate» (Polvere radioattiva, predoni e motori truccati). Palette: ocra, ruggine e sabbia sotto un sole bruciato. Formato 16:9. |
-|  | `disastri/invasione-dei-fan.webp` | L'invasione dei fan · famiglia `spettacolo` | media | L'invasione dei fan: Un gruppo di fan scavalca le recinzioni e invade l'arena per conoscere i propri idoli.. Arena «Terre Desolate» (Polvere radioattiva, predoni e motori truccati). Palette: ocra, ruggine e sabbia sotto un sole bruciato. Formato 16:9. |
-|  | `disastri/gioco-delle-sedie.webp` | Il gioco delle sedie · famiglia `spettacolo` | media | Il gioco delle sedie: Gli organizzatori mettono al centro dell'arena una sedia in meno dei concorrenti. Chi resta in piedi viene punito.. Arena «Terre Desolate» (Polvere radioattiva, predoni e motori truccati). Palette: ocra, ruggine e sabbia sotto un sole bruciato. Formato 16:9. |
-|  | `disastri/nebbia-delle-risate-registrate.webp` | La nebbia delle risate registrate · famiglia `spettacolo` | media | La nebbia delle risate registrate: Dagli altoparlanti partono risate registrate a ogni sfortuna. È psicologicamente devastante.. Arena «Terre Desolate» (Polvere radioattiva, predoni e motori truccati). Palette: ocra, ruggine e sabbia sotto un sole bruciato. Formato 16:9. |
-|  | `disastri/notte-rossa.webp` | La notte rossa · famiglia `buio` · 18+ | bassa | La notte rossa: Gli organizzatori sospendono ogni regola per una notte: niente telecamere sui dettagli, niente limiti.. Arena «Terre Desolate» (Polvere radioattiva, predoni e motori truccati). Palette: ocra, ruggine e sabbia sotto un sole bruciato. Formato 16:9. |
-|  | `disastri/bar-aperto.webp` | Il bar aperto · famiglia `festa` · 18+ | bassa | Il bar aperto: Un bar con alcol illimitato compare nel mezzo dell'arena. Gratis, per un'ora.. Arena «Terre Desolate» (Polvere radioattiva, predoni e motori truccati). Palette: ocra, ruggine e sabbia sotto un sole bruciato. Formato 16:9. |
-|  | `disastri/pioggia-di-sangue.webp` | La pioggia di sangue · famiglia `cielo` · 18+ | bassa | La pioggia di sangue: Una pioggia di sangue animale cade sull'arena per motivi puramente estetici.. Arena «Terre Desolate» (Polvere radioattiva, predoni e motori truccati). Palette: ocra, ruggine e sabbia sotto un sole bruciato. Formato 16:9. |
-|  | `disastri/spettacolo-del-pudore.webp` | Lo spettacolo del pudore · famiglia `sabbia` · 18+ | bassa | Lo spettacolo del pudore: Gli organizzatori fanno sparire tutti i vestiti dei concorrenti per un giorno.. Arena «Terre Desolate» (Polvere radioattiva, predoni e motori truccati). Palette: ocra, ruggine e sabbia sotto un sole bruciato. Formato 16:9. |
-|  | `disastri/spore-del-desiderio.webp` | Le spore del desiderio · famiglia `festa` · 18+ | bassa | Le spore del desiderio: Le spore di un fungo rendono tutti irresistibilmente attratti dalla persona più vicina.. Arena «Terre Desolate» (Polvere radioattiva, predoni e motori truccati). Palette: ocra, ruggine e sabbia sotto un sole bruciato. Formato 16:9. |
-|  | `disastri/macello.webp` | Il macello · famiglia `sangue` · 18+ | bassa | Il macello: Gli organizzatori aprono le gabbie di tutti i mostri insieme e chiamano l'evento "Il macello". Il nome è accurato.. Arena «Terre Desolate» (Polvere radioattiva, predoni e motori truccati). Palette: ocra, ruggine e sabbia sotto un sole bruciato. Formato 16:9. |
-|  | `disastri/tempesta-di-ruggine.webp` | La tempesta di ruggine · famiglia `fulmine` | media | La tempesta di ruggine: Una tempesta trasforma in ruggine tutto ciò che è metallo.. Arena «Terre Desolate» (Polvere radioattiva, predoni e motori truccati). Palette: ocra, ruggine e sabbia sotto un sole bruciato. Formato 16:9. |
-|  | `disastri/cammelli-mutanti.webp` | I cammelli mutanti · famiglia `bestie` | media | I cammelli mutanti: Un branco di cammelli con tre gobbe e un pessimo carattere attraversa il deserto.. Arena «Terre Desolate» (Polvere radioattiva, predoni e motori truccati). Palette: ocra, ruggine e sabbia sotto un sole bruciato. Formato 16:9. |
-|  | `disastri/mercato-dei-predoni.webp` | Il mercato dei predoni · famiglia `cassa` | media | Il mercato dei predoni: I predoni aprono un mercato in cui si vende di tutto, anche i concorrenti.. Arena «Terre Desolate» (Polvere radioattiva, predoni e motori truccati). Palette: ocra, ruggine e sabbia sotto un sole bruciato. Formato 16:9. |
-|  | `disastri/formiche-di-vetro.webp` | Le formiche di vetro · famiglia `sciame` | media | Le formiche di vetro: Formiche trasparenti grandi come cani escono da un cratere.. Arena «Terre Desolate» (Polvere radioattiva, predoni e motori truccati). Palette: ocra, ruggine e sabbia sotto un sole bruciato. Formato 16:9. |
-|  | `disastri/miraggio.webp` | Il miraggio · famiglia `sabbia` | media | Il miraggio: Il deserto mostra a ognuno un'oasi diversa.. Arena «Terre Desolate» (Polvere radioattiva, predoni e motori truccati). Palette: ocra, ruggine e sabbia sotto un sole bruciato. Formato 16:9. |
-|  | `disastri/pioggia-di-pesci.webp` | La pioggia di pesci · famiglia `pioggia` | media | La pioggia di pesci: Un tornado ha raccolto un intero lago e ora lo restituisce, pesci compresi.. Arena «Terre Desolate» (Polvere radioattiva, predoni e motori truccati). Palette: ocra, ruggine e sabbia sotto un sole bruciato. Formato 16:9. |
-|  | `disastri/vecchio-esercito.webp` | Il vecchio esercito · famiglia `tech` | media | Il vecchio esercito: Un esercito di robot militari della vecchia guerra si risveglia.. Arena «Terre Desolate» (Polvere radioattiva, predoni e motori truccati). Palette: ocra, ruggine e sabbia sotto un sole bruciato. Formato 16:9. |
-|  | `disastri/sabbia-che-canta.webp` | La sabbia che canta · famiglia `sabbia` | media | La sabbia che canta: Il vento sulla sabbia produce una melodia ipnotica.. Arena «Terre Desolate» (Polvere radioattiva, predoni e motori truccati). Palette: ocra, ruggine e sabbia sotto un sole bruciato. Formato 16:9. |
-|  | `disastri/grande-incendio.webp` | Il grande incendio · famiglia `fuoco` | media | Il grande incendio: Il petrolio della Raffineria prende fuoco e il fuoco corre sulla sabbia.. Arena «Terre Desolate» (Polvere radioattiva, predoni e motori truccati). Palette: ocra, ruggine e sabbia sotto un sole bruciato. Formato 16:9. |
-|  | `disastri/radio-dei-morti.webp` | La radio dei morti · famiglia `tech` | media | La radio dei morti: Una vecchia radio trasmette nomi. Chi sente il proprio nome, muore.. Arena «Terre Desolate» (Polvere radioattiva, predoni e motori truccati). Palette: ocra, ruggine e sabbia sotto un sole bruciato. Formato 16:9. |
-|  | `disastri/pioggia-di-rottami-spaziali.webp` | La pioggia di rottami spaziali · famiglia `pioggia` | media | La pioggia di rottami spaziali: Una stazione spaziale abbandonata precipita a pezzi sul deserto.. Arena «Terre Desolate» (Polvere radioattiva, predoni e motori truccati). Palette: ocra, ruggine e sabbia sotto un sole bruciato. Formato 16:9. |
-|  | `disastri/culto-del-motore.webp` | Il culto del motore · famiglia `sabbia` | media | Il culto del motore: Una setta che adora i motori rapisce chiunque sappia guidare.. Arena «Terre Desolate» (Polvere radioattiva, predoni e motori truccati). Palette: ocra, ruggine e sabbia sotto un sole bruciato. Formato 16:9. |
-|  | `disastri/notte-senza-fine.webp` | La notte senza fine · famiglia `buio` | media | La notte senza fine: Una nube di cenere oscura il sole per tutto il giorno.. Arena «Terre Desolate» (Polvere radioattiva, predoni e motori truccati). Palette: ocra, ruggine e sabbia sotto un sole bruciato. Formato 16:9. |
-|  | `disastri/vermi-delle-dune.webp` | I vermi delle dune · famiglia `sabbia` | media | I vermi delle dune: I vermi delle sabbie entrano in calore e diventano territoriali.. Arena «Terre Desolate» (Polvere radioattiva, predoni e motori truccati). Palette: ocra, ruggine e sabbia sotto un sole bruciato. Formato 16:9. |
-|  | `disastri/diga-dei-castori.webp` | La diga dei castori · famiglia `acqua` | media | La diga dei castori: Castori mutanti costruiscono una diga sul fiume secco e lo inondano.. Arena «Terre Desolate» (Polvere radioattiva, predoni e motori truccati). Palette: ocra, ruggine e sabbia sotto un sole bruciato. Formato 16:9. |
-|  | `disastri/orgia-dei-predoni.webp` | L'orgia dei predoni · famiglia `festa` · 18+ | bassa | L'orgia dei predoni: I predoni organizzano una festa selvaggia con alcol, fuoco e nessuna regola.. Arena «Terre Desolate» (Polvere radioattiva, predoni e motori truccati). Palette: ocra, ruggine e sabbia sotto un sole bruciato. Formato 16:9. |
-|  | `disastri/mattatoio-dei-mutanti.webp` | Il mattatoio dei mutanti · famiglia `bestie` · 18+ | bassa | Il mattatoio dei mutanti: I mutanti appendono le loro prede ai pali della strada.. Arena «Terre Desolate» (Polvere radioattiva, predoni e motori truccati). Palette: ocra, ruggine e sabbia sotto un sole bruciato. Formato 16:9. |
-|  | `disastri/crollo-della-diga.webp` | Il crollo della Diga · famiglia `acqua` | media | Il crollo della Diga: La Diga cede: un muro d'acqua attraversa il deserto.. Arena «Terre Desolate» (Polvere radioattiva, predoni e motori truccati). Palette: ocra, ruggine e sabbia sotto un sole bruciato. Formato 16:9. |
-|  | `disastri/invasione-dei-predoni.webp` | L'invasione dei predoni · famiglia `bestie` | media | L'invasione dei predoni: Una banda di predoni attraversa l'arena bruciando tutto.. Arena «Terre Desolate» (Polvere radioattiva, predoni e motori truccati). Palette: ocra, ruggine e sabbia sotto un sole bruciato. Formato 16:9. |
-|  | `disastri/cratere-che-si-apre.webp` | Il cratere che si apre · famiglia `terremoto` | media | Il cratere che si apre: Il terreno sprofonda in un nuovo cratere radioattivo.. Arena «Terre Desolate» (Polvere radioattiva, predoni e motori truccati). Palette: ocra, ruggine e sabbia sotto un sole bruciato. Formato 16:9. |
+<details><summary>Prompt completo, pronto da incollare</summary>
 
-### Oggetti (1:1, 512×512, sfondo trasparente)
+```text
+A vast scrapyard of rusted cars, tyres and piled junk under a hazy sun. Ochre, rust and sand palette under a scorched hazy sun, dusty post-apocalyptic desert wasteland. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Wide 16:9 establishing shot of the location, no people, eye-level view, the key landmark inside the central third of the frame, soft depth fog in the background. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
+```
 
-| | File | Soggetto | Priorità | Traccia |
-| --- | --- | --- | --- | --- |
-|  | `oggetti/arma.webp` | Arma | alta | Arma: Più forza negli scontri, in base alla qualità (★). Si consuma a ogni colpo e alla fine si rompe; con un attrezzo si può riparare. Chi è ingegnoso può intingerla nel veleno.. Arena «Terre Desolate» (Polvere radioattiva, predoni e motori truccati). Palette: ocra, ruggine e sabbia sotto un sole bruciato. Formato 1:1. Sfondo trasparente. |
-|  | `oggetti/armatura.webp` | Protezione (per esempio armatura di copertoni, scudo ricavato da un cartello stradale) | alta | Protezione (per esempio armatura di copertoni, scudo ricavato da un cartello stradale): Riduce i danni e a volte para un colpo mortale. Si consuma a ogni colpo incassato.. Arena «Terre Desolate» (Polvere radioattiva, predoni e motori truccati). Palette: ocra, ruggine e sabbia sotto un sole bruciato. Formato 1:1. Sfondo trasparente. |
-|  | `oggetti/med.webp` | Cure | alta | Cure: Si usa da soli o sugli alleati: richiude le ferite gravi, ferma veleni e infezioni presi in tempo, abbassa l'indicatore dell'arena.. Arena «Terre Desolate» (Polvere radioattiva, predoni e motori truccati). Palette: ocra, ruggine e sabbia sotto un sole bruciato. Formato 1:1. Sfondo trasparente. |
-|  | `oggetti/cibo.webp` | Cibo | alta | Cibo: Si mangia quando la sazietà cala. Si può dividere con gli alleati, regalare o scambiare.. Arena «Terre Desolate» (Polvere radioattiva, predoni e motori truccati). Palette: ocra, ruggine e sabbia sotto un sole bruciato. Formato 1:1. Sfondo trasparente. |
-|  | `oggetti/attrezzo.webp` | Attrezzo (per esempio contatore Geiger, chiave inglese) | alta | Attrezzo (per esempio contatore Geiger, chiave inglese): Più cibo trovato, fughe più facili da tempeste e trappole, difesa migliore di notte, armi riparate.. Arena «Terre Desolate» (Polvere radioattiva, predoni e motori truccati). Palette: ocra, ruggine e sabbia sotto un sole bruciato. Formato 1:1. Sfondo trasparente. |
-|  | `oggetti/mappa.webp` | Mappa | alta | Mappa: Più cibo, meno disastri, trappole scoperte in anticipo e vie di fuga sicure.. Arena «Terre Desolate» (Polvere radioattiva, predoni e motori truccati). Palette: ocra, ruggine e sabbia sotto un sole bruciato. Formato 1:1. Sfondo trasparente. |
-|  | `oggetti/trap.webp` | Trappola | alta | Trappola: Di notte chi la sa usare la piazza nella sua zona. Chi ci passa rischia grosso, e l'uccisione va a chi l'ha piazzata.. Arena «Terre Desolate» (Polvere radioattiva, predoni e motori truccati). Palette: ocra, ruggine e sabbia sotto un sole bruciato. Formato 1:1. Sfondo trasparente. |
-|  | `oggetti/esplosivo.webp` | Esplosivo | alta | Esplosivo: Più forza negli scontri. Chi è ingegnoso ci costruisce trappole esplosive. Da ubriachi è un pessimo compagno.. Arena «Terre Desolate» (Polvere radioattiva, predoni e motori truccati). Palette: ocra, ruggine e sabbia sotto un sole bruciato. Formato 1:1. Sfondo trasparente. |
-|  | `oggetti/veleno.webp` | Veleno | alta | Veleno: Apre la strada agli avvelenamenti; chi è ingegnoso ci intinge l'arma, che poi avvelena a ogni colpo.. Arena «Terre Desolate» (Polvere radioattiva, predoni e motori truccati). Palette: ocra, ruggine e sabbia sotto un sole bruciato. Formato 1:1. Sfondo trasparente. |
-|  | `oggetti/amuleto.webp` | Portafortuna | alta | Portafortuna: Può evitare una morte diretta narrata da un evento: probabilità 85%, certa per chi è superstizioso. Si consuma quando salva. Non ferma i danni periodici di fame, malattie e ferite. Calma Terrore e Corruzione.. Arena «Terre Desolate» (Polvere radioattiva, predoni e motori truccati). Palette: ocra, ruggine e sabbia sotto un sole bruciato. Formato 1:1. Sfondo trasparente. |
-|  | `oggetti/alcol.webp` | Alcol (per esempio bottiglia di distillato di cactus) | alta | Alcol (per esempio bottiglia di distillato di cactus): Scalda, fa dimenticare, disinfetta le ferite infette. E ubriaca.. Arena «Terre Desolate» (Polvere radioattiva, predoni e motori truccati). Palette: ocra, ruggine e sabbia sotto un sole bruciato. Formato 1:1. Sfondo trasparente. |
-|  | `oggetti/valore.webp` | Merce di scambio (per esempio manciata di tappi di bottiglia, tanica di benzina) | alta | Merce di scambio (per esempio manciata di tappi di bottiglia, tanica di benzina): Non serve a niente, tranne che a comprare cibo e cure da chi ne ha.. Arena «Terre Desolate» (Polvere radioattiva, predoni e motori truccati). Palette: ocra, ruggine e sabbia sotto un sole bruciato. Formato 1:1. Sfondo trasparente. |
-|  | `oggetti/ricordo.webp` | Ricordo (per esempio foto di famiglia, lettera mai spedita) | alta | Ricordo (per esempio foto di famiglia, lettera mai spedita): Un pezzo di casa: ogni notte tiene su il morale. Se è di qualcuno che non c'è più, ancora di più.. Arena «Terre Desolate» (Polvere radioattiva, predoni e motori truccati). Palette: ocra, ruggine e sabbia sotto un sole bruciato. Formato 1:1. Sfondo trasparente. |
+</details>
+
+#### Autostrada spezzata
+
+- **File**: `assets/arene/wasteland/luoghi/autostrada-spezzata.webp`
+- **Cosa mostrare**: Cavalcavia autostradale crollato nel deserto, camion abbandonati.
+
+**Prompt**
+
+```text
+A broken highway overpass collapsed into the desert, abandoned trucks below.
+```
+
+<details><summary>Prompt completo, pronto da incollare</summary>
+
+```text
+A broken highway overpass collapsed into the desert, abandoned trucks below. Ochre, rust and sand palette under a scorched hazy sun, dusty post-apocalyptic desert wasteland. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Wide 16:9 establishing shot of the location, no people, eye-level view, the key landmark inside the central third of the frame, soft depth fog in the background. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
+```
+
+</details>
+
+#### Raffineria
+
+- **File**: `assets/arene/wasteland/luoghi/raffineria.webp`
+- **Cosa mostrare**: Raffineria arrugginita con torce di gas accese e intrico di tubi.
+
+**Prompt**
+
+```text
+A rusted oil refinery with burning flare stacks and a tangle of pipes.
+```
+
+<details><summary>Prompt completo, pronto da incollare</summary>
+
+```text
+A rusted oil refinery with burning flare stacks and a tangle of pipes. Ochre, rust and sand palette under a scorched hazy sun, dusty post-apocalyptic desert wasteland. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Wide 16:9 establishing shot of the location, no people, eye-level view, the key landmark inside the central third of the frame, soft depth fog in the background. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
+```
+
+</details>
+
+#### Città fantasma
+
+- **File**: `assets/arene/wasteland/luoghi/citta-fantasma.webp`
+- **Cosa mostrare**: Città fantasma con edifici mezzi sepolti, cartelloni sbiaditi e rotolacampo.
+
+**Prompt**
+
+```text
+A ghost town with half-buried buildings, faded blank billboards and tumbleweeds.
+```
+
+<details><summary>Prompt completo, pronto da incollare</summary>
+
+```text
+A ghost town with half-buried buildings, faded blank billboards and tumbleweeds. Ochre, rust and sand palette under a scorched hazy sun, dusty post-apocalyptic desert wasteland. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Wide 16:9 establishing shot of the location, no people, eye-level view, the key landmark inside the central third of the frame, soft depth fog in the background. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
+```
+
+</details>
+
+#### Cratere
+
+- **File**: `assets/arene/wasteland/luoghi/cratere.webp`
+- **Cosa mostrare**: Cratere radioattivo enorme con pozze che brillano di verde.
+
+**Prompt**
+
+```text
+A huge radioactive crater with glowing green pools.
+```
+
+<details><summary>Prompt completo, pronto da incollare</summary>
+
+```text
+A huge radioactive crater with glowing green pools. Ochre, rust and sand palette under a scorched hazy sun, dusty post-apocalyptic desert wasteland. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Wide 16:9 establishing shot of the location, no people, eye-level view, the key landmark inside the central third of the frame, soft depth fog in the background. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
+```
+
+</details>
+
+#### Diga
+
+- **File**: `assets/arene/wasteland/luoghi/diga.webp`
+- **Cosa mostrare**: Diga di cemento gigante incrinata, con un insediamento di fortuna in cima.
+
+**Prompt**
+
+```text
+A giant cracked concrete dam with a makeshift settlement built on top.
+```
+
+<details><summary>Prompt completo, pronto da incollare</summary>
+
+```text
+A giant cracked concrete dam with a makeshift settlement built on top. Ochre, rust and sand palette under a scorched hazy sun, dusty post-apocalyptic desert wasteland. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Wide 16:9 establishing shot of the location, no people, eye-level view, the key landmark inside the central third of the frame, soft depth fog in the background. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
+```
+
+</details>
+
+### Pericoli · Terre Desolate (4:3, 960 × 720 px, sfondo pieno e scuro)
+
+#### Banda di predoni
+
+- **File**: `assets/arene/wasteland/pericoli/banda-di-predoni.webp`
+- **Cosa mostrare**: Banda di predoni con armature di cuoio chiodato e occhialoni, accanto a buggy truccati.
+
+**Prompt**
+
+```text
+A gang of raiders in spiked leather armour and goggles standing by modified buggies.
+```
+
+<details><summary>Prompt completo, pronto da incollare</summary>
+
+```text
+A gang of raiders in spiked leather armour and goggles standing by modified buggies. Ochre, rust and sand palette under a scorched hazy sun, dusty post-apocalyptic desert wasteland. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. 4:3 wanted-poster portrait, single threat centered and facing the viewer, head and eyes in the upper middle of the frame, dark vignetted background that fades to near black at the edges. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
+```
+
+</details>
+
+#### Scorpione gigante
+
+- **File**: `assets/arene/wasteland/pericoli/scorpione-gigante.webp`
+- **Cosa mostrare**: Scorpione gigante del deserto col pungiglione alzato.
+
+**Prompt**
+
+```text
+A giant desert scorpion with its stinger raised, chitin shining in the sun.
+```
+
+<details><summary>Prompt completo, pronto da incollare</summary>
+
+```text
+A giant desert scorpion with its stinger raised, chitin shining in the sun. Ochre, rust and sand palette under a scorched hazy sun, dusty post-apocalyptic desert wasteland. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. 4:3 wanted-poster portrait, single threat centered and facing the viewer, head and eyes in the upper middle of the frame, dark vignetted background that fades to near black at the edges. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
+```
+
+</details>
+
+#### Branco di cani mutati
+
+- **File**: `assets/arene/wasteland/pericoli/branco-di-cani-mutati.webp`
+- **Cosa mostrare**: Branco di cani mutati senza pelo, con occhi in più, che ringhiano.
+
+**Prompt**
+
+```text
+A pack of hairless mutated dogs with extra eyes, growling.
+```
+
+<details><summary>Prompt completo, pronto da incollare</summary>
+
+```text
+A pack of hairless mutated dogs with extra eyes, growling. Ochre, rust and sand palette under a scorched hazy sun, dusty post-apocalyptic desert wasteland. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. 4:3 wanted-poster portrait, single threat centered and facing the viewer, head and eyes in the upper middle of the frame, dark vignetted background that fades to near black at the edges. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
+```
+
+</details>
+
+#### Verme delle sabbie
+
+- **File**: `assets/arene/wasteland/pericoli/verme-delle-sabbie.webp`
+- **Cosa mostrare**: Verme delle sabbie colossale che erompe dalle dune, bocca circolare piena di denti.
+
+**Prompt**
+
+```text
+A colossal sandworm bursting out of the dunes, a circular mouth full of teeth.
+```
+
+<details><summary>Prompt completo, pronto da incollare</summary>
+
+```text
+A colossal sandworm bursting out of the dunes, a circular mouth full of teeth. Ochre, rust and sand palette under a scorched hazy sun, dusty post-apocalyptic desert wasteland. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. 4:3 wanted-poster portrait, single threat centered and facing the viewer, head and eyes in the upper middle of the frame, dark vignetted background that fades to near black at the edges. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
+```
+
+</details>
+
+### Armi · Terre Desolate (1:1, 512 × 512 px, sfondo trasparente)
+
+#### Fucile arrugginito
+
+- **File**: `assets/arene/wasteland/armi/fucile-arrugginito.webp`
+- **Cosa mostrare**: Fucile a otturatore arrugginito con mirino legato col nastro.
+
+**Prompt**
+
+```text
+A rusty bolt-action rifle with a scope held on by tape.
+```
+
+<details><summary>Prompt completo, pronto da incollare</summary>
+
+```text
+A rusty bolt-action rifle with a scope held on by tape. Ochre, rust and sand palette under a scorched hazy sun, dusty post-apocalyptic desert wasteland. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Single object only, isolated on a fully transparent background, square 1:1, three-quarter view laid diagonally from lower left to upper right, 12% empty margin on every side, crisp silhouette with a thin dark outline so it reads on both light and dark backgrounds, no hands, no shadow on the ground. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
+```
+
+</details>
+
+#### Lancia ricavata da un tubo
+
+- **File**: `assets/arene/wasteland/armi/lancia-ricavata-da-un-tubo.webp`
+- **Cosa mostrare**: Lancia fatta con un tubo di metallo e un tondino appuntito.
+
+**Prompt**
+
+```text
+A spear made from a metal pipe with a sharpened rebar tip.
+```
+
+<details><summary>Prompt completo, pronto da incollare</summary>
+
+```text
+A spear made from a metal pipe with a sharpened rebar tip. Ochre, rust and sand palette under a scorched hazy sun, dusty post-apocalyptic desert wasteland. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Single object only, isolated on a fully transparent background, square 1:1, three-quarter view laid diagonally from lower left to upper right, 12% empty margin on every side, crisp silhouette with a thin dark outline so it reads on both light and dark backgrounds, no hands, no shadow on the ground. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
+```
+
+</details>
+
+#### Balestra artigianale
+
+- **File**: `assets/arene/wasteland/armi/balestra-artigianale.webp`
+- **Cosa mostrare**: Balestra artigianale fatta con balestre d'auto e rottami.
+
+**Prompt**
+
+```text
+A homemade crossbow built from car leaf springs and scrap metal.
+```
+
+<details><summary>Prompt completo, pronto da incollare</summary>
+
+```text
+A homemade crossbow built from car leaf springs and scrap metal. Ochre, rust and sand palette under a scorched hazy sun, dusty post-apocalyptic desert wasteland. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Single object only, isolated on a fully transparent background, square 1:1, three-quarter view laid diagonally from lower left to upper right, 12% empty margin on every side, crisp silhouette with a thin dark outline so it reads on both light and dark backgrounds, no hands, no shadow on the ground. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
+```
+
+</details>
+
+#### Molotov
+
+- **File**: `assets/arene/wasteland/armi/molotov.webp`
+- **Cosa mostrare**: Bottiglia molotov con lo straccio in fiamme.
+
+**Prompt**
+
+```text
+A molotov cocktail bottle with a burning rag.
+```
+
+<details><summary>Prompt completo, pronto da incollare</summary>
+
+```text
+A molotov cocktail bottle with a burning rag. Ochre, rust and sand palette under a scorched hazy sun, dusty post-apocalyptic desert wasteland. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Single object only, isolated on a fully transparent background, square 1:1, three-quarter view laid diagonally from lower left to upper right, 12% empty margin on every side, crisp silhouette with a thin dark outline so it reads on both light and dark backgrounds, no hands, no shadow on the ground. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
+```
+
+</details>
+
+#### Catena
+
+- **File**: `assets/arene/wasteland/armi/catena.webp`
+- **Cosa mostrare**: Catena pesante arrotolata con un lucchetto.
+
+**Prompt**
+
+```text
+A heavy coiled chain with a padlock.
+```
+
+<details><summary>Prompt completo, pronto da incollare</summary>
+
+```text
+A heavy coiled chain with a padlock. Ochre, rust and sand palette under a scorched hazy sun, dusty post-apocalyptic desert wasteland. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Single object only, isolated on a fully transparent background, square 1:1, three-quarter view laid diagonally from lower left to upper right, 12% empty margin on every side, crisp silhouette with a thin dark outline so it reads on both light and dark backgrounds, no hands, no shadow on the ground. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
+```
+
+</details>
+
+#### Mannaia
+
+- **File**: `assets/arene/wasteland/armi/mannaia.webp`
+- **Cosa mostrare**: Mannaia grande con manico fasciato.
+
+**Prompt**
+
+```text
+A large meat cleaver with a cloth-wrapped handle.
+```
+
+<details><summary>Prompt completo, pronto da incollare</summary>
+
+```text
+A large meat cleaver with a cloth-wrapped handle. Ochre, rust and sand palette under a scorched hazy sun, dusty post-apocalyptic desert wasteland. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Single object only, isolated on a fully transparent background, square 1:1, three-quarter view laid diagonally from lower left to upper right, 12% empty margin on every side, crisp silhouette with a thin dark outline so it reads on both light and dark backgrounds, no hands, no shadow on the ground. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
+```
+
+</details>
+
+#### Lanciachiodi
+
+- **File**: `assets/arene/wasteland/armi/lanciachiodi.webp`
+- **Cosa mostrare**: Sparachiodi modificato come arma, con caricatore a tamburo.
+
+**Prompt**
+
+```text
+A nail gun modified into a weapon with a drum magazine.
+```
+
+<details><summary>Prompt completo, pronto da incollare</summary>
+
+```text
+A nail gun modified into a weapon with a drum magazine. Ochre, rust and sand palette under a scorched hazy sun, dusty post-apocalyptic desert wasteland. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Single object only, isolated on a fully transparent background, square 1:1, three-quarter view laid diagonally from lower left to upper right, 12% empty margin on every side, crisp silhouette with a thin dark outline so it reads on both light and dark backgrounds, no hands, no shadow on the ground. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
+```
+
+</details>
+
+---
 
 ## Liceo Spietato
 
-Cartella: `assets/arene/liceo/`. Palette: rosa, lilla e pastello da corridoio scolastico.
+Interrogazioni, gossip e alleanze da intervallo. Nessuno muore: si viene eliminati.
 
-### Luoghi (16:9, 1280×720, sfondo pieno)
+- **Cartella**: `assets/arene/liceo/` (con le sottocartelle `luoghi/`, `pericoli/`, `armi/`)
+- **Riferimento di stile**: `assets/arene/liceo.webp`
+- **Atmosfera**: Liceo italiano in chiave satirica: rosa, lilla e pastello, luce di finestre a vetri, tono da commedia. Nessuna violenza, nessun sangue: le «minacce» sono caricature.
+- **Stile da aggiungere a ogni prompt di questa arena** (è già incluso nei prompt completi):
 
-| | File | Soggetto | Priorità | Traccia |
-| --- | --- | --- | --- | --- |
-|  | `luoghi/palestra.webp` | Palestra | alta | Palestra: il luogo dell'arena visto da vicino. Arena «Liceo Spietato» (Interrogazioni, gossip e alleanze da intervallo. Nessuno muore: si viene eliminati). Palette: rosa, lilla e pastello da corridoio scolastico. Formato 16:9. |
-|  | `luoghi/mensa.webp` | Mensa | alta | Mensa: il luogo dell'arena visto da vicino. Arena «Liceo Spietato» (Interrogazioni, gossip e alleanze da intervallo. Nessuno muore: si viene eliminati). Palette: rosa, lilla e pastello da corridoio scolastico. Formato 16:9. |
-|  | `luoghi/biblioteca.webp` | Biblioteca | alta | Biblioteca: il luogo dell'arena visto da vicino. Arena «Liceo Spietato» (Interrogazioni, gossip e alleanze da intervallo. Nessuno muore: si viene eliminati). Palette: rosa, lilla e pastello da corridoio scolastico. Formato 16:9. |
-|  | `luoghi/laboratorio-di-chimica.webp` | Laboratorio di chimica | alta | Laboratorio di chimica: il luogo dell'arena visto da vicino. Arena «Liceo Spietato» (Interrogazioni, gossip e alleanze da intervallo. Nessuno muore: si viene eliminati). Palette: rosa, lilla e pastello da corridoio scolastico. Formato 16:9. |
-|  | `luoghi/cortile.webp` | Cortile | alta | Cortile: il luogo dell'arena visto da vicino. Arena «Liceo Spietato» (Interrogazioni, gossip e alleanze da intervallo. Nessuno muore: si viene eliminati). Palette: rosa, lilla e pastello da corridoio scolastico. Formato 16:9. |
-|  | `luoghi/aula-magna.webp` | Aula magna | alta | Aula magna: il luogo dell'arena visto da vicino. Arena «Liceo Spietato» (Interrogazioni, gossip e alleanze da intervallo. Nessuno muore: si viene eliminati). Palette: rosa, lilla e pastello da corridoio scolastico. Formato 16:9. |
+```text
+Pink, lilac and pastel palette, bright window light, playful satirical comedy mood, Italian high school, non-violent. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours.
+```
 
-### Pericoli (4:3, 960×720, sfondo pieno, scuro)
+Più, a seconda della sezione:
 
-| | File | Soggetto | Priorità | Traccia |
-| --- | --- | --- | --- | --- |
-|  | `pericoli/preside.webp` | Preside | alta | Preside: figura minacciosa ma non violenta. Arena «Liceo Spietato» (Interrogazioni, gossip e alleanze da intervallo. Nessuno muore: si viene eliminati). Palette: rosa, lilla e pastello da corridoio scolastico. Formato 4:3. |
-|  | `pericoli/bidello-di-turno.webp` | Bidello di turno | alta | Bidello di turno: figura minacciosa ma non violenta. Arena «Liceo Spietato» (Interrogazioni, gossip e alleanze da intervallo. Nessuno muore: si viene eliminati). Palette: rosa, lilla e pastello da corridoio scolastico. Formato 4:3. |
-|  | `pericoli/ispezione-a-sorpresa.webp` | Ispezione a sorpresa | alta | Ispezione a sorpresa: figura minacciosa ma non violenta. Arena «Liceo Spietato» (Interrogazioni, gossip e alleanze da intervallo. Nessuno muore: si viene eliminati). Palette: rosa, lilla e pastello da corridoio scolastico. Formato 4:3. |
-|  | `pericoli/professoressa-di-matematica.webp` | Professoressa di matematica | alta | Professoressa di matematica: figura minacciosa ma non violenta. Arena «Liceo Spietato» (Interrogazioni, gossip e alleanze da intervallo. Nessuno muore: si viene eliminati). Palette: rosa, lilla e pastello da corridoio scolastico. Formato 4:3. |
+- Luoghi: `Wide 16:9 establishing shot of the location, no people, eye-level view, the key landmark inside the central third of the frame, soft depth fog in the background.`
+- Pericoli: `4:3 wanted-poster portrait, single threat centered and facing the viewer, head and eyes in the upper middle of the frame, dark vignetted background that fades to near black at the edges. Light-hearted comic caricature, not scary, not violent, not resembling any real person.`
+- Armi: `Single object only, isolated on a fully transparent background, square 1:1, three-quarter view laid diagonally from lower left to upper right, 12% empty margin on every side, crisp silhouette with a thin dark outline so it reads on both light and dark backgrounds, no hands, no shadow on the ground. An everyday object used as a playful office or school prank, comic tone.`
+- Sempre: `No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.`
 
-### Armi (1:1, 512×512, sfondo trasparente)
+### Luoghi · Liceo Spietato (16:9, 1280 × 720 px, sfondo pieno)
 
-| | File | Soggetto | Priorità | Traccia |
-| --- | --- | --- | --- | --- |
-|  | `armi/gossip-esplosivo.webp` | Gossip esplosivo | media | Gossip esplosivo: oggetto d'ufficio o di scuola usato come arma impropria. Arena «Liceo Spietato» (Interrogazioni, gossip e alleanze da intervallo. Nessuno muore: si viene eliminati). Palette: rosa, lilla e pastello da corridoio scolastico. Formato 1:1. Sfondo trasparente. |
-|  | `armi/foto-imbarazzante.webp` | Foto imbarazzante | media | Foto imbarazzante: oggetto d'ufficio o di scuola usato come arma impropria. Arena «Liceo Spietato» (Interrogazioni, gossip e alleanze da intervallo. Nessuno muore: si viene eliminati). Palette: rosa, lilla e pastello da corridoio scolastico. Formato 1:1. Sfondo trasparente. |
-|  | `armi/compito-copiato.webp` | Compito copiato | media | Compito copiato: oggetto d'ufficio o di scuola usato come arma impropria. Arena «Liceo Spietato» (Interrogazioni, gossip e alleanze da intervallo. Nessuno muore: si viene eliminati). Palette: rosa, lilla e pastello da corridoio scolastico. Formato 1:1. Sfondo trasparente. |
-|  | `armi/pallone-da-dodgeball.webp` | Pallone da dodgeball | media | Pallone da dodgeball: oggetto d'ufficio o di scuola usato come arma impropria. Arena «Liceo Spietato» (Interrogazioni, gossip e alleanze da intervallo. Nessuno muore: si viene eliminati). Palette: rosa, lilla e pastello da corridoio scolastico. Formato 1:1. Sfondo trasparente. |
-|  | `armi/registro-rubato.webp` | Registro rubato | media | Registro rubato: oggetto d'ufficio o di scuola usato come arma impropria. Arena «Liceo Spietato» (Interrogazioni, gossip e alleanze da intervallo. Nessuno muore: si viene eliminati). Palette: rosa, lilla e pastello da corridoio scolastico. Formato 1:1. Sfondo trasparente. |
-|  | `armi/profilo-falso.webp` | Profilo falso | media | Profilo falso: oggetto d'ufficio o di scuola usato come arma impropria. Arena «Liceo Spietato» (Interrogazioni, gossip e alleanze da intervallo. Nessuno muore: si viene eliminati). Palette: rosa, lilla e pastello da corridoio scolastico. Formato 1:1. Sfondo trasparente. |
+#### Palestra
 
-### Meteo (16:10, 1200×750, sfondo pieno)
+- **File**: `assets/arene/liceo/luoghi/palestra.webp`
+- **Cosa mostrare**: Palestra della scuola con parquet, canestri, funi e tappetini impilati.
 
-| | File | Soggetto | Priorità | Traccia |
-| --- | --- | --- | --- | --- |
-|  | `meteo/compito-di-matematica.webp` | Compito di matematica | alta | Compito di matematica: Interrogazioni a raffica: l'ansia è nell'aria.. Arena «Liceo Spietato» (Interrogazioni, gossip e alleanze da intervallo. Nessuno muore: si viene eliminati). Palette: rosa, lilla e pastello da corridoio scolastico. Formato 16:10. |
-|  | `meteo/assemblea-distituto.webp` | Assemblea d'istituto | alta | Assemblea d'istituto: Niente lezioni, tante chiacchiere: oggi si fa politica.. Arena «Liceo Spietato» (Interrogazioni, gossip e alleanze da intervallo. Nessuno muore: si viene eliminati). Palette: rosa, lilla e pastello da corridoio scolastico. Formato 16:10. |
-|  | `meteo/gita-scolastica.webp` | Gita scolastica | alta | Gita scolastica: Pullman, panini e alleanze nate in ultima fila.. Arena «Liceo Spietato» (Interrogazioni, gossip e alleanze da intervallo. Nessuno muore: si viene eliminati). Palette: rosa, lilla e pastello da corridoio scolastico. Formato 16:10. |
-|  | `meteo/ondata-di-influenza.webp` | Ondata di influenza | alta | Ondata di influenza: Mezza classe è a casa con la febbre.. Arena «Liceo Spietato» (Interrogazioni, gossip e alleanze da intervallo. Nessuno muore: si viene eliminati). Palette: rosa, lilla e pastello da corridoio scolastico. Formato 16:10. |
-|  | `meteo/settimana-dei-colloqui.webp` | Settimana dei colloqui | alta | Settimana dei colloqui: I genitori sono a scuola. Ogni segreto rischia di uscire.. Arena «Liceo Spietato» (Interrogazioni, gossip e alleanze da intervallo. Nessuno muore: si viene eliminati). Palette: rosa, lilla e pastello da corridoio scolastico. Formato 16:10. |
-|  | `meteo/venerdi-prima-del-ponte.webp` | Venerdì prima del ponte | alta | Venerdì prima del ponte: Nessuno ascolta, tutti pianificano.. Arena «Liceo Spietato» (Interrogazioni, gossip e alleanze da intervallo. Nessuno muore: si viene eliminati). Palette: rosa, lilla e pastello da corridoio scolastico. Formato 16:10. |
-|  | `meteo/giornata-dello-sport.webp` | Giornata dello sport | alta | Giornata dello sport: Tutta la scuola in Palestra: chi corre, chi si nasconde in infermeria.. Arena «Liceo Spietato» (Interrogazioni, gossip e alleanze da intervallo. Nessuno muore: si viene eliminati). Palette: rosa, lilla e pastello da corridoio scolastico. Formato 16:10. |
-|  | `meteo/settimana-dello-studente.webp` | Settimana dello studente | alta | Settimana dello studente: Attività alternative e pochissime lezioni: il paradiso.. Arena «Liceo Spietato» (Interrogazioni, gossip e alleanze da intervallo. Nessuno muore: si viene eliminati). Palette: rosa, lilla e pastello da corridoio scolastico. Formato 16:10. |
-|  | `meteo/consegna-delle-pagelle.webp` | Consegna delle pagelle | alta | Consegna delle pagelle: Le famiglie leggono i voti. Tensione in tutte le chat.. Arena «Liceo Spietato» (Interrogazioni, gossip e alleanze da intervallo. Nessuno muore: si viene eliminati). Palette: rosa, lilla e pastello da corridoio scolastico. Formato 16:10. |
+**Prompt**
 
-### Disastri (16:9, 1280×720, sfondo pieno)
+```text
+A school gym with a wooden floor, basketball hoops, climbing ropes and stacked mats.
+```
 
-| | File | Soggetto | Priorità | Traccia |
-| --- | --- | --- | --- | --- |
-|  | `disastri/ispezione-ministeriale.webp` | L'ispezione ministeriale · famiglia `burocrazia` | alta | L'ispezione ministeriale: Arrivano gli ispettori del ministero: ogni irregolarità verrà punita.. Arena «Liceo Spietato» (Interrogazioni, gossip e alleanze da intervallo. Nessuno muore: si viene eliminati). Palette: rosa, lilla e pastello da corridoio scolastico. Formato 16:9. |
-|  | `disastri/compito-a-sorpresa.webp` | Il compito a sorpresa · famiglia `burocrazia` | alta | Il compito a sorpresa: La professoressa di matematica entra sorridendo: compito in classe a sorpresa.. Arena «Liceo Spietato» (Interrogazioni, gossip e alleanze da intervallo. Nessuno muore: si viene eliminati). Palette: rosa, lilla e pastello da corridoio scolastico. Formato 16:9. |
-|  | `disastri/chat-trapelata.webp` | La chat trapelata · famiglia `burocrazia` | alta | La chat trapelata: La chat segreta della classe finisce sul telefono della Preside.. Arena «Liceo Spietato» (Interrogazioni, gossip e alleanze da intervallo. Nessuno muore: si viene eliminati). Palette: rosa, lilla e pastello da corridoio scolastico. Formato 16:9. |
-|  | `disastri/circolare.webp` | La circolare · famiglia `burocrazia` | alta | La circolare: Arriva una circolare: telefoni sequestrati per una settimana.. Arena «Liceo Spietato» (Interrogazioni, gossip e alleanze da intervallo. Nessuno muore: si viene eliminati). Palette: rosa, lilla e pastello da corridoio scolastico. Formato 16:9. |
-|  | `disastri/sciopero-dei-bus.webp` | Lo sciopero dei bus · famiglia `burocrazia` | alta | Lo sciopero dei bus: I bus scioperano proprio il giorno della verifica.. Arena «Liceo Spietato» (Interrogazioni, gossip e alleanze da intervallo. Nessuno muore: si viene eliminati). Palette: rosa, lilla e pastello da corridoio scolastico. Formato 16:9. |
-|  | `disastri/interrogazione-a-tappeto.webp` | L'interrogazione a tappeto · famiglia `burocrazia` | alta | L'interrogazione a tappeto: La professoressa di latino interroga tutti, nessuno escluso.. Arena «Liceo Spietato» (Interrogazioni, gossip e alleanze da intervallo. Nessuno muore: si viene eliminati). Palette: rosa, lilla e pastello da corridoio scolastico. Formato 16:9. |
-|  | `disastri/gita-disastrosa.webp` | La gita disastrosa · famiglia `festa` | alta | La gita disastrosa: La gita di classe finisce in un disastro.. Arena «Liceo Spietato» (Interrogazioni, gossip e alleanze da intervallo. Nessuno muore: si viene eliminati). Palette: rosa, lilla e pastello da corridoio scolastico. Formato 16:9. |
-|  | `disastri/crollo-della-rete.webp` | Il crollo della rete · famiglia `terremoto` | alta | Il crollo della rete: La rete della scuola crolla durante il compito online.. Arena «Liceo Spietato» (Interrogazioni, gossip e alleanze da intervallo. Nessuno muore: si viene eliminati). Palette: rosa, lilla e pastello da corridoio scolastico. Formato 16:9. |
-|  | `disastri/assemblea-di-istituto.webp` | L'assemblea di istituto · famiglia `burocrazia` | alta | L'assemblea di istituto: L'assemblea di istituto degenera in una rissa verbale.. Arena «Liceo Spietato» (Interrogazioni, gossip e alleanze da intervallo. Nessuno muore: si viene eliminati). Palette: rosa, lilla e pastello da corridoio scolastico. Formato 16:9. |
-|  | `disastri/epidemia-di-influenza.webp` | L'epidemia di influenza · famiglia `tossico` | media | L'epidemia di influenza: Metà della classe si ammala.. Arena «Liceo Spietato» (Interrogazioni, gossip e alleanze da intervallo. Nessuno muore: si viene eliminati). Palette: rosa, lilla e pastello da corridoio scolastico. Formato 16:9. |
-|  | `disastri/perquisizione.webp` | La perquisizione · famiglia `burocrazia` | media | La perquisizione: I professori controllano tutti gli zaini.. Arena «Liceo Spietato» (Interrogazioni, gossip e alleanze da intervallo. Nessuno muore: si viene eliminati). Palette: rosa, lilla e pastello da corridoio scolastico. Formato 16:9. |
-|  | `disastri/consiglio-di-classe.webp` | Il consiglio di classe · famiglia `burocrazia` | media | Il consiglio di classe: Il consiglio di classe decide chi è a rischio bocciatura.. Arena «Liceo Spietato» (Interrogazioni, gossip e alleanze da intervallo. Nessuno muore: si viene eliminati). Palette: rosa, lilla e pastello da corridoio scolastico. Formato 16:9. |
-|  | `disastri/professore-nuovo.webp` | Il professore nuovo · famiglia `burocrazia` | media | Il professore nuovo: Arriva un supplente che boccia chiunque.. Arena «Liceo Spietato» (Interrogazioni, gossip e alleanze da intervallo. Nessuno muore: si viene eliminati). Palette: rosa, lilla e pastello da corridoio scolastico. Formato 16:9. |
-|  | `disastri/foto-di-classe.webp` | La foto di classe · famiglia `burocrazia` | media | La foto di classe: La foto di classe finisce sui social con commenti terribili.. Arena «Liceo Spietato» (Interrogazioni, gossip e alleanze da intervallo. Nessuno muore: si viene eliminati). Palette: rosa, lilla e pastello da corridoio scolastico. Formato 16:9. |
-|  | `disastri/compito-di-gruppo.webp` | Il compito di gruppo · famiglia `burocrazia` | media | Il compito di gruppo: La professoressa assegna gruppi a caso per un progetto.. Arena «Liceo Spietato» (Interrogazioni, gossip e alleanze da intervallo. Nessuno muore: si viene eliminati). Palette: rosa, lilla e pastello da corridoio scolastico. Formato 16:9. |
-|  | `disastri/allarme-antincendio.webp` | L'allarme antincendio · famiglia `burocrazia` | media | L'allarme antincendio: L'allarme antincendio suona durante la verifica.. Arena «Liceo Spietato» (Interrogazioni, gossip e alleanze da intervallo. Nessuno muore: si viene eliminati). Palette: rosa, lilla e pastello da corridoio scolastico. Formato 16:9. |
-|  | `disastri/olimpiade-di-matematica.webp` | L'olimpiade di matematica · famiglia `burocrazia` | media | L'olimpiade di matematica: Tutti devono partecipare all'olimpiade di matematica.. Arena «Liceo Spietato» (Interrogazioni, gossip e alleanze da intervallo. Nessuno muore: si viene eliminati). Palette: rosa, lilla e pastello da corridoio scolastico. Formato 16:9. |
-|  | `disastri/ballo-della-scuola.webp` | Il ballo della scuola · famiglia `festa` | media | Il ballo della scuola: Si apre la caccia agli inviti per il ballo.. Arena «Liceo Spietato» (Interrogazioni, gossip e alleanze da intervallo. Nessuno muore: si viene eliminati). Palette: rosa, lilla e pastello da corridoio scolastico. Formato 16:9. |
-|  | `disastri/verifica-di-chimica.webp` | La verifica di chimica · famiglia `burocrazia` | media | La verifica di chimica: La verifica di chimica è la più difficile dell'anno.. Arena «Liceo Spietato» (Interrogazioni, gossip e alleanze da intervallo. Nessuno muore: si viene eliminati). Palette: rosa, lilla e pastello da corridoio scolastico. Formato 16:9. |
-|  | `disastri/genitori-a-colloquio.webp` | I genitori a colloquio · famiglia `burocrazia` | media | I genitori a colloquio: Arrivano i colloqui con i genitori.. Arena «Liceo Spietato» (Interrogazioni, gossip e alleanze da intervallo. Nessuno muore: si viene eliminati). Palette: rosa, lilla e pastello da corridoio scolastico. Formato 16:9. |
-|  | `disastri/gara-di-corsa.webp` | La gara di corsa · famiglia `burocrazia` | media | La gara di corsa: Il professore di ginnastica organizza una gara di resistenza.. Arena «Liceo Spietato» (Interrogazioni, gossip e alleanze da intervallo. Nessuno muore: si viene eliminati). Palette: rosa, lilla e pastello da corridoio scolastico. Formato 16:9. |
-|  | `disastri/registro-elettronico.webp` | Il registro elettronico · famiglia `burocrazia` | media | Il registro elettronico: Il registro elettronico pubblica per errore tutti i voti.. Arena «Liceo Spietato» (Interrogazioni, gossip e alleanze da intervallo. Nessuno muore: si viene eliminati). Palette: rosa, lilla e pastello da corridoio scolastico. Formato 16:9. |
-|  | `disastri/corso-di-recupero.webp` | Il corso di recupero · famiglia `burocrazia` | media | Il corso di recupero: La scuola obbliga i peggiori a seguire un corso di recupero.. Arena «Liceo Spietato» (Interrogazioni, gossip e alleanze da intervallo. Nessuno muore: si viene eliminati). Palette: rosa, lilla e pastello da corridoio scolastico. Formato 16:9. |
-|  | `disastri/gita-sulla-neve.webp` | La gita sulla neve · famiglia `festa` | media | La gita sulla neve: La gita sulla neve è un caos di sci e slittini.. Arena «Liceo Spietato» (Interrogazioni, gossip e alleanze da intervallo. Nessuno muore: si viene eliminati). Palette: rosa, lilla e pastello da corridoio scolastico. Formato 16:9. |
-|  | `disastri/gruppo-social.webp` | Il gruppo social · famiglia `burocrazia` | media | Il gruppo social: Un profilo anonimo inizia a pubblicare i segreti di tutti.. Arena «Liceo Spietato» (Interrogazioni, gossip e alleanze da intervallo. Nessuno muore: si viene eliminati). Palette: rosa, lilla e pastello da corridoio scolastico. Formato 16:9. |
-|  | `disastri/esame-di-guida.webp` | L'esame di guida · famiglia `burocrazia` | media | L'esame di guida: Mezza classe fa l'esame della patente lo stesso giorno.. Arena «Liceo Spietato» (Interrogazioni, gossip e alleanze da intervallo. Nessuno muore: si viene eliminati). Palette: rosa, lilla e pastello da corridoio scolastico. Formato 16:9. |
-|  | `disastri/torneo-di-calcetto.webp` | Il torneo di calcetto · famiglia `burocrazia` | media | Il torneo di calcetto: Il torneo di calcetto tra classi degenera.. Arena «Liceo Spietato» (Interrogazioni, gossip e alleanze da intervallo. Nessuno muore: si viene eliminati). Palette: rosa, lilla e pastello da corridoio scolastico. Formato 16:9. |
-|  | `disastri/nuova-preside.webp` | La nuova Preside · famiglia `burocrazia` | media | La nuova Preside: Arriva una nuova Preside con regole durissime.. Arena «Liceo Spietato» (Interrogazioni, gossip e alleanze da intervallo. Nessuno muore: si viene eliminati). Palette: rosa, lilla e pastello da corridoio scolastico. Formato 16:9. |
-|  | `disastri/esame-finale.webp` | L'esame finale · famiglia `burocrazia` | media | L'esame finale: Tutti devono affrontare una simulazione d'esame.. Arena «Liceo Spietato» (Interrogazioni, gossip e alleanze da intervallo. Nessuno muore: si viene eliminati). Palette: rosa, lilla e pastello da corridoio scolastico. Formato 16:9. |
-|  | `disastri/neve.webp` | La neve · famiglia `gelo` | media | La neve: Una nevicata chiude la scuola per tre giorni.. Arena «Liceo Spietato» (Interrogazioni, gossip e alleanze da intervallo. Nessuno muore: si viene eliminati). Palette: rosa, lilla e pastello da corridoio scolastico. Formato 16:9. |
-|  | `disastri/guasto-della-macchinetta.webp` | Il guasto della macchinetta · famiglia `burocrazia` | media | Il guasto della macchinetta: La macchinetta del caffè si rompe per tre giorni.. Arena «Liceo Spietato» (Interrogazioni, gossip e alleanze da intervallo. Nessuno muore: si viene eliminati). Palette: rosa, lilla e pastello da corridoio scolastico. Formato 16:9. |
-|  | `disastri/telecamera-nuova.webp` | La telecamera nuova · famiglia `spettacolo` | media | La telecamera nuova: Viene installata una telecamera che riprende tutti.. Arena «Liceo Spietato» (Interrogazioni, gossip e alleanze da intervallo. Nessuno muore: si viene eliminati). Palette: rosa, lilla e pastello da corridoio scolastico. Formato 16:9. |
-|  | `disastri/trasloco-di-piano.webp` | Il trasloco di piano · famiglia `burocrazia` | media | Il trasloco di piano: Tutti devono cambiare piano in un'ora.. Arena «Liceo Spietato» (Interrogazioni, gossip e alleanze da intervallo. Nessuno muore: si viene eliminati). Palette: rosa, lilla e pastello da corridoio scolastico. Formato 16:9. |
-|  | `disastri/circolare-in-maiuscolo.webp` | La circolare in maiuscolo · famiglia `burocrazia` | media | La circolare in maiuscolo: Arriva una circolare scritta tutta in maiuscolo. Nessuno sa cosa voglia dire, ma fa paura.. Arena «Liceo Spietato» (Interrogazioni, gossip e alleanze da intervallo. Nessuno muore: si viene eliminati). Palette: rosa, lilla e pastello da corridoio scolastico. Formato 16:9. |
-|  | `disastri/festa-a-sorpresa.webp` | La festa a sorpresa · famiglia `festa` | media | La festa a sorpresa: Viene organizzata una festa a sorpresa per una persona che nessuno conosce.. Arena «Liceo Spietato» (Interrogazioni, gossip e alleanze da intervallo. Nessuno muore: si viene eliminati). Palette: rosa, lilla e pastello da corridoio scolastico. Formato 16:9. |
-|  | `disastri/sciopero-del-riscaldamento.webp` | Lo sciopero del riscaldamento · famiglia `gelo` | media | Lo sciopero del riscaldamento: Il riscaldamento si spegne in pieno inverno.. Arena «Liceo Spietato» (Interrogazioni, gossip e alleanze da intervallo. Nessuno muore: si viene eliminati). Palette: rosa, lilla e pastello da corridoio scolastico. Formato 16:9. |
-|  | `disastri/password-scaduta.webp` | La password scaduta · famiglia `burocrazia` | media | La password scaduta: Tutte le password scadono contemporaneamente.. Arena «Liceo Spietato» (Interrogazioni, gossip e alleanze da intervallo. Nessuno muore: si viene eliminati). Palette: rosa, lilla e pastello da corridoio scolastico. Formato 16:9. |
-|  | `disastri/ispezione-dei-bagni.webp` | L'ispezione dei bagni · famiglia `burocrazia` | media | L'ispezione dei bagni: Qualcuno ha lasciato il bagno in condizioni indicibili e parte un'indagine.. Arena «Liceo Spietato» (Interrogazioni, gossip e alleanze da intervallo. Nessuno muore: si viene eliminati). Palette: rosa, lilla e pastello da corridoio scolastico. Formato 16:9. |
-|  | `disastri/occupazione.webp` | L'occupazione · famiglia `burocrazia` | media | L'occupazione: Gli studenti occupano la scuola per una settimana.. Arena «Liceo Spietato» (Interrogazioni, gossip e alleanze da intervallo. Nessuno muore: si viene eliminati). Palette: rosa, lilla e pastello da corridoio scolastico. Formato 16:9. |
-|  | `disastri/viaggio-di-istruzione.webp` | Il viaggio di istruzione · famiglia `festa` | media | Il viaggio di istruzione: Gita di cinque giorni in una capitale europea.. Arena «Liceo Spietato» (Interrogazioni, gossip e alleanze da intervallo. Nessuno muore: si viene eliminati). Palette: rosa, lilla e pastello da corridoio scolastico. Formato 16:9. |
-|  | `disastri/pagella.webp` | La pagella · famiglia `burocrazia` | media | La pagella: Arrivano le pagelle del primo quadrimestre.. Arena «Liceo Spietato» (Interrogazioni, gossip e alleanze da intervallo. Nessuno muore: si viene eliminati). Palette: rosa, lilla e pastello da corridoio scolastico. Formato 16:9. |
-|  | `disastri/professore-severissimo.webp` | Il professore severissimo · famiglia `burocrazia` | media | Il professore severissimo: Arriva il professore più temuto della provincia, quello che boccia per sport.. Arena «Liceo Spietato» (Interrogazioni, gossip e alleanze da intervallo. Nessuno muore: si viene eliminati). Palette: rosa, lilla e pastello da corridoio scolastico. Formato 16:9. |
-|  | `disastri/wifi-della-scuola.webp` | Il wifi della scuola · famiglia `burocrazia` | media | Il wifi della scuola: Il wifi della scuola diventa velocissimo e tutti scaricano di tutto.. Arena «Liceo Spietato» (Interrogazioni, gossip e alleanze da intervallo. Nessuno muore: si viene eliminati). Palette: rosa, lilla e pastello da corridoio scolastico. Formato 16:9. |
-|  | `disastri/giornata-dello-sport.webp` | La giornata dello sport · famiglia `luce` | media | La giornata dello sport: Gare di atletica obbligatorie per tutti.. Arena «Liceo Spietato» (Interrogazioni, gossip e alleanze da intervallo. Nessuno muore: si viene eliminati). Palette: rosa, lilla e pastello da corridoio scolastico. Formato 16:9. |
-|  | `disastri/nuovo-arrivato.webp` | Il nuovo arrivato · famiglia `burocrazia` | media | Il nuovo arrivato: Arriva uno studente nuovo bellissimo, e tutti perdono la testa.. Arena «Liceo Spietato» (Interrogazioni, gossip e alleanze da intervallo. Nessuno muore: si viene eliminati). Palette: rosa, lilla e pastello da corridoio scolastico. Formato 16:9. |
-|  | `disastri/black-friday-dei-compiti.webp` | Il black friday dei compiti · famiglia `burocrazia` | media | Il black friday dei compiti: La professoressa assegna duecento esercizi per il giorno dopo.. Arena «Liceo Spietato» (Interrogazioni, gossip e alleanze da intervallo. Nessuno muore: si viene eliminati). Palette: rosa, lilla e pastello da corridoio scolastico. Formato 16:9. |
-|  | `disastri/chat-dei-genitori.webp` | La chat dei genitori · famiglia `burocrazia` | media | La chat dei genitori: La chat dei genitori scopre tutto quello che succede in classe.. Arena «Liceo Spietato» (Interrogazioni, gossip e alleanze da intervallo. Nessuno muore: si viene eliminati). Palette: rosa, lilla e pastello da corridoio scolastico. Formato 16:9. |
-|  | `disastri/ballo-di-fine-anno-anticipato.webp` | Il ballo di fine anno anticipato · famiglia `festa` | media | Il ballo di fine anno anticipato: Il ballo di fine anno viene anticipato a sorpresa a domani.. Arena «Liceo Spietato» (Interrogazioni, gossip e alleanze da intervallo. Nessuno muore: si viene eliminati). Palette: rosa, lilla e pastello da corridoio scolastico. Formato 16:9. |
-|  | `disastri/ispezione-del-ministero.webp` | L'ispezione del ministero · famiglia `burocrazia` | media | L'ispezione del ministero: Gli ispettori del ministero entrano nelle classi senza preavviso.. Arena «Liceo Spietato» (Interrogazioni, gossip e alleanze da intervallo. Nessuno muore: si viene eliminati). Palette: rosa, lilla e pastello da corridoio scolastico. Formato 16:9. |
-|  | `disastri/influenza-di-gennaio.webp` | L'influenza di gennaio · famiglia `tossico` | media | L'influenza di gennaio: Mezza scuola si ammala nella stessa settimana.. Arena «Liceo Spietato» (Interrogazioni, gossip e alleanze da intervallo. Nessuno muore: si viene eliminati). Palette: rosa, lilla e pastello da corridoio scolastico. Formato 16:9. |
-|  | `disastri/chat-della-classe-trapelata.webp` | La chat della classe trapelata · famiglia `burocrazia` | media | La chat della classe trapelata: Tutti i messaggi della chat di classe finiscono online.. Arena «Liceo Spietato» (Interrogazioni, gossip e alleanze da intervallo. Nessuno muore: si viene eliminati). Palette: rosa, lilla e pastello da corridoio scolastico. Formato 16:9. |
-|  | `disastri/sciopero-dei-professori.webp` | Lo sciopero dei professori · famiglia `burocrazia` | media | Lo sciopero dei professori: Niente lezioni per tre giorni, ma tante verifiche dopo.. Arena «Liceo Spietato» (Interrogazioni, gossip e alleanze da intervallo. Nessuno muore: si viene eliminati). Palette: rosa, lilla e pastello da corridoio scolastico. Formato 16:9. |
-|  | `disastri/assemblea-che-degenera.webp` | L'assemblea che degenera · famiglia `burocrazia` | media | L'assemblea che degenera: L'assemblea d'istituto finisce in una rissa di cori.. Arena «Liceo Spietato» (Interrogazioni, gossip e alleanze da intervallo. Nessuno muore: si viene eliminati). Palette: rosa, lilla e pastello da corridoio scolastico. Formato 16:9. |
-|  | `disastri/festa-clandestina.webp` | La festa clandestina · famiglia `festa` | media | La festa clandestina: Una festa clandestina in Palestra viene scoperta dalla preside.. Arena «Liceo Spietato» (Interrogazioni, gossip e alleanze da intervallo. Nessuno muore: si viene eliminati). Palette: rosa, lilla e pastello da corridoio scolastico. Formato 16:9. |
-|  | `disastri/blackout-del-registro-elettronico.webp` | Il blackout del registro elettronico · famiglia `burocrazia` | media | Il blackout del registro elettronico: Il registro elettronico va in tilt e tutti i voti si mescolano.. Arena «Liceo Spietato» (Interrogazioni, gossip e alleanze da intervallo. Nessuno muore: si viene eliminati). Palette: rosa, lilla e pastello da corridoio scolastico. Formato 16:9. |
-|  | `disastri/pagella-di-meta-anno.webp` | La pagella di metà anno · famiglia `burocrazia` | media | La pagella di metà anno: Arrivano le pagelle. Le famiglie le leggono.. Arena «Liceo Spietato» (Interrogazioni, gossip e alleanze da intervallo. Nessuno muore: si viene eliminati). Palette: rosa, lilla e pastello da corridoio scolastico. Formato 16:9. |
+<details><summary>Prompt completo, pronto da incollare</summary>
 
-### Oggetti (1:1, 512×512, sfondo trasparente)
+```text
+A school gym with a wooden floor, basketball hoops, climbing ropes and stacked mats. Pink, lilac and pastel palette, bright window light, playful satirical comedy mood, Italian high school, non-violent. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Wide 16:9 establishing shot of the location, no people, eye-level view, the key landmark inside the central third of the frame, soft depth fog in the background. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
+```
 
-| | File | Soggetto | Priorità | Traccia |
-| --- | --- | --- | --- | --- |
-|  | `oggetti/arma.webp` | Asso nella manica | alta | Asso nella manica: Dà più forza negli scontri di reputazione, in base alla qualità (★). A ogni uso perde efficacia; un attrezzo può rimetterlo in sesto.. Arena «Liceo Spietato» (Interrogazioni, gossip e alleanze da intervallo. Nessuno muore: si viene eliminati). Palette: rosa, lilla e pastello da corridoio scolastico. Formato 1:1. Sfondo trasparente. |
-|  | `oggetti/armatura.webp` | Protezione (per esempio alibi di ferro, felpa col cappuccio) | alta | Protezione (per esempio alibi di ferro, felpa col cappuccio): Attenua i colpi alla reputazione e a volte evita un'eliminazione diretta. A ogni colpo incassato perde efficacia.. Arena «Liceo Spietato» (Interrogazioni, gossip e alleanze da intervallo. Nessuno muore: si viene eliminati). Palette: rosa, lilla e pastello da corridoio scolastico. Formato 1:1. Sfondo trasparente. |
-|  | `oggetti/med.webp` | Aiuto | alta | Aiuto: Serve a recuperare reputazione e a ridurre Ansia o Stress. Si può usare per sé o per aiutare gli alleati.. Arena «Liceo Spietato» (Interrogazioni, gossip e alleanze da intervallo. Nessuno muore: si viene eliminati). Palette: rosa, lilla e pastello da corridoio scolastico. Formato 1:1. Sfondo trasparente. |
-|  | `oggetti/cibo.webp` | Cibo | alta | Cibo: Si mangia quando la sazietà cala. Si può dividere con gli alleati, regalare o scambiare.. Arena «Liceo Spietato» (Interrogazioni, gossip e alleanze da intervallo. Nessuno muore: si viene eliminati). Palette: rosa, lilla e pastello da corridoio scolastico. Formato 1:1. Sfondo trasparente. |
-|  | `oggetti/attrezzo.webp` | Strumento (per esempio appunti di tutto l'anno, calcolatrice scientifica) | alta | Strumento (per esempio appunti di tutto l'anno, calcolatrice scientifica): Aiuta a trovare provviste, evitare tranelli e affrontare gli imprevisti. Può ridare efficacia agli assi nella manica.. Arena «Liceo Spietato» (Interrogazioni, gossip e alleanze da intervallo. Nessuno muore: si viene eliminati). Palette: rosa, lilla e pastello da corridoio scolastico. Formato 1:1. Sfondo trasparente. |
-|  | `oggetti/mappa.webp` | Mappa | alta | Mappa: Più cibo, meno disastri, trappole scoperte in anticipo e vie di fuga sicure.. Arena «Liceo Spietato» (Interrogazioni, gossip e alleanze da intervallo. Nessuno muore: si viene eliminati). Palette: rosa, lilla e pastello da corridoio scolastico. Formato 1:1. Sfondo trasparente. |
-|  | `oggetti/trap.webp` | Tranello | alta | Tranello: Si prepara nella propria zona durante la notte. Chi ci casca perde reputazione e rischia l'eliminazione, attribuita a chi ha preparato il tranello.. Arena «Liceo Spietato» (Interrogazioni, gossip e alleanze da intervallo. Nessuno muore: si viene eliminati). Palette: rosa, lilla e pastello da corridoio scolastico. Formato 1:1. Sfondo trasparente. |
-|  | `oggetti/esplosivo.webp` | Colpo di scena | alta | Colpo di scena: Dà più forza negli scontri di reputazione e può rendere più efficace un tranello. Usarlo senza lucidità può causare una figuraccia.. Arena «Liceo Spietato» (Interrogazioni, gossip e alleanze da intervallo. Nessuno muore: si viene eliminati). Palette: rosa, lilla e pastello da corridoio scolastico. Formato 1:1. Sfondo trasparente. |
-|  | `oggetti/veleno.webp` | Colpo basso | alta | Colpo basso: Pettegolezzi e segnalazioni aprono la strada a eventi che mettono in difficoltà i rivali e possono farli uscire dai giochi.. Arena «Liceo Spietato» (Interrogazioni, gossip e alleanze da intervallo. Nessuno muore: si viene eliminati). Palette: rosa, lilla e pastello da corridoio scolastico. Formato 1:1. Sfondo trasparente. |
-|  | `oggetti/amuleto.webp` | Carta di riserva | alta | Carta di riserva: Può evitare un'eliminazione diretta narrata da un evento: probabilità 85%, certa per chi è superstizioso. Si consuma quando salva; non impedisce il ritiro per reputazione o energie esaurite.. Arena «Liceo Spietato» (Interrogazioni, gossip e alleanze da intervallo. Nessuno muore: si viene eliminati). Palette: rosa, lilla e pastello da corridoio scolastico. Formato 1:1. Sfondo trasparente. |
-|  | `oggetti/alcol.webp` | Bevanda (per esempio lattina di energy drink) | alta | Bevanda (per esempio lattina di energy drink): Una pausa può abbassare Ansia e Stress, ma può anche ridurre lucidità ed energie. Nel Liceo si tratta di energy drink.. Arena «Liceo Spietato» (Interrogazioni, gossip e alleanze da intervallo. Nessuno muore: si viene eliminati). Palette: rosa, lilla e pastello da corridoio scolastico. Formato 1:1. Sfondo trasparente. |
-|  | `oggetti/valore.webp` | Merce di scambio (per esempio buoni pasto, risposte del compito di domani) | alta | Merce di scambio (per esempio buoni pasto, risposte del compito di domani): Non serve a niente, tranne che a comprare cibo e cure da chi ne ha.. Arena «Liceo Spietato» (Interrogazioni, gossip e alleanze da intervallo. Nessuno muore: si viene eliminati). Palette: rosa, lilla e pastello da corridoio scolastico. Formato 1:1. Sfondo trasparente. |
-|  | `oggetti/ricordo.webp` | Ricordo (per esempio portachiavi dell'amicizia, quaderno delle confidenze) | alta | Ricordo (per esempio portachiavi dell'amicizia, quaderno delle confidenze): Un pezzo di casa: ogni notte tiene su il morale. Se è di qualcuno che non c'è più, ancora di più.. Arena «Liceo Spietato» (Interrogazioni, gossip e alleanze da intervallo. Nessuno muore: si viene eliminati). Palette: rosa, lilla e pastello da corridoio scolastico. Formato 1:1. Sfondo trasparente. |
+</details>
+
+#### Mensa
+
+- **File**: `assets/arene/liceo/luoghi/mensa.webp`
+- **Cosa mostrare**: Mensa scolastica rumorosa con tavoli lunghi, vassoi e il bancone del pranzo.
+
+**Prompt**
+
+```text
+A busy school cafeteria with long tables, food trays and a lunch counter, no people.
+```
+
+<details><summary>Prompt completo, pronto da incollare</summary>
+
+```text
+A busy school cafeteria with long tables, food trays and a lunch counter, no people. Pink, lilac and pastel palette, bright window light, playful satirical comedy mood, Italian high school, non-violent. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Wide 16:9 establishing shot of the location, no people, eye-level view, the key landmark inside the central third of the frame, soft depth fog in the background. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
+```
+
+</details>
+
+#### Biblioteca
+
+- **File**: `assets/arene/liceo/luoghi/biblioteca.webp`
+- **Cosa mostrare**: Biblioteca scolastica silenziosa con scaffali e tavoli da studio.
+
+**Prompt**
+
+```text
+A quiet school library with bookshelves, study tables and green desk lamps.
+```
+
+<details><summary>Prompt completo, pronto da incollare</summary>
+
+```text
+A quiet school library with bookshelves, study tables and green desk lamps. Pink, lilac and pastel palette, bright window light, playful satirical comedy mood, Italian high school, non-violent. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Wide 16:9 establishing shot of the location, no people, eye-level view, the key landmark inside the central third of the frame, soft depth fog in the background. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
+```
+
+</details>
+
+#### Laboratorio di chimica
+
+- **File**: `assets/arene/liceo/luoghi/laboratorio-di-chimica.webp`
+- **Cosa mostrare**: Laboratorio di chimica con becher, cappa aspirante e fiasche colorate che bollono.
+
+**Prompt**
+
+```text
+A chemistry lab with beakers, a fume hood and colourful bubbling flasks.
+```
+
+<details><summary>Prompt completo, pronto da incollare</summary>
+
+```text
+A chemistry lab with beakers, a fume hood and colourful bubbling flasks. Pink, lilac and pastel palette, bright window light, playful satirical comedy mood, Italian high school, non-violent. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Wide 16:9 establishing shot of the location, no people, eye-level view, the key landmark inside the central third of the frame, soft depth fog in the background. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
+```
+
+</details>
+
+#### Cortile
+
+- **File**: `assets/arene/liceo/luoghi/cortile.webp`
+- **Cosa mostrare**: Cortile della scuola con panchine, un albero, motorini e zaini a terra.
+
+**Prompt**
+
+```text
+The school courtyard with benches, a big tree, parked scooters and backpacks on the ground.
+```
+
+<details><summary>Prompt completo, pronto da incollare</summary>
+
+```text
+The school courtyard with benches, a big tree, parked scooters and backpacks on the ground. Pink, lilac and pastel palette, bright window light, playful satirical comedy mood, Italian high school, non-violent. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Wide 16:9 establishing shot of the location, no people, eye-level view, the key landmark inside the central third of the frame, soft depth fog in the background. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
+```
+
+</details>
+
+#### Aula magna
+
+- **File**: `assets/arene/liceo/luoghi/aula-magna.webp`
+- **Cosa mostrare**: Aula magna con file di poltroncine, palco e microfono.
+
+**Prompt**
+
+```text
+An assembly hall with rows of folding seats, a stage and a single microphone.
+```
+
+<details><summary>Prompt completo, pronto da incollare</summary>
+
+```text
+An assembly hall with rows of folding seats, a stage and a single microphone. Pink, lilac and pastel palette, bright window light, playful satirical comedy mood, Italian high school, non-violent. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Wide 16:9 establishing shot of the location, no people, eye-level view, the key landmark inside the central third of the frame, soft depth fog in the background. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
+```
+
+</details>
+
+### Pericoli · Liceo Spietato (4:3, 960 × 720 px, sfondo pieno e scuro)
+
+#### Preside
+
+- **File**: `assets/arene/liceo/pericoli/preside.webp`
+- **Cosa mostrare**: Caricatura della Preside severa, braccia conserte, occhiali abbassati, sulla soglia.
+
+**Prompt**
+
+```text
+A caricature of a stern school principal, arms crossed, glasses lowered, standing in a doorway.
+```
+
+<details><summary>Prompt completo, pronto da incollare</summary>
+
+```text
+A caricature of a stern school principal, arms crossed, glasses lowered, standing in a doorway. Pink, lilac and pastel palette, bright window light, playful satirical comedy mood, Italian high school, non-violent. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. 4:3 wanted-poster portrait, single threat centered and facing the viewer, head and eyes in the upper middle of the frame, dark vignetted background that fades to near black at the edges. Light-hearted comic caricature, not scary, not violent, not resembling any real person. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
+```
+
+</details>
+
+#### Bidello di turno
+
+- **File**: `assets/arene/liceo/pericoli/bidello-di-turno.webp`
+- **Cosa mostrare**: Caricatura del bidello brontolone con mocio, secchio e mazzo di chiavi.
+
+**Prompt**
+
+```text
+A caricature of a grumpy school janitor with a mop, a bucket and a ring of keys.
+```
+
+<details><summary>Prompt completo, pronto da incollare</summary>
+
+```text
+A caricature of a grumpy school janitor with a mop, a bucket and a ring of keys. Pink, lilac and pastel palette, bright window light, playful satirical comedy mood, Italian high school, non-violent. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. 4:3 wanted-poster portrait, single threat centered and facing the viewer, head and eyes in the upper middle of the frame, dark vignetted background that fades to near black at the edges. Light-hearted comic caricature, not scary, not violent, not resembling any real person. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
+```
+
+</details>
+
+#### Ispezione a sorpresa
+
+- **File**: `assets/arene/liceo/pericoli/ispezione-a-sorpresa.webp`
+- **Cosa mostrare**: L'ispezione a sorpresa personificata: un ispettore con cartellina e lente che spunta da una porta.
+
+**Prompt**
+
+```text
+A caricature of a school inspector with a clipboard and a magnifying glass peeking through a door.
+```
+
+<details><summary>Prompt completo, pronto da incollare</summary>
+
+```text
+A caricature of a school inspector with a clipboard and a magnifying glass peeking through a door. Pink, lilac and pastel palette, bright window light, playful satirical comedy mood, Italian high school, non-violent. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. 4:3 wanted-poster portrait, single threat centered and facing the viewer, head and eyes in the upper middle of the frame, dark vignetted background that fades to near black at the edges. Light-hearted comic caricature, not scary, not violent, not resembling any real person. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
+```
+
+</details>
+
+#### Professoressa di matematica
+
+- **File**: `assets/arene/liceo/pericoli/professoressa-di-matematica.webp`
+- **Cosa mostrare**: Caricatura della prof di matematica con la penna rossa, lavagna con formule illeggibili alle spalle.
+
+**Prompt**
+
+```text
+A caricature of a strict math teacher holding a red pen, a blackboard with blurred unreadable formulas behind her.
+```
+
+<details><summary>Prompt completo, pronto da incollare</summary>
+
+```text
+A caricature of a strict math teacher holding a red pen, a blackboard with blurred unreadable formulas behind her. Pink, lilac and pastel palette, bright window light, playful satirical comedy mood, Italian high school, non-violent. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. 4:3 wanted-poster portrait, single threat centered and facing the viewer, head and eyes in the upper middle of the frame, dark vignetted background that fades to near black at the edges. Light-hearted comic caricature, not scary, not violent, not resembling any real person. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
+```
+
+</details>
+
+### Armi · Liceo Spietato (1:1, 512 × 512 px, sfondo trasparente)
+
+#### Gossip esplosivo
+
+- **File**: `assets/arene/liceo/armi/gossip-esplosivo.webp`
+- **Cosa mostrare**: Smartphone con un fumetto di chat che esplode come un fuoco d'artificio.
+
+**Prompt**
+
+```text
+A smartphone with a glowing chat bubble bursting out of it like a firework.
+```
+
+<details><summary>Prompt completo, pronto da incollare</summary>
+
+```text
+A smartphone with a glowing chat bubble bursting out of it like a firework. Pink, lilac and pastel palette, bright window light, playful satirical comedy mood, Italian high school, non-violent. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Single object only, isolated on a fully transparent background, square 1:1, three-quarter view laid diagonally from lower left to upper right, 12% empty margin on every side, crisp silhouette with a thin dark outline so it reads on both light and dark backgrounds, no hands, no shadow on the ground. An everyday object used as a playful office or school prank, comic tone. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
+```
+
+</details>
+
+#### Foto imbarazzante
+
+- **File**: `assets/arene/liceo/armi/foto-imbarazzante.webp`
+- **Cosa mostrare**: Polaroid con un'immagine imbarazzante sfocata e un bagliore rosa.
+
+**Prompt**
+
+```text
+A polaroid photo showing a blurred embarrassing picture, with a pink glow.
+```
+
+<details><summary>Prompt completo, pronto da incollare</summary>
+
+```text
+A polaroid photo showing a blurred embarrassing picture, with a pink glow. Pink, lilac and pastel palette, bright window light, playful satirical comedy mood, Italian high school, non-violent. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Single object only, isolated on a fully transparent background, square 1:1, three-quarter view laid diagonally from lower left to upper right, 12% empty margin on every side, crisp silhouette with a thin dark outline so it reads on both light and dark backgrounds, no hands, no shadow on the ground. An everyday object used as a playful office or school prank, comic tone. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
+```
+
+</details>
+
+#### Compito copiato
+
+- **File**: `assets/arene/liceo/armi/compito-copiato.webp`
+- **Cosa mostrare**: Compito in classe con un bigliettino nascosto che spunta.
+
+**Prompt**
+
+```text
+A folded test paper with a tiny cheat sheet sticking out, no readable writing.
+```
+
+<details><summary>Prompt completo, pronto da incollare</summary>
+
+```text
+A folded test paper with a tiny cheat sheet sticking out, no readable writing. Pink, lilac and pastel palette, bright window light, playful satirical comedy mood, Italian high school, non-violent. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Single object only, isolated on a fully transparent background, square 1:1, three-quarter view laid diagonally from lower left to upper right, 12% empty margin on every side, crisp silhouette with a thin dark outline so it reads on both light and dark backgrounds, no hands, no shadow on the ground. An everyday object used as a playful office or school prank, comic tone. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
+```
+
+</details>
+
+#### Pallone da dodgeball
+
+- **File**: `assets/arene/liceo/armi/pallone-da-dodgeball.webp`
+- **Cosa mostrare**: Pallone rosso da dodgeball con scie di movimento.
+
+**Prompt**
+
+```text
+A red rubber dodgeball with motion streaks.
+```
+
+<details><summary>Prompt completo, pronto da incollare</summary>
+
+```text
+A red rubber dodgeball with motion streaks. Pink, lilac and pastel palette, bright window light, playful satirical comedy mood, Italian high school, non-violent. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Single object only, isolated on a fully transparent background, square 1:1, three-quarter view laid diagonally from lower left to upper right, 12% empty margin on every side, crisp silhouette with a thin dark outline so it reads on both light and dark backgrounds, no hands, no shadow on the ground. An everyday object used as a playful office or school prank, comic tone. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
+```
+
+</details>
+
+#### Registro rubato
+
+- **File**: `assets/arene/liceo/armi/registro-rubato.webp`
+- **Cosa mostrare**: Registro di classe spesso con il segnalibro a nastro.
+
+**Prompt**
+
+```text
+A thick class register book with a ribbon bookmark, plain cover.
+```
+
+<details><summary>Prompt completo, pronto da incollare</summary>
+
+```text
+A thick class register book with a ribbon bookmark, plain cover. Pink, lilac and pastel palette, bright window light, playful satirical comedy mood, Italian high school, non-violent. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Single object only, isolated on a fully transparent background, square 1:1, three-quarter view laid diagonally from lower left to upper right, 12% empty margin on every side, crisp silhouette with a thin dark outline so it reads on both light and dark backgrounds, no hands, no shadow on the ground. An everyday object used as a playful office or school prank, comic tone. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
+```
+
+</details>
+
+#### Profilo falso
+
+- **File**: `assets/arene/liceo/armi/profilo-falso.webp`
+- **Cosa mostrare**: Smartphone con un profilo social finto e l'icona di una maschera.
+
+**Prompt**
+
+```text
+A smartphone showing a fake social profile with a disguise mask icon.
+```
+
+<details><summary>Prompt completo, pronto da incollare</summary>
+
+```text
+A smartphone showing a fake social profile with a disguise mask icon. Pink, lilac and pastel palette, bright window light, playful satirical comedy mood, Italian high school, non-violent. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Single object only, isolated on a fully transparent background, square 1:1, three-quarter view laid diagonally from lower left to upper right, 12% empty margin on every side, crisp silhouette with a thin dark outline so it reads on both light and dark backgrounds, no hands, no shadow on the ground. An everyday object used as a playful office or school prank, comic tone. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
+```
+
+</details>
+
+---
 
 ## Ufficio Open Space
 
-Cartella: `assets/arene/ufficio/`. Palette: verde petrolio, grigi e luci al neon da open space.
+Riunioni infinite, fogli Excel e licenziamenti. Nessuno muore: si viene licenziati.
 
-### Luoghi (16:9, 1280×720, sfondo pieno)
+- **Cartella**: `assets/arene/ufficio/` (con le sottocartelle `luoghi/`, `pericoli/`, `armi/`)
+- **Riferimento di stile**: `assets/arene/ufficio.webp`
+- **Atmosfera**: Open space aziendale in chiave satirica: verde petrolio, grigi, neon freddi, luce da monitor. Tono da commedia d'ufficio, nessuna violenza.
+- **Stile da aggiungere a ogni prompt di questa arena** (è già incluso nei prompt completi):
 
-| | File | Soggetto | Priorità | Traccia |
-| --- | --- | --- | --- | --- |
-|  | `luoghi/sala-riunioni.webp` | Sala riunioni | alta | Sala riunioni: il luogo dell'arena visto da vicino. Arena «Ufficio Open Space» (Riunioni infinite, fogli Excel e licenziamenti. Nessuno muore: si viene licenziati). Palette: verde petrolio, grigi e luci al neon da open space. Formato 16:9. |
-|  | `luoghi/open-space.webp` | Open space | alta | Open space: il luogo dell'arena visto da vicino. Arena «Ufficio Open Space» (Riunioni infinite, fogli Excel e licenziamenti. Nessuno muore: si viene licenziati). Palette: verde petrolio, grigi e luci al neon da open space. Formato 16:9. |
-|  | `luoghi/cucina.webp` | Cucina | alta | Cucina: il luogo dell'arena visto da vicino. Arena «Ufficio Open Space» (Riunioni infinite, fogli Excel e licenziamenti. Nessuno muore: si viene licenziati). Palette: verde petrolio, grigi e luci al neon da open space. Formato 16:9. |
-|  | `luoghi/ufficio-del-direttore.webp` | Ufficio del direttore | alta | Ufficio del direttore: il luogo dell'arena visto da vicino. Arena «Ufficio Open Space» (Riunioni infinite, fogli Excel e licenziamenti. Nessuno muore: si viene licenziati). Palette: verde petrolio, grigi e luci al neon da open space. Formato 16:9. |
-|  | `luoghi/sala-stampanti.webp` | Sala stampanti | alta | Sala stampanti: il luogo dell'arena visto da vicino. Arena «Ufficio Open Space» (Riunioni infinite, fogli Excel e licenziamenti. Nessuno muore: si viene licenziati). Palette: verde petrolio, grigi e luci al neon da open space. Formato 16:9. |
-|  | `luoghi/parcheggio.webp` | Parcheggio | alta | Parcheggio: il luogo dell'arena visto da vicino. Arena «Ufficio Open Space» (Riunioni infinite, fogli Excel e licenziamenti. Nessuno muore: si viene licenziati). Palette: verde petrolio, grigi e luci al neon da open space. Formato 16:9. |
+```text
+Teal green and grey palette with cold neon office light and monitor glow, satirical corporate comedy mood, non-violent. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours.
+```
 
-### Pericoli (4:3, 960×720, sfondo pieno, scuro)
+Più, a seconda della sezione:
 
-| | File | Soggetto | Priorità | Traccia |
-| --- | --- | --- | --- | --- |
-|  | `pericoli/direttore-generale.webp` | Direttore generale | alta | Direttore generale: figura minacciosa ma non violenta. Arena «Ufficio Open Space» (Riunioni infinite, fogli Excel e licenziamenti. Nessuno muore: si viene licenziati). Palette: verde petrolio, grigi e luci al neon da open space. Formato 4:3. |
-|  | `pericoli/ufficio-risorse-umane.webp` | Ufficio Risorse umane | alta | Ufficio Risorse umane: figura minacciosa ma non violenta. Arena «Ufficio Open Space» (Riunioni infinite, fogli Excel e licenziamenti. Nessuno muore: si viene licenziati). Palette: verde petrolio, grigi e luci al neon da open space. Formato 4:3. |
-|  | `pericoli/consulente-esterno.webp` | Consulente esterno | alta | Consulente esterno: figura minacciosa ma non violenta. Arena «Ufficio Open Space» (Riunioni infinite, fogli Excel e licenziamenti. Nessuno muore: si viene licenziati). Palette: verde petrolio, grigi e luci al neon da open space. Formato 4:3. |
-|  | `pericoli/riorganizzazione-aziendale.webp` | Riorganizzazione aziendale | alta | Riorganizzazione aziendale: figura minacciosa ma non violenta. Arena «Ufficio Open Space» (Riunioni infinite, fogli Excel e licenziamenti. Nessuno muore: si viene licenziati). Palette: verde petrolio, grigi e luci al neon da open space. Formato 4:3. |
+- Luoghi: `Wide 16:9 establishing shot of the location, no people, eye-level view, the key landmark inside the central third of the frame, soft depth fog in the background.`
+- Pericoli: `4:3 wanted-poster portrait, single threat centered and facing the viewer, head and eyes in the upper middle of the frame, dark vignetted background that fades to near black at the edges. Light-hearted comic caricature, not scary, not violent, not resembling any real person.`
+- Armi: `Single object only, isolated on a fully transparent background, square 1:1, three-quarter view laid diagonally from lower left to upper right, 12% empty margin on every side, crisp silhouette with a thin dark outline so it reads on both light and dark backgrounds, no hands, no shadow on the ground. An everyday object used as a playful office or school prank, comic tone.`
+- Sempre: `No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.`
 
-### Armi (1:1, 512×512, sfondo trasparente)
+### Luoghi · Ufficio Open Space (16:9, 1280 × 720 px, sfondo pieno)
 
-| | File | Soggetto | Priorità | Traccia |
-| --- | --- | --- | --- | --- |
-|  | `armi/mail-in-copia-a-tutti.webp` | Mail in copia a tutti | media | Mail in copia a tutti: oggetto d'ufficio o di scuola usato come arma impropria. Arena «Ufficio Open Space» (Riunioni infinite, fogli Excel e licenziamenti. Nessuno muore: si viene licenziati). Palette: verde petrolio, grigi e luci al neon da open space. Formato 1:1. Sfondo trasparente. |
-|  | `armi/report-pieno-di-errori-altrui.webp` | Report pieno di errori altrui | media | Report pieno di errori altrui: oggetto d'ufficio o di scuola usato come arma impropria. Arena «Ufficio Open Space» (Riunioni infinite, fogli Excel e licenziamenti. Nessuno muore: si viene licenziati). Palette: verde petrolio, grigi e luci al neon da open space. Formato 1:1. Sfondo trasparente. |
-|  | `armi/presentazione-rubata.webp` | Presentazione rubata | media | Presentazione rubata: oggetto d'ufficio o di scuola usato come arma impropria. Arena «Ufficio Open Space» (Riunioni infinite, fogli Excel e licenziamenti. Nessuno muore: si viene licenziati). Palette: verde petrolio, grigi e luci al neon da open space. Formato 1:1. Sfondo trasparente. |
-|  | `armi/badge-clonato-del-capo.webp` | Badge clonato del capo | media | Badge clonato del capo: oggetto d'ufficio o di scuola usato come arma impropria. Arena «Ufficio Open Space» (Riunioni infinite, fogli Excel e licenziamenti. Nessuno muore: si viene licenziati). Palette: verde petrolio, grigi e luci al neon da open space. Formato 1:1. Sfondo trasparente. |
-|  | `armi/foglio-excel-con-le-prove.webp` | Foglio Excel con le prove | media | Foglio Excel con le prove: oggetto d'ufficio o di scuola usato come arma impropria. Arena «Ufficio Open Space» (Riunioni infinite, fogli Excel e licenziamenti. Nessuno muore: si viene licenziati). Palette: verde petrolio, grigi e luci al neon da open space. Formato 1:1. Sfondo trasparente. |
-|  | `armi/nota-spese-gonfiata.webp` | Nota spese gonfiata | media | Nota spese gonfiata: oggetto d'ufficio o di scuola usato come arma impropria. Arena «Ufficio Open Space» (Riunioni infinite, fogli Excel e licenziamenti. Nessuno muore: si viene licenziati). Palette: verde petrolio, grigi e luci al neon da open space. Formato 1:1. Sfondo trasparente. |
+#### Sala riunioni
 
-### Meteo (16:10, 1200×750, sfondo pieno)
+- **File**: `assets/arene/ufficio/luoghi/sala-riunioni.webp`
+- **Cosa mostrare**: Sala riunioni con tavolo di vetro lungo, sedie vuote, schermo del proiettore e lavagna.
 
-| | File | Soggetto | Priorità | Traccia |
-| --- | --- | --- | --- | --- |
-|  | `meteo/chiusura-trimestrale.webp` | Chiusura trimestrale | alta | Chiusura trimestrale: I numeri non tornano e tutti devono restare fino a tardi.. Arena «Ufficio Open Space» (Riunioni infinite, fogli Excel e licenziamenti. Nessuno muore: si viene licenziati). Palette: verde petrolio, grigi e luci al neon da open space. Formato 16:10. |
-|  | `meteo/server-giu.webp` | Server giù | alta | Server giù: Niente email, niente Excel: il caos ha il sapore della libertà.. Arena «Ufficio Open Space» (Riunioni infinite, fogli Excel e licenziamenti. Nessuno muore: si viene licenziati). Palette: verde petrolio, grigi e luci al neon da open space. Formato 16:10. |
-|  | `meteo/venerdi-casual.webp` | Venerdì casual | alta | Venerdì casual: Bermuda in ufficio e guardie abbassate.. Arena «Ufficio Open Space» (Riunioni infinite, fogli Excel e licenziamenti. Nessuno muore: si viene licenziati). Palette: verde petrolio, grigi e luci al neon da open space. Formato 16:10. |
-|  | `meteo/visita-del-ceo.webp` | Visita del CEO | alta | Visita del CEO: Il capo dei capi passa per i corridoi: tutti fingono di lavorare.. Arena «Ufficio Open Space» (Riunioni infinite, fogli Excel e licenziamenti. Nessuno muore: si viene licenziati). Palette: verde petrolio, grigi e luci al neon da open space. Formato 16:10. |
-|  | `meteo/riscaldamento-rotto.webp` | Riscaldamento rotto | alta | Riscaldamento rotto: Diciassette gradi e giacche addosso.. Arena «Ufficio Open Space» (Riunioni infinite, fogli Excel e licenziamenti. Nessuno muore: si viene licenziati). Palette: verde petrolio, grigi e luci al neon da open space. Formato 16:10. |
-|  | `meteo/torta-di-compleanno-in-cucina.webp` | Torta di compleanno in cucina | alta | Torta di compleanno in cucina: Qualcuno compie gli anni: zuccheri per tutti.. Arena «Ufficio Open Space» (Riunioni infinite, fogli Excel e licenziamenti. Nessuno muore: si viene licenziati). Palette: verde petrolio, grigi e luci al neon da open space. Formato 16:10. |
-|  | `meteo/lunedi-di-inventario.webp` | Lunedì di inventario | alta | Lunedì di inventario: Si conta tutto: penne, risme, persone.. Arena «Ufficio Open Space» (Riunioni infinite, fogli Excel e licenziamenti. Nessuno muore: si viene licenziati). Palette: verde petrolio, grigi e luci al neon da open space. Formato 16:10. |
-|  | `meteo/ponte-festivo.webp` | Ponte festivo | alta | Ponte festivo: Mezzo ufficio è in ferie: chi resta, comanda.. Arena «Ufficio Open Space» (Riunioni infinite, fogli Excel e licenziamenti. Nessuno muore: si viene licenziati). Palette: verde petrolio, grigi e luci al neon da open space. Formato 16:10. |
-|  | `meteo/valutazione-annuale.webp` | Valutazione annuale | alta | Valutazione annuale: Oggi si decidono i premi. E i licenziamenti.. Arena «Ufficio Open Space» (Riunioni infinite, fogli Excel e licenziamenti. Nessuno muore: si viene licenziati). Palette: verde petrolio, grigi e luci al neon da open space. Formato 16:10. |
+**Prompt**
 
-### Disastri (16:9, 1280×720, sfondo pieno)
+```text
+A meeting room with a long glass table, empty chairs, a projector screen and a whiteboard with blurred scribbles.
+```
 
-| | File | Soggetto | Priorità | Traccia |
-| --- | --- | --- | --- | --- |
-|  | `disastri/riorganizzazione.webp` | La riorganizzazione · famiglia `burocrazia` | alta | La riorganizzazione: Arriva un consulente esterno con una slide intitolata "Ottimizzazione delle risorse".. Arena «Ufficio Open Space» (Riunioni infinite, fogli Excel e licenziamenti. Nessuno muore: si viene licenziati). Palette: verde petrolio, grigi e luci al neon da open space. Formato 16:9. |
-|  | `disastri/server-e-giu.webp` | Il server è giù · famiglia `tech` | alta | Il server è giù: Il server aziendale si blocca durante la chiusura del trimestre.. Arena «Ufficio Open Space» (Riunioni infinite, fogli Excel e licenziamenti. Nessuno muore: si viene licenziati). Palette: verde petrolio, grigi e luci al neon da open space. Formato 16:9. |
-|  | `disastri/audit.webp` | L'audit · famiglia `burocrazia` | alta | L'audit: L'ufficio Risorse umane annuncia un audit su tutte le note spese.. Arena «Ufficio Open Space» (Riunioni infinite, fogli Excel e licenziamenti. Nessuno muore: si viene licenziati). Palette: verde petrolio, grigi e luci al neon da open space. Formato 16:9. |
-|  | `disastri/nuovo-software.webp` | Il nuovo software · famiglia `burocrazia` | alta | Il nuovo software: L'azienda introduce un nuovo gestionale che nessuno sa usare.. Arena «Ufficio Open Space» (Riunioni infinite, fogli Excel e licenziamenti. Nessuno muore: si viene licenziati). Palette: verde petrolio, grigi e luci al neon da open space. Formato 16:9. |
-|  | `disastri/fusione.webp` | La fusione · famiglia `burocrazia` | alta | La fusione: L'azienda viene acquisita da una multinazionale.. Arena «Ufficio Open Space» (Riunioni infinite, fogli Excel e licenziamenti. Nessuno muore: si viene licenziati). Palette: verde petrolio, grigi e luci al neon da open space. Formato 16:9. |
-|  | `disastri/taglio-dei-costi.webp` | Taglio dei costi · famiglia `burocrazia` | alta | Taglio dei costi: Il Direttore annuncia un taglio del dieci per cento del personale.. Arena «Ufficio Open Space» (Riunioni infinite, fogli Excel e licenziamenti. Nessuno muore: si viene licenziati). Palette: verde petrolio, grigi e luci al neon da open space. Formato 16:9. |
-|  | `disastri/trasloco.webp` | Il trasloco · famiglia `burocrazia` | alta | Il trasloco: L'ufficio trasloca in un'altra sede in periferia.. Arena «Ufficio Open Space» (Riunioni infinite, fogli Excel e licenziamenti. Nessuno muore: si viene licenziati). Palette: verde petrolio, grigi e luci al neon da open space. Formato 16:9. |
-|  | `disastri/smart-working-forzato.webp` | Lo smart working forzato · famiglia `burocrazia` | alta | Lo smart working forzato: Tutti a casa per un mese, con controlli a sorpresa via webcam.. Arena «Ufficio Open Space» (Riunioni infinite, fogli Excel e licenziamenti. Nessuno muore: si viene licenziati). Palette: verde petrolio, grigi e luci al neon da open space. Formato 16:9. |
-|  | `disastri/valutazione-annuale.webp` | La valutazione annuale · famiglia `burocrazia` | alta | La valutazione annuale: Arrivano le valutazioni di fine anno.. Arena «Ufficio Open Space» (Riunioni infinite, fogli Excel e licenziamenti. Nessuno muore: si viene licenziati). Palette: verde petrolio, grigi e luci al neon da open space. Formato 16:9. |
-|  | `disastri/hackeraggio.webp` | L'hackeraggio · famiglia `tech` | media | L'hackeraggio: Un attacco informatico blocca tutti i computer.. Arena «Ufficio Open Space» (Riunioni infinite, fogli Excel e licenziamenti. Nessuno muore: si viene licenziati). Palette: verde petrolio, grigi e luci al neon da open space. Formato 16:9. |
-|  | `disastri/gita-di-team-building.webp` | La gita di team building · famiglia `festa` | media | La gita di team building: L'azienda organizza un weekend di team building in montagna.. Arena «Ufficio Open Space» (Riunioni infinite, fogli Excel e licenziamenti. Nessuno muore: si viene licenziati). Palette: verde petrolio, grigi e luci al neon da open space. Formato 16:9. |
-|  | `disastri/nuovo-capo.webp` | Il nuovo capo · famiglia `burocrazia` | media | Il nuovo capo: Arriva un nuovo capo che vuole cambiare tutto.. Arena «Ufficio Open Space» (Riunioni infinite, fogli Excel e licenziamenti. Nessuno muore: si viene licenziati). Palette: verde petrolio, grigi e luci al neon da open space. Formato 16:9. |
-|  | `disastri/guasto-allaria-condizionata.webp` | Il guasto all'aria condizionata · famiglia `tossico` | media | Il guasto all'aria condizionata: L'aria condizionata si rompe a luglio.. Arena «Ufficio Open Space» (Riunioni infinite, fogli Excel e licenziamenti. Nessuno muore: si viene licenziati). Palette: verde petrolio, grigi e luci al neon da open space. Formato 16:9. |
-|  | `disastri/ispezione-della-sicurezza.webp` | L'ispezione della sicurezza · famiglia `burocrazia` | media | L'ispezione della sicurezza: Arriva un'ispezione sulla sicurezza sul lavoro.. Arena «Ufficio Open Space» (Riunioni infinite, fogli Excel e licenziamenti. Nessuno muore: si viene licenziati). Palette: verde petrolio, grigi e luci al neon da open space. Formato 16:9. |
-|  | `disastri/open-space-rumoroso.webp` | L'open space rumoroso · famiglia `burocrazia` | media | L'open space rumoroso: I lavori di ristrutturazione al piano di sopra durano tutto il giorno.. Arena «Ufficio Open Space» (Riunioni infinite, fogli Excel e licenziamenti. Nessuno muore: si viene licenziati). Palette: verde petrolio, grigi e luci al neon da open space. Formato 16:9. |
-|  | `disastri/riunione-infinita.webp` | La riunione infinita · famiglia `burocrazia` | media | La riunione infinita: Il Direttore convoca una riunione di otto ore.. Arena «Ufficio Open Space» (Riunioni infinite, fogli Excel e licenziamenti. Nessuno muore: si viene licenziati). Palette: verde petrolio, grigi e luci al neon da open space. Formato 16:9. |
-|  | `disastri/cliente-furioso.webp` | Il cliente furioso · famiglia `burocrazia` | media | Il cliente furioso: Il cliente più importante minaccia di andarsene.. Arena «Ufficio Open Space» (Riunioni infinite, fogli Excel e licenziamenti. Nessuno muore: si viene licenziati). Palette: verde petrolio, grigi e luci al neon da open space. Formato 16:9. |
-|  | `disastri/nuove-regole.webp` | Le nuove regole · famiglia `burocrazia` | media | Le nuove regole: L'ufficio Risorse umane pubblica un regolamento di cento pagine.. Arena «Ufficio Open Space» (Riunioni infinite, fogli Excel e licenziamenti. Nessuno muore: si viene licenziati). Palette: verde petrolio, grigi e luci al neon da open space. Formato 16:9. |
-|  | `disastri/festa-di-natale.webp` | La festa di Natale · famiglia `festa` | media | La festa di Natale: La festa di Natale aziendale finisce fuori controllo.. Arena «Ufficio Open Space» (Riunioni infinite, fogli Excel e licenziamenti. Nessuno muore: si viene licenziati). Palette: verde petrolio, grigi e luci al neon da open space. Formato 16:9. |
-|  | `disastri/controllo-delle-note-spese.webp` | Il controllo delle note spese · famiglia `burocrazia` | media | Il controllo delle note spese: Il controllo di gestione esamina tutte le note spese.. Arena «Ufficio Open Space» (Riunioni infinite, fogli Excel e licenziamenti. Nessuno muore: si viene licenziati). Palette: verde petrolio, grigi e luci al neon da open space. Formato 16:9. |
-|  | `disastri/sostituzione-con-lintelligenza-artificiale.webp` | La sostituzione con l'intelligenza artificiale · famiglia `tech` | media | La sostituzione con l'intelligenza artificiale: L'azienda introduce un programma che fa il lavoro di metà dell'ufficio.. Arena «Ufficio Open Space» (Riunioni infinite, fogli Excel e licenziamenti. Nessuno muore: si viene licenziati). Palette: verde petrolio, grigi e luci al neon da open space. Formato 16:9. |
-|  | `disastri/influenza-dellufficio.webp` | L'influenza dell'ufficio · famiglia `tossico` | media | L'influenza dell'ufficio: Un virus si diffonde in tutto l'open space.. Arena «Ufficio Open Space» (Riunioni infinite, fogli Excel e licenziamenti. Nessuno muore: si viene licenziati). Palette: verde petrolio, grigi e luci al neon da open space. Formato 16:9. |
-|  | `disastri/gara-di-vendite.webp` | La gara di vendite · famiglia `burocrazia` | media | La gara di vendite: Il Direttore lancia una gara: chi vende meno se ne va.. Arena «Ufficio Open Space» (Riunioni infinite, fogli Excel e licenziamenti. Nessuno muore: si viene licenziati). Palette: verde petrolio, grigi e luci al neon da open space. Formato 16:9. |
-|  | `disastri/blackout.webp` | Il blackout · famiglia `buio` | media | Il blackout: Un blackout cancella tutto il lavoro non salvato.. Arena «Ufficio Open Space» (Riunioni infinite, fogli Excel e licenziamenti. Nessuno muore: si viene licenziati). Palette: verde petrolio, grigi e luci al neon da open space. Formato 16:9. |
-|  | `disastri/audit-esterno.webp` | L'audit esterno · famiglia `burocrazia` | media | L'audit esterno: Arrivano i revisori esterni.. Arena «Ufficio Open Space» (Riunioni infinite, fogli Excel e licenziamenti. Nessuno muore: si viene licenziati). Palette: verde petrolio, grigi e luci al neon da open space. Formato 16:9. |
-|  | `disastri/sciopero.webp` | Lo sciopero · famiglia `burocrazia` | media | Lo sciopero: I sindacati proclamano uno sciopero generale.. Arena «Ufficio Open Space» (Riunioni infinite, fogli Excel e licenziamenti. Nessuno muore: si viene licenziati). Palette: verde petrolio, grigi e luci al neon da open space. Formato 16:9. |
-|  | `disastri/premio-di-produzione.webp` | Il premio di produzione · famiglia `burocrazia` | media | Il premio di produzione: Viene annunciato un premio di produzione per un solo dipendente.. Arena «Ufficio Open Space» (Riunioni infinite, fogli Excel e licenziamenti. Nessuno muore: si viene licenziati). Palette: verde petrolio, grigi e luci al neon da open space. Formato 16:9. |
-|  | `disastri/nuovo-stagista.webp` | Il nuovo stagista · famiglia `burocrazia` | media | Il nuovo stagista: Arriva uno stagista più bravo di tutti.. Arena «Ufficio Open Space» (Riunioni infinite, fogli Excel e licenziamenti. Nessuno muore: si viene licenziati). Palette: verde petrolio, grigi e luci al neon da open space. Formato 16:9. |
-|  | `disastri/macchinetta-del-caffe.webp` | La macchinetta del caffè · famiglia `burocrazia` | media | La macchinetta del caffè: La macchinetta del caffè si rompe per una settimana.. Arena «Ufficio Open Space» (Riunioni infinite, fogli Excel e licenziamenti. Nessuno muore: si viene licenziati). Palette: verde petrolio, grigi e luci al neon da open space. Formato 16:9. |
-|  | `disastri/consiglio-di-amministrazione.webp` | Il Consiglio di amministrazione · famiglia `burocrazia` | media | Il Consiglio di amministrazione: Il Consiglio di amministrazione visita l'ufficio.. Arena «Ufficio Open Space» (Riunioni infinite, fogli Excel e licenziamenti. Nessuno muore: si viene licenziati). Palette: verde petrolio, grigi e luci al neon da open space. Formato 16:9. |
-|  | `disastri/guasto-della-macchinetta.webp` | Il guasto della macchinetta · famiglia `burocrazia` | media | Il guasto della macchinetta: La macchinetta del caffè si rompe per tre giorni.. Arena «Ufficio Open Space» (Riunioni infinite, fogli Excel e licenziamenti. Nessuno muore: si viene licenziati). Palette: verde petrolio, grigi e luci al neon da open space. Formato 16:9. |
-|  | `disastri/telecamera-nuova.webp` | La telecamera nuova · famiglia `spettacolo` | media | La telecamera nuova: Viene installata una telecamera che riprende tutti.. Arena «Ufficio Open Space» (Riunioni infinite, fogli Excel e licenziamenti. Nessuno muore: si viene licenziati). Palette: verde petrolio, grigi e luci al neon da open space. Formato 16:9. |
-|  | `disastri/trasloco-di-piano.webp` | Il trasloco di piano · famiglia `burocrazia` | media | Il trasloco di piano: Tutti devono cambiare piano in un'ora.. Arena «Ufficio Open Space» (Riunioni infinite, fogli Excel e licenziamenti. Nessuno muore: si viene licenziati). Palette: verde petrolio, grigi e luci al neon da open space. Formato 16:9. |
-|  | `disastri/circolare-in-maiuscolo.webp` | La circolare in maiuscolo · famiglia `burocrazia` | media | La circolare in maiuscolo: Arriva una circolare scritta tutta in maiuscolo. Nessuno sa cosa voglia dire, ma fa paura.. Arena «Ufficio Open Space» (Riunioni infinite, fogli Excel e licenziamenti. Nessuno muore: si viene licenziati). Palette: verde petrolio, grigi e luci al neon da open space. Formato 16:9. |
-|  | `disastri/festa-a-sorpresa.webp` | La festa a sorpresa · famiglia `festa` | media | La festa a sorpresa: Viene organizzata una festa a sorpresa per una persona che nessuno conosce.. Arena «Ufficio Open Space» (Riunioni infinite, fogli Excel e licenziamenti. Nessuno muore: si viene licenziati). Palette: verde petrolio, grigi e luci al neon da open space. Formato 16:9. |
-|  | `disastri/sciopero-del-riscaldamento.webp` | Lo sciopero del riscaldamento · famiglia `gelo` | media | Lo sciopero del riscaldamento: Il riscaldamento si spegne in pieno inverno.. Arena «Ufficio Open Space» (Riunioni infinite, fogli Excel e licenziamenti. Nessuno muore: si viene licenziati). Palette: verde petrolio, grigi e luci al neon da open space. Formato 16:9. |
-|  | `disastri/password-scaduta.webp` | La password scaduta · famiglia `burocrazia` | media | La password scaduta: Tutte le password scadono contemporaneamente.. Arena «Ufficio Open Space» (Riunioni infinite, fogli Excel e licenziamenti. Nessuno muore: si viene licenziati). Palette: verde petrolio, grigi e luci al neon da open space. Formato 16:9. |
-|  | `disastri/ispezione-dei-bagni.webp` | L'ispezione dei bagni · famiglia `burocrazia` | media | L'ispezione dei bagni: Qualcuno ha lasciato il bagno in condizioni indicibili e parte un'indagine.. Arena «Ufficio Open Space» (Riunioni infinite, fogli Excel e licenziamenti. Nessuno muore: si viene licenziati). Palette: verde petrolio, grigi e luci al neon da open space. Formato 16:9. |
-|  | `disastri/settimana-corta.webp` | La settimana corta · famiglia `burocrazia` | media | La settimana corta: L'azienda introduce la settimana di quattro giorni, ma con il lavoro di sei.. Arena «Ufficio Open Space» (Riunioni infinite, fogli Excel e licenziamenti. Nessuno muore: si viene licenziati). Palette: verde petrolio, grigi e luci al neon da open space. Formato 16:9. |
-|  | `disastri/trasloco-digitale.webp` | Il trasloco digitale · famiglia `burocrazia` | media | Il trasloco digitale: Tutti i documenti vengono spostati su un nuovo sistema. Metà spariscono.. Arena «Ufficio Open Space» (Riunioni infinite, fogli Excel e licenziamenti. Nessuno muore: si viene licenziati). Palette: verde petrolio, grigi e luci al neon da open space. Formato 16:9. |
-|  | `disastri/colloquio-annuale.webp` | Il colloquio annuale · famiglia `burocrazia` | media | Il colloquio annuale: Il Direttore incontra uno per uno tutti i dipendenti.. Arena «Ufficio Open Space» (Riunioni infinite, fogli Excel e licenziamenti. Nessuno muore: si viene licenziati). Palette: verde petrolio, grigi e luci al neon da open space. Formato 16:9. |
-|  | `disastri/riunione-fiume.webp` | La riunione fiume · famiglia `acqua` | media | La riunione fiume: La riunione del lunedì dura fino al martedì.. Arena «Ufficio Open Space» (Riunioni infinite, fogli Excel e licenziamenti. Nessuno muore: si viene licenziati). Palette: verde petrolio, grigi e luci al neon da open space. Formato 16:9. |
-|  | `disastri/stagista-prodigio.webp` | La stagista prodigio · famiglia `burocrazia` | media | La stagista prodigio: Arriva una stagista che sa fare tutto meglio di tutti.. Arena «Ufficio Open Space» (Riunioni infinite, fogli Excel e licenziamenti. Nessuno muore: si viene licenziati). Palette: verde petrolio, grigi e luci al neon da open space. Formato 16:9. |
-|  | `disastri/cyber-truffa.webp` | La cyber truffa · famiglia `burocrazia` | media | La cyber truffa: Una mail truffaldina arriva a tutti, firmata dal Direttore.. Arena «Ufficio Open Space» (Riunioni infinite, fogli Excel e licenziamenti. Nessuno muore: si viene licenziati). Palette: verde petrolio, grigi e luci al neon da open space. Formato 16:9. |
-|  | `disastri/caldo-record.webp` | Il caldo record · famiglia `caldo` | media | Il caldo record: L'aria condizionata si rompe nella settimana più calda dell'anno.. Arena «Ufficio Open Space» (Riunioni infinite, fogli Excel e licenziamenti. Nessuno muore: si viene licenziati). Palette: verde petrolio, grigi e luci al neon da open space. Formato 16:9. |
-|  | `disastri/controllo-degli-orari.webp` | Il controllo degli orari · famiglia `burocrazia` | media | Il controllo degli orari: Il nuovo badge registra ogni minuto di pausa.. Arena «Ufficio Open Space» (Riunioni infinite, fogli Excel e licenziamenti. Nessuno muore: si viene licenziati). Palette: verde petrolio, grigi e luci al neon da open space. Formato 16:9. |
-|  | `disastri/raccolta-fondi.webp` | La raccolta fondi · famiglia `festa` | media | La raccolta fondi: Il Direttore chiede a tutti di contribuire alla festa aziendale.. Arena «Ufficio Open Space» (Riunioni infinite, fogli Excel e licenziamenti. Nessuno muore: si viene licenziati). Palette: verde petrolio, grigi e luci al neon da open space. Formato 16:9. |
-|  | `disastri/ufficio-senza-scrivanie.webp` | L'ufficio senza scrivanie · famiglia `burocrazia` | media | L'ufficio senza scrivanie: L'azienda elimina le scrivanie fisse: chi arriva prima sceglie.. Arena «Ufficio Open Space» (Riunioni infinite, fogli Excel e licenziamenti. Nessuno muore: si viene licenziati). Palette: verde petrolio, grigi e luci al neon da open space. Formato 16:9. |
-|  | `disastri/festa-di-natale-fuori-controllo.webp` | La festa di Natale fuori controllo · famiglia `festa` · 18+ | bassa | La festa di Natale fuori controllo: La festa aziendale finisce con il Direttore che balla sul bancone e il tesoriere che piange in bagno.. Arena «Ufficio Open Space» (Riunioni infinite, fogli Excel e licenziamenti. Nessuno muore: si viene licenziati). Palette: verde petrolio, grigi e luci al neon da open space. Formato 16:9. |
-|  | `disastri/team-building-in-spa.webp` | Il team building in spa · famiglia `burocrazia` · 18+ | bassa | Il team building in spa: L'azienda organizza un ritiro in una spa con sauna mista.. Arena «Ufficio Open Space» (Riunioni infinite, fogli Excel e licenziamenti. Nessuno muore: si viene licenziati). Palette: verde petrolio, grigi e luci al neon da open space. Formato 16:9. |
-|  | `disastri/virus-informatico.webp` | Il virus informatico · famiglia `tossico` | media | Il virus informatico: Un virus cancella metà dei file aziendali.. Arena «Ufficio Open Space» (Riunioni infinite, fogli Excel e licenziamenti. Nessuno muore: si viene licenziati). Palette: verde petrolio, grigi e luci al neon da open space. Formato 16:9. |
-|  | `disastri/influenza-dufficio.webp` | L'influenza d'ufficio · famiglia `tossico` | media | L'influenza d'ufficio: Una brutta influenza gira tra le scrivanie.. Arena «Ufficio Open Space» (Riunioni infinite, fogli Excel e licenziamenti. Nessuno muore: si viene licenziati). Palette: verde petrolio, grigi e luci al neon da open space. Formato 16:9. |
-|  | `disastri/team-building.webp` | Il team building · famiglia `burocrazia` | media | Il team building: L'azienda organizza un team building in montagna.. Arena «Ufficio Open Space» (Riunioni infinite, fogli Excel e licenziamenti. Nessuno muore: si viene licenziati). Palette: verde petrolio, grigi e luci al neon da open space. Formato 16:9. |
-|  | `disastri/mail-del-direttore.webp` | La mail del Direttore · famiglia `burocrazia` | media | La mail del Direttore: Il Direttore manda a tutti una mail che inizia con «Mi dispiace dovervi comunicare...».. Arena «Ufficio Open Space» (Riunioni infinite, fogli Excel e licenziamenti. Nessuno muore: si viene licenziati). Palette: verde petrolio, grigi e luci al neon da open space. Formato 16:9. |
-|  | `disastri/trasloco-in-coworking.webp` | Il trasloco in coworking · famiglia `burocrazia` | media | Il trasloco in coworking: L'azienda si trasferisce in un coworking con le scrivanie in comune.. Arena «Ufficio Open Space» (Riunioni infinite, fogli Excel e licenziamenti. Nessuno muore: si viene licenziati). Palette: verde petrolio, grigi e luci al neon da open space. Formato 16:9. |
-|  | `disastri/fusione-aziendale.webp` | La fusione aziendale · famiglia `burocrazia` | media | La fusione aziendale: L'azienda viene comprata da una multinazionale.. Arena «Ufficio Open Space» (Riunioni infinite, fogli Excel e licenziamenti. Nessuno muore: si viene licenziati). Palette: verde petrolio, grigi e luci al neon da open space. Formato 16:9. |
-|  | `disastri/guasto-dellaria-condizionata.webp` | Il guasto dell'aria condizionata · famiglia `tossico` | media | Il guasto dell'aria condizionata: L'aria condizionata si rompe ad agosto.. Arena «Ufficio Open Space» (Riunioni infinite, fogli Excel e licenziamenti. Nessuno muore: si viene licenziati). Palette: verde petrolio, grigi e luci al neon da open space. Formato 16:9. |
-|  | `disastri/cena-dei-licenziamenti.webp` | La cena dei licenziamenti · famiglia `burocrazia` | media | La cena dei licenziamenti: Il Direttore invita tutti a cena: a fine serata, consegna delle buste.. Arena «Ufficio Open Space» (Riunioni infinite, fogli Excel e licenziamenti. Nessuno muore: si viene licenziati). Palette: verde petrolio, grigi e luci al neon da open space. Formato 16:9. |
+<details><summary>Prompt completo, pronto da incollare</summary>
 
-### Oggetti (1:1, 512×512, sfondo trasparente)
+```text
+A meeting room with a long glass table, empty chairs, a projector screen and a whiteboard with blurred scribbles. Teal green and grey palette with cold neon office light and monitor glow, satirical corporate comedy mood, non-violent. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Wide 16:9 establishing shot of the location, no people, eye-level view, the key landmark inside the central third of the frame, soft depth fog in the background. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
+```
 
-| | File | Soggetto | Priorità | Traccia |
-| --- | --- | --- | --- | --- |
-|  | `oggetti/arma.webp` | Asso nella manica | alta | Asso nella manica: Dà più forza negli scontri di reputazione, in base alla qualità (★). A ogni uso perde efficacia; un attrezzo può rimetterlo in sesto.. Arena «Ufficio Open Space» (Riunioni infinite, fogli Excel e licenziamenti. Nessuno muore: si viene licenziati). Palette: verde petrolio, grigi e luci al neon da open space. Formato 1:1. Sfondo trasparente. |
-|  | `oggetti/armatura.webp` | Protezione (per esempio scrivania d'angolo strategica, cuffie antirumore) | alta | Protezione (per esempio scrivania d'angolo strategica, cuffie antirumore): Attenua i colpi alla reputazione e a volte evita un'eliminazione diretta. A ogni colpo incassato perde efficacia.. Arena «Ufficio Open Space» (Riunioni infinite, fogli Excel e licenziamenti. Nessuno muore: si viene licenziati). Palette: verde petrolio, grigi e luci al neon da open space. Formato 1:1. Sfondo trasparente. |
-|  | `oggetti/med.webp` | Aiuto | alta | Aiuto: Serve a recuperare reputazione e a ridurre Ansia o Stress. Si può usare per sé o per aiutare gli alleati.. Arena «Ufficio Open Space» (Riunioni infinite, fogli Excel e licenziamenti. Nessuno muore: si viene licenziati). Palette: verde petrolio, grigi e luci al neon da open space. Formato 1:1. Sfondo trasparente. |
-|  | `oggetti/cibo.webp` | Cibo | alta | Cibo: Si mangia quando la sazietà cala. Si può dividere con gli alleati, regalare o scambiare.. Arena «Ufficio Open Space» (Riunioni infinite, fogli Excel e licenziamenti. Nessuno muore: si viene licenziati). Palette: verde petrolio, grigi e luci al neon da open space. Formato 1:1. Sfondo trasparente. |
-|  | `oggetti/attrezzo.webp` | Strumento (per esempio chiavetta USB con tutte le password, macro di Excel miracolosa) | alta | Strumento (per esempio chiavetta USB con tutte le password, macro di Excel miracolosa): Aiuta a trovare provviste, evitare tranelli e affrontare gli imprevisti. Può ridare efficacia agli assi nella manica.. Arena «Ufficio Open Space» (Riunioni infinite, fogli Excel e licenziamenti. Nessuno muore: si viene licenziati). Palette: verde petrolio, grigi e luci al neon da open space. Formato 1:1. Sfondo trasparente. |
-|  | `oggetti/mappa.webp` | Mappa | alta | Mappa: Più cibo, meno disastri, trappole scoperte in anticipo e vie di fuga sicure.. Arena «Ufficio Open Space» (Riunioni infinite, fogli Excel e licenziamenti. Nessuno muore: si viene licenziati). Palette: verde petrolio, grigi e luci al neon da open space. Formato 1:1. Sfondo trasparente. |
-|  | `oggetti/trap.webp` | Tranello | alta | Tranello: Si prepara nella propria zona durante la notte. Chi ci casca perde reputazione e rischia l'eliminazione, attribuita a chi ha preparato il tranello.. Arena «Ufficio Open Space» (Riunioni infinite, fogli Excel e licenziamenti. Nessuno muore: si viene licenziati). Palette: verde petrolio, grigi e luci al neon da open space. Formato 1:1. Sfondo trasparente. |
-|  | `oggetti/esplosivo.webp` | Colpo di scena | alta | Colpo di scena: Dà più forza negli scontri di reputazione e può rendere più efficace un tranello. Usarlo senza lucidità può causare una figuraccia.. Arena «Ufficio Open Space» (Riunioni infinite, fogli Excel e licenziamenti. Nessuno muore: si viene licenziati). Palette: verde petrolio, grigi e luci al neon da open space. Formato 1:1. Sfondo trasparente. |
-|  | `oggetti/veleno.webp` | Colpo basso | alta | Colpo basso: Pettegolezzi e segnalazioni aprono la strada a eventi che mettono in difficoltà i rivali e possono farli uscire dai giochi.. Arena «Ufficio Open Space» (Riunioni infinite, fogli Excel e licenziamenti. Nessuno muore: si viene licenziati). Palette: verde petrolio, grigi e luci al neon da open space. Formato 1:1. Sfondo trasparente. |
-|  | `oggetti/amuleto.webp` | Carta di riserva | alta | Carta di riserva: Può evitare un'eliminazione diretta narrata da un evento: probabilità 85%, certa per chi è superstizioso. Si consuma quando salva; non impedisce il ritiro per reputazione o energie esaurite.. Arena «Ufficio Open Space» (Riunioni infinite, fogli Excel e licenziamenti. Nessuno muore: si viene licenziati). Palette: verde petrolio, grigi e luci al neon da open space. Formato 1:1. Sfondo trasparente. |
-|  | `oggetti/alcol.webp` | Bevanda (per esempio amaro della cena aziendale) | alta | Bevanda (per esempio amaro della cena aziendale): Una pausa può abbassare Ansia e Stress, ma può anche ridurre lucidità ed energie. Nel Liceo si tratta di energy drink.. Arena «Ufficio Open Space» (Riunioni infinite, fogli Excel e licenziamenti. Nessuno muore: si viene licenziati). Palette: verde petrolio, grigi e luci al neon da open space. Formato 1:1. Sfondo trasparente. |
-|  | `oggetti/valore.webp` | Merce di scambio (per esempio buoni pasto, ferie arretrate) | alta | Merce di scambio (per esempio buoni pasto, ferie arretrate): Non serve a niente, tranne che a comprare cibo e cure da chi ne ha.. Arena «Ufficio Open Space» (Riunioni infinite, fogli Excel e licenziamenti. Nessuno muore: si viene licenziati). Palette: verde petrolio, grigi e luci al neon da open space. Formato 1:1. Sfondo trasparente. |
-|  | `oggetti/ricordo.webp` | Ricordo (per esempio foto del gatto, tazza con scritto «Il capo migliore del mondo») | alta | Ricordo (per esempio foto del gatto, tazza con scritto «Il capo migliore del mondo»): Un pezzo di casa: ogni notte tiene su il morale. Se è di qualcuno che non c'è più, ancora di più.. Arena «Ufficio Open Space» (Riunioni infinite, fogli Excel e licenziamenti. Nessuno muore: si viene licenziati). Palette: verde petrolio, grigi e luci al neon da open space. Formato 1:1. Sfondo trasparente. |
+</details>
+
+#### Open space
+
+- **File**: `assets/arene/ufficio/luoghi/open-space.webp`
+- **Cosa mostrare**: Open space sterminato con file di scrivanie, monitor e piante in vaso.
+
+**Prompt**
+
+```text
+A sprawling open-space office with rows of desks, monitors and potted plants.
+```
+
+<details><summary>Prompt completo, pronto da incollare</summary>
+
+```text
+A sprawling open-space office with rows of desks, monitors and potted plants. Teal green and grey palette with cold neon office light and monitor glow, satirical corporate comedy mood, non-violent. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Wide 16:9 establishing shot of the location, no people, eye-level view, the key landmark inside the central third of the frame, soft depth fog in the background. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
+```
+
+</details>
+
+#### Cucina
+
+- **File**: `assets/arene/ufficio/luoghi/cucina.webp`
+- **Cosa mostrare**: Angolo cucina con macchinetta del caffè, tazze, microonde e frigo pieno di bigliettini.
+
+**Prompt**
+
+```text
+The office kitchenette with a coffee machine, mugs, a microwave and a fridge covered in sticky notes.
+```
+
+<details><summary>Prompt completo, pronto da incollare</summary>
+
+```text
+The office kitchenette with a coffee machine, mugs, a microwave and a fridge covered in sticky notes. Teal green and grey palette with cold neon office light and monitor glow, satirical corporate comedy mood, non-violent. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Wide 16:9 establishing shot of the location, no people, eye-level view, the key landmark inside the central third of the frame, soft depth fog in the background. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
+```
+
+</details>
+
+#### Ufficio del direttore
+
+- **File**: `assets/arene/ufficio/luoghi/ufficio-del-direttore.webp`
+- **Cosa mostrare**: Ufficio d'angolo del Direttore con poltrona di pelle, vetrata panoramica e premi sugli scaffali.
+
+**Prompt**
+
+```text
+The director's corner office with a big leather chair, a panoramic window and trophies on shelves.
+```
+
+<details><summary>Prompt completo, pronto da incollare</summary>
+
+```text
+The director's corner office with a big leather chair, a panoramic window and trophies on shelves. Teal green and grey palette with cold neon office light and monitor glow, satirical corporate comedy mood, non-violent. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Wide 16:9 establishing shot of the location, no people, eye-level view, the key landmark inside the central third of the frame, soft depth fog in the background. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
+```
+
+</details>
+
+#### Sala stampanti
+
+- **File**: `assets/arene/ufficio/luoghi/sala-stampanti.webp`
+- **Cosa mostrare**: Stanzino delle stampanti con una fotocopiatrice inceppata che sputa fogli.
+
+**Prompt**
+
+```text
+A cramped printer room with a jammed copier spitting out paper.
+```
+
+<details><summary>Prompt completo, pronto da incollare</summary>
+
+```text
+A cramped printer room with a jammed copier spitting out paper. Teal green and grey palette with cold neon office light and monitor glow, satirical corporate comedy mood, non-violent. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Wide 16:9 establishing shot of the location, no people, eye-level view, the key landmark inside the central third of the frame, soft depth fog in the background. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
+```
+
+</details>
+
+#### Parcheggio
+
+- **File**: `assets/arene/ufficio/luoghi/parcheggio.webp`
+- **Cosa mostrare**: Parcheggio aziendale sotterraneo con posti riservati e neon.
+
+**Prompt**
+
+```text
+An underground company car park with reserved spaces and fluorescent lights.
+```
+
+<details><summary>Prompt completo, pronto da incollare</summary>
+
+```text
+An underground company car park with reserved spaces and fluorescent lights. Teal green and grey palette with cold neon office light and monitor glow, satirical corporate comedy mood, non-violent. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Wide 16:9 establishing shot of the location, no people, eye-level view, the key landmark inside the central third of the frame, soft depth fog in the background. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
+```
+
+</details>
+
+### Pericoli · Ufficio Open Space (4:3, 960 × 720 px, sfondo pieno e scuro)
+
+#### Direttore generale
+
+- **File**: `assets/arene/ufficio/pericoli/direttore-generale.webp`
+- **Cosa mostrare**: Caricatura dell'amministratore delegato in completo impeccabile, controluce davanti a una vetrata.
+
+**Prompt**
+
+```text
+A caricature of a CEO in a sharp suit, silhouetted against a tall window, power pose.
+```
+
+<details><summary>Prompt completo, pronto da incollare</summary>
+
+```text
+A caricature of a CEO in a sharp suit, silhouetted against a tall window, power pose. Teal green and grey palette with cold neon office light and monitor glow, satirical corporate comedy mood, non-violent. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. 4:3 wanted-poster portrait, single threat centered and facing the viewer, head and eyes in the upper middle of the frame, dark vignetted background that fades to near black at the edges. Light-hearted comic caricature, not scary, not violent, not resembling any real person. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
+```
+
+</details>
+
+#### Ufficio Risorse umane
+
+- **File**: `assets/arene/ufficio/pericoli/ufficio-risorse-umane.webp`
+- **Cosa mostrare**: Caricatura di una persona delle Risorse umane con un sorriso di circostanza e una pila di cartelline.
+
+**Prompt**
+
+```text
+A caricature of an HR officer with a polite fake smile holding a stack of folders.
+```
+
+<details><summary>Prompt completo, pronto da incollare</summary>
+
+```text
+A caricature of an HR officer with a polite fake smile holding a stack of folders. Teal green and grey palette with cold neon office light and monitor glow, satirical corporate comedy mood, non-violent. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. 4:3 wanted-poster portrait, single threat centered and facing the viewer, head and eyes in the upper middle of the frame, dark vignetted background that fades to near black at the edges. Light-hearted comic caricature, not scary, not violent, not resembling any real person. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
+```
+
+</details>
+
+#### Consulente esterno
+
+- **File**: `assets/arene/ufficio/pericoli/consulente-esterno.webp`
+- **Cosa mostrare**: Caricatura del consulente esterno con capelli impomatati, portatile e un grafico a torta olografico.
+
+**Prompt**
+
+```text
+A caricature of a slick external consultant with gelled hair, a laptop and a holographic pie chart.
+```
+
+<details><summary>Prompt completo, pronto da incollare</summary>
+
+```text
+A caricature of a slick external consultant with gelled hair, a laptop and a holographic pie chart. Teal green and grey palette with cold neon office light and monitor glow, satirical corporate comedy mood, non-violent. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. 4:3 wanted-poster portrait, single threat centered and facing the viewer, head and eyes in the upper middle of the frame, dark vignetted background that fades to near black at the edges. Light-hearted comic caricature, not scary, not violent, not resembling any real person. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
+```
+
+</details>
+
+#### Riorganizzazione aziendale
+
+- **File**: `assets/arene/ufficio/pericoli/riorganizzazione-aziendale.webp`
+- **Cosa mostrare**: La riorganizzazione personificata: un mostro di caselle e frecce di organigramma aggrovigliate.
+
+**Prompt**
+
+```text
+A corporate reorganization personified as a tangled monster made of org-chart boxes and arrows.
+```
+
+<details><summary>Prompt completo, pronto da incollare</summary>
+
+```text
+A corporate reorganization personified as a tangled monster made of org-chart boxes and arrows. Teal green and grey palette with cold neon office light and monitor glow, satirical corporate comedy mood, non-violent. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. 4:3 wanted-poster portrait, single threat centered and facing the viewer, head and eyes in the upper middle of the frame, dark vignetted background that fades to near black at the edges. Light-hearted comic caricature, not scary, not violent, not resembling any real person. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
+```
+
+</details>
+
+### Armi · Ufficio Open Space (1:1, 512 × 512 px, sfondo trasparente)
+
+#### Mail in copia a tutti
+
+- **File**: `assets/arene/ufficio/armi/mail-in-copia-a-tutti.webp`
+- **Cosa mostrare**: Busta di una mail che si moltiplica in tante copie luminose.
+
+**Prompt**
+
+```text
+An email envelope multiplying into many glowing copies.
+```
+
+<details><summary>Prompt completo, pronto da incollare</summary>
+
+```text
+An email envelope multiplying into many glowing copies. Teal green and grey palette with cold neon office light and monitor glow, satirical corporate comedy mood, non-violent. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Single object only, isolated on a fully transparent background, square 1:1, three-quarter view laid diagonally from lower left to upper right, 12% empty margin on every side, crisp silhouette with a thin dark outline so it reads on both light and dark backgrounds, no hands, no shadow on the ground. An everyday object used as a playful office or school prank, comic tone. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
+```
+
+</details>
+
+#### Report pieno di errori altrui
+
+- **File**: `assets/arene/ufficio/armi/report-pieno-di-errori-altrui.webp`
+- **Cosa mostrare**: Report stampato coperto di segni rossi e post-it.
+
+**Prompt**
+
+```text
+A printed report covered in red marks and sticky notes, no readable text.
+```
+
+<details><summary>Prompt completo, pronto da incollare</summary>
+
+```text
+A printed report covered in red marks and sticky notes, no readable text. Teal green and grey palette with cold neon office light and monitor glow, satirical corporate comedy mood, non-violent. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Single object only, isolated on a fully transparent background, square 1:1, three-quarter view laid diagonally from lower left to upper right, 12% empty margin on every side, crisp silhouette with a thin dark outline so it reads on both light and dark backgrounds, no hands, no shadow on the ground. An everyday object used as a playful office or school prank, comic tone. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
+```
+
+</details>
+
+#### Presentazione rubata
+
+- **File**: `assets/arene/ufficio/armi/presentazione-rubata.webp`
+- **Cosa mostrare**: Chiavetta USB con una slide proiettata e una mascherina da ladro.
+
+**Prompt**
+
+```text
+A USB stick projecting a slide, wearing a tiny burglar mask.
+```
+
+<details><summary>Prompt completo, pronto da incollare</summary>
+
+```text
+A USB stick projecting a slide, wearing a tiny burglar mask. Teal green and grey palette with cold neon office light and monitor glow, satirical corporate comedy mood, non-violent. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Single object only, isolated on a fully transparent background, square 1:1, three-quarter view laid diagonally from lower left to upper right, 12% empty margin on every side, crisp silhouette with a thin dark outline so it reads on both light and dark backgrounds, no hands, no shadow on the ground. An everyday object used as a playful office or school prank, comic tone. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
+```
+
+</details>
+
+#### Badge clonato del capo
+
+- **File**: `assets/arene/ufficio/armi/badge-clonato-del-capo.webp`
+- **Cosa mostrare**: Badge col cordino e una sua copia identica luminosa.
+
+**Prompt**
+
+```text
+An ID badge on a lanyard with a glowing duplicate copy beside it, blank photo area.
+```
+
+<details><summary>Prompt completo, pronto da incollare</summary>
+
+```text
+An ID badge on a lanyard with a glowing duplicate copy beside it, blank photo area. Teal green and grey palette with cold neon office light and monitor glow, satirical corporate comedy mood, non-violent. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Single object only, isolated on a fully transparent background, square 1:1, three-quarter view laid diagonally from lower left to upper right, 12% empty margin on every side, crisp silhouette with a thin dark outline so it reads on both light and dark backgrounds, no hands, no shadow on the ground. An everyday object used as a playful office or school prank, comic tone. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
+```
+
+</details>
+
+#### Foglio Excel con le prove
+
+- **File**: `assets/arene/ufficio/armi/foglio-excel-con-le-prove.webp`
+- **Cosa mostrare**: Stampa di un foglio di calcolo con celle evidenziate e una lente.
+
+**Prompt**
+
+```text
+A spreadsheet printout with highlighted cells and a magnifying glass, no readable numbers.
+```
+
+<details><summary>Prompt completo, pronto da incollare</summary>
+
+```text
+A spreadsheet printout with highlighted cells and a magnifying glass, no readable numbers. Teal green and grey palette with cold neon office light and monitor glow, satirical corporate comedy mood, non-violent. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Single object only, isolated on a fully transparent background, square 1:1, three-quarter view laid diagonally from lower left to upper right, 12% empty margin on every side, crisp silhouette with a thin dark outline so it reads on both light and dark backgrounds, no hands, no shadow on the ground. An everyday object used as a playful office or school prank, comic tone. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
+```
+
+</details>
+
+#### Nota spese gonfiata
+
+- **File**: `assets/arene/ufficio/armi/nota-spese-gonfiata.webp`
+- **Cosa mostrare**: Uno scontrino che si gonfia come un palloncino.
+
+**Prompt**
+
+```text
+A paper receipt inflating like a balloon.
+```
+
+<details><summary>Prompt completo, pronto da incollare</summary>
+
+```text
+A paper receipt inflating like a balloon. Teal green and grey palette with cold neon office light and monitor glow, satirical corporate comedy mood, non-violent. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Single object only, isolated on a fully transparent background, square 1:1, three-quarter view laid diagonally from lower left to upper right, 12% empty margin on every side, crisp silhouette with a thin dark outline so it reads on both light and dark backgrounds, no hands, no shadow on the ground. An everyday object used as a playful office or school prank, comic tone. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
+```
+
+</details>
