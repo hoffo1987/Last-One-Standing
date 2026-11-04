@@ -13,6 +13,32 @@ module.exports = {
     armi: { en: 'single object only, isolated on a fully transparent background, square 1:1, three-quarter view laid diagonally from lower left to upper right, 12% empty margin on every side, crisp silhouette with a thin dark outline so it reads on both light and dark backgrounds, no hands, no shadow on the ground' },
   },
 
+  // Midjourney v8.2: come si compone ogni comando (vedi tools/atlas-slots.js)
+  mj: {
+    version: '8.2',
+    // banner delle arene usati come riferimento di stile, dal repository pubblico
+    sref: (id) => 'https://raw.githubusercontent.com/hoffo1987/Last-One-Standing/main/assets/arene/' + id + '.webp',
+    medium: 'painterly digital game illustration, soft visible brushwork, clean graphic shapes, cinematic rim lighting, atmospheric depth',
+    luoghi: {
+      shot: 'wide establishing shot at eye level, an empty deserted location, the main landmark centered in the frame, layered depth with soft distant haze',
+      params: { ar: '16:9', sw: 300, s: 250, chaos: 8 },
+      no: 'text, letters, words, readable signs, logo, watermark, people, characters, frame, border',
+    },
+    pericoli: {
+      shot: 'dramatic portrait framed like a wanted poster, single subject centered and staring at the viewer, eyes in the upper half of the frame, dark vignette fading to near black at the edges',
+      soft: 'comic caricature portrait framed like a wanted poster, playful exaggerated features, single subject centered and looking at the viewer, eyes in the upper half of the frame, dark vignette fading to near black at the edges, funny rather than scary',
+      params: { ar: '4:3', sw: 250, s: 300, chaos: 8 },
+      no: 'text, letters, words, logo, watermark, frame, border, poster lettering',
+      noSoft: 'text, letters, words, logo, watermark, frame, border, poster lettering, blood, gore, weapons, real person',
+    },
+    armi: {
+      shot: 'single game inventory item, three-quarter view laid diagonally from lower left to upper right, centered with generous empty margin, crisp clean silhouette with a thin dark outline, isolated on a plain flat light grey background',
+      soft: 'single game inventory item, an everyday object turned into a playful prank weapon, three-quarter view laid diagonally from lower left to upper right, centered with generous empty margin, crisp clean silhouette with a thin dark outline, isolated on a plain flat light grey background',
+      params: { ar: '1:1', sw: 120, s: 150, chaos: 0 },
+      no: 'text, letters, logo, watermark, hands, person, scenery, background objects, cast shadow, frame, border',
+    },
+  },
+
   arenas: {
     classico: {
       look: 'Bosco selvaggio al tramonto: ambra, ocra e marroni caldi, ombre blu fredde, luce radente arancione. Tono da sopravvivenza, avventuroso più che splatter.',
@@ -220,7 +246,7 @@ module.exports = {
       style: 'pink, lilac and pastel palette, bright window light, playful satirical comedy mood, Italian high school, non-violent',
       luoghi: {
         palestra: ['Palestra della scuola con parquet, canestri, funi e tappetini impilati.', 'a school gym with a wooden floor, basketball hoops, climbing ropes and stacked mats'],
-        mensa: ['Mensa scolastica rumorosa con tavoli lunghi, vassoi e il bancone del pranzo.', 'a busy school cafeteria with long tables, food trays and a lunch counter, no people'],
+        mensa: ['Mensa scolastica rumorosa con tavoli lunghi, vassoi e il bancone del pranzo.', 'an empty school cafeteria after lunch, long tables, abandoned food trays and a steaming lunch counter'],
         biblioteca: ['Biblioteca scolastica silenziosa con scaffali e tavoli da studio.', 'a quiet school library with bookshelves, study tables and green desk lamps'],
         'laboratorio-di-chimica': ['Laboratorio di chimica con becher, cappa aspirante e fiasche colorate che bollono.', 'a chemistry lab with beakers, a fume hood and colourful bubbling flasks'],
         cortile: ['Cortile della scuola con panchine, un albero, motorini e zaini a terra.', 'the school courtyard with benches, a big tree, parked scooters and backpacks on the ground'],
@@ -235,7 +261,7 @@ module.exports = {
       armi: {
         'gossip-esplosivo': ['Smartphone con un fumetto di chat che esplode come un fuoco d\'artificio.', 'a smartphone with a glowing chat bubble bursting out of it like a firework'],
         'foto-imbarazzante': ['Polaroid con un\'immagine imbarazzante sfocata e un bagliore rosa.', 'a polaroid photo showing a blurred embarrassing picture, with a pink glow'],
-        'compito-copiato': ['Compito in classe con un bigliettino nascosto che spunta.', 'a folded test paper with a tiny cheat sheet sticking out, no readable writing'],
+        'compito-copiato': ['Compito in classe con un bigliettino nascosto che spunta.', 'a folded test paper with a tiny rolled cheat sheet sticking out, scribbled lines instead of writing'],
         'pallone-da-dodgeball': ['Pallone rosso da dodgeball con scie di movimento.', 'a red rubber dodgeball with motion streaks'],
         'registro-rubato': ['Registro di classe spesso con il segnalibro a nastro.', 'a thick class register book with a ribbon bookmark, plain cover'],
         'profilo-falso': ['Smartphone con un profilo social finto e l\'icona di una maschera.', 'a smartphone showing a fake social profile with a disguise mask icon'],
@@ -261,10 +287,10 @@ module.exports = {
       },
       armi: {
         'mail-in-copia-a-tutti': ['Busta di una mail che si moltiplica in tante copie luminose.', 'an email envelope multiplying into many glowing copies'],
-        'report-pieno-di-errori-altrui': ['Report stampato coperto di segni rossi e post-it.', 'a printed report covered in red marks and sticky notes, no readable text'],
+        'report-pieno-di-errori-altrui': ['Report stampato coperto di segni rossi e post-it.', 'a printed report covered in red correction marks and colourful sticky notes, abstract scribbled lines'],
         'presentazione-rubata': ['Chiavetta USB con una slide proiettata e una mascherina da ladro.', 'a USB stick projecting a slide, wearing a tiny burglar mask'],
         'badge-clonato-del-capo': ['Badge col cordino e una sua copia identica luminosa.', 'an ID badge on a lanyard with a glowing duplicate copy beside it, blank photo area'],
-        'foglio-excel-con-le-prove': ['Stampa di un foglio di calcolo con celle evidenziate e una lente.', 'a spreadsheet printout with highlighted cells and a magnifying glass, no readable numbers'],
+        'foglio-excel-con-le-prove': ['Stampa di un foglio di calcolo con celle evidenziate e una lente.', 'a spreadsheet printout with bright highlighted cells under a magnifying glass, abstract grid marks'],
         'nota-spese-gonfiata': ['Uno scontrino che si gonfia come un palloncino.', 'a paper receipt inflating like a balloon'],
       },
     },

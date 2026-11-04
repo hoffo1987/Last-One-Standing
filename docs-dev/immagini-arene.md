@@ -1,75 +1,71 @@
-# Immagini delle arene: luoghi, pericoli e armi
+# Immagini delle arene con Midjourney v8.2: luoghi, pericoli e armi
 
 _Generato da `node tools/atlas-slots.js` a partire da `tools/atlas-brief.js`: per cambiare un testo o un prompt modifica il brief e rigenera, non questo file._
 
-**Presenti: 0 su 156** (luoghi 0/54, pericoli 0/35, armi 0/67). Meteo, disastri e oggetti arriveranno in un secondo momento.
+**Presenti: 0 su 156** (luoghi 0/54, pericoli 0/35, armi 0/67). Meteo, disastri e oggetti arriveranno dopo.
 
-## In breve
+## 1. Impostazioni di Midjourney
 
-1. Genera l'immagine con il prompt della voce (in inglese, perché i generatori lo seguono meglio; sopra c'è sempre la descrizione in italiano).
-2. Esportala in **WebP** con le dimensioni della sua sezione e salvala con il **nome esatto** indicato, nella cartella indicata.
-3. Lancia `node tools/build.js`: il sito la usa al posto dell'illustrazione provvisoria. `node tools/atlas-slots.js` aggiorna i conteggi qui sopra (✓ accanto alle voci presenti).
+Ogni comando qui sotto contiene già tutti i parametri: copialo intero nella barra «Imagine» di midjourney.com (o dopo `/imagine` su Discord) e invia. I parametri scritti nel comando hanno la precedenza sul pannello, ma imposta comunque il pannello **Settings** così, una volta sola, per non avere sorprese:
 
-## Regole comuni
+| Impostazione | Valore | Perché |
+| --- | --- | --- |
+| **Version** | **8.2** | È il modello richiesto; è anche scritto in ogni comando (`--v 8.2`). |
+| **Personalization** | **spenta** | Il tuo profilo personale cambierebbe lo stile da un'immagine all'altra: deve comandare il banner dell'arena. |
+| **Mode / Raw** | **Standard (Raw spento)** | Il Raw toglie l'estetica di Midjourney; qui serve proprio quella pittorica, guidata dal riferimento di stile. |
+| **Stylization** | lascia il valore predefinito | Ogni comando lo fissa con `--s` (vedi la tabella sotto). |
+| **Weirdness** | **0** | Niente stranezze: le immagini devono essere coerenti tra loro. |
+| **Variety** | lascia il predefinito | Ogni comando lo fissa con `--chaos`. |
+| **HD** | **acceso** (se il tuo abbonamento lo prevede) | Esce a circa 2048 px: poi la riduco io alle misure del sito, più nitida. Se non c'è, va bene anche la risoluzione normale. |
+| **Speed** | Fast o Relax | Non cambia il risultato. Evita la modalità Draft: è più grezza e non va d'accordo con l'HD. |
+| **Stealth** | come preferisci | Non cambia il risultato. |
 
-- **Formato**: WebP con qualità 80–85. Si accettano anche PNG, JPG o AVIF con lo stesso nome (prevale il primo trovato tra webp, png, jpg, jpeg, avif). Profilo colore sRGB.
-- **Nomi**: minuscolo, senza accenti né apostrofi, parole separate da trattini, proprio come nell'elenco. Un nome diverso non viene trovato.
-- **Niente testo** dentro le immagini: niente scritte, cartelli leggibili, loghi o filigrane. I nomi li scrive il sito.
-- **Stile**: lo stesso dei banner delle arene (`assets/arene/<arena>.webp`). Il modo più sicuro per restare coerenti è dare al generatore **il banner dell'arena come immagine di riferimento** e creare tutte le immagini di un'arena nella stessa sessione.
-- **Persone**: nessuna persona reale riconoscibile. Nel Liceo e nell'Ufficio i pericoli sono caricature comiche.
-- **Peso**: entro i limiti della tabella; il sito carica le immagini solo quando servono, ma pesi alti rallentano il telefono.
-- **Il file unico** `dist/last-one-standing.html` non incorpora queste immagini (diventerebbe enorme): le mostra il sito.
+### Parametri usati in ogni sezione
 
-| Sezione | Proporzioni | Dimensioni | Minimo | Sfondo | Peso massimo | Quante |
-| --- | --- | --- | --- | --- | --- | --- |
-| Luoghi | 16:9 | 1280 × 720 px | 960 × 540 px | pieno | 150 KB | 54 |
-| Pericoli | 4:3 | 960 × 720 px | 800 × 600 px | pieno e scuro | 120 KB | 35 |
-| Armi | 1:1 | 512 × 512 px | 384 × 384 px | trasparente | 60 KB | 67 |
+| Sezione | Formato `--ar` | Stile `--s` | Peso del riferimento `--sw` | Varietà `--chaos` | Esclusi `--no` |
+| --- | --- | --- | --- | --- | --- |
+| Luoghi | 16:9 | 250 | 300 | 8 | text, letters, words, readable signs, logo, watermark, people, characters, frame, border |
+| Pericoli | 4:3 | 300 | 250 | 8 | text, letters, words, logo, watermark, frame, border, poster lettering (nel Liceo e nell'Ufficio anche: blood, gore, weapons, real person) |
+| Armi | 1:1 | 150 | 120 | 0 | text, letters, logo, watermark, hands, person, scenery, background objects, cast shadow, frame, border |
 
-### Luoghi: come appaiono e come comporle
+- **`--sref`** è il banner dell'arena, preso dal repository pubblico: tutte le immagini di un'arena ne ereditano palette, luce e pennellata, quindi stanno bene accanto al banner e tra loro. **`--sw`** dice quanto pesa: alto per luoghi e pericoli (devono sembrare la stessa arena), basso per le armi (devono restare oggetti puliti, non paesaggi).
+- **`--s`** (stylize) dà a Midjourney spazio per rendere l'immagine più ricca: più alto nei pericoli, più basso nelle armi, dove serve una sagoma semplice.
+- **`--chaos`** a 8 varia un po' le quattro proposte di luoghi e pericoli; a 0 per le armi, che devono uscire composte sempre allo stesso modo.
+- **`--no`** tiene fuori scritte, loghi, cornici e persone: i nomi li scrive il sito, e una cornice disegnata stonerebbe con le schede.
+- Se Midjourney rifiuta un parametro (gli aggiornamenti a volte ne cambiano i limiti), toglilo dal comando e rilancia: il resto funziona da solo. Se non riesce a leggere il link del banner, scaricalo dal sito, caricalo nella barra «Imagine» come **Style reference** e togli `--sref …` dal comando.
 
-Scheda della zona nel capitolo Mappa. Al computer l'immagine occupa la parte alta della scheda in 16:9, larga circa 270 px. Sul telefono diventa una colonna a sinistra di 120 × 140 px circa: si vede solo la **fascia centrale verticale**, poco meno di metà della larghezza.
+## 2. Come lavorare, arena per arena
 
-- Il punto di riconoscimento del luogo (la Cornucopia, la torre, il bancone…) va nel **terzo centrale**.
-- Inquadratura ad altezza d'occhio, profondità con un po' di foschia sullo sfondo.
-- Nessuna persona: il luogo deve sembrare pronto per i concorrenti.
-- L'immagine si vede piccola: servono contrasti netti tra primo piano e sfondo e poche cose ben riconoscibili, non una scena affollata.
+1. Apri il capitolo dell'arena qui sotto e genera le voci **una dopo l'altra nella stessa sessione**: con lo stesso riferimento escono coerenti.
+2. Di ogni comando ottieni quattro proposte: scegli la migliore seguendo il consiglio della sezione e, se serve, usa **Vary (Subtle)** per piccoli ritocchi. Evita Vary (Strong): cambia troppo.
+3. Scarica l'immagine scelta in **PNG**. Al nome non pensarci: mandamele anche così, dicendomi a quale voce corrispondono, oppure chiamale già con il nome del file indicato.
+4. **Al resto penso io**: ritaglio alle proporzioni giuste, riduzione alle misure del sito, scontorno delle armi (per questo le facciamo su fondo grigio uniforme: Midjourney non crea sfondi trasparenti), conversione in WebP, nomi e cartelle. Poi il sito le usa al posto delle illustrazioni provvisorie.
 
-### Pericoli: come appaiono e come comporle
+## 3. Come appaiono nel sito
 
-Manifesto «ricercato» appeso nel capitolo Mappa: carta color avorio, puntina rossa, leggermente inclinato. L'immagine è un 4:3 largo circa 190 px al computer e 150 px sul telefono, con il nome scritto sotto dal sito.
+| Sezione | Dove si vede | Misura finale | Sfondo finale | Quante |
+| --- | --- | --- | --- | --- |
+| Luoghi | Scheda della zona nel capitolo Mappa | 1280 × 720 px (16:9) | pieno | 54 |
+| Pericoli | Manifesto «ricercato» appeso nel capitolo Mappa: carta color avorio, puntina rossa, leggermente inclinato | 960 × 720 px (4:3) | pieno e scuro | 35 |
+| Armi | Rastrelliera dell'armeria nel capitolo Mappa: ogni arma sta in una piastrella arrotondata di **62 × 62 px**, sia su fondo chiaro sia su fondo scuro. | 512 × 512 px (1:1) | trasparente (lo scontorno lo faccio io) | 67 |
 
-- Un solo soggetto (o un gruppo che si legge come uno), **centrato e rivolto verso chi guarda**.
-- Testa e occhi nella metà alta: il ritaglio toglie pochissimo dai bordi, ma i bordi devono essere sacrificabili.
-- Sfondo scuro che sfuma quasi al nero ai bordi: sul manifesto chiaro fa da cornice.
-- Nel Liceo e nell'Ufficio sono **caricature comiche**, mai minacciose o violente, e non devono somigliare a persone reali.
-
-### Armi: come appaiono e come comporle
-
-Rastrelliera dell'armeria nel capitolo Mappa: ogni arma sta in una piastrella arrotondata di **62 × 62 px**, sia su fondo chiaro sia su fondo scuro (tema notte).
-
-- Un solo oggetto, **sfondo completamente trasparente** (WebP o PNG con canale alfa).
-- Disposto in diagonale dal basso a sinistra all'alto a destra, con circa il **12% di margine** su ogni lato.
-- Sagoma netta con un sottile contorno scuro, così si legge su fondo chiaro e scuro; niente ombra a terra, niente mani.
-- Deve riconoscersi a 62 px: forme semplici, pochi dettagli minuti.
-
-### Come sono fatti i prompt
-
-Ogni voce ha un **prompt breve**, scritto apposta per quel soggetto. Il **prompt completo** (si apre sotto ogni voce) aggiunge, nell'ordine, lo stile dell'arena, lo stile comune del gioco, le regole della sezione (inquadratura, sfondo, margini) e i divieti (niente testo, loghi, persone reali). Puoi usare il completo così com'è, oppure impostare stile e regole una volta sola nel generatore e incollare solo i prompt brevi. Se il generatore ha un campo per il «negative prompt», sposta lì la frase dei divieti.
+- **Luoghi**: Scheda della zona nel capitolo Mappa. Al computer l'immagine sta in alto nella scheda, in 16:9, larga circa 270 px. Sul telefono diventa una colonna a sinistra di circa 120 × 140 px: si vede solo la **fascia centrale verticale**. Tra le quattro proposte scegli quella con il luogo **più riconoscibile al centro** e meno dettagli minuti: deve funzionare anche piccola.
+- **Pericoli**: Manifesto «ricercato» appeso nel capitolo Mappa: carta color avorio, puntina rossa, leggermente inclinato. L'immagine è un 4:3 largo circa 190 px al computer e 150 px sul telefono, con il nome scritto sotto dal sito. Scegli quella con il soggetto **centrato, che guarda verso di te**, e i bordi scuri. Nel Liceo e nell'Ufficio deve far sorridere, non paura.
+- **Armi**: Rastrelliera dell'armeria nel capitolo Mappa: ogni arma sta in una piastrella arrotondata di **62 × 62 px**, sia su fondo chiaro sia su fondo scuro. Scegli quella con **un solo oggetto intero**, ben staccato dal fondo grigio uniforme, senza ombre a terra: così lo scontorno viene pulito.
 
 ## Indice
 
-| Arena | Cartella | Luoghi | Pericoli | Armi |
+| Arena | Banner usato come stile | Luoghi | Pericoli | Armi |
 | --- | --- | --- | --- | --- |
-| [Arena Classica](#arena-classica) | `assets/arene/classico/` | 6 | 4 | 10 |
-| [Reame Incantato](#reame-incantato) | `assets/arene/fantasy/` | 6 | 4 | 8 |
-| [Stazione Orbitale](#stazione-orbitale) | `assets/arene/scifi/` | 6 | 4 | 7 |
-| [Città degli Infetti](#città-degli-infetti) | `assets/arene/zombie/` | 6 | 4 | 8 |
-| [Isola Battle Royale](#isola-battle-royale) | `assets/arene/royale/` | 6 | 3 | 8 |
-| [Villa Maledetta](#villa-maledetta) | `assets/arene/horror/` | 6 | 4 | 7 |
-| [Terre Desolate](#terre-desolate) | `assets/arene/wasteland/` | 6 | 4 | 7 |
-| [Liceo Spietato](#liceo-spietato) | `assets/arene/liceo/` | 6 | 4 | 6 |
-| [Ufficio Open Space](#ufficio-open-space) | `assets/arene/ufficio/` | 6 | 4 | 6 |
+| [Arena Classica](#arena-classica) | [classico.webp](https://raw.githubusercontent.com/hoffo1987/Last-One-Standing/main/assets/arene/classico.webp) | 6 | 4 | 10 |
+| [Reame Incantato](#reame-incantato) | [fantasy.webp](https://raw.githubusercontent.com/hoffo1987/Last-One-Standing/main/assets/arene/fantasy.webp) | 6 | 4 | 8 |
+| [Stazione Orbitale](#stazione-orbitale) | [scifi.webp](https://raw.githubusercontent.com/hoffo1987/Last-One-Standing/main/assets/arene/scifi.webp) | 6 | 4 | 7 |
+| [Città degli Infetti](#città-degli-infetti) | [zombie.webp](https://raw.githubusercontent.com/hoffo1987/Last-One-Standing/main/assets/arene/zombie.webp) | 6 | 4 | 8 |
+| [Isola Battle Royale](#isola-battle-royale) | [royale.webp](https://raw.githubusercontent.com/hoffo1987/Last-One-Standing/main/assets/arene/royale.webp) | 6 | 3 | 8 |
+| [Villa Maledetta](#villa-maledetta) | [horror.webp](https://raw.githubusercontent.com/hoffo1987/Last-One-Standing/main/assets/arene/horror.webp) | 6 | 4 | 7 |
+| [Terre Desolate](#terre-desolate) | [wasteland.webp](https://raw.githubusercontent.com/hoffo1987/Last-One-Standing/main/assets/arene/wasteland.webp) | 6 | 4 | 7 |
+| [Liceo Spietato](#liceo-spietato) | [liceo.webp](https://raw.githubusercontent.com/hoffo1987/Last-One-Standing/main/assets/arene/liceo.webp) | 6 | 4 | 6 |
+| [Ufficio Open Space](#ufficio-open-space) | [ufficio.webp](https://raw.githubusercontent.com/hoffo1987/Last-One-Standing/main/assets/arene/ufficio.webp) | 6 | 4 | 6 |
 
 ---
 
@@ -77,407 +73,194 @@ Ogni voce ha un **prompt breve**, scritto apposta per quel soggetto. Il **prompt
 
 Boschi, fiumi e una Cornucopia piena di armi.
 
-- **Cartella**: `assets/arene/classico/` (con le sottocartelle `luoghi/`, `pericoli/`, `armi/`)
-- **Riferimento di stile**: `assets/arene/classico.webp`
 - **Atmosfera**: Bosco selvaggio al tramonto: ambra, ocra e marroni caldi, ombre blu fredde, luce radente arancione. Tono da sopravvivenza, avventuroso più che splatter.
-- **Stile da aggiungere a ogni prompt di questa arena** (è già incluso nei prompt completi):
+- **Riferimento di stile** (`--sref`): [https://raw.githubusercontent.com/hoffo1987/Last-One-Standing/main/assets/arene/classico.webp](https://raw.githubusercontent.com/hoffo1987/Last-One-Standing/main/assets/arene/classico.webp)
 
-```text
-Warm amber, ochre and brown sunset palette with cool blue shadows, wild forest survival arena. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours.
-```
-
-Più, a seconda della sezione:
-
-- Luoghi: `Wide 16:9 establishing shot of the location, no people, eye-level view, the key landmark inside the central third of the frame, soft depth fog in the background.`
-- Pericoli: `4:3 wanted-poster portrait, single threat centered and facing the viewer, head and eyes in the upper middle of the frame, dark vignetted background that fades to near black at the edges.`
-- Armi: `Single object only, isolated on a fully transparent background, square 1:1, three-quarter view laid diagonally from lower left to upper right, 12% empty margin on every side, crisp silhouette with a thin dark outline so it reads on both light and dark backgrounds, no hands, no shadow on the ground.`
-- Sempre: `No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.`
-
-### Luoghi · Arena Classica (16:9, 1280 × 720 px, sfondo pieno)
+### Luoghi · Arena Classica
 
 #### Cornucopia
 
-- **File**: `assets/arene/classico/luoghi/cornucopia.webp`
-- **Cosa mostrare**: La Cornucopia dorata su un poggio roccioso al centro di una radura, che trabocca di armi, zaini e casse.
-
-**Prompt**
+La Cornucopia dorata su un poggio roccioso al centro di una radura, che trabocca di armi, zaini e casse.  
+File: `assets/arene/classico/luoghi/cornucopia.webp`
 
 ```text
-A giant golden horn-shaped cornucopia resting on a rocky mound in a forest clearing, spilling weapons, backpacks and supply crates onto the grass.
+A giant golden horn-shaped cornucopia resting on a rocky mound in a forest clearing, spilling weapons, backpacks and supply crates onto the grass, wide establishing shot at eye level, an empty deserted location, the main landmark centered in the frame, layered depth with soft distant haze, warm amber, ochre and brown sunset palette with cool blue shadows, wild forest survival arena, painterly digital game illustration, soft visible brushwork, clean graphic shapes, cinematic rim lighting, atmospheric depth --v 8.2 --ar 16:9 --s 250 --chaos 8 --sref https://raw.githubusercontent.com/hoffo1987/Last-One-Standing/main/assets/arene/classico.webp --sw 300 --no text, letters, words, readable signs, logo, watermark, people, characters, frame, border
 ```
-
-<details><summary>Prompt completo, pronto da incollare</summary>
-
-```text
-A giant golden horn-shaped cornucopia resting on a rocky mound in a forest clearing, spilling weapons, backpacks and supply crates onto the grass. Warm amber, ochre and brown sunset palette with cool blue shadows, wild forest survival arena. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Wide 16:9 establishing shot of the location, no people, eye-level view, the key landmark inside the central third of the frame, soft depth fog in the background. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
-```
-
-</details>
 
 #### Bosco
 
-- **File**: `assets/arene/classico/luoghi/bosco.webp`
-- **Cosa mostrare**: Bosco fitto e antico all'imbrunire, lame di luce tra i tronchi e un sentiero nascosto.
-
-**Prompt**
+Bosco fitto e antico all'imbrunire, lame di luce tra i tronchi e un sentiero nascosto.  
+File: `assets/arene/classico/luoghi/bosco.webp`
 
 ```text
-A dense ancient pine forest at dusk, shafts of golden light between tall trunks, ferns and a narrow hidden trail.
+A dense ancient pine forest at dusk, shafts of golden light between tall trunks, ferns and a narrow hidden trail, wide establishing shot at eye level, an empty deserted location, the main landmark centered in the frame, layered depth with soft distant haze, warm amber, ochre and brown sunset palette with cool blue shadows, wild forest survival arena, painterly digital game illustration, soft visible brushwork, clean graphic shapes, cinematic rim lighting, atmospheric depth --v 8.2 --ar 16:9 --s 250 --chaos 8 --sref https://raw.githubusercontent.com/hoffo1987/Last-One-Standing/main/assets/arene/classico.webp --sw 300 --no text, letters, words, readable signs, logo, watermark, people, characters, frame, border
 ```
-
-<details><summary>Prompt completo, pronto da incollare</summary>
-
-```text
-A dense ancient pine forest at dusk, shafts of golden light between tall trunks, ferns and a narrow hidden trail. Warm amber, ochre and brown sunset palette with cool blue shadows, wild forest survival arena. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Wide 16:9 establishing shot of the location, no people, eye-level view, the key landmark inside the central third of the frame, soft depth fog in the background. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
-```
-
-</details>
 
 #### Fiume
 
-- **File**: `assets/arene/classico/luoghi/fiume.webp`
-- **Cosa mostrare**: Fiume tortuoso tra massi coperti di muschio, piccole rapide e un tronco caduto che fa da ponte.
-
-**Prompt**
+Fiume tortuoso tra massi coperti di muschio, piccole rapide e un tronco caduto che fa da ponte.  
+File: `assets/arene/classico/luoghi/fiume.webp`
 
 ```text
-A winding river between mossy boulders, shallow rapids reflecting the orange sky, a fallen log used as a bridge.
+A winding river between mossy boulders, shallow rapids reflecting the orange sky, a fallen log used as a bridge, wide establishing shot at eye level, an empty deserted location, the main landmark centered in the frame, layered depth with soft distant haze, warm amber, ochre and brown sunset palette with cool blue shadows, wild forest survival arena, painterly digital game illustration, soft visible brushwork, clean graphic shapes, cinematic rim lighting, atmospheric depth --v 8.2 --ar 16:9 --s 250 --chaos 8 --sref https://raw.githubusercontent.com/hoffo1987/Last-One-Standing/main/assets/arene/classico.webp --sw 300 --no text, letters, words, readable signs, logo, watermark, people, characters, frame, border
 ```
-
-<details><summary>Prompt completo, pronto da incollare</summary>
-
-```text
-A winding river between mossy boulders, shallow rapids reflecting the orange sky, a fallen log used as a bridge. Warm amber, ochre and brown sunset palette with cool blue shadows, wild forest survival arena. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Wide 16:9 establishing shot of the location, no people, eye-level view, the key landmark inside the central third of the frame, soft depth fog in the background. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
-```
-
-</details>
 
 #### Paludi
 
-- **File**: `assets/arene/classico/luoghi/paludi.webp`
-- **Cosa mostrare**: Palude scura con canne, alberi morti contorti e nebbia bassa sull'acqua.
-
-**Prompt**
+Palude scura con canne, alberi morti contorti e nebbia bassa sull'acqua.  
+File: `assets/arene/classico/luoghi/paludi.webp`
 
 ```text
-A murky marsh with tall reeds, twisted dead trees and low mist over black water, a few fireflies.
+A murky marsh with tall reeds, twisted dead trees and low mist over black water, a few fireflies, wide establishing shot at eye level, an empty deserted location, the main landmark centered in the frame, layered depth with soft distant haze, warm amber, ochre and brown sunset palette with cool blue shadows, wild forest survival arena, painterly digital game illustration, soft visible brushwork, clean graphic shapes, cinematic rim lighting, atmospheric depth --v 8.2 --ar 16:9 --s 250 --chaos 8 --sref https://raw.githubusercontent.com/hoffo1987/Last-One-Standing/main/assets/arene/classico.webp --sw 300 --no text, letters, words, readable signs, logo, watermark, people, characters, frame, border
 ```
-
-<details><summary>Prompt completo, pronto da incollare</summary>
-
-```text
-A murky marsh with tall reeds, twisted dead trees and low mist over black water, a few fireflies. Warm amber, ochre and brown sunset palette with cool blue shadows, wild forest survival arena. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Wide 16:9 establishing shot of the location, no people, eye-level view, the key landmark inside the central third of the frame, soft depth fog in the background. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
-```
-
-</details>
 
 #### Rovine
 
-- **File**: `assets/arene/classico/luoghi/rovine.webp`
-- **Cosa mostrare**: Rovine di un antico tempio in pietra invase dai rampicanti, colonne spezzate e un arco crollato.
-
-**Prompt**
+Rovine di un antico tempio in pietra invase dai rampicanti, colonne spezzate e un arco crollato.  
+File: `assets/arene/classico/luoghi/rovine.webp`
 
 ```text
-Crumbling stone ruins of an ancient temple overgrown with vines, broken columns and a collapsed archway.
+Crumbling stone ruins of an ancient temple overgrown with vines, broken columns and a collapsed archway, wide establishing shot at eye level, an empty deserted location, the main landmark centered in the frame, layered depth with soft distant haze, warm amber, ochre and brown sunset palette with cool blue shadows, wild forest survival arena, painterly digital game illustration, soft visible brushwork, clean graphic shapes, cinematic rim lighting, atmospheric depth --v 8.2 --ar 16:9 --s 250 --chaos 8 --sref https://raw.githubusercontent.com/hoffo1987/Last-One-Standing/main/assets/arene/classico.webp --sw 300 --no text, letters, words, readable signs, logo, watermark, people, characters, frame, border
 ```
-
-<details><summary>Prompt completo, pronto da incollare</summary>
-
-```text
-Crumbling stone ruins of an ancient temple overgrown with vines, broken columns and a collapsed archway. Warm amber, ochre and brown sunset palette with cool blue shadows, wild forest survival arena. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Wide 16:9 establishing shot of the location, no people, eye-level view, the key landmark inside the central third of the frame, soft depth fog in the background. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
-```
-
-</details>
 
 #### Altopiano
 
-- **File**: `assets/arene/classico/luoghi/altopiano.webp`
-- **Cosa mostrare**: Altopiano roccioso spazzato dal vento, erba brinata e montagne lontane: il posto più freddo dell'arena.
-
-**Prompt**
+Altopiano roccioso spazzato dal vento, erba brinata e montagne lontane: il posto più freddo dell'arena.  
+File: `assets/arene/classico/luoghi/altopiano.webp`
 
 ```text
-A windswept rocky highland plateau with sparse frosted grass and distant mountains, cold blue shadows under a warm sky.
+A windswept rocky highland plateau with sparse frosted grass and distant mountains, cold blue shadows under a warm sky, wide establishing shot at eye level, an empty deserted location, the main landmark centered in the frame, layered depth with soft distant haze, warm amber, ochre and brown sunset palette with cool blue shadows, wild forest survival arena, painterly digital game illustration, soft visible brushwork, clean graphic shapes, cinematic rim lighting, atmospheric depth --v 8.2 --ar 16:9 --s 250 --chaos 8 --sref https://raw.githubusercontent.com/hoffo1987/Last-One-Standing/main/assets/arene/classico.webp --sw 300 --no text, letters, words, readable signs, logo, watermark, people, characters, frame, border
 ```
 
-<details><summary>Prompt completo, pronto da incollare</summary>
-
-```text
-A windswept rocky highland plateau with sparse frosted grass and distant mountains, cold blue shadows under a warm sky. Warm amber, ochre and brown sunset palette with cool blue shadows, wild forest survival arena. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Wide 16:9 establishing shot of the location, no people, eye-level view, the key landmark inside the central third of the frame, soft depth fog in the background. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
-```
-
-</details>
-
-### Pericoli · Arena Classica (4:3, 960 × 720 px, sfondo pieno e scuro)
+### Pericoli · Arena Classica
 
 #### Branco di lupi mutanti
 
-- **File**: `assets/arene/classico/pericoli/branco-di-lupi-mutanti.webp`
-- **Cosa mostrare**: Branco di lupi mutanti con occhi ambra e chiazze di pelo metallico, che escono ringhiando dagli alberi.
-
-**Prompt**
+Branco di lupi mutanti con occhi ambra e chiazze di pelo metallico, che escono ringhiando dagli alberi.  
+File: `assets/arene/classico/pericoli/branco-di-lupi-mutanti.webp`
 
 ```text
-A pack of three mutated wolves with glowing amber eyes and patches of metallic fur, snarling as they step out of shadowy trees.
+A pack of three mutated wolves with glowing amber eyes and patches of metallic fur, snarling as they step out of shadowy trees, dramatic portrait framed like a wanted poster, single subject centered and staring at the viewer, eyes in the upper half of the frame, dark vignette fading to near black at the edges, warm amber, ochre and brown sunset palette with cool blue shadows, wild forest survival arena, painterly digital game illustration, soft visible brushwork, clean graphic shapes, cinematic rim lighting, atmospheric depth --v 8.2 --ar 4:3 --s 300 --chaos 8 --sref https://raw.githubusercontent.com/hoffo1987/Last-One-Standing/main/assets/arene/classico.webp --sw 250 --no text, letters, words, logo, watermark, frame, border, poster lettering
 ```
-
-<details><summary>Prompt completo, pronto da incollare</summary>
-
-```text
-A pack of three mutated wolves with glowing amber eyes and patches of metallic fur, snarling as they step out of shadowy trees. Warm amber, ochre and brown sunset palette with cool blue shadows, wild forest survival arena. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. 4:3 wanted-poster portrait, single threat centered and facing the viewer, head and eyes in the upper middle of the frame, dark vignetted background that fades to near black at the edges. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
-```
-
-</details>
 
 #### Sciame di vespe velenose
 
-- **File**: `assets/arene/classico/pericoli/sciame-di-vespe-velenose.webp`
-- **Cosa mostrare**: Sciame di vespe giganti e velenose; una in primo piano, nitida, con il pungiglione in vista.
-
-**Prompt**
+Sciame di vespe giganti e velenose; una in primo piano, nitida, con il pungiglione in vista.  
+File: `assets/arene/classico/pericoli/sciame-di-vespe-velenose.webp`
 
 ```text
-A menacing swarm of oversized venomous wasps with glowing yellow stripes, one wasp in sharp focus in the foreground with its stinger visible.
+A menacing swarm of oversized venomous wasps with glowing yellow stripes, one wasp in sharp focus in the foreground with its stinger visible, dramatic portrait framed like a wanted poster, single subject centered and staring at the viewer, eyes in the upper half of the frame, dark vignette fading to near black at the edges, warm amber, ochre and brown sunset palette with cool blue shadows, wild forest survival arena, painterly digital game illustration, soft visible brushwork, clean graphic shapes, cinematic rim lighting, atmospheric depth --v 8.2 --ar 4:3 --s 300 --chaos 8 --sref https://raw.githubusercontent.com/hoffo1987/Last-One-Standing/main/assets/arene/classico.webp --sw 250 --no text, letters, words, logo, watermark, frame, border, poster lettering
 ```
-
-<details><summary>Prompt completo, pronto da incollare</summary>
-
-```text
-A menacing swarm of oversized venomous wasps with glowing yellow stripes, one wasp in sharp focus in the foreground with its stinger visible. Warm amber, ochre and brown sunset palette with cool blue shadows, wild forest survival arena. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. 4:3 wanted-poster portrait, single threat centered and facing the viewer, head and eyes in the upper middle of the frame, dark vignetted background that fades to near black at the edges. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
-```
-
-</details>
 
 #### Orso affamato
 
-- **File**: `assets/arene/classico/pericoli/orso-affamato.webp`
-- **Cosa mostrare**: Enorme orso bruno affamato, ritto sulle zampe posteriori, muso segnato da cicatrici.
-
-**Prompt**
+Enorme orso bruno affamato, ritto sulle zampe posteriori, muso segnato da cicatrici.  
+File: `assets/arene/classico/pericoli/orso-affamato.webp`
 
 ```text
-A huge starving brown bear rearing up on its hind legs, scarred muzzle, ribs showing, hungry eyes.
+A huge starving brown bear rearing up on its hind legs, scarred muzzle, ribs showing, hungry eyes, dramatic portrait framed like a wanted poster, single subject centered and staring at the viewer, eyes in the upper half of the frame, dark vignette fading to near black at the edges, warm amber, ochre and brown sunset palette with cool blue shadows, wild forest survival arena, painterly digital game illustration, soft visible brushwork, clean graphic shapes, cinematic rim lighting, atmospheric depth --v 8.2 --ar 4:3 --s 300 --chaos 8 --sref https://raw.githubusercontent.com/hoffo1987/Last-One-Standing/main/assets/arene/classico.webp --sw 250 --no text, letters, words, logo, watermark, frame, border, poster lettering
 ```
-
-<details><summary>Prompt completo, pronto da incollare</summary>
-
-```text
-A huge starving brown bear rearing up on its hind legs, scarred muzzle, ribs showing, hungry eyes. Warm amber, ochre and brown sunset palette with cool blue shadows, wild forest survival arena. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. 4:3 wanted-poster portrait, single threat centered and facing the viewer, head and eyes in the upper middle of the frame, dark vignetted background that fades to near black at the edges. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
-```
-
-</details>
 
 #### Serpente gigante
 
-- **File**: `assets/arene/classico/pericoli/serpente-gigante.webp`
-- **Cosa mostrare**: Serpente gigante dalle squame smeraldo, avvolto su sé stesso con la testa alzata.
-
-**Prompt**
+Serpente gigante dalle squame smeraldo, avvolto su sé stesso con la testa alzata.  
+File: `assets/arene/classico/pericoli/serpente-gigante.webp`
 
 ```text
-A giant coiled serpent with emerald scales raising its head, forked tongue out, eyes catching the sunset light.
+A giant coiled serpent with emerald scales raising its head, forked tongue out, eyes catching the sunset light, dramatic portrait framed like a wanted poster, single subject centered and staring at the viewer, eyes in the upper half of the frame, dark vignette fading to near black at the edges, warm amber, ochre and brown sunset palette with cool blue shadows, wild forest survival arena, painterly digital game illustration, soft visible brushwork, clean graphic shapes, cinematic rim lighting, atmospheric depth --v 8.2 --ar 4:3 --s 300 --chaos 8 --sref https://raw.githubusercontent.com/hoffo1987/Last-One-Standing/main/assets/arene/classico.webp --sw 250 --no text, letters, words, logo, watermark, frame, border, poster lettering
 ```
 
-<details><summary>Prompt completo, pronto da incollare</summary>
-
-```text
-A giant coiled serpent with emerald scales raising its head, forked tongue out, eyes catching the sunset light. Warm amber, ochre and brown sunset palette with cool blue shadows, wild forest survival arena. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. 4:3 wanted-poster portrait, single threat centered and facing the viewer, head and eyes in the upper middle of the frame, dark vignetted background that fades to near black at the edges. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
-```
-
-</details>
-
-### Armi · Arena Classica (1:1, 512 × 512 px, sfondo trasparente)
+### Armi · Arena Classica
 
 #### Coltello
 
-- **File**: `assets/arene/classico/armi/coltello.webp`
-- **Cosa mostrare**: Coltello da sopravvivenza con manico in cuoio.
-
-**Prompt**
+Coltello da sopravvivenza con manico in cuoio.  
+File: `assets/arene/classico/armi/coltello.webp`
 
 ```text
-A sturdy survival knife with a leather-wrapped handle and a clip-point steel blade.
+A sturdy survival knife with a leather-wrapped handle and a clip-point steel blade, single game inventory item, three-quarter view laid diagonally from lower left to upper right, centered with generous empty margin, crisp clean silhouette with a thin dark outline, isolated on a plain flat light grey background, warm amber, ochre and brown sunset palette with cool blue shadows, wild forest survival arena, painterly digital game illustration, soft visible brushwork, clean graphic shapes, cinematic rim lighting, atmospheric depth --v 8.2 --ar 1:1 --s 150 --chaos 0 --sref https://raw.githubusercontent.com/hoffo1987/Last-One-Standing/main/assets/arene/classico.webp --sw 120 --no text, letters, logo, watermark, hands, person, scenery, background objects, cast shadow, frame, border
 ```
-
-<details><summary>Prompt completo, pronto da incollare</summary>
-
-```text
-A sturdy survival knife with a leather-wrapped handle and a clip-point steel blade. Warm amber, ochre and brown sunset palette with cool blue shadows, wild forest survival arena. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Single object only, isolated on a fully transparent background, square 1:1, three-quarter view laid diagonally from lower left to upper right, 12% empty margin on every side, crisp silhouette with a thin dark outline so it reads on both light and dark backgrounds, no hands, no shadow on the ground. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
-```
-
-</details>
 
 #### Arco
 
-- **File**: `assets/arene/classico/armi/arco.webp`
-- **Cosa mostrare**: Arco ricurvo in legno con una freccia incoccata.
-
-**Prompt**
+Arco ricurvo in legno con una freccia incoccata.  
+File: `assets/arene/classico/armi/arco.webp`
 
 ```text
-A wooden recurve bow with a taut string and one arrow nocked.
+A wooden recurve bow with a taut string and one arrow nocked, single game inventory item, three-quarter view laid diagonally from lower left to upper right, centered with generous empty margin, crisp clean silhouette with a thin dark outline, isolated on a plain flat light grey background, warm amber, ochre and brown sunset palette with cool blue shadows, wild forest survival arena, painterly digital game illustration, soft visible brushwork, clean graphic shapes, cinematic rim lighting, atmospheric depth --v 8.2 --ar 1:1 --s 150 --chaos 0 --sref https://raw.githubusercontent.com/hoffo1987/Last-One-Standing/main/assets/arene/classico.webp --sw 120 --no text, letters, logo, watermark, hands, person, scenery, background objects, cast shadow, frame, border
 ```
-
-<details><summary>Prompt completo, pronto da incollare</summary>
-
-```text
-A wooden recurve bow with a taut string and one arrow nocked. Warm amber, ochre and brown sunset palette with cool blue shadows, wild forest survival arena. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Single object only, isolated on a fully transparent background, square 1:1, three-quarter view laid diagonally from lower left to upper right, 12% empty margin on every side, crisp silhouette with a thin dark outline so it reads on both light and dark backgrounds, no hands, no shadow on the ground. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
-```
-
-</details>
 
 #### Lancia
 
-- **File**: `assets/arene/classico/armi/lancia.webp`
-- **Cosa mostrare**: Lancia da caccia con asta di frassino e punta a foglia.
-
-**Prompt**
+Lancia da caccia con asta di frassino e punta a foglia.  
+File: `assets/arene/classico/armi/lancia.webp`
 
 ```text
-A hunting spear with an ash-wood shaft and a leaf-shaped steel tip bound with cord.
+A hunting spear with an ash-wood shaft and a leaf-shaped steel tip bound with cord, single game inventory item, three-quarter view laid diagonally from lower left to upper right, centered with generous empty margin, crisp clean silhouette with a thin dark outline, isolated on a plain flat light grey background, warm amber, ochre and brown sunset palette with cool blue shadows, wild forest survival arena, painterly digital game illustration, soft visible brushwork, clean graphic shapes, cinematic rim lighting, atmospheric depth --v 8.2 --ar 1:1 --s 150 --chaos 0 --sref https://raw.githubusercontent.com/hoffo1987/Last-One-Standing/main/assets/arene/classico.webp --sw 120 --no text, letters, logo, watermark, hands, person, scenery, background objects, cast shadow, frame, border
 ```
-
-<details><summary>Prompt completo, pronto da incollare</summary>
-
-```text
-A hunting spear with an ash-wood shaft and a leaf-shaped steel tip bound with cord. Warm amber, ochre and brown sunset palette with cool blue shadows, wild forest survival arena. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Single object only, isolated on a fully transparent background, square 1:1, three-quarter view laid diagonally from lower left to upper right, 12% empty margin on every side, crisp silhouette with a thin dark outline so it reads on both light and dark backgrounds, no hands, no shadow on the ground. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
-```
-
-</details>
 
 #### Ascia
 
-- **File**: `assets/arene/classico/armi/ascia.webp`
-- **Cosa mostrare**: Ascia da boscaiolo con manico consumato.
-
-**Prompt**
+Ascia da boscaiolo con manico consumato.  
+File: `assets/arene/classico/armi/ascia.webp`
 
 ```text
-A woodcutter's axe with a worn wooden handle and a chipped steel head.
+A woodcutter's axe with a worn wooden handle and a chipped steel head, single game inventory item, three-quarter view laid diagonally from lower left to upper right, centered with generous empty margin, crisp clean silhouette with a thin dark outline, isolated on a plain flat light grey background, warm amber, ochre and brown sunset palette with cool blue shadows, wild forest survival arena, painterly digital game illustration, soft visible brushwork, clean graphic shapes, cinematic rim lighting, atmospheric depth --v 8.2 --ar 1:1 --s 150 --chaos 0 --sref https://raw.githubusercontent.com/hoffo1987/Last-One-Standing/main/assets/arene/classico.webp --sw 120 --no text, letters, logo, watermark, hands, person, scenery, background objects, cast shadow, frame, border
 ```
-
-<details><summary>Prompt completo, pronto da incollare</summary>
-
-```text
-A woodcutter's axe with a worn wooden handle and a chipped steel head. Warm amber, ochre and brown sunset palette with cool blue shadows, wild forest survival arena. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Single object only, isolated on a fully transparent background, square 1:1, three-quarter view laid diagonally from lower left to upper right, 12% empty margin on every side, crisp silhouette with a thin dark outline so it reads on both light and dark backgrounds, no hands, no shadow on the ground. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
-```
-
-</details>
 
 #### Machete
 
-- **File**: `assets/arene/classico/armi/machete.webp`
-- **Cosa mostrare**: Machete lungo, lama leggermente curva.
-
-**Prompt**
+Machete lungo, lama leggermente curva.  
+File: `assets/arene/classico/armi/machete.webp`
 
 ```text
-A long machete with a slightly curved blade and a black rubber grip.
+A long machete with a slightly curved blade and a black rubber grip, single game inventory item, three-quarter view laid diagonally from lower left to upper right, centered with generous empty margin, crisp clean silhouette with a thin dark outline, isolated on a plain flat light grey background, warm amber, ochre and brown sunset palette with cool blue shadows, wild forest survival arena, painterly digital game illustration, soft visible brushwork, clean graphic shapes, cinematic rim lighting, atmospheric depth --v 8.2 --ar 1:1 --s 150 --chaos 0 --sref https://raw.githubusercontent.com/hoffo1987/Last-One-Standing/main/assets/arene/classico.webp --sw 120 --no text, letters, logo, watermark, hands, person, scenery, background objects, cast shadow, frame, border
 ```
-
-<details><summary>Prompt completo, pronto da incollare</summary>
-
-```text
-A long machete with a slightly curved blade and a black rubber grip. Warm amber, ochre and brown sunset palette with cool blue shadows, wild forest survival arena. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Single object only, isolated on a fully transparent background, square 1:1, three-quarter view laid diagonally from lower left to upper right, 12% empty margin on every side, crisp silhouette with a thin dark outline so it reads on both light and dark backgrounds, no hands, no shadow on the ground. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
-```
-
-</details>
 
 #### Tridente
 
-- **File**: `assets/arene/classico/armi/tridente.webp`
-- **Cosa mostrare**: Tridente da pesca con asta di legno.
-
-**Prompt**
+Tridente da pesca con asta di legno.  
+File: `assets/arene/classico/armi/tridente.webp`
 
 ```text
-A three-pronged fishing trident with a wooden shaft and rope binding.
+A three-pronged fishing trident with a wooden shaft and rope binding, single game inventory item, three-quarter view laid diagonally from lower left to upper right, centered with generous empty margin, crisp clean silhouette with a thin dark outline, isolated on a plain flat light grey background, warm amber, ochre and brown sunset palette with cool blue shadows, wild forest survival arena, painterly digital game illustration, soft visible brushwork, clean graphic shapes, cinematic rim lighting, atmospheric depth --v 8.2 --ar 1:1 --s 150 --chaos 0 --sref https://raw.githubusercontent.com/hoffo1987/Last-One-Standing/main/assets/arene/classico.webp --sw 120 --no text, letters, logo, watermark, hands, person, scenery, background objects, cast shadow, frame, border
 ```
-
-<details><summary>Prompt completo, pronto da incollare</summary>
-
-```text
-A three-pronged fishing trident with a wooden shaft and rope binding. Warm amber, ochre and brown sunset palette with cool blue shadows, wild forest survival arena. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Single object only, isolated on a fully transparent background, square 1:1, three-quarter view laid diagonally from lower left to upper right, 12% empty margin on every side, crisp silhouette with a thin dark outline so it reads on both light and dark backgrounds, no hands, no shadow on the ground. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
-```
-
-</details>
 
 #### Fionda
 
-- **File**: `assets/arene/classico/armi/fionda.webp`
-- **Cosa mostrare**: Fionda di legno a forcella con tasca di cuoio.
-
-**Prompt**
+Fionda di legno a forcella con tasca di cuoio.  
+File: `assets/arene/classico/armi/fionda.webp`
 
 ```text
-A forked wooden slingshot with rubber bands and a small leather pouch holding a pebble.
+A forked wooden slingshot with rubber bands and a small leather pouch holding a pebble, single game inventory item, three-quarter view laid diagonally from lower left to upper right, centered with generous empty margin, crisp clean silhouette with a thin dark outline, isolated on a plain flat light grey background, warm amber, ochre and brown sunset palette with cool blue shadows, wild forest survival arena, painterly digital game illustration, soft visible brushwork, clean graphic shapes, cinematic rim lighting, atmospheric depth --v 8.2 --ar 1:1 --s 150 --chaos 0 --sref https://raw.githubusercontent.com/hoffo1987/Last-One-Standing/main/assets/arene/classico.webp --sw 120 --no text, letters, logo, watermark, hands, person, scenery, background objects, cast shadow, frame, border
 ```
-
-<details><summary>Prompt completo, pronto da incollare</summary>
-
-```text
-A forked wooden slingshot with rubber bands and a small leather pouch holding a pebble. Warm amber, ochre and brown sunset palette with cool blue shadows, wild forest survival arena. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Single object only, isolated on a fully transparent background, square 1:1, three-quarter view laid diagonally from lower left to upper right, 12% empty margin on every side, crisp silhouette with a thin dark outline so it reads on both light and dark backgrounds, no hands, no shadow on the ground. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
-```
-
-</details>
 
 #### Spada corta
 
-- **File**: `assets/arene/classico/armi/spada-corta.webp`
-- **Cosa mostrare**: Spada corta tipo gladio, guardia semplice.
-
-**Prompt**
+Spada corta tipo gladio, guardia semplice.  
+File: `assets/arene/classico/armi/spada-corta.webp`
 
 ```text
-A short gladius-style sword with a simple crossguard and wrapped grip.
+A short gladius-style sword with a simple crossguard and wrapped grip, single game inventory item, three-quarter view laid diagonally from lower left to upper right, centered with generous empty margin, crisp clean silhouette with a thin dark outline, isolated on a plain flat light grey background, warm amber, ochre and brown sunset palette with cool blue shadows, wild forest survival arena, painterly digital game illustration, soft visible brushwork, clean graphic shapes, cinematic rim lighting, atmospheric depth --v 8.2 --ar 1:1 --s 150 --chaos 0 --sref https://raw.githubusercontent.com/hoffo1987/Last-One-Standing/main/assets/arene/classico.webp --sw 120 --no text, letters, logo, watermark, hands, person, scenery, background objects, cast shadow, frame, border
 ```
-
-<details><summary>Prompt completo, pronto da incollare</summary>
-
-```text
-A short gladius-style sword with a simple crossguard and wrapped grip. Warm amber, ochre and brown sunset palette with cool blue shadows, wild forest survival arena. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Single object only, isolated on a fully transparent background, square 1:1, three-quarter view laid diagonally from lower left to upper right, 12% empty margin on every side, crisp silhouette with a thin dark outline so it reads on both light and dark backgrounds, no hands, no shadow on the ground. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
-```
-
-</details>
 
 #### Pugnale
 
-- **File**: `assets/arene/classico/armi/pugnale.webp`
-- **Cosa mostrare**: Pugnale sottile a doppio taglio.
-
-**Prompt**
+Pugnale sottile a doppio taglio.  
+File: `assets/arene/classico/armi/pugnale.webp`
 
 ```text
-A slim double-edged dagger with a cord-wrapped hilt.
+A slim double-edged dagger with a cord-wrapped hilt, single game inventory item, three-quarter view laid diagonally from lower left to upper right, centered with generous empty margin, crisp clean silhouette with a thin dark outline, isolated on a plain flat light grey background, warm amber, ochre and brown sunset palette with cool blue shadows, wild forest survival arena, painterly digital game illustration, soft visible brushwork, clean graphic shapes, cinematic rim lighting, atmospheric depth --v 8.2 --ar 1:1 --s 150 --chaos 0 --sref https://raw.githubusercontent.com/hoffo1987/Last-One-Standing/main/assets/arene/classico.webp --sw 120 --no text, letters, logo, watermark, hands, person, scenery, background objects, cast shadow, frame, border
 ```
-
-<details><summary>Prompt completo, pronto da incollare</summary>
-
-```text
-A slim double-edged dagger with a cord-wrapped hilt. Warm amber, ochre and brown sunset palette with cool blue shadows, wild forest survival arena. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Single object only, isolated on a fully transparent background, square 1:1, three-quarter view laid diagonally from lower left to upper right, 12% empty margin on every side, crisp silhouette with a thin dark outline so it reads on both light and dark backgrounds, no hands, no shadow on the ground. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
-```
-
-</details>
 
 #### Mazza
 
-- **File**: `assets/arene/classico/armi/mazza.webp`
-- **Cosa mostrare**: Clava di legno pesante con borchie di ferro.
-
-**Prompt**
+Clava di legno pesante con borchie di ferro.  
+File: `assets/arene/classico/armi/mazza.webp`
 
 ```text
-A heavy wooden war club studded with iron rivets.
+A heavy wooden war club studded with iron rivets, single game inventory item, three-quarter view laid diagonally from lower left to upper right, centered with generous empty margin, crisp clean silhouette with a thin dark outline, isolated on a plain flat light grey background, warm amber, ochre and brown sunset palette with cool blue shadows, wild forest survival arena, painterly digital game illustration, soft visible brushwork, clean graphic shapes, cinematic rim lighting, atmospheric depth --v 8.2 --ar 1:1 --s 150 --chaos 0 --sref https://raw.githubusercontent.com/hoffo1987/Last-One-Standing/main/assets/arene/classico.webp --sw 120 --no text, letters, logo, watermark, hands, person, scenery, background objects, cast shadow, frame, border
 ```
-
-<details><summary>Prompt completo, pronto da incollare</summary>
-
-```text
-A heavy wooden war club studded with iron rivets. Warm amber, ochre and brown sunset palette with cool blue shadows, wild forest survival arena. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Single object only, isolated on a fully transparent background, square 1:1, three-quarter view laid diagonally from lower left to upper right, 12% empty margin on every side, crisp silhouette with a thin dark outline so it reads on both light and dark backgrounds, no hands, no shadow on the ground. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
-```
-
-</details>
 
 ---
 
@@ -485,369 +268,176 @@ A heavy wooden war club studded with iron rivets. Warm amber, ochre and brown su
 
 Draghi, rune e foreste che sussurrano.
 
-- **Cartella**: `assets/arene/fantasy/` (con le sottocartelle `luoghi/`, `pericoli/`, `armi/`)
-- **Riferimento di stile**: `assets/arene/fantasy.webp`
 - **Atmosfera**: Fiaba oscura di notte: viola, magenta e blu notte, bagliori magici turchesi e dorati, rune luminose. Meraviglia e minaccia insieme.
-- **Stile da aggiungere a ogni prompt di questa arena** (è già incluso nei prompt completi):
+- **Riferimento di stile** (`--sref`): [https://raw.githubusercontent.com/hoffo1987/Last-One-Standing/main/assets/arene/fantasy.webp](https://raw.githubusercontent.com/hoffo1987/Last-One-Standing/main/assets/arene/fantasy.webp)
 
-```text
-Violet, magenta and midnight blue palette with glowing turquoise and gold magic, dark fairy-tale kingdom. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours.
-```
-
-Più, a seconda della sezione:
-
-- Luoghi: `Wide 16:9 establishing shot of the location, no people, eye-level view, the key landmark inside the central third of the frame, soft depth fog in the background.`
-- Pericoli: `4:3 wanted-poster portrait, single threat centered and facing the viewer, head and eyes in the upper middle of the frame, dark vignetted background that fades to near black at the edges.`
-- Armi: `Single object only, isolated on a fully transparent background, square 1:1, three-quarter view laid diagonally from lower left to upper right, 12% empty margin on every side, crisp silhouette with a thin dark outline so it reads on both light and dark backgrounds, no hands, no shadow on the ground.`
-- Sempre: `No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.`
-
-### Luoghi · Reame Incantato (16:9, 1280 × 720 px, sfondo pieno)
+### Luoghi · Reame Incantato
 
 #### Torre in rovina
 
-- **File**: `assets/arene/fantasy/luoghi/torre-in-rovina.webp`
-- **Cosa mostrare**: Torre di uno stregone in pietra scura, mezza crollata, con rune accese sui muri, al chiaro di luna.
-
-**Prompt**
+Torre di uno stregone in pietra scura, mezza crollata, con rune accese sui muri, al chiaro di luna.  
+File: `assets/arene/fantasy/luoghi/torre-in-rovina.webp`
 
 ```text
-A ruined wizard's tower of dark stone, half collapsed, glowing violet runes on its walls, under a huge moon.
+A ruined wizard's tower of dark stone, half collapsed, glowing violet runes on its walls, under a huge moon, wide establishing shot at eye level, an empty deserted location, the main landmark centered in the frame, layered depth with soft distant haze, violet, magenta and midnight blue palette with glowing turquoise and gold magic, dark fairy-tale kingdom, painterly digital game illustration, soft visible brushwork, clean graphic shapes, cinematic rim lighting, atmospheric depth --v 8.2 --ar 16:9 --s 250 --chaos 8 --sref https://raw.githubusercontent.com/hoffo1987/Last-One-Standing/main/assets/arene/fantasy.webp --sw 300 --no text, letters, words, readable signs, logo, watermark, people, characters, frame, border
 ```
-
-<details><summary>Prompt completo, pronto da incollare</summary>
-
-```text
-A ruined wizard's tower of dark stone, half collapsed, glowing violet runes on its walls, under a huge moon. Violet, magenta and midnight blue palette with glowing turquoise and gold magic, dark fairy-tale kingdom. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Wide 16:9 establishing shot of the location, no people, eye-level view, the key landmark inside the central third of the frame, soft depth fog in the background. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
-```
-
-</details>
 
 #### Foresta elfica
 
-- **File**: `assets/arene/fantasy/luoghi/foresta-elfica.webp`
-- **Cosa mostrare**: Foresta elfica di alberi giganti dalla corteccia argentata, lanterne appese e lucine sospese.
-
-**Prompt**
+Foresta elfica di alberi giganti dalla corteccia argentata, lanterne appese e lucine sospese.  
+File: `assets/arene/fantasy/luoghi/foresta-elfica.webp`
 
 ```text
-An elven forest of giant silver-barked trees, hanging lanterns and floating motes of light.
+An elven forest of giant silver-barked trees, hanging lanterns and floating motes of light, wide establishing shot at eye level, an empty deserted location, the main landmark centered in the frame, layered depth with soft distant haze, violet, magenta and midnight blue palette with glowing turquoise and gold magic, dark fairy-tale kingdom, painterly digital game illustration, soft visible brushwork, clean graphic shapes, cinematic rim lighting, atmospheric depth --v 8.2 --ar 16:9 --s 250 --chaos 8 --sref https://raw.githubusercontent.com/hoffo1987/Last-One-Standing/main/assets/arene/fantasy.webp --sw 300 --no text, letters, words, readable signs, logo, watermark, people, characters, frame, border
 ```
-
-<details><summary>Prompt completo, pronto da incollare</summary>
-
-```text
-An elven forest of giant silver-barked trees, hanging lanterns and floating motes of light. Violet, magenta and midnight blue palette with glowing turquoise and gold magic, dark fairy-tale kingdom. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Wide 16:9 establishing shot of the location, no people, eye-level view, the key landmark inside the central third of the frame, soft depth fog in the background. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
-```
-
-</details>
 
 #### Lago nebbioso
 
-- **File**: `assets/arene/fantasy/luoghi/lago-nebbioso.webp`
-- **Cosa mostrare**: Lago incantato di notte, acqua a specchio, pontile di pietra e una statua mezza sommersa.
-
-**Prompt**
+Lago incantato di notte, acqua a specchio, pontile di pietra e una statua mezza sommersa.  
+File: `assets/arene/fantasy/luoghi/lago-nebbioso.webp`
 
 ```text
-A misty enchanted lake at night, glassy water, a small stone pier and a half-sunken statue.
+A misty enchanted lake at night, glassy water, a small stone pier and a half-sunken statue, wide establishing shot at eye level, an empty deserted location, the main landmark centered in the frame, layered depth with soft distant haze, violet, magenta and midnight blue palette with glowing turquoise and gold magic, dark fairy-tale kingdom, painterly digital game illustration, soft visible brushwork, clean graphic shapes, cinematic rim lighting, atmospheric depth --v 8.2 --ar 16:9 --s 250 --chaos 8 --sref https://raw.githubusercontent.com/hoffo1987/Last-One-Standing/main/assets/arene/fantasy.webp --sw 300 --no text, letters, words, readable signs, logo, watermark, people, characters, frame, border
 ```
-
-<details><summary>Prompt completo, pronto da incollare</summary>
-
-```text
-A misty enchanted lake at night, glassy water, a small stone pier and a half-sunken statue. Violet, magenta and midnight blue palette with glowing turquoise and gold magic, dark fairy-tale kingdom. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Wide 16:9 establishing shot of the location, no people, eye-level view, the key landmark inside the central third of the frame, soft depth fog in the background. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
-```
-
-</details>
 
 #### Miniere
 
-- **File**: `assets/arene/fantasy/luoghi/miniere.webp`
-- **Cosa mostrare**: Miniere naniche scavate nella montagna, impalcature, binari con carrello e vene di cristallo luminose.
-
-**Prompt**
+Miniere naniche scavate nella montagna, impalcature, binari con carrello e vene di cristallo luminose.  
+File: `assets/arene/fantasy/luoghi/miniere.webp`
 
 ```text
-Dwarven mines carved into a mountain, wooden scaffolding, minecart rails and glowing crystal veins in the rock.
+Dwarven mines carved into a mountain, wooden scaffolding, minecart rails and glowing crystal veins in the rock, wide establishing shot at eye level, an empty deserted location, the main landmark centered in the frame, layered depth with soft distant haze, violet, magenta and midnight blue palette with glowing turquoise and gold magic, dark fairy-tale kingdom, painterly digital game illustration, soft visible brushwork, clean graphic shapes, cinematic rim lighting, atmospheric depth --v 8.2 --ar 16:9 --s 250 --chaos 8 --sref https://raw.githubusercontent.com/hoffo1987/Last-One-Standing/main/assets/arene/fantasy.webp --sw 300 --no text, letters, words, readable signs, logo, watermark, people, characters, frame, border
 ```
-
-<details><summary>Prompt completo, pronto da incollare</summary>
-
-```text
-Dwarven mines carved into a mountain, wooden scaffolding, minecart rails and glowing crystal veins in the rock. Violet, magenta and midnight blue palette with glowing turquoise and gold magic, dark fairy-tale kingdom. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Wide 16:9 establishing shot of the location, no people, eye-level view, the key landmark inside the central third of the frame, soft depth fog in the background. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
-```
-
-</details>
 
 #### Palude stregata
 
-- **File**: `assets/arene/fantasy/luoghi/palude-stregata.webp`
-- **Cosa mostrare**: Palude stregata con alberi storti, muschio pendente, una capanna su palafitte e fuochi fatui verdi.
-
-**Prompt**
+Palude stregata con alberi storti, muschio pendente, una capanna su palafitte e fuochi fatui verdi.  
+File: `assets/arene/fantasy/luoghi/palude-stregata.webp`
 
 ```text
-A haunted swamp with crooked trees, hanging moss, a witch's hut on stilts and green will-o'-wisps.
+A haunted swamp with crooked trees, hanging moss, a witch's hut on stilts and green will-o'-wisps, wide establishing shot at eye level, an empty deserted location, the main landmark centered in the frame, layered depth with soft distant haze, violet, magenta and midnight blue palette with glowing turquoise and gold magic, dark fairy-tale kingdom, painterly digital game illustration, soft visible brushwork, clean graphic shapes, cinematic rim lighting, atmospheric depth --v 8.2 --ar 16:9 --s 250 --chaos 8 --sref https://raw.githubusercontent.com/hoffo1987/Last-One-Standing/main/assets/arene/fantasy.webp --sw 300 --no text, letters, words, readable signs, logo, watermark, people, characters, frame, border
 ```
-
-<details><summary>Prompt completo, pronto da incollare</summary>
-
-```text
-A haunted swamp with crooked trees, hanging moss, a witch's hut on stilts and green will-o'-wisps. Violet, magenta and midnight blue palette with glowing turquoise and gold magic, dark fairy-tale kingdom. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Wide 16:9 establishing shot of the location, no people, eye-level view, the key landmark inside the central third of the frame, soft depth fog in the background. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
-```
-
-</details>
 
 #### Picco del drago
 
-- **File**: `assets/arene/fantasy/luoghi/picco-del-drago.webp`
-- **Cosa mostrare**: Picco frastagliato con la tana del drago: rocce bruciate, mucchi d'oro e fumo che sale.
-
-**Prompt**
+Picco frastagliato con la tana del drago: rocce bruciate, mucchi d'oro e fumo che sale.  
+File: `assets/arene/fantasy/luoghi/picco-del-drago.webp`
 
 ```text
-A jagged mountain peak with a dragon's lair, scorched rocks, heaps of gold coins and smoke rising into the night.
+A jagged mountain peak with a dragon's lair, scorched rocks, heaps of gold coins and smoke rising into the night, wide establishing shot at eye level, an empty deserted location, the main landmark centered in the frame, layered depth with soft distant haze, violet, magenta and midnight blue palette with glowing turquoise and gold magic, dark fairy-tale kingdom, painterly digital game illustration, soft visible brushwork, clean graphic shapes, cinematic rim lighting, atmospheric depth --v 8.2 --ar 16:9 --s 250 --chaos 8 --sref https://raw.githubusercontent.com/hoffo1987/Last-One-Standing/main/assets/arene/fantasy.webp --sw 300 --no text, letters, words, readable signs, logo, watermark, people, characters, frame, border
 ```
 
-<details><summary>Prompt completo, pronto da incollare</summary>
-
-```text
-A jagged mountain peak with a dragon's lair, scorched rocks, heaps of gold coins and smoke rising into the night. Violet, magenta and midnight blue palette with glowing turquoise and gold magic, dark fairy-tale kingdom. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Wide 16:9 establishing shot of the location, no people, eye-level view, the key landmark inside the central third of the frame, soft depth fog in the background. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
-```
-
-</details>
-
-### Pericoli · Reame Incantato (4:3, 960 × 720 px, sfondo pieno e scuro)
+### Pericoli · Reame Incantato
 
 #### Troll di caverna
 
-- **File**: `assets/arene/fantasy/pericoli/troll-di-caverna.webp`
-- **Cosa mostrare**: Troll di caverna enorme, pelle grigia bitorzoluta, clava di pietra, occhi piccoli e luminosi.
-
-**Prompt**
+Troll di caverna enorme, pelle grigia bitorzoluta, clava di pietra, occhi piccoli e luminosi.  
+File: `assets/arene/fantasy/pericoli/troll-di-caverna.webp`
 
 ```text
-A hulking cave troll with grey warty skin and a stone club, small glowing eyes, stooping in a cave mouth.
+A hulking cave troll with grey warty skin and a stone club, small glowing eyes, stooping in a cave mouth, dramatic portrait framed like a wanted poster, single subject centered and staring at the viewer, eyes in the upper half of the frame, dark vignette fading to near black at the edges, violet, magenta and midnight blue palette with glowing turquoise and gold magic, dark fairy-tale kingdom, painterly digital game illustration, soft visible brushwork, clean graphic shapes, cinematic rim lighting, atmospheric depth --v 8.2 --ar 4:3 --s 300 --chaos 8 --sref https://raw.githubusercontent.com/hoffo1987/Last-One-Standing/main/assets/arene/fantasy.webp --sw 250 --no text, letters, words, logo, watermark, frame, border, poster lettering
 ```
-
-<details><summary>Prompt completo, pronto da incollare</summary>
-
-```text
-A hulking cave troll with grey warty skin and a stone club, small glowing eyes, stooping in a cave mouth. Violet, magenta and midnight blue palette with glowing turquoise and gold magic, dark fairy-tale kingdom. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. 4:3 wanted-poster portrait, single threat centered and facing the viewer, head and eyes in the upper middle of the frame, dark vignetted background that fades to near black at the edges. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
-```
-
-</details>
 
 #### Viverna
 
-- **File**: `assets/arene/fantasy/pericoli/viverna.webp`
-- **Cosa mostrare**: Viverna con ali membranose spalancate e coda uncinata, appollaiata su una rupe mentre ruggisce.
-
-**Prompt**
+Viverna con ali membranose spalancate e coda uncinata, appollaiata su una rupe mentre ruggisce.  
+File: `assets/arene/fantasy/pericoli/viverna.webp`
 
 ```text
-A wyvern with leathery wings spread wide and a barbed tail, perched on a cliff edge, roaring.
+A wyvern with leathery wings spread wide and a barbed tail, perched on a cliff edge, roaring, dramatic portrait framed like a wanted poster, single subject centered and staring at the viewer, eyes in the upper half of the frame, dark vignette fading to near black at the edges, violet, magenta and midnight blue palette with glowing turquoise and gold magic, dark fairy-tale kingdom, painterly digital game illustration, soft visible brushwork, clean graphic shapes, cinematic rim lighting, atmospheric depth --v 8.2 --ar 4:3 --s 300 --chaos 8 --sref https://raw.githubusercontent.com/hoffo1987/Last-One-Standing/main/assets/arene/fantasy.webp --sw 250 --no text, letters, words, logo, watermark, frame, border, poster lettering
 ```
-
-<details><summary>Prompt completo, pronto da incollare</summary>
-
-```text
-A wyvern with leathery wings spread wide and a barbed tail, perched on a cliff edge, roaring. Violet, magenta and midnight blue palette with glowing turquoise and gold magic, dark fairy-tale kingdom. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. 4:3 wanted-poster portrait, single threat centered and facing the viewer, head and eyes in the upper middle of the frame, dark vignetted background that fades to near black at the edges. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
-```
-
-</details>
 
 #### Spettro errante
 
-- **File**: `assets/arene/fantasy/pericoli/spettro-errante.webp`
-- **Cosa mostrare**: Spettro traslucido in vesti a brandelli, bagliore azzurro, occhi vuoti, nella nebbia.
-
-**Prompt**
+Spettro traslucido in vesti a brandelli, bagliore azzurro, occhi vuoti, nella nebbia.  
+File: `assets/arene/fantasy/pericoli/spettro-errante.webp`
 
 ```text
-A wandering translucent wraith in tattered robes, faint blue glow, hollow eyes, drifting through mist.
+A wandering translucent wraith in tattered robes, faint blue glow, hollow eyes, drifting through mist, dramatic portrait framed like a wanted poster, single subject centered and staring at the viewer, eyes in the upper half of the frame, dark vignette fading to near black at the edges, violet, magenta and midnight blue palette with glowing turquoise and gold magic, dark fairy-tale kingdom, painterly digital game illustration, soft visible brushwork, clean graphic shapes, cinematic rim lighting, atmospheric depth --v 8.2 --ar 4:3 --s 300 --chaos 8 --sref https://raw.githubusercontent.com/hoffo1987/Last-One-Standing/main/assets/arene/fantasy.webp --sw 250 --no text, letters, words, logo, watermark, frame, border, poster lettering
 ```
-
-<details><summary>Prompt completo, pronto da incollare</summary>
-
-```text
-A wandering translucent wraith in tattered robes, faint blue glow, hollow eyes, drifting through mist. Violet, magenta and midnight blue palette with glowing turquoise and gold magic, dark fairy-tale kingdom. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. 4:3 wanted-poster portrait, single threat centered and facing the viewer, head and eyes in the upper middle of the frame, dark vignetted background that fades to near black at the edges. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
-```
-
-</details>
 
 #### Branco di lupi mannari
 
-- **File**: `assets/arene/fantasy/pericoli/branco-di-lupi-mannari.webp`
-- **Cosa mostrare**: Branco di lupi mannari sotto la luna piena, il capobranco in primo piano.
-
-**Prompt**
+Branco di lupi mannari sotto la luna piena, il capobranco in primo piano.  
+File: `assets/arene/fantasy/pericoli/branco-di-lupi-mannari.webp`
 
 ```text
-A pack of werewolves under the full moon, the alpha in front with bristling fur and bared fangs.
+A pack of werewolves under the full moon, the alpha in front with bristling fur and bared fangs, dramatic portrait framed like a wanted poster, single subject centered and staring at the viewer, eyes in the upper half of the frame, dark vignette fading to near black at the edges, violet, magenta and midnight blue palette with glowing turquoise and gold magic, dark fairy-tale kingdom, painterly digital game illustration, soft visible brushwork, clean graphic shapes, cinematic rim lighting, atmospheric depth --v 8.2 --ar 4:3 --s 300 --chaos 8 --sref https://raw.githubusercontent.com/hoffo1987/Last-One-Standing/main/assets/arene/fantasy.webp --sw 250 --no text, letters, words, logo, watermark, frame, border, poster lettering
 ```
 
-<details><summary>Prompt completo, pronto da incollare</summary>
-
-```text
-A pack of werewolves under the full moon, the alpha in front with bristling fur and bared fangs. Violet, magenta and midnight blue palette with glowing turquoise and gold magic, dark fairy-tale kingdom. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. 4:3 wanted-poster portrait, single threat centered and facing the viewer, head and eyes in the upper middle of the frame, dark vignetted background that fades to near black at the edges. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
-```
-
-</details>
-
-### Armi · Reame Incantato (1:1, 512 × 512 px, sfondo trasparente)
+### Armi · Reame Incantato
 
 #### Spada runica
 
-- **File**: `assets/arene/fantasy/armi/spada-runica.webp`
-- **Cosa mostrare**: Spada lunga con rune viola luminose sulla lama.
-
-**Prompt**
+Spada lunga con rune viola luminose sulla lama.  
+File: `assets/arene/fantasy/armi/spada-runica.webp`
 
 ```text
-A longsword with glowing violet runes running along the blade.
+A longsword with glowing violet runes running along the blade, single game inventory item, three-quarter view laid diagonally from lower left to upper right, centered with generous empty margin, crisp clean silhouette with a thin dark outline, isolated on a plain flat light grey background, violet, magenta and midnight blue palette with glowing turquoise and gold magic, dark fairy-tale kingdom, painterly digital game illustration, soft visible brushwork, clean graphic shapes, cinematic rim lighting, atmospheric depth --v 8.2 --ar 1:1 --s 150 --chaos 0 --sref https://raw.githubusercontent.com/hoffo1987/Last-One-Standing/main/assets/arene/fantasy.webp --sw 120 --no text, letters, logo, watermark, hands, person, scenery, background objects, cast shadow, frame, border
 ```
-
-<details><summary>Prompt completo, pronto da incollare</summary>
-
-```text
-A longsword with glowing violet runes running along the blade. Violet, magenta and midnight blue palette with glowing turquoise and gold magic, dark fairy-tale kingdom. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Single object only, isolated on a fully transparent background, square 1:1, three-quarter view laid diagonally from lower left to upper right, 12% empty margin on every side, crisp silhouette with a thin dark outline so it reads on both light and dark backgrounds, no hands, no shadow on the ground. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
-```
-
-</details>
 
 #### Bastone magico
 
-- **File**: `assets/arene/fantasy/armi/bastone-magico.webp`
-- **Cosa mostrare**: Bastone da mago nodoso con un cristallo luminoso sospeso in cima.
-
-**Prompt**
+Bastone da mago nodoso con un cristallo luminoso sospeso in cima.  
+File: `assets/arene/fantasy/armi/bastone-magico.webp`
 
 ```text
-A gnarled wizard staff topped with a floating glowing crystal.
+A gnarled wizard staff topped with a floating glowing crystal, single game inventory item, three-quarter view laid diagonally from lower left to upper right, centered with generous empty margin, crisp clean silhouette with a thin dark outline, isolated on a plain flat light grey background, violet, magenta and midnight blue palette with glowing turquoise and gold magic, dark fairy-tale kingdom, painterly digital game illustration, soft visible brushwork, clean graphic shapes, cinematic rim lighting, atmospheric depth --v 8.2 --ar 1:1 --s 150 --chaos 0 --sref https://raw.githubusercontent.com/hoffo1987/Last-One-Standing/main/assets/arene/fantasy.webp --sw 120 --no text, letters, logo, watermark, hands, person, scenery, background objects, cast shadow, frame, border
 ```
-
-<details><summary>Prompt completo, pronto da incollare</summary>
-
-```text
-A gnarled wizard staff topped with a floating glowing crystal. Violet, magenta and midnight blue palette with glowing turquoise and gold magic, dark fairy-tale kingdom. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Single object only, isolated on a fully transparent background, square 1:1, three-quarter view laid diagonally from lower left to upper right, 12% empty margin on every side, crisp silhouette with a thin dark outline so it reads on both light and dark backgrounds, no hands, no shadow on the ground. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
-```
-
-</details>
 
 #### Arco elfico
 
-- **File**: `assets/arene/fantasy/armi/arco-elfico.webp`
-- **Cosa mostrare**: Arco lungo elfico in legno chiaro con intarsi d'argento a foglia.
-
-**Prompt**
+Arco lungo elfico in legno chiaro con intarsi d'argento a foglia.  
+File: `assets/arene/fantasy/armi/arco-elfico.webp`
 
 ```text
-An elegant elven longbow of pale wood with leaf-shaped silver inlays.
+An elegant elven longbow of pale wood with leaf-shaped silver inlays, single game inventory item, three-quarter view laid diagonally from lower left to upper right, centered with generous empty margin, crisp clean silhouette with a thin dark outline, isolated on a plain flat light grey background, violet, magenta and midnight blue palette with glowing turquoise and gold magic, dark fairy-tale kingdom, painterly digital game illustration, soft visible brushwork, clean graphic shapes, cinematic rim lighting, atmospheric depth --v 8.2 --ar 1:1 --s 150 --chaos 0 --sref https://raw.githubusercontent.com/hoffo1987/Last-One-Standing/main/assets/arene/fantasy.webp --sw 120 --no text, letters, logo, watermark, hands, person, scenery, background objects, cast shadow, frame, border
 ```
-
-<details><summary>Prompt completo, pronto da incollare</summary>
-
-```text
-An elegant elven longbow of pale wood with leaf-shaped silver inlays. Violet, magenta and midnight blue palette with glowing turquoise and gold magic, dark fairy-tale kingdom. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Single object only, isolated on a fully transparent background, square 1:1, three-quarter view laid diagonally from lower left to upper right, 12% empty margin on every side, crisp silhouette with a thin dark outline so it reads on both light and dark backgrounds, no hands, no shadow on the ground. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
-```
-
-</details>
 
 #### Ascia nanica
 
-- **File**: `assets/arene/fantasy/armi/ascia-nanica.webp`
-- **Cosa mostrare**: Ascia nanica a doppia lama con incisioni a intreccio.
-
-**Prompt**
+Ascia nanica a doppia lama con incisioni a intreccio.  
+File: `assets/arene/fantasy/armi/ascia-nanica.webp`
 
 ```text
-A heavy double-bladed dwarven axe with engraved knotwork and a leather grip.
+A heavy double-bladed dwarven axe with engraved knotwork and a leather grip, single game inventory item, three-quarter view laid diagonally from lower left to upper right, centered with generous empty margin, crisp clean silhouette with a thin dark outline, isolated on a plain flat light grey background, violet, magenta and midnight blue palette with glowing turquoise and gold magic, dark fairy-tale kingdom, painterly digital game illustration, soft visible brushwork, clean graphic shapes, cinematic rim lighting, atmospheric depth --v 8.2 --ar 1:1 --s 150 --chaos 0 --sref https://raw.githubusercontent.com/hoffo1987/Last-One-Standing/main/assets/arene/fantasy.webp --sw 120 --no text, letters, logo, watermark, hands, person, scenery, background objects, cast shadow, frame, border
 ```
-
-<details><summary>Prompt completo, pronto da incollare</summary>
-
-```text
-A heavy double-bladed dwarven axe with engraved knotwork and a leather grip. Violet, magenta and midnight blue palette with glowing turquoise and gold magic, dark fairy-tale kingdom. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Single object only, isolated on a fully transparent background, square 1:1, three-quarter view laid diagonally from lower left to upper right, 12% empty margin on every side, crisp silhouette with a thin dark outline so it reads on both light and dark backgrounds, no hands, no shadow on the ground. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
-```
-
-</details>
 
 #### Pugnale avvelenato
 
-- **File**: `assets/arene/fantasy/armi/pugnale-avvelenato.webp`
-- **Cosa mostrare**: Pugnale ricurvo che gocciola veleno verde.
-
-**Prompt**
+Pugnale ricurvo che gocciola veleno verde.  
+File: `assets/arene/fantasy/armi/pugnale-avvelenato.webp`
 
 ```text
-A curved dagger dripping bright green poison.
+A curved dagger dripping bright green poison, single game inventory item, three-quarter view laid diagonally from lower left to upper right, centered with generous empty margin, crisp clean silhouette with a thin dark outline, isolated on a plain flat light grey background, violet, magenta and midnight blue palette with glowing turquoise and gold magic, dark fairy-tale kingdom, painterly digital game illustration, soft visible brushwork, clean graphic shapes, cinematic rim lighting, atmospheric depth --v 8.2 --ar 1:1 --s 150 --chaos 0 --sref https://raw.githubusercontent.com/hoffo1987/Last-One-Standing/main/assets/arene/fantasy.webp --sw 120 --no text, letters, logo, watermark, hands, person, scenery, background objects, cast shadow, frame, border
 ```
-
-<details><summary>Prompt completo, pronto da incollare</summary>
-
-```text
-A curved dagger dripping bright green poison. Violet, magenta and midnight blue palette with glowing turquoise and gold magic, dark fairy-tale kingdom. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Single object only, isolated on a fully transparent background, square 1:1, three-quarter view laid diagonally from lower left to upper right, 12% empty margin on every side, crisp silhouette with a thin dark outline so it reads on both light and dark backgrounds, no hands, no shadow on the ground. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
-```
-
-</details>
 
 #### Martello da guerra
 
-- **File**: `assets/arene/fantasy/armi/martello-da-guerra.webp`
-- **Cosa mostrare**: Martello da guerra massiccio con testa in ferro incisa di rune.
-
-**Prompt**
+Martello da guerra massiccio con testa in ferro incisa di rune.  
+File: `assets/arene/fantasy/armi/martello-da-guerra.webp`
 
 ```text
-A massive war hammer with a rune-carved iron head.
+A massive war hammer with a rune-carved iron head, single game inventory item, three-quarter view laid diagonally from lower left to upper right, centered with generous empty margin, crisp clean silhouette with a thin dark outline, isolated on a plain flat light grey background, violet, magenta and midnight blue palette with glowing turquoise and gold magic, dark fairy-tale kingdom, painterly digital game illustration, soft visible brushwork, clean graphic shapes, cinematic rim lighting, atmospheric depth --v 8.2 --ar 1:1 --s 150 --chaos 0 --sref https://raw.githubusercontent.com/hoffo1987/Last-One-Standing/main/assets/arene/fantasy.webp --sw 120 --no text, letters, logo, watermark, hands, person, scenery, background objects, cast shadow, frame, border
 ```
-
-<details><summary>Prompt completo, pronto da incollare</summary>
-
-```text
-A massive war hammer with a rune-carved iron head. Violet, magenta and midnight blue palette with glowing turquoise and gold magic, dark fairy-tale kingdom. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Single object only, isolated on a fully transparent background, square 1:1, three-quarter view laid diagonally from lower left to upper right, 12% empty margin on every side, crisp silhouette with a thin dark outline so it reads on both light and dark backgrounds, no hands, no shadow on the ground. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
-```
-
-</details>
 
 #### Balestra
 
-- **File**: `assets/arene/fantasy/armi/balestra.webp`
-- **Cosa mostrare**: Balestra fantasy in legno scuro e ottone.
-
-**Prompt**
+Balestra fantasy in legno scuro e ottone.  
+File: `assets/arene/fantasy/armi/balestra.webp`
 
 ```text
-A fantasy crossbow of dark wood with brass fittings and a loaded bolt.
+A fantasy crossbow of dark wood with brass fittings and a loaded bolt, single game inventory item, three-quarter view laid diagonally from lower left to upper right, centered with generous empty margin, crisp clean silhouette with a thin dark outline, isolated on a plain flat light grey background, violet, magenta and midnight blue palette with glowing turquoise and gold magic, dark fairy-tale kingdom, painterly digital game illustration, soft visible brushwork, clean graphic shapes, cinematic rim lighting, atmospheric depth --v 8.2 --ar 1:1 --s 150 --chaos 0 --sref https://raw.githubusercontent.com/hoffo1987/Last-One-Standing/main/assets/arene/fantasy.webp --sw 120 --no text, letters, logo, watermark, hands, person, scenery, background objects, cast shadow, frame, border
 ```
-
-<details><summary>Prompt completo, pronto da incollare</summary>
-
-```text
-A fantasy crossbow of dark wood with brass fittings and a loaded bolt. Violet, magenta and midnight blue palette with glowing turquoise and gold magic, dark fairy-tale kingdom. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Single object only, isolated on a fully transparent background, square 1:1, three-quarter view laid diagonally from lower left to upper right, 12% empty margin on every side, crisp silhouette with a thin dark outline so it reads on both light and dark backgrounds, no hands, no shadow on the ground. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
-```
-
-</details>
 
 #### Lancia incantata
 
-- **File**: `assets/arene/fantasy/armi/lancia-incantata.webp`
-- **Cosa mostrare**: Lancia sottile con la punta avvolta da una luce pallida.
-
-**Prompt**
+Lancia sottile con la punta avvolta da una luce pallida.  
+File: `assets/arene/fantasy/armi/lancia-incantata.webp`
 
 ```text
-A slender spear with an enchanted blade wreathed in pale light.
+A slender spear with an enchanted blade wreathed in pale light, single game inventory item, three-quarter view laid diagonally from lower left to upper right, centered with generous empty margin, crisp clean silhouette with a thin dark outline, isolated on a plain flat light grey background, violet, magenta and midnight blue palette with glowing turquoise and gold magic, dark fairy-tale kingdom, painterly digital game illustration, soft visible brushwork, clean graphic shapes, cinematic rim lighting, atmospheric depth --v 8.2 --ar 1:1 --s 150 --chaos 0 --sref https://raw.githubusercontent.com/hoffo1987/Last-One-Standing/main/assets/arene/fantasy.webp --sw 120 --no text, letters, logo, watermark, hands, person, scenery, background objects, cast shadow, frame, border
 ```
-
-<details><summary>Prompt completo, pronto da incollare</summary>
-
-```text
-A slender spear with an enchanted blade wreathed in pale light. Violet, magenta and midnight blue palette with glowing turquoise and gold magic, dark fairy-tale kingdom. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Single object only, isolated on a fully transparent background, square 1:1, three-quarter view laid diagonally from lower left to upper right, 12% empty margin on every side, crisp silhouette with a thin dark outline so it reads on both light and dark backgrounds, no hands, no shadow on the ground. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
-```
-
-</details>
 
 ---
 
@@ -855,350 +445,167 @@ A slender spear with an enchanted blade wreathed in pale light. Violet, magenta 
 
 Ossigeno limitato, droni e un reattore instabile.
 
-- **Cartella**: `assets/arene/scifi/` (con le sottocartelle `luoghi/`, `pericoli/`, `armi/`)
-- **Riferimento di stile**: `assets/arene/scifi.webp`
 - **Atmosfera**: Stazione orbitale: blu, ciano e acciaio spazzolato, neon freddi, spie rosse di allarme, la Terra o le stelle dai finestrini.
-- **Stile da aggiungere a ogni prompt di questa arena** (è già incluso nei prompt completi):
+- **Riferimento di stile** (`--sref`): [https://raw.githubusercontent.com/hoffo1987/Last-One-Standing/main/assets/arene/scifi.webp](https://raw.githubusercontent.com/hoffo1987/Last-One-Standing/main/assets/arene/scifi.webp)
 
-```text
-Cold blue and cyan neon on brushed steel with red warning lights, orbital space station. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours.
-```
-
-Più, a seconda della sezione:
-
-- Luoghi: `Wide 16:9 establishing shot of the location, no people, eye-level view, the key landmark inside the central third of the frame, soft depth fog in the background.`
-- Pericoli: `4:3 wanted-poster portrait, single threat centered and facing the viewer, head and eyes in the upper middle of the frame, dark vignetted background that fades to near black at the edges.`
-- Armi: `Single object only, isolated on a fully transparent background, square 1:1, three-quarter view laid diagonally from lower left to upper right, 12% empty margin on every side, crisp silhouette with a thin dark outline so it reads on both light and dark backgrounds, no hands, no shadow on the ground.`
-- Sempre: `No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.`
-
-### Luoghi · Stazione Orbitale (16:9, 1280 × 720 px, sfondo pieno)
+### Luoghi · Stazione Orbitale
 
 #### Hangar
 
-- **File**: `assets/arene/scifi/luoghi/hangar.webp`
-- **Cosa mostrare**: Hangar enorme con una navetta attraccata, container e il portellone aperto sulle stelle.
-
-**Prompt**
+Hangar enorme con una navetta attraccata, container e il portellone aperto sulle stelle.  
+File: `assets/arene/scifi/luoghi/hangar.webp`
 
 ```text
-A vast spaceship hangar with a docked shuttle, cargo containers and an open bay door showing the stars.
+A vast spaceship hangar with a docked shuttle, cargo containers and an open bay door showing the stars, wide establishing shot at eye level, an empty deserted location, the main landmark centered in the frame, layered depth with soft distant haze, cold blue and cyan neon on brushed steel with red warning lights, orbital space station, painterly digital game illustration, soft visible brushwork, clean graphic shapes, cinematic rim lighting, atmospheric depth --v 8.2 --ar 16:9 --s 250 --chaos 8 --sref https://raw.githubusercontent.com/hoffo1987/Last-One-Standing/main/assets/arene/scifi.webp --sw 300 --no text, letters, words, readable signs, logo, watermark, people, characters, frame, border
 ```
-
-<details><summary>Prompt completo, pronto da incollare</summary>
-
-```text
-A vast spaceship hangar with a docked shuttle, cargo containers and an open bay door showing the stars. Cold blue and cyan neon on brushed steel with red warning lights, orbital space station. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Wide 16:9 establishing shot of the location, no people, eye-level view, the key landmark inside the central third of the frame, soft depth fog in the background. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
-```
-
-</details>
 
 #### Serra idroponica
 
-- **File**: `assets/arene/scifi/luoghi/serra-idroponica.webp`
-- **Cosa mostrare**: Modulo serra idroponica: file di piante sotto luci viola, tubi d'acqua e una cupola di vetro.
-
-**Prompt**
+Modulo serra idroponica: file di piante sotto luci viola, tubi d'acqua e una cupola di vetro.  
+File: `assets/arene/scifi/luoghi/serra-idroponica.webp`
 
 ```text
-A hydroponic greenhouse module, rows of plants under purple grow lights, water pipes and a glass dome.
+A hydroponic greenhouse module, rows of plants under purple grow lights, water pipes and a glass dome, wide establishing shot at eye level, an empty deserted location, the main landmark centered in the frame, layered depth with soft distant haze, cold blue and cyan neon on brushed steel with red warning lights, orbital space station, painterly digital game illustration, soft visible brushwork, clean graphic shapes, cinematic rim lighting, atmospheric depth --v 8.2 --ar 16:9 --s 250 --chaos 8 --sref https://raw.githubusercontent.com/hoffo1987/Last-One-Standing/main/assets/arene/scifi.webp --sw 300 --no text, letters, words, readable signs, logo, watermark, people, characters, frame, border
 ```
-
-<details><summary>Prompt completo, pronto da incollare</summary>
-
-```text
-A hydroponic greenhouse module, rows of plants under purple grow lights, water pipes and a glass dome. Cold blue and cyan neon on brushed steel with red warning lights, orbital space station. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Wide 16:9 establishing shot of the location, no people, eye-level view, the key landmark inside the central third of the frame, soft depth fog in the background. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
-```
-
-</details>
 
 #### Reattore
 
-- **File**: `assets/arene/scifi/luoghi/reattore.webp`
-- **Cosa mostrare**: Il nucleo del reattore: una sfera ciano incandescente dentro un anello d'acciaio, passerelle e luci d'allarme.
-
-**Prompt**
+Il nucleo del reattore: una sfera ciano incandescente dentro un anello d'acciaio, passerelle e luci d'allarme.  
+File: `assets/arene/scifi/luoghi/reattore.webp`
 
 ```text
-The station's reactor core, a glowing cyan sphere inside a steel ring, catwalks and warning lights.
+The station's reactor core, a glowing cyan sphere inside a steel ring, catwalks and warning lights, wide establishing shot at eye level, an empty deserted location, the main landmark centered in the frame, layered depth with soft distant haze, cold blue and cyan neon on brushed steel with red warning lights, orbital space station, painterly digital game illustration, soft visible brushwork, clean graphic shapes, cinematic rim lighting, atmospheric depth --v 8.2 --ar 16:9 --s 250 --chaos 8 --sref https://raw.githubusercontent.com/hoffo1987/Last-One-Standing/main/assets/arene/scifi.webp --sw 300 --no text, letters, words, readable signs, logo, watermark, people, characters, frame, border
 ```
-
-<details><summary>Prompt completo, pronto da incollare</summary>
-
-```text
-The station's reactor core, a glowing cyan sphere inside a steel ring, catwalks and warning lights. Cold blue and cyan neon on brushed steel with red warning lights, orbital space station. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Wide 16:9 establishing shot of the location, no people, eye-level view, the key landmark inside the central third of the frame, soft depth fog in the background. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
-```
-
-</details>
 
 #### Ponte di comando
 
-- **File**: `assets/arene/scifi/luoghi/ponte-di-comando.webp`
-- **Cosa mostrare**: Ponte di comando con console olografiche curve e una vetrata enorme sulla Terra.
-
-**Prompt**
+Ponte di comando con console olografiche curve e una vetrata enorme sulla Terra.  
+File: `assets/arene/scifi/luoghi/ponte-di-comando.webp`
 
 ```text
-The command bridge with curved holographic consoles and a huge window looking down on Earth.
+The command bridge with curved holographic consoles and a huge window looking down on Earth, wide establishing shot at eye level, an empty deserted location, the main landmark centered in the frame, layered depth with soft distant haze, cold blue and cyan neon on brushed steel with red warning lights, orbital space station, painterly digital game illustration, soft visible brushwork, clean graphic shapes, cinematic rim lighting, atmospheric depth --v 8.2 --ar 16:9 --s 250 --chaos 8 --sref https://raw.githubusercontent.com/hoffo1987/Last-One-Standing/main/assets/arene/scifi.webp --sw 300 --no text, letters, words, readable signs, logo, watermark, people, characters, frame, border
 ```
-
-<details><summary>Prompt completo, pronto da incollare</summary>
-
-```text
-The command bridge with curved holographic consoles and a huge window looking down on Earth. Cold blue and cyan neon on brushed steel with red warning lights, orbital space station. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Wide 16:9 establishing shot of the location, no people, eye-level view, the key landmark inside the central third of the frame, soft depth fog in the background. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
-```
-
-</details>
 
 #### Moduli abitativi
 
-- **File**: `assets/arene/scifi/luoghi/moduli-abitativi.webp`
-- **Cosa mostrare**: Moduli dell'equipaggio stretti: cuccette, armadietti e un piccolo oblò rotondo.
-
-**Prompt**
+Moduli dell'equipaggio stretti: cuccette, armadietti e un piccolo oblò rotondo.  
+File: `assets/arene/scifi/luoghi/moduli-abitativi.webp`
 
 ```text
-Cramped crew living modules with bunks, personal lockers and a small round porthole.
+Cramped crew living modules with bunks, personal lockers and a small round porthole, wide establishing shot at eye level, an empty deserted location, the main landmark centered in the frame, layered depth with soft distant haze, cold blue and cyan neon on brushed steel with red warning lights, orbital space station, painterly digital game illustration, soft visible brushwork, clean graphic shapes, cinematic rim lighting, atmospheric depth --v 8.2 --ar 16:9 --s 250 --chaos 8 --sref https://raw.githubusercontent.com/hoffo1987/Last-One-Standing/main/assets/arene/scifi.webp --sw 300 --no text, letters, words, readable signs, logo, watermark, people, characters, frame, border
 ```
-
-<details><summary>Prompt completo, pronto da incollare</summary>
-
-```text
-Cramped crew living modules with bunks, personal lockers and a small round porthole. Cold blue and cyan neon on brushed steel with red warning lights, orbital space station. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Wide 16:9 establishing shot of the location, no people, eye-level view, the key landmark inside the central third of the frame, soft depth fog in the background. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
-```
-
-</details>
 
 #### Condotti di servizio
 
-- **File**: `assets/arene/scifi/luoghi/condotti-di-servizio.webp`
-- **Cosa mostrare**: Condotti di servizio angusti con cavi, sfiati di vapore e luci d'emergenza tremolanti.
-
-**Prompt**
+Condotti di servizio angusti con cavi, sfiati di vapore e luci d'emergenza tremolanti.  
+File: `assets/arene/scifi/luoghi/condotti-di-servizio.webp`
 
 ```text
-Narrow service ducts packed with cables, steam vents and flickering red emergency lights.
+Narrow service ducts packed with cables, steam vents and flickering red emergency lights, wide establishing shot at eye level, an empty deserted location, the main landmark centered in the frame, layered depth with soft distant haze, cold blue and cyan neon on brushed steel with red warning lights, orbital space station, painterly digital game illustration, soft visible brushwork, clean graphic shapes, cinematic rim lighting, atmospheric depth --v 8.2 --ar 16:9 --s 250 --chaos 8 --sref https://raw.githubusercontent.com/hoffo1987/Last-One-Standing/main/assets/arene/scifi.webp --sw 300 --no text, letters, words, readable signs, logo, watermark, people, characters, frame, border
 ```
 
-<details><summary>Prompt completo, pronto da incollare</summary>
-
-```text
-Narrow service ducts packed with cables, steam vents and flickering red emergency lights. Cold blue and cyan neon on brushed steel with red warning lights, orbital space station. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Wide 16:9 establishing shot of the location, no people, eye-level view, the key landmark inside the central third of the frame, soft depth fog in the background. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
-```
-
-</details>
-
-### Pericoli · Stazione Orbitale (4:3, 960 × 720 px, sfondo pieno e scuro)
+### Pericoli · Stazione Orbitale
 
 #### Drone di sicurezza impazzito
 
-- **File**: `assets/arene/scifi/pericoli/drone-di-sicurezza-impazzito.webp`
-- **Cosa mostrare**: Drone di sicurezza fuori controllo con un solo occhio rosso e rotori danneggiati che sprizzano scintille.
-
-**Prompt**
+Drone di sicurezza fuori controllo con un solo occhio rosso e rotori danneggiati che sprizzano scintille.  
+File: `assets/arene/scifi/pericoli/drone-di-sicurezza-impazzito.webp`
 
 ```text
-A rogue security drone with a single red eye and damaged rotors throwing sparks.
+A rogue security drone with a single red eye and damaged rotors throwing sparks, dramatic portrait framed like a wanted poster, single subject centered and staring at the viewer, eyes in the upper half of the frame, dark vignette fading to near black at the edges, cold blue and cyan neon on brushed steel with red warning lights, orbital space station, painterly digital game illustration, soft visible brushwork, clean graphic shapes, cinematic rim lighting, atmospheric depth --v 8.2 --ar 4:3 --s 300 --chaos 8 --sref https://raw.githubusercontent.com/hoffo1987/Last-One-Standing/main/assets/arene/scifi.webp --sw 250 --no text, letters, words, logo, watermark, frame, border, poster lettering
 ```
-
-<details><summary>Prompt completo, pronto da incollare</summary>
-
-```text
-A rogue security drone with a single red eye and damaged rotors throwing sparks. Cold blue and cyan neon on brushed steel with red warning lights, orbital space station. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. 4:3 wanted-poster portrait, single threat centered and facing the viewer, head and eyes in the upper middle of the frame, dark vignetted background that fades to near black at the edges. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
-```
-
-</details>
 
 #### Sciame di nanobot
 
-- **File**: `assets/arene/scifi/pericoli/sciame-di-nanobot.webp`
-- **Cosa mostrare**: Sciame argentato di nanobot che si avvita formando una sagoma minacciosa.
-
-**Prompt**
+Sciame argentato di nanobot che si avvita formando una sagoma minacciosa.  
+File: `assets/arene/scifi/pericoli/sciame-di-nanobot.webp`
 
 ```text
-A swirling silver swarm of nanobots forming a menacing face-like shape.
+A swirling silver swarm of nanobots forming a menacing face-like shape, dramatic portrait framed like a wanted poster, single subject centered and staring at the viewer, eyes in the upper half of the frame, dark vignette fading to near black at the edges, cold blue and cyan neon on brushed steel with red warning lights, orbital space station, painterly digital game illustration, soft visible brushwork, clean graphic shapes, cinematic rim lighting, atmospheric depth --v 8.2 --ar 4:3 --s 300 --chaos 8 --sref https://raw.githubusercontent.com/hoffo1987/Last-One-Standing/main/assets/arene/scifi.webp --sw 250 --no text, letters, words, logo, watermark, frame, border, poster lettering
 ```
-
-<details><summary>Prompt completo, pronto da incollare</summary>
-
-```text
-A swirling silver swarm of nanobots forming a menacing face-like shape. Cold blue and cyan neon on brushed steel with red warning lights, orbital space station. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. 4:3 wanted-poster portrait, single threat centered and facing the viewer, head and eyes in the upper middle of the frame, dark vignetted background that fades to near black at the edges. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
-```
-
-</details>
 
 #### Creatura aliena dai tentacoli
 
-- **File**: `assets/arene/scifi/pericoli/creatura-aliena-dai-tentacoli.webp`
-- **Cosa mostrare**: Creatura aliena con tentacoli lucidi e macchie bioluminescenti che esce da una grata.
-
-**Prompt**
+Creatura aliena con tentacoli lucidi e macchie bioluminescenti che esce da una grata.  
+File: `assets/arene/scifi/pericoli/creatura-aliena-dai-tentacoli.webp`
 
 ```text
-An alien creature with glossy tentacles and bioluminescent spots squeezing out of a vent grate.
+An alien creature with glossy tentacles and bioluminescent spots squeezing out of a vent grate, dramatic portrait framed like a wanted poster, single subject centered and staring at the viewer, eyes in the upper half of the frame, dark vignette fading to near black at the edges, cold blue and cyan neon on brushed steel with red warning lights, orbital space station, painterly digital game illustration, soft visible brushwork, clean graphic shapes, cinematic rim lighting, atmospheric depth --v 8.2 --ar 4:3 --s 300 --chaos 8 --sref https://raw.githubusercontent.com/hoffo1987/Last-One-Standing/main/assets/arene/scifi.webp --sw 250 --no text, letters, words, logo, watermark, frame, border, poster lettering
 ```
-
-<details><summary>Prompt completo, pronto da incollare</summary>
-
-```text
-An alien creature with glossy tentacles and bioluminescent spots squeezing out of a vent grate. Cold blue and cyan neon on brushed steel with red warning lights, orbital space station. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. 4:3 wanted-poster portrait, single threat centered and facing the viewer, head and eyes in the upper middle of the frame, dark vignetted background that fades to near black at the edges. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
-```
-
-</details>
 
 #### Androide da combattimento
 
-- **File**: `assets/arene/scifi/pericoli/androide-da-combattimento.webp`
-- **Cosa mostrare**: Androide da combattimento corazzato, visore acceso, pelle sintetica strappata.
-
-**Prompt**
+Androide da combattimento corazzato, visore acceso, pelle sintetica strappata.  
+File: `assets/arene/scifi/pericoli/androide-da-combattimento.webp`
 
 ```text
-A battle android with an armoured chassis, glowing visor and torn synthetic skin.
+A battle android with an armoured chassis, glowing visor and torn synthetic skin, dramatic portrait framed like a wanted poster, single subject centered and staring at the viewer, eyes in the upper half of the frame, dark vignette fading to near black at the edges, cold blue and cyan neon on brushed steel with red warning lights, orbital space station, painterly digital game illustration, soft visible brushwork, clean graphic shapes, cinematic rim lighting, atmospheric depth --v 8.2 --ar 4:3 --s 300 --chaos 8 --sref https://raw.githubusercontent.com/hoffo1987/Last-One-Standing/main/assets/arene/scifi.webp --sw 250 --no text, letters, words, logo, watermark, frame, border, poster lettering
 ```
 
-<details><summary>Prompt completo, pronto da incollare</summary>
-
-```text
-A battle android with an armoured chassis, glowing visor and torn synthetic skin. Cold blue and cyan neon on brushed steel with red warning lights, orbital space station. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. 4:3 wanted-poster portrait, single threat centered and facing the viewer, head and eyes in the upper middle of the frame, dark vignetted background that fades to near black at the edges. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
-```
-
-</details>
-
-### Armi · Stazione Orbitale (1:1, 512 × 512 px, sfondo trasparente)
+### Armi · Stazione Orbitale
 
 #### Fucile al plasma
 
-- **File**: `assets/arene/scifi/armi/fucile-al-plasma.webp`
-- **Cosa mostrare**: Fucile al plasma affusolato con celle d'energia ciano.
-
-**Prompt**
+Fucile al plasma affusolato con celle d'energia ciano.  
+File: `assets/arene/scifi/armi/fucile-al-plasma.webp`
 
 ```text
-A sleek plasma rifle with glowing cyan energy cells.
+A sleek plasma rifle with glowing cyan energy cells, single game inventory item, three-quarter view laid diagonally from lower left to upper right, centered with generous empty margin, crisp clean silhouette with a thin dark outline, isolated on a plain flat light grey background, cold blue and cyan neon on brushed steel with red warning lights, orbital space station, painterly digital game illustration, soft visible brushwork, clean graphic shapes, cinematic rim lighting, atmospheric depth --v 8.2 --ar 1:1 --s 150 --chaos 0 --sref https://raw.githubusercontent.com/hoffo1987/Last-One-Standing/main/assets/arene/scifi.webp --sw 120 --no text, letters, logo, watermark, hands, person, scenery, background objects, cast shadow, frame, border
 ```
-
-<details><summary>Prompt completo, pronto da incollare</summary>
-
-```text
-A sleek plasma rifle with glowing cyan energy cells. Cold blue and cyan neon on brushed steel with red warning lights, orbital space station. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Single object only, isolated on a fully transparent background, square 1:1, three-quarter view laid diagonally from lower left to upper right, 12% empty margin on every side, crisp silhouette with a thin dark outline so it reads on both light and dark backgrounds, no hands, no shadow on the ground. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
-```
-
-</details>
 
 #### Lama vibrante
 
-- **File**: `assets/arene/scifi/armi/lama-vibrante.webp`
-- **Cosa mostrare**: Lama vibrante con il filo traslucido che ronza.
-
-**Prompt**
+Lama vibrante con il filo traslucido che ronza.  
+File: `assets/arene/scifi/armi/lama-vibrante.webp`
 
 ```text
-A vibro-blade with a humming translucent edge and a ribbed grip.
+A vibro-blade with a humming translucent edge and a ribbed grip, single game inventory item, three-quarter view laid diagonally from lower left to upper right, centered with generous empty margin, crisp clean silhouette with a thin dark outline, isolated on a plain flat light grey background, cold blue and cyan neon on brushed steel with red warning lights, orbital space station, painterly digital game illustration, soft visible brushwork, clean graphic shapes, cinematic rim lighting, atmospheric depth --v 8.2 --ar 1:1 --s 150 --chaos 0 --sref https://raw.githubusercontent.com/hoffo1987/Last-One-Standing/main/assets/arene/scifi.webp --sw 120 --no text, letters, logo, watermark, hands, person, scenery, background objects, cast shadow, frame, border
 ```
-
-<details><summary>Prompt completo, pronto da incollare</summary>
-
-```text
-A vibro-blade with a humming translucent edge and a ribbed grip. Cold blue and cyan neon on brushed steel with red warning lights, orbital space station. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Single object only, isolated on a fully transparent background, square 1:1, three-quarter view laid diagonally from lower left to upper right, 12% empty margin on every side, crisp silhouette with a thin dark outline so it reads on both light and dark backgrounds, no hands, no shadow on the ground. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
-```
-
-</details>
 
 #### Pistola laser
 
-- **File**: `assets/arene/scifi/armi/pistola-laser.webp`
-- **Cosa mostrare**: Pistola laser compatta con emettitore rosso.
-
-**Prompt**
+Pistola laser compatta con emettitore rosso.  
+File: `assets/arene/scifi/armi/pistola-laser.webp`
 
 ```text
-A compact laser pistol with a red emitter tip.
+A compact laser pistol with a red emitter tip, single game inventory item, three-quarter view laid diagonally from lower left to upper right, centered with generous empty margin, crisp clean silhouette with a thin dark outline, isolated on a plain flat light grey background, cold blue and cyan neon on brushed steel with red warning lights, orbital space station, painterly digital game illustration, soft visible brushwork, clean graphic shapes, cinematic rim lighting, atmospheric depth --v 8.2 --ar 1:1 --s 150 --chaos 0 --sref https://raw.githubusercontent.com/hoffo1987/Last-One-Standing/main/assets/arene/scifi.webp --sw 120 --no text, letters, logo, watermark, hands, person, scenery, background objects, cast shadow, frame, border
 ```
-
-<details><summary>Prompt completo, pronto da incollare</summary>
-
-```text
-A compact laser pistol with a red emitter tip. Cold blue and cyan neon on brushed steel with red warning lights, orbital space station. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Single object only, isolated on a fully transparent background, square 1:1, three-quarter view laid diagonally from lower left to upper right, 12% empty margin on every side, crisp silhouette with a thin dark outline so it reads on both light and dark backgrounds, no hands, no shadow on the ground. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
-```
-
-</details>
 
 #### Granata EMP
 
-- **File**: `assets/arene/scifi/armi/granata-emp.webp`
-- **Cosa mostrare**: Granata EMP sferica con archi elettrici blu.
-
-**Prompt**
+Granata EMP sferica con archi elettrici blu.  
+File: `assets/arene/scifi/armi/granata-emp.webp`
 
 ```text
-A spherical EMP grenade with crackling blue electric arcs.
+A spherical EMP grenade with crackling blue electric arcs, single game inventory item, three-quarter view laid diagonally from lower left to upper right, centered with generous empty margin, crisp clean silhouette with a thin dark outline, isolated on a plain flat light grey background, cold blue and cyan neon on brushed steel with red warning lights, orbital space station, painterly digital game illustration, soft visible brushwork, clean graphic shapes, cinematic rim lighting, atmospheric depth --v 8.2 --ar 1:1 --s 150 --chaos 0 --sref https://raw.githubusercontent.com/hoffo1987/Last-One-Standing/main/assets/arene/scifi.webp --sw 120 --no text, letters, logo, watermark, hands, person, scenery, background objects, cast shadow, frame, border
 ```
-
-<details><summary>Prompt completo, pronto da incollare</summary>
-
-```text
-A spherical EMP grenade with crackling blue electric arcs. Cold blue and cyan neon on brushed steel with red warning lights, orbital space station. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Single object only, isolated on a fully transparent background, square 1:1, three-quarter view laid diagonally from lower left to upper right, 12% empty margin on every side, crisp silhouette with a thin dark outline so it reads on both light and dark backgrounds, no hands, no shadow on the ground. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
-```
-
-</details>
 
 #### Frusta monofilamento
 
-- **File**: `assets/arene/scifi/armi/frusta-monofilamento.webp`
-- **Cosa mostrare**: Frusta a monofilamento: impugnatura metallica e un filo luminoso quasi invisibile.
-
-**Prompt**
+Frusta a monofilamento: impugnatura metallica e un filo luminoso quasi invisibile.  
+File: `assets/arene/scifi/armi/frusta-monofilamento.webp`
 
 ```text
-A monofilament whip, a metal handle with a nearly invisible glowing line coiled around it.
+A monofilament whip, a metal handle with a nearly invisible glowing line coiled around it, single game inventory item, three-quarter view laid diagonally from lower left to upper right, centered with generous empty margin, crisp clean silhouette with a thin dark outline, isolated on a plain flat light grey background, cold blue and cyan neon on brushed steel with red warning lights, orbital space station, painterly digital game illustration, soft visible brushwork, clean graphic shapes, cinematic rim lighting, atmospheric depth --v 8.2 --ar 1:1 --s 150 --chaos 0 --sref https://raw.githubusercontent.com/hoffo1987/Last-One-Standing/main/assets/arene/scifi.webp --sw 120 --no text, letters, logo, watermark, hands, person, scenery, background objects, cast shadow, frame, border
 ```
-
-<details><summary>Prompt completo, pronto da incollare</summary>
-
-```text
-A monofilament whip, a metal handle with a nearly invisible glowing line coiled around it. Cold blue and cyan neon on brushed steel with red warning lights, orbital space station. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Single object only, isolated on a fully transparent background, square 1:1, three-quarter view laid diagonally from lower left to upper right, 12% empty margin on every side, crisp silhouette with a thin dark outline so it reads on both light and dark backgrounds, no hands, no shadow on the ground. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
-```
-
-</details>
 
 #### Taser a impulsi
 
-- **File**: `assets/arene/scifi/armi/taser-a-impulsi.webp`
-- **Cosa mostrare**: Taser a impulsi con elettrodi che crepitano.
-
-**Prompt**
+Taser a impulsi con elettrodi che crepitano.  
+File: `assets/arene/scifi/armi/taser-a-impulsi.webp`
 
 ```text
-A pulse taser with crackling electrodes.
+A pulse taser with crackling electrodes, single game inventory item, three-quarter view laid diagonally from lower left to upper right, centered with generous empty margin, crisp clean silhouette with a thin dark outline, isolated on a plain flat light grey background, cold blue and cyan neon on brushed steel with red warning lights, orbital space station, painterly digital game illustration, soft visible brushwork, clean graphic shapes, cinematic rim lighting, atmospheric depth --v 8.2 --ar 1:1 --s 150 --chaos 0 --sref https://raw.githubusercontent.com/hoffo1987/Last-One-Standing/main/assets/arene/scifi.webp --sw 120 --no text, letters, logo, watermark, hands, person, scenery, background objects, cast shadow, frame, border
 ```
-
-<details><summary>Prompt completo, pronto da incollare</summary>
-
-```text
-A pulse taser with crackling electrodes. Cold blue and cyan neon on brushed steel with red warning lights, orbital space station. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Single object only, isolated on a fully transparent background, square 1:1, three-quarter view laid diagonally from lower left to upper right, 12% empty margin on every side, crisp silhouette with a thin dark outline so it reads on both light and dark backgrounds, no hands, no shadow on the ground. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
-```
-
-</details>
 
 #### Cannone a rotaia portatile
 
-- **File**: `assets/arene/scifi/armi/cannone-a-rotaia-portatile.webp`
-- **Cosa mostrare**: Cannone a rotaia portatile con binari magnetici e calcio pesante.
-
-**Prompt**
+Cannone a rotaia portatile con binari magnetici e calcio pesante.  
+File: `assets/arene/scifi/armi/cannone-a-rotaia-portatile.webp`
 
 ```text
-A portable railgun with twin magnetic rails and a heavy stock.
+A portable railgun with twin magnetic rails and a heavy stock, single game inventory item, three-quarter view laid diagonally from lower left to upper right, centered with generous empty margin, crisp clean silhouette with a thin dark outline, isolated on a plain flat light grey background, cold blue and cyan neon on brushed steel with red warning lights, orbital space station, painterly digital game illustration, soft visible brushwork, clean graphic shapes, cinematic rim lighting, atmospheric depth --v 8.2 --ar 1:1 --s 150 --chaos 0 --sref https://raw.githubusercontent.com/hoffo1987/Last-One-Standing/main/assets/arene/scifi.webp --sw 120 --no text, letters, logo, watermark, hands, person, scenery, background objects, cast shadow, frame, border
 ```
-
-<details><summary>Prompt completo, pronto da incollare</summary>
-
-```text
-A portable railgun with twin magnetic rails and a heavy stock. Cold blue and cyan neon on brushed steel with red warning lights, orbital space station. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Single object only, isolated on a fully transparent background, square 1:1, three-quarter view laid diagonally from lower left to upper right, 12% empty margin on every side, crisp silhouette with a thin dark outline so it reads on both light and dark backgrounds, no hands, no shadow on the ground. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
-```
-
-</details>
 
 ---
 
@@ -1206,369 +613,176 @@ A portable railgun with twin magnetic rails and a heavy stock. Cold blue and cya
 
 Ospedali vuoti, orde affamate e radio gracchianti.
 
-- **Cartella**: `assets/arene/zombie/` (con le sottocartelle `luoghi/`, `pericoli/`, `armi/`)
-- **Riferimento di stile**: `assets/arene/zombie.webp`
 - **Atmosfera**: Città abbandonata dopo il contagio: verdi malati, grigi, ruggine, cielo coperto, luci tremolanti. Inquietante più che splatter.
-- **Stile da aggiungere a ogni prompt di questa arena** (è già incluso nei prompt completi):
+- **Riferimento di stile** (`--sref`): [https://raw.githubusercontent.com/hoffo1987/Last-One-Standing/main/assets/arene/zombie.webp](https://raw.githubusercontent.com/hoffo1987/Last-One-Standing/main/assets/arene/zombie.webp)
 
-```text
-Sickly green, grey and rust palette under an overcast sky, abandoned post-outbreak city. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours.
-```
-
-Più, a seconda della sezione:
-
-- Luoghi: `Wide 16:9 establishing shot of the location, no people, eye-level view, the key landmark inside the central third of the frame, soft depth fog in the background.`
-- Pericoli: `4:3 wanted-poster portrait, single threat centered and facing the viewer, head and eyes in the upper middle of the frame, dark vignetted background that fades to near black at the edges.`
-- Armi: `Single object only, isolated on a fully transparent background, square 1:1, three-quarter view laid diagonally from lower left to upper right, 12% empty margin on every side, crisp silhouette with a thin dark outline so it reads on both light and dark backgrounds, no hands, no shadow on the ground.`
-- Sempre: `No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.`
-
-### Luoghi · Città degli Infetti (16:9, 1280 × 720 px, sfondo pieno)
+### Luoghi · Città degli Infetti
 
 #### Ospedale
 
-- **File**: `assets/arene/zombie/luoghi/ospedale.webp`
-- **Cosa mostrare**: Corridoio d'ospedale abbandonato con barelle rovesciate, luci tremolanti e porte barricate.
-
-**Prompt**
+Corridoio d'ospedale abbandonato con barelle rovesciate, luci tremolanti e porte barricate.  
+File: `assets/arene/zombie/luoghi/ospedale.webp`
 
 ```text
-An abandoned hospital corridor with overturned gurneys, flickering lights and barricaded doors.
+An abandoned hospital corridor with overturned gurneys, flickering lights and barricaded doors, wide establishing shot at eye level, an empty deserted location, the main landmark centered in the frame, layered depth with soft distant haze, sickly green, grey and rust palette under an overcast sky, abandoned post-outbreak city, painterly digital game illustration, soft visible brushwork, clean graphic shapes, cinematic rim lighting, atmospheric depth --v 8.2 --ar 16:9 --s 250 --chaos 8 --sref https://raw.githubusercontent.com/hoffo1987/Last-One-Standing/main/assets/arene/zombie.webp --sw 300 --no text, letters, words, readable signs, logo, watermark, people, characters, frame, border
 ```
-
-<details><summary>Prompt completo, pronto da incollare</summary>
-
-```text
-An abandoned hospital corridor with overturned gurneys, flickering lights and barricaded doors. Sickly green, grey and rust palette under an overcast sky, abandoned post-outbreak city. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Wide 16:9 establishing shot of the location, no people, eye-level view, the key landmark inside the central third of the frame, soft depth fog in the background. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
-```
-
-</details>
 
 #### Centro commerciale
 
-- **File**: `assets/arene/zombie/luoghi/centro-commerciale.webp`
-- **Cosa mostrare**: Atrio di un centro commerciale saccheggiato, scale mobili rotte, carrelli sparsi, lucernari.
-
-**Prompt**
+Atrio di un centro commerciale saccheggiato, scale mobili rotte, carrelli sparsi, lucernari.  
+File: `assets/arene/zombie/luoghi/centro-commerciale.webp`
 
 ```text
-A looted shopping mall atrium with broken escalators, scattered trolleys and dusty skylights.
+A looted shopping mall atrium with broken escalators, scattered trolleys and dusty skylights, wide establishing shot at eye level, an empty deserted location, the main landmark centered in the frame, layered depth with soft distant haze, sickly green, grey and rust palette under an overcast sky, abandoned post-outbreak city, painterly digital game illustration, soft visible brushwork, clean graphic shapes, cinematic rim lighting, atmospheric depth --v 8.2 --ar 16:9 --s 250 --chaos 8 --sref https://raw.githubusercontent.com/hoffo1987/Last-One-Standing/main/assets/arene/zombie.webp --sw 300 --no text, letters, words, readable signs, logo, watermark, people, characters, frame, border
 ```
-
-<details><summary>Prompt completo, pronto da incollare</summary>
-
-```text
-A looted shopping mall atrium with broken escalators, scattered trolleys and dusty skylights. Sickly green, grey and rust palette under an overcast sky, abandoned post-outbreak city. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Wide 16:9 establishing shot of the location, no people, eye-level view, the key landmark inside the central third of the frame, soft depth fog in the background. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
-```
-
-</details>
 
 #### Metropolitana
 
-- **File**: `assets/arene/zombie/luoghi/metropolitana.webp`
-- **Cosa mostrare**: Banchina della metro al buio, un treno deragliato, binari allagati e lampade d'emergenza.
-
-**Prompt**
+Banchina della metro al buio, un treno deragliato, binari allagati e lampade d'emergenza.  
+File: `assets/arene/zombie/luoghi/metropolitana.webp`
 
 ```text
-A dark subway platform with a derailed train, flooded tracks and emergency lamps.
+A dark subway platform with a derailed train, flooded tracks and emergency lamps, wide establishing shot at eye level, an empty deserted location, the main landmark centered in the frame, layered depth with soft distant haze, sickly green, grey and rust palette under an overcast sky, abandoned post-outbreak city, painterly digital game illustration, soft visible brushwork, clean graphic shapes, cinematic rim lighting, atmospheric depth --v 8.2 --ar 16:9 --s 250 --chaos 8 --sref https://raw.githubusercontent.com/hoffo1987/Last-One-Standing/main/assets/arene/zombie.webp --sw 300 --no text, letters, words, readable signs, logo, watermark, people, characters, frame, border
 ```
-
-<details><summary>Prompt completo, pronto da incollare</summary>
-
-```text
-A dark subway platform with a derailed train, flooded tracks and emergency lamps. Sickly green, grey and rust palette under an overcast sky, abandoned post-outbreak city. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Wide 16:9 establishing shot of the location, no people, eye-level view, the key landmark inside the central third of the frame, soft depth fog in the background. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
-```
-
-</details>
 
 #### Scuola
 
-- **File**: `assets/arene/zombie/luoghi/scuola.webp`
-- **Cosa mostrare**: Corridoio di scuola vuoto, armadietti, fogli a terra e finestre sbarrate con assi.
-
-**Prompt**
+Corridoio di scuola vuoto, armadietti, fogli a terra e finestre sbarrate con assi.  
+File: `assets/arene/zombie/luoghi/scuola.webp`
 
 ```text
-An empty school hallway with lockers, papers on the floor and windows boarded up with planks.
+An empty school hallway with lockers, papers on the floor and windows boarded up with planks, wide establishing shot at eye level, an empty deserted location, the main landmark centered in the frame, layered depth with soft distant haze, sickly green, grey and rust palette under an overcast sky, abandoned post-outbreak city, painterly digital game illustration, soft visible brushwork, clean graphic shapes, cinematic rim lighting, atmospheric depth --v 8.2 --ar 16:9 --s 250 --chaos 8 --sref https://raw.githubusercontent.com/hoffo1987/Last-One-Standing/main/assets/arene/zombie.webp --sw 300 --no text, letters, words, readable signs, logo, watermark, people, characters, frame, border
 ```
-
-<details><summary>Prompt completo, pronto da incollare</summary>
-
-```text
-An empty school hallway with lockers, papers on the floor and windows boarded up with planks. Sickly green, grey and rust palette under an overcast sky, abandoned post-outbreak city. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Wide 16:9 establishing shot of the location, no people, eye-level view, the key landmark inside the central third of the frame, soft depth fog in the background. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
-```
-
-</details>
 
 #### Stazione di polizia
 
-- **File**: `assets/arene/zombie/luoghi/stazione-di-polizia.webp`
-- **Cosa mostrare**: Stazione di polizia fortificata con sacchi di sabbia, un furgone blindato e fari.
-
-**Prompt**
+Stazione di polizia fortificata con sacchi di sabbia, un furgone blindato e fari.  
+File: `assets/arene/zombie/luoghi/stazione-di-polizia.webp`
 
 ```text
-A fortified police station with sandbags, an armoured van and searchlights.
+A fortified police station with sandbags, an armoured van and searchlights, wide establishing shot at eye level, an empty deserted location, the main landmark centered in the frame, layered depth with soft distant haze, sickly green, grey and rust palette under an overcast sky, abandoned post-outbreak city, painterly digital game illustration, soft visible brushwork, clean graphic shapes, cinematic rim lighting, atmospheric depth --v 8.2 --ar 16:9 --s 250 --chaos 8 --sref https://raw.githubusercontent.com/hoffo1987/Last-One-Standing/main/assets/arene/zombie.webp --sw 300 --no text, letters, words, readable signs, logo, watermark, people, characters, frame, border
 ```
-
-<details><summary>Prompt completo, pronto da incollare</summary>
-
-```text
-A fortified police station with sandbags, an armoured van and searchlights. Sickly green, grey and rust palette under an overcast sky, abandoned post-outbreak city. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Wide 16:9 establishing shot of the location, no people, eye-level view, the key landmark inside the central third of the frame, soft depth fog in the background. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
-```
-
-</details>
 
 #### Periferia
 
-- **File**: `assets/arene/zombie/luoghi/periferia.webp`
-- **Cosa mostrare**: Strada di periferia con auto abbandonate, prati incolti e fumo all'orizzonte.
-
-**Prompt**
+Strada di periferia con auto abbandonate, prati incolti e fumo all'orizzonte.  
+File: `assets/arene/zombie/luoghi/periferia.webp`
 
 ```text
-A suburban street with abandoned cars, overgrown lawns and smoke on the horizon.
+A suburban street with abandoned cars, overgrown lawns and smoke on the horizon, wide establishing shot at eye level, an empty deserted location, the main landmark centered in the frame, layered depth with soft distant haze, sickly green, grey and rust palette under an overcast sky, abandoned post-outbreak city, painterly digital game illustration, soft visible brushwork, clean graphic shapes, cinematic rim lighting, atmospheric depth --v 8.2 --ar 16:9 --s 250 --chaos 8 --sref https://raw.githubusercontent.com/hoffo1987/Last-One-Standing/main/assets/arene/zombie.webp --sw 300 --no text, letters, words, readable signs, logo, watermark, people, characters, frame, border
 ```
 
-<details><summary>Prompt completo, pronto da incollare</summary>
-
-```text
-A suburban street with abandoned cars, overgrown lawns and smoke on the horizon. Sickly green, grey and rust palette under an overcast sky, abandoned post-outbreak city. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Wide 16:9 establishing shot of the location, no people, eye-level view, the key landmark inside the central third of the frame, soft depth fog in the background. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
-```
-
-</details>
-
-### Pericoli · Città degli Infetti (4:3, 960 × 720 px, sfondo pieno e scuro)
+### Pericoli · Città degli Infetti
 
 #### Orda di zombi
 
-- **File**: `assets/arene/zombie/pericoli/orda-di-zombi.webp`
-- **Cosa mostrare**: Orda fitta di zombi che riempie una strada, tante mani protese in avanti.
-
-**Prompt**
+Orda fitta di zombi che riempie una strada, tante mani protese in avanti.  
+File: `assets/arene/zombie/pericoli/orda-di-zombi.webp`
 
 ```text
-A dense horde of shambling zombies filling a city street, many hands reaching forward.
+A dense horde of shambling zombies filling a city street, many hands reaching forward, dramatic portrait framed like a wanted poster, single subject centered and staring at the viewer, eyes in the upper half of the frame, dark vignette fading to near black at the edges, sickly green, grey and rust palette under an overcast sky, abandoned post-outbreak city, painterly digital game illustration, soft visible brushwork, clean graphic shapes, cinematic rim lighting, atmospheric depth --v 8.2 --ar 4:3 --s 300 --chaos 8 --sref https://raw.githubusercontent.com/hoffo1987/Last-One-Standing/main/assets/arene/zombie.webp --sw 250 --no text, letters, words, logo, watermark, frame, border, poster lettering
 ```
-
-<details><summary>Prompt completo, pronto da incollare</summary>
-
-```text
-A dense horde of shambling zombies filling a city street, many hands reaching forward. Sickly green, grey and rust palette under an overcast sky, abandoned post-outbreak city. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. 4:3 wanted-poster portrait, single threat centered and facing the viewer, head and eyes in the upper middle of the frame, dark vignetted background that fades to near black at the edges. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
-```
-
-</details>
 
 #### Infetto corridore
 
-- **File**: `assets/arene/zombie/pericoli/infetto-corridore.webp`
-- **Cosa mostrare**: Infetto corridore colto a metà scatto, vestiti strappati, occhi folli.
-
-**Prompt**
+Infetto corridore colto a metà scatto, vestiti strappati, occhi folli.  
+File: `assets/arene/zombie/pericoli/infetto-corridore.webp`
 
 ```text
-A fast infected runner caught mid-sprint, torn clothes, wild eyes, motion frozen.
+A fast infected runner caught mid-sprint, torn clothes, wild eyes, motion frozen, dramatic portrait framed like a wanted poster, single subject centered and staring at the viewer, eyes in the upper half of the frame, dark vignette fading to near black at the edges, sickly green, grey and rust palette under an overcast sky, abandoned post-outbreak city, painterly digital game illustration, soft visible brushwork, clean graphic shapes, cinematic rim lighting, atmospheric depth --v 8.2 --ar 4:3 --s 300 --chaos 8 --sref https://raw.githubusercontent.com/hoffo1987/Last-One-Standing/main/assets/arene/zombie.webp --sw 250 --no text, letters, words, logo, watermark, frame, border, poster lettering
 ```
-
-<details><summary>Prompt completo, pronto da incollare</summary>
-
-```text
-A fast infected runner caught mid-sprint, torn clothes, wild eyes, motion frozen. Sickly green, grey and rust palette under an overcast sky, abandoned post-outbreak city. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. 4:3 wanted-poster portrait, single threat centered and facing the viewer, head and eyes in the upper middle of the frame, dark vignetted background that fades to near black at the edges. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
-```
-
-</details>
 
 #### Cane infetto
 
-- **File**: `assets/arene/zombie/pericoli/cane-infetto.webp`
-- **Cosa mostrare**: Cane infetto con pelo a chiazze, denti scoperti e occhi lattiginosi.
-
-**Prompt**
+Cane infetto con pelo a chiazze, denti scoperti e occhi lattiginosi.  
+File: `assets/arene/zombie/pericoli/cane-infetto.webp`
 
 ```text
-An infected dog with patchy fur, bared teeth and milky eyes.
+An infected dog with patchy fur, bared teeth and milky eyes, dramatic portrait framed like a wanted poster, single subject centered and staring at the viewer, eyes in the upper half of the frame, dark vignette fading to near black at the edges, sickly green, grey and rust palette under an overcast sky, abandoned post-outbreak city, painterly digital game illustration, soft visible brushwork, clean graphic shapes, cinematic rim lighting, atmospheric depth --v 8.2 --ar 4:3 --s 300 --chaos 8 --sref https://raw.githubusercontent.com/hoffo1987/Last-One-Standing/main/assets/arene/zombie.webp --sw 250 --no text, letters, words, logo, watermark, frame, border, poster lettering
 ```
-
-<details><summary>Prompt completo, pronto da incollare</summary>
-
-```text
-An infected dog with patchy fur, bared teeth and milky eyes. Sickly green, grey and rust palette under an overcast sky, abandoned post-outbreak city. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. 4:3 wanted-poster portrait, single threat centered and facing the viewer, head and eyes in the upper middle of the frame, dark vignetted background that fades to near black at the edges. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
-```
-
-</details>
 
 #### Gigante mutato
 
-- **File**: `assets/arene/zombie/pericoli/gigante-mutato.webp`
-- **Cosa mostrare**: Gigante mutato con muscoli gonfi e escrescenze ossee che sfonda un muro.
-
-**Prompt**
+Gigante mutato con muscoli gonfi e escrescenze ossee che sfonda un muro.  
+File: `assets/arene/zombie/pericoli/gigante-mutato.webp`
 
 ```text
-A towering mutated giant with swollen muscles and bone growths, smashing through a brick wall.
+A towering mutated giant with swollen muscles and bone growths, smashing through a brick wall, dramatic portrait framed like a wanted poster, single subject centered and staring at the viewer, eyes in the upper half of the frame, dark vignette fading to near black at the edges, sickly green, grey and rust palette under an overcast sky, abandoned post-outbreak city, painterly digital game illustration, soft visible brushwork, clean graphic shapes, cinematic rim lighting, atmospheric depth --v 8.2 --ar 4:3 --s 300 --chaos 8 --sref https://raw.githubusercontent.com/hoffo1987/Last-One-Standing/main/assets/arene/zombie.webp --sw 250 --no text, letters, words, logo, watermark, frame, border, poster lettering
 ```
 
-<details><summary>Prompt completo, pronto da incollare</summary>
-
-```text
-A towering mutated giant with swollen muscles and bone growths, smashing through a brick wall. Sickly green, grey and rust palette under an overcast sky, abandoned post-outbreak city. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. 4:3 wanted-poster portrait, single threat centered and facing the viewer, head and eyes in the upper middle of the frame, dark vignetted background that fades to near black at the edges. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
-```
-
-</details>
-
-### Armi · Città degli Infetti (1:1, 512 × 512 px, sfondo trasparente)
+### Armi · Città degli Infetti
 
 #### Mazza chiodata
 
-- **File**: `assets/arene/zombie/armi/mazza-chiodata.webp`
-- **Cosa mostrare**: Mazza da baseball avvolta nel filo spinato e nei chiodi.
-
-**Prompt**
+Mazza da baseball avvolta nel filo spinato e nei chiodi.  
+File: `assets/arene/zombie/armi/mazza-chiodata.webp`
 
 ```text
-A baseball bat wrapped in barbed wire and studded with nails.
+A baseball bat wrapped in barbed wire and studded with nails, single game inventory item, three-quarter view laid diagonally from lower left to upper right, centered with generous empty margin, crisp clean silhouette with a thin dark outline, isolated on a plain flat light grey background, sickly green, grey and rust palette under an overcast sky, abandoned post-outbreak city, painterly digital game illustration, soft visible brushwork, clean graphic shapes, cinematic rim lighting, atmospheric depth --v 8.2 --ar 1:1 --s 150 --chaos 0 --sref https://raw.githubusercontent.com/hoffo1987/Last-One-Standing/main/assets/arene/zombie.webp --sw 120 --no text, letters, logo, watermark, hands, person, scenery, background objects, cast shadow, frame, border
 ```
-
-<details><summary>Prompt completo, pronto da incollare</summary>
-
-```text
-A baseball bat wrapped in barbed wire and studded with nails. Sickly green, grey and rust palette under an overcast sky, abandoned post-outbreak city. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Single object only, isolated on a fully transparent background, square 1:1, three-quarter view laid diagonally from lower left to upper right, 12% empty margin on every side, crisp silhouette with a thin dark outline so it reads on both light and dark backgrounds, no hands, no shadow on the ground. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
-```
-
-</details>
 
 #### Fucile a pompa
 
-- **File**: `assets/arene/zombie/armi/fucile-a-pompa.webp`
-- **Cosa mostrare**: Fucile a pompa con il calcio rattoppato col nastro.
-
-**Prompt**
+Fucile a pompa con il calcio rattoppato col nastro.  
+File: `assets/arene/zombie/armi/fucile-a-pompa.webp`
 
 ```text
-A pump-action shotgun with a duct-taped stock.
+A pump-action shotgun with a duct-taped stock, single game inventory item, three-quarter view laid diagonally from lower left to upper right, centered with generous empty margin, crisp clean silhouette with a thin dark outline, isolated on a plain flat light grey background, sickly green, grey and rust palette under an overcast sky, abandoned post-outbreak city, painterly digital game illustration, soft visible brushwork, clean graphic shapes, cinematic rim lighting, atmospheric depth --v 8.2 --ar 1:1 --s 150 --chaos 0 --sref https://raw.githubusercontent.com/hoffo1987/Last-One-Standing/main/assets/arene/zombie.webp --sw 120 --no text, letters, logo, watermark, hands, person, scenery, background objects, cast shadow, frame, border
 ```
-
-<details><summary>Prompt completo, pronto da incollare</summary>
-
-```text
-A pump-action shotgun with a duct-taped stock. Sickly green, grey and rust palette under an overcast sky, abandoned post-outbreak city. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Single object only, isolated on a fully transparent background, square 1:1, three-quarter view laid diagonally from lower left to upper right, 12% empty margin on every side, crisp silhouette with a thin dark outline so it reads on both light and dark backgrounds, no hands, no shadow on the ground. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
-```
-
-</details>
 
 #### Piede di porco
 
-- **File**: `assets/arene/zombie/armi/piede-di-porco.webp`
-- **Cosa mostrare**: Piede di porco in acciaio rosso.
-
-**Prompt**
+Piede di porco in acciaio rosso.  
+File: `assets/arene/zombie/armi/piede-di-porco.webp`
 
 ```text
-A red steel crowbar, scuffed paint.
+A red steel crowbar, scuffed paint, single game inventory item, three-quarter view laid diagonally from lower left to upper right, centered with generous empty margin, crisp clean silhouette with a thin dark outline, isolated on a plain flat light grey background, sickly green, grey and rust palette under an overcast sky, abandoned post-outbreak city, painterly digital game illustration, soft visible brushwork, clean graphic shapes, cinematic rim lighting, atmospheric depth --v 8.2 --ar 1:1 --s 150 --chaos 0 --sref https://raw.githubusercontent.com/hoffo1987/Last-One-Standing/main/assets/arene/zombie.webp --sw 120 --no text, letters, logo, watermark, hands, person, scenery, background objects, cast shadow, frame, border
 ```
-
-<details><summary>Prompt completo, pronto da incollare</summary>
-
-```text
-A red steel crowbar, scuffed paint. Sickly green, grey and rust palette under an overcast sky, abandoned post-outbreak city. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Single object only, isolated on a fully transparent background, square 1:1, three-quarter view laid diagonally from lower left to upper right, 12% empty margin on every side, crisp silhouette with a thin dark outline so it reads on both light and dark backgrounds, no hands, no shadow on the ground. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
-```
-
-</details>
 
 #### Motosega
 
-- **File**: `assets/arene/zombie/armi/motosega.webp`
-- **Cosa mostrare**: Motosega con il corpo arancione graffiato.
-
-**Prompt**
+Motosega con il corpo arancione graffiato.  
+File: `assets/arene/zombie/armi/motosega.webp`
 
 ```text
-A chainsaw with a scratched orange body.
+A chainsaw with a scratched orange body, single game inventory item, three-quarter view laid diagonally from lower left to upper right, centered with generous empty margin, crisp clean silhouette with a thin dark outline, isolated on a plain flat light grey background, sickly green, grey and rust palette under an overcast sky, abandoned post-outbreak city, painterly digital game illustration, soft visible brushwork, clean graphic shapes, cinematic rim lighting, atmospheric depth --v 8.2 --ar 1:1 --s 150 --chaos 0 --sref https://raw.githubusercontent.com/hoffo1987/Last-One-Standing/main/assets/arene/zombie.webp --sw 120 --no text, letters, logo, watermark, hands, person, scenery, background objects, cast shadow, frame, border
 ```
-
-<details><summary>Prompt completo, pronto da incollare</summary>
-
-```text
-A chainsaw with a scratched orange body. Sickly green, grey and rust palette under an overcast sky, abandoned post-outbreak city. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Single object only, isolated on a fully transparent background, square 1:1, three-quarter view laid diagonally from lower left to upper right, 12% empty margin on every side, crisp silhouette with a thin dark outline so it reads on both light and dark backgrounds, no hands, no shadow on the ground. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
-```
-
-</details>
 
 #### Katana
 
-- **File**: `assets/arene/zombie/armi/katana.webp`
-- **Cosa mostrare**: Katana con l'impugnatura consumata.
-
-**Prompt**
+Katana con l'impugnatura consumata.  
+File: `assets/arene/zombie/armi/katana.webp`
 
 ```text
-A katana with a worn wrapped handle.
+A katana with a worn wrapped handle, single game inventory item, three-quarter view laid diagonally from lower left to upper right, centered with generous empty margin, crisp clean silhouette with a thin dark outline, isolated on a plain flat light grey background, sickly green, grey and rust palette under an overcast sky, abandoned post-outbreak city, painterly digital game illustration, soft visible brushwork, clean graphic shapes, cinematic rim lighting, atmospheric depth --v 8.2 --ar 1:1 --s 150 --chaos 0 --sref https://raw.githubusercontent.com/hoffo1987/Last-One-Standing/main/assets/arene/zombie.webp --sw 120 --no text, letters, logo, watermark, hands, person, scenery, background objects, cast shadow, frame, border
 ```
-
-<details><summary>Prompt completo, pronto da incollare</summary>
-
-```text
-A katana with a worn wrapped handle. Sickly green, grey and rust palette under an overcast sky, abandoned post-outbreak city. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Single object only, isolated on a fully transparent background, square 1:1, three-quarter view laid diagonally from lower left to upper right, 12% empty margin on every side, crisp silhouette with a thin dark outline so it reads on both light and dark backgrounds, no hands, no shadow on the ground. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
-```
-
-</details>
 
 #### Balestra
 
-- **File**: `assets/arene/zombie/armi/balestra.webp`
-- **Cosa mostrare**: Balestra moderna da caccia con mirino.
-
-**Prompt**
+Balestra moderna da caccia con mirino.  
+File: `assets/arene/zombie/armi/balestra.webp`
 
 ```text
-A modern hunting crossbow with a scope.
+A modern hunting crossbow with a scope, single game inventory item, three-quarter view laid diagonally from lower left to upper right, centered with generous empty margin, crisp clean silhouette with a thin dark outline, isolated on a plain flat light grey background, sickly green, grey and rust palette under an overcast sky, abandoned post-outbreak city, painterly digital game illustration, soft visible brushwork, clean graphic shapes, cinematic rim lighting, atmospheric depth --v 8.2 --ar 1:1 --s 150 --chaos 0 --sref https://raw.githubusercontent.com/hoffo1987/Last-One-Standing/main/assets/arene/zombie.webp --sw 120 --no text, letters, logo, watermark, hands, person, scenery, background objects, cast shadow, frame, border
 ```
-
-<details><summary>Prompt completo, pronto da incollare</summary>
-
-```text
-A modern hunting crossbow with a scope. Sickly green, grey and rust palette under an overcast sky, abandoned post-outbreak city. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Single object only, isolated on a fully transparent background, square 1:1, three-quarter view laid diagonally from lower left to upper right, 12% empty margin on every side, crisp silhouette with a thin dark outline so it reads on both light and dark backgrounds, no hands, no shadow on the ground. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
-```
-
-</details>
 
 #### Pistola
 
-- **File**: `assets/arene/zombie/armi/pistola.webp`
-- **Cosa mostrare**: Pistola semiautomatica malridotta.
-
-**Prompt**
+Pistola semiautomatica malridotta.  
+File: `assets/arene/zombie/armi/pistola.webp`
 
 ```text
-A battered semi-automatic pistol.
+A battered semi-automatic pistol, single game inventory item, three-quarter view laid diagonally from lower left to upper right, centered with generous empty margin, crisp clean silhouette with a thin dark outline, isolated on a plain flat light grey background, sickly green, grey and rust palette under an overcast sky, abandoned post-outbreak city, painterly digital game illustration, soft visible brushwork, clean graphic shapes, cinematic rim lighting, atmospheric depth --v 8.2 --ar 1:1 --s 150 --chaos 0 --sref https://raw.githubusercontent.com/hoffo1987/Last-One-Standing/main/assets/arene/zombie.webp --sw 120 --no text, letters, logo, watermark, hands, person, scenery, background objects, cast shadow, frame, border
 ```
-
-<details><summary>Prompt completo, pronto da incollare</summary>
-
-```text
-A battered semi-automatic pistol. Sickly green, grey and rust palette under an overcast sky, abandoned post-outbreak city. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Single object only, isolated on a fully transparent background, square 1:1, three-quarter view laid diagonally from lower left to upper right, 12% empty margin on every side, crisp silhouette with a thin dark outline so it reads on both light and dark backgrounds, no hands, no shadow on the ground. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
-```
-
-</details>
 
 #### Accetta
 
-- **File**: `assets/arene/zombie/armi/accetta.webp`
-- **Cosa mostrare**: Accetta con impugnatura in gomma.
-
-**Prompt**
+Accetta con impugnatura in gomma.  
+File: `assets/arene/zombie/armi/accetta.webp`
 
 ```text
-A hatchet with a rubber grip.
+A hatchet with a rubber grip, single game inventory item, three-quarter view laid diagonally from lower left to upper right, centered with generous empty margin, crisp clean silhouette with a thin dark outline, isolated on a plain flat light grey background, sickly green, grey and rust palette under an overcast sky, abandoned post-outbreak city, painterly digital game illustration, soft visible brushwork, clean graphic shapes, cinematic rim lighting, atmospheric depth --v 8.2 --ar 1:1 --s 150 --chaos 0 --sref https://raw.githubusercontent.com/hoffo1987/Last-One-Standing/main/assets/arene/zombie.webp --sw 120 --no text, letters, logo, watermark, hands, person, scenery, background objects, cast shadow, frame, border
 ```
-
-<details><summary>Prompt completo, pronto da incollare</summary>
-
-```text
-A hatchet with a rubber grip. Sickly green, grey and rust palette under an overcast sky, abandoned post-outbreak city. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Single object only, isolated on a fully transparent background, square 1:1, three-quarter view laid diagonally from lower left to upper right, 12% empty margin on every side, crisp silhouette with a thin dark outline so it reads on both light and dark backgrounds, no hands, no shadow on the ground. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
-```
-
-</details>
 
 ---
 
@@ -1576,350 +790,167 @@ A hatchet with a rubber grip. Sickly green, grey and rust palette under an overc
 
 Un aereo, cento casse e una zona che si stringe.
 
-- **Cartella**: `assets/arene/royale/` (con le sottocartelle `luoghi/`, `pericoli/`, `armi/`)
-- **Riferimento di stile**: `assets/arene/royale.webp`
 - **Atmosfera**: Isola tropicale da battle royale videoludico: blu mare, verde giungla, arancio di tramonto, contrasti puliti, un po' «da videogioco».
-- **Stile da aggiungere a ogni prompt di questa arena** (è già incluso nei prompt completi):
+- **Riferimento di stile** (`--sref`): [https://raw.githubusercontent.com/hoffo1987/Last-One-Standing/main/assets/arene/royale.webp](https://raw.githubusercontent.com/hoffo1987/Last-One-Standing/main/assets/arene/royale.webp)
 
-```text
-Tropical island palette of deep sea blue, jungle green and orange sunset, clean stylised battle-royale video game look. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours.
-```
-
-Più, a seconda della sezione:
-
-- Luoghi: `Wide 16:9 establishing shot of the location, no people, eye-level view, the key landmark inside the central third of the frame, soft depth fog in the background.`
-- Pericoli: `4:3 wanted-poster portrait, single threat centered and facing the viewer, head and eyes in the upper middle of the frame, dark vignetted background that fades to near black at the edges.`
-- Armi: `Single object only, isolated on a fully transparent background, square 1:1, three-quarter view laid diagonally from lower left to upper right, 12% empty margin on every side, crisp silhouette with a thin dark outline so it reads on both light and dark backgrounds, no hands, no shadow on the ground.`
-- Sempre: `No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.`
-
-### Luoghi · Isola Battle Royale (16:9, 1280 × 720 px, sfondo pieno)
+### Luoghi · Isola Battle Royale
 
 #### Aeroporto
 
-- **File**: `assets/arene/royale/luoghi/aeroporto.webp`
-- **Cosa mostrare**: Piccolo aeroporto dell'isola con pista, un cargo arrugginito e la torre di controllo.
-
-**Prompt**
+Piccolo aeroporto dell'isola con pista, un cargo arrugginito e la torre di controllo.  
+File: `assets/arene/royale/luoghi/aeroporto.webp`
 
 ```text
-A small island airport with a runway, a rusty cargo plane and a control tower.
+A small island airport with a runway, a rusty cargo plane and a control tower, wide establishing shot at eye level, an empty deserted location, the main landmark centered in the frame, layered depth with soft distant haze, tropical island palette of deep sea blue, jungle green and orange sunset, clean stylised battle-royale video game look, painterly digital game illustration, soft visible brushwork, clean graphic shapes, cinematic rim lighting, atmospheric depth --v 8.2 --ar 16:9 --s 250 --chaos 8 --sref https://raw.githubusercontent.com/hoffo1987/Last-One-Standing/main/assets/arene/royale.webp --sw 300 --no text, letters, words, readable signs, logo, watermark, people, characters, frame, border
 ```
-
-<details><summary>Prompt completo, pronto da incollare</summary>
-
-```text
-A small island airport with a runway, a rusty cargo plane and a control tower. Tropical island palette of deep sea blue, jungle green and orange sunset, clean stylised battle-royale video game look. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Wide 16:9 establishing shot of the location, no people, eye-level view, the key landmark inside the central third of the frame, soft depth fog in the background. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
-```
-
-</details>
 
 #### Base militare
 
-- **File**: `assets/arene/royale/luoghi/base-militare.webp`
-- **Cosa mostrare**: Base militare con tende, torrette di guardia, casse di rifornimento ed eliporto.
-
-**Prompt**
+Base militare con tende, torrette di guardia, casse di rifornimento ed eliporto.  
+File: `assets/arene/royale/luoghi/base-militare.webp`
 
 ```text
-A military base with tents, watchtowers, supply crates and a helipad.
+A military base with tents, watchtowers, supply crates and a helipad, wide establishing shot at eye level, an empty deserted location, the main landmark centered in the frame, layered depth with soft distant haze, tropical island palette of deep sea blue, jungle green and orange sunset, clean stylised battle-royale video game look, painterly digital game illustration, soft visible brushwork, clean graphic shapes, cinematic rim lighting, atmospheric depth --v 8.2 --ar 16:9 --s 250 --chaos 8 --sref https://raw.githubusercontent.com/hoffo1987/Last-One-Standing/main/assets/arene/royale.webp --sw 300 --no text, letters, words, readable signs, logo, watermark, people, characters, frame, border
 ```
-
-<details><summary>Prompt completo, pronto da incollare</summary>
-
-```text
-A military base with tents, watchtowers, supply crates and a helipad. Tropical island palette of deep sea blue, jungle green and orange sunset, clean stylised battle-royale video game look. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Wide 16:9 establishing shot of the location, no people, eye-level view, the key landmark inside the central third of the frame, soft depth fog in the background. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
-```
-
-</details>
 
 #### Villaggio costiero
 
-- **File**: `assets/arene/royale/luoghi/villaggio-costiero.webp`
-- **Cosa mostrare**: Villaggio di pescatori con case colorate, pontile di legno e barche.
-
-**Prompt**
+Villaggio di pescatori con case colorate, pontile di legno e barche.  
+File: `assets/arene/royale/luoghi/villaggio-costiero.webp`
 
 ```text
-A coastal fishing village with colourful houses, a wooden pier and boats.
+A coastal fishing village with colourful houses, a wooden pier and boats, wide establishing shot at eye level, an empty deserted location, the main landmark centered in the frame, layered depth with soft distant haze, tropical island palette of deep sea blue, jungle green and orange sunset, clean stylised battle-royale video game look, painterly digital game illustration, soft visible brushwork, clean graphic shapes, cinematic rim lighting, atmospheric depth --v 8.2 --ar 16:9 --s 250 --chaos 8 --sref https://raw.githubusercontent.com/hoffo1987/Last-One-Standing/main/assets/arene/royale.webp --sw 300 --no text, letters, words, readable signs, logo, watermark, people, characters, frame, border
 ```
-
-<details><summary>Prompt completo, pronto da incollare</summary>
-
-```text
-A coastal fishing village with colourful houses, a wooden pier and boats. Tropical island palette of deep sea blue, jungle green and orange sunset, clean stylised battle-royale video game look. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Wide 16:9 establishing shot of the location, no people, eye-level view, the key landmark inside the central third of the frame, soft depth fog in the background. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
-```
-
-</details>
 
 #### Centrale elettrica
 
-- **File**: `assets/arene/royale/luoghi/centrale-elettrica.webp`
-- **Cosa mostrare**: Centrale elettrica con torri di raffreddamento, tralicci e trasformatori.
-
-**Prompt**
+Centrale elettrica con torri di raffreddamento, tralicci e trasformatori.  
+File: `assets/arene/royale/luoghi/centrale-elettrica.webp`
 
 ```text
-A power plant with cooling towers, pylons and humming transformers.
+A power plant with cooling towers, pylons and humming transformers, wide establishing shot at eye level, an empty deserted location, the main landmark centered in the frame, layered depth with soft distant haze, tropical island palette of deep sea blue, jungle green and orange sunset, clean stylised battle-royale video game look, painterly digital game illustration, soft visible brushwork, clean graphic shapes, cinematic rim lighting, atmospheric depth --v 8.2 --ar 16:9 --s 250 --chaos 8 --sref https://raw.githubusercontent.com/hoffo1987/Last-One-Standing/main/assets/arene/royale.webp --sw 300 --no text, letters, words, readable signs, logo, watermark, people, characters, frame, border
 ```
-
-<details><summary>Prompt completo, pronto da incollare</summary>
-
-```text
-A power plant with cooling towers, pylons and humming transformers. Tropical island palette of deep sea blue, jungle green and orange sunset, clean stylised battle-royale video game look. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Wide 16:9 establishing shot of the location, no people, eye-level view, the key landmark inside the central third of the frame, soft depth fog in the background. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
-```
-
-</details>
 
 #### Fattoria
 
-- **File**: `assets/arene/royale/luoghi/fattoria.webp`
-- **Cosa mostrare**: Fattoria con fienile rosso, balle di fieno, silos e campi di grano.
-
-**Prompt**
+Fattoria con fienile rosso, balle di fieno, silos e campi di grano.  
+File: `assets/arene/royale/luoghi/fattoria.webp`
 
 ```text
-A farm with a red barn, hay bales, a silo and golden wheat fields.
+A farm with a red barn, hay bales, a silo and golden wheat fields, wide establishing shot at eye level, an empty deserted location, the main landmark centered in the frame, layered depth with soft distant haze, tropical island palette of deep sea blue, jungle green and orange sunset, clean stylised battle-royale video game look, painterly digital game illustration, soft visible brushwork, clean graphic shapes, cinematic rim lighting, atmospheric depth --v 8.2 --ar 16:9 --s 250 --chaos 8 --sref https://raw.githubusercontent.com/hoffo1987/Last-One-Standing/main/assets/arene/royale.webp --sw 300 --no text, letters, words, readable signs, logo, watermark, people, characters, frame, border
 ```
-
-<details><summary>Prompt completo, pronto da incollare</summary>
-
-```text
-A farm with a red barn, hay bales, a silo and golden wheat fields. Tropical island palette of deep sea blue, jungle green and orange sunset, clean stylised battle-royale video game look. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Wide 16:9 establishing shot of the location, no people, eye-level view, the key landmark inside the central third of the frame, soft depth fog in the background. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
-```
-
-</details>
 
 #### Foresta
 
-- **File**: `assets/arene/royale/luoghi/foresta.webp`
-- **Cosa mostrare**: Foresta tropicale rigogliosa con palme, felci e una cassa di rifornimento nascosta.
-
-**Prompt**
+Foresta tropicale rigogliosa con palme, felci e una cassa di rifornimento nascosta.  
+File: `assets/arene/royale/luoghi/foresta.webp`
 
 ```text
-A lush tropical forest with palm trees, ferns and a hidden glowing supply crate.
+A lush tropical forest with palm trees, ferns and a hidden glowing supply crate, wide establishing shot at eye level, an empty deserted location, the main landmark centered in the frame, layered depth with soft distant haze, tropical island palette of deep sea blue, jungle green and orange sunset, clean stylised battle-royale video game look, painterly digital game illustration, soft visible brushwork, clean graphic shapes, cinematic rim lighting, atmospheric depth --v 8.2 --ar 16:9 --s 250 --chaos 8 --sref https://raw.githubusercontent.com/hoffo1987/Last-One-Standing/main/assets/arene/royale.webp --sw 300 --no text, letters, words, readable signs, logo, watermark, people, characters, frame, border
 ```
 
-<details><summary>Prompt completo, pronto da incollare</summary>
-
-```text
-A lush tropical forest with palm trees, ferns and a hidden glowing supply crate. Tropical island palette of deep sea blue, jungle green and orange sunset, clean stylised battle-royale video game look. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Wide 16:9 establishing shot of the location, no people, eye-level view, the key landmark inside the central third of the frame, soft depth fog in the background. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
-```
-
-</details>
-
-### Pericoli · Isola Battle Royale (4:3, 960 × 720 px, sfondo pieno e scuro)
+### Pericoli · Isola Battle Royale
 
 #### Drone armato
 
-- **File**: `assets/arene/royale/pericoli/drone-armato.webp`
-- **Cosa mostrare**: Drone quadricottero armato con mitragliatrice e laser di puntamento rosso.
-
-**Prompt**
+Drone quadricottero armato con mitragliatrice e laser di puntamento rosso.  
+File: `assets/arene/royale/pericoli/drone-armato.webp`
 
 ```text
-An armed quadcopter drone with a mounted gun and a red targeting laser.
+An armed quadcopter drone with a mounted gun and a red targeting laser, dramatic portrait framed like a wanted poster, single subject centered and staring at the viewer, eyes in the upper half of the frame, dark vignette fading to near black at the edges, tropical island palette of deep sea blue, jungle green and orange sunset, clean stylised battle-royale video game look, painterly digital game illustration, soft visible brushwork, clean graphic shapes, cinematic rim lighting, atmospheric depth --v 8.2 --ar 4:3 --s 300 --chaos 8 --sref https://raw.githubusercontent.com/hoffo1987/Last-One-Standing/main/assets/arene/royale.webp --sw 250 --no text, letters, words, logo, watermark, frame, border, poster lettering
 ```
-
-<details><summary>Prompt completo, pronto da incollare</summary>
-
-```text
-An armed quadcopter drone with a mounted gun and a red targeting laser. Tropical island palette of deep sea blue, jungle green and orange sunset, clean stylised battle-royale video game look. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. 4:3 wanted-poster portrait, single threat centered and facing the viewer, head and eyes in the upper middle of the frame, dark vignetted background that fades to near black at the edges. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
-```
-
-</details>
 
 #### Elicottero da caccia
 
-- **File**: `assets/arene/royale/pericoli/elicottero-da-caccia.webp`
-- **Cosa mostrare**: Elicottero d'attacco in volo basso con il faro acceso.
-
-**Prompt**
+Elicottero d'attacco in volo basso con il faro acceso.  
+File: `assets/arene/royale/pericoli/elicottero-da-caccia.webp`
 
 ```text
-An attack helicopter hovering low with its searchlight on.
+An attack helicopter hovering low with its searchlight on, dramatic portrait framed like a wanted poster, single subject centered and staring at the viewer, eyes in the upper half of the frame, dark vignette fading to near black at the edges, tropical island palette of deep sea blue, jungle green and orange sunset, clean stylised battle-royale video game look, painterly digital game illustration, soft visible brushwork, clean graphic shapes, cinematic rim lighting, atmospheric depth --v 8.2 --ar 4:3 --s 300 --chaos 8 --sref https://raw.githubusercontent.com/hoffo1987/Last-One-Standing/main/assets/arene/royale.webp --sw 250 --no text, letters, words, logo, watermark, frame, border, poster lettering
 ```
-
-<details><summary>Prompt completo, pronto da incollare</summary>
-
-```text
-An attack helicopter hovering low with its searchlight on. Tropical island palette of deep sea blue, jungle green and orange sunset, clean stylised battle-royale video game look. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. 4:3 wanted-poster portrait, single threat centered and facing the viewer, head and eyes in the upper middle of the frame, dark vignetted background that fades to near black at the edges. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
-```
-
-</details>
 
 #### Cane da guardia addestrato
 
-- **File**: `assets/arene/royale/pericoli/cane-da-guardia-addestrato.webp`
-- **Cosa mostrare**: Pastore tedesco da guardia con giubbotto tattico, che abbaia.
-
-**Prompt**
+Pastore tedesco da guardia con giubbotto tattico, che abbaia.  
+File: `assets/arene/royale/pericoli/cane-da-guardia-addestrato.webp`
 
 ```text
-A trained German shepherd guard dog in a tactical vest, barking.
+A trained German shepherd guard dog in a tactical vest, barking, dramatic portrait framed like a wanted poster, single subject centered and staring at the viewer, eyes in the upper half of the frame, dark vignette fading to near black at the edges, tropical island palette of deep sea blue, jungle green and orange sunset, clean stylised battle-royale video game look, painterly digital game illustration, soft visible brushwork, clean graphic shapes, cinematic rim lighting, atmospheric depth --v 8.2 --ar 4:3 --s 300 --chaos 8 --sref https://raw.githubusercontent.com/hoffo1987/Last-One-Standing/main/assets/arene/royale.webp --sw 250 --no text, letters, words, logo, watermark, frame, border, poster lettering
 ```
 
-<details><summary>Prompt completo, pronto da incollare</summary>
-
-```text
-A trained German shepherd guard dog in a tactical vest, barking. Tropical island palette of deep sea blue, jungle green and orange sunset, clean stylised battle-royale video game look. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. 4:3 wanted-poster portrait, single threat centered and facing the viewer, head and eyes in the upper middle of the frame, dark vignetted background that fades to near black at the edges. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
-```
-
-</details>
-
-### Armi · Isola Battle Royale (1:1, 512 × 512 px, sfondo trasparente)
+### Armi · Isola Battle Royale
 
 #### Fucile d'assalto
 
-- **File**: `assets/arene/royale/armi/fucile-dassalto.webp`
-- **Cosa mostrare**: Fucile d'assalto con mirino a punto rosso.
-
-**Prompt**
+Fucile d'assalto con mirino a punto rosso.  
+File: `assets/arene/royale/armi/fucile-dassalto.webp`
 
 ```text
-An assault rifle with a red-dot sight.
+An assault rifle with a red-dot sight, single game inventory item, three-quarter view laid diagonally from lower left to upper right, centered with generous empty margin, crisp clean silhouette with a thin dark outline, isolated on a plain flat light grey background, tropical island palette of deep sea blue, jungle green and orange sunset, clean stylised battle-royale video game look, painterly digital game illustration, soft visible brushwork, clean graphic shapes, cinematic rim lighting, atmospheric depth --v 8.2 --ar 1:1 --s 150 --chaos 0 --sref https://raw.githubusercontent.com/hoffo1987/Last-One-Standing/main/assets/arene/royale.webp --sw 120 --no text, letters, logo, watermark, hands, person, scenery, background objects, cast shadow, frame, border
 ```
-
-<details><summary>Prompt completo, pronto da incollare</summary>
-
-```text
-An assault rifle with a red-dot sight. Tropical island palette of deep sea blue, jungle green and orange sunset, clean stylised battle-royale video game look. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Single object only, isolated on a fully transparent background, square 1:1, three-quarter view laid diagonally from lower left to upper right, 12% empty margin on every side, crisp silhouette with a thin dark outline so it reads on both light and dark backgrounds, no hands, no shadow on the ground. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
-```
-
-</details>
 
 #### Pistola
 
-- **File**: `assets/arene/royale/armi/pistola.webp`
-- **Cosa mostrare**: Pistola semiautomatica nera.
-
-**Prompt**
+Pistola semiautomatica nera.  
+File: `assets/arene/royale/armi/pistola.webp`
 
 ```text
-A black semi-automatic pistol.
+A black semi-automatic pistol, single game inventory item, three-quarter view laid diagonally from lower left to upper right, centered with generous empty margin, crisp clean silhouette with a thin dark outline, isolated on a plain flat light grey background, tropical island palette of deep sea blue, jungle green and orange sunset, clean stylised battle-royale video game look, painterly digital game illustration, soft visible brushwork, clean graphic shapes, cinematic rim lighting, atmospheric depth --v 8.2 --ar 1:1 --s 150 --chaos 0 --sref https://raw.githubusercontent.com/hoffo1987/Last-One-Standing/main/assets/arene/royale.webp --sw 120 --no text, letters, logo, watermark, hands, person, scenery, background objects, cast shadow, frame, border
 ```
-
-<details><summary>Prompt completo, pronto da incollare</summary>
-
-```text
-A black semi-automatic pistol. Tropical island palette of deep sea blue, jungle green and orange sunset, clean stylised battle-royale video game look. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Single object only, isolated on a fully transparent background, square 1:1, three-quarter view laid diagonally from lower left to upper right, 12% empty margin on every side, crisp silhouette with a thin dark outline so it reads on both light and dark backgrounds, no hands, no shadow on the ground. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
-```
-
-</details>
 
 #### Fucile da cecchino
 
-- **File**: `assets/arene/royale/armi/fucile-da-cecchino.webp`
-- **Cosa mostrare**: Fucile da cecchino con cannocchiale lungo e bipiede.
-
-**Prompt**
+Fucile da cecchino con cannocchiale lungo e bipiede.  
+File: `assets/arene/royale/armi/fucile-da-cecchino.webp`
 
 ```text
-A sniper rifle with a long scope and a folded bipod.
+A sniper rifle with a long scope and a folded bipod, single game inventory item, three-quarter view laid diagonally from lower left to upper right, centered with generous empty margin, crisp clean silhouette with a thin dark outline, isolated on a plain flat light grey background, tropical island palette of deep sea blue, jungle green and orange sunset, clean stylised battle-royale video game look, painterly digital game illustration, soft visible brushwork, clean graphic shapes, cinematic rim lighting, atmospheric depth --v 8.2 --ar 1:1 --s 150 --chaos 0 --sref https://raw.githubusercontent.com/hoffo1987/Last-One-Standing/main/assets/arene/royale.webp --sw 120 --no text, letters, logo, watermark, hands, person, scenery, background objects, cast shadow, frame, border
 ```
-
-<details><summary>Prompt completo, pronto da incollare</summary>
-
-```text
-A sniper rifle with a long scope and a folded bipod. Tropical island palette of deep sea blue, jungle green and orange sunset, clean stylised battle-royale video game look. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Single object only, isolated on a fully transparent background, square 1:1, three-quarter view laid diagonally from lower left to upper right, 12% empty margin on every side, crisp silhouette with a thin dark outline so it reads on both light and dark backgrounds, no hands, no shadow on the ground. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
-```
-
-</details>
 
 #### Fucile a pompa
 
-- **File**: `assets/arene/royale/armi/fucile-a-pompa.webp`
-- **Cosa mostrare**: Fucile a pompa tattico.
-
-**Prompt**
+Fucile a pompa tattico.  
+File: `assets/arene/royale/armi/fucile-a-pompa.webp`
 
 ```text
-A tactical pump shotgun.
+A tactical pump shotgun, single game inventory item, three-quarter view laid diagonally from lower left to upper right, centered with generous empty margin, crisp clean silhouette with a thin dark outline, isolated on a plain flat light grey background, tropical island palette of deep sea blue, jungle green and orange sunset, clean stylised battle-royale video game look, painterly digital game illustration, soft visible brushwork, clean graphic shapes, cinematic rim lighting, atmospheric depth --v 8.2 --ar 1:1 --s 150 --chaos 0 --sref https://raw.githubusercontent.com/hoffo1987/Last-One-Standing/main/assets/arene/royale.webp --sw 120 --no text, letters, logo, watermark, hands, person, scenery, background objects, cast shadow, frame, border
 ```
-
-<details><summary>Prompt completo, pronto da incollare</summary>
-
-```text
-A tactical pump shotgun. Tropical island palette of deep sea blue, jungle green and orange sunset, clean stylised battle-royale video game look. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Single object only, isolated on a fully transparent background, square 1:1, three-quarter view laid diagonally from lower left to upper right, 12% empty margin on every side, crisp silhouette with a thin dark outline so it reads on both light and dark backgrounds, no hands, no shadow on the ground. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
-```
-
-</details>
 
 #### Granata
 
-- **File**: `assets/arene/royale/armi/granata.webp`
-- **Cosa mostrare**: Granata a frammentazione con la spoletta.
-
-**Prompt**
+Granata a frammentazione con la spoletta.  
+File: `assets/arene/royale/armi/granata.webp`
 
 ```text
-A fragmentation grenade with its pin.
+A fragmentation grenade with its pin, single game inventory item, three-quarter view laid diagonally from lower left to upper right, centered with generous empty margin, crisp clean silhouette with a thin dark outline, isolated on a plain flat light grey background, tropical island palette of deep sea blue, jungle green and orange sunset, clean stylised battle-royale video game look, painterly digital game illustration, soft visible brushwork, clean graphic shapes, cinematic rim lighting, atmospheric depth --v 8.2 --ar 1:1 --s 150 --chaos 0 --sref https://raw.githubusercontent.com/hoffo1987/Last-One-Standing/main/assets/arene/royale.webp --sw 120 --no text, letters, logo, watermark, hands, person, scenery, background objects, cast shadow, frame, border
 ```
-
-<details><summary>Prompt completo, pronto da incollare</summary>
-
-```text
-A fragmentation grenade with its pin. Tropical island palette of deep sea blue, jungle green and orange sunset, clean stylised battle-royale video game look. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Single object only, isolated on a fully transparent background, square 1:1, three-quarter view laid diagonally from lower left to upper right, 12% empty margin on every side, crisp silhouette with a thin dark outline so it reads on both light and dark backgrounds, no hands, no shadow on the ground. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
-```
-
-</details>
 
 #### Mitraglietta
 
-- **File**: `assets/arene/royale/armi/mitraglietta.webp`
-- **Cosa mostrare**: Mitraglietta compatta.
-
-**Prompt**
+Mitraglietta compatta.  
+File: `assets/arene/royale/armi/mitraglietta.webp`
 
 ```text
-A compact submachine gun.
+A compact submachine gun, single game inventory item, three-quarter view laid diagonally from lower left to upper right, centered with generous empty margin, crisp clean silhouette with a thin dark outline, isolated on a plain flat light grey background, tropical island palette of deep sea blue, jungle green and orange sunset, clean stylised battle-royale video game look, painterly digital game illustration, soft visible brushwork, clean graphic shapes, cinematic rim lighting, atmospheric depth --v 8.2 --ar 1:1 --s 150 --chaos 0 --sref https://raw.githubusercontent.com/hoffo1987/Last-One-Standing/main/assets/arene/royale.webp --sw 120 --no text, letters, logo, watermark, hands, person, scenery, background objects, cast shadow, frame, border
 ```
-
-<details><summary>Prompt completo, pronto da incollare</summary>
-
-```text
-A compact submachine gun. Tropical island palette of deep sea blue, jungle green and orange sunset, clean stylised battle-royale video game look. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Single object only, isolated on a fully transparent background, square 1:1, three-quarter view laid diagonally from lower left to upper right, 12% empty margin on every side, crisp silhouette with a thin dark outline so it reads on both light and dark backgrounds, no hands, no shadow on the ground. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
-```
-
-</details>
 
 #### Coltello da combattimento
 
-- **File**: `assets/arene/royale/armi/coltello-da-combattimento.webp`
-- **Cosa mostrare**: Coltello da combattimento con dorso seghettato.
-
-**Prompt**
+Coltello da combattimento con dorso seghettato.  
+File: `assets/arene/royale/armi/coltello-da-combattimento.webp`
 
 ```text
-A combat knife with a serrated spine.
+A combat knife with a serrated spine, single game inventory item, three-quarter view laid diagonally from lower left to upper right, centered with generous empty margin, crisp clean silhouette with a thin dark outline, isolated on a plain flat light grey background, tropical island palette of deep sea blue, jungle green and orange sunset, clean stylised battle-royale video game look, painterly digital game illustration, soft visible brushwork, clean graphic shapes, cinematic rim lighting, atmospheric depth --v 8.2 --ar 1:1 --s 150 --chaos 0 --sref https://raw.githubusercontent.com/hoffo1987/Last-One-Standing/main/assets/arene/royale.webp --sw 120 --no text, letters, logo, watermark, hands, person, scenery, background objects, cast shadow, frame, border
 ```
-
-<details><summary>Prompt completo, pronto da incollare</summary>
-
-```text
-A combat knife with a serrated spine. Tropical island palette of deep sea blue, jungle green and orange sunset, clean stylised battle-royale video game look. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Single object only, isolated on a fully transparent background, square 1:1, three-quarter view laid diagonally from lower left to upper right, 12% empty margin on every side, crisp silhouette with a thin dark outline so it reads on both light and dark backgrounds, no hands, no shadow on the ground. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
-```
-
-</details>
 
 #### Balestra
 
-- **File**: `assets/arene/royale/armi/balestra.webp`
-- **Cosa mostrare**: Balestra tattica mimetica.
-
-**Prompt**
+Balestra tattica mimetica.  
+File: `assets/arene/royale/armi/balestra.webp`
 
 ```text
-A tactical crossbow with a camouflage pattern.
+A tactical crossbow with a camouflage pattern, single game inventory item, three-quarter view laid diagonally from lower left to upper right, centered with generous empty margin, crisp clean silhouette with a thin dark outline, isolated on a plain flat light grey background, tropical island palette of deep sea blue, jungle green and orange sunset, clean stylised battle-royale video game look, painterly digital game illustration, soft visible brushwork, clean graphic shapes, cinematic rim lighting, atmospheric depth --v 8.2 --ar 1:1 --s 150 --chaos 0 --sref https://raw.githubusercontent.com/hoffo1987/Last-One-Standing/main/assets/arene/royale.webp --sw 120 --no text, letters, logo, watermark, hands, person, scenery, background objects, cast shadow, frame, border
 ```
-
-<details><summary>Prompt completo, pronto da incollare</summary>
-
-```text
-A tactical crossbow with a camouflage pattern. Tropical island palette of deep sea blue, jungle green and orange sunset, clean stylised battle-royale video game look. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Single object only, isolated on a fully transparent background, square 1:1, three-quarter view laid diagonally from lower left to upper right, 12% empty margin on every side, crisp silhouette with a thin dark outline so it reads on both light and dark backgrounds, no hands, no shadow on the ground. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
-```
-
-</details>
 
 ---
 
@@ -1927,350 +958,167 @@ A tactical crossbow with a camouflage pattern. Tropical island palette of deep s
 
 Specchi che sussurrano e porte che si chiudono da sole.
 
-- **Cartella**: `assets/arene/horror/` (con le sottocartelle `luoghi/`, `pericoli/`, `armi/`)
-- **Riferimento di stile**: `assets/arene/horror.webp`
 - **Atmosfera**: Villa gotica maledetta: cremisi, nero e oro di candela, nebbia, luna rossa. Paura sottile e atmosfera, niente sangue esplicito.
-- **Stile da aggiungere a ogni prompt di questa arena** (è già incluso nei prompt completi):
+- **Riferimento di stile** (`--sref`): [https://raw.githubusercontent.com/hoffo1987/Last-One-Standing/main/assets/arene/horror.webp](https://raw.githubusercontent.com/hoffo1987/Last-One-Standing/main/assets/arene/horror.webp)
 
-```text
-Crimson, black and candlelight gold palette, eerie mist, gothic haunted mansion. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours.
-```
-
-Più, a seconda della sezione:
-
-- Luoghi: `Wide 16:9 establishing shot of the location, no people, eye-level view, the key landmark inside the central third of the frame, soft depth fog in the background.`
-- Pericoli: `4:3 wanted-poster portrait, single threat centered and facing the viewer, head and eyes in the upper middle of the frame, dark vignetted background that fades to near black at the edges.`
-- Armi: `Single object only, isolated on a fully transparent background, square 1:1, three-quarter view laid diagonally from lower left to upper right, 12% empty margin on every side, crisp silhouette with a thin dark outline so it reads on both light and dark backgrounds, no hands, no shadow on the ground.`
-- Sempre: `No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.`
-
-### Luoghi · Villa Maledetta (16:9, 1280 × 720 px, sfondo pieno)
+### Luoghi · Villa Maledetta
 
 #### Cantina
 
-- **File**: `assets/arene/horror/luoghi/cantina.webp`
-- **Cosa mostrare**: Cantina umida con botti piene di ragnatele, una lampadina che oscilla e una porta socchiusa.
-
-**Prompt**
+Cantina umida con botti piene di ragnatele, una lampadina che oscilla e una porta socchiusa.  
+File: `assets/arene/horror/luoghi/cantina.webp`
 
 ```text
-A damp wine cellar with cobwebbed barrels, a single swinging light bulb and a door left ajar.
+A damp wine cellar with cobwebbed barrels, a single swinging light bulb and a door left ajar, wide establishing shot at eye level, an empty deserted location, the main landmark centered in the frame, layered depth with soft distant haze, crimson, black and candlelight gold palette, eerie mist, gothic haunted mansion, painterly digital game illustration, soft visible brushwork, clean graphic shapes, cinematic rim lighting, atmospheric depth --v 8.2 --ar 16:9 --s 250 --chaos 8 --sref https://raw.githubusercontent.com/hoffo1987/Last-One-Standing/main/assets/arene/horror.webp --sw 300 --no text, letters, words, readable signs, logo, watermark, people, characters, frame, border
 ```
-
-<details><summary>Prompt completo, pronto da incollare</summary>
-
-```text
-A damp wine cellar with cobwebbed barrels, a single swinging light bulb and a door left ajar. Crimson, black and candlelight gold palette, eerie mist, gothic haunted mansion. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Wide 16:9 establishing shot of the location, no people, eye-level view, the key landmark inside the central third of the frame, soft depth fog in the background. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
-```
-
-</details>
 
 #### Soffitta
 
-- **File**: `assets/arene/horror/luoghi/soffitta.webp`
-- **Cosa mostrare**: Soffitta polverosa con mobili coperti da teli, un vecchio cavallo a dondolo e luna da un oblò.
-
-**Prompt**
+Soffitta polverosa con mobili coperti da teli, un vecchio cavallo a dondolo e luna da un oblò.  
+File: `assets/arene/horror/luoghi/soffitta.webp`
 
 ```text
-A dusty attic with sheet-covered furniture, an old rocking horse and moonlight through a round window.
+A dusty attic with sheet-covered furniture, an old rocking horse and moonlight through a round window, wide establishing shot at eye level, an empty deserted location, the main landmark centered in the frame, layered depth with soft distant haze, crimson, black and candlelight gold palette, eerie mist, gothic haunted mansion, painterly digital game illustration, soft visible brushwork, clean graphic shapes, cinematic rim lighting, atmospheric depth --v 8.2 --ar 16:9 --s 250 --chaos 8 --sref https://raw.githubusercontent.com/hoffo1987/Last-One-Standing/main/assets/arene/horror.webp --sw 300 --no text, letters, words, readable signs, logo, watermark, people, characters, frame, border
 ```
-
-<details><summary>Prompt completo, pronto da incollare</summary>
-
-```text
-A dusty attic with sheet-covered furniture, an old rocking horse and moonlight through a round window. Crimson, black and candlelight gold palette, eerie mist, gothic haunted mansion. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Wide 16:9 establishing shot of the location, no people, eye-level view, the key landmark inside the central third of the frame, soft depth fog in the background. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
-```
-
-</details>
 
 #### Cappella
 
-- **File**: `assets/arene/horror/luoghi/cappella.webp`
-- **Cosa mostrare**: Cappella gotica privata con candele, vetrate rotte e panche vuote.
-
-**Prompt**
+Cappella gotica privata con candele, vetrate rotte e panche vuote.  
+File: `assets/arene/horror/luoghi/cappella.webp`
 
 ```text
-A private gothic chapel with candles, broken stained glass and empty pews.
+A private gothic chapel with candles, broken stained glass and empty pews, wide establishing shot at eye level, an empty deserted location, the main landmark centered in the frame, layered depth with soft distant haze, crimson, black and candlelight gold palette, eerie mist, gothic haunted mansion, painterly digital game illustration, soft visible brushwork, clean graphic shapes, cinematic rim lighting, atmospheric depth --v 8.2 --ar 16:9 --s 250 --chaos 8 --sref https://raw.githubusercontent.com/hoffo1987/Last-One-Standing/main/assets/arene/horror.webp --sw 300 --no text, letters, words, readable signs, logo, watermark, people, characters, frame, border
 ```
-
-<details><summary>Prompt completo, pronto da incollare</summary>
-
-```text
-A private gothic chapel with candles, broken stained glass and empty pews. Crimson, black and candlelight gold palette, eerie mist, gothic haunted mansion. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Wide 16:9 establishing shot of the location, no people, eye-level view, the key landmark inside the central third of the frame, soft depth fog in the background. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
-```
-
-</details>
 
 #### Cimitero
 
-- **File**: `assets/arene/horror/luoghi/cimitero.webp`
-- **Cosa mostrare**: Cimitero incolto con lapidi storte, cancello di ferro e nebbia sotto una luna rossa.
-
-**Prompt**
+Cimitero incolto con lapidi storte, cancello di ferro e nebbia sotto una luna rossa.  
+File: `assets/arene/horror/luoghi/cimitero.webp`
 
 ```text
-An overgrown cemetery with leaning tombstones, an iron gate and fog under a red moon.
+An overgrown cemetery with leaning tombstones, an iron gate and fog under a red moon, wide establishing shot at eye level, an empty deserted location, the main landmark centered in the frame, layered depth with soft distant haze, crimson, black and candlelight gold palette, eerie mist, gothic haunted mansion, painterly digital game illustration, soft visible brushwork, clean graphic shapes, cinematic rim lighting, atmospheric depth --v 8.2 --ar 16:9 --s 250 --chaos 8 --sref https://raw.githubusercontent.com/hoffo1987/Last-One-Standing/main/assets/arene/horror.webp --sw 300 --no text, letters, words, readable signs, logo, watermark, people, characters, frame, border
 ```
-
-<details><summary>Prompt completo, pronto da incollare</summary>
-
-```text
-An overgrown cemetery with leaning tombstones, an iron gate and fog under a red moon. Crimson, black and candlelight gold palette, eerie mist, gothic haunted mansion. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Wide 16:9 establishing shot of the location, no people, eye-level view, the key landmark inside the central third of the frame, soft depth fog in the background. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
-```
-
-</details>
 
 #### Biblioteca
 
-- **File**: `assets/arene/horror/luoghi/biblioteca.webp`
-- **Cosa mostrare**: Biblioteca antica con scaffali altissimi, polvere sospesa e un libro aperto sul leggio.
-
-**Prompt**
+Biblioteca antica con scaffali altissimi, polvere sospesa e un libro aperto sul leggio.  
+File: `assets/arene/horror/luoghi/biblioteca.webp`
 
 ```text
-A grand old library with towering shelves, floating dust and a book lying open on a lectern.
+A grand old library with towering shelves, floating dust and a book lying open on a lectern, wide establishing shot at eye level, an empty deserted location, the main landmark centered in the frame, layered depth with soft distant haze, crimson, black and candlelight gold palette, eerie mist, gothic haunted mansion, painterly digital game illustration, soft visible brushwork, clean graphic shapes, cinematic rim lighting, atmospheric depth --v 8.2 --ar 16:9 --s 250 --chaos 8 --sref https://raw.githubusercontent.com/hoffo1987/Last-One-Standing/main/assets/arene/horror.webp --sw 300 --no text, letters, words, readable signs, logo, watermark, people, characters, frame, border
 ```
-
-<details><summary>Prompt completo, pronto da incollare</summary>
-
-```text
-A grand old library with towering shelves, floating dust and a book lying open on a lectern. Crimson, black and candlelight gold palette, eerie mist, gothic haunted mansion. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Wide 16:9 establishing shot of the location, no people, eye-level view, the key landmark inside the central third of the frame, soft depth fog in the background. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
-```
-
-</details>
 
 #### Serra
 
-- **File**: `assets/arene/horror/luoghi/serra.webp`
-- **Cosa mostrare**: Serra vittoriana in rovina con vetri rotti, piante carnivore e rampicanti.
-
-**Prompt**
+Serra vittoriana in rovina con vetri rotti, piante carnivore e rampicanti.  
+File: `assets/arene/horror/luoghi/serra.webp`
 
 ```text
-A derelict Victorian greenhouse with shattered glass, carnivorous plants and creeping vines.
+A derelict Victorian greenhouse with shattered glass, carnivorous plants and creeping vines, wide establishing shot at eye level, an empty deserted location, the main landmark centered in the frame, layered depth with soft distant haze, crimson, black and candlelight gold palette, eerie mist, gothic haunted mansion, painterly digital game illustration, soft visible brushwork, clean graphic shapes, cinematic rim lighting, atmospheric depth --v 8.2 --ar 16:9 --s 250 --chaos 8 --sref https://raw.githubusercontent.com/hoffo1987/Last-One-Standing/main/assets/arene/horror.webp --sw 300 --no text, letters, words, readable signs, logo, watermark, people, characters, frame, border
 ```
 
-<details><summary>Prompt completo, pronto da incollare</summary>
-
-```text
-A derelict Victorian greenhouse with shattered glass, carnivorous plants and creeping vines. Crimson, black and candlelight gold palette, eerie mist, gothic haunted mansion. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Wide 16:9 establishing shot of the location, no people, eye-level view, the key landmark inside the central third of the frame, soft depth fog in the background. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
-```
-
-</details>
-
-### Pericoli · Villa Maledetta (4:3, 960 × 720 px, sfondo pieno e scuro)
+### Pericoli · Villa Maledetta
 
 #### Spettro urlante
 
-- **File**: `assets/arene/horror/pericoli/spettro-urlante.webp`
-- **Cosa mostrare**: Fantasma che urla con la bocca innaturalmente allungata e capelli pallidi fluttuanti.
-
-**Prompt**
+Fantasma che urla con la bocca innaturalmente allungata e capelli pallidi fluttuanti.  
+File: `assets/arene/horror/pericoli/spettro-urlante.webp`
 
 ```text
-A screaming ghost with an unnaturally stretched mouth and pale floating hair, glowing white.
+A screaming ghost with an unnaturally stretched mouth and pale floating hair, glowing white, dramatic portrait framed like a wanted poster, single subject centered and staring at the viewer, eyes in the upper half of the frame, dark vignette fading to near black at the edges, crimson, black and candlelight gold palette, eerie mist, gothic haunted mansion, painterly digital game illustration, soft visible brushwork, clean graphic shapes, cinematic rim lighting, atmospheric depth --v 8.2 --ar 4:3 --s 300 --chaos 8 --sref https://raw.githubusercontent.com/hoffo1987/Last-One-Standing/main/assets/arene/horror.webp --sw 250 --no text, letters, words, logo, watermark, frame, border, poster lettering
 ```
-
-<details><summary>Prompt completo, pronto da incollare</summary>
-
-```text
-A screaming ghost with an unnaturally stretched mouth and pale floating hair, glowing white. Crimson, black and candlelight gold palette, eerie mist, gothic haunted mansion. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. 4:3 wanted-poster portrait, single threat centered and facing the viewer, head and eyes in the upper middle of the frame, dark vignetted background that fades to near black at the edges. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
-```
-
-</details>
 
 #### Bambola posseduta
 
-- **File**: `assets/arene/horror/pericoli/bambola-posseduta.webp`
-- **Cosa mostrare**: Bambola di porcellana col viso incrinato e un occhio di vetro, seduta su una sedia, troppo viva.
-
-**Prompt**
+Bambola di porcellana col viso incrinato e un occhio di vetro, seduta su una sedia, troppo viva.  
+File: `assets/arene/horror/pericoli/bambola-posseduta.webp`
 
 ```text
-A porcelain doll with a cracked face and one glass eye, sitting in a chair, slightly too alive.
+A porcelain doll with a cracked face and one glass eye, sitting in a chair, slightly too alive, dramatic portrait framed like a wanted poster, single subject centered and staring at the viewer, eyes in the upper half of the frame, dark vignette fading to near black at the edges, crimson, black and candlelight gold palette, eerie mist, gothic haunted mansion, painterly digital game illustration, soft visible brushwork, clean graphic shapes, cinematic rim lighting, atmospheric depth --v 8.2 --ar 4:3 --s 300 --chaos 8 --sref https://raw.githubusercontent.com/hoffo1987/Last-One-Standing/main/assets/arene/horror.webp --sw 250 --no text, letters, words, logo, watermark, frame, border, poster lettering
 ```
-
-<details><summary>Prompt completo, pronto da incollare</summary>
-
-```text
-A porcelain doll with a cracked face and one glass eye, sitting in a chair, slightly too alive. Crimson, black and candlelight gold palette, eerie mist, gothic haunted mansion. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. 4:3 wanted-poster portrait, single threat centered and facing the viewer, head and eyes in the upper middle of the frame, dark vignetted background that fades to near black at the edges. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
-```
-
-</details>
 
 #### Entità senza volto
 
-- **File**: `assets/arene/horror/pericoli/entita-senza-volto.webp`
-- **Cosa mostrare**: Entità alta e senza volto in un corridoio buio, braccia troppo lunghe.
-
-**Prompt**
+Entità alta e senza volto in un corridoio buio, braccia troppo lunghe.  
+File: `assets/arene/horror/pericoli/entita-senza-volto.webp`
 
 ```text
-A tall faceless entity in a dark corridor, unnaturally long arms, black suit.
+A tall faceless entity in a dark corridor, unnaturally long arms, black suit, dramatic portrait framed like a wanted poster, single subject centered and staring at the viewer, eyes in the upper half of the frame, dark vignette fading to near black at the edges, crimson, black and candlelight gold palette, eerie mist, gothic haunted mansion, painterly digital game illustration, soft visible brushwork, clean graphic shapes, cinematic rim lighting, atmospheric depth --v 8.2 --ar 4:3 --s 300 --chaos 8 --sref https://raw.githubusercontent.com/hoffo1987/Last-One-Standing/main/assets/arene/horror.webp --sw 250 --no text, letters, words, logo, watermark, frame, border, poster lettering
 ```
-
-<details><summary>Prompt completo, pronto da incollare</summary>
-
-```text
-A tall faceless entity in a dark corridor, unnaturally long arms, black suit. Crimson, black and candlelight gold palette, eerie mist, gothic haunted mansion. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. 4:3 wanted-poster portrait, single threat centered and facing the viewer, head and eyes in the upper middle of the frame, dark vignetted background that fades to near black at the edges. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
-```
-
-</details>
 
 #### Stormo di corvi
 
-- **File**: `assets/arene/horror/pericoli/stormo-di-corvi.webp`
-- **Cosa mostrare**: Stormo di corvi che esplode da un albero morto; uno fissa chi guarda.
-
-**Prompt**
+Stormo di corvi che esplode da un albero morto; uno fissa chi guarda.  
+File: `assets/arene/horror/pericoli/stormo-di-corvi.webp`
 
 ```text
-A flock of crows bursting from a dead tree, one crow staring straight at the viewer.
+A flock of crows bursting from a dead tree, one crow staring straight at the viewer, dramatic portrait framed like a wanted poster, single subject centered and staring at the viewer, eyes in the upper half of the frame, dark vignette fading to near black at the edges, crimson, black and candlelight gold palette, eerie mist, gothic haunted mansion, painterly digital game illustration, soft visible brushwork, clean graphic shapes, cinematic rim lighting, atmospheric depth --v 8.2 --ar 4:3 --s 300 --chaos 8 --sref https://raw.githubusercontent.com/hoffo1987/Last-One-Standing/main/assets/arene/horror.webp --sw 250 --no text, letters, words, logo, watermark, frame, border, poster lettering
 ```
 
-<details><summary>Prompt completo, pronto da incollare</summary>
-
-```text
-A flock of crows bursting from a dead tree, one crow staring straight at the viewer. Crimson, black and candlelight gold palette, eerie mist, gothic haunted mansion. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. 4:3 wanted-poster portrait, single threat centered and facing the viewer, head and eyes in the upper middle of the frame, dark vignetted background that fades to near black at the edges. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
-```
-
-</details>
-
-### Armi · Villa Maledetta (1:1, 512 × 512 px, sfondo trasparente)
+### Armi · Villa Maledetta
 
 #### Candelabro d'argento
 
-- **File**: `assets/arene/horror/armi/candelabro-dargento.webp`
-- **Cosa mostrare**: Candelabro d'argento pesante con tre candele che colano.
-
-**Prompt**
+Candelabro d'argento pesante con tre candele che colano.  
+File: `assets/arene/horror/armi/candelabro-dargento.webp`
 
 ```text
-A heavy silver candelabra with three dripping candles.
+A heavy silver candelabra with three dripping candles, single game inventory item, three-quarter view laid diagonally from lower left to upper right, centered with generous empty margin, crisp clean silhouette with a thin dark outline, isolated on a plain flat light grey background, crimson, black and candlelight gold palette, eerie mist, gothic haunted mansion, painterly digital game illustration, soft visible brushwork, clean graphic shapes, cinematic rim lighting, atmospheric depth --v 8.2 --ar 1:1 --s 150 --chaos 0 --sref https://raw.githubusercontent.com/hoffo1987/Last-One-Standing/main/assets/arene/horror.webp --sw 120 --no text, letters, logo, watermark, hands, person, scenery, background objects, cast shadow, frame, border
 ```
-
-<details><summary>Prompt completo, pronto da incollare</summary>
-
-```text
-A heavy silver candelabra with three dripping candles. Crimson, black and candlelight gold palette, eerie mist, gothic haunted mansion. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Single object only, isolated on a fully transparent background, square 1:1, three-quarter view laid diagonally from lower left to upper right, 12% empty margin on every side, crisp silhouette with a thin dark outline so it reads on both light and dark backgrounds, no hands, no shadow on the ground. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
-```
-
-</details>
 
 #### Ascia
 
-- **File**: `assets/arene/horror/armi/ascia.webp`
-- **Cosa mostrare**: Vecchia ascia arrugginita.
-
-**Prompt**
+Vecchia ascia arrugginita.  
+File: `assets/arene/horror/armi/ascia.webp`
 
 ```text
-An old rusted axe with a cracked wooden handle.
+An old rusted axe with a cracked wooden handle, single game inventory item, three-quarter view laid diagonally from lower left to upper right, centered with generous empty margin, crisp clean silhouette with a thin dark outline, isolated on a plain flat light grey background, crimson, black and candlelight gold palette, eerie mist, gothic haunted mansion, painterly digital game illustration, soft visible brushwork, clean graphic shapes, cinematic rim lighting, atmospheric depth --v 8.2 --ar 1:1 --s 150 --chaos 0 --sref https://raw.githubusercontent.com/hoffo1987/Last-One-Standing/main/assets/arene/horror.webp --sw 120 --no text, letters, logo, watermark, hands, person, scenery, background objects, cast shadow, frame, border
 ```
-
-<details><summary>Prompt completo, pronto da incollare</summary>
-
-```text
-An old rusted axe with a cracked wooden handle. Crimson, black and candlelight gold palette, eerie mist, gothic haunted mansion. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Single object only, isolated on a fully transparent background, square 1:1, three-quarter view laid diagonally from lower left to upper right, 12% empty margin on every side, crisp silhouette with a thin dark outline so it reads on both light and dark backgrounds, no hands, no shadow on the ground. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
-```
-
-</details>
 
 #### Fucile da caccia
 
-- **File**: `assets/arene/horror/armi/fucile-da-caccia.webp`
-- **Cosa mostrare**: Doppietta da caccia con calcio in legno.
-
-**Prompt**
+Doppietta da caccia con calcio in legno.  
+File: `assets/arene/horror/armi/fucile-da-caccia.webp`
 
 ```text
-A double-barrelled hunting shotgun with a wooden stock.
+A double-barrelled hunting shotgun with a wooden stock, single game inventory item, three-quarter view laid diagonally from lower left to upper right, centered with generous empty margin, crisp clean silhouette with a thin dark outline, isolated on a plain flat light grey background, crimson, black and candlelight gold palette, eerie mist, gothic haunted mansion, painterly digital game illustration, soft visible brushwork, clean graphic shapes, cinematic rim lighting, atmospheric depth --v 8.2 --ar 1:1 --s 150 --chaos 0 --sref https://raw.githubusercontent.com/hoffo1987/Last-One-Standing/main/assets/arene/horror.webp --sw 120 --no text, letters, logo, watermark, hands, person, scenery, background objects, cast shadow, frame, border
 ```
-
-<details><summary>Prompt completo, pronto da incollare</summary>
-
-```text
-A double-barrelled hunting shotgun with a wooden stock. Crimson, black and candlelight gold palette, eerie mist, gothic haunted mansion. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Single object only, isolated on a fully transparent background, square 1:1, three-quarter view laid diagonally from lower left to upper right, 12% empty margin on every side, crisp silhouette with a thin dark outline so it reads on both light and dark backgrounds, no hands, no shadow on the ground. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
-```
-
-</details>
 
 #### Pugnale rituale
 
-- **File**: `assets/arene/horror/armi/pugnale-rituale.webp`
-- **Cosa mostrare**: Pugnale rituale con elsa d'osso e simboli incisi.
-
-**Prompt**
+Pugnale rituale con elsa d'osso e simboli incisi.  
+File: `assets/arene/horror/armi/pugnale-rituale.webp`
 
 ```text
-A ritual dagger with a bone hilt and engraved occult symbols.
+A ritual dagger with a bone hilt and engraved occult symbols, single game inventory item, three-quarter view laid diagonally from lower left to upper right, centered with generous empty margin, crisp clean silhouette with a thin dark outline, isolated on a plain flat light grey background, crimson, black and candlelight gold palette, eerie mist, gothic haunted mansion, painterly digital game illustration, soft visible brushwork, clean graphic shapes, cinematic rim lighting, atmospheric depth --v 8.2 --ar 1:1 --s 150 --chaos 0 --sref https://raw.githubusercontent.com/hoffo1987/Last-One-Standing/main/assets/arene/horror.webp --sw 120 --no text, letters, logo, watermark, hands, person, scenery, background objects, cast shadow, frame, border
 ```
-
-<details><summary>Prompt completo, pronto da incollare</summary>
-
-```text
-A ritual dagger with a bone hilt and engraved occult symbols. Crimson, black and candlelight gold palette, eerie mist, gothic haunted mansion. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Single object only, isolated on a fully transparent background, square 1:1, three-quarter view laid diagonally from lower left to upper right, 12% empty margin on every side, crisp silhouette with a thin dark outline so it reads on both light and dark backgrounds, no hands, no shadow on the ground. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
-```
-
-</details>
 
 #### Crocifisso appuntito
 
-- **File**: `assets/arene/horror/armi/crocifisso-appuntito.webp`
-- **Cosa mostrare**: Crocifisso di legno appuntito come un paletto.
-
-**Prompt**
+Crocifisso di legno appuntito come un paletto.  
+File: `assets/arene/horror/armi/crocifisso-appuntito.webp`
 
 ```text
-A wooden crucifix sharpened into a stake at the bottom.
+A wooden crucifix sharpened into a stake at the bottom, single game inventory item, three-quarter view laid diagonally from lower left to upper right, centered with generous empty margin, crisp clean silhouette with a thin dark outline, isolated on a plain flat light grey background, crimson, black and candlelight gold palette, eerie mist, gothic haunted mansion, painterly digital game illustration, soft visible brushwork, clean graphic shapes, cinematic rim lighting, atmospheric depth --v 8.2 --ar 1:1 --s 150 --chaos 0 --sref https://raw.githubusercontent.com/hoffo1987/Last-One-Standing/main/assets/arene/horror.webp --sw 120 --no text, letters, logo, watermark, hands, person, scenery, background objects, cast shadow, frame, border
 ```
-
-<details><summary>Prompt completo, pronto da incollare</summary>
-
-```text
-A wooden crucifix sharpened into a stake at the bottom. Crimson, black and candlelight gold palette, eerie mist, gothic haunted mansion. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Single object only, isolated on a fully transparent background, square 1:1, three-quarter view laid diagonally from lower left to upper right, 12% empty margin on every side, crisp silhouette with a thin dark outline so it reads on both light and dark backgrounds, no hands, no shadow on the ground. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
-```
-
-</details>
 
 #### Attizzatoio
 
-- **File**: `assets/arene/horror/armi/attizzatoio.webp`
-- **Cosa mostrare**: Attizzatoio da camino in ferro battuto.
-
-**Prompt**
+Attizzatoio da camino in ferro battuto.  
+File: `assets/arene/horror/armi/attizzatoio.webp`
 
 ```text
-A wrought iron fireplace poker with a hooked tip.
+A wrought iron fireplace poker with a hooked tip, single game inventory item, three-quarter view laid diagonally from lower left to upper right, centered with generous empty margin, crisp clean silhouette with a thin dark outline, isolated on a plain flat light grey background, crimson, black and candlelight gold palette, eerie mist, gothic haunted mansion, painterly digital game illustration, soft visible brushwork, clean graphic shapes, cinematic rim lighting, atmospheric depth --v 8.2 --ar 1:1 --s 150 --chaos 0 --sref https://raw.githubusercontent.com/hoffo1987/Last-One-Standing/main/assets/arene/horror.webp --sw 120 --no text, letters, logo, watermark, hands, person, scenery, background objects, cast shadow, frame, border
 ```
-
-<details><summary>Prompt completo, pronto da incollare</summary>
-
-```text
-A wrought iron fireplace poker with a hooked tip. Crimson, black and candlelight gold palette, eerie mist, gothic haunted mansion. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Single object only, isolated on a fully transparent background, square 1:1, three-quarter view laid diagonally from lower left to upper right, 12% empty margin on every side, crisp silhouette with a thin dark outline so it reads on both light and dark backgrounds, no hands, no shadow on the ground. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
-```
-
-</details>
 
 #### Falce
 
-- **File**: `assets/arene/horror/armi/falce.webp`
-- **Cosa mostrare**: Falce da contadino con la lama lunga e curva.
-
-**Prompt**
+Falce da contadino con la lama lunga e curva.  
+File: `assets/arene/horror/armi/falce.webp`
 
 ```text
-A farmer's scythe with a long curved blade.
+A farmer's scythe with a long curved blade, single game inventory item, three-quarter view laid diagonally from lower left to upper right, centered with generous empty margin, crisp clean silhouette with a thin dark outline, isolated on a plain flat light grey background, crimson, black and candlelight gold palette, eerie mist, gothic haunted mansion, painterly digital game illustration, soft visible brushwork, clean graphic shapes, cinematic rim lighting, atmospheric depth --v 8.2 --ar 1:1 --s 150 --chaos 0 --sref https://raw.githubusercontent.com/hoffo1987/Last-One-Standing/main/assets/arene/horror.webp --sw 120 --no text, letters, logo, watermark, hands, person, scenery, background objects, cast shadow, frame, border
 ```
-
-<details><summary>Prompt completo, pronto da incollare</summary>
-
-```text
-A farmer's scythe with a long curved blade. Crimson, black and candlelight gold palette, eerie mist, gothic haunted mansion. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Single object only, isolated on a fully transparent background, square 1:1, three-quarter view laid diagonally from lower left to upper right, 12% empty margin on every side, crisp silhouette with a thin dark outline so it reads on both light and dark backgrounds, no hands, no shadow on the ground. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
-```
-
-</details>
 
 ---
 
@@ -2278,350 +1126,167 @@ A farmer's scythe with a long curved blade. Crimson, black and candlelight gold 
 
 Polvere radioattiva, predoni e motori truccati.
 
-- **Cartella**: `assets/arene/wasteland/` (con le sottocartelle `luoghi/`, `pericoli/`, `armi/`)
-- **Riferimento di stile**: `assets/arene/wasteland.webp`
 - **Atmosfera**: Deserto post-atomico: ocra, ruggine e sabbia sotto un sole bruciato, foschia di polvere, lamiere e motori truccati.
-- **Stile da aggiungere a ogni prompt di questa arena** (è già incluso nei prompt completi):
+- **Riferimento di stile** (`--sref`): [https://raw.githubusercontent.com/hoffo1987/Last-One-Standing/main/assets/arene/wasteland.webp](https://raw.githubusercontent.com/hoffo1987/Last-One-Standing/main/assets/arene/wasteland.webp)
 
-```text
-Ochre, rust and sand palette under a scorched hazy sun, dusty post-apocalyptic desert wasteland. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours.
-```
-
-Più, a seconda della sezione:
-
-- Luoghi: `Wide 16:9 establishing shot of the location, no people, eye-level view, the key landmark inside the central third of the frame, soft depth fog in the background.`
-- Pericoli: `4:3 wanted-poster portrait, single threat centered and facing the viewer, head and eyes in the upper middle of the frame, dark vignetted background that fades to near black at the edges.`
-- Armi: `Single object only, isolated on a fully transparent background, square 1:1, three-quarter view laid diagonally from lower left to upper right, 12% empty margin on every side, crisp silhouette with a thin dark outline so it reads on both light and dark backgrounds, no hands, no shadow on the ground.`
-- Sempre: `No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.`
-
-### Luoghi · Terre Desolate (16:9, 1280 × 720 px, sfondo pieno)
+### Luoghi · Terre Desolate
 
 #### Discarica
 
-- **File**: `assets/arene/wasteland/luoghi/discarica.webp`
-- **Cosa mostrare**: Enorme sfasciacarrozze di auto arrugginite, pneumatici e rottami sotto un sole velato.
-
-**Prompt**
+Enorme sfasciacarrozze di auto arrugginite, pneumatici e rottami sotto un sole velato.  
+File: `assets/arene/wasteland/luoghi/discarica.webp`
 
 ```text
-A vast scrapyard of rusted cars, tyres and piled junk under a hazy sun.
+A vast scrapyard of rusted cars, tyres and piled junk under a hazy sun, wide establishing shot at eye level, an empty deserted location, the main landmark centered in the frame, layered depth with soft distant haze, ochre, rust and sand palette under a scorched hazy sun, dusty post-apocalyptic desert wasteland, painterly digital game illustration, soft visible brushwork, clean graphic shapes, cinematic rim lighting, atmospheric depth --v 8.2 --ar 16:9 --s 250 --chaos 8 --sref https://raw.githubusercontent.com/hoffo1987/Last-One-Standing/main/assets/arene/wasteland.webp --sw 300 --no text, letters, words, readable signs, logo, watermark, people, characters, frame, border
 ```
-
-<details><summary>Prompt completo, pronto da incollare</summary>
-
-```text
-A vast scrapyard of rusted cars, tyres and piled junk under a hazy sun. Ochre, rust and sand palette under a scorched hazy sun, dusty post-apocalyptic desert wasteland. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Wide 16:9 establishing shot of the location, no people, eye-level view, the key landmark inside the central third of the frame, soft depth fog in the background. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
-```
-
-</details>
 
 #### Autostrada spezzata
 
-- **File**: `assets/arene/wasteland/luoghi/autostrada-spezzata.webp`
-- **Cosa mostrare**: Cavalcavia autostradale crollato nel deserto, camion abbandonati.
-
-**Prompt**
+Cavalcavia autostradale crollato nel deserto, camion abbandonati.  
+File: `assets/arene/wasteland/luoghi/autostrada-spezzata.webp`
 
 ```text
-A broken highway overpass collapsed into the desert, abandoned trucks below.
+A broken highway overpass collapsed into the desert, abandoned trucks below, wide establishing shot at eye level, an empty deserted location, the main landmark centered in the frame, layered depth with soft distant haze, ochre, rust and sand palette under a scorched hazy sun, dusty post-apocalyptic desert wasteland, painterly digital game illustration, soft visible brushwork, clean graphic shapes, cinematic rim lighting, atmospheric depth --v 8.2 --ar 16:9 --s 250 --chaos 8 --sref https://raw.githubusercontent.com/hoffo1987/Last-One-Standing/main/assets/arene/wasteland.webp --sw 300 --no text, letters, words, readable signs, logo, watermark, people, characters, frame, border
 ```
-
-<details><summary>Prompt completo, pronto da incollare</summary>
-
-```text
-A broken highway overpass collapsed into the desert, abandoned trucks below. Ochre, rust and sand palette under a scorched hazy sun, dusty post-apocalyptic desert wasteland. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Wide 16:9 establishing shot of the location, no people, eye-level view, the key landmark inside the central third of the frame, soft depth fog in the background. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
-```
-
-</details>
 
 #### Raffineria
 
-- **File**: `assets/arene/wasteland/luoghi/raffineria.webp`
-- **Cosa mostrare**: Raffineria arrugginita con torce di gas accese e intrico di tubi.
-
-**Prompt**
+Raffineria arrugginita con torce di gas accese e intrico di tubi.  
+File: `assets/arene/wasteland/luoghi/raffineria.webp`
 
 ```text
-A rusted oil refinery with burning flare stacks and a tangle of pipes.
+A rusted oil refinery with burning flare stacks and a tangle of pipes, wide establishing shot at eye level, an empty deserted location, the main landmark centered in the frame, layered depth with soft distant haze, ochre, rust and sand palette under a scorched hazy sun, dusty post-apocalyptic desert wasteland, painterly digital game illustration, soft visible brushwork, clean graphic shapes, cinematic rim lighting, atmospheric depth --v 8.2 --ar 16:9 --s 250 --chaos 8 --sref https://raw.githubusercontent.com/hoffo1987/Last-One-Standing/main/assets/arene/wasteland.webp --sw 300 --no text, letters, words, readable signs, logo, watermark, people, characters, frame, border
 ```
-
-<details><summary>Prompt completo, pronto da incollare</summary>
-
-```text
-A rusted oil refinery with burning flare stacks and a tangle of pipes. Ochre, rust and sand palette under a scorched hazy sun, dusty post-apocalyptic desert wasteland. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Wide 16:9 establishing shot of the location, no people, eye-level view, the key landmark inside the central third of the frame, soft depth fog in the background. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
-```
-
-</details>
 
 #### Città fantasma
 
-- **File**: `assets/arene/wasteland/luoghi/citta-fantasma.webp`
-- **Cosa mostrare**: Città fantasma con edifici mezzi sepolti, cartelloni sbiaditi e rotolacampo.
-
-**Prompt**
+Città fantasma con edifici mezzi sepolti, cartelloni sbiaditi e rotolacampo.  
+File: `assets/arene/wasteland/luoghi/citta-fantasma.webp`
 
 ```text
-A ghost town with half-buried buildings, faded blank billboards and tumbleweeds.
+A ghost town with half-buried buildings, faded blank billboards and tumbleweeds, wide establishing shot at eye level, an empty deserted location, the main landmark centered in the frame, layered depth with soft distant haze, ochre, rust and sand palette under a scorched hazy sun, dusty post-apocalyptic desert wasteland, painterly digital game illustration, soft visible brushwork, clean graphic shapes, cinematic rim lighting, atmospheric depth --v 8.2 --ar 16:9 --s 250 --chaos 8 --sref https://raw.githubusercontent.com/hoffo1987/Last-One-Standing/main/assets/arene/wasteland.webp --sw 300 --no text, letters, words, readable signs, logo, watermark, people, characters, frame, border
 ```
-
-<details><summary>Prompt completo, pronto da incollare</summary>
-
-```text
-A ghost town with half-buried buildings, faded blank billboards and tumbleweeds. Ochre, rust and sand palette under a scorched hazy sun, dusty post-apocalyptic desert wasteland. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Wide 16:9 establishing shot of the location, no people, eye-level view, the key landmark inside the central third of the frame, soft depth fog in the background. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
-```
-
-</details>
 
 #### Cratere
 
-- **File**: `assets/arene/wasteland/luoghi/cratere.webp`
-- **Cosa mostrare**: Cratere radioattivo enorme con pozze che brillano di verde.
-
-**Prompt**
+Cratere radioattivo enorme con pozze che brillano di verde.  
+File: `assets/arene/wasteland/luoghi/cratere.webp`
 
 ```text
-A huge radioactive crater with glowing green pools.
+A huge radioactive crater with glowing green pools, wide establishing shot at eye level, an empty deserted location, the main landmark centered in the frame, layered depth with soft distant haze, ochre, rust and sand palette under a scorched hazy sun, dusty post-apocalyptic desert wasteland, painterly digital game illustration, soft visible brushwork, clean graphic shapes, cinematic rim lighting, atmospheric depth --v 8.2 --ar 16:9 --s 250 --chaos 8 --sref https://raw.githubusercontent.com/hoffo1987/Last-One-Standing/main/assets/arene/wasteland.webp --sw 300 --no text, letters, words, readable signs, logo, watermark, people, characters, frame, border
 ```
-
-<details><summary>Prompt completo, pronto da incollare</summary>
-
-```text
-A huge radioactive crater with glowing green pools. Ochre, rust and sand palette under a scorched hazy sun, dusty post-apocalyptic desert wasteland. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Wide 16:9 establishing shot of the location, no people, eye-level view, the key landmark inside the central third of the frame, soft depth fog in the background. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
-```
-
-</details>
 
 #### Diga
 
-- **File**: `assets/arene/wasteland/luoghi/diga.webp`
-- **Cosa mostrare**: Diga di cemento gigante incrinata, con un insediamento di fortuna in cima.
-
-**Prompt**
+Diga di cemento gigante incrinata, con un insediamento di fortuna in cima.  
+File: `assets/arene/wasteland/luoghi/diga.webp`
 
 ```text
-A giant cracked concrete dam with a makeshift settlement built on top.
+A giant cracked concrete dam with a makeshift settlement built on top, wide establishing shot at eye level, an empty deserted location, the main landmark centered in the frame, layered depth with soft distant haze, ochre, rust and sand palette under a scorched hazy sun, dusty post-apocalyptic desert wasteland, painterly digital game illustration, soft visible brushwork, clean graphic shapes, cinematic rim lighting, atmospheric depth --v 8.2 --ar 16:9 --s 250 --chaos 8 --sref https://raw.githubusercontent.com/hoffo1987/Last-One-Standing/main/assets/arene/wasteland.webp --sw 300 --no text, letters, words, readable signs, logo, watermark, people, characters, frame, border
 ```
 
-<details><summary>Prompt completo, pronto da incollare</summary>
-
-```text
-A giant cracked concrete dam with a makeshift settlement built on top. Ochre, rust and sand palette under a scorched hazy sun, dusty post-apocalyptic desert wasteland. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Wide 16:9 establishing shot of the location, no people, eye-level view, the key landmark inside the central third of the frame, soft depth fog in the background. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
-```
-
-</details>
-
-### Pericoli · Terre Desolate (4:3, 960 × 720 px, sfondo pieno e scuro)
+### Pericoli · Terre Desolate
 
 #### Banda di predoni
 
-- **File**: `assets/arene/wasteland/pericoli/banda-di-predoni.webp`
-- **Cosa mostrare**: Banda di predoni con armature di cuoio chiodato e occhialoni, accanto a buggy truccati.
-
-**Prompt**
+Banda di predoni con armature di cuoio chiodato e occhialoni, accanto a buggy truccati.  
+File: `assets/arene/wasteland/pericoli/banda-di-predoni.webp`
 
 ```text
-A gang of raiders in spiked leather armour and goggles standing by modified buggies.
+A gang of raiders in spiked leather armour and goggles standing by modified buggies, dramatic portrait framed like a wanted poster, single subject centered and staring at the viewer, eyes in the upper half of the frame, dark vignette fading to near black at the edges, ochre, rust and sand palette under a scorched hazy sun, dusty post-apocalyptic desert wasteland, painterly digital game illustration, soft visible brushwork, clean graphic shapes, cinematic rim lighting, atmospheric depth --v 8.2 --ar 4:3 --s 300 --chaos 8 --sref https://raw.githubusercontent.com/hoffo1987/Last-One-Standing/main/assets/arene/wasteland.webp --sw 250 --no text, letters, words, logo, watermark, frame, border, poster lettering
 ```
-
-<details><summary>Prompt completo, pronto da incollare</summary>
-
-```text
-A gang of raiders in spiked leather armour and goggles standing by modified buggies. Ochre, rust and sand palette under a scorched hazy sun, dusty post-apocalyptic desert wasteland. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. 4:3 wanted-poster portrait, single threat centered and facing the viewer, head and eyes in the upper middle of the frame, dark vignetted background that fades to near black at the edges. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
-```
-
-</details>
 
 #### Scorpione gigante
 
-- **File**: `assets/arene/wasteland/pericoli/scorpione-gigante.webp`
-- **Cosa mostrare**: Scorpione gigante del deserto col pungiglione alzato.
-
-**Prompt**
+Scorpione gigante del deserto col pungiglione alzato.  
+File: `assets/arene/wasteland/pericoli/scorpione-gigante.webp`
 
 ```text
-A giant desert scorpion with its stinger raised, chitin shining in the sun.
+A giant desert scorpion with its stinger raised, chitin shining in the sun, dramatic portrait framed like a wanted poster, single subject centered and staring at the viewer, eyes in the upper half of the frame, dark vignette fading to near black at the edges, ochre, rust and sand palette under a scorched hazy sun, dusty post-apocalyptic desert wasteland, painterly digital game illustration, soft visible brushwork, clean graphic shapes, cinematic rim lighting, atmospheric depth --v 8.2 --ar 4:3 --s 300 --chaos 8 --sref https://raw.githubusercontent.com/hoffo1987/Last-One-Standing/main/assets/arene/wasteland.webp --sw 250 --no text, letters, words, logo, watermark, frame, border, poster lettering
 ```
-
-<details><summary>Prompt completo, pronto da incollare</summary>
-
-```text
-A giant desert scorpion with its stinger raised, chitin shining in the sun. Ochre, rust and sand palette under a scorched hazy sun, dusty post-apocalyptic desert wasteland. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. 4:3 wanted-poster portrait, single threat centered and facing the viewer, head and eyes in the upper middle of the frame, dark vignetted background that fades to near black at the edges. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
-```
-
-</details>
 
 #### Branco di cani mutati
 
-- **File**: `assets/arene/wasteland/pericoli/branco-di-cani-mutati.webp`
-- **Cosa mostrare**: Branco di cani mutati senza pelo, con occhi in più, che ringhiano.
-
-**Prompt**
+Branco di cani mutati senza pelo, con occhi in più, che ringhiano.  
+File: `assets/arene/wasteland/pericoli/branco-di-cani-mutati.webp`
 
 ```text
-A pack of hairless mutated dogs with extra eyes, growling.
+A pack of hairless mutated dogs with extra eyes, growling, dramatic portrait framed like a wanted poster, single subject centered and staring at the viewer, eyes in the upper half of the frame, dark vignette fading to near black at the edges, ochre, rust and sand palette under a scorched hazy sun, dusty post-apocalyptic desert wasteland, painterly digital game illustration, soft visible brushwork, clean graphic shapes, cinematic rim lighting, atmospheric depth --v 8.2 --ar 4:3 --s 300 --chaos 8 --sref https://raw.githubusercontent.com/hoffo1987/Last-One-Standing/main/assets/arene/wasteland.webp --sw 250 --no text, letters, words, logo, watermark, frame, border, poster lettering
 ```
-
-<details><summary>Prompt completo, pronto da incollare</summary>
-
-```text
-A pack of hairless mutated dogs with extra eyes, growling. Ochre, rust and sand palette under a scorched hazy sun, dusty post-apocalyptic desert wasteland. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. 4:3 wanted-poster portrait, single threat centered and facing the viewer, head and eyes in the upper middle of the frame, dark vignetted background that fades to near black at the edges. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
-```
-
-</details>
 
 #### Verme delle sabbie
 
-- **File**: `assets/arene/wasteland/pericoli/verme-delle-sabbie.webp`
-- **Cosa mostrare**: Verme delle sabbie colossale che erompe dalle dune, bocca circolare piena di denti.
-
-**Prompt**
+Verme delle sabbie colossale che erompe dalle dune, bocca circolare piena di denti.  
+File: `assets/arene/wasteland/pericoli/verme-delle-sabbie.webp`
 
 ```text
-A colossal sandworm bursting out of the dunes, a circular mouth full of teeth.
+A colossal sandworm bursting out of the dunes, a circular mouth full of teeth, dramatic portrait framed like a wanted poster, single subject centered and staring at the viewer, eyes in the upper half of the frame, dark vignette fading to near black at the edges, ochre, rust and sand palette under a scorched hazy sun, dusty post-apocalyptic desert wasteland, painterly digital game illustration, soft visible brushwork, clean graphic shapes, cinematic rim lighting, atmospheric depth --v 8.2 --ar 4:3 --s 300 --chaos 8 --sref https://raw.githubusercontent.com/hoffo1987/Last-One-Standing/main/assets/arene/wasteland.webp --sw 250 --no text, letters, words, logo, watermark, frame, border, poster lettering
 ```
 
-<details><summary>Prompt completo, pronto da incollare</summary>
-
-```text
-A colossal sandworm bursting out of the dunes, a circular mouth full of teeth. Ochre, rust and sand palette under a scorched hazy sun, dusty post-apocalyptic desert wasteland. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. 4:3 wanted-poster portrait, single threat centered and facing the viewer, head and eyes in the upper middle of the frame, dark vignetted background that fades to near black at the edges. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
-```
-
-</details>
-
-### Armi · Terre Desolate (1:1, 512 × 512 px, sfondo trasparente)
+### Armi · Terre Desolate
 
 #### Fucile arrugginito
 
-- **File**: `assets/arene/wasteland/armi/fucile-arrugginito.webp`
-- **Cosa mostrare**: Fucile a otturatore arrugginito con mirino legato col nastro.
-
-**Prompt**
+Fucile a otturatore arrugginito con mirino legato col nastro.  
+File: `assets/arene/wasteland/armi/fucile-arrugginito.webp`
 
 ```text
-A rusty bolt-action rifle with a scope held on by tape.
+A rusty bolt-action rifle with a scope held on by tape, single game inventory item, three-quarter view laid diagonally from lower left to upper right, centered with generous empty margin, crisp clean silhouette with a thin dark outline, isolated on a plain flat light grey background, ochre, rust and sand palette under a scorched hazy sun, dusty post-apocalyptic desert wasteland, painterly digital game illustration, soft visible brushwork, clean graphic shapes, cinematic rim lighting, atmospheric depth --v 8.2 --ar 1:1 --s 150 --chaos 0 --sref https://raw.githubusercontent.com/hoffo1987/Last-One-Standing/main/assets/arene/wasteland.webp --sw 120 --no text, letters, logo, watermark, hands, person, scenery, background objects, cast shadow, frame, border
 ```
-
-<details><summary>Prompt completo, pronto da incollare</summary>
-
-```text
-A rusty bolt-action rifle with a scope held on by tape. Ochre, rust and sand palette under a scorched hazy sun, dusty post-apocalyptic desert wasteland. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Single object only, isolated on a fully transparent background, square 1:1, three-quarter view laid diagonally from lower left to upper right, 12% empty margin on every side, crisp silhouette with a thin dark outline so it reads on both light and dark backgrounds, no hands, no shadow on the ground. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
-```
-
-</details>
 
 #### Lancia ricavata da un tubo
 
-- **File**: `assets/arene/wasteland/armi/lancia-ricavata-da-un-tubo.webp`
-- **Cosa mostrare**: Lancia fatta con un tubo di metallo e un tondino appuntito.
-
-**Prompt**
+Lancia fatta con un tubo di metallo e un tondino appuntito.  
+File: `assets/arene/wasteland/armi/lancia-ricavata-da-un-tubo.webp`
 
 ```text
-A spear made from a metal pipe with a sharpened rebar tip.
+A spear made from a metal pipe with a sharpened rebar tip, single game inventory item, three-quarter view laid diagonally from lower left to upper right, centered with generous empty margin, crisp clean silhouette with a thin dark outline, isolated on a plain flat light grey background, ochre, rust and sand palette under a scorched hazy sun, dusty post-apocalyptic desert wasteland, painterly digital game illustration, soft visible brushwork, clean graphic shapes, cinematic rim lighting, atmospheric depth --v 8.2 --ar 1:1 --s 150 --chaos 0 --sref https://raw.githubusercontent.com/hoffo1987/Last-One-Standing/main/assets/arene/wasteland.webp --sw 120 --no text, letters, logo, watermark, hands, person, scenery, background objects, cast shadow, frame, border
 ```
-
-<details><summary>Prompt completo, pronto da incollare</summary>
-
-```text
-A spear made from a metal pipe with a sharpened rebar tip. Ochre, rust and sand palette under a scorched hazy sun, dusty post-apocalyptic desert wasteland. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Single object only, isolated on a fully transparent background, square 1:1, three-quarter view laid diagonally from lower left to upper right, 12% empty margin on every side, crisp silhouette with a thin dark outline so it reads on both light and dark backgrounds, no hands, no shadow on the ground. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
-```
-
-</details>
 
 #### Balestra artigianale
 
-- **File**: `assets/arene/wasteland/armi/balestra-artigianale.webp`
-- **Cosa mostrare**: Balestra artigianale fatta con balestre d'auto e rottami.
-
-**Prompt**
+Balestra artigianale fatta con balestre d'auto e rottami.  
+File: `assets/arene/wasteland/armi/balestra-artigianale.webp`
 
 ```text
-A homemade crossbow built from car leaf springs and scrap metal.
+A homemade crossbow built from car leaf springs and scrap metal, single game inventory item, three-quarter view laid diagonally from lower left to upper right, centered with generous empty margin, crisp clean silhouette with a thin dark outline, isolated on a plain flat light grey background, ochre, rust and sand palette under a scorched hazy sun, dusty post-apocalyptic desert wasteland, painterly digital game illustration, soft visible brushwork, clean graphic shapes, cinematic rim lighting, atmospheric depth --v 8.2 --ar 1:1 --s 150 --chaos 0 --sref https://raw.githubusercontent.com/hoffo1987/Last-One-Standing/main/assets/arene/wasteland.webp --sw 120 --no text, letters, logo, watermark, hands, person, scenery, background objects, cast shadow, frame, border
 ```
-
-<details><summary>Prompt completo, pronto da incollare</summary>
-
-```text
-A homemade crossbow built from car leaf springs and scrap metal. Ochre, rust and sand palette under a scorched hazy sun, dusty post-apocalyptic desert wasteland. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Single object only, isolated on a fully transparent background, square 1:1, three-quarter view laid diagonally from lower left to upper right, 12% empty margin on every side, crisp silhouette with a thin dark outline so it reads on both light and dark backgrounds, no hands, no shadow on the ground. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
-```
-
-</details>
 
 #### Molotov
 
-- **File**: `assets/arene/wasteland/armi/molotov.webp`
-- **Cosa mostrare**: Bottiglia molotov con lo straccio in fiamme.
-
-**Prompt**
+Bottiglia molotov con lo straccio in fiamme.  
+File: `assets/arene/wasteland/armi/molotov.webp`
 
 ```text
-A molotov cocktail bottle with a burning rag.
+A molotov cocktail bottle with a burning rag, single game inventory item, three-quarter view laid diagonally from lower left to upper right, centered with generous empty margin, crisp clean silhouette with a thin dark outline, isolated on a plain flat light grey background, ochre, rust and sand palette under a scorched hazy sun, dusty post-apocalyptic desert wasteland, painterly digital game illustration, soft visible brushwork, clean graphic shapes, cinematic rim lighting, atmospheric depth --v 8.2 --ar 1:1 --s 150 --chaos 0 --sref https://raw.githubusercontent.com/hoffo1987/Last-One-Standing/main/assets/arene/wasteland.webp --sw 120 --no text, letters, logo, watermark, hands, person, scenery, background objects, cast shadow, frame, border
 ```
-
-<details><summary>Prompt completo, pronto da incollare</summary>
-
-```text
-A molotov cocktail bottle with a burning rag. Ochre, rust and sand palette under a scorched hazy sun, dusty post-apocalyptic desert wasteland. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Single object only, isolated on a fully transparent background, square 1:1, three-quarter view laid diagonally from lower left to upper right, 12% empty margin on every side, crisp silhouette with a thin dark outline so it reads on both light and dark backgrounds, no hands, no shadow on the ground. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
-```
-
-</details>
 
 #### Catena
 
-- **File**: `assets/arene/wasteland/armi/catena.webp`
-- **Cosa mostrare**: Catena pesante arrotolata con un lucchetto.
-
-**Prompt**
+Catena pesante arrotolata con un lucchetto.  
+File: `assets/arene/wasteland/armi/catena.webp`
 
 ```text
-A heavy coiled chain with a padlock.
+A heavy coiled chain with a padlock, single game inventory item, three-quarter view laid diagonally from lower left to upper right, centered with generous empty margin, crisp clean silhouette with a thin dark outline, isolated on a plain flat light grey background, ochre, rust and sand palette under a scorched hazy sun, dusty post-apocalyptic desert wasteland, painterly digital game illustration, soft visible brushwork, clean graphic shapes, cinematic rim lighting, atmospheric depth --v 8.2 --ar 1:1 --s 150 --chaos 0 --sref https://raw.githubusercontent.com/hoffo1987/Last-One-Standing/main/assets/arene/wasteland.webp --sw 120 --no text, letters, logo, watermark, hands, person, scenery, background objects, cast shadow, frame, border
 ```
-
-<details><summary>Prompt completo, pronto da incollare</summary>
-
-```text
-A heavy coiled chain with a padlock. Ochre, rust and sand palette under a scorched hazy sun, dusty post-apocalyptic desert wasteland. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Single object only, isolated on a fully transparent background, square 1:1, three-quarter view laid diagonally from lower left to upper right, 12% empty margin on every side, crisp silhouette with a thin dark outline so it reads on both light and dark backgrounds, no hands, no shadow on the ground. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
-```
-
-</details>
 
 #### Mannaia
 
-- **File**: `assets/arene/wasteland/armi/mannaia.webp`
-- **Cosa mostrare**: Mannaia grande con manico fasciato.
-
-**Prompt**
+Mannaia grande con manico fasciato.  
+File: `assets/arene/wasteland/armi/mannaia.webp`
 
 ```text
-A large meat cleaver with a cloth-wrapped handle.
+A large meat cleaver with a cloth-wrapped handle, single game inventory item, three-quarter view laid diagonally from lower left to upper right, centered with generous empty margin, crisp clean silhouette with a thin dark outline, isolated on a plain flat light grey background, ochre, rust and sand palette under a scorched hazy sun, dusty post-apocalyptic desert wasteland, painterly digital game illustration, soft visible brushwork, clean graphic shapes, cinematic rim lighting, atmospheric depth --v 8.2 --ar 1:1 --s 150 --chaos 0 --sref https://raw.githubusercontent.com/hoffo1987/Last-One-Standing/main/assets/arene/wasteland.webp --sw 120 --no text, letters, logo, watermark, hands, person, scenery, background objects, cast shadow, frame, border
 ```
-
-<details><summary>Prompt completo, pronto da incollare</summary>
-
-```text
-A large meat cleaver with a cloth-wrapped handle. Ochre, rust and sand palette under a scorched hazy sun, dusty post-apocalyptic desert wasteland. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Single object only, isolated on a fully transparent background, square 1:1, three-quarter view laid diagonally from lower left to upper right, 12% empty margin on every side, crisp silhouette with a thin dark outline so it reads on both light and dark backgrounds, no hands, no shadow on the ground. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
-```
-
-</details>
 
 #### Lanciachiodi
 
-- **File**: `assets/arene/wasteland/armi/lanciachiodi.webp`
-- **Cosa mostrare**: Sparachiodi modificato come arma, con caricatore a tamburo.
-
-**Prompt**
+Sparachiodi modificato come arma, con caricatore a tamburo.  
+File: `assets/arene/wasteland/armi/lanciachiodi.webp`
 
 ```text
-A nail gun modified into a weapon with a drum magazine.
+A nail gun modified into a weapon with a drum magazine, single game inventory item, three-quarter view laid diagonally from lower left to upper right, centered with generous empty margin, crisp clean silhouette with a thin dark outline, isolated on a plain flat light grey background, ochre, rust and sand palette under a scorched hazy sun, dusty post-apocalyptic desert wasteland, painterly digital game illustration, soft visible brushwork, clean graphic shapes, cinematic rim lighting, atmospheric depth --v 8.2 --ar 1:1 --s 150 --chaos 0 --sref https://raw.githubusercontent.com/hoffo1987/Last-One-Standing/main/assets/arene/wasteland.webp --sw 120 --no text, letters, logo, watermark, hands, person, scenery, background objects, cast shadow, frame, border
 ```
-
-<details><summary>Prompt completo, pronto da incollare</summary>
-
-```text
-A nail gun modified into a weapon with a drum magazine. Ochre, rust and sand palette under a scorched hazy sun, dusty post-apocalyptic desert wasteland. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Single object only, isolated on a fully transparent background, square 1:1, three-quarter view laid diagonally from lower left to upper right, 12% empty margin on every side, crisp silhouette with a thin dark outline so it reads on both light and dark backgrounds, no hands, no shadow on the ground. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
-```
-
-</details>
 
 ---
 
@@ -2629,331 +1294,158 @@ A nail gun modified into a weapon with a drum magazine. Ochre, rust and sand pal
 
 Interrogazioni, gossip e alleanze da intervallo. Nessuno muore: si viene eliminati.
 
-- **Cartella**: `assets/arene/liceo/` (con le sottocartelle `luoghi/`, `pericoli/`, `armi/`)
-- **Riferimento di stile**: `assets/arene/liceo.webp`
 - **Atmosfera**: Liceo italiano in chiave satirica: rosa, lilla e pastello, luce di finestre a vetri, tono da commedia. Nessuna violenza, nessun sangue: le «minacce» sono caricature.
-- **Stile da aggiungere a ogni prompt di questa arena** (è già incluso nei prompt completi):
+- **Riferimento di stile** (`--sref`): [https://raw.githubusercontent.com/hoffo1987/Last-One-Standing/main/assets/arene/liceo.webp](https://raw.githubusercontent.com/hoffo1987/Last-One-Standing/main/assets/arene/liceo.webp)
 
-```text
-Pink, lilac and pastel palette, bright window light, playful satirical comedy mood, Italian high school, non-violent. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours.
-```
-
-Più, a seconda della sezione:
-
-- Luoghi: `Wide 16:9 establishing shot of the location, no people, eye-level view, the key landmark inside the central third of the frame, soft depth fog in the background.`
-- Pericoli: `4:3 wanted-poster portrait, single threat centered and facing the viewer, head and eyes in the upper middle of the frame, dark vignetted background that fades to near black at the edges. Light-hearted comic caricature, not scary, not violent, not resembling any real person.`
-- Armi: `Single object only, isolated on a fully transparent background, square 1:1, three-quarter view laid diagonally from lower left to upper right, 12% empty margin on every side, crisp silhouette with a thin dark outline so it reads on both light and dark backgrounds, no hands, no shadow on the ground. An everyday object used as a playful office or school prank, comic tone.`
-- Sempre: `No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.`
-
-### Luoghi · Liceo Spietato (16:9, 1280 × 720 px, sfondo pieno)
+### Luoghi · Liceo Spietato
 
 #### Palestra
 
-- **File**: `assets/arene/liceo/luoghi/palestra.webp`
-- **Cosa mostrare**: Palestra della scuola con parquet, canestri, funi e tappetini impilati.
-
-**Prompt**
+Palestra della scuola con parquet, canestri, funi e tappetini impilati.  
+File: `assets/arene/liceo/luoghi/palestra.webp`
 
 ```text
-A school gym with a wooden floor, basketball hoops, climbing ropes and stacked mats.
+A school gym with a wooden floor, basketball hoops, climbing ropes and stacked mats, wide establishing shot at eye level, an empty deserted location, the main landmark centered in the frame, layered depth with soft distant haze, pink, lilac and pastel palette, bright window light, playful satirical comedy mood, Italian high school, non-violent, painterly digital game illustration, soft visible brushwork, clean graphic shapes, cinematic rim lighting, atmospheric depth --v 8.2 --ar 16:9 --s 250 --chaos 8 --sref https://raw.githubusercontent.com/hoffo1987/Last-One-Standing/main/assets/arene/liceo.webp --sw 300 --no text, letters, words, readable signs, logo, watermark, people, characters, frame, border
 ```
-
-<details><summary>Prompt completo, pronto da incollare</summary>
-
-```text
-A school gym with a wooden floor, basketball hoops, climbing ropes and stacked mats. Pink, lilac and pastel palette, bright window light, playful satirical comedy mood, Italian high school, non-violent. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Wide 16:9 establishing shot of the location, no people, eye-level view, the key landmark inside the central third of the frame, soft depth fog in the background. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
-```
-
-</details>
 
 #### Mensa
 
-- **File**: `assets/arene/liceo/luoghi/mensa.webp`
-- **Cosa mostrare**: Mensa scolastica rumorosa con tavoli lunghi, vassoi e il bancone del pranzo.
-
-**Prompt**
+Mensa scolastica rumorosa con tavoli lunghi, vassoi e il bancone del pranzo.  
+File: `assets/arene/liceo/luoghi/mensa.webp`
 
 ```text
-A busy school cafeteria with long tables, food trays and a lunch counter, no people.
+An empty school cafeteria after lunch, long tables, abandoned food trays and a steaming lunch counter, wide establishing shot at eye level, an empty deserted location, the main landmark centered in the frame, layered depth with soft distant haze, pink, lilac and pastel palette, bright window light, playful satirical comedy mood, Italian high school, non-violent, painterly digital game illustration, soft visible brushwork, clean graphic shapes, cinematic rim lighting, atmospheric depth --v 8.2 --ar 16:9 --s 250 --chaos 8 --sref https://raw.githubusercontent.com/hoffo1987/Last-One-Standing/main/assets/arene/liceo.webp --sw 300 --no text, letters, words, readable signs, logo, watermark, people, characters, frame, border
 ```
-
-<details><summary>Prompt completo, pronto da incollare</summary>
-
-```text
-A busy school cafeteria with long tables, food trays and a lunch counter, no people. Pink, lilac and pastel palette, bright window light, playful satirical comedy mood, Italian high school, non-violent. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Wide 16:9 establishing shot of the location, no people, eye-level view, the key landmark inside the central third of the frame, soft depth fog in the background. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
-```
-
-</details>
 
 #### Biblioteca
 
-- **File**: `assets/arene/liceo/luoghi/biblioteca.webp`
-- **Cosa mostrare**: Biblioteca scolastica silenziosa con scaffali e tavoli da studio.
-
-**Prompt**
+Biblioteca scolastica silenziosa con scaffali e tavoli da studio.  
+File: `assets/arene/liceo/luoghi/biblioteca.webp`
 
 ```text
-A quiet school library with bookshelves, study tables and green desk lamps.
+A quiet school library with bookshelves, study tables and green desk lamps, wide establishing shot at eye level, an empty deserted location, the main landmark centered in the frame, layered depth with soft distant haze, pink, lilac and pastel palette, bright window light, playful satirical comedy mood, Italian high school, non-violent, painterly digital game illustration, soft visible brushwork, clean graphic shapes, cinematic rim lighting, atmospheric depth --v 8.2 --ar 16:9 --s 250 --chaos 8 --sref https://raw.githubusercontent.com/hoffo1987/Last-One-Standing/main/assets/arene/liceo.webp --sw 300 --no text, letters, words, readable signs, logo, watermark, people, characters, frame, border
 ```
-
-<details><summary>Prompt completo, pronto da incollare</summary>
-
-```text
-A quiet school library with bookshelves, study tables and green desk lamps. Pink, lilac and pastel palette, bright window light, playful satirical comedy mood, Italian high school, non-violent. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Wide 16:9 establishing shot of the location, no people, eye-level view, the key landmark inside the central third of the frame, soft depth fog in the background. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
-```
-
-</details>
 
 #### Laboratorio di chimica
 
-- **File**: `assets/arene/liceo/luoghi/laboratorio-di-chimica.webp`
-- **Cosa mostrare**: Laboratorio di chimica con becher, cappa aspirante e fiasche colorate che bollono.
-
-**Prompt**
+Laboratorio di chimica con becher, cappa aspirante e fiasche colorate che bollono.  
+File: `assets/arene/liceo/luoghi/laboratorio-di-chimica.webp`
 
 ```text
-A chemistry lab with beakers, a fume hood and colourful bubbling flasks.
+A chemistry lab with beakers, a fume hood and colourful bubbling flasks, wide establishing shot at eye level, an empty deserted location, the main landmark centered in the frame, layered depth with soft distant haze, pink, lilac and pastel palette, bright window light, playful satirical comedy mood, Italian high school, non-violent, painterly digital game illustration, soft visible brushwork, clean graphic shapes, cinematic rim lighting, atmospheric depth --v 8.2 --ar 16:9 --s 250 --chaos 8 --sref https://raw.githubusercontent.com/hoffo1987/Last-One-Standing/main/assets/arene/liceo.webp --sw 300 --no text, letters, words, readable signs, logo, watermark, people, characters, frame, border
 ```
-
-<details><summary>Prompt completo, pronto da incollare</summary>
-
-```text
-A chemistry lab with beakers, a fume hood and colourful bubbling flasks. Pink, lilac and pastel palette, bright window light, playful satirical comedy mood, Italian high school, non-violent. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Wide 16:9 establishing shot of the location, no people, eye-level view, the key landmark inside the central third of the frame, soft depth fog in the background. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
-```
-
-</details>
 
 #### Cortile
 
-- **File**: `assets/arene/liceo/luoghi/cortile.webp`
-- **Cosa mostrare**: Cortile della scuola con panchine, un albero, motorini e zaini a terra.
-
-**Prompt**
+Cortile della scuola con panchine, un albero, motorini e zaini a terra.  
+File: `assets/arene/liceo/luoghi/cortile.webp`
 
 ```text
-The school courtyard with benches, a big tree, parked scooters and backpacks on the ground.
+The school courtyard with benches, a big tree, parked scooters and backpacks on the ground, wide establishing shot at eye level, an empty deserted location, the main landmark centered in the frame, layered depth with soft distant haze, pink, lilac and pastel palette, bright window light, playful satirical comedy mood, Italian high school, non-violent, painterly digital game illustration, soft visible brushwork, clean graphic shapes, cinematic rim lighting, atmospheric depth --v 8.2 --ar 16:9 --s 250 --chaos 8 --sref https://raw.githubusercontent.com/hoffo1987/Last-One-Standing/main/assets/arene/liceo.webp --sw 300 --no text, letters, words, readable signs, logo, watermark, people, characters, frame, border
 ```
-
-<details><summary>Prompt completo, pronto da incollare</summary>
-
-```text
-The school courtyard with benches, a big tree, parked scooters and backpacks on the ground. Pink, lilac and pastel palette, bright window light, playful satirical comedy mood, Italian high school, non-violent. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Wide 16:9 establishing shot of the location, no people, eye-level view, the key landmark inside the central third of the frame, soft depth fog in the background. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
-```
-
-</details>
 
 #### Aula magna
 
-- **File**: `assets/arene/liceo/luoghi/aula-magna.webp`
-- **Cosa mostrare**: Aula magna con file di poltroncine, palco e microfono.
-
-**Prompt**
+Aula magna con file di poltroncine, palco e microfono.  
+File: `assets/arene/liceo/luoghi/aula-magna.webp`
 
 ```text
-An assembly hall with rows of folding seats, a stage and a single microphone.
+An assembly hall with rows of folding seats, a stage and a single microphone, wide establishing shot at eye level, an empty deserted location, the main landmark centered in the frame, layered depth with soft distant haze, pink, lilac and pastel palette, bright window light, playful satirical comedy mood, Italian high school, non-violent, painterly digital game illustration, soft visible brushwork, clean graphic shapes, cinematic rim lighting, atmospheric depth --v 8.2 --ar 16:9 --s 250 --chaos 8 --sref https://raw.githubusercontent.com/hoffo1987/Last-One-Standing/main/assets/arene/liceo.webp --sw 300 --no text, letters, words, readable signs, logo, watermark, people, characters, frame, border
 ```
 
-<details><summary>Prompt completo, pronto da incollare</summary>
-
-```text
-An assembly hall with rows of folding seats, a stage and a single microphone. Pink, lilac and pastel palette, bright window light, playful satirical comedy mood, Italian high school, non-violent. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Wide 16:9 establishing shot of the location, no people, eye-level view, the key landmark inside the central third of the frame, soft depth fog in the background. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
-```
-
-</details>
-
-### Pericoli · Liceo Spietato (4:3, 960 × 720 px, sfondo pieno e scuro)
+### Pericoli · Liceo Spietato
 
 #### Preside
 
-- **File**: `assets/arene/liceo/pericoli/preside.webp`
-- **Cosa mostrare**: Caricatura della Preside severa, braccia conserte, occhiali abbassati, sulla soglia.
-
-**Prompt**
+Caricatura della Preside severa, braccia conserte, occhiali abbassati, sulla soglia.  
+File: `assets/arene/liceo/pericoli/preside.webp`
 
 ```text
-A caricature of a stern school principal, arms crossed, glasses lowered, standing in a doorway.
+A caricature of a stern school principal, arms crossed, glasses lowered, standing in a doorway, comic caricature portrait framed like a wanted poster, playful exaggerated features, single subject centered and looking at the viewer, eyes in the upper half of the frame, dark vignette fading to near black at the edges, funny rather than scary, pink, lilac and pastel palette, bright window light, playful satirical comedy mood, Italian high school, non-violent, painterly digital game illustration, soft visible brushwork, clean graphic shapes, cinematic rim lighting, atmospheric depth --v 8.2 --ar 4:3 --s 300 --chaos 8 --sref https://raw.githubusercontent.com/hoffo1987/Last-One-Standing/main/assets/arene/liceo.webp --sw 250 --no text, letters, words, logo, watermark, frame, border, poster lettering, blood, gore, weapons, real person
 ```
-
-<details><summary>Prompt completo, pronto da incollare</summary>
-
-```text
-A caricature of a stern school principal, arms crossed, glasses lowered, standing in a doorway. Pink, lilac and pastel palette, bright window light, playful satirical comedy mood, Italian high school, non-violent. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. 4:3 wanted-poster portrait, single threat centered and facing the viewer, head and eyes in the upper middle of the frame, dark vignetted background that fades to near black at the edges. Light-hearted comic caricature, not scary, not violent, not resembling any real person. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
-```
-
-</details>
 
 #### Bidello di turno
 
-- **File**: `assets/arene/liceo/pericoli/bidello-di-turno.webp`
-- **Cosa mostrare**: Caricatura del bidello brontolone con mocio, secchio e mazzo di chiavi.
-
-**Prompt**
+Caricatura del bidello brontolone con mocio, secchio e mazzo di chiavi.  
+File: `assets/arene/liceo/pericoli/bidello-di-turno.webp`
 
 ```text
-A caricature of a grumpy school janitor with a mop, a bucket and a ring of keys.
+A caricature of a grumpy school janitor with a mop, a bucket and a ring of keys, comic caricature portrait framed like a wanted poster, playful exaggerated features, single subject centered and looking at the viewer, eyes in the upper half of the frame, dark vignette fading to near black at the edges, funny rather than scary, pink, lilac and pastel palette, bright window light, playful satirical comedy mood, Italian high school, non-violent, painterly digital game illustration, soft visible brushwork, clean graphic shapes, cinematic rim lighting, atmospheric depth --v 8.2 --ar 4:3 --s 300 --chaos 8 --sref https://raw.githubusercontent.com/hoffo1987/Last-One-Standing/main/assets/arene/liceo.webp --sw 250 --no text, letters, words, logo, watermark, frame, border, poster lettering, blood, gore, weapons, real person
 ```
-
-<details><summary>Prompt completo, pronto da incollare</summary>
-
-```text
-A caricature of a grumpy school janitor with a mop, a bucket and a ring of keys. Pink, lilac and pastel palette, bright window light, playful satirical comedy mood, Italian high school, non-violent. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. 4:3 wanted-poster portrait, single threat centered and facing the viewer, head and eyes in the upper middle of the frame, dark vignetted background that fades to near black at the edges. Light-hearted comic caricature, not scary, not violent, not resembling any real person. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
-```
-
-</details>
 
 #### Ispezione a sorpresa
 
-- **File**: `assets/arene/liceo/pericoli/ispezione-a-sorpresa.webp`
-- **Cosa mostrare**: L'ispezione a sorpresa personificata: un ispettore con cartellina e lente che spunta da una porta.
-
-**Prompt**
+L'ispezione a sorpresa personificata: un ispettore con cartellina e lente che spunta da una porta.  
+File: `assets/arene/liceo/pericoli/ispezione-a-sorpresa.webp`
 
 ```text
-A caricature of a school inspector with a clipboard and a magnifying glass peeking through a door.
+A caricature of a school inspector with a clipboard and a magnifying glass peeking through a door, comic caricature portrait framed like a wanted poster, playful exaggerated features, single subject centered and looking at the viewer, eyes in the upper half of the frame, dark vignette fading to near black at the edges, funny rather than scary, pink, lilac and pastel palette, bright window light, playful satirical comedy mood, Italian high school, non-violent, painterly digital game illustration, soft visible brushwork, clean graphic shapes, cinematic rim lighting, atmospheric depth --v 8.2 --ar 4:3 --s 300 --chaos 8 --sref https://raw.githubusercontent.com/hoffo1987/Last-One-Standing/main/assets/arene/liceo.webp --sw 250 --no text, letters, words, logo, watermark, frame, border, poster lettering, blood, gore, weapons, real person
 ```
-
-<details><summary>Prompt completo, pronto da incollare</summary>
-
-```text
-A caricature of a school inspector with a clipboard and a magnifying glass peeking through a door. Pink, lilac and pastel palette, bright window light, playful satirical comedy mood, Italian high school, non-violent. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. 4:3 wanted-poster portrait, single threat centered and facing the viewer, head and eyes in the upper middle of the frame, dark vignetted background that fades to near black at the edges. Light-hearted comic caricature, not scary, not violent, not resembling any real person. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
-```
-
-</details>
 
 #### Professoressa di matematica
 
-- **File**: `assets/arene/liceo/pericoli/professoressa-di-matematica.webp`
-- **Cosa mostrare**: Caricatura della prof di matematica con la penna rossa, lavagna con formule illeggibili alle spalle.
-
-**Prompt**
+Caricatura della prof di matematica con la penna rossa, lavagna con formule illeggibili alle spalle.  
+File: `assets/arene/liceo/pericoli/professoressa-di-matematica.webp`
 
 ```text
-A caricature of a strict math teacher holding a red pen, a blackboard with blurred unreadable formulas behind her.
+A caricature of a strict math teacher holding a red pen, a blackboard with blurred unreadable formulas behind her, comic caricature portrait framed like a wanted poster, playful exaggerated features, single subject centered and looking at the viewer, eyes in the upper half of the frame, dark vignette fading to near black at the edges, funny rather than scary, pink, lilac and pastel palette, bright window light, playful satirical comedy mood, Italian high school, non-violent, painterly digital game illustration, soft visible brushwork, clean graphic shapes, cinematic rim lighting, atmospheric depth --v 8.2 --ar 4:3 --s 300 --chaos 8 --sref https://raw.githubusercontent.com/hoffo1987/Last-One-Standing/main/assets/arene/liceo.webp --sw 250 --no text, letters, words, logo, watermark, frame, border, poster lettering, blood, gore, weapons, real person
 ```
 
-<details><summary>Prompt completo, pronto da incollare</summary>
-
-```text
-A caricature of a strict math teacher holding a red pen, a blackboard with blurred unreadable formulas behind her. Pink, lilac and pastel palette, bright window light, playful satirical comedy mood, Italian high school, non-violent. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. 4:3 wanted-poster portrait, single threat centered and facing the viewer, head and eyes in the upper middle of the frame, dark vignetted background that fades to near black at the edges. Light-hearted comic caricature, not scary, not violent, not resembling any real person. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
-```
-
-</details>
-
-### Armi · Liceo Spietato (1:1, 512 × 512 px, sfondo trasparente)
+### Armi · Liceo Spietato
 
 #### Gossip esplosivo
 
-- **File**: `assets/arene/liceo/armi/gossip-esplosivo.webp`
-- **Cosa mostrare**: Smartphone con un fumetto di chat che esplode come un fuoco d'artificio.
-
-**Prompt**
+Smartphone con un fumetto di chat che esplode come un fuoco d'artificio.  
+File: `assets/arene/liceo/armi/gossip-esplosivo.webp`
 
 ```text
-A smartphone with a glowing chat bubble bursting out of it like a firework.
+A smartphone with a glowing chat bubble bursting out of it like a firework, single game inventory item, an everyday object turned into a playful prank weapon, three-quarter view laid diagonally from lower left to upper right, centered with generous empty margin, crisp clean silhouette with a thin dark outline, isolated on a plain flat light grey background, pink, lilac and pastel palette, bright window light, playful satirical comedy mood, Italian high school, non-violent, painterly digital game illustration, soft visible brushwork, clean graphic shapes, cinematic rim lighting, atmospheric depth --v 8.2 --ar 1:1 --s 150 --chaos 0 --sref https://raw.githubusercontent.com/hoffo1987/Last-One-Standing/main/assets/arene/liceo.webp --sw 120 --no text, letters, logo, watermark, hands, person, scenery, background objects, cast shadow, frame, border
 ```
-
-<details><summary>Prompt completo, pronto da incollare</summary>
-
-```text
-A smartphone with a glowing chat bubble bursting out of it like a firework. Pink, lilac and pastel palette, bright window light, playful satirical comedy mood, Italian high school, non-violent. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Single object only, isolated on a fully transparent background, square 1:1, three-quarter view laid diagonally from lower left to upper right, 12% empty margin on every side, crisp silhouette with a thin dark outline so it reads on both light and dark backgrounds, no hands, no shadow on the ground. An everyday object used as a playful office or school prank, comic tone. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
-```
-
-</details>
 
 #### Foto imbarazzante
 
-- **File**: `assets/arene/liceo/armi/foto-imbarazzante.webp`
-- **Cosa mostrare**: Polaroid con un'immagine imbarazzante sfocata e un bagliore rosa.
-
-**Prompt**
+Polaroid con un'immagine imbarazzante sfocata e un bagliore rosa.  
+File: `assets/arene/liceo/armi/foto-imbarazzante.webp`
 
 ```text
-A polaroid photo showing a blurred embarrassing picture, with a pink glow.
+A polaroid photo showing a blurred embarrassing picture, with a pink glow, single game inventory item, an everyday object turned into a playful prank weapon, three-quarter view laid diagonally from lower left to upper right, centered with generous empty margin, crisp clean silhouette with a thin dark outline, isolated on a plain flat light grey background, pink, lilac and pastel palette, bright window light, playful satirical comedy mood, Italian high school, non-violent, painterly digital game illustration, soft visible brushwork, clean graphic shapes, cinematic rim lighting, atmospheric depth --v 8.2 --ar 1:1 --s 150 --chaos 0 --sref https://raw.githubusercontent.com/hoffo1987/Last-One-Standing/main/assets/arene/liceo.webp --sw 120 --no text, letters, logo, watermark, hands, person, scenery, background objects, cast shadow, frame, border
 ```
-
-<details><summary>Prompt completo, pronto da incollare</summary>
-
-```text
-A polaroid photo showing a blurred embarrassing picture, with a pink glow. Pink, lilac and pastel palette, bright window light, playful satirical comedy mood, Italian high school, non-violent. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Single object only, isolated on a fully transparent background, square 1:1, three-quarter view laid diagonally from lower left to upper right, 12% empty margin on every side, crisp silhouette with a thin dark outline so it reads on both light and dark backgrounds, no hands, no shadow on the ground. An everyday object used as a playful office or school prank, comic tone. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
-```
-
-</details>
 
 #### Compito copiato
 
-- **File**: `assets/arene/liceo/armi/compito-copiato.webp`
-- **Cosa mostrare**: Compito in classe con un bigliettino nascosto che spunta.
-
-**Prompt**
+Compito in classe con un bigliettino nascosto che spunta.  
+File: `assets/arene/liceo/armi/compito-copiato.webp`
 
 ```text
-A folded test paper with a tiny cheat sheet sticking out, no readable writing.
+A folded test paper with a tiny rolled cheat sheet sticking out, scribbled lines instead of writing, single game inventory item, an everyday object turned into a playful prank weapon, three-quarter view laid diagonally from lower left to upper right, centered with generous empty margin, crisp clean silhouette with a thin dark outline, isolated on a plain flat light grey background, pink, lilac and pastel palette, bright window light, playful satirical comedy mood, Italian high school, non-violent, painterly digital game illustration, soft visible brushwork, clean graphic shapes, cinematic rim lighting, atmospheric depth --v 8.2 --ar 1:1 --s 150 --chaos 0 --sref https://raw.githubusercontent.com/hoffo1987/Last-One-Standing/main/assets/arene/liceo.webp --sw 120 --no text, letters, logo, watermark, hands, person, scenery, background objects, cast shadow, frame, border
 ```
-
-<details><summary>Prompt completo, pronto da incollare</summary>
-
-```text
-A folded test paper with a tiny cheat sheet sticking out, no readable writing. Pink, lilac and pastel palette, bright window light, playful satirical comedy mood, Italian high school, non-violent. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Single object only, isolated on a fully transparent background, square 1:1, three-quarter view laid diagonally from lower left to upper right, 12% empty margin on every side, crisp silhouette with a thin dark outline so it reads on both light and dark backgrounds, no hands, no shadow on the ground. An everyday object used as a playful office or school prank, comic tone. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
-```
-
-</details>
 
 #### Pallone da dodgeball
 
-- **File**: `assets/arene/liceo/armi/pallone-da-dodgeball.webp`
-- **Cosa mostrare**: Pallone rosso da dodgeball con scie di movimento.
-
-**Prompt**
+Pallone rosso da dodgeball con scie di movimento.  
+File: `assets/arene/liceo/armi/pallone-da-dodgeball.webp`
 
 ```text
-A red rubber dodgeball with motion streaks.
+A red rubber dodgeball with motion streaks, single game inventory item, an everyday object turned into a playful prank weapon, three-quarter view laid diagonally from lower left to upper right, centered with generous empty margin, crisp clean silhouette with a thin dark outline, isolated on a plain flat light grey background, pink, lilac and pastel palette, bright window light, playful satirical comedy mood, Italian high school, non-violent, painterly digital game illustration, soft visible brushwork, clean graphic shapes, cinematic rim lighting, atmospheric depth --v 8.2 --ar 1:1 --s 150 --chaos 0 --sref https://raw.githubusercontent.com/hoffo1987/Last-One-Standing/main/assets/arene/liceo.webp --sw 120 --no text, letters, logo, watermark, hands, person, scenery, background objects, cast shadow, frame, border
 ```
-
-<details><summary>Prompt completo, pronto da incollare</summary>
-
-```text
-A red rubber dodgeball with motion streaks. Pink, lilac and pastel palette, bright window light, playful satirical comedy mood, Italian high school, non-violent. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Single object only, isolated on a fully transparent background, square 1:1, three-quarter view laid diagonally from lower left to upper right, 12% empty margin on every side, crisp silhouette with a thin dark outline so it reads on both light and dark backgrounds, no hands, no shadow on the ground. An everyday object used as a playful office or school prank, comic tone. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
-```
-
-</details>
 
 #### Registro rubato
 
-- **File**: `assets/arene/liceo/armi/registro-rubato.webp`
-- **Cosa mostrare**: Registro di classe spesso con il segnalibro a nastro.
-
-**Prompt**
+Registro di classe spesso con il segnalibro a nastro.  
+File: `assets/arene/liceo/armi/registro-rubato.webp`
 
 ```text
-A thick class register book with a ribbon bookmark, plain cover.
+A thick class register book with a ribbon bookmark, plain cover, single game inventory item, an everyday object turned into a playful prank weapon, three-quarter view laid diagonally from lower left to upper right, centered with generous empty margin, crisp clean silhouette with a thin dark outline, isolated on a plain flat light grey background, pink, lilac and pastel palette, bright window light, playful satirical comedy mood, Italian high school, non-violent, painterly digital game illustration, soft visible brushwork, clean graphic shapes, cinematic rim lighting, atmospheric depth --v 8.2 --ar 1:1 --s 150 --chaos 0 --sref https://raw.githubusercontent.com/hoffo1987/Last-One-Standing/main/assets/arene/liceo.webp --sw 120 --no text, letters, logo, watermark, hands, person, scenery, background objects, cast shadow, frame, border
 ```
-
-<details><summary>Prompt completo, pronto da incollare</summary>
-
-```text
-A thick class register book with a ribbon bookmark, plain cover. Pink, lilac and pastel palette, bright window light, playful satirical comedy mood, Italian high school, non-violent. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Single object only, isolated on a fully transparent background, square 1:1, three-quarter view laid diagonally from lower left to upper right, 12% empty margin on every side, crisp silhouette with a thin dark outline so it reads on both light and dark backgrounds, no hands, no shadow on the ground. An everyday object used as a playful office or school prank, comic tone. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
-```
-
-</details>
 
 #### Profilo falso
 
-- **File**: `assets/arene/liceo/armi/profilo-falso.webp`
-- **Cosa mostrare**: Smartphone con un profilo social finto e l'icona di una maschera.
-
-**Prompt**
+Smartphone con un profilo social finto e l'icona di una maschera.  
+File: `assets/arene/liceo/armi/profilo-falso.webp`
 
 ```text
-A smartphone showing a fake social profile with a disguise mask icon.
+A smartphone showing a fake social profile with a disguise mask icon, single game inventory item, an everyday object turned into a playful prank weapon, three-quarter view laid diagonally from lower left to upper right, centered with generous empty margin, crisp clean silhouette with a thin dark outline, isolated on a plain flat light grey background, pink, lilac and pastel palette, bright window light, playful satirical comedy mood, Italian high school, non-violent, painterly digital game illustration, soft visible brushwork, clean graphic shapes, cinematic rim lighting, atmospheric depth --v 8.2 --ar 1:1 --s 150 --chaos 0 --sref https://raw.githubusercontent.com/hoffo1987/Last-One-Standing/main/assets/arene/liceo.webp --sw 120 --no text, letters, logo, watermark, hands, person, scenery, background objects, cast shadow, frame, border
 ```
-
-<details><summary>Prompt completo, pronto da incollare</summary>
-
-```text
-A smartphone showing a fake social profile with a disguise mask icon. Pink, lilac and pastel palette, bright window light, playful satirical comedy mood, Italian high school, non-violent. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Single object only, isolated on a fully transparent background, square 1:1, three-quarter view laid diagonally from lower left to upper right, 12% empty margin on every side, crisp silhouette with a thin dark outline so it reads on both light and dark backgrounds, no hands, no shadow on the ground. An everyday object used as a playful office or school prank, comic tone. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
-```
-
-</details>
 
 ---
 
@@ -2961,328 +1453,155 @@ A smartphone showing a fake social profile with a disguise mask icon. Pink, lila
 
 Riunioni infinite, fogli Excel e licenziamenti. Nessuno muore: si viene licenziati.
 
-- **Cartella**: `assets/arene/ufficio/` (con le sottocartelle `luoghi/`, `pericoli/`, `armi/`)
-- **Riferimento di stile**: `assets/arene/ufficio.webp`
 - **Atmosfera**: Open space aziendale in chiave satirica: verde petrolio, grigi, neon freddi, luce da monitor. Tono da commedia d'ufficio, nessuna violenza.
-- **Stile da aggiungere a ogni prompt di questa arena** (è già incluso nei prompt completi):
+- **Riferimento di stile** (`--sref`): [https://raw.githubusercontent.com/hoffo1987/Last-One-Standing/main/assets/arene/ufficio.webp](https://raw.githubusercontent.com/hoffo1987/Last-One-Standing/main/assets/arene/ufficio.webp)
 
-```text
-Teal green and grey palette with cold neon office light and monitor glow, satirical corporate comedy mood, non-violent. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours.
-```
-
-Più, a seconda della sezione:
-
-- Luoghi: `Wide 16:9 establishing shot of the location, no people, eye-level view, the key landmark inside the central third of the frame, soft depth fog in the background.`
-- Pericoli: `4:3 wanted-poster portrait, single threat centered and facing the viewer, head and eyes in the upper middle of the frame, dark vignetted background that fades to near black at the edges. Light-hearted comic caricature, not scary, not violent, not resembling any real person.`
-- Armi: `Single object only, isolated on a fully transparent background, square 1:1, three-quarter view laid diagonally from lower left to upper right, 12% empty margin on every side, crisp silhouette with a thin dark outline so it reads on both light and dark backgrounds, no hands, no shadow on the ground. An everyday object used as a playful office or school prank, comic tone.`
-- Sempre: `No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.`
-
-### Luoghi · Ufficio Open Space (16:9, 1280 × 720 px, sfondo pieno)
+### Luoghi · Ufficio Open Space
 
 #### Sala riunioni
 
-- **File**: `assets/arene/ufficio/luoghi/sala-riunioni.webp`
-- **Cosa mostrare**: Sala riunioni con tavolo di vetro lungo, sedie vuote, schermo del proiettore e lavagna.
-
-**Prompt**
+Sala riunioni con tavolo di vetro lungo, sedie vuote, schermo del proiettore e lavagna.  
+File: `assets/arene/ufficio/luoghi/sala-riunioni.webp`
 
 ```text
-A meeting room with a long glass table, empty chairs, a projector screen and a whiteboard with blurred scribbles.
+A meeting room with a long glass table, empty chairs, a projector screen and a whiteboard with blurred scribbles, wide establishing shot at eye level, an empty deserted location, the main landmark centered in the frame, layered depth with soft distant haze, teal green and grey palette with cold neon office light and monitor glow, satirical corporate comedy mood, non-violent, painterly digital game illustration, soft visible brushwork, clean graphic shapes, cinematic rim lighting, atmospheric depth --v 8.2 --ar 16:9 --s 250 --chaos 8 --sref https://raw.githubusercontent.com/hoffo1987/Last-One-Standing/main/assets/arene/ufficio.webp --sw 300 --no text, letters, words, readable signs, logo, watermark, people, characters, frame, border
 ```
-
-<details><summary>Prompt completo, pronto da incollare</summary>
-
-```text
-A meeting room with a long glass table, empty chairs, a projector screen and a whiteboard with blurred scribbles. Teal green and grey palette with cold neon office light and monitor glow, satirical corporate comedy mood, non-violent. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Wide 16:9 establishing shot of the location, no people, eye-level view, the key landmark inside the central third of the frame, soft depth fog in the background. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
-```
-
-</details>
 
 #### Open space
 
-- **File**: `assets/arene/ufficio/luoghi/open-space.webp`
-- **Cosa mostrare**: Open space sterminato con file di scrivanie, monitor e piante in vaso.
-
-**Prompt**
+Open space sterminato con file di scrivanie, monitor e piante in vaso.  
+File: `assets/arene/ufficio/luoghi/open-space.webp`
 
 ```text
-A sprawling open-space office with rows of desks, monitors and potted plants.
+A sprawling open-space office with rows of desks, monitors and potted plants, wide establishing shot at eye level, an empty deserted location, the main landmark centered in the frame, layered depth with soft distant haze, teal green and grey palette with cold neon office light and monitor glow, satirical corporate comedy mood, non-violent, painterly digital game illustration, soft visible brushwork, clean graphic shapes, cinematic rim lighting, atmospheric depth --v 8.2 --ar 16:9 --s 250 --chaos 8 --sref https://raw.githubusercontent.com/hoffo1987/Last-One-Standing/main/assets/arene/ufficio.webp --sw 300 --no text, letters, words, readable signs, logo, watermark, people, characters, frame, border
 ```
-
-<details><summary>Prompt completo, pronto da incollare</summary>
-
-```text
-A sprawling open-space office with rows of desks, monitors and potted plants. Teal green and grey palette with cold neon office light and monitor glow, satirical corporate comedy mood, non-violent. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Wide 16:9 establishing shot of the location, no people, eye-level view, the key landmark inside the central third of the frame, soft depth fog in the background. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
-```
-
-</details>
 
 #### Cucina
 
-- **File**: `assets/arene/ufficio/luoghi/cucina.webp`
-- **Cosa mostrare**: Angolo cucina con macchinetta del caffè, tazze, microonde e frigo pieno di bigliettini.
-
-**Prompt**
+Angolo cucina con macchinetta del caffè, tazze, microonde e frigo pieno di bigliettini.  
+File: `assets/arene/ufficio/luoghi/cucina.webp`
 
 ```text
-The office kitchenette with a coffee machine, mugs, a microwave and a fridge covered in sticky notes.
+The office kitchenette with a coffee machine, mugs, a microwave and a fridge covered in sticky notes, wide establishing shot at eye level, an empty deserted location, the main landmark centered in the frame, layered depth with soft distant haze, teal green and grey palette with cold neon office light and monitor glow, satirical corporate comedy mood, non-violent, painterly digital game illustration, soft visible brushwork, clean graphic shapes, cinematic rim lighting, atmospheric depth --v 8.2 --ar 16:9 --s 250 --chaos 8 --sref https://raw.githubusercontent.com/hoffo1987/Last-One-Standing/main/assets/arene/ufficio.webp --sw 300 --no text, letters, words, readable signs, logo, watermark, people, characters, frame, border
 ```
-
-<details><summary>Prompt completo, pronto da incollare</summary>
-
-```text
-The office kitchenette with a coffee machine, mugs, a microwave and a fridge covered in sticky notes. Teal green and grey palette with cold neon office light and monitor glow, satirical corporate comedy mood, non-violent. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Wide 16:9 establishing shot of the location, no people, eye-level view, the key landmark inside the central third of the frame, soft depth fog in the background. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
-```
-
-</details>
 
 #### Ufficio del direttore
 
-- **File**: `assets/arene/ufficio/luoghi/ufficio-del-direttore.webp`
-- **Cosa mostrare**: Ufficio d'angolo del Direttore con poltrona di pelle, vetrata panoramica e premi sugli scaffali.
-
-**Prompt**
+Ufficio d'angolo del Direttore con poltrona di pelle, vetrata panoramica e premi sugli scaffali.  
+File: `assets/arene/ufficio/luoghi/ufficio-del-direttore.webp`
 
 ```text
-The director's corner office with a big leather chair, a panoramic window and trophies on shelves.
+The director's corner office with a big leather chair, a panoramic window and trophies on shelves, wide establishing shot at eye level, an empty deserted location, the main landmark centered in the frame, layered depth with soft distant haze, teal green and grey palette with cold neon office light and monitor glow, satirical corporate comedy mood, non-violent, painterly digital game illustration, soft visible brushwork, clean graphic shapes, cinematic rim lighting, atmospheric depth --v 8.2 --ar 16:9 --s 250 --chaos 8 --sref https://raw.githubusercontent.com/hoffo1987/Last-One-Standing/main/assets/arene/ufficio.webp --sw 300 --no text, letters, words, readable signs, logo, watermark, people, characters, frame, border
 ```
-
-<details><summary>Prompt completo, pronto da incollare</summary>
-
-```text
-The director's corner office with a big leather chair, a panoramic window and trophies on shelves. Teal green and grey palette with cold neon office light and monitor glow, satirical corporate comedy mood, non-violent. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Wide 16:9 establishing shot of the location, no people, eye-level view, the key landmark inside the central third of the frame, soft depth fog in the background. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
-```
-
-</details>
 
 #### Sala stampanti
 
-- **File**: `assets/arene/ufficio/luoghi/sala-stampanti.webp`
-- **Cosa mostrare**: Stanzino delle stampanti con una fotocopiatrice inceppata che sputa fogli.
-
-**Prompt**
+Stanzino delle stampanti con una fotocopiatrice inceppata che sputa fogli.  
+File: `assets/arene/ufficio/luoghi/sala-stampanti.webp`
 
 ```text
-A cramped printer room with a jammed copier spitting out paper.
+A cramped printer room with a jammed copier spitting out paper, wide establishing shot at eye level, an empty deserted location, the main landmark centered in the frame, layered depth with soft distant haze, teal green and grey palette with cold neon office light and monitor glow, satirical corporate comedy mood, non-violent, painterly digital game illustration, soft visible brushwork, clean graphic shapes, cinematic rim lighting, atmospheric depth --v 8.2 --ar 16:9 --s 250 --chaos 8 --sref https://raw.githubusercontent.com/hoffo1987/Last-One-Standing/main/assets/arene/ufficio.webp --sw 300 --no text, letters, words, readable signs, logo, watermark, people, characters, frame, border
 ```
-
-<details><summary>Prompt completo, pronto da incollare</summary>
-
-```text
-A cramped printer room with a jammed copier spitting out paper. Teal green and grey palette with cold neon office light and monitor glow, satirical corporate comedy mood, non-violent. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Wide 16:9 establishing shot of the location, no people, eye-level view, the key landmark inside the central third of the frame, soft depth fog in the background. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
-```
-
-</details>
 
 #### Parcheggio
 
-- **File**: `assets/arene/ufficio/luoghi/parcheggio.webp`
-- **Cosa mostrare**: Parcheggio aziendale sotterraneo con posti riservati e neon.
-
-**Prompt**
+Parcheggio aziendale sotterraneo con posti riservati e neon.  
+File: `assets/arene/ufficio/luoghi/parcheggio.webp`
 
 ```text
-An underground company car park with reserved spaces and fluorescent lights.
+An underground company car park with reserved spaces and fluorescent lights, wide establishing shot at eye level, an empty deserted location, the main landmark centered in the frame, layered depth with soft distant haze, teal green and grey palette with cold neon office light and monitor glow, satirical corporate comedy mood, non-violent, painterly digital game illustration, soft visible brushwork, clean graphic shapes, cinematic rim lighting, atmospheric depth --v 8.2 --ar 16:9 --s 250 --chaos 8 --sref https://raw.githubusercontent.com/hoffo1987/Last-One-Standing/main/assets/arene/ufficio.webp --sw 300 --no text, letters, words, readable signs, logo, watermark, people, characters, frame, border
 ```
 
-<details><summary>Prompt completo, pronto da incollare</summary>
-
-```text
-An underground company car park with reserved spaces and fluorescent lights. Teal green and grey palette with cold neon office light and monitor glow, satirical corporate comedy mood, non-violent. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Wide 16:9 establishing shot of the location, no people, eye-level view, the key landmark inside the central third of the frame, soft depth fog in the background. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
-```
-
-</details>
-
-### Pericoli · Ufficio Open Space (4:3, 960 × 720 px, sfondo pieno e scuro)
+### Pericoli · Ufficio Open Space
 
 #### Direttore generale
 
-- **File**: `assets/arene/ufficio/pericoli/direttore-generale.webp`
-- **Cosa mostrare**: Caricatura dell'amministratore delegato in completo impeccabile, controluce davanti a una vetrata.
-
-**Prompt**
+Caricatura dell'amministratore delegato in completo impeccabile, controluce davanti a una vetrata.  
+File: `assets/arene/ufficio/pericoli/direttore-generale.webp`
 
 ```text
-A caricature of a CEO in a sharp suit, silhouetted against a tall window, power pose.
+A caricature of a CEO in a sharp suit, silhouetted against a tall window, power pose, comic caricature portrait framed like a wanted poster, playful exaggerated features, single subject centered and looking at the viewer, eyes in the upper half of the frame, dark vignette fading to near black at the edges, funny rather than scary, teal green and grey palette with cold neon office light and monitor glow, satirical corporate comedy mood, non-violent, painterly digital game illustration, soft visible brushwork, clean graphic shapes, cinematic rim lighting, atmospheric depth --v 8.2 --ar 4:3 --s 300 --chaos 8 --sref https://raw.githubusercontent.com/hoffo1987/Last-One-Standing/main/assets/arene/ufficio.webp --sw 250 --no text, letters, words, logo, watermark, frame, border, poster lettering, blood, gore, weapons, real person
 ```
-
-<details><summary>Prompt completo, pronto da incollare</summary>
-
-```text
-A caricature of a CEO in a sharp suit, silhouetted against a tall window, power pose. Teal green and grey palette with cold neon office light and monitor glow, satirical corporate comedy mood, non-violent. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. 4:3 wanted-poster portrait, single threat centered and facing the viewer, head and eyes in the upper middle of the frame, dark vignetted background that fades to near black at the edges. Light-hearted comic caricature, not scary, not violent, not resembling any real person. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
-```
-
-</details>
 
 #### Ufficio Risorse umane
 
-- **File**: `assets/arene/ufficio/pericoli/ufficio-risorse-umane.webp`
-- **Cosa mostrare**: Caricatura di una persona delle Risorse umane con un sorriso di circostanza e una pila di cartelline.
-
-**Prompt**
+Caricatura di una persona delle Risorse umane con un sorriso di circostanza e una pila di cartelline.  
+File: `assets/arene/ufficio/pericoli/ufficio-risorse-umane.webp`
 
 ```text
-A caricature of an HR officer with a polite fake smile holding a stack of folders.
+A caricature of an HR officer with a polite fake smile holding a stack of folders, comic caricature portrait framed like a wanted poster, playful exaggerated features, single subject centered and looking at the viewer, eyes in the upper half of the frame, dark vignette fading to near black at the edges, funny rather than scary, teal green and grey palette with cold neon office light and monitor glow, satirical corporate comedy mood, non-violent, painterly digital game illustration, soft visible brushwork, clean graphic shapes, cinematic rim lighting, atmospheric depth --v 8.2 --ar 4:3 --s 300 --chaos 8 --sref https://raw.githubusercontent.com/hoffo1987/Last-One-Standing/main/assets/arene/ufficio.webp --sw 250 --no text, letters, words, logo, watermark, frame, border, poster lettering, blood, gore, weapons, real person
 ```
-
-<details><summary>Prompt completo, pronto da incollare</summary>
-
-```text
-A caricature of an HR officer with a polite fake smile holding a stack of folders. Teal green and grey palette with cold neon office light and monitor glow, satirical corporate comedy mood, non-violent. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. 4:3 wanted-poster portrait, single threat centered and facing the viewer, head and eyes in the upper middle of the frame, dark vignetted background that fades to near black at the edges. Light-hearted comic caricature, not scary, not violent, not resembling any real person. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
-```
-
-</details>
 
 #### Consulente esterno
 
-- **File**: `assets/arene/ufficio/pericoli/consulente-esterno.webp`
-- **Cosa mostrare**: Caricatura del consulente esterno con capelli impomatati, portatile e un grafico a torta olografico.
-
-**Prompt**
+Caricatura del consulente esterno con capelli impomatati, portatile e un grafico a torta olografico.  
+File: `assets/arene/ufficio/pericoli/consulente-esterno.webp`
 
 ```text
-A caricature of a slick external consultant with gelled hair, a laptop and a holographic pie chart.
+A caricature of a slick external consultant with gelled hair, a laptop and a holographic pie chart, comic caricature portrait framed like a wanted poster, playful exaggerated features, single subject centered and looking at the viewer, eyes in the upper half of the frame, dark vignette fading to near black at the edges, funny rather than scary, teal green and grey palette with cold neon office light and monitor glow, satirical corporate comedy mood, non-violent, painterly digital game illustration, soft visible brushwork, clean graphic shapes, cinematic rim lighting, atmospheric depth --v 8.2 --ar 4:3 --s 300 --chaos 8 --sref https://raw.githubusercontent.com/hoffo1987/Last-One-Standing/main/assets/arene/ufficio.webp --sw 250 --no text, letters, words, logo, watermark, frame, border, poster lettering, blood, gore, weapons, real person
 ```
-
-<details><summary>Prompt completo, pronto da incollare</summary>
-
-```text
-A caricature of a slick external consultant with gelled hair, a laptop and a holographic pie chart. Teal green and grey palette with cold neon office light and monitor glow, satirical corporate comedy mood, non-violent. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. 4:3 wanted-poster portrait, single threat centered and facing the viewer, head and eyes in the upper middle of the frame, dark vignetted background that fades to near black at the edges. Light-hearted comic caricature, not scary, not violent, not resembling any real person. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
-```
-
-</details>
 
 #### Riorganizzazione aziendale
 
-- **File**: `assets/arene/ufficio/pericoli/riorganizzazione-aziendale.webp`
-- **Cosa mostrare**: La riorganizzazione personificata: un mostro di caselle e frecce di organigramma aggrovigliate.
-
-**Prompt**
+La riorganizzazione personificata: un mostro di caselle e frecce di organigramma aggrovigliate.  
+File: `assets/arene/ufficio/pericoli/riorganizzazione-aziendale.webp`
 
 ```text
-A corporate reorganization personified as a tangled monster made of org-chart boxes and arrows.
+A corporate reorganization personified as a tangled monster made of org-chart boxes and arrows, comic caricature portrait framed like a wanted poster, playful exaggerated features, single subject centered and looking at the viewer, eyes in the upper half of the frame, dark vignette fading to near black at the edges, funny rather than scary, teal green and grey palette with cold neon office light and monitor glow, satirical corporate comedy mood, non-violent, painterly digital game illustration, soft visible brushwork, clean graphic shapes, cinematic rim lighting, atmospheric depth --v 8.2 --ar 4:3 --s 300 --chaos 8 --sref https://raw.githubusercontent.com/hoffo1987/Last-One-Standing/main/assets/arene/ufficio.webp --sw 250 --no text, letters, words, logo, watermark, frame, border, poster lettering, blood, gore, weapons, real person
 ```
 
-<details><summary>Prompt completo, pronto da incollare</summary>
-
-```text
-A corporate reorganization personified as a tangled monster made of org-chart boxes and arrows. Teal green and grey palette with cold neon office light and monitor glow, satirical corporate comedy mood, non-violent. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. 4:3 wanted-poster portrait, single threat centered and facing the viewer, head and eyes in the upper middle of the frame, dark vignetted background that fades to near black at the edges. Light-hearted comic caricature, not scary, not violent, not resembling any real person. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
-```
-
-</details>
-
-### Armi · Ufficio Open Space (1:1, 512 × 512 px, sfondo trasparente)
+### Armi · Ufficio Open Space
 
 #### Mail in copia a tutti
 
-- **File**: `assets/arene/ufficio/armi/mail-in-copia-a-tutti.webp`
-- **Cosa mostrare**: Busta di una mail che si moltiplica in tante copie luminose.
-
-**Prompt**
+Busta di una mail che si moltiplica in tante copie luminose.  
+File: `assets/arene/ufficio/armi/mail-in-copia-a-tutti.webp`
 
 ```text
-An email envelope multiplying into many glowing copies.
+An email envelope multiplying into many glowing copies, single game inventory item, an everyday object turned into a playful prank weapon, three-quarter view laid diagonally from lower left to upper right, centered with generous empty margin, crisp clean silhouette with a thin dark outline, isolated on a plain flat light grey background, teal green and grey palette with cold neon office light and monitor glow, satirical corporate comedy mood, non-violent, painterly digital game illustration, soft visible brushwork, clean graphic shapes, cinematic rim lighting, atmospheric depth --v 8.2 --ar 1:1 --s 150 --chaos 0 --sref https://raw.githubusercontent.com/hoffo1987/Last-One-Standing/main/assets/arene/ufficio.webp --sw 120 --no text, letters, logo, watermark, hands, person, scenery, background objects, cast shadow, frame, border
 ```
-
-<details><summary>Prompt completo, pronto da incollare</summary>
-
-```text
-An email envelope multiplying into many glowing copies. Teal green and grey palette with cold neon office light and monitor glow, satirical corporate comedy mood, non-violent. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Single object only, isolated on a fully transparent background, square 1:1, three-quarter view laid diagonally from lower left to upper right, 12% empty margin on every side, crisp silhouette with a thin dark outline so it reads on both light and dark backgrounds, no hands, no shadow on the ground. An everyday object used as a playful office or school prank, comic tone. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
-```
-
-</details>
 
 #### Report pieno di errori altrui
 
-- **File**: `assets/arene/ufficio/armi/report-pieno-di-errori-altrui.webp`
-- **Cosa mostrare**: Report stampato coperto di segni rossi e post-it.
-
-**Prompt**
+Report stampato coperto di segni rossi e post-it.  
+File: `assets/arene/ufficio/armi/report-pieno-di-errori-altrui.webp`
 
 ```text
-A printed report covered in red marks and sticky notes, no readable text.
+A printed report covered in red correction marks and colourful sticky notes, abstract scribbled lines, single game inventory item, an everyday object turned into a playful prank weapon, three-quarter view laid diagonally from lower left to upper right, centered with generous empty margin, crisp clean silhouette with a thin dark outline, isolated on a plain flat light grey background, teal green and grey palette with cold neon office light and monitor glow, satirical corporate comedy mood, non-violent, painterly digital game illustration, soft visible brushwork, clean graphic shapes, cinematic rim lighting, atmospheric depth --v 8.2 --ar 1:1 --s 150 --chaos 0 --sref https://raw.githubusercontent.com/hoffo1987/Last-One-Standing/main/assets/arene/ufficio.webp --sw 120 --no text, letters, logo, watermark, hands, person, scenery, background objects, cast shadow, frame, border
 ```
-
-<details><summary>Prompt completo, pronto da incollare</summary>
-
-```text
-A printed report covered in red marks and sticky notes, no readable text. Teal green and grey palette with cold neon office light and monitor glow, satirical corporate comedy mood, non-violent. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Single object only, isolated on a fully transparent background, square 1:1, three-quarter view laid diagonally from lower left to upper right, 12% empty margin on every side, crisp silhouette with a thin dark outline so it reads on both light and dark backgrounds, no hands, no shadow on the ground. An everyday object used as a playful office or school prank, comic tone. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
-```
-
-</details>
 
 #### Presentazione rubata
 
-- **File**: `assets/arene/ufficio/armi/presentazione-rubata.webp`
-- **Cosa mostrare**: Chiavetta USB con una slide proiettata e una mascherina da ladro.
-
-**Prompt**
+Chiavetta USB con una slide proiettata e una mascherina da ladro.  
+File: `assets/arene/ufficio/armi/presentazione-rubata.webp`
 
 ```text
-A USB stick projecting a slide, wearing a tiny burglar mask.
+A USB stick projecting a slide, wearing a tiny burglar mask, single game inventory item, an everyday object turned into a playful prank weapon, three-quarter view laid diagonally from lower left to upper right, centered with generous empty margin, crisp clean silhouette with a thin dark outline, isolated on a plain flat light grey background, teal green and grey palette with cold neon office light and monitor glow, satirical corporate comedy mood, non-violent, painterly digital game illustration, soft visible brushwork, clean graphic shapes, cinematic rim lighting, atmospheric depth --v 8.2 --ar 1:1 --s 150 --chaos 0 --sref https://raw.githubusercontent.com/hoffo1987/Last-One-Standing/main/assets/arene/ufficio.webp --sw 120 --no text, letters, logo, watermark, hands, person, scenery, background objects, cast shadow, frame, border
 ```
-
-<details><summary>Prompt completo, pronto da incollare</summary>
-
-```text
-A USB stick projecting a slide, wearing a tiny burglar mask. Teal green and grey palette with cold neon office light and monitor glow, satirical corporate comedy mood, non-violent. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Single object only, isolated on a fully transparent background, square 1:1, three-quarter view laid diagonally from lower left to upper right, 12% empty margin on every side, crisp silhouette with a thin dark outline so it reads on both light and dark backgrounds, no hands, no shadow on the ground. An everyday object used as a playful office or school prank, comic tone. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
-```
-
-</details>
 
 #### Badge clonato del capo
 
-- **File**: `assets/arene/ufficio/armi/badge-clonato-del-capo.webp`
-- **Cosa mostrare**: Badge col cordino e una sua copia identica luminosa.
-
-**Prompt**
+Badge col cordino e una sua copia identica luminosa.  
+File: `assets/arene/ufficio/armi/badge-clonato-del-capo.webp`
 
 ```text
-An ID badge on a lanyard with a glowing duplicate copy beside it, blank photo area.
+An ID badge on a lanyard with a glowing duplicate copy beside it, blank photo area, single game inventory item, an everyday object turned into a playful prank weapon, three-quarter view laid diagonally from lower left to upper right, centered with generous empty margin, crisp clean silhouette with a thin dark outline, isolated on a plain flat light grey background, teal green and grey palette with cold neon office light and monitor glow, satirical corporate comedy mood, non-violent, painterly digital game illustration, soft visible brushwork, clean graphic shapes, cinematic rim lighting, atmospheric depth --v 8.2 --ar 1:1 --s 150 --chaos 0 --sref https://raw.githubusercontent.com/hoffo1987/Last-One-Standing/main/assets/arene/ufficio.webp --sw 120 --no text, letters, logo, watermark, hands, person, scenery, background objects, cast shadow, frame, border
 ```
-
-<details><summary>Prompt completo, pronto da incollare</summary>
-
-```text
-An ID badge on a lanyard with a glowing duplicate copy beside it, blank photo area. Teal green and grey palette with cold neon office light and monitor glow, satirical corporate comedy mood, non-violent. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Single object only, isolated on a fully transparent background, square 1:1, three-quarter view laid diagonally from lower left to upper right, 12% empty margin on every side, crisp silhouette with a thin dark outline so it reads on both light and dark backgrounds, no hands, no shadow on the ground. An everyday object used as a playful office or school prank, comic tone. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
-```
-
-</details>
 
 #### Foglio Excel con le prove
 
-- **File**: `assets/arene/ufficio/armi/foglio-excel-con-le-prove.webp`
-- **Cosa mostrare**: Stampa di un foglio di calcolo con celle evidenziate e una lente.
-
-**Prompt**
+Stampa di un foglio di calcolo con celle evidenziate e una lente.  
+File: `assets/arene/ufficio/armi/foglio-excel-con-le-prove.webp`
 
 ```text
-A spreadsheet printout with highlighted cells and a magnifying glass, no readable numbers.
+A spreadsheet printout with bright highlighted cells under a magnifying glass, abstract grid marks, single game inventory item, an everyday object turned into a playful prank weapon, three-quarter view laid diagonally from lower left to upper right, centered with generous empty margin, crisp clean silhouette with a thin dark outline, isolated on a plain flat light grey background, teal green and grey palette with cold neon office light and monitor glow, satirical corporate comedy mood, non-violent, painterly digital game illustration, soft visible brushwork, clean graphic shapes, cinematic rim lighting, atmospheric depth --v 8.2 --ar 1:1 --s 150 --chaos 0 --sref https://raw.githubusercontent.com/hoffo1987/Last-One-Standing/main/assets/arene/ufficio.webp --sw 120 --no text, letters, logo, watermark, hands, person, scenery, background objects, cast shadow, frame, border
 ```
-
-<details><summary>Prompt completo, pronto da incollare</summary>
-
-```text
-A spreadsheet printout with highlighted cells and a magnifying glass, no readable numbers. Teal green and grey palette with cold neon office light and monitor glow, satirical corporate comedy mood, non-violent. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Single object only, isolated on a fully transparent background, square 1:1, three-quarter view laid diagonally from lower left to upper right, 12% empty margin on every side, crisp silhouette with a thin dark outline so it reads on both light and dark backgrounds, no hands, no shadow on the ground. An everyday object used as a playful office or school prank, comic tone. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
-```
-
-</details>
 
 #### Nota spese gonfiata
 
-- **File**: `assets/arene/ufficio/armi/nota-spese-gonfiata.webp`
-- **Cosa mostrare**: Uno scontrino che si gonfia come un palloncino.
-
-**Prompt**
+Uno scontrino che si gonfia come un palloncino.  
+File: `assets/arene/ufficio/armi/nota-spese-gonfiata.webp`
 
 ```text
-A paper receipt inflating like a balloon.
+A paper receipt inflating like a balloon, single game inventory item, an everyday object turned into a playful prank weapon, three-quarter view laid diagonally from lower left to upper right, centered with generous empty margin, crisp clean silhouette with a thin dark outline, isolated on a plain flat light grey background, teal green and grey palette with cold neon office light and monitor glow, satirical corporate comedy mood, non-violent, painterly digital game illustration, soft visible brushwork, clean graphic shapes, cinematic rim lighting, atmospheric depth --v 8.2 --ar 1:1 --s 150 --chaos 0 --sref https://raw.githubusercontent.com/hoffo1987/Last-One-Standing/main/assets/arene/ufficio.webp --sw 120 --no text, letters, logo, watermark, hands, person, scenery, background objects, cast shadow, frame, border
 ```
-
-<details><summary>Prompt completo, pronto da incollare</summary>
-
-```text
-A paper receipt inflating like a balloon. Teal green and grey palette with cold neon office light and monitor glow, satirical corporate comedy mood, non-violent. Painterly digital illustration in the style of the Last One Standing arena banners, soft brushwork, clean shapes, dramatic cinematic lighting, rich but controlled colours. Single object only, isolated on a fully transparent background, square 1:1, three-quarter view laid diagonally from lower left to upper right, 12% empty margin on every side, crisp silhouette with a thin dark outline so it reads on both light and dark backgrounds, no hands, no shadow on the ground. An everyday object used as a playful office or school prank, comic tone. No text, no letters, no logos, no watermark, no UI, no frame, no realistic photo look, no recognizable real people.
-```
-
-</details>
