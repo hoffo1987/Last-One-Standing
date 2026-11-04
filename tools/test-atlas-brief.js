@@ -14,16 +14,18 @@ let n = 0;
 assert.deepStrictEqual(Object.keys(B.arenas).sort(), D.themes.map((t) => t.id).sort(), 'una voce del brief per ogni arena');
 D.themes.forEach((t) => {
   const ar = B.arenas[t.id];
-  assert.ok(ar.look && ar.style, t.id + ': atmosfera e stile');
+  assert.ok(ar.look && ar.light && ar.prop && typeof ar.facet === 'string', t.id + ': atmosfera, luce e stile');
   ['luoghi', 'pericoli', 'armi'].forEach((kind) => {
     const want = [...new Set(itemsOf(t, kind).map(A.slug))].sort();
     const have = Object.keys(ar[kind] || {}).sort();
     assert.deepStrictEqual(have, want, t.id + '/' + kind + ': il brief deve avere esattamente queste voci');
     have.forEach((k) => {
-      const [it, en] = ar[kind][k];
-      assert.ok(it && it.length > 15 && /[.!]$/.test(it), t.id + '/' + kind + '/' + k + ': descrizione italiana completa');
-      assert.ok(en && en.length > 20 && !/\.$/.test(en), t.id + '/' + kind + '/' + k + ': prompt inglese senza punto finale');
-      assert.ok(!/["«»]/.test(en), t.id + '/' + kind + '/' + k + ': niente virgolette nel prompt');
+      const [it, en, motion] = ar[kind][k], id = t.id + '/' + kind + '/' + k;
+      assert.ok(it && it.length > 15 && /[.!]$/.test(it), id + ': descrizione italiana completa');
+      assert.ok(en && en.length > 20 && /\.$/.test(en) && /^[A-Z]/.test(en), id + ': scena in inglese in frasi complete');
+      assert.ok(!/["«»]/.test(en) && !/\bno (people|text|readable)\b/i.test(en), id + ': niente virgolette né negazioni nella scena (vanno in --no)');
+      if (kind === 'armi') assert.strictEqual(motion, undefined, id + ': le armi non hanno il video');
+      else assert.ok(motion && motion.length > 25 && /\.$/.test(motion), id + ': movimento per il video in loop');
       n++;
     });
   });
