@@ -42,7 +42,7 @@ function imageCmd(t, kind, scene) {
   else body = scene + ' ' + M.style(facet(B)) + (kind === 'pericoli' && soft ? ' ' + M.soft : '') + ' ' + B.light;
   return body + ' --v ' + MJ.version + ' ' + M.params + ' --no ' + (soft && M.noSoft ? M.noSoft : M.no);
 }
-const videoCmd = (motion) => MJ.video.lead + ' ' + cap(motion) + ' ' + MJ.video.params;
+const videoCmd = (kind, motion) => MJ.video.lead[kind] + ' ' + cap(motion) + ' ' + MJ.video.params;
 
 // righe
 const rows = [], missingBrief = [];
@@ -55,7 +55,7 @@ D.themes.forEach((t) => {
       const br = (B[kind] || {})[key];
       if (!br) { missingBrief.push(t.id + '/' + kind + '/' + key); return; }
       rows.push({ arena: t.id, nome: t.name, kind, key, label: cap(strip(name)), base: 'assets/arene/' + t.id + '/' + kind + '/' + key, it: br[0],
-        img: imageCmd(t, kind, br[1]), vid: br[2] ? videoCmd(br[2]) : '', ok: has(t.id, kind, key, IMG), okv: has(t.id, kind, key, VID) });
+        img: imageCmd(t, kind, br[1]), vid: br[2] ? videoCmd(kind, br[2]) : '', ok: has(t.id, kind, key, IMG), okv: has(t.id, kind, key, VID) });
     });
   });
 });
@@ -82,6 +82,8 @@ let md = '# Immagini e video delle arene con Midjourney v8.2\n\n' +
   '3. **la frase di luce dell\'arena**, uguale per tutte le voci di quell\'arena: è ciò che tiene insieme palette e atmosfera;\n' +
   '4. **i parametri**: solo `--v 8.2`, il formato `--ar` e le esclusioni `--no`. Nessun riferimento alle immagini del sito.\n\n' +
   '`--no` tiene fuori scritte, **firme** (nella Cornucopia è comparsa una firma finta in basso a destra), loghi, cornici e persone. Le esclusioni stanno solo lì: scritte dentro la frase («no people») Midjourney spesso le fa al contrario.\n\n' +
+  '**Lunghezza e ordine.** La v8 è più letterale delle versioni precedenti: segue ciò che c\'è scritto e aggiunge meno «abbellimenti» da sola, quindi rende meglio con descrizioni piene e concrete (materiali, posizione delle cose, provenienza della luce). Conta il numero di soggetti e dettagli più delle parole. Per questo ogni testo sta tra **70 e 120 parole**, come quello della Cornucopia (circa 110) che ha funzionato, e **sotto gli 850 caratteri**, così il Prompt Shortener non interviene a tagliare. L\'ordine conta: il soggetto viene sempre per primo, lo stile e la luce dopo, perché Midjourney dà più peso all\'inizio.\n\n' +
+  '**Cosa ho controllato in ogni testo**: soggetto nel terzo centrale (sul telefono si vede solo quello); un dettaglio raccontato in primo piano e uno sfondo con profondità; pochi oggetti ben distinti invece di elenchi lunghi; cartelli, schermi e fogli sempre «blank» o con segni astratti, mai con testo; nei pericoli una posa, un\'espressione e una luce sul soggetto; nelle armi materiali, usura e un dettaglio d\'arena, perché a 62 px resta solo la sagoma; nessuna parola che Midjourney possa prendere alla lettera disegnando cornici o manifesti.\n\n' +
 
   '## 2. Impostazioni di Midjourney\n\n' +
   'Nel pannello **Settings** di midjourney.com (o con `/settings` su Discord), una volta sola:\n\n' +
@@ -111,7 +113,7 @@ let md = '# Immagini e video delle arene con Midjourney v8.2\n\n' +
   '## 4. I video d\'ambiente in loop\n\n' +
   'Ogni luogo e ogni pericolo ha anche un **prompt per il video**: una scena quasi ferma con poche cose che respirano (nebbia, foglie, luci, fiamme, respiro delle creature), a camera fissa, che si ripete senza stacchi.\n\n' +
   '1. Apri l\'immagine scelta e premi **Animate → Manual** (l\'immagine diventa il fotogramma iniziale).\n' +
-  '2. Incolla il prompt del video: contiene già **`--motion low`** (movimento lieve, adatto ai loop) e **`--loop`** (il fotogramma finale coincide con il primo, così il video ricomincia senza salti).\n' +
+  '2. Incolla il prompt del video: comincia dicendo che la camera è ferma e che **il luogo o il soggetto restano immobili** (aiuta molto il loop), poi elenca solo tre o quattro piccoli movimenti; contiene già **`--motion low`** (movimento lieve, adatto ai loop) e **`--loop`** (il fotogramma finale coincide con il primo, così il video ricomincia senza salti).\n' +
   '3. Se il tuo piano lo prevede, scegli **HD**. Delle quattro proposte prendi quella più calma; se qualcosa si muove troppo, rilancia (Rerun) invece di estendere il video.\n' +
   '4. Scarica l\'MP4. Non serve allungarlo: pochi secondi in loop bastano.\n\n' +
   '**Le armi niente video**: stanno in piastrelle di 62 px e devono avere lo sfondo trasparente, che un video non può avere. Se vorrai un tocco di vita lì, aggiungo io un riflesso animato sul sito.\n\n' +
