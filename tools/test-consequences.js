@@ -6,7 +6,7 @@ const path = require('node:path');
 const vm = require('node:vm');
 
 const src = path.join(__dirname, '..', 'src');
-const files = ['data-core.js', 'data-themes.js', 'content/_systems.js', 'content/_ecology.js', 'content/_items.js', 'content/_relazioni.js', 'engine-systems.js', 'engine.js'];
+const files = ['data-core.js', 'data-themes.js', 'content/_systems.js', 'content/_ecology.js', 'content/_items.js', 'content/_relazioni.js', 'engine-systems.js', 'engine-geography.js', 'engine.js'];
 const sources = files.map((f) => [f, fs.readFileSync(path.join(src, f), 'utf8')]);
 let passed = 0;
 function test(name, run) {
@@ -40,7 +40,7 @@ function scenario({ item = 'cibo', effects, setupA = '', setupB, participants = 
     { id: 'a', name: 'Ada', gender: 'F', team: 1, traits: [], attr: { int: 10 } },
     { id: 'b', name: 'Bruno', gender: 'M', team: 2, traits: [], attr: { int: 1 } },
   ];
-  const result = ctx.LOS.simulate({ cast, theme: 'audit', seed, difficulty: 'normale', teamsAllied: false, maxDays: 3 });
+  const result = ctx.LOS.simulate({ cast, theme: 'audit', mapVersion: 0, seed, difficulty: 'normale', teamsAllied: false, maxDays: 3 });
   const opening = result.phases.find((p) => p.kind === 'b');
   const day = result.phases.find((p) => p.kind === 'd');
   assert.ok(opening && day, 'lo scenario deve raggiungere la prima giornata');

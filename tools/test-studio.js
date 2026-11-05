@@ -1,6 +1,6 @@
 const assert = require('node:assert/strict'), fs = require('node:fs'), path = require('node:path'), vm = require('node:vm');
 const src = path.join(__dirname, '..', 'src');
-for (const f of ['data-core.js', 'data-themes.js', ...fs.readdirSync(path.join(src, 'content')).filter(f => f.endsWith('.js')).sort().map(f => 'content/' + f), 'engine-systems.js', 'engine.js']) require(path.join(src, f));
+for (const f of ['data-core.js', 'data-themes.js', ...fs.readdirSync(path.join(src, 'content')).filter(f => f.endsWith('.js')).sort().map(f => 'content/' + f), 'engine-systems.js', 'engine-geography.js', 'engine.js']) require(path.join(src, f));
 const L = globalThis.LOS, D = globalThis.LOS_DATA, studioCode = fs.readFileSync(path.join(src, 'studio.js'), 'utf8');
 const ctx = vm.createContext({}); vm.runInContext(studioCode, ctx); const Studio = ctx.LOS_STUDIO;
 let passed = 0;
@@ -43,7 +43,7 @@ function uiFixture() {
     try {
       D.themes = [{ ...themes[0], id: 'audit-relations', soft: true, pool: { b: '1 | {A} aspetta.', d: '1 | {A} aspetta.', n: '1 | {A} riposa.', finale: '2 k:A>B | {A} elimina {B}.', fallback: '1 | {A} aspetta.' }, disasters: [], extra: {} }];
       D.packs = []; D.more = {}; D.eco.arenas['audit-relations'] = { key: [], drain: { food: 0, en: 0, mo: 0 }, mods: { beast: 0 }, zones: [], meteo: [], meter: null };
-      const input = { ...cfg, cast: cast.map(t => ({ ...t, traits: [], attr: Object.fromEntries(D.attrs.map(a => [a.id, 5])) })), theme: 'audit-relations', maxDays: 3,
+      const input = { ...cfg, cast: cast.map(t => ({ ...t, traits: [], attr: Object.fromEntries(D.attrs.map(a => [a.id, 5])) })), theme: 'audit-relations', mapVersion:0, maxDays: 3,
         initialRelations: [{ from: 'a', to: 'b', type: 'coppia' }, { from: 'c', to: 'a', type: 'fiducia' }] };
       const result = L.simulate(input);
       assert.equal(result.phases[0].snap.rel.a.p, 'b'); assert.equal(result.phases[0].snap.rel.b.p, 'a');

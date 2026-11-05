@@ -16,7 +16,7 @@ const BRIEF = require('./atlas-brief.js'), MJ = BRIEF.mj;
 
 const KINDS = ['luoghi', 'pericoli', 'armi'];
 // le voci che la guida mostra davvero (devono restare allineate con src/ui.js)
-const itemsOf = (t, kind) => (kind === 'luoghi' ? t.lex.luogo : kind === 'pericoli' ? t.lex.mostro : t.lex.arma.slice(0, 10));
+const itemsOf = (t, kind) => (kind === 'luoghi' ? global.LOS_GEOGRAPHY.describe(t,D.eco.arenas[t.id]).map(z=>z.name) : kind === 'pericoli' ? t.lex.mostro : t.lex.arma.slice(0, 10));
 const strip = (x) => x.replace(/^(il |lo |la |l'|i |gli |le |un |uno |una |un'|delle |dei |degli |del |della |dell')/i, '');
 const cap = (x) => x.charAt(0).toUpperCase() + x.slice(1);
 const IMG = ['webp', 'png', 'jpg', 'jpeg', 'avif'], VID = ['webm', 'mp4'];

@@ -34,12 +34,12 @@ test('il contesto descrive i requisiti presenti prima dell’evento senza aggiun
   assert.equal(c.eventReason({ req: [] }, [a, b]), '');
 });
 const c = vm.createContext({});
-for (const f of ['data-core.js', 'data-themes.js', ...fs.readdirSync(path.join(src, 'content')).filter(f => f.endsWith('.js')).sort().map(f => 'content/' + f), 'engine-systems.js', 'engine.js']) vm.runInContext(fs.readFileSync(path.join(src, f), 'utf8'), c, { filename: f });
+for (const f of ['data-core.js', 'data-themes.js', ...fs.readdirSync(path.join(src, 'content')).filter(f => f.endsWith('.js')).sort().map(f => 'content/' + f), 'engine-systems.js', 'engine-geography.js', 'engine.js']) vm.runInContext(fs.readFileSync(path.join(src, f), 'utf8'), c, { filename: f });
 test('anche un catalogo con un solo modello idoneo permette di terminare la partita', () => {
   const D = c.LOS_DATA, ordinary = D.themes[0];
   D.themes = [{ ...ordinary, id: 'audit', soft: true, pool: { b: '1 | {A} aspetta.', d: '1 | {A} aspetta.', n: '1 | {A} aspetta.', fallback: '1 | {A} aspetta.', finale: '2 k:A>B | {A} elimina {B}.' }, disasters: [], extra: {} }];
   D.packs = []; D.more = {}; D.coreExtra = {};
-  const cfg = { cast: c.LOS.randomCast(8, 'poco-catalogo', 1), theme: 'audit', seed: 'poco-catalogo', maxDays: 3 };
+  const cfg = { cast: c.LOS.randomCast(8, 'poco-catalogo', 1), theme: 'audit', mapVersion: 0, seed: 'poco-catalogo', maxDays: 3 };
   const result = c.LOS.simulate(cfg);
   assert.equal(result.winners.length, 1); assert.deepEqual(c.LOS.simulate(cfg), result);
 });

@@ -1771,6 +1771,8 @@ details.card > summary { font-size: 16px; }
 .item-facts { list-style: none; padding: 0; display: grid; gap: 10px; margin: 10px 0; }
 .item-facts > li { padding: 10px; border-left: 3px solid var(--accent); border-radius: 8px; background: var(--panel-2); }
 .dx-title .dx-kicker { text-shadow: 0 1px 8px rgba(0,0,0,.7); }
+/* Geografia: schema dei passaggi e tracce della sola fase visibile. */
+.map-view{min-width:0}.map-caption{font-size:12px;line-height:1.6;margin:0 0 8px}.arena-graph{position:relative;aspect-ratio:360/320;width:100%;margin:8px auto 20px;max-width:480px}.arena-graph>svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}.arena-graph line,.arena-graph path{fill:none;stroke:currentColor;opacity:.18;stroke-width:1.5}.arena-graph line.shut,.arena-graph path.shut{stroke-dasharray:4 5;opacity:.1}.map-node{position:absolute;transform:translate(-50%,-50%);width:28%;max-width:102px;background:none;border:0;color:inherit;padding:4px;cursor:pointer;font:inherit;line-height:1.2;text-align:center}.map-node b{display:block;border:1px solid currentColor;border-radius:50%;width:28px;height:28px;line-height:26px;margin:0 auto 3px;background:var(--bg);font-size:13px}.map-node span{display:block;font-size:11px;font-weight:650;overflow-wrap:anywhere}.map-node small{display:block;font-size:10px;opacity:.7;margin-top:2px}.map-node.shut{opacity:.45}.map-node.selected b{outline:3px solid currentColor;outline-offset:3px}.map-view .map{display:grid;grid-template-columns:minmax(0,1fr);gap:10px;margin-top:12px}.map-view .zone{display:block;min-width:0}.map-view .zone h4{margin:0 0 5px}.map-view .zone h4 button,.map-links button,.map-person,.map-events button{background:none;border:0;padding:0;color:inherit;font:inherit;cursor:pointer;text-align:left;overflow-wrap:anywhere}.map-links button,.map-person{text-decoration:underline;text-underline-offset:3px}.map-view .zone .help{font-size:11px;margin:5px 0;line-height:1.6}.map-properties,.map-links,.map-fallen{font-size:11px;line-height:1.7;margin:8px 0}.map-view .zone details{font-size:12px;line-height:1.6;margin-top:8px}.map-events{padding-left:18px}.map-events li+li{margin-top:10px}.map-events button:hover{text-decoration:underline}.map-journeys{margin-top:16px;font-size:12px}.map-journeys ol{padding-left:20px}.map-journeys li{margin:12px 0;line-height:1.6}.map-route,.map-journeys .help{display:block;font-size:11px}.event-place{display:block;font-size:10px;letter-spacing:.03em;opacity:.65;margin-bottom:4px}.personal-route{padding-left:18px;font-size:12px;line-height:1.6}.personal-route li+li{margin-top:6px}
 </style>
 
 <header class="top">
@@ -7669,151 +7671,249 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
 })(typeof window === 'object' ? window : globalThis);
 
 ;
-/* Sistemi deterministici isolati. Le dipendenze sono esplicite e il RNG è quello della partita. */
+/* Geografia della partita: dati salvabili, percorsi e vincoli dei testi.
+ * Nessuna dipendenza dal DOM; nessuna sorgente casuale nascosta. */
 (function (G) {
   'use strict';
-  function createItemLedger({ phase, meter }) {
-    const facts = []; let context = '';
-    const state = (t) => {
-      const states = new Set(Object.keys(t.st)), set = (s, on) => on ? states.add(s) : states.delete(s);
-      set('ferito', t.hp < 55); set('grave', t.hp < 25); set('affamato', t.food < 25); set('esausto', t.en < 22); set('disperato', t.mo < 22);
-      if (meter) set(meter.st, meter.infect ? t.infected && t.pr >= meter.thr : t.pr >= meter.thr);
-      return { hp: Math.max(0, Math.min(100, t.hp)), en: Math.max(0, Math.min(100, t.en)), mo: Math.max(0, Math.min(100, t.mo)), food: Math.max(0, Math.min(100, t.food)), pr: Math.max(0, Math.min(100, t.pr)), states: [...states].sort(), infected: !!t.infected };
-    };
-    function record(kind, owner, target, item, before, detail = '') {
-      if (!item) return;
-      facts.push({ ph: phase(), seq: facts.length, kind, owner: owner.id, who: target.id, item: { t: item.type, n: item.name, h: item.how || 'trovato', f: item.from || null, d: item.d || 0 }, before: before || state(target), after: state(target), detail, context });
-    }
-    function use(kind, owner, target, item, action, detail) {
-      const before = state(target), result = action(); record(kind, owner, target, item, before, detail); return result;
-    }
-    return { facts, state, record, use, setContext(value) { context = value; } };
+  const definitions = {
+    classico: { start: 0, feast: 0, finale: 0, links: [[0,1],[0,2],[0,4],[1,2],[1,3],[2,3],[2,5],[3,4],[4,5]], descriptions: ['Il punto dei rifornimenti: conteso e senza copertura.', 'Sentieri e vegetazione offrono copertura.', 'Acqua e cibo, ma le rive espongono agli incontri.', 'Poco cibo sicuro e terreno insidioso.', 'Muri crollati e nascondigli riparati.', 'Poca copertura, vie di passaggio esposte.'] },
+    fantasy: { start: 6, feast: 6, finale: 6, extra: ["l'Altare delle armi", [1.4,1.5,0.2], 'La radura del banchetto e delle sfide, al centro dei sentieri.'], links: [[6,0],[6,1],[6,2],[0,3],[0,5],[1,2],[1,4],[2,4],[3,5],[4,5]], descriptions: ['Le rovine della Torre offrono mura e ripari.', 'La foresta nutre chi sa cercare.', 'Le rive sono aperte e difficili da difendere.', 'Gallerie riparate, ma pericolose.', 'Acqua stagnante e magia ostile.', 'Le pendici del drago sono povere ed esposte.'] },
+    scifi: { start: 0, feast: 0, finale: 0, links: [[0,1],[0,4],[0,5],[1,2],[1,4],[2,3],[2,5],[3,4],[3,5]], descriptions: ['Attracchi e casse di rifornimento.', 'Colture e acqua dei ricircolatori.', 'Impianti instabili e ossigeno difficile da recuperare.', 'Console e accessi sorvegliati.', 'Alloggi protetti, adatti al riposo.', 'Passaggi di manutenzione stretti e riparati.'] },
+    zombie: { start: 6, feast: 0, finale: 6, extra: ['la Piazza', [1.3,1.4,0.2], 'Il piazzale del convoglio, collegato al centro e alle vie di fuga.'], links: [[6,0],[6,1],[6,2],[0,3],[0,4],[1,2],[1,5],[2,4],[3,5],[4,5]], descriptions: ['Cure e scorte, ma molti infetti.', 'Negozi pieni di risorse e passaggi contesi.', 'Gallerie buie dove è difficile ritirarsi.', 'Aule e corridoi offrono riparo.', 'Locali barricabili e accessi controllabili.', 'Case sparse e strade verso il centro.'] },
+    royale: { start: null, feast: 0, finale: 0, links: [[0,1],[0,2],[0,5],[1,3],[1,5],[2,3],[2,4],[3,4],[4,5]], descriptions: ['Hangar e casse: molti rifornimenti e molti rivali.', 'Armi e risorse contese.', 'Edifici utili per ripararsi.', 'Passaggi esposti tra gli impianti.', 'Campi e provviste, con ripari limitati.', 'Copertura e sentieri ai margini dell’isola.'] },
+    horror: { start: 6, feast: 6, finale: 6, extra: ['il Salone', [1.4,1.3,0.5], 'L’ingresso della villa e la sala del ballo, da cui si raggiungono le altre ali.'], links: [[6,0],[6,1],[6,4],[6,5],[0,2],[0,5],[1,4],[2,3],[3,5]], descriptions: ['Buio e passaggi sotterranei.', 'Stanze chiuse e rumori sopra il soffitto.', 'Un riparo appartato e relativamente sicuro.', 'Tombe e percorsi scoperti.', 'Scaffali e stanze dove nascondersi.', 'La serra e i vialetti del giardino.'] },
+    wasteland: { start: 6, feast: 1, finale: 5, extra: ['il Deposito', [1.5,1.4,0.4], 'Il cancello iniziale e le scorte, lungo l’autostrada.'], links: [[6,0],[6,1],[6,3],[0,2],[0,3],[1,2],[1,5],[2,4],[3,4],[3,5],[4,5]], descriptions: ['Rottami utili e ripari di fortuna.', 'Asfalto aperto, convogli e poche coperture.', 'Impianti contaminati e strutture instabili.', 'Case vuote in cui trovare riparo.', 'Pochissime risorse e radiazioni elevate.', 'Acqua e passaggi verso il bacino.'] },
+    liceo: { start: 5, feast: 0, finale: 5, extra:['le Aule',[1.1,1.3,0.5],'Le classi delle lezioni, delle verifiche e delle interrogazioni.'],links: [[5,0],[5,2],[5,4],[0,1],[0,4],[1,2],[1,4],[2,3],[3,4],[6,2],[6,3],[6,4],[6,5]], descriptions: ['Gare e festa di istituto.', 'Merende e tavoli in cui nascono alleanze.', 'Silenzio e un posto per riprendersi.', 'Esperimenti e occasioni per fare figuracce.', 'Incontri, gossip e cambi d’ora.', 'Banchi, assemblee e convocazioni della Preside.'] },
+    ufficio: { start: 1, feast: 2, finale: 0, links: [[0,1],[0,3],[1,2],[1,4],[1,5],[2,4],[2,5],[3,4]], descriptions: ['Presentazioni e verdetti della direzione.', 'Scrivanie, colleghi e sguardi indiscreti.', 'Caffè, scorte e cena aziendale.', 'Colloqui ad alto rischio.', 'Una pausa appartata, finché la stampante collabora.', 'Fuori dagli uffici, con accesso alla cucina e all’open space.'] },
+  };
+  const strip = s => s.replace(/^(?:il |lo |la |l['’]|i |gli |le )/i, '');
+  const habitats={
+    classico:{water:[2,3],trees:[1,2,3,4],inside:[4]},fantasy:{water:[2,4],trees:[1,2,4],inside:[0,3]},
+    scifi:{water:[],trees:[],inside:[0,1,2,3,4,5]},zombie:{water:[2,5],trees:[3,5],inside:[0,1,2,3,4]},
+    royale:{water:[2],trees:[4,5],inside:[0,1,2,3,4]},horror:{water:[0,5],trees:[3,5],inside:[0,1,2,4,6]},
+    wasteland:{water:[5],trees:[],inside:[2,3,6]},liceo:{water:[1,4],trees:[4],inside:[0,1,2,3,5,6]},ufficio:{water:[2],trees:[5],inside:[0,1,2,3,4]},
+  };
+  const escapeRE = s => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  function describe(theme, eco) {
+    const def = definitions[theme.id];
+    if (!def) throw new Error('Geografia mancante: ' + theme.id);
+    const names = theme.lex.luogo.concat(def.extra ? [def.extra[0]] : []);
+    return names.map((name, id) => {
+      const p = id === theme.lex.luogo.length && def.extra ? def.extra[1] : eco?.zones?.[id] || [1,1,0.5];
+      return { id, name, links: def.links.flatMap(([a,b]) => a === id ? [b] : b === id ? [a] : []).sort((a,b) => a-b), resources: p[0], danger: p[1], shelter: p[2], features:Object.keys(habitats[theme.id]).filter(k=>habitats[theme.id][k].includes(id)), description: def.descriptions[id] || def.extra?.[2] || '' };
+    });
   }
-  function eventVariety() {
-    const counts = new Map(), recent = [];
-    const key = (ev) => ev.text.toLowerCase().replace(/\s+/g, ' ').trim();
-    return {
-      recent: (ev) => recent.includes(key(ev)),
-      weight: (ev) => 1 / Math.pow(1 + (counts.get(key(ev)) || 0), 1.5),
-      record(ev) { const k = key(ev); counts.set(k, (counts.get(k) || 0) + 1); recent.push(k); if (recent.length > 8) recent.shift(); },
-    };
+  function enrich(theme, zones) { return { ...theme, lex: { ...theme.lex, luogo: zones.map(z => z.name) } }; }
+  function path(zones, from, to, closed = new Set()) {
+    if (!zones[from] || !zones[to] || closed.has(to) && to !== from) return null;
+    const queue = [[from]], visited = new Set([from]);
+    for (let at = 0; at < queue.length; at++) {
+      const route = queue[at], last = route[route.length-1];
+      if (last === to) return route;
+      for (const next of zones[last].links) if (!visited.has(next) && !closed.has(next)) { visited.add(next); queue.push(route.concat(next)); }
+    }
+    return null;
   }
-
-
-  function createMemory(env) {
-    const { phases, BD, tweak, getDay } = env;
-    function remember(a, b, k, x, scale) {
-      if (!a || !b || a === b) return;
-      const l = (a.mem[b.id] = a.mem[b.id] || []);
-      if (l.length && l[l.length - 1].k === k && l[l.length - 1].ph === phases.length) return;
-      const fact = { ph: phases.length, k, x: x ? x.id : null };
-      l.push(fact);
-      (a.memoryHistory[b.id] || (a.memoryHistory[b.id] = [])).push(fact);
-      if (l.length > 8) l.shift();
-      tweak(a, b, (BD.memfx || {})[k], scale);
-      tweak(a, b, { k: 4 });
-    }
-    function remember1(t, html, kind) {
-      if (!t || !html) return;
-      t.diary.push({ ph: phases.length, d: getDay(), h: html, k: kind || 'pensiero' });
-      // Il diario è un documento storico, non una coda di lavoro: le pagine
-      // precedenti restano disponibili anche nelle partite più lunghe.
-    }
-    return { remember, remember1 };
+  function connected(zones, closed) {
+    const open = zones.filter(z => !closed.has(z.id));
+    return open.length > 0 && open.every(z => path(zones, open[0].id, z.id, closed));
   }
-
-  function createVitals(env) {
-    const { phases, clamp, M, hasTrait, DR, rng, stats, sys, possessive, itemOf, takeItem, itemLedger } = env;
-    function syncSt(t) {
-      const ph = phases.length;
-      const set = (k, on) => { if (on) { if (t.st[k] == null) t.st[k] = ph; } else delete t.st[k]; };
-      t.hp = Math.min(100, t.hp); t.en = clamp(t.en, 0, 100); t.mo = clamp(t.mo, 0, 100); t.food = clamp(t.food, 0, 100); t.pr = clamp(t.pr, 0, 100);
-      set('ferito', t.hp < 55); set('grave', t.hp < 25); set('affamato', t.food < 25); set('esausto', t.en < 22); set('disperato', t.mo < 22);
-      if (t.st.avvelenato == null) t.poisonSource = null;
-      if (M) set(M.st, M.infect ? t.infected && t.pr >= M.thr : t.pr >= M.thr);
+  function camp(zones,positions,closed=new Set()){
+    const candidates=zones.filter(z=>!closed.has(z.id)).map(z=>{
+      const routes=positions.map(from=>path(zones,from,z.id,closed));
+      return {id:z.id,score:routes.every(Boolean)?z.shelter*2-z.danger*0.45+z.resources*0.1-routes.reduce((n,p)=>n+p.length-1,0)/positions.length*0.2:-Infinity};
+    }).filter(x=>Number.isFinite(x.score)).sort((a,b)=>b.score-a.score||a.id-b.id);
+    return candidates[0]?.id??null;
+  }
+  // Lessemi vietati nei repertori condivisi: i testi specifici non vengono
+  // sostituiti con sinonimi meccanici che potrebbero rompere grammatica o senso.
+  const incompatible = {
+    scifi: /\b(?:bosco|boschi|fiume|fiumi|ruscello|lago|palud\w*|cespugli\w*|alber\w*|ram[oi]|foresta|sottobosco|grotta|grotte|pigna|ghiand\w*|radura|dirupo|precipizio|sabbia|liana|liane|nido|vespe|pesca|pescare|conigli\w*|lup[oi]|orso|cinghiale|fontana|falò|fuoco da campo|pioggia|neve|nevica|temporale|grandine|cielo|sole|tramonto|alba|stelle|costellazion\w*|luna|lune|cornucopia|gong)\b/iu,
+    fantasy: /\b(?:cornucopia|telecamer\w*|televis\w*|drone|droni|computer|monitor|microfono|riflettor\w*|regista|regia|batteri[ae]|elettric\w*|laser|aereo|elicottero|paracadut\w*|pistola|fucile|proiettil\w*|motosega|smartphone|selfie|frigorifero|munizioni|podcast|download|streaming|hashtag|cellulare|telefono|wifi|wi-fi|walkie[ -]talkie)\b/iu,
+    zombie: /\b(?:cornucopia|gong|piattaforma di lancio|spada runica|drago|incantesimo|elfic\w*)\b/iu,
+    royale: /\b(?:cornucopia|gong|spada runica|incantesimo|elfic\w*)\b/iu,
+    horror: /\b(?:cornucopia|piattaforma di lancio|gong|navetta|reattore|nanobot|radiazioni|mitragliatrice)\b/iu,
+    wasteland: /\b(?:cornucopia|gong|foresta elfica|bosco|boschi|sottobosco|liana|liane|prato verde|erba fresca|alber[oi] rigoglios\w*|bacche fresche)\b/iu,
+    liceo: /\b(?:sangue|sanguina\w*|cadaver\w*|ammazz\w*|uccid\w*|sbran\w*|decapit\w*|sgozz\w*|fucile|pistola|proiettil\w*|cornucopia)\b/iu,
+    ufficio: /\b(?:sangue|sanguina\w*|cadaver\w*|ammazz\w*|uccid\w*|sbran\w*|decapit\w*|sgozz\w*|fucile|pistola|proiettil\w*|cornucopia)\b/iu,
+  };
+  const offTheme = (text, theme) => !!incompatible[theme.id]?.test(theme.id==='scifi'?text.replace(/pioggia di micrometeoriti/giu,'sciame di micrometeoriti'):text);
+  // Varianti editoriali: si sostituiscono locuzioni intere, con i rispettivi
+  // articoli, mantenendo azione, tono ed esiti del modello originale.
+  const variants={
+    fantasy:[
+      ['la Cornucopia',"l'Altare delle armi"],['le telecamere elfiche','le sfere divinatorie'],['le telecamere','le sfere divinatorie'],['alle telecamere','alle sfere divinatorie'],['la telecamera','la sfera divinatoria'],['una telecamera','una sfera divinatoria'],['alla telecamera','alla sfera divinatoria'],['le telecamere','le sfere divinatorie'],['La regia','La cerchia dei veggenti'],['la regia','la cerchia dei veggenti'],['il collegamento','la visione'],['un elicottero','una viverna'],['tre paracadute di cibo','tre corvi carichi di provviste'],['un unico paracadute','un unico corvo messaggero'],['Un drone degli sponsor','Un corvo degli sponsor'],['un selfie','un autoritratto magico'],['fa zoom','avvicina la visione'],['in camera','verso una sfera divinatoria'],['Mezza nazione','Mezzo reame'],["Nell'arena c'è una luna sola.",'Nel reame le lune sono due. Per una volta non è un’allucinazione.'],
+    ],
+    scifi:[
+      ['la Cornucopia',"l'Hangar"],['nello stesso cespuglio','dietro lo stesso armadietto'],['ogni albero che incontra','ogni pannello che incontra'],['riposa al sole','riposa sotto una lampada di manutenzione'],['cade da un dirupo','precipita da una passerella'],['rivolto al cielo','rivolto a una telecamera sul soffitto'],['verso il cielo','verso il soffitto'],['contro un albero','contro un montante'],["sull'albero più alto della zona",'su una passerella sopraelevata'],['la corteccia di un albero','il rivestimento isolante di un cavo'],['a duello un albero', 'a duello un montante'],["Vince l'albero",'Vince il montante'],['attraversare il fiume a nuoto','attraversare un modulo in decompressione senza fune di sicurezza'],['Di notte. Vestit[A:o/a].','In pieno ciclo notturno. Senza tuta.'],['a pescare e a raccontarsi','a recuperare razioni da un distributore e a raccontarsi'],['dei funghi trovati in una radura','una coltura sperimentale della Serra idroponica'],['un bagno insieme nel fiume','una pausa insieme nelle docce dei Moduli abitativi'],['la testa nel fiume','la testa in un condotto di scarico'],["bevendo acqua del fiume",'bevendo acqua del ricircolatore'],['inquadra il cielo','inquadra il soffitto'],['dietro un cespuglio','dietro un armadietto'],['sfida un albero a braccio di ferro e lo sradica','strappa un montante dal suo alloggiamento a mani nude'],['sfida un albero a braccio di ferro','prova a piegare un montante a mani nude'],['corde e rami piegati','cavi e molle recuperate'],["filtra l'acqua con sabbia e carbone",'ripristina il filtro del ricircolatore'],['una pioggia di sassi','una raffica di bulloni'],['in un cespuglio','dietro un carrello di manutenzione'],['Il cespuglio era occupato','Il carrello era già occupato'],['sotto il sole senza acqua','tra i moduli senza una bombola di riserva'],['pesta un ramo secco','pesta una fascetta metallica'],['spezza un albero giovane','spezza un tubo dismesso'],["un masso che bloccava l'unica uscita della grotta",'un portello deformato che bloccava il passaggio'],["da un albero all'altro, senza mai toccare terra",'da una passerella all’altra, senza toccare il pavimento'],['su un sasso, poi su un ramo, poi sullo stesso sasso','su un bullone, poi su un cavo, poi sullo stesso bullone'],['Un uccello','Un drone delle pulizie'],['un secondo uccello','un secondo drone'],['un ramo cade','un cavo si stacca'],['al centro della radura','al centro del modulo'],['accende un fuoco con due sassi, caccia un coniglio con un laccio e cucina uno stufato','ripristina un fornello di emergenza e prepara uno stufato con le razioni'],['prova a cacciare un coniglio. Il coniglio','prova a catturare un drone delle consegne. Il drone'],["se il sole giri intorno all'arena o il contrario",'se la stazione giri intorno al pianeta o il contrario'],['su tutti gli alberi della zona','su tutti i pannelli della zona'],['da un albero su cui','da una passerella su cui'],['Morde un ramo','Morde un cavo'],['a un ramo a quattro metri', 'a un cavo a quattro metri'],['un cespuglio con la forma di','un carrello coperto da un telo con la forma di'],['gli alberi l[A:o/a] stiano spiando. Gli alberi hanno le telecamere','i pannelli l[A:o/a] stiano spiando. I pannelli hanno le telecamere'],['prende a pugni un albero per sfogarsi. L’albero cade','prende a pugni un pannello per sfogarsi. Il pannello cede'],["prende a pugni un albero per sfogarsi. L'albero cade",'prende a pugni un pannello per sfogarsi. Il pannello cede'],['a ogni sasso della zona. Al tramonto','a ogni bullone della zona. A fine ciclo'],['il sasso più grosso','il bullone più grosso'],['nascoste negli alberi','incassate nei pannelli'],['una pigna','un bullone'],['da un albero dritt[A:o/a]','da una scala dritt[A:o/a]'],["da una parte all'altra del fiume",'dalle due parti di un portello bloccato'],['Nessuno dei due sa nuotare','Nessuno dei due sa sbloccarlo'],['un cespuglio pieno di bacche','un distributore pieno di snack'],['Le bacche erano lassative','Gli snack erano lassativi'],['fino al tramonto','fino a fine ciclo'],['dietro un albero','dietro un montante'],['a un ramo','a una sbarra'],["all'alba",'al cambio di ciclo'],["prima dell'alba",'prima del cambio di ciclo'],['alla luce fioca delle stelle','alla luce di un terminale'],['guarda le stelle e ne sceglie una','osserva una carta stellare e sceglie una stella'],['contro il gelo','contro le correnti dei condotti'],['un letto di foglie, un tetto di rami e un fuoco che non fa fumo','un giaciglio di teli isolanti e un riparo dalle ventole'],['alla luna. Poi alla seconda luna. Nell’arena c’è una luna sola','al pianeta. Poi al suo riflesso nell’oblò. I brindisi sono due, il pianeta uno'],["alla luna. Poi alla seconda luna. Nell'arena c'è una luna sola",'al pianeta. Poi al suo riflesso nell’oblò. I brindisi sono due, il pianeta uno'],['a guardare le stelle passare','a guardare un planetario sul terminale'],['Ogni volta che ne passa una','Ogni volta che compare una stella'],["le stelle dell'arena",'la carta stellare del terminale'],['travestiti da cespugli','nascosti sotto teli di manutenzione'],['Un ramo si spezza','Un cavo si stacca'],['Il cannone suonerà','Il computer registrerà la perdita del segnale vitale'],['suona il cannone','si spegne il segnale vitale'],
+    ],
+    zombie:[['la Cornucopia','la Piazza']],royale:[['la Cornucopia',"l'Aeroporto"]],horror:[['la Cornucopia','il Salone']],
+    wasteland:[['la Cornucopia','il Deposito'],['nel Bosco','tra i ruderi della Città fantasma'],['in un bosco','tra i ruderi della Città fantasma'],['nel sottobosco','tra i rottami della Discarica']],
+  };
+  function adaptText(text,theme){
+    let out=text;
+    if(theme.id==='fantasy')out=out.replace('Il pubblico la scarica tre milioni di volte.','I bardi del reame la ricantano in ogni taverna.').replace('logo dello sponsor principale','sigillo del mecenate del reame').replace('pecore sono mutanti','pecore sono stregate').replace('Il programma di cucina viene rinnovato per tre stagioni.','I cantastorie chiedono altre tre esibizioni.').replace('Gli ascolti fanno il record della stagione.','I bardi ne parleranno per il resto della stagione.');
+    const editorial=theme.id==='fantasy'?[["Il blackout delle telecamere","Il silenzio delle sfere"],['niente telecamere sui dettagli, niente limiti','le sfere divinatorie vengono oscurate, e non ci sono limiti'],['un nuovo regista','un nuovo cerimoniere'],['di regia','del cerimoniere'],['i droni','i corvi messaggeri']]:theme.id==='scifi'?[['Pioggia di detriti','Sciame di detriti'],['La pioggia di bulloni','La raffica di bulloni'],['La pioggia di coriandoli','Lo sciame di coriandoli'],['La pioggia di sangue','Gli ugelli scarlatti'],["Una pioggia di sangue animale cade sull'arena",'Gli ugelli di manutenzione spruzzano sangue animale nei moduli']]:[];
+    for(const [from,to] of editorial.concat(variants[theme.id]||[])){
+      out=out.split(from).join(to);if(from.includes("'"))out=out.split(from.replaceAll("'",'’')).join(to);
+      const capital=from[0].toUpperCase()+from.slice(1);if(capital!==from)out=out.split(capital).join(to[0].toUpperCase()+to.slice(1));
     }
-    function hurt(t, dmg, by, cause, inTick) {
-      if (!t.alive) return;
-      dmg *= Math.max(0.55, 1.2 - t.attr.res * 0.04) * (hasTrait(t, 'sopravvissuto') ? 0.85 : 1);
-      const ar = itemOf(t, 'armatura');
-      if (ar && dmg >= 8) {
-        const before = itemLedger.state(t), unprotected = dmg;
-        dmg *= 0.62;
-        itemLedger.record('absorb', t, t, ar, before, 'Danno calcolato ridotto da ' + unprotected.toFixed(2) + ' a ' + dmg.toFixed(2) + '; prima di limiti alla salute'); ar.u = (ar.u || 1) - 1;
-        if (ar.u <= 0) { takeItem(t, ar); sys('armorBreak', [t], { i: ar.name, ip: possessive(ar) }, { cat: 'hurt', why: 'oggetto' }, 1); }
+    return out;
+  }
+  const who = rs => rs.map(i => '{' + String.fromCharCode(65+i) + '}').join(' e ');
+  function functionalText(ev, branch, theme) {
+    const p = branch || ev, parts = [], soft = !!theme.soft;
+    for (const k of (branch ? ev.kills.concat(p.kills) : ev.kills)) parts.push(who(k.by) + (k.betray ? (k.by.length>1?' tradiscono ':' tradisce ') : soft ? (k.by.length>1?' mettono fuori gioco ':' mette fuori gioco ') : (k.by.length>1?' tendono un agguato fatale a ':' tende un agguato fatale a ')) + who(k.v) + '.');
+    for (const i of (branch ? ev.dies.concat(p.dies) : ev.dies)) parts.push(who([i]) + (soft ? ' perde definitivamente il posto nella gara.' : ' non supera il pericolo e perde la vita.'));
+    const fx = branch ? ev.fx.concat(p.fx) : ev.fx;
+    for (const f of fx) {
+      const a = who([f.r[0]]), b = f.r.length > 1 ? who([f.r[1]]) : '', item = '{' + f.item + (f.t === 'gain' ? '' : ':' + String.fromCharCode(65 + (f.t === 'steal' ? f.r[1] : f.r[0]))) + '}';
+      const status = { ferito: soft ? 'scosso dopo una figuraccia' : 'ferito', malato: 'malato', avvelenato: soft ? 'in difficoltà per uno scherzo di cattivo gusto' : 'avvelenato', ubriaco: 'ubriaco', affamato: 'senza energie per la fame', sconvolto: 'sconvolto', lutto: soft ? 'abbattuto per chi è uscito dai giochi' : 'in lutto' }[f.s] || 'in difficoltà';
+      const text = {
+        al: who(f.r) + ' decidono di allearsi.', br: a + ' rompe la propria alleanza.',
+        gain: a + ' recupera ' + item + '.', lose: a + ' perde ' + item + '.', consume: a + ' usa ' + item + '.',
+        steal: a + ' sottrae ' + item + ' a ' + b + '.', give: a + ' consegna ' + item + ' a ' + b + '.',
+        status: a + ' resta ' + status + '.', cure: a + ' riesce a rimettersi in sesto.',
+        hit: a + (soft ? ' mette in difficoltà ' : ' ferisce ') + b + '.', poison: a + (soft ? ' prepara uno scherzo che indebolisce ' : ' avvelena ') + b + '.',
+        save: a + ' aiuta ' + b + ' a superare il pericolo.', love: a + ' e ' + b + ' si dichiarano e si mettono insieme.',
+        forgive: a + ' perdona ' + b + '.', repay: a + ' salda il proprio debito con ' + b + '.', debt: a + ' resta in debito con ' + b + '.',
+        rel: a + ' e ' + b + (f.v > 0 ? ' trovano un’intesa.' : ' entrano in contrasto.'),
+        bondfx: a + (f.v >= 0 ? ' sente crescere ' : ' sente diminuire ') + ({f:'la fiducia in ',r:'il rispetto per ',p:'la paura di ',t:'l’attrazione per '}[f.k] || 'il legame con ') + b + '.',
+        mkpromise: a + ' fa a ' + b + ' una promessa di ' + ({fedelta:'fedeltà',protezione:'protezione',vendetta:'vendetta',cibo:'condivisione delle provviste'}[f.k] || f.k) + '.',
+        breakup: a + ' e ' + b + ' si lasciano.', reunite: a + ' e ' + b + ' tornano insieme.', star: a + ' conquista l’attenzione di chi segue la gara.',
+        vital: a + ({hp:f.v>=0?(soft?' recupera credibilità.':' si riprende dalle ferite.'):(soft?' perde credibilità.':' vede peggiorare la propria salute.'),en:f.v>=0?' recupera energie.':' si affatica.',mo:f.v>=0?' ritrova fiducia.':' si scoraggia.',food:f.v>=0?' riesce a sfamarsi.':' sente il peso della fame.',pr:f.v>=0?' sente aumentare la pressione dell’arena.':' ritrova un po’ di sollievo.'}[f.k]),
+        move: '',
+      }[f.t];
+      if (text) parts.push(text);
+    }
+    if (!parts.length) {
+      const scenes = {
+        scifi: ['{A} controlla le giunture del modulo. Il rumore di fondo non promette nulla di buono.', '{A} si ferma ad ascoltare i condotti. Per una volta, sente solo le ventole.', '{A} cerca un angolo lontano dalle luci di emergenza e riprende fiato.'],
+        fantasy: ['{A} osserva i segni lasciati dalla magia e decide di non toccarli.', '{A} sussurra una vecchia formula per farsi coraggio. Almeno la voce non trema.', '{A} si concede una pausa e controlla i sentieri del reame.'],
+        _: ['{A} studia i passaggi della zona prima di fare la prossima mossa.', '{A} cerca un posto tranquillo e riprende fiato.', '{A} ascolta i rumori intorno e decide di aspettare.'],
+      };
+      let h = 0; for (const c of ev.text) h = (h*31+c.charCodeAt(0)) >>> 0;
+      parts.push((scenes[theme.id] || scenes._)[h%3]);
+    }
+    // L'accordo è delegato alla grammatica originale, anche per il neutro.
+    return parts.join(' ').replace(/\{([A-F])\} resta (ferito|malato|avvelenato|ubriaco|sconvolto|scosso)\b/g, (_,r,s) => '{'+r+'} resta '+s.slice(0,-1)+'['+r+':o/a]');
+  }
+  const aliasCache=new WeakMap(),poolCache=new WeakMap();
+  const genericPlaces={
+    'Paludi':['palude'],'Rovine':['rovina'],'Foresta elfica':['foresta'],'Lago nebbioso':['lago'],'Miniere':['miniera'],'Palude stregata':['palude'],
+    'Metropolitana':['metro'],'Villaggio costiero':['villaggio'],'Aeroporto':['hangar'],'Autostrada spezzata':['autostrada'],'Laboratorio di chimica':['laboratorio'],'Aule':['aula','classe'],
+  };
+  function aliases(zones) {
+    if(aliasCache.has(zones))return aliasCache.get(zones);
+    const list=zones.map(z => {
+      const bare = strip(z.name), variants = [bare];
+      const short = { 'Torre in rovina':['Torre'], 'Picco del drago':['Picco'], 'Lago nebbioso':['Lago nebbioso'], 'Altare delle armi':['Altare'], 'Ponte di comando':['Ponte di comando'], 'Centro commerciale':['Centro commerciale'], 'Città fantasma':['Città fantasma'] }[bare];
+      if (short) variants.push(...short);
+      variants.push(...genericPlaces[bare]||[]);
+      return { zone:z.id, re:new RegExp('(?<![\\p{L}])(?:'+variants.map(escapeRE).join('|')+')(?![\\p{L}])','giu') };
+    });
+    aliasCache.set(zones,list);return list;
+  }
+  function mentions(text, zones) {
+    const found = [];
+    for (const {zone,re} of aliases(zones)) for (const m of text.matchAll(re)) found.push({zone,index:m.index,length:m[0].length});
+    const accepted=[];for(const x of found.sort((a,b)=>a.index-b.index||b.length-a.length))if(!accepted.some(p=>x.index<p.index+p.length&&p.index<x.index+x.length))accepted.push(x);
+    return accepted;
+  }
+  function pickLex(lex,key,zone,theme,zones,rng){
+    if(key!=='rifugio'&&key!=='trappola')return rng.pick(lex[key]||['qualcosa']);
+    const candidates=(lex[key]||[]).filter(text=>mentions(text,zones).every(m=>m.zone===zone)&&(!/\b(?:albero|alberi|rami|ramo|tronco|pianta carnivora)\b/iu.test(text)||zones[zone].features.includes('trees')));
+    return rng.pick(candidates.length?candidates:[key==='trappola'?(theme.soft?'un tranello preparato di nascosto':'un ostacolo nascosto'):theme.soft?'un angolo tranquillo':theme.id==='scifi'?'un vano di manutenzione':'un riparo di fortuna']);
+  }
+  function rule(text, zones, explicit) {
+    const found = mentions(text, zones);
+    const needs=[];
+    if(/\b(?:nuota|nuotano|pesca|pescano|pescare|annega|annegano|riva|riva del|corrente del|letto del fiume|attraversa il fiume|si tuffa|si tuffano)\b/iu.test(text)) needs.push('water');
+    if(/\b(?:si arrampica|si arrampicano|sale|salgono|cade|cadono|dorme|dormono|si nasconde|si nascondono|precipita|precipitano)[^.!?]{0,45}\b(?:albero|alberi|ramo|rami|tronco)\b|\b(?:abbatte un albero|nido di vespe|lancia una pigna|sottobosco)\b/iu.test(text)) needs.push('trees');
+    const scatter=/scappano in direzioni opposte|si separano e (?:fuggono|scappano)|fuggono in direzioni opposte/iu.test(text);
+    const direct=[...text.matchAll(/\{([A-F])\}\s+(?:se ne va|si allontana|si dilegua|si defila|abbandona il campo|scappa via)/giu)].map(m=>m[1].charCodeAt(0)-65);
+    const coordinated=text.match(/^\{([A-F])\}[^.!?]{0,140}(?:e si dilegua|e si defila|e scappa via|poi si allontana|poi se ne va)/iu);
+    const depart=[...new Set(direct.concat(coordinated?[coordinated[1].charCodeAt(0)-65]:[]))];
+    if (explicit && (explicit.at!=null||explicit.travel!=null)) return { at:explicit.at??null, travel:explicit.travel??null,needs,scatter,depart };
+    if (!found.length) return { at:null, travel:null,needs,scatter,depart };
+    const last = found[found.length-1];
+    const prefix = text.slice(Math.max(0,last.index-100),last.index);
+    const moving = /(?:corre|fugge|scappa|raggiunge|raggiungono|arriva|arrivano|torna|tornano|entra|entrano|si (?:dirige|dirigono|sposta|spostano|rifugia|rifugiano|nasconde|nascondono)|segue|seguono)[^.!?]{0,65}(?:in|nel|nella|nelle|nello|nei|nell['’]|verso|fino a|alla|all['’]|al|sul|sulla)\s*$/iu.test(prefix);
+    return { at:moving ? (found.length > 1 ? found[0].zone : null) : found[0].zone, travel:moving ? last.zone : null,needs,scatter,depart };
+  }
+  function prepare(ev, theme, zones) {
+    const e = { ...ev };
+    if(ev.origin!=='custom'){e.text=adaptText(ev.text,theme);if(ev.test){e.okText=adaptText(ev.okText,theme);e.koText=adaptText(ev.koText,theme);}if(e.text!==ev.text)e.adapted=true;}
+    if(ev.origin!=='custom'&&ev.fx.some(f=>f.t==='br')){const changed=e.text.replace(/, lasciando \{([A-F])\} da sol\[[A-F]:o\/a\]/g,' e abbandona il patto con {$1}');if(changed!==e.text){e.text=changed;e.adapted=true;}}
+    if (ev.origin !== 'custom' && (offTheme(e.text,theme) || ev.test && (offTheme(e.okText,theme)||offTheme(e.koText,theme)))) {
+      if (ev.test) { e.okText=functionalText(ev,ev.ok,theme); e.koText=functionalText(ev,ev.ko,theme); e.text=e.okText+' || '+e.koText; }
+      else e.text=functionalText(ev,null,theme);
+      e.adapted = true;
+    }
+    e.space = e.test ? [rule(e.okText,zones,e.location),rule(e.koText,zones,e.location)] : [rule(e.text,zones,e.location)];
+    if(ev.origin==='custom'&&e.location&&Object.values(e.location).some(z=>!zones[z]))throw new Error('Evento personalizzato con zona inesistente: '+e.text);
+    if(ev.origin!=='custom'&&!zones.some(z=>e.space.every(s=>(s.at==null||s.at===z.id)&&(s.travel==null||s.travel===z.id||z.links.includes(s.travel))&&s.needs.every(k=>zones[s.travel??z.id].features.includes(k))))) {
+      if(e.test){e.okText=functionalText(ev,ev.ok,theme);e.koText=functionalText(ev,ev.ko,theme);e.text=e.okText+' || '+e.koText;}else e.text=functionalText(ev,null,theme);
+      e.adapted=true;e.space=e.test?[rule(e.okText,zones,e.location),rule(e.koText,zones,e.location)]:[rule(e.text,zones,e.location)];
+    }
+    return e;
+  }
+  function preparePools(pools, theme, zones) {
+    const key=JSON.stringify(zones.map(z=>[z.name,z.features]));
+    const cached=poolCache.get(pools);if(cached?.key===key)return cached.out;
+    const out = { ...pools, lex:{...pools.lex,luogo:zones.map(z=>z.name),med:[theme.soft?'un aiuto per riprendersi':theme.id==='fantasy'?'una pozione curativa':'un kit medico'],trap:theme.lex.trappola} };
+    for (const [k,v] of Object.entries(pools)) if (Array.isArray(v) && k !== 'disasters') out[k]=v.map(e=>prepare(e,theme,zones));
+    out.disasters=pools.disasters.map(d=>({...d,n:adaptText(d.n,theme),intro:adaptText(d.intro,theme),out:d.out.map(e=>prepare(e,theme,zones))}));
+    poolCache.set(pools,{key,out});return out;
+  }
+  function create({theme, zones, T, closed, phase, hasMap, onMap, onEnter=()=>{}}) {
+    let seq=0, used=new Map();
+    const data={version:1,zones:zones.map(z=>({...z,links:z.links.slice()})),start:Object.fromEntries(T.map(t=>[t.id,t.zone])),moves:[],deaths:[],closures:[]};
+    const reset=()=>{used=new Map();};
+    const budget=t=>t.en<(theme.soft?3:5)*(t.en<20?1.2:1)*(hasMap(t)?0.75:1)?0:Math.max(0,2-(used.get(t.id)||0));
+    function move(t,to,reason,options={}) {
+      if (!t.alive || t.hp<=0 || to===t.zone) return null;
+      if(closed.has(to))return null;
+      const route=path(zones,t.zone,to,options.mode==='evacuate'?new Set():closed); if (!route || route.length<2) return null;
+      const hops=options.forced ? route.length-1 : Math.min(options.steps||1,budget(t),route.length-1);
+      if (!hops) return null;
+      let last=null;
+      for(let i=1;i<=hops;i++){
+        if(!t.alive||t.hp<=0)break;
+        const from=t.zone,dest=route[i],cost=Math.round((theme.soft?3:5)*(t.en<20?1.2:1)*(hasMap(t)?0.75:1)*100)/100;
+        if(!options.forced&&t.en<cost)break;
+        const paid=Math.min(Math.max(0,t.en),cost);t.en=Math.max(0,t.en-cost);t.zone=dest;used.set(t.id,(used.get(t.id)||0)+1);
+        last={seq:seq++,ph:phase(),id:t.id,from,to:dest,path:[from,dest],reason,mode:options.mode||'goal',cost:paid,target:options.target||null};
+        data.moves.push(last);if(hasMap(t))onMap(t,last);onEnter(t,last);
       }
-      const hp0 = t.hp;
-      t.hp -= dmg; if (!inTick) t.hp = Math.max(Math.min(8, hp0), t.hp);
-      t.hurtPh = phases.length;
-      if (by && by !== t) t.cause = { k: cause === 'trap' ? 'trap' : 'wound', by: by.id, ph: phases.length };
-      else if (cause && !(inTick && t.cause && t.cause.k === cause && t.cause.by)) t.cause = { k: cause, ph: phases.length, by: null };
-      if (M && M.infect && !t.infected && (cause === 'wound' || cause === 'beast' || by) && rng.chance(M.infect * Math.max(0.4, 1.2 - t.attr.res * 0.05))) {
-        t.infected = true; t.pr = Math.max(t.pr, 8); stats.infected++;
-        sys('infect', [t], {}, { cat: 'hurt', why: 'infezione' }, 3);
-      }
-      t.mo -= Math.min(10, dmg / 4);
-      syncSt(t);
+      return last;
     }
-    return { syncSt, hurt };
-  }
-
-  function createInventory(env) {
-    const { IT, theme, ITEM_NAME, LEX, rng, MOD, itemOf, clamp, getDay, getOrigin } = env;
-    const capInv = (t) => { while (t.inv.length > 8) { const k = t.inv.findIndex((x) => x.type !== 'ricordo'); t.inv.splice(k >= 0 ? k : 0, 1); } };
-    const itemName = (type) => {
-      const n = ((IT.names || {})[theme.id] || {})[type] || ((IT.names || {})._ || {})[type];
-      if (n && n.length) return rng.pick(n);
-      return ITEM_NAME[type] || rng.pick(LEX[type] || ['qualcosa']);
-    };
-    const maxUses = (type, q) => (type === 'arma' ? Math.max(2, Math.round((2 + (q || 2) * 2) / (MOD.wear || 1))) : type === 'armatura' ? 3 : 0);
-    function mkItem(type, name, how, from, q) {
-      const it = { type, name: name || itemName(type), how: how || getOrigin() || 'trovato', from: from ? from.id : null, d: getDay() };
-      if (type === 'arma') it.q = q || clamp(Math.round(0.7 + rng.f() * 2.2 * MOD.weapon), 1, 3);
-      const mu = maxUses(type, it.q); if (mu) { it.u = mu; it.um = mu; }
-      return it;
-    }
-    const itemScore = (it) => (it.q || 2) * 10 + (it.u || 0) + (it.x ? 5 : 0);
-    function canReceiveItem(t, it) {
-      if (!t || !t.alive) return false;
-      const old = itemOf(t, it.type);
-      if ((it.type === 'arma' || it.type === 'armatura') && old && itemScore(old) >= itemScore(it)) return false;
-      // capInv eliminerebbe proprio l'oggetto ricevuto da uno zaino pieno di ricordi.
-      return !(t.inv.length >= 8 && it.type !== 'ricordo' && t.inv.every((x) => x.type === 'ricordo'));
-    }
-    function addItem(t, it) {
-      if (it.type === 'arma' || it.type === 'armatura') {
-        const old = itemOf(t, it.type);
-        if (old) { if (itemScore(old) >= itemScore(it)) return false; t.inv.splice(t.inv.indexOf(old), 1); }
-      }
-      t.inv.push(it); capInv(t); return true;
-    }
-    function takeItem(t, it) { const k = t.inv.indexOf(it); if (k >= 0) t.inv.splice(k, 1); return it; }
-    return { capInv, itemName, maxUses, mkItem, itemScore, canReceiveItem, addItem, takeItem };
-  }
-
-  function createSnapshots(env) {
-    const { T, syncSt, aff, relTop, alive, closed, edges, M, byId } = env;
-    function snapshot() {
-      const zones = {}, allies = {}, st = {}, inv = {}, kills = {}, rel = {}, vit = {}, mind = {};
-      T.forEach((t) => {
-        if (t.alive) syncSt(t);
-        zones[t.id] = t.zone; allies[t.id] = t.allyId; st[t.id] = Object.keys(t.st); inv[t.id] = t.inv.map((x) => { const o = { t: x.type, n: x.name, h: x.how || 'trovato' }; if (x.q) o.q = x.q; if (x.u != null) { o.u = x.u; o.m = x.um; } if (x.from) o.f = x.from; if (x.d) o.d = x.d; if (x.x) o.x = x.x; return o; }); kills[t.id] = t.kills;
-        if (t.alive && t.goal) mind[t.id] = { g: t.goal.k, tg: t.goal.tg, since: t.goal.ph, th: t.thought };
-        if (t.alive) vit[t.id] = [Math.round(Math.max(0, t.hp)), Math.round(t.en), Math.round(t.mo), Math.round(t.food), M && (!M.infect || t.infected) ? Math.round(t.pr) : -1];
-        const friends = T.filter((u) => u !== t && u.alive && aff(t, u) >= 40).map((u) => u.id);
-        const enemies = T.filter((u) => u !== t && u.alive && aff(t, u) <= -40 && !t.grudges[u.id]).map((u) => u.id);
-        rel[t.id] = { p: t.partner, g: Object.keys(t.grudges).filter((id) => byId[id].alive).map((id) => [id, t.grudges[id].why, t.grudges[id].victim]), o: Object.keys(t.owes).filter((id) => byId[id].alive), f: t.fame, tr: t.traitor, fr: friends, en: enemies, lost: t.lost, top: t.alive ? relTop(t) : [] };
+    function accepts(ev,roles) {
+      const z=roles[0].zone;
+      if (closed.has(z)||roles.some(t=>t.zone!==z)) return false;
+      return (ev.space||[rule(ev.text,zones,ev.location)]).every(s=>{
+        if (s.at!=null&&s.at!==z) return false;
+        const location=s.travel??z;
+        if ((s.needs||[]).some(k=>!zones[location]?.features.includes(k))) return false;
+        if(s.scatter&&(zones[z].links.filter(x=>!closed.has(x)).length<2||roles.some(t=>budget(t)<1)))return false;
+        if((s.depart||[]).some(i=>!roles[i]||budget(roles[i])<(s.travel!=null&&s.travel!==z?2:1)||!zones[location].links.some(x=>!closed.has(x))))return false;
+        if (s.travel==null||s.travel===z) return true;
+        const p=path(zones,z,s.travel,closed);
+        return p&&p.length===2&&roles.every(t=>budget(t)>=1);
       });
-      return { alive: alive().map((t) => t.id), zones, allies, st, inv, kills, rel, vit, mind, closed: [...closed], edges: edges() };
     }
-
-    return { snapshot };
+    function locate(people,zone) {
+      const positions=Object.fromEntries(people.map(t=>[t.id,t.zone]));
+      const unique=[...new Set(Object.values(positions))];
+      return {seq:seq++,zone:zone??(unique.length===1?unique[0]:null),positions};
+    }
+    function death(t){data.deaths.push({seq:seq++,ph:phase(),id:t.id,zone:t.zone});}
+    function closure(zone,reason='tempesta'){closed.add(zone);data.closures.push({seq:seq++,ph:phase(),zone,reason});}
+    return {data,reset,budget,move,accepts,locate,death,closure};
   }
-
-  const api = { eventVariety, createMemory, createVitals, createInventory, createSnapshots, createItemLedger };
-  G.LOS_SYSTEMS = api;
-  if (typeof module === 'object' && module.exports) module.exports = api;
-})(typeof window === 'object' ? window : globalThis);
+  G.LOS_GEOGRAPHY={definitions,describe,enrich,path,connected,camp,offTheme,adaptText,functionalText,mentions,rule,pickLex,prepare,preparePools,create,strip};
+  if(typeof module==='object'&&module.exports) module.exports=G.LOS_GEOGRAPHY;
+})(typeof window!=='undefined'?window:globalThis);
 
 ;
 /* Last One Standing — motore di simulazione deterministico.
@@ -7822,6 +7922,7 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
   'use strict';
   const D = G.LOS_DATA;
   const Systems = G.LOS_SYSTEMS || (typeof require === 'function' ? require('./engine-systems.js') : null);
+  const Geography = G.LOS_GEOGRAPHY || (typeof require === 'function' ? require('./engine-geography.js') : null);
   if (!Systems) throw new Error('Sistemi del motore non disponibili.');
 
   /* ---------------- RNG con seme ---------------- */
@@ -7875,7 +7976,7 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
   const L = (c) => c.charCodeAt(0) - 65;
   const letters = (s) => [...s].map(L);
   const ITEMS = 'arma|cibo|med|trap|veleno|mappa|amuleto|esplosivo|armatura|attrezzo|alcol|valore|ricordo';
-  const LEXKEYS = 'arma|cibo|luogo|mostro|trappola|rifugio|dono|amuleto|alcol|veleno|mappa|esplosivo|armatura|attrezzo|valore|ricordo';
+  const LEXKEYS = 'arma|cibo|luogo|mostro|trappola|rifugio|dono|amuleto|alcol|veleno|mappa|esplosivo|armatura|attrezzo|valore|ricordo|med|trap';
   const VITALS = { hp: 'hp', en: 'en', mo: 'mo', food: 'food', pr: 'pr' };
   // nomi degli oggetti nuovi (protezioni, attrezzi, merce, ricordi, alcol) per un'arena
   function itemLex(theme) {
@@ -7906,6 +8007,7 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
       if (self && self[1] === self[2]) throw new Error('Etichetta riferita due volte alla stessa persona "' + tok + '" in: ' + line);
       let tgt = ev;
       if (/^(ok|ko):/.test(tok)) { tgt = tok[1] === 'k' ? ev.ok : ev.ko; tok = tok.slice(3); }
+      if ((m=tok.match(/^(at|to):(\d+)$/))) { if(tgt!==ev) throw new Error('at:/to: non possono avere il prefisso ok: o ko:.'); ev.location=Object.assign({},ev.location,{[m[1]==='at'?'at':'travel']:+m[2]}); continue; }
       if ((m = tok.match(/^test:([A-F])=(\w+?)(\d+)?$/))) { ev.test = { r: L(m[1]), attr: m[2], dc: m[3] ? +m[3] : 11 }; continue; }
       if ((m = tok.match(/^att:([A-F])([<>])(\w+?)(\d+)$/))) { ev.req.push({ t: 'att', r: ID(m[1]), op: m[2], attr: m[3], v: +m[4] }); continue; }
       if ((m = tok.match(/^(no)?trait:([A-F])=(\w+)$/))) { ev.req.push({ t: m[1] ? 'notrait' : 'trait', r: ID(m[2]), trait: m[3] }); continue; }
@@ -8236,11 +8338,16 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
       castIds.add(id);
     });
     const initialRelations = normalizeInitialRelations(cfg.initialRelations, castIds);
-    const theme = D.themes.find((t) => t.id === cfg.theme) || D.themes[0];
+    const baseTheme = D.themes.find((t) => t.id === cfg.theme) || D.themes[0];
+    const mapEnabled = cfg.mapVersion !== 0;
+    if (mapEnabled && !Geography) throw new Error('Geografia del motore non disponibile.');
+    const geographyZones = mapEnabled ? Geography.describe(baseTheme, D.eco?.arenas?.[baseTheme.id]) : null;
+    const theme = mapEnabled ? Geography.enrich(baseTheme, geographyZones) : baseTheme;
     const seed = cfg.seed == null || cfg.seed === '' ? String(Date.now()) : String(cfg.seed);
     const rng = makeRng(seed + '|' + theme.id);
     const adult = !!cfg.adult && !theme.noAdult;
-    const pools = buildPools(theme, cfg.custom, adult);
+    const originalPools = buildPools(baseTheme, cfg.custom, adult);
+    const pools = mapEnabled ? Geography.preparePools(originalPools, theme, geographyZones) : originalPools;
     const variety = Systems.eventVariety();
     const LEX = pools.lex;
     const E = Object.assign({}, D.echo || {}, theme.soft ? D.echoSoft || {} : {});
@@ -8254,21 +8361,22 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
     const M = R.meter || null;
     const MOD = Object.assign({ forage: 1, heal: 1, weapon: 1, stealth: 1, fame: 1, sponsor: 1, night: 1, beast: 1, trap: 1, amulet: 0.85, map: 1, greed: 1, nightAlone: 0 }, R.mods);
     const DR = Object.assign({ food: 1, en: 1, mo: 1 }, R.drain);
-    const ZP = theme.lex.luogo.map((_, i) => (R.zones && R.zones[i]) || [1, 1, 0.5]);
+    const ZP = mapEnabled ? geographyZones.map(z => [z.resources,z.danger,z.shelter]) : theme.lex.luogo.map((_, i) => (R.zones && R.zones[i]) || [1, 1, 0.5]);
     const KEYW = [1, 0.7, 0.5];
     const keyBonus = (t) => (R.key || []).reduce((s, a, i) => s + ((t.attr[a] != null ? t.attr[a] : 5) - 5) * KEYW[i], 0);
     let W = { n: '', d: '', fx: {} };
+    let previousWeather='';
     const wx = (k, d) => (W.fx && W.fx[k] != null ? W.fx[k] : d);
     const TX = (k) => (R.txt && R.txt[k]) || (theme.soft && ECO.txtSoft && ECO.txtSoft[k]) || (ECO.txt && ECO.txt[k]) || [];
     const closed = new Set(); // zone inghiottite dalla tempesta (Battle Royale)
-    const traps = []; const zoneLoot = {};
+    const traps = []; const zoneLoot = {}, trapChecks=new WeakMap();
     let SYS = []; let pendingNotes = [];
     // oggetti e mente dei concorrenti
     const IT = D.items || { types: {}, names: {}, how: {} };
     const MIND = D.mind || { goals: {}, acts: {}, actsSoft: {}, diary: { trait: {} }, diarySoft: { trait: {} }, mem: {} };
     let ORIGIN = null, CURKIND = '';
     const VO = D.voice || {}, VS = D.voiceSoft || {}, CH = D.chats || {};
-    const ACT = (k) => (theme.soft && MIND.actsSoft && MIND.actsSoft[k]) || (MIND.acts || {})[k] || [];
+    const ACT = (k) => mapEnabled&&theme.soft&&k==='sleepwalk'?['{0} si allontana nel dormiveglia fino a {z}. Si sveglia lì, senza ricordare il percorso.']:(theme.soft && MIND.actsSoft && MIND.actsSoft[k]) || (MIND.acts || {})[k] || [];
     const DIA = (k) => (theme.soft && MIND.diarySoft && MIND.diarySoft[k]) || (MIND.diary || {})[k] || [];
     const DIAT = (tr) => (theme.soft && MIND.diarySoft && MIND.diarySoft.trait && MIND.diarySoft.trait[tr]) || ((MIND.diary || {}).trait || {})[tr] || [];
 
@@ -8289,6 +8397,7 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
     if (T.length < 2) throw new Error('Servono almeno 2 concorrenti.');
     T.forEach((t) => {
       t.zone = rng.int(zoneCount);
+      if (mapEnabled && Geography.definitions[theme.id].start != null) t.zone = Geography.definitions[theme.id].start;
 
       t.food = clamp(64 + t.attr.sop * 2, 0, 100);
       t.mo = clamp(50 + (t.attr.car - 5) * 2 + (t.attr.cor - 5) * 2 + (t.traits.includes('leader') ? 5 : 0) + (t.traits.includes('paranoico') ? -6 : 0), 20, 85);
@@ -8360,6 +8469,9 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
     const alive = () => T.filter((t) => t.alive);
     const phases = [];
     const itemLedger = Systems.createItemLedger({ phase: () => phases.length, meter: M });
+    const geo = mapEnabled ? Geography.create({ theme, zones: geographyZones, T, closed, phase: () => phases.length,
+      hasMap: t => hasItem(t,'mappa'), onMap: (t,m) => itemLedger.record('bonus',t,t,itemOf(t,'mappa'),null,'Percorso: costo in energia ridotto del 25%; costo effettivo '+m.cost),
+      onEnter:(t,m)=>{if(m.mode==='evacuate'&&closed.has(t.zone)){hurt(t,8*wx('storm',1),null,'storm',true);t.stormZ=zoneName(t.zone);}triggerTraps(t);if(t.hp<=0)resolveVitals();} }) : null;
     let day = 0, deathCounter = 0, pendingFallen = [], noDeathStreak = 0;
     const stats = { events: 0, alliances: 0, betrayals: 0, firstBlood: null, deathsByDay: [], envDeaths: 0, killDeaths: 0, items: 0, revenges: 0, couples: 0, debtsRepaid: 0, amulets: 0, sponsors: 0, echoes: 0, tests: 0, testsPassed: 0,
       causes: {}, shared: 0, nursed: 0, foraged: 0, trapsSet: 0, trapHits: 0, beasts: 0, infected: 0, cured: 0, broken: 0, looted: 0, meteo: [], expelled: 0, trades: 0 };
@@ -8413,6 +8525,7 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
       return !W.n || (!(f.lethal > 1) && !(f.beast > 1) && !((f.pr || 0) > 0));
     }
     function checkReq(ev, roles) {
+      if (geo && ev.text != null && !geo.accepts(ev,roles)) return false;
       for (const r of ev.req) {
         const A = roles[r.r ? r.r[0] : 0], B = r.r && r.r[1] != null ? roles[r.r[1]] : null;
         switch (r.t) {
@@ -8577,7 +8690,7 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
     }
     function assign(ev, P, un) {
       const others = [];
-      un.forEach((id) => id !== P.id && byId[id].alive && others.push(byId[id]));
+      un.forEach((id) => id !== P.id && byId[id].alive && (!geo || byId[id].zone === P.zone) && others.push(byId[id]));
       if (others.length < ev.n - 1) return null;
       let best = null, bestScore = -Infinity;
       for (let attempt = 0; attempt < 12; attempt++) {
@@ -8622,6 +8735,7 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
       return { plain: edFix(nm(s, (t) => t.name)), html: edFix(nm(esc(s), nameTag)) };
     }
     function echo(list, people, cls) {
+      if (geo) list = (list || []).map(text=>Geography.adaptText(text,theme)).filter(text => !Geography.offTheme(text,theme));
       if (!list || !list.length) return null;
       const tpl = rng.pick(list);
       let s = tpl.replace(/\[(\d):([^\]]*)\]/g, (_, i, o) => genderPick([people[+i]], o));
@@ -8633,15 +8747,16 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
     // ---------- ecosistema: testi e valori vitali ----------
     function fmt(src, people, vars) {
       const fits = (x) => { let mx = -1; x.replace(/[{\[](\d)[}:]/g, (_, d) => { mx = Math.max(mx, +d); }); return mx < people.length && !/\{(i|ip|j|k|z|n)\}/.test(x.replace(/\{(i|ip|j|k|z|n)\}/g, (m, v) => (vars && vars[v] != null && vars[v] !== '' ? '' : m))); };
-      const list = (Array.isArray(src) ? src : []).filter(fits); if (!list.length) return null;
-      let s = rng.pick(list); const src0 = s;
+      const here = vars && vars.z ? theme.lex.luogo.indexOf(vars.z) : people[0]?.zone;
+      const list = (Array.isArray(src) ? src : []).map(source=>({source,text:geo?Geography.adaptText(source,theme):source})).filter(x => fits(x.text) && (!geo || !Geography.offTheme(x.text,theme) && Geography.mentions(x.text,geographyZones).every(m => m.zone === here) && proseDepartures(x.text).every(i=>people[i]&&geo.budget(people[i])>0&&geographyZones[people[i].zone].links.some(z=>!closed.has(z))))); if (!list.length) return null;
+      const chosen=rng.pick(list);let s=chosen.text;const src0=chosen.source;
       s = s.replace(/\[(\d):([^\]]*)\]/g, (_, i, o) => genderPick([people[+i]], o))
         .replace(/\{(i|ip|j|k|z|m|n|d)\}/g, (_, x) => (vars && vars[x] != null ? vars[x] : ''))
-        .replace(LEX_RE, (_, k2) => (k2 === 'luogo' && vars && vars.z ? vars.z : rng.pick(LEX[k2] || ['qualcosa'])));
+        .replace(LEX_RE, (_, k2) => (k2 === 'luogo' && (vars?.z || geo && people[0]) ? vars?.z || theme.lex.luogo[people[0].zone] : geo?Geography.pickLex(LEX,k2,here,theme,geographyZones,rng):rng.pick(LEX[k2] || ['qualcosa'])));
       s = cap(artPrep(s));
       return { src: src0, plain: edFix(s.replace(/\{(\d)\}/g, (_, i) => people[+i].name)), html: edFix(esc(s).replace(/\{(\d)\}/g, (_, i) => nameTag(people[+i]))) };
     }
-    const sysText = (k, people, vars) => fmt(TX(k), people, vars);
+    const sysText = (k, people, vars) => fmt(TX(k), people, vars) || (geo ? fmt((theme.soft && ECO.txtSoft?.[k]) || ECO.txt?.[k],people,vars) : null);
     // le voci: una battuta di chi parla, scelta da tratti, arena e situazione
     const USED = new Set();
     // sceglie tra le frasi non ancora usate in questa partita (se ne restano)
@@ -8664,7 +8779,10 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
     function sys(k, people, vars, o, pri) {
       const tx = sysText(k, people, vars); if (!tx) return null;
       const ev = Object.assign({ html: tx.html, plain: tx.plain, ids: people.map((p) => p.id), deaths: [], lethal: false, origin: 'sys', cat: 'none', why: 'conseguenza', echo: [] }, o || {});
+      if(geo&&/^trap(?:Dodge|Ally|Hit)$/.test(k))ev.ids=[people[1].id];
+      if (geo) ev.place = geo.locate(people,vars?.z ? theme.lex.luogo.indexOf(vars.z) : undefined);
       SYS.push({ pri: pri || 1, ev });
+      if(geo)moveAfterProse(tx,people);
       return ev;
     }
     // ricordi dei rapporti (in prima persona) e diario segreto
@@ -8703,6 +8821,7 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
     }
     function kill(v, killers, txt, out) {
       if (!v.alive) return;
+      if (geo) geo.death(v);
       v.alive = false;
       if (!v.deathKind) v.deathKind = killers.length ? 'kill' : 'event';
       v.deathPhase = phases.length; v.deathDay = day; v.order = ++deathCounter;
@@ -8812,7 +8931,7 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
       if (v.promises) v.promises.forEach(dissolvePromise);
     }
     function giveItem(t, type, ctx, lexPick, name, q, how, from, src) {
-      const nm = name || (type === 'arma' ? lexPick('arma') : type === 'cibo' ? ctx.cibo || 'delle provviste' : ITEM_NAME[type] || lexPick(type));
+      const nm = name || (type === 'arma' ? lexPick('arma') : type === 'cibo' ? ctx.cibo || 'delle provviste' : geo && ctx[type] ? ctx[type] : ITEM_NAME[type] || lexPick(type));
       const it = src ? Object.assign({}, src, { how: how || 'trovato', from: from ? from.id : null, d: day }) : mkItem(type, nm, how, from, q);
       if (!addItem(t, it)) return false;
       t.items++; stats.items++;
@@ -8868,17 +8987,29 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
     }
     function apply(ev, roles) {
       CTX = null;
-      variety.record(ev);
+      if (geo && !geo.accepts(ev,roles)) throw new Error('Evento fuori posizione: '+ev.text);
+      if(!geo)variety.record(ev);
       const reason = eventReason(ev, roles);
       if (ev.test) ev = resolveTest(ev, roles);
+      if (geo) {
+        const space = Geography.rule(ev.text,geographyZones,ev.location);
+        if (space.travel != null) roles.forEach(t => geo.move(t,space.travel,'Spostamento raccontato dall’evento',{mode:'event'}));
+        if(roles.some(t=>!t.alive)){
+          const plain='Una trappola interrompe il percorso di '+roles.map(t=>t.name).join(', ')+': l’incontro previsto non avviene.';
+          return {plain,html:esc(plain),ids:roles.filter(t=>t.alive).map(t=>t.id),deaths:[],lethal:false,note:true,origin:'sys',cat:'none',place:geo.locate(roles),echo:[]};
+        }
+        variety.record(ev);
+      }
+      const place = geo ? geo.locate(roles) : null;
       const ctx = {};
-      const lexPick = (k) => (ctx[k] != null ? ctx[k] : (ctx[k] = rng.pick(LEX[k] || ['qualcosa'])));
+      if (geo) ctx.luogo = theme.lex.luogo[roles[0].zone];
+      const lexPick = (k) => (ctx[k] != null ? ctx[k] : (ctx[k] = geo?Geography.pickLex(LEX,k,roles[0].zone,theme,geographyZones,rng):rng.pick(LEX[k] || ['qualcosa'])));
       const txt = render(ev.text, roles, lexPick, ev);
       itemLedger.setContext(txt.plain);
       const heldItems = roles.map(t => t.inv.slice());
       const out = [];
       const z = ctx.luogo != null ? theme.lex.luogo.indexOf(ctx.luogo) : roles[0].zone;
-      roles.forEach((t) => { t.events++; if (z >= 0) t.zone = z; });
+      roles.forEach((t) => { t.events++; if (!geo && z >= 0) t.zone = z; });
       // amuleti: salvano una volta da qualunque morte
       const saved = new Set();
       ev.victims.forEach((i) => {
@@ -9068,7 +9199,9 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
       const deaths = roles.filter((t, i) => ev.victims.includes(i) && !t.alive).map((t) => t.id);
       const cat = ev.lethal && !deaths.length && ev.cat !== 'betray' ? 'hurt' : ev.cat;
       itemLedger.setContext('');
-      return { html: txt.html, plain: txt.plain, ids: roles.map((t) => t.id), deaths, lethal: deaths.length > 0, origin: ev.origin, cat, why: ev.why, reason, echo: out.slice(0, 3), test: ev.testRes || null };
+      if(geo&&Geography.rule(ev.text,geographyZones,ev.location).scatter){const exits=geographyZones[roles[0].zone].links.filter(z=>!closed.has(z));roles.filter(t=>t.alive).forEach((t,i)=>geo.move(t,exits[i%exits.length],'Fugge in una direzione diversa dagli altri',{mode:'event'}));}
+      if(geo)for(const i of Geography.rule(ev.text,geographyZones,ev.location).depart||[]){const t=roles[i];if(t?.alive){const exits=geographyZones[t.zone].links.filter(z=>!closed.has(z));if(exits.length)geo.move(t,rng.pick(exits),'Si allontana dopo l’incontro',{mode:'event'});}}
+      return Object.assign({ html: txt.html, plain: txt.plain, ids: roles.map((t) => t.id), deaths, lethal: deaths.length > 0, origin: ev.origin, cat, why: ev.why, reason, echo: out.slice(0, 3), test: ev.testRes || null },geo?{place}:{});
     }
 
     function lethalProb(kind) {
@@ -9081,7 +9214,12 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
       return Math.min(0.9, Math.max(0.03, p));
     }
 
-    const { snapshot } = Systems.createSnapshots({ T, syncSt, aff, relTop, alive, closed, edges, M, byId });
+    const { snapshot: originalSnapshot } = Systems.createSnapshots({ T, syncSt, aff, relTop, alive, closed, edges, M, byId });
+    function snapshot() {
+      const snap = originalSnapshot();
+      if (geo) snap.terrain = { traps: traps.map(t=>({zone:t.zone,owner:t.owner,name:t.name})), loot:Object.entries(zoneLoot).filter(([,items])=>items.length).map(([zone,items])=>({zone:+zone,count:items.length})) };
+      return snap;
+    }
 
     function tickStatus() {
       alive().forEach((t) => Object.keys(STATUS_TTL).forEach((s) => { if (t.st[s] != null && phases.length - t.st[s] >= STATUS_TTL[s]) delete t.st[s]; }));
@@ -9092,7 +9230,7 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
       const g = a[0].allyId;
       if (g != null && a.every((t) => t.allyId === g)) {
         a.forEach((t) => leaveAlliance(t));
-        const s = 'Rimasti soli, gli ultimi alleati si guardano con sospetto: l\'alleanza è finita.';
+        const s = geo&&a.some(t=>t.zone!==a[0].zone)?'Rimasti soli nella gara, gli ultimi alleati rompono il patto: da ora ognuno pensa a sé.':'Rimasti soli, gli ultimi alleati si guardano con sospetto: l\'alleanza è finita.';
         events.push({ html: s, plain: s, ids: a.map((t) => t.id), deaths: [], lethal: false, note: true });
       }
     }
@@ -9118,8 +9256,8 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
     }
 
     /* ---------- ecosistema: conseguenze automatiche ---------- */
-    const allyMates = (t) => (t.allyId != null ? [...(alliances.get(t.allyId) || [])].map((id) => byId[id]).filter((x) => x && x !== t && x.alive) : []);
-    const buddies = (t) => { const a = allyMates(t); if (t.partner && byId[t.partner] && byId[t.partner].alive && !a.includes(byId[t.partner])) a.push(byId[t.partner]); return a; };
+    const allyMates = (t,anywhere) => (t.allyId != null ? [...(alliances.get(t.allyId) || [])].map((id) => byId[id]).filter((x) => x && x !== t && x.alive && (!geo || anywhere || x.zone === t.zone)) : []);
+    const buddies = (t) => { const a = allyMates(t); if (t.partner && byId[t.partner] && byId[t.partner].alive && (!geo || byId[t.partner].zone === t.zone) && !a.includes(byId[t.partner])) a.push(byId[t.partner]); return a; };
     const zoneName = (z) => theme.lex.luogo[z] || theme.lex.luogo[0];
     const d6 = () => 2 + rng.int(6) + rng.int(6);
 
@@ -9205,7 +9343,8 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
       // le alleanze dividono il cibo, oppure litigano
       const seenG = new Set();
       A.forEach((t) => {
-        if (t.allyId == null || seenG.has(t.allyId)) return; seenG.add(t.allyId);
+        const camp = geo ? t.allyId+':'+t.zone : t.allyId;
+        if (t.allyId == null || seenG.has(camp)) return; seenG.add(camp);
         const g = [t].concat(allyMates(t));
         g.filter((x) => x.food < 30 && !hasItem(x, 'cibo')).forEach((h) => {
           const donor = g.filter((x) => x !== h && hasItem(x, 'cibo') && x.food >= 35).sort((a, b) => b.attr.emp - a.attr.emp)[0];
@@ -9257,7 +9396,8 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
       A.forEach((t) => {
         if (!t.alive) return;
         const mates = buddies(t), alone = !mates.length;
-        let rest = 12 + t.attr.res * 1.1 + (t.allyId != null ? 10 : 0) + (t.partner ? 6 : 0) + ZP[t.zone][2] * 12 - (hasTrait(t, 'sonnambulo') ? 10 : 0) - (meterBad(t) ? 8 : 0) - (t.st.lutto != null ? 6 : 0);
+        const localAlly = geo ? allyMates(t).length > 0 : t.allyId != null, localPartner = t.partner && (!geo || mates.some(x=>x.id===t.partner));
+        let rest = 12 + t.attr.res * 1.1 + (localAlly ? 10 : 0) + (localPartner ? 6 : 0) + ZP[t.zone][2] * 12 - (hasTrait(t, 'sonnambulo') ? 10 : 0) - (meterBad(t) ? 8 : 0) - (t.st.lutto != null ? 6 : 0);
         if (alone && MOD.nightAlone) rest -= 10 * MOD.nightAlone;
         t.en += rest / Math.max(0.8, wx('en', 1));
         if (t.allyId != null && !watchMsg && rng.chance(0.12)) { const m = allyMates(t)[0]; if (m) { watchMsg++; sys('watch', [t, m], {}, { cat: 'ally', why: 'riposo' }, 0); } }
@@ -9274,7 +9414,7 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
           sys('woundSick', [t], {}, { cat: 'hurt', why: 'ferite' }, 2);
         }
         const rc = itemOf(t, 'ricordo');
-        let dm = (rc ? (rc.from && byId[rc.from] && !byId[rc.from].alive ? 7 : 4) : 0) + (t.allyId != null ? 4 : 0) + (t.partner ? 6 : 0) + (mates.some((x) => hasTrait(x, 'leader')) ? 3 : 0) + (t.fame >= 3 ? 2 : 0) +
+        let dm = (rc ? (rc.from && byId[rc.from] && !byId[rc.from].alive ? 7 : 4) : 0) + (localAlly ? 4 : 0) + (localPartner ? 6 : 0) + (mates.some((x) => hasTrait(x, 'leader')) ? 3 : 0) + (t.fame >= 3 ? 2 : 0) +
           (alone ? (hasTrait(t, 'solitario') ? 2 : -3) : 0) - (t.food < 25 ? 6 : 0) - (t.hp < 40 ? 6 : 0) - (meterBad(t) ? 5 : 0);
         if (dm < 0) dm *= DR.mo;
         if (rc) itemLedger.record('comfort', t, t, rc, null, 'Contributo al morale notturno: +' + (rc.from && byId[rc.from] && !byId[rc.from].alive ? 7 : 4) + ' nel calcolo complessivo');
@@ -9284,7 +9424,7 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
       // il morale a pezzi: conforto, furti tra alleati, abbandoni
       A.forEach((t) => {
         if (!t.alive || t.mo >= 24) return;
-        const p = t.partner && byId[t.partner] && byId[t.partner].alive ? byId[t.partner] : null;
+        const p = t.partner && byId[t.partner] && byId[t.partner].alive && (!geo || byId[t.partner].zone === t.zone) ? byId[t.partner] : null;
         if (p && rng.chance(0.7)) { t.mo += 22; addAff(t, p, 8); sys('comfort', [p, t], {}, { cat: 'love', why: 'morale' }, 2); }
         else if (t.allyId != null && !hasTrait(t, 'leale')) {
           const mark = allyMates(t).find((x) => hasItem(x, 'cibo'));
@@ -9374,7 +9514,7 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
         syncSt(t);
       });
       // la tempesta del Battle Royale
-      if (closed.size) {
+      if (closed.size && !geo) {
         let msgs = 0;
         alive().forEach((t) => {
           if (!closed.has(t.zone)) return;
@@ -9389,12 +9529,17 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
         });
       }
       // le trappole scattano
+      triggerTraps();
+    }
+    function triggerTraps(arriving) {
       for (let k = traps.length - 1; k >= 0; k--) {
         const tp = traps[k], owner = byId[tp.owner];
         if (phases.length - tp.ph > 9) { traps.splice(k, 1); continue; }
         if (tp.ph >= phases.length) continue;
-        const here = rng.shuffle(alive().filter((x) => x.zone === tp.zone && x.id !== tp.owner));
+        let checked=trapChecks.get(tp);if(!checked||checked.ph!==phases.length){checked={ph:phases.length,ids:new Set()};trapChecks.set(tp,checked);}
+        const here = rng.shuffle(alive().filter((x) => x.zone === tp.zone && x.id !== tp.owner && (!geo || (!arriving||x===arriving)&&!checked.ids.has(x.id))));
         for (const v of here) {
+          if(geo)checked.ids.add(v.id);
           if (!rng.chance(0.16 * MOD.trap * wx('trap', 1))) continue;
           traps.splice(k, 1);
           const z = zoneName(tp.zone);
@@ -9435,13 +9580,14 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
         let mercy = null;
         if (c.k === 'infect') { mercy = buddies(t).find((x) => x.attr.cor >= 6); if (mercy && rng.chance(0.5)) { k = 'mercy'; people = [t, mercy]; mercy.mo -= 20; } else mercy = null; }
         const z = (c.k === 'storm' && t.stormZ) || (c.k === 'trap' && t.trapZ) || zoneName(t.zone);
-        const tx = sysText(k, people, { z, i: t.accItem || '', m: M ? M.name.toLowerCase() : '' }) || sysText('woundDeathAny', [t], {});
+        const tx = sysText(k, people, { z, i: t.accItem || '', m: M ? M.name.toLowerCase() : '' }) || sysText('woundDeathAny', [t], {}) || fmt([theme.soft ? '{0} cede e viene ritirat[0:o/a] dalla gara.' : '{0} non riesce più a resistere e perde la vita.'],[t]);
+        const place = geo ? geo.locate(people,t.zone) : null;
         const out = [];
         t.deathKind = c.k;
         kill(t, K ? [K] : [], tx, out);
         if (K && c.k === 'trap') { K.trapKills++; }
         stats.causes[c.k] = (stats.causes[c.k] || 0) + 1;
-        SYS.push({ pri: 9, ev: { html: tx.html, plain: tx.plain, ids: people.filter((p) => p === t || p.alive).map((p) => p.id), deaths: [t.id], lethal: true, origin: 'sys', cat: K ? 'kill' : 'death', why, echo: out.slice(0, 3) } });
+        SYS.push({ pri: 9, ev: Object.assign({ html: tx.html, plain: tx.plain, ids: people.filter((p) => p === t || p.alive).map((p) => p.id), deaths: [t.id], lethal: true, origin: 'sys', cat: K ? 'kill' : 'death', why, echo: out.slice(0, 3) },geo?{place}:{}) });
       });
     }
 
@@ -9465,8 +9611,11 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
       });
     }
     // un evento di sistema già scritto
+    function proseDepartures(text){return Geography.rule(text.replace(/\{(\d)\}/g,(_,i)=>'{'+String.fromCharCode(65+(+i))+'}'),geographyZones).depart||[];}
+    function moveAfterProse(tx,people){for(const i of proseDepartures(Geography.adaptText(tx.src||'',theme))){const t=people[i];if(!t?.alive)continue;const exits=geographyZones[t.zone].links.filter(z=>!closed.has(z));if(exits.length)geo.move(t,rng.pick(exits),'Si allontana dal gruppo',{mode:'event'});}}
     function sys2(tx, people, cat, whyTxt, pri, ids) {
-      SYS.push({ pri: pri || 1, ev: { html: tx.html, plain: tx.plain, ids: ids || people.map((p) => p.id), deaths: [], lethal: false, origin: 'sys', cat: cat || 'none', why: 'carattere', whyTxt: whyTxt || '', echo: [] } });
+      SYS.push({ pri: pri || 1, ev: Object.assign({ html: tx.html, plain: tx.plain, ids: ids || people.map((p) => p.id), deaths: [], lethal: false, origin: 'sys', cat: cat || 'none', why: 'carattere', whyTxt: whyTxt || '', echo: [] },geo?{place:geo.locate(ids?people.filter(p=>ids.includes(p.id)):people)}:{}) });
+      if(geo)moveAfterProse(tx,people);
     }
 
     // l'obiettivo del momento nasce da stato, legami e carattere
@@ -9505,6 +9654,7 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
     }
     // gli spostamenti di giorno seguono l'obiettivo e il gruppo
     function moveByGoals() {
+      if (geo) return spatialGoals();
       const open = [...Array(zoneCount).keys()].filter((i) => !closed.has(i));
       if (!open.length) return;
       const best = (f) => open.slice().sort((a, b) => f(b) - f(a))[0];
@@ -9525,6 +9675,67 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
         if (scary && rng.chance(0.6)) { const safe = open.filter((i) => i !== scary.zone); if (safe.length) z = best((i) => (safe.includes(i) ? 1 : -9) + ZP[i][2] - ZP[i][1] * 0.3 + rng.f() * 0.4); }
         if (z != null && !closed.has(z)) t.zone = z;
       });
+    }
+
+    function spatialGoals(night) {
+      // Le destinazioni sono fotografate prima delle partenze: l'ordine del
+      // cast non fa inseguire posizioni già modificate nello stesso giro.
+      const positions = Object.fromEntries(alive().map(t=>[t.id,t.zone]));
+      for (const t of alive()) {
+        const g=t.goal||{k:'sopravvivere'}, target=aliveId(g.tg)?byId[g.tg]:null;
+        const reachable=geographyZones.filter(z=>!closed.has(z.id)&&Geography.path(geographyZones,t.zone,z.id,closed));
+        let destination=t.zone, reason='Esplora i passaggi vicini', tg=null;
+        const allies=allyMates(t,true).concat(t.partner&&aliveId(t.partner)?[byId[t.partner]]:[]);
+        if (night && allies.length && !hasTrait(t,'solitario')) {
+          const party=[...new Map([t,...allies].map(x=>[x.id,x])).values()];
+          const meeting=Geography.camp(geographyZones,party.map(x=>positions[x.id]),closed);
+          if(meeting!=null){destination=meeting;reason='Raggiunge il riparo scelto per ricongiungersi al gruppo';}
+        } else if (target && ['vendetta','caccia','proteggere','cotta','tradire'].includes(g.k)) {
+          destination=positions[target.id]; tg=target.id;
+          if(['proteggere','cotta'].includes(g.k)&&target.goal?.tg===t.id&&['proteggere','cotta'].includes(target.goal.k))destination=positions[t.ix<target.ix?t.id:target.id];
+          reason={vendetta:'Segue le tracce del bersaglio della vendetta',caccia:'Cerca il proprio bersaglio',proteggere:'Cerca la persona che vuole proteggere',cotta:'Cerca una persona a cui tiene',tradire:'Cerca un compagno dell’alleanza'}[g.k];
+        } else if (['cibo','curarsi','nascondersi'].includes(g.k)) {
+          const scores=reachable.map(z=>({z:z.id,score:(g.k==='cibo'?z.resources:z.shelter-z.danger*0.45)-(Geography.path(geographyZones,t.zone,z.id,closed).length-1)*0.12+rng.f()*0.15})).sort((a,b)=>b.score-a.score||a.z-b.z);
+          destination=scores[0]?.z??t.zone; reason=g.k==='cibo'?'Cerca una zona con più provviste':'Cerca un luogo più riparato';
+        } else if (allies.length && rng.chance(0.65)) {
+          const leader=[t,...allies].sort((a,b)=>(hasTrait(b,'leader')?1:0)-(hasTrait(a,'leader')?1:0)||a.ix-b.ix)[0];
+          destination=positions[leader.id]; tg=leader.id; reason='Cerca di ricongiungersi all’alleanza';
+        } else if (rng.chance(night?0.2:0.55)) {
+          const neighbors=geographyZones[t.zone].links.filter(z=>!closed.has(z));
+          if (neighbors.length) destination=rng.wpick(neighbors,z=>1+geographyZones[z].shelter+geographyZones[z].resources/(1+alive().filter(x=>x.zone===z).length));
+        }
+        const scary=alive().find(x=>x!==t&&x.zone===destination&&!isAlly(t,x)&&fearOf(t,x)>=50&&tg!==x.id);
+        if (scary) {
+          const safe=reachable.filter(z=>z.id!==scary.zone).sort((a,b)=>(b.shelter-b.danger*0.4)-(a.shelter-a.danger*0.4)||a.id-b.id);
+          if (safe.length) { destination=safe[0].id; reason='Evita una persona che teme'; tg=null; }
+        }
+        geo.move(t,destination,reason,{target:tg});
+      }
+    }
+    function gather(kind) {
+      const def=Geography.definitions[theme.id], preferred=def[kind];
+      const open=geographyZones.filter(z=>!closed.has(z.id));
+      const target=closed.has(preferred)?open.sort((a,b)=>b.resources-a.resources||a.id-b.id)[0].id:preferred;
+      alive().forEach(t=>geo.move(t,target,kind==='finale'?'Converge verso lo scontro finale':'Raggiunge il punto dei rifornimenti',{forced:true,mode:'gather'}));
+      return target;
+    }
+    function sealFinale(meeting) {
+      while(geographyZones.filter(z=>!closed.has(z.id)).length>1){
+        const next=geographyZones.find(z=>z.id!==meeting&&!closed.has(z.id)&&Geography.connected(geographyZones,new Set([...closed,z.id])));
+        if(!next)break;geo.closure(next.id,'finale');
+      }
+    }
+    function evacuate() {
+      for (const t of alive()) {
+        if (!closed.has(t.zone)) continue;
+        const z=zoneName(t.zone), chance=0.3+t.attr.agi*0.05+t.en/260+(hasItem(t,'mappa')?0.2:0)+(hasItem(t,'attrezzo')?0.15:0);
+        if (hasItem(t,'mappa')) itemLedger.record('bonus',t,t,itemOf(t,'mappa'),null,'+0,20 al calcolo della probabilità di fuga dalla tempesta');
+        if (!rng.chance(chance)) { hurt(t,(14+rng.int(14))*wx('storm',1),null,'storm',true); t.stormZ=z; if(t.hp>0) sys('storm',[t],{z},{cat:'hurt',why:'tempesta'},2); }
+        if(t.hp<=0){resolveVitals();if(!t.alive)continue;}
+        const routes=geographyZones.filter(x=>!closed.has(x.id)).map(x=>Geography.path(geographyZones,t.zone,x.id,new Set())).filter(Boolean).sort((a,b)=>a.length-b.length||a[a.length-1]-b[b.length-1]);
+        if(routes.length) geo.move(t,routes[0][routes[0].length-1],'Esce dalla zona chiusa dalla tempesta',{forced:true,mode:'evacuate'});
+      }
+      resolveVitals();
     }
 
     // complotti, cotte e confessioni nascono e muoiono di notte
@@ -9550,6 +9761,7 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
       alive().forEach((t) => {
         if (!aliveId(t.crush) || t.partner || phases.length - (t.crushPh || 0) < 3) return;
         const u = byId[t.crush];
+        if(geo&&t.zone!==u.zone)return;
         if (u.partner || !rng.chance(hasTrait(t, 'romantico') ? 0.45 : 0.2 + t.attr.cor * 0.02)) return;
         if (cfg.teamWin && u.team !== t.team) return;
         const yes = u.crush === t.id || rng.chance(clamp((attractOf(u, t) - 15) / 55 + (like(u, t) - 20) / 120 + (hasTrait(u, 'romantico') ? 0.15 : 0) + (t.attr.car - 5) * 0.03, 0.05, 0.85));
@@ -9639,7 +9851,7 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
         // rito portafortuna
         if (tr('superstizioso')) add(0.9, () => { t.mo += 8; if (M && !M.infect) t.pr -= 10; const am = itemOf(t, 'amuleto'); return say('ritual', [t], { i: am ? am.name : '' }, 'none', traitName('superstizioso'), 0); });
         // sonnambulismo
-        if (tr('sonnambulo')) add(1.1, () => { const z = rng.pick([...Array(zoneCount).keys()].filter((i) => i !== t.zone && !closed.has(i))); if (z == null) return false; t.zone = z; t.en -= 6; return say('sleepwalk', [t], { z: zoneName(z) }, 'none', traitName('sonnambulo'), 1); });
+        if (tr('sonnambulo')) add(1.1, () => { const choices=geo?geographyZones[t.zone].links:[...Array(zoneCount).keys()]; const z = rng.pick(choices.filter((i) => i !== t.zone && !closed.has(i))); if (z == null) return false; if(geo){if(!geo.move(t,z,'Si allontana durante il sonno',{mode:'sleepwalk'})) return false;if(!t.alive)return true;}else t.zone = z; t.en -= 6; return say('sleepwalk', [t], { z: zoneName(z) }, 'none', traitName('sonnambulo'), 1); });
         // follia
         if (tr('folle')) add(0.9, () => { t.mo += 6; return say('madness', [t], {}, 'none', traitName('folle'), 0); });
         // sfortuna
@@ -9670,7 +9882,7 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
         }
         // spiare e smascherare i complotti
         if (tr('furtivo') || tr('paranoico') || t.attr.int >= 8) {
-          const plotter = allyMates(t).find((x) => x.plot && aliveId(x.plot) && isAlly(x, byId[x.plot]));
+          const plotter = allyMates(t).find((x) => x.plot && aliveId(x.plot) && isAlly(x, byId[x.plot]) && (!geo||byId[x.plot].zone===t.zone));
           if (plotter) add(2.6, () => {
             const victim = byId[plotter.plot];
             if (!rng.chance((0.3 + t.attr.furt * 0.03 + t.attr.int * 0.02) * clamp((trustOf(victim, t) + 70) / 100, 0.3, 1.3))) return false;
@@ -9889,6 +10101,7 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
     // testimoni: chi vede un'uccisione o un salvataggio cambia idea su chi l'ha fatto
     function witness(actor, kind, victim, roles) {
       if (!actor || !actor.alive) return;
+      if (geo && victim && victim.zone !== actor.zone) return;
       const seen = alive().filter((w) => w.zone === actor.zone && !roles.includes(w));
       rng.shuffle(seen).slice(0, 4).forEach((w, i) => {
         remember(w, actor, kind === 'kill' ? 'sawKill' : 'sawSave', victim, kind === 'kill' ? 1 + Math.min(1, actor.kills * 0.15) : 1);
@@ -9955,13 +10168,13 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
       });
       // triangoli: due cotte per la stessa persona
       A.forEach((a) => A.forEach((b) => {
-        if (a.ix >= b.ix || !a.crush || a.crush !== b.crush || hasMem(a, b, 'rivalLove')) return;
+        if (a.ix >= b.ix || !a.crush || a.crush !== b.crush || hasMem(a, b, 'rivalLove') || geo&&a.zone!==b.zone) return;
         remember(a, b, 'rivalLove'); remember(b, a, 'rivalLove');
         const e = useFmt(BA('triangle'), [a, b, byId[a.crush]]); if (e) sys2(e, [a, b], 'love', 'Triangolo', 3);
       }));
       // le coppie in crisi si lasciano
       A.forEach((a) => {
-        const b = aliveId(a.partner) ? byId[a.partner] : null; if (!b || a.ix > b.ix) return;
+        const b = aliveId(a.partner) ? byId[a.partner] : null; if (!b || a.ix > b.ix || geo && a.zone !== b.zone) return;
         const strain = (like(a, b) < 0 ? 0.35 : 0) + (trustOf(a, b) < -25 || trustOf(b, a) < -25 ? 0.35 : 0) + (a.grudges[b.id] || b.grudges[a.id] ? 0.4 : 0) + (a.crush || b.crush ? 0.25 : 0);
         if (!strain || !rng.chance(Math.min(0.7, strain))) return;
         a.partner = null; b.partner = null; a.exPartner = b.id; b.exPartner = a.id; a.mo -= 15 * DR.mo; b.mo -= 15 * DR.mo;
@@ -10056,11 +10269,19 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
       const events = pendingNotes.splice(0);
       SYS = [];
       ORIGIN = kind === 'f' ? 'festino' : null; CURKIND = kind;
+      const before = alive().length;
+      if (geo) {
+        geo.reset(); evacuate();
+        if (kind === 'n') spatialGoals(true);
+        if (kind === 'f') { const target=gather('feast'); intro+=' Punto di ritrovo: '+zoneName(target)+'.'; }
+        if (kind === 'b' && theme.id === 'liceo') intro='Suona la campanella: in Aula magna tutti cercano il banco migliore.';
+        if (kind === 'b' && theme.id === 'ufficio') intro='Nell’Open space comincia la corsa alla scrivania vicino alla finestra.';
+        if (kind === 'n' && theme.id === 'liceo') intro='Le lezioni sono finite: chi resta a scuola si sposta tra le aule, riprende fiato e scrive sulla chat di classe.';
+      }
       tickStatus();
       if (kind === 'd') moveByGoals();
       maybeDissolve(events);
       if (kind === 'd' && day >= 2) sponsorDrop(events);
-      const before = alive().length;
       const order = rng.shuffle(alive());
       const un = new Set(order.map((t) => t.id));
       const fallback = pools.fallback.length ? pools.fallback : parseBlock(D.core.fallback);
@@ -10075,8 +10296,11 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
         let n = 0; un.forEach((id) => { if (byId[id].alive) n++; });
         const wc = new Map();
         const wOf = (e) => { let w = wc.get(e); if (w === undefined) { w = weightFor(e, P); wc.set(e, w); } return w; };
-        const candL = pool.filter((e) => e.lethal && e.n <= n && e.victims.length < nAlive && !e.risky);
-        const candS = pool.filter((e) => !e.lethal && e.n <= n && (!e.risky || nAlive > 2));
+        const present=geo?order.filter(t=>un.has(t.id)&&t.alive&&t.zone===P.zone).length:n;
+        const usable=e=>e.n<=present&&(!geo||(e.space||[]).every(s=>(s.at==null||s.at===P.zone)&&(s.travel==null||s.travel===P.zone||geographyZones[P.zone].links.includes(s.travel)&&!closed.has(s.travel)&&geo.budget(P)>0)));
+        const affected=!geo||kind!=='dis'||!opt?.affectedZones||opt.affectedZones.includes(P.zone);
+        const candL = affected?pool.filter((e) => e.lethal && usable(e) && e.victims.length < nAlive && !e.risky):[];
+        const candS = affected?pool.filter((e) => !e.lethal && usable(e) && (!e.risky || nAlive > 2)):[];
         for (let attempt = 0; attempt < 25 && !done; attempt++) {
           const wantLethal = nAlive > 1 && rng.chance(pL);
           const cand = wantLethal ? candL : candS;
@@ -10091,7 +10315,7 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
           roles.forEach((t) => un.delete(t.id));
           done = true;
         }
-        if (!done) { events.push(apply(rng.wpick(fallback, (e) => variety.weight(e)), [P])); un.delete(P.id); }
+        if (!done) { const safe=fallback.filter(e=>!geo||geo.accepts(e,[P])); const ev=rng.wpick(safe, (e) => variety.weight(e))||parseLine('1 | {A} osserva i passaggi della zona e aspetta il momento giusto.'); events.push(apply(ev, [P])); un.delete(P.id); }
       }
       // conseguenze automatiche della fase
       if (kind === 'n') nightEnd();
@@ -10112,10 +10336,11 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
         A2.forEach((a) => A2.forEach((b) => {
           if (a.ix >= b.ix || a.zone !== b.zone || hs >= 1 || like(a, b) > -25 || a.grudges[b.id] && a.grudges[b.id].why === 'kill' || !rng.chance(0.3)) return;
           remember(a, b, 'hardship'); remember(b, a, 'hardship'); hs++;
-          const e = useFmt(BA('hardship'), [a, b]); if (e) events.push({ html: e.html, plain: e.plain, ids: [a.id, b.id], deaths: [], lethal: false, origin: 'sys', cat: 'heal', why: 'carattere', whyTxt: 'Legame', echo: [] });
+          const e = useFmt(BA('hardship'), [a, b]); if (e) events.push(Object.assign({ html: e.html, plain: e.plain, ids: [a.id, b.id], deaths: [], lethal: false, origin: 'sys', cat: 'heal', why: 'carattere', whyTxt: 'Legame', echo: [] },geo?{place:geo.locate([a,b])}:{}));
         }));
       }
       if (kind === 'd' || kind === 'dis' || kind === 'f') diaryNight(0.35);
+      if(geo)events.sort((a,b)=>(a.place?.seq??-1)-(b.place?.seq??-1));
       const died = before - alive().length;
       noDeathStreak = died ? 0 : noDeathStreak + 1;
       phases.push(Object.assign({ kind, day, title, intro, events, snap: snapshot(), meteo: W.n ? { n: W.n, d: W.d } : null }, opt || {}));
@@ -10126,21 +10351,26 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
       const pool = pools.lovers.filter((e) => e.n === 2);
       if (!pool.length) return false;
       const events = [];
+      if (geo) { SYS=[];geo.reset(); gather('finale'); }
       for (let k = 0; k < 10 && !isEnded(); k++) {
         const ev = rng.wpick(pool, (e) => e.w * variety.weight(e));
         const roles = rng.chance(0.5) ? [A, B] : [B, A];
         if (!checkReq(ev, roles)) continue;
         events.push(apply(ev, roles));
       }
-      if (!isEnded()) return false;
+      if (!isEnded() && (!geo || !events.length)) return false;
+      if(geo){events.push(...SYS.map(x=>x.ev));SYS=[];events.sort((a,b)=>(a.place?.seq??-1)-(b.place?.seq??-1));}
       phases.push({ kind: 'finale', day, title: 'L\'ultimo atto', intro: 'Restano in due, e si amano. L\'arena ha previsto anche questo.', events, snap: snapshot() });
-      return true;
+      return isEnded();
     }
 
     function runFinale() {
       const events = [];
+      let meeting=null;
+      if(geo){SYS=[];geo.reset();meeting=gather('finale');sealFinale(meeting);}
       alive().forEach((t) => leaveAlliance(t));
-      const pool = pools.finale;
+      let pool = geo ? pools.finale.filter(e=>e.space.every(s=>(s.at==null||s.at===meeting)&&(s.travel==null||s.travel===meeting))) : pools.finale;
+      if(geo&&!pool.length)pool=[parseLine(theme.soft?'2 k:A>B | {A} vince lo scontro decisivo con {B}.':'2 k:A>B | {A} prevale nello scontro con {B}, che perde la vita.')];
       let rounds = 0;
       while (!isEnded() && rounds++ < 40) {
         const order = rng.shuffle(alive());
@@ -10160,7 +10390,8 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
         }
         if (cfg.teamWin && !isEnded() && rounds > 30) break;
       }
-      phases.push({ kind: 'finale', day, title: 'Lo scontro finale', intro: theme.intro.finale, events, snap: snapshot() });
+      if(geo){events.push(...SYS.map(x=>x.ev));SYS=[];events.sort((a,b)=>(a.place?.seq??-1)-(b.place?.seq??-1));}
+      phases.push({ kind: 'finale', day, title: 'Lo scontro finale', intro: theme.intro.finale+(geo?' Punto di ritrovo: '+zoneName(meeting)+'. Gli altri passaggi vengono chiusi prima dello scontro.':''), events, snap: snapshot() });
     }
 
     // il meteo del giorno e, nel Battle Royale, la zona che si stringe
@@ -10168,8 +10399,13 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
       const list = R.meteo || [];
       if (list.length) {
         const calm = { n: '', d: '', fx: {} };
-        const pick = rng.chance(day === 1 ? 0.35 : 0.72) ? rng.pick(list.filter((m) => m.n !== W.n)) : calm;
+        const pick = rng.chance(day === 1 ? 0.35 : 0.72) ? rng.pick(list.filter((m) => m.n !== (geo?previousWeather:W.n))) : calm;
+        if(geo)previousWeather=pick?.n||'';
         W = pick || calm;
+        if(geo){
+          const corrections={scifi:{'Silenzio radio':{d:'Le comunicazioni tra i moduli sono interrotte: i rumori locali restano l’unico avvertimento.'},Blackout:{d:'Luci spente e comandi fuori uso: i passaggi di servizio restano percorribili, ma si combatte al buio.'}},liceo:{'Gita scolastica':{n:'Giornata di attività libere',d:'Niente lezione frontale: gli studenti girano per gli spazi della scuola, con panini e tempo per parlare.'},'Ondata di influenza':{d:'Molte aule sono vuote per l’influenza. Chi resta a scuola cerca di tenersi in forze.'},'Giornata dello sport':{d:'Gare in Palestra e attività negli altri spazi: chi corre, chi cerca una scusa per fermarsi.'}}};
+          W=Object.assign({},W,corrections[theme.id]?.[W.n]||{});
+        }
         if (W.n) {
           stats.meteo.push({ day, n: W.n });
           const html = ((ECO.txt && ECO.txt.meteo) || '<b>{n}.</b> {d}').replace('{n}', esc(W.n)).replace('{d}', esc(W.d));
@@ -10180,7 +10416,10 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
         const open = [...Array(zoneCount).keys()].filter((i) => !closed.has(i));
         const n = wx('storm', 1) > 1.3 ? 2 : 1;
         for (let k = 0; k < n && open.length > 2; k++) {
-          const z = open.splice(rng.int(open.length), 1)[0]; closed.add(z);
+          const candidates=geo?open.filter(z=>Geography.connected(geographyZones,new Set([...closed,z]))):open;
+          if(!candidates.length) break;
+          const z = candidates[rng.int(candidates.length)]; open.splice(open.indexOf(z),1);
+          if(geo) geo.closure(z); else closed.add(z);
           const tx = sysText('stormClose', [], { z: zoneName(z) });
           if (tx) pendingNotes.push({ html: tx.html, plain: tx.plain, ids: [], deaths: [], lethal: false, note: true });
         }
@@ -10230,7 +10469,8 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
         if (!opts.length) { usedDisasters.clear(); opts = pools.disasters; }
         const dz = rng.pick(opts);
         usedDisasters.add(dz.n); lastDisaster = day;
-        runPhase('dis', dz.out.concat(pools.ds), dz.n, dz.intro, { adult: !!dz.adult });
+        const areas=geo?[...new Set(Geography.mentions(dz.n,geographyZones).map(m=>m.zone))]:[];
+        runPhase('dis', dz.out.concat(pools.ds), dz.n, dz.intro, Object.assign({ adult: !!dz.adult },areas.length?{affectedZones:areas}:{}));
       }
       if (isEnded() || loversEnd()) break;
       runPhase('n', pools.n, theme.phase.n + ' ' + day, theme.intro.n);
@@ -10284,7 +10524,7 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
       return ['amore', 'amicizia', 'nemesi', 'tradimento', 'pieta', 'nonCorrisposto', 'mentore', 'odio', 'paura'].map((k) => best[k]).filter(Boolean);
     }
     stats.stories = bondStories();
-    return { version: 2, theme: theme.id, adult, seed, days: day, phases, itemFacts: itemLedger.facts, tributes: stripped, winners: winners.map((t) => t.id), stats };
+    return Object.assign({ version: 2, theme: theme.id, adult, seed, days: day, phases, itemFacts: itemLedger.facts, tributes: stripped, winners: winners.map((t) => t.id), stats },geo?{spatial:geo.data}:{});
   }
 
   /* ---------------- Cast casuale ---------------- */
@@ -10349,7 +10589,7 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
 </script>
 <script>window.LOS_ASSETS = {"logo":"img/logo.f2d5175789.webp","icona":"img/icona.8b02ddeb49.webp","favicon":"img/favicon.86774dc7cf.png","panoramica":"img/panoramica.66c4c27255.webp","sagome":["img/sagome-cappuccio.e8876ba986.webp","img/sagome-esploratore.9a99fd13f8.webp","img/sagome-viaggiatore.5e36435604.webp"],"arene":{"classico":"img/arene-classico.42c6ba42ee.webp","fantasy":"img/arene-fantasy.75b7fb0d32.webp","horror":"img/arene-horror.48052d80b4.webp","liceo":"img/arene-liceo.05ed578a90.webp","royale":"img/arene-royale.36c9952cd7.webp","scifi":"img/arene-scifi.403694f00f.webp","ufficio":"img/arene-ufficio.67b271bea3.webp","wasteland":"img/arene-wasteland.889002ace8.webp","zombie":"img/arene-zombie.36c9135a12.webp"},"atlas":{"classico":{"luoghi":{"altopiano":"img/arene-classico-luoghi-altopiano.36a37512d3.webp","bosco":"img/arene-classico-luoghi-bosco.2e9163544b.webp","cornucopia":"img/arene-classico-luoghi-cornucopia.393b2dabe1.webp","fiume":"img/arene-classico-luoghi-fiume.22b335a914.webp","paludi":"img/arene-classico-luoghi-paludi.77cf115eb4.webp","rovine":"img/arene-classico-luoghi-rovine.9ea4f70ca9.webp"},"pericoli":{"branco-di-lupi-mutanti":"img/arene-classico-pericoli-branco-di-lupi-mutanti.d786a62875.webp","orso-affamato":"img/arene-classico-pericoli-orso-affamato.e4f38a9892.webp","sciame-di-vespe-velenose":"img/arene-classico-pericoli-sciame-di-vespe-velenose.5adb2c7b8d.webp","serpente-gigante":"img/arene-classico-pericoli-serpente-gigante.b17e7f3d91.webp"}},"fantasy":{"luoghi":{"foresta-elfica":"img/arene-fantasy-luoghi-foresta-elfica.0448fcfbd3.webp","lago-nebbioso":"img/arene-fantasy-luoghi-lago-nebbioso.f19abc7c81.webp","miniere":"img/arene-fantasy-luoghi-miniere.5baa916ec9.webp","palude-stregata":"img/arene-fantasy-luoghi-palude-stregata.6a0b2af4a7.webp","picco-del-drago":"img/arene-fantasy-luoghi-picco-del-drago.06bdfd84b1.webp","torre-in-rovina":"img/arene-fantasy-luoghi-torre-in-rovina.ac716863c7.webp"},"pericoli":{"branco-di-lupi-mannari":"img/arene-fantasy-pericoli-branco-di-lupi-mannari.1c9124ceee.webp","spettro-errante":"img/arene-fantasy-pericoli-spettro-errante.056074bc23.webp","troll-di-caverna":"img/arene-fantasy-pericoli-troll-di-caverna.31aa2444f0.webp","viverna":"img/arene-fantasy-pericoli-viverna.577b91a819.webp"}},"horror":{"luoghi":{"biblioteca":"img/arene-horror-luoghi-biblioteca.00d6ab97f4.webp","cappella":"img/arene-horror-luoghi-cappella.a51e505028.webp","cimitero":"img/arene-horror-luoghi-cimitero.7a441de089.webp","serra":"img/arene-horror-luoghi-serra.b3d91121d4.webp","soffitta":"img/arene-horror-luoghi-soffitta.466d40cea3.webp"},"pericoli":{"bambola-posseduta":"img/arene-horror-pericoli-bambola-posseduta.7064eef1d7.webp","entita-senza-volto":"img/arene-horror-pericoli-entita-senza-volto.2c28467bdd.webp","spettro-urlante":"img/arene-horror-pericoli-spettro-urlante.25fa554e05.webp","stormo-di-corvi":"img/arene-horror-pericoli-stormo-di-corvi.fe5c85d7ae.webp"}},"liceo":{"luoghi":{"aula-magna":"img/arene-liceo-luoghi-aula-magna.0478e35c5c.webp","biblioteca":"img/arene-liceo-luoghi-biblioteca.1ae806ae58.webp","cortile":"img/arene-liceo-luoghi-cortile.51bf433337.webp","laboratorio-di-chimica":"img/arene-liceo-luoghi-laboratorio-di-chimica.eba1434683.webp","mensa":"img/arene-liceo-luoghi-mensa.67bcbc7e37.webp","palestra":"img/arene-liceo-luoghi-palestra.8ecb872849.webp"},"pericoli":{"bidello-di-turno":"img/arene-liceo-pericoli-bidello-di-turno.191c43a8bd.webp","ispezione-a-sorpresa":"img/arene-liceo-pericoli-ispezione-a-sorpresa.bef087d9b9.webp","preside":"img/arene-liceo-pericoli-preside.033f6c9aae.webp","professoressa-di-matematica":"img/arene-liceo-pericoli-professoressa-di-matematica.6cb65c6a3f.webp"}},"royale":{"luoghi":{"aeroporto":"img/arene-royale-luoghi-aeroporto.81e8ce98d4.webp","base-militare":"img/arene-royale-luoghi-base-militare.67f3a7de9d.webp","centrale-elettrica":"img/arene-royale-luoghi-centrale-elettrica.05ee57458a.webp","fattoria":"img/arene-royale-luoghi-fattoria.7c780dda87.webp","foresta":"img/arene-royale-luoghi-foresta.03b47644d0.webp","villaggio-costiero":"img/arene-royale-luoghi-villaggio-costiero.568519eb7c.webp"},"pericoli":{"cane-da-guardia-addestrato":"img/arene-royale-pericoli-cane-da-guardia-addestrato.c7853a67a0.webp","drone-armato":"img/arene-royale-pericoli-drone-armato.30d0b73e01.webp","elicottero-da-caccia":"img/arene-royale-pericoli-elicottero-da-caccia.8c68e62346.webp"}},"scifi":{"luoghi":{"hangar":"img/arene-scifi-luoghi-hangar.6de551833b.webp","moduli-abitativi":"img/arene-scifi-luoghi-moduli-abitativi.9f5bb96d39.webp","ponte-di-comando":"img/arene-scifi-luoghi-ponte-di-comando.3e9ffd005a.webp","reattore":"img/arene-scifi-luoghi-reattore.d10a335006.webp","serra-idroponica":"img/arene-scifi-luoghi-serra-idroponica.b6f4407853.webp"},"pericoli":{"androide-da-combattimento":"img/arene-scifi-pericoli-androide-da-combattimento.1a3d3eb38e.webp","creatura-aliena-dai-tentacoli":"img/arene-scifi-pericoli-creatura-aliena-dai-tentacoli.b6b314ddd9.webp","drone-di-sicurezza-impazzito":"img/arene-scifi-pericoli-drone-di-sicurezza-impazzito.c8a9c6f9e3.webp","sciame-di-nanobot":"img/arene-scifi-pericoli-sciame-di-nanobot.d43296f047.webp"}},"ufficio":{"luoghi":{"cucina":"img/arene-ufficio-luoghi-cucina.d968f8861d.webp","open-space":"img/arene-ufficio-luoghi-open-space.b6b7990c99.webp","parcheggio":"img/arene-ufficio-luoghi-parcheggio.d593f2ed83.webp","sala-stampanti":"img/arene-ufficio-luoghi-sala-stampanti.1727f50082.webp","ufficio-del-direttore":"img/arene-ufficio-luoghi-ufficio-del-direttore.bb3b6cabab.webp"},"pericoli":{"consulente-esterno":"img/arene-ufficio-pericoli-consulente-esterno.ce6e200c3f.webp","direttore-generale":"img/arene-ufficio-pericoli-direttore-generale.da2eb1f708.webp","riorganizzazione-aziendale":"img/arene-ufficio-pericoli-riorganizzazione-aziendale.1fd57b76b3.webp","ufficio-risorse-umane":"img/arene-ufficio-pericoli-ufficio-risorse-umane.8392df7518.webp"}},"wasteland":{"luoghi":{"autostrada-spezzata":"img/arene-wasteland-luoghi-autostrada-spezzata.19a72a0b97.webp","citta-fantasma":"img/arene-wasteland-luoghi-citta-fantasma.fe22bb72b2.webp","cratere":"img/arene-wasteland-luoghi-cratere.04de7ca40a.webp","diga":"img/arene-wasteland-luoghi-diga.3be9abe15a.webp","discarica":"img/arene-wasteland-luoghi-discarica.b8783ad9c6.webp","raffineria":"img/arene-wasteland-luoghi-raffineria.081e2d2ad6.webp"},"pericoli":{"banda-di-predoni":"img/arene-wasteland-pericoli-banda-di-predoni.1dfcfd1628.webp","branco-di-cani-mutati":"img/arene-wasteland-pericoli-branco-di-cani-mutati.442fabfc39.webp","scorpione-gigante":"img/arene-wasteland-pericoli-scorpione-gigante.2dd8911367.webp","verme-delle-sabbie":"img/arene-wasteland-pericoli-verme-delle-sabbie.a0d445beeb.webp"}},"zombie":{"luoghi":{"centro-commerciale":"img/arene-zombie-luoghi-centro-commerciale.333f4699d5.webp","metropolitana":"img/arene-zombie-luoghi-metropolitana.878a263605.webp","periferia":"img/arene-zombie-luoghi-periferia.e28a7d70c7.webp","scuola":"img/arene-zombie-luoghi-scuola.153ddbaa75.webp","stazione-di-polizia":"img/arene-zombie-luoghi-stazione-di-polizia.157f7a17f5.webp"},"pericoli":{"cane-infetto":"img/arene-zombie-pericoli-cane-infetto.fdff913d6f.webp","gigante-mutato":"img/arene-zombie-pericoli-gigante-mutato.91fad36b70.webp","infetto-corridore":"img/arene-zombie-pericoli-infetto-corridore.61f48faafd.webp","orda-di-zombi":"img/arene-zombie-pericoli-orda-di-zombi.e0fc6d1b56.webp"}}}};
 ;
-window.LOS_BUILD = "dd76e250b973e109a0ff27fe229187c3cc6debc0cb5591d2b69fa60641bbce50";
+window.LOS_BUILD = "b794e23aada3da97e46b0948b4340ce44da6ca1390bd294c8a3cf745c2a15e8b";
 ;
 /* Last One Standing — grafica vettoriale: logo, icone delle arene, illustrazioni.
  * Tutto è SVG generato in codice: nessuna immagine esterna. */
@@ -11156,8 +11396,64 @@ window.LOS_BUILD = "dd76e250b973e109a0ff27fe229187c3cc6debc0cb5591d2b69fa60641bb
         const ok = Object.entries(x).every(([k, v]) => (!['html', 'deathHtml', 'h', 'th'].includes(k) || typeof v !== 'string' || safeHtml(v, ids)) && plainData(v, depth + 1));
         seen.delete(x); return ok;
       }
-      return plainData(result, 0);
+      return plainData(result, 0) && (result.spatial === undefined || validSpatial(result,ids));
     } catch (e) { return false; }
+  }
+  // Il registro deve riprodurre le posizioni salvate, senza affidarsi alla
+  // geografia della versione installata oggi. Si controllano anche gli eventi
+  // in ordine reale: le conseguenze di sistema possono essere mostrate dopo.
+  function validSpatial(result,ids) {
+    const map=result.spatial,phases=result.phases;
+    if(!record(map)||map.version!==1||!Array.isArray(map.zones)||map.zones.length<2||map.zones.length>16||!record(map.start))return false;
+    const zone=z=>integer(z)&&z<map.zones.length;
+    for(const [i,z] of map.zones.entries()){
+      if(!record(z)||z.id!==i||typeof z.name!=='string'||!z.name.length||typeof z.description!=='string'||!Array.isArray(z.links)||new Set(z.links).size!==z.links.length||!z.links.every(n=>zone(n)&&n!==i))return false;
+      if(!['resources','danger','shelter'].every(k=>Number.isFinite(z[k])&&z[k]>=0&&z[k]<=(k==='shelter'?1:3)))return false;
+      if(z.features!==undefined&&(!Array.isArray(z.features)||!z.features.every(x=>typeof x==='string')))return false;
+    }
+    if(map.zones.some(z=>z.links.some(n=>!map.zones[n].links.includes(z.id))))return false;
+    const reachable=new Set([0]),queue=[0];for(let i=0;i<queue.length;i++)for(const n of map.zones[queue[i]].links)if(!reachable.has(n)){reachable.add(n);queue.push(n);}if(reachable.size!==map.zones.length)return false;
+    if(Object.keys(map.start).length!==ids.size||[...ids].some(id=>!zone(map.start[id])))return false;
+    if(!['moves','deaths','closures'].every(k=>Array.isArray(map[k])&&map[k].length<=200000))return false;
+    const known=new Map(result.tributes.map(t=>[t.id,t])),seen=new Set(),entries=phases.map(()=>[]);
+    function add(entry,kind){if(!record(entry)||!integer(entry.seq)||seen.has(entry.seq)||!integer(entry.ph)||entry.ph>=phases.length)return false;seen.add(entry.seq);entries[entry.ph].push({kind,...entry});return true;}
+    for(const m of map.moves){if(!ids.has(m.id)||!zone(m.from)||!zone(m.to)||m.from===m.to||!Array.isArray(m.path)||m.path.length<2||m.path.length>16||m.path[0]!==m.from||m.path[m.path.length-1]!==m.to||!m.path.every(zone)||typeof m.reason!=='string'||!m.reason.length||!['goal','event','gather','evacuate','sleepwalk'].includes(m.mode)||!Number.isFinite(m.cost)||m.cost<0||m.cost>100||m.target!=null&&!ids.has(m.target)||!add(m,'move'))return false;}
+    for(const d of map.deaths)if(!ids.has(d.id)||!zone(d.zone)||known.get(d.id).deathPhase!==d.ph||!add(d,'death'))return false;
+    for(const c of map.closures)if(!zone(c.zone)||c.reason!==undefined&&!['tempesta','finale'].includes(c.reason)||!add(c,'close'))return false;
+    for(const [ph,p] of phases.entries()){
+      if(p.affectedZones!==undefined&&(!Array.isArray(p.affectedZones)||!p.affectedZones.every(zone)))return false;
+      for(const e of p.events){
+        if(!e.place){if(!e.note)return false;continue;}
+        const l=e.place;
+        if(!record(l)||l.zone!=null&&!zone(l.zone)||!record(l.positions)||!Object.entries(l.positions).every(([id,z])=>ids.has(id)&&zone(z))||!add({...l,ph,event:e},'event'))return false;
+      }
+      const terrain=p.snap.terrain;
+      if(!record(terrain)||!Array.isArray(terrain.traps)||!Array.isArray(terrain.loot)||!terrain.traps.every(t=>record(t)&&zone(t.zone)&&ids.has(t.owner)&&typeof t.name==='string')||!terrain.loot.every(l=>record(l)&&zone(l.zone)&&integer(l.count,1)))return false;
+    }
+    const positions={...map.start},dead=new Set(),closed=new Set();let last=-1;
+    for(const [ph,list] of entries.entries()){
+      const ordinary=new Map();
+      for(const entry of list.sort((a,b)=>a.seq-b.seq)){
+        if(entry.seq<=last)return false;last=entry.seq;
+        if(entry.kind==='close'){if(closed.has(entry.zone))return false;closed.add(entry.zone);}
+        if(entry.kind==='move'){
+          const m=entry;if(dead.has(m.id)||positions[m.id]!==m.from)return false;
+          for(let i=1;i<m.path.length;i++)if(!map.zones[m.path[i-1]].links.includes(m.path[i])||closed.has(m.path[i])&&!(m.mode==='evacuate'&&closed.has(m.from)))return false;
+          if(['goal','event','sleepwalk'].includes(m.mode)){ordinary.set(m.id,(ordinary.get(m.id)||0)+m.path.length-1);if(ordinary.get(m.id)>2)return false;}
+          positions[m.id]=m.to;
+        }
+        if(entry.kind==='death'){if(dead.has(entry.id)||positions[entry.id]!==entry.zone)return false;dead.add(entry.id);}
+        if(entry.kind==='event'){
+          if(Object.entries(entry.positions).some(([id,z])=>positions[id]!==z))return false;
+          if(!entry.event.note&&entry.event.ids.some(id=>dead.has(id)))return false;
+          if(entry.event.origin!=='sys'&&!entry.event.note&&(entry.zone==null||entry.event.ids.some(id=>dead.has(id)||entry.positions[id]!==entry.zone)))return false;
+        }
+      }
+      const snap=phases[ph].snap;
+      if([...ids].some(id=>snap.zones[id]!==positions[id]||snap.alive.includes(id)===dead.has(id)))return false;
+      if(snap.closed.length!==closed.size||snap.closed.some(z=>!closed.has(z)))return false;
+    }
+    return [...ids].every(id=>dead.has(id)===!known.get(id).alive);
   }
   function envelopeOk(e, id) {
     return record(e) && e.schema === 1 && e.id === id && typeof e.buildId === 'string' && Number.isFinite(e.createdAt) && e.createdAt > 0 &&
@@ -11383,6 +11679,47 @@ window.LOS_BUILD = "dd76e250b973e109a0ff27fe229187c3cc6debc0cb5591d2b69fa60641bb
 })(typeof window === 'object' ? window : globalThis);
 
 ;
+/* Lettura della geografia registrata, senza ricostruire la partita. */
+(function(G){
+  'use strict';
+  const esc=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const bare=s=>s.replace(/^(?:il |lo |la |l['’]|i |gli |le )/i,'');
+  const level=(v,kind)=>kind==='shelter'?(v>=0.7?'buono':v>=0.45?'discreto':'scarso'):(v>=1.35?'alte':v>=0.95?'medie':'basse');
+  function graph(zones,closed,counts,selected){
+    const points=zones.map((z,i)=>i===6?[180,160]:[180+126*Math.sin(i*Math.PI/3),160-123*Math.cos(i*Math.PI/3)]);
+    const lines=zones.flatMap(z=>z.links.filter(to=>to>z.id).map(to=>{
+      const a=points[z.id],b=points[to],cls=closed.has(z.id)||closed.has(to)?'shut':'',dx=b[0]-a[0],dy=b[1]-a[1],length=Math.hypot(dx,dy);
+      const acrossHub=zones.length===7&&z.id!==6&&to!==6&&Math.abs(dx*(160-a[1])-dy*(180-a[0]))/length<27;
+      if(acrossHub)return '<path d="M '+a[0]+' '+a[1]+' Q '+((a[0]+b[0])/2-dy/length*90)+' '+((a[1]+b[1])/2+dx/length*90)+' '+b[0]+' '+b[1]+'" class="'+cls+'"/>';
+      return '<line x1="'+a[0]+'" y1="'+a[1]+'" x2="'+b[0]+'" y2="'+b[1]+'" class="'+cls+'"/>';
+    })).join('');
+    return '<div class="arena-graph" role="group" aria-label="Collegamenti tra le zone: le linee tratteggiate indicano i passaggi chiusi"><svg viewBox="0 0 360 320" aria-hidden="true">'+lines+'</svg>'+zones.map((z,i)=>{const occupancy=counts[i]+' '+(counts[i]===1?'presente':'presenti');return '<button type="button" class="map-node'+(closed.has(i)?' shut':'')+(selected===i?' selected':'')+'" style="left:'+(points[i][0]/3.6)+'%;top:'+(points[i][1]/3.2)+'%" data-map-zone="'+i+'" aria-pressed="'+(selected===i)+'" aria-label="'+esc(bare(z.name))+': '+occupancy+(closed.has(i)?', zona chiusa':'')+'"><b>'+(i+1)+'</b><span>'+esc(bare(z.name))+'</span><small>'+occupancy+'</small></button>';}).join('')+'</div>';
+  }
+  function render(result,phaseIndex,options={}){
+    const phase=result.phases[phaseIndex];if(!phase)return '';
+    const spatial=result.spatial,theme=options.theme,by=Object.fromEntries(result.tributes.map(t=>[t.id,t]));
+    const zones=spatial?.zones||theme.lex.luogo.map((name,id)=>({id,name,links:[],resources:options.properties?.[id]?.[0]??1,danger:options.properties?.[id]?.[1]??1,shelter:options.properties?.[id]?.[2]??0.5,description:''}));
+    const closureReason=id=>spatial?.closures.filter(c=>c.zone===id&&c.ph<=phaseIndex).at(-1)?.reason;
+    const closed=new Set(phase.snap.closed||[]),selected=zones[options.selected]?options.selected:null;
+    const present=z=>phase.snap.alive.filter(id=>phase.snap.zones[id]===z);
+    const name=id=>by[id]?.name||'Concorrente';
+    const person=id=>'<button type="button" class="map-person" data-prof="'+esc(id)+'">'+esc(name(id))+'</button>';
+    const deaths=spatial?.deaths.filter(d=>d.ph===phaseIndex)||[];
+    const moves=spatial?.moves.filter(m=>m.ph===phaseIndex)||[];
+    const locations=phase.events.map((e,index)=>({e,index})).filter(({e})=>e.place&&e.place.zone!=null);
+    const traps=phase.snap.terrain?.traps||[],loot=phase.snap.terrain?.loot||[];
+    const cards=zones.filter(z=>selected==null||selected===z.id).map(z=>{
+      const here=present(z.id),fallen=deaths.filter(d=>d.zone===z.id),events=locations.filter(x=>x.e.place.zone===z.id&&!x.e.note);
+      const tz=traps.filter(t=>t.zone===z.id),lz=loot.find(x=>x.zone===z.id),affected=phase.affectedZones?.includes(z.id);
+      return '<article class="zone'+(closed.has(z.id)?' closed':'')+(fallen.length?' hot':'')+'"><h4><button type="button" data-map-zone="'+z.id+'">'+(z.id+1)+'. '+esc(bare(z.name))+'</button></h4><p class="help">'+esc(z.description)+'</p><p class="map-properties">Risorse '+level(z.resources)+' · Pericolo '+level(z.danger).replace('alte','alto').replace('medie','medio').replace('basse','basso')+' · Riparo '+level(z.shelter,'shelter')+'</p>'+(closed.has(z.id)?'<p class="ztag">'+(closureReason(z.id)==='finale'?'Accesso chiuso per lo scontro finale':'Zona chiusa dalla tempesta')+'</p>':'')+(affected?'<p class="ztag">Area del disastro in questa fase</p>':'')+'<div class="dots">'+here.map(id=>options.avatar?options.avatar(by[id]):person(id)).join('')+'</div><p class="help">'+(here.length?here.map(id=>esc(name(id))).join(', '):'Nessun concorrente presente a fine fase.')+'</p>'+(fallen.length?'<p class="map-fallen">'+(theme.soft?'Usciti dai giochi qui':'Morti qui')+': '+fallen.map(d=>person(d.id)).join(', ')+'</p>':'')+(tz.length?'<details><summary>'+tz.length+' '+(theme.soft?(tz.length===1?'tranello':'tranelli'):(tz.length===1?'trappola':'trappole'))+(tz.length===1?(theme.soft?' ancora attivo':' ancora attiva'):' ancora attivi')+'</summary><ul>'+tz.map(t=>'<li>'+esc(t.name)+' · '+person(t.owner)+'</li>').join('')+'</ul></details>':'')+(lz?'<p class="help">Bottino rimasto: '+lz.count+' '+(lz.count===1?'oggetto':'oggetti')+'.</p>':'')+(spatial?'<p class="map-links">Passaggi: '+z.links.map(id=>'<button type="button" data-map-zone="'+id+'">'+esc(bare(zones[id].name))+(closed.has(id)?' (chiuso)':'')+'</button>').join(' · ')+'</p>':'')+(events.length?'<details><summary>'+events.length+' '+(events.length===1?'fatto avvenuto qui':'fatti avvenuti qui')+'</summary><ol class="map-events">'+events.sort((a,b)=>a.e.place.seq-b.e.place.seq).map(({e,index})=>'<li><button type="button" data-map-event="'+index+'">'+esc(e.plain)+'</button></li>').join('')+'</ol></details>':'')+'</article>';
+    }).join('');
+    const journeys=moves.filter(m=>selected==null||m.path.includes(selected));
+    return '<div class="map-view"><p class="map-caption"><b>Posizioni a fine fase '+(phaseIndex+1)+'</b><br>'+ (spatial?'I fatti e i percorsi sotto raccontano anche i passaggi precedenti della stessa fase. Le linee indicano i collegamenti, non distanze in metri.':'Replay storico: sono disponibili le posizioni salvate a fine fase. Percorsi e luoghi dei singoli eventi non erano registrati.')+'</p>'+(spatial?graph(zones,closed,zones.map(z=>present(z.id).length),selected):'')+(selected!=null?'<button class="btn sm" type="button" data-map-zone="all">Mostra tutte le zone</button>':'')+'<div class="map">'+cards+'</div>'+(spatial?'<details class="map-journeys"'+(journeys.length<9?' open':'')+'><summary>Spostamenti della fase'+(selected!=null?' in questa zona':'')+' · '+journeys.length+'</summary>'+(journeys.length?'<ol>'+journeys.sort((a,b)=>a.seq-b.seq).map(m=>'<li>'+person(m.id)+'<span class="map-route">'+m.path.map(z=>esc(bare(zones[z].name))).join(' → ')+'</span><span class="help">'+esc(m.reason)+' · Energia −'+m.cost.toLocaleString('it-IT')+'</span></li>').join('')+'</ol>':'<p class="help">Nessun cambio di zona registrato in questa fase.</p>')+'</details>':'')+'</div>';
+  }
+  G.LOS_MAP_VIEW={render,graph};if(typeof module==='object'&&module.exports)module.exports=G.LOS_MAP_VIEW;
+})(typeof window!=='undefined'?window:globalThis);
+
+;
 /* Strumenti facoltativi: legami iniziali, eventi, campioni e stagioni. */
 (function (G) {
   'use strict';
@@ -11447,8 +11784,8 @@ window.LOS_BUILD = "dd76e250b973e109a0ff27fe229187c3cc6debc0cb5591d2b69fa60641bb
       }
       const beforeKills = previous?.kills?.[id] || 0, afterKills = current.kills?.[id] || 0;
       if (afterKills > beforeKills) changes.push({ kind: 'credit', before: beforeKills, after: afterKills });
-      return { phase, day: p.day, title: p.title, events, changes, itemFacts: (result.itemFacts || []).filter(f => f.ph === phase && (f.who === id || f.owner === id)), memories: memories.get(phase) || [], diary: diary.get(phase) || [] };
-    }).filter((p) => p.events.length || p.changes.length || p.itemFacts.length || p.memories.length || p.diary.length);
+      return { phase, day: p.day, title: p.title, events, changes, movements:(result.spatial?.moves||[]).filter(m=>m.ph===phase&&m.id===id), itemFacts: (result.itemFacts || []).filter(f => f.ph === phase && (f.who === id || f.owner === id)), memories: memories.get(phase) || [], diary: diary.get(phase) || [] };
+    }).filter((p) => p.events.length || p.changes.length || p.movements.length || p.itemFacts.length || p.memories.length || p.diary.length);
   }
   function seasonScores(season) {
     const rows = new Map(season.configuration.cast.map((t) => [t.id, { id: t.id, name: t.name, points: 0, wins: 0, kills: 0, played: 0, rankSum: 0 }]));
@@ -11528,6 +11865,7 @@ window.LOS_BUILD = "dd76e250b973e109a0ff27fe229187c3cc6debc0cb5591d2b69fa60641bb
       const on = (S.followed || []).includes(t.id), heading = $('#h-prof'); if (!heading) return;
       const result = A.getSIM(), theme = D.themes.find((th) => th.id === result.theme), timeline = personalTimeline(result, t.id, phase);
       const history = '<details class="personal-history"><summary>Il percorso fino a questa fase · ' + plural(timeline.length, 'tappa', 'tappe') + '</summary><p class="help">In ordine cronologico: eventi, ricordi, diario e cambiamenti tra fine fase e fine fase. Le variazioni di salute compaiono sempre; per gli altri valori mostriamo quelle di almeno 10 punti. Un oggetto può entrare e uscire nella stessa fase senza comparire nel confronto dello zaino.</p><ol class="causal-path">' + timeline.map((step) => '<li><b>G' + (step.day || 1) + ' · ' + esc(step.title) + '</b>' +
+        (step.movements.length?'<ul class="personal-route">'+step.movements.map(m=>'<li>'+esc(m.path.map(z=>result.spatial.zones[z].name).join(' → '))+' · '+esc(m.reason)+' · Energia −'+m.cost+'</li>').join('')+'</ul>':'')+
         (step.changes.length ? '<ul class="change-list">' + step.changes.map((c) => '<li>' + esc(changeText(c, t, theme, result)) + '</li>').join('') + '</ul>' : '') +
         itemFactsHTML(step.itemFacts, result, theme) + step.events.map((e) => '<p>' + esc(e.plain) + '</p>').join('') + step.memories.map((m) => memoryHTML(t, m, theme)).filter(Boolean).map((m) => '<p class="help">Ricordo: «' + m + '»</p>').join('') + step.diary.map((page) => '<p class="diary-entry"><span class="sub">Diario</span> ' + A.linkify(page.h) + '</p>').join('') +
         '<button class="btn sm" type="button" data-personal-phase="' + step.phase + '">Rivedi la fase ' + (step.phase + 1) + '</button></li>').join('') + '</ol></details>';
@@ -11839,6 +12177,9 @@ window.LOS_BUILD = "dd76e250b973e109a0ff27fe229187c3cc6debc0cb5591d2b69fa60641bb
   const $$ = (s, r = document) => [...r.querySelectorAll(s)];
   const esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   const THEMES = Object.fromEntries(D.themes.map((t) => [t.id, t]));
+  const resultTheme = result => result?.spatial ? { ...THEMES[result.theme], lex:{...THEMES[result.theme].lex,luogo:result.spatial.zones.map(z=>z.name)} } : THEMES[result.theme];
+  let mapSelection=null;
+  let lastSideResult=null,lastSidePhase=-1,lastSideTab='';
   const TRAITS = Object.fromEntries(D.traits.map((t) => [t.id, t]));
   const own = (o, k) => typeof k === 'string' && Object.prototype.hasOwnProperty.call(o, k);
   const record = (x) => x != null && typeof x === 'object' && !Array.isArray(x);
@@ -11971,10 +12312,12 @@ window.LOS_BUILD = "dd76e250b973e109a0ff27fe229187c3cc6debc0cb5591d2b69fa60641bb
     if (v) { if (v[0] < 25) bits.push(theme.soft ? 'con la reputazione a pezzi' : 'ridott' + G3(t.gender, 'o', 'a', 'ə') + ' male'); else if (v[0] < 55) bits.push(statusLabel('ferito', t, theme).toLowerCase()); if (v[3] < 25) bits.push('affamat' + G3(t.gender, 'o', 'a', 'ə')); if (v[1] < 22) bits.push('sfinit' + G3(t.gender, 'o', 'a', 'ə')); if (v[2] < 22) bits.push('a pezzi'); else if (v[2] >= 80) bits.push('carichissim' + G3(t.gender, 'o', 'a', 'ə')); }
     if (st.includes('ubriaco')) bits.push(statusLabel('ubriaco', t, theme).toLowerCase());
     const allies = snap.allies[t.id] != null ? snap.alive.filter((x) => x !== t.id && snap.allies[x] === snap.allies[t.id]).length : 0;
+    const partner=snap.rel?.[t.id]?.p;
+    const nearby=snap.alive.filter(id=>id!==t.id&&snap.zones[id]===snap.zones[t.id]&&(snap.allies[t.id]!=null&&snap.allies[id]===snap.allies[t.id]||id===partner)).length;
     const where = zone ? zone.replace(/^(il |lo |la |l'|i |gli |le )/i, (a) => a.toLowerCase()) : '';
     const lead = (where ? 'A ' + where : 'In gara') + (bits.length ? ', ' + bits.join(', ') : '') + (allies ? ', in alleanza con ' + plural(allies, 'alleato', 'alleati') : ', senza alleati') + '.';
     const g = m ? (MND.goals || {})[m.g] : null;
-    return '<div class="nowcard"><div class="sub">Adesso</div><p class="nowlead">' + esc(fixA(lead)) + '</p>' +
+    return '<div class="nowcard"><div class="sub">Adesso</div><p class="nowlead">' + esc(fixA(lead)) + '</p><p class="help">'+(nearby?plural(nearby,'compagno presente','compagni presenti')+' in questa zona.':'Nessun compagno presente in questa zona.')+'</p>' +
       (m && g ? '<div class="goal' + (g.secret ? ' secret' : '') + '"><span class="glbl">Obiettivo</span><b>' + esc(goalLabel(m)) + '</b>' + (g.secret ? '<span class="gsec" title="Gli altri concorrenti non lo sanno">segreto</span>' : '') + (m.since != null && m.since < i ? '<span class="gsince">da G' + (SIM.phases[m.since] ? SIM.phases[m.since].day || 1 : 1) + '</span>' : '') + '</div>' : '') +
       (m && m.th ? '<blockquote class="thought">' + linkify(m.th) + '</blockquote>' : '') + '</div>';
   }
@@ -12997,7 +13340,7 @@ window.LOS_BUILD = "dd76e250b973e109a0ff27fe229187c3cc6debc0cb5591d2b69fa60641bb
     $('#arenaPreview').innerHTML =
       '<header class="dx-hero"><div class="apv-banner" aria-hidden="true">' + ART.scene(t.id) + '</div>' +
         '<div class="dx-title"><span class="dx-kicker">Guida all\'arena</span><h2>' + esc(t.name) + '</h2><p>' + esc(t.tag) + '</p>' + (t.soft ? '<span class="dx-soft">Nessuno muore: si esce dai giochi</span>' : '') + '</div></header>' +
-      '<div class="dx-stats">' + stat(pt.events + (adult ? pt.adultEvents : 0), 'Eventi') + stat(pt.disasters + (adult ? pt.adultDisasters : 0), 'Disastri') + stat(t.lex.luogo.length, 'Zone') + stat((A.meteo || []).length, 'Tipi di meteo') + '</div>' +
+      '<div class="dx-stats">' + stat(pt.events + (adult ? pt.adultEvents : 0), 'Eventi') + stat(pt.disasters + (adult ? pt.adultDisasters : 0), 'Disastri') + stat(window.LOS_GEOGRAPHY.describe(t,A).length, 'Zone') + stat((A.meteo || []).length, 'Tipi di meteo') + '</div>' +
       '<nav class="dx-nav" role="tablist" aria-label="Capitoli della guida">' + CHAPTERS.map(([k, l]) => '<button type="button" role="tab" id="dxt-' + k + '" data-dx="' + k + '" aria-controls="dxp-' + k + '" aria-selected="' + (dxCh === k) + '" tabindex="' + (dxCh === k ? 0 : -1) + '">' + chIcon(k) + '<span>' + l + '</span></button>').join('') + '</nav>' +
       CHAPTERS.map(([k]) => '<section class="dx-panel" role="tabpanel" id="dxp-' + k + '" aria-labelledby="dxt-' + k + '"' + (dxCh === k ? '' : ' hidden') + '>' + (dxCh === k ? chapter(k, t) : '') + '</section>').join('');
     AN.field($('#arenaPreview .apv-banner'), t.id, { intensity: 1.2 });
@@ -13021,14 +13364,16 @@ window.LOS_BUILD = "dd76e250b973e109a0ff27fe229187c3cc6debc0cb5591d2b69fa60641bb
     return '<div class="zm ' + tone + '"><span>' + label + '</span><i><b style="width:' + pc.toFixed(0) + '%"></b></i><em>' + words + '</em></div>';
   }
   function chMap(t) {
-    const A = arenaOf(t.id), Z = t.lex.luogo.map((_, i) => (A.zones && A.zones[i]) || [1, 1, 0.5]);
+    const A = arenaOf(t.id), geography=window.LOS_GEOGRAPHY.describe(t,A);
+    t=window.LOS_GEOGRAPHY.enrich(t,geography);
+    const Z = geography.map(z=>[z.resources,z.danger,z.shelter]);
     const best = (j, dir) => Z.reduce((bi, z, i) => (dir * z[j] > dir * Z[bi][j] ? i : bi), 0);
     const rich = best(0, 1), risk = best(1, 1), safe = best(2, 1);
     const zones = t.lex.luogo.map((name, i) => {
       const z = Z[i], nm = capFirst(stripArt(name));
       const tags = [i === rich ? '<span class="ztg good">Più ricca</span>' : '', i === risk ? '<span class="ztg bad">Più pericolosa</span>' : '', i === safe ? '<span class="ztg calm">Miglior riparo</span>' : ''].join('');
       return '<article class="zc" style="--i:' + i + '">' + ATL.pic(t.id, 'luoghi', name, t.hue, { index: i }) +
-        '<div class="zc-body"><h4>' + esc(nm) + '</h4>' + (tags ? '<div class="ztgs">' + tags + '</div>' : '') +
+        '<div class="zc-body"><h4>' + esc(nm) + '</h4><p class="help">'+esc(geography[i].description)+'</p><p class="help">Passaggi: '+esc(geography[i].links.map(z=>stripArt(geography[z].name)).join(', '))+'</p>' + (tags ? '<div class="ztgs">' + tags + '</div>' : '') +
         meterRow('Risorse', z[0], 1.8, ['Scarse', 'Medie', 'Ricche'][LEVEL(z[0], 1.35, 0.95)], 'res') +
         meterRow('Pericolo', z[1], 1.8, ['Basso', 'Medio', 'Alto'][LEVEL(z[1], 1.35, 0.95)], 'dng') +
         meterRow('Riparo', z[2], 1, ['Scarso', 'Discreto', 'Buono'][LEVEL(z[2], 0.7, 0.45)], 'shl') + '</div></article>';
@@ -13041,7 +13386,7 @@ window.LOS_BUILD = "dd76e250b973e109a0ff27fe229187c3cc6debc0cb5591d2b69fa60641bb
       '<div><h5>Da tenere d\'occhio</h5><div class="chips">' + [lb.hp, lb.en, lb.mo, lb.food].map((x) => '<span class="chip dim">' + esc(x) + '</span>').join('') + (m ? '<span class="chip st">' + esc(m.name) + '</span>' : '') + '</div></div></div></div></section>' : '';
     const arms = t.lex.arma.slice(0, 10).map((x) => '<li class="arm">' + ATL.pic(t.id, 'armi', x, t.hue) + '<span>' + esc(capFirst(stripArt(x))) + '</span></li>').join('');
     const beasts = t.lex.mostro.map((x, i) => '<article class="wanted" style="--r:' + ((i % 2 ? 1 : -1) * (1 + i % 3)) + 'deg">' + ATL.pic(t.id, 'pericoli', x, t.hue) + '<div class="wd-body"><span class="wd-tag">' + (t.soft ? 'Attenzione' : 'Pericolo') + '</span><h4>' + esc(capFirst(stripArt(x))) + '</h4></div></article>').join('');
-    return chHead('Il campo di gioco', plural(Z.length, 'zona', 'zone') + ' dove si muovono i concorrenti. Le zone ricche danno più cibo, quelle pericolose più agguati; di notte conta il riparo.') +
+    return chHead('Il campo di gioco', plural(Z.length, 'zona', 'zone') + ' collegate da passaggi. Gli spostamenti consumano energia e gli incontri richiedono la presenza nello stesso luogo. Le zone ricche aiutano a trovare cibo; di notte il riparo e i compagni presenti favoriscono il recupero.') +
       '<div class="zboard">' + zones + '</div>' + plaque +
       '<div class="dx-split"><section class="arsenal"><div class="ch-sub"><h4>' + (t.soft ? 'Armi improprie' : 'Armeria') + '</h4><p>' + (t.soft ? 'Con queste si fanno fuori i rivali, senza versare sangue.' : 'Si raccolgono in giro, si rubano agli altri o arrivano dagli sponsor.') + '</p></div><ul class="rack">' + arms + '</ul></section>' +
       '<section class="bestiary"><div class="ch-sub"><h4>' + (t.soft ? 'Da evitare' : 'Pericoli') + '</h4><p>' + (t.soft ? 'Girano per i corridoi: chi resta da solo rischia di finire nei guai.' : 'Di notte attaccano chi dorme da solo, soprattutto nelle zone pericolose.') + '</p></div><div class="wanted-grid">' + beasts + '</div></section></div>';
@@ -13329,7 +13674,8 @@ window.LOS_BUILD = "dd76e250b973e109a0ff27fe229187c3cc6debc0cb5591d2b69fa60641bb
     const why = e.test ? '<span title="Tiro ' + e.test.roll + ' contro soglia ' + e.test.dc + '">Prova di ' + esc(ATTRN[e.test.attr] || e.test.attr) + ' · <span class="dice"><span class="roll">' + e.test.roll + '</span>/' + e.test.dc + '</span> · ' + (e.test.pass ? 'superata' : 'fallita') + '</span>' : e.sponsor ? 'Sponsor' : e.whyTxt ? esc(e.whyTxt) : whyLabel(e, theme);
     const echo = ((e.echo || []).length ? '<ul class="echo">' + e.echo.map((x) => '<li class="' + (x.cls || '') + '">' + fix(x.html) + '</li>').join('') + '</ul>' : '') +
       (e.reason ? '<details class="event-reason"><summary>Il contesto</summary><p>' + esc(e.reason) + '</p></details>' : '');
-    return '<div class="ev' + (!tributes && (S.followed || []).some((id) => e.ids.includes(id)) ? ' followed' : '') + (e.deaths.length ? ' lethal' : '') + (anim ? ' in fx-' + cat + (e.sponsor ? ' fx-sponsor' : '') : '') + '" style="--cc:var(--c-' + cat + ');--d:' + (delay || 0) + 'ms">' + avs + '<div class="evbody">' + (why ? '<span class="why' + (e.test ? (e.test.pass ? ' ok' : ' ko') : '') + '">' + why + '</span>' : '') + '<p>' + fix(e.html) + '</p>' + echo + '</div>' + chip + '</div>';
+    const place=e.place?(e.place.zone!=null?'<span class="event-place">'+esc(stripArt(theme.lex.luogo[e.place.zone]||'Zona'))+'</span>':'<span class="event-place">Riferimenti a persone in zone diverse</span>'):'';
+    return '<div class="ev' + (!tributes && (S.followed || []).some((id) => e.ids.includes(id)) ? ' followed' : '') + (e.deaths.length ? ' lethal' : '') + (anim ? ' in fx-' + cat + (e.sponsor ? ' fx-sponsor' : '') : '') + '"'+(e.place?' data-map-step="'+e.place.seq+'"':'')+' style="--cc:var(--c-' + cat + ');--d:' + (delay || 0) + 'ms">' + avs + '<div class="evbody">' + place + (why ? '<span class="why' + (e.test ? (e.test.pass ? ' ok' : ' ko') : '') + '">' + why + '</span>' : '') + '<p>' + fix(e.html) + '</p>' + echo + '</div>' + chip + '</div>';
   }
   function timelineHTML(P, i, seenAt, hideFuture) {
     const days = [];
@@ -13344,7 +13690,7 @@ window.LOS_BUILD = "dd76e250b973e109a0ff27fe229187c3cc6debc0cb5591d2b69fa60641bb
   function renderLive(fromRoute) {
     $('#liveEmpty').hidden = !!SIM; $('#liveBody').hidden = !SIM;
     if (!SIM) return;
-    const theme = THEMES[SIM.theme], soft = !!theme.soft;
+    const theme = resultTheme(SIM), soft = !!theme.soft;
     const P = SIM.phases, i = Math.max(0, Math.min(P.length - 1, S.run.phase || 0));
     S.run.phase = i; S.run.seen = Math.max(S.run.seen || 0, i);
     const ph = P[i], total = SIM.tributes.length;
@@ -13409,24 +13755,14 @@ window.LOS_BUILD = "dd76e250b973e109a0ff27fe229187c3cc6debc0cb5591d2b69fa60641bb
     save();
   }
   function renderSide(i) {
-    const theme = THEMES[SIM.theme], ph = SIM.phases[i], soft = !!theme.soft;
+    const theme = resultTheme(SIM), ph = SIM.phases[i], soft = !!theme.soft;
     $$('.stabs button').forEach((b) => { const active = b.dataset.s === sideTab; b.setAttribute('aria-selected', active); b.tabIndex = active ? 0 : -1; });
     $('#sideBody').setAttribute('aria-labelledby', 'side-tab-' + sideTab);
     $('.stabs [data-s="fallen"]').textContent = soft ? (theme.id === 'ufficio' ? 'Licenziati' : 'Eliminati') : 'Caduti';
     const aliveSet = new Set(ph.snap.alive);
     let h = '';
     if (sideTab === 'map') {
-      const zones = theme.lex.luogo.map((z) => z.replace(/^(il |lo |la |l'|i |gli |le )/i, ''));
-      const hot = {};
-      ph.events.forEach((e) => e.deaths.length && e.ids.forEach((id) => (hot[ph.snap.zones[id]] = 1)));
-      const ZP = arenaOf(theme.id).zones || [], shut = new Set(ph.snap.closed || []);
-      const dots = (v) => { const n = v >= 1.35 ? 3 : v >= 0.95 ? 2 : 1; return '<b class="zl" aria-label="' + ['bassa', 'media', 'alta'][n - 1] + '">' + '●'.repeat(n) + '<span>' + '●'.repeat(3 - n) + '</span></b>'; };
-      h = '<div class="map">' + zones.map((z, zi) => {
-        const here = ph.snap.alive.filter((id) => ph.snap.zones[id] === zi);
-        const p = ZP[zi] || [1, 1, 0.5];
-        return '<div class="zone' + (hot[zi] ? ' hot' : '') + (shut.has(zi) ? ' closed' : '') + '"><span class="zn"><span>' + esc(z) + '</span></span><div class="dots">' + here.map((id) => avHTML(BY[id], { btn: true })).join('') + '</div>' +
-          '<span class="zprops" title="Risorse e pericolo della zona"><span>Risorse ' + dots(p[0]) + '</span><span>Pericolo ' + dots(p[1]) + '</span>' + (shut.has(zi) ? '<span class="ztag">tempesta</span>' : '') + '</span></div>';
-      }).join('') + '</div><p class="help" style="margin-top:10px">Le zone ricche danno più cibo, quelle pericolose più agguati' + (shut.size ? '; in grigio quelle inghiottite dalla tempesta' : '') + '. Tocca un volto per aprire la scheda.</p>';
+      h=window.LOS_MAP_VIEW.render(SIM,i,{theme,properties:arenaOf(theme.id).zones,selected:mapSelection,avatar:t=>avHTML(t,{btn:true})});
     } else if (sideTab === 'fallen') {
       const dead = SIM.tributes.filter((t) => !t.alive && t.deathPhase <= i).sort((a, b) => b.order - a.order);
       h = dead.length ? '<div class="plist">' + dead.map((t) => '<button type="button" class="prow" data-prof="' + esc(t.id) + '">' + avHTML(t, { dead: true }) + '<span style="min-width:0"><span class="pn">' + esc(t.name) + '</span><span class="ps">' + (t.killerIds.length ? 'per mano di ' + esc(t.killerIds.map((k) => BY[k].name).join(', ')) + (causeTxt(t, theme) ? ' · ' + causeTxt(t, theme) : '') : causeTxt(t, theme) ? 'per ' + causeTxt(t, theme) : 'vittima dell\'arena') + '</span></span><span class="pk">G' + t.deathDay + '</span></button>').join('') + '</div>' : '<p class="help">Ancora nessuno.</p>';
@@ -13459,9 +13795,15 @@ window.LOS_BUILD = "dd76e250b973e109a0ff27fe229187c3cc6debc0cb5591d2b69fa60641bb
         (solo.length ? '<div class="agroup"><h4>Senza alleati · ' + solo.length + '</h4><div class="row">' + solo.map(av).join('') + '</div></div>' : '');
     }
     $('#sideBody').innerHTML = h;
+    if(lastSideResult!==SIM||lastSidePhase!==i||lastSideTab!==sideTab)$('#sideBody').scrollTop=0;
+    lastSideResult=SIM;lastSidePhase=i;lastSideTab=sideTab;
   }
   // mappa dei legami: filtri per tipo ed evidenziazione al passaggio
   $('#sideBody').addEventListener('click', (e) => {
+    const zone=e.target.closest('[data-map-zone]');
+    if(zone&&SIM){mapSelection=zone.dataset.mapZone==='all'?null:+zone.dataset.mapZone;renderSide(S.run.phase);$('#sideBody').scrollTop=0;$('#sideBody .map-node[data-map-zone="'+mapSelection+'"]')?.focus({preventScroll:true});return;}
+    const event=e.target.closest('[data-map-event]');
+    if(event&&SIM){const ev=SIM.phases[S.run.phase].events[+event.dataset.mapEvent];if(!ev?.place)return;stopPlay();if(S.settings.followOnly&&!ev.ids.some(id=>(S.followed||[]).includes(id))){S.settings.followOnly=false;renderLive(true);}const card=$('#phBody [data-map-step="'+ev.place.seq+'"]');if(card){card.tabIndex=-1;card.scrollIntoView({block:'center',behavior:AN.reduced?'auto':'smooth'});card.focus({preventScroll:true});}return;}
     const b = e.target.closest('[data-net]'); if (!b || !SIM) return;
     const c = b.dataset.net; if (netOff.has(c)) netOff.delete(c); else netOff.add(c);
     renderSide(S.run.phase);
@@ -13522,7 +13864,7 @@ window.LOS_BUILD = "dd76e250b973e109a0ff27fe229187c3cc6debc0cb5591d2b69fa60641bb
   function openProfile(id) {
     const t = BY[id]; if (!t) return;
     stopPlay();
-    const theme = THEMES[SIM.theme], soft = !!theme.soft;
+    const theme = resultTheme(SIM), soft = !!theme.soft;
     const atRes = curView === 'esito';
     const i = atRes ? SIM.phases.length - 1 : S.run.phase || 0;
     const snap = SIM.phases[i].snap;
@@ -13660,7 +14002,7 @@ window.LOS_BUILD = "dd76e250b973e109a0ff27fe229187c3cc6debc0cb5591d2b69fa60641bb
   function renderResults() {
     $('#resEmpty').hidden = !!SIM; $('#resBody').hidden = !SIM;
     if (!SIM) return;
-    const theme = THEMES[SIM.theme], soft = !!theme.soft, st = SIM.stats;
+    const theme = resultTheme(SIM), soft = !!theme.soft, st = SIM.stats;
     const W = SIM.winners.map((id) => BY[id]);
     const kN = (n) => n + ' ' + (soft ? (n === 1 ? 'eliminazione' : 'eliminazioni') : (n === 1 ? 'uccisione' : 'uccisioni'));
     let hero;
@@ -13765,7 +14107,7 @@ window.LOS_BUILD = "dd76e250b973e109a0ff27fe229187c3cc6debc0cb5591d2b69fa60641bb
     if (first && W.length) { S.run.celebrated = true; save(); setTimeout(() => AN.confetti(theme.id, theme.hue), 650); }
   }
   function summaryText() {
-    const theme = THEMES[SIM.theme], W = SIM.winners.map((id) => BY[id]);
+    const theme = resultTheme(SIM), W = SIM.winners.map((id) => BY[id]);
     const lines = ['LAST ONE STANDING · ' + theme.name, SIM.tributes.length + ' concorrenti · ' + plural(SIM.days, 'giorno', 'giorni') + ' · seme ' + SIM.seed, ''];
     if (W.length === 1) lines.push(G3(W[0].gender, 'Ultimo', 'Ultima', 'Ultimə') + ' in piedi: ' + W[0].name + ' (' + W[0].kills + ')');
     else if (W.length) lines.push('Vince la squadra ' + W[0].team + ': ' + W.map((w) => w.name).join(', '));
@@ -13775,7 +14117,7 @@ window.LOS_BUILD = "dd76e250b973e109a0ff27fe229187c3cc6debc0cb5591d2b69fa60641bb
   }
   async function drawPoster() {
     try { if (document.fonts && document.fonts.ready) await document.fonts.ready; } catch (e) { /* niente */ }
-    const theme = THEMES[SIM.theme], W = SIM.winners.map((id) => BY[id]), h = theme.hue;
+    const theme = resultTheme(SIM), W = SIM.winners.map((id) => BY[id]), h = theme.hue;
     const cv = document.createElement('canvas'); cv.width = 1080; cv.height = 1350;
     const g = cv.getContext('2d');
     const acc = 'hsl(' + h + ' 90% 62%)', ink = '#eef0f4', mute = 'hsl(' + h + ' 10% 66%)';

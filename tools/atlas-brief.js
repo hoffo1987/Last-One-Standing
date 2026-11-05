@@ -119,6 +119,10 @@ module.exports = {
       light: "Cool moonlit violet and magenta tones meet glowing turquoise and gold magical light, with deep midnight blue shadows and drifting enchanted mist.",
       prop: "Lit by a cool violet moonlight key light with a glowing turquoise magical rim light.",
       luoghi: {
+        "altare-delle-armi": [
+          "Altare di pietra nella radura centrale, rastrelliere e tre sentieri verso Torre, Foresta e Lago.",
+          "A broad weathered stone altar occupies the central third of a circular forest clearing, surrounded by simple wooden weapon racks and low broken standing stones. Three distinct paths disappear toward a ruined tower, dense woodland and a misty lake in the distance. An abandoned leather satchel, a cracked bowl and scattered pale petals rest in the foreground. Abstract carved grooves glow faintly beneath drifting magical haze.",
+          "Pale petals drift slowly above the altar, faint light pulses in the carved grooves, and soft mist passes between the standing stones."],
         "torre-in-rovina": [
           "Torre di uno stregone mezza crollata, rune accese sui muri, luna enorme.",
           "A ruined wizard tower of dark stone rises in the central third of the frame, half collapsed, with glowing violet runes carved along its cracked walls and a crooked balcony hanging over the void. Fallen blocks, scattered open spell books and a broken staff with a dim crystal lie among the ferns in the foreground. A huge silver moon, drifting clouds and distant mountain silhouettes fill the background.",
@@ -268,6 +272,10 @@ module.exports = {
       light: "Sickly green and overcast grey daylight falls on rust and wet concrete, with flickering fluorescent accents, deep olive shadows and low drifting smog.",
       prop: "Lit by a sickly green overcast key light with a pale fluorescent rim light.",
       luoghi: {
+        "piazza": [
+          "Piazza del convoglio abbandonato, casse aperte e vie verso ospedale, negozi e metropolitana.",
+          "An abandoned supply convoy stands in the central third of a rain soaked city square, its battered truck doors hanging open beside overturned wooden crates. A hospital entrance, shuttered shopping arcade and stairway down to the subway frame three separate exits in the background. Torn plastic sheeting, loose bandages and an empty water can lie across the foreground paving stones. Sickly reflections shimmer in shallow puddles between scattered barricades.",
+          "Loose plastic sheeting lifts gently in the wind, shallow puddles ripple, and a failing fluorescent light flickers near the subway stairs."],
         "ospedale": [
           "Corridoio d'ospedale abbandonato con barelle rovesciate, luci tremolanti e porte barricate.",
           "An abandoned hospital corridor leading to barricaded double doors in the central third of the frame, chairs and gurneys piled against them. Overturned gurneys, scattered pill bottles, a wheelchair and a toppled IV stand cover the foreground floor. Flickering ceiling lights, a torn privacy curtain and smeared windows recede into the background.",
@@ -416,6 +424,10 @@ module.exports = {
       light: "Blood crimson moonlight and warm candle gold glow against deep black shadows, with cold creeping fog.",
       prop: "Lit by a warm candle gold key light with a crimson moonlight rim light.",
       luoghi: {
+        "salone": [
+          "Salone del ballo della villa, tavoli con doni e porte verso le diverse ali dell'edificio.",
+          "A grand abandoned ballroom fills the central third of a decaying gothic mansion, with a cracked marble dance floor and a long table holding small parcels wrapped in black paper. Tall doorways lead toward a staircase, a dark library corridor and a glass garden entrance. A broken masquerade mask, fallen wax and a single overturned chair occupy the foreground. Tarnished mirrors and heavy curtains recede into deep shadow beneath an old chandelier.",
+          "Candle flames sway gently, a loose curtain moves slowly beside a doorway, and thin fog slides across the cracked marble floor."],
         "cantina": [
           "Cantina umida con botti piene di ragnatele, una lampadina che oscilla e una porta socchiusa.",
           "A damp wine cellar with a heavy wooden door left ajar in the central third of the frame, a sliver of red light glowing through the gap. Cobwebbed barrels, dusty broken bottles and worn stone steps fill the foreground. A single bare bulb hangs from vaulted brick arches in the background, its light barely reaching the corners.",
@@ -489,6 +501,10 @@ module.exports = {
       light: "Harsh scorched sunlight bleaches ochre sand and rusted metal, with burnt orange highlights, deep umber shadows and a thick haze of dust.",
       prop: "Lit by a harsh scorched sunlight key light with a burnt orange rim light.",
       luoghi: {
+        "deposito": [
+          "Deposito di rifornimenti con cancello aperto, taniche e casse vicino all'autostrada spezzata.",
+          "A rusted supply depot stands in the central third of a dusty desert yard, its heavy gate pushed open onto stacked crates and dented water cans. A cracked service road leads toward a broken highway, while low scrap heaps and distant empty buildings mark two other exits. A frayed rope, an overturned metal cup and dry tire tracks cross the foreground sand. Corrugated roofs and leaning fences fade into a thick burnt orange dust haze.",
+          "Fine dust drifts slowly through the open gate, a frayed rope sways gently, and warm heat shimmer rises above the cracked road."],
         "discarica": [
           "Enorme sfasciacarrozze di auto arrugginite, pneumatici e rottami sotto un sole velato.",
           "A vast scrapyard with a towering pile of crushed rusted cars in the central third of the frame, topped by a lookout hut made of sheet metal. Old tyres, dented oil drums and a rusted car door fill the foreground. A tall rusted crane with a hanging magnet and a hazy pale sun fill the background.",
@@ -562,6 +578,10 @@ module.exports = {
       light: "Soft pastel pink and lilac light pours through tall windows, with warm golden highlights, gentle violet shadows and a dreamy afternoon glow, playful satirical comedy mood.",
       prop: "Lit by a soft pastel pink key light with a warm golden rim light, playful comedy mood.",
       luoghi: {
+        "aule": [
+          "Aula scolastica con file di banchi, cattedra e porta aperta sul corridoio delle lezioni.",
+          "Rows of slightly mismatched school desks fill the central third of an Italian classroom, facing a teacher desk and a large chalkboard covered with faint abstract marks. An open door reveals the corridor outside, with a distant glimpse of the library entrance. A forgotten pencil case, an exercise book with blank pages and a crumpled paper ball sit in the foreground. Tall windows and pastel painted walls give the room a gently comic afternoon atmosphere.",
+          "A curtain lifts softly beside the tall windows, a loose exercise book page turns gently, and pale dust motes float in the afternoon light."],
         "palestra": [
           "Palestra della scuola con parquet, canestri, funi e tappetini impilati.",
           "A school gym with a basketball hoop above a polished wooden floor in the central third of the frame, a single ball resting under it. Stacked blue mats, a forgotten red dodgeball and a wooden bench with a towel fill the foreground. Climbing ropes, wall bars and tall windows full of afternoon light fill the background.",

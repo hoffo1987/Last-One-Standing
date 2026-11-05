@@ -129,6 +129,7 @@ test('La scheda selezionata passa fase e contesto corretti alle statistiche', ()
     avHTML: () => '', nowHTML: () => '', vbars: () => '', bagHTML: () => '', relHTML: () => '', peopleHTML: () => '', diaryHTML: () => '',
     plural: (n, s, p) => n + ' ' + (n === 1 ? s : p), linkify: (s) => s });
   c.a.promises = [promise()];
+  vm.runInContext(part('  const resultTheme =', '  let mapSelection='), c);
   vm.runInContext(part('  function openProfile(', '  function attrHTML('), c);
   c.openProfile('a');
   assert.doesNotMatch(c.elements['#profBody'].innerHTML, /prove superate|sciolta/);

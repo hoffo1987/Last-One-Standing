@@ -4,6 +4,7 @@ const fs = require('node:fs'), path = require('node:path'), vm = require('node:v
 const src = path.join(__dirname, '..', 'src'), c = vm.createContext({});
 for (const f of ['data-core.js', 'data-themes.js', ...fs.readdirSync(path.join(src, 'content')).filter(f => f.endsWith('.js')).sort().map(f => 'content/' + f)]) vm.runInContext(fs.readFileSync(path.join(src, f), 'utf8'), c);
 vm.runInContext(fs.readFileSync(path.join(src, 'engine-systems.js'), 'utf8'), c);
+vm.runInContext(fs.readFileSync(path.join(src, 'engine-geography.js'), 'utf8'), c);
 vm.runInContext(fs.readFileSync(process.argv[3] || path.join(src, 'engine.js'), 'utf8'), c);
 for (const theme of c.LOS_DATA.themes) {
   let repeated = 0, total = 0;

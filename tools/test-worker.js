@@ -2,7 +2,7 @@
 const fs = require('node:fs'), path = require('node:path'), vm = require('node:vm'), assert = require('node:assert/strict');
 const { Worker } = require('node:worker_threads');
 const src = path.join(__dirname, '..', 'src');
-const engine = ['data-core.js', 'data-themes.js', ...fs.readdirSync(path.join(src, 'content')).filter(f => f.endsWith('.js')).sort().map(f => 'content/' + f), 'engine-systems.js', 'engine.js'].map(f => fs.readFileSync(path.join(src, f), 'utf8')).join('\n;\n');
+const engine = ['data-core.js', 'data-themes.js', ...fs.readdirSync(path.join(src, 'content')).filter(f => f.endsWith('.js')).sort().map(f => 'content/' + f), 'engine-systems.js', 'engine-geography.js', 'engine.js'].map(f => fs.readFileSync(path.join(src, f), 'utf8')).join('\n;\n');
 const main = vm.createContext({}); vm.runInContext(engine, main);
 const moduleCode = fs.readFileSync(path.join(src, 'simulator.js'), 'utf8');
 function context(withWorker) {

@@ -2,7 +2,7 @@
 // node tools/fuzz.js [numero]
 const fs = require('fs'), path = require('path');
 const dir = path.join(__dirname, '..', 'src');
-for (const f of ['data-core.js', 'data-themes.js', ...fs.readdirSync(path.join(dir, 'content')).filter((x) => x.endsWith('.js')).sort().map((x) => 'content/' + x), 'engine-systems.js', 'engine.js']) require(path.join(dir, f));
+for (const f of ['data-core.js', 'data-themes.js', ...fs.readdirSync(path.join(dir, 'content')).filter((x) => x.endsWith('.js')).sort().map((x) => 'content/' + x), 'engine-systems.js', 'engine-geography.js', 'engine.js']) require(path.join(dir, f));
 const D = globalThis.LOS_DATA, LOS = globalThis.LOS;
 const N = +process.argv[2] || 1500;
 const r = LOS.makeRng('fuzz');

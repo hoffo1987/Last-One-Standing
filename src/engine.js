@@ -4,6 +4,7 @@
   'use strict';
   const D = G.LOS_DATA;
   const Systems = G.LOS_SYSTEMS || (typeof require === 'function' ? require('./engine-systems.js') : null);
+  const Geography = G.LOS_GEOGRAPHY || (typeof require === 'function' ? require('./engine-geography.js') : null);
   if (!Systems) throw new Error('Sistemi del motore non disponibili.');
 
   /* ---------------- RNG con seme ---------------- */
@@ -57,7 +58,7 @@
   const L = (c) => c.charCodeAt(0) - 65;
   const letters = (s) => [...s].map(L);
   const ITEMS = 'arma|cibo|med|trap|veleno|mappa|amuleto|esplosivo|armatura|attrezzo|alcol|valore|ricordo';
-  const LEXKEYS = 'arma|cibo|luogo|mostro|trappola|rifugio|dono|amuleto|alcol|veleno|mappa|esplosivo|armatura|attrezzo|valore|ricordo';
+  const LEXKEYS = 'arma|cibo|luogo|mostro|trappola|rifugio|dono|amuleto|alcol|veleno|mappa|esplosivo|armatura|attrezzo|valore|ricordo|med|trap';
   const VITALS = { hp: 'hp', en: 'en', mo: 'mo', food: 'food', pr: 'pr' };
   // nomi degli oggetti nuovi (protezioni, attrezzi, merce, ricordi, alcol) per un'arena
   function itemLex(theme) {
@@ -88,6 +89,7 @@
       if (self && self[1] === self[2]) throw new Error('Etichetta riferita due volte alla stessa persona "' + tok + '" in: ' + line);
       let tgt = ev;
       if (/^(ok|ko):/.test(tok)) { tgt = tok[1] === 'k' ? ev.ok : ev.ko; tok = tok.slice(3); }
+      if ((m=tok.match(/^(at|to):(\d+)$/))) { if(tgt!==ev) throw new Error('at:/to: non possono avere il prefisso ok: o ko:.'); ev.location=Object.assign({},ev.location,{[m[1]==='at'?'at':'travel']:+m[2]}); continue; }
       if ((m = tok.match(/^test:([A-F])=(\w+?)(\d+)?$/))) { ev.test = { r: L(m[1]), attr: m[2], dc: m[3] ? +m[3] : 11 }; continue; }
       if ((m = tok.match(/^att:([A-F])([<>])(\w+?)(\d+)$/))) { ev.req.push({ t: 'att', r: ID(m[1]), op: m[2], attr: m[3], v: +m[4] }); continue; }
       if ((m = tok.match(/^(no)?trait:([A-F])=(\w+)$/))) { ev.req.push({ t: m[1] ? 'notrait' : 'trait', r: ID(m[2]), trait: m[3] }); continue; }
@@ -418,11 +420,16 @@
       castIds.add(id);
     });
     const initialRelations = normalizeInitialRelations(cfg.initialRelations, castIds);
-    const theme = D.themes.find((t) => t.id === cfg.theme) || D.themes[0];
+    const baseTheme = D.themes.find((t) => t.id === cfg.theme) || D.themes[0];
+    const mapEnabled = cfg.mapVersion !== 0;
+    if (mapEnabled && !Geography) throw new Error('Geografia del motore non disponibile.');
+    const geographyZones = mapEnabled ? Geography.describe(baseTheme, D.eco?.arenas?.[baseTheme.id]) : null;
+    const theme = mapEnabled ? Geography.enrich(baseTheme, geographyZones) : baseTheme;
     const seed = cfg.seed == null || cfg.seed === '' ? String(Date.now()) : String(cfg.seed);
     const rng = makeRng(seed + '|' + theme.id);
     const adult = !!cfg.adult && !theme.noAdult;
-    const pools = buildPools(theme, cfg.custom, adult);
+    const originalPools = buildPools(baseTheme, cfg.custom, adult);
+    const pools = mapEnabled ? Geography.preparePools(originalPools, theme, geographyZones) : originalPools;
     const variety = Systems.eventVariety();
     const LEX = pools.lex;
     const E = Object.assign({}, D.echo || {}, theme.soft ? D.echoSoft || {} : {});
@@ -436,21 +443,22 @@
     const M = R.meter || null;
     const MOD = Object.assign({ forage: 1, heal: 1, weapon: 1, stealth: 1, fame: 1, sponsor: 1, night: 1, beast: 1, trap: 1, amulet: 0.85, map: 1, greed: 1, nightAlone: 0 }, R.mods);
     const DR = Object.assign({ food: 1, en: 1, mo: 1 }, R.drain);
-    const ZP = theme.lex.luogo.map((_, i) => (R.zones && R.zones[i]) || [1, 1, 0.5]);
+    const ZP = mapEnabled ? geographyZones.map(z => [z.resources,z.danger,z.shelter]) : theme.lex.luogo.map((_, i) => (R.zones && R.zones[i]) || [1, 1, 0.5]);
     const KEYW = [1, 0.7, 0.5];
     const keyBonus = (t) => (R.key || []).reduce((s, a, i) => s + ((t.attr[a] != null ? t.attr[a] : 5) - 5) * KEYW[i], 0);
     let W = { n: '', d: '', fx: {} };
+    let previousWeather='';
     const wx = (k, d) => (W.fx && W.fx[k] != null ? W.fx[k] : d);
     const TX = (k) => (R.txt && R.txt[k]) || (theme.soft && ECO.txtSoft && ECO.txtSoft[k]) || (ECO.txt && ECO.txt[k]) || [];
     const closed = new Set(); // zone inghiottite dalla tempesta (Battle Royale)
-    const traps = []; const zoneLoot = {};
+    const traps = []; const zoneLoot = {}, trapChecks=new WeakMap();
     let SYS = []; let pendingNotes = [];
     // oggetti e mente dei concorrenti
     const IT = D.items || { types: {}, names: {}, how: {} };
     const MIND = D.mind || { goals: {}, acts: {}, actsSoft: {}, diary: { trait: {} }, diarySoft: { trait: {} }, mem: {} };
     let ORIGIN = null, CURKIND = '';
     const VO = D.voice || {}, VS = D.voiceSoft || {}, CH = D.chats || {};
-    const ACT = (k) => (theme.soft && MIND.actsSoft && MIND.actsSoft[k]) || (MIND.acts || {})[k] || [];
+    const ACT = (k) => mapEnabled&&theme.soft&&k==='sleepwalk'?['{0} si allontana nel dormiveglia fino a {z}. Si sveglia lì, senza ricordare il percorso.']:(theme.soft && MIND.actsSoft && MIND.actsSoft[k]) || (MIND.acts || {})[k] || [];
     const DIA = (k) => (theme.soft && MIND.diarySoft && MIND.diarySoft[k]) || (MIND.diary || {})[k] || [];
     const DIAT = (tr) => (theme.soft && MIND.diarySoft && MIND.diarySoft.trait && MIND.diarySoft.trait[tr]) || ((MIND.diary || {}).trait || {})[tr] || [];
 
@@ -471,6 +479,7 @@
     if (T.length < 2) throw new Error('Servono almeno 2 concorrenti.');
     T.forEach((t) => {
       t.zone = rng.int(zoneCount);
+      if (mapEnabled && Geography.definitions[theme.id].start != null) t.zone = Geography.definitions[theme.id].start;
 
       t.food = clamp(64 + t.attr.sop * 2, 0, 100);
       t.mo = clamp(50 + (t.attr.car - 5) * 2 + (t.attr.cor - 5) * 2 + (t.traits.includes('leader') ? 5 : 0) + (t.traits.includes('paranoico') ? -6 : 0), 20, 85);
@@ -542,6 +551,9 @@
     const alive = () => T.filter((t) => t.alive);
     const phases = [];
     const itemLedger = Systems.createItemLedger({ phase: () => phases.length, meter: M });
+    const geo = mapEnabled ? Geography.create({ theme, zones: geographyZones, T, closed, phase: () => phases.length,
+      hasMap: t => hasItem(t,'mappa'), onMap: (t,m) => itemLedger.record('bonus',t,t,itemOf(t,'mappa'),null,'Percorso: costo in energia ridotto del 25%; costo effettivo '+m.cost),
+      onEnter:(t,m)=>{if(m.mode==='evacuate'&&closed.has(t.zone)){hurt(t,8*wx('storm',1),null,'storm',true);t.stormZ=zoneName(t.zone);}triggerTraps(t);if(t.hp<=0)resolveVitals();} }) : null;
     let day = 0, deathCounter = 0, pendingFallen = [], noDeathStreak = 0;
     const stats = { events: 0, alliances: 0, betrayals: 0, firstBlood: null, deathsByDay: [], envDeaths: 0, killDeaths: 0, items: 0, revenges: 0, couples: 0, debtsRepaid: 0, amulets: 0, sponsors: 0, echoes: 0, tests: 0, testsPassed: 0,
       causes: {}, shared: 0, nursed: 0, foraged: 0, trapsSet: 0, trapHits: 0, beasts: 0, infected: 0, cured: 0, broken: 0, looted: 0, meteo: [], expelled: 0, trades: 0 };
@@ -595,6 +607,7 @@
       return !W.n || (!(f.lethal > 1) && !(f.beast > 1) && !((f.pr || 0) > 0));
     }
     function checkReq(ev, roles) {
+      if (geo && ev.text != null && !geo.accepts(ev,roles)) return false;
       for (const r of ev.req) {
         const A = roles[r.r ? r.r[0] : 0], B = r.r && r.r[1] != null ? roles[r.r[1]] : null;
         switch (r.t) {
@@ -759,7 +772,7 @@
     }
     function assign(ev, P, un) {
       const others = [];
-      un.forEach((id) => id !== P.id && byId[id].alive && others.push(byId[id]));
+      un.forEach((id) => id !== P.id && byId[id].alive && (!geo || byId[id].zone === P.zone) && others.push(byId[id]));
       if (others.length < ev.n - 1) return null;
       let best = null, bestScore = -Infinity;
       for (let attempt = 0; attempt < 12; attempt++) {
@@ -804,6 +817,7 @@
       return { plain: edFix(nm(s, (t) => t.name)), html: edFix(nm(esc(s), nameTag)) };
     }
     function echo(list, people, cls) {
+      if (geo) list = (list || []).map(text=>Geography.adaptText(text,theme)).filter(text => !Geography.offTheme(text,theme));
       if (!list || !list.length) return null;
       const tpl = rng.pick(list);
       let s = tpl.replace(/\[(\d):([^\]]*)\]/g, (_, i, o) => genderPick([people[+i]], o));
@@ -815,15 +829,16 @@
     // ---------- ecosistema: testi e valori vitali ----------
     function fmt(src, people, vars) {
       const fits = (x) => { let mx = -1; x.replace(/[{\[](\d)[}:]/g, (_, d) => { mx = Math.max(mx, +d); }); return mx < people.length && !/\{(i|ip|j|k|z|n)\}/.test(x.replace(/\{(i|ip|j|k|z|n)\}/g, (m, v) => (vars && vars[v] != null && vars[v] !== '' ? '' : m))); };
-      const list = (Array.isArray(src) ? src : []).filter(fits); if (!list.length) return null;
-      let s = rng.pick(list); const src0 = s;
+      const here = vars && vars.z ? theme.lex.luogo.indexOf(vars.z) : people[0]?.zone;
+      const list = (Array.isArray(src) ? src : []).map(source=>({source,text:geo?Geography.adaptText(source,theme):source})).filter(x => fits(x.text) && (!geo || !Geography.offTheme(x.text,theme) && Geography.mentions(x.text,geographyZones).every(m => m.zone === here) && proseDepartures(x.text).every(i=>people[i]&&geo.budget(people[i])>0&&geographyZones[people[i].zone].links.some(z=>!closed.has(z))))); if (!list.length) return null;
+      const chosen=rng.pick(list);let s=chosen.text;const src0=chosen.source;
       s = s.replace(/\[(\d):([^\]]*)\]/g, (_, i, o) => genderPick([people[+i]], o))
         .replace(/\{(i|ip|j|k|z|m|n|d)\}/g, (_, x) => (vars && vars[x] != null ? vars[x] : ''))
-        .replace(LEX_RE, (_, k2) => (k2 === 'luogo' && vars && vars.z ? vars.z : rng.pick(LEX[k2] || ['qualcosa'])));
+        .replace(LEX_RE, (_, k2) => (k2 === 'luogo' && (vars?.z || geo && people[0]) ? vars?.z || theme.lex.luogo[people[0].zone] : geo?Geography.pickLex(LEX,k2,here,theme,geographyZones,rng):rng.pick(LEX[k2] || ['qualcosa'])));
       s = cap(artPrep(s));
       return { src: src0, plain: edFix(s.replace(/\{(\d)\}/g, (_, i) => people[+i].name)), html: edFix(esc(s).replace(/\{(\d)\}/g, (_, i) => nameTag(people[+i]))) };
     }
-    const sysText = (k, people, vars) => fmt(TX(k), people, vars);
+    const sysText = (k, people, vars) => fmt(TX(k), people, vars) || (geo ? fmt((theme.soft && ECO.txtSoft?.[k]) || ECO.txt?.[k],people,vars) : null);
     // le voci: una battuta di chi parla, scelta da tratti, arena e situazione
     const USED = new Set();
     // sceglie tra le frasi non ancora usate in questa partita (se ne restano)
@@ -846,7 +861,10 @@
     function sys(k, people, vars, o, pri) {
       const tx = sysText(k, people, vars); if (!tx) return null;
       const ev = Object.assign({ html: tx.html, plain: tx.plain, ids: people.map((p) => p.id), deaths: [], lethal: false, origin: 'sys', cat: 'none', why: 'conseguenza', echo: [] }, o || {});
+      if(geo&&/^trap(?:Dodge|Ally|Hit)$/.test(k))ev.ids=[people[1].id];
+      if (geo) ev.place = geo.locate(people,vars?.z ? theme.lex.luogo.indexOf(vars.z) : undefined);
       SYS.push({ pri: pri || 1, ev });
+      if(geo)moveAfterProse(tx,people);
       return ev;
     }
     // ricordi dei rapporti (in prima persona) e diario segreto
@@ -885,6 +903,7 @@
     }
     function kill(v, killers, txt, out) {
       if (!v.alive) return;
+      if (geo) geo.death(v);
       v.alive = false;
       if (!v.deathKind) v.deathKind = killers.length ? 'kill' : 'event';
       v.deathPhase = phases.length; v.deathDay = day; v.order = ++deathCounter;
@@ -994,7 +1013,7 @@
       if (v.promises) v.promises.forEach(dissolvePromise);
     }
     function giveItem(t, type, ctx, lexPick, name, q, how, from, src) {
-      const nm = name || (type === 'arma' ? lexPick('arma') : type === 'cibo' ? ctx.cibo || 'delle provviste' : ITEM_NAME[type] || lexPick(type));
+      const nm = name || (type === 'arma' ? lexPick('arma') : type === 'cibo' ? ctx.cibo || 'delle provviste' : geo && ctx[type] ? ctx[type] : ITEM_NAME[type] || lexPick(type));
       const it = src ? Object.assign({}, src, { how: how || 'trovato', from: from ? from.id : null, d: day }) : mkItem(type, nm, how, from, q);
       if (!addItem(t, it)) return false;
       t.items++; stats.items++;
@@ -1050,17 +1069,29 @@
     }
     function apply(ev, roles) {
       CTX = null;
-      variety.record(ev);
+      if (geo && !geo.accepts(ev,roles)) throw new Error('Evento fuori posizione: '+ev.text);
+      if(!geo)variety.record(ev);
       const reason = eventReason(ev, roles);
       if (ev.test) ev = resolveTest(ev, roles);
+      if (geo) {
+        const space = Geography.rule(ev.text,geographyZones,ev.location);
+        if (space.travel != null) roles.forEach(t => geo.move(t,space.travel,'Spostamento raccontato dall’evento',{mode:'event'}));
+        if(roles.some(t=>!t.alive)){
+          const plain='Una trappola interrompe il percorso di '+roles.map(t=>t.name).join(', ')+': l’incontro previsto non avviene.';
+          return {plain,html:esc(plain),ids:roles.filter(t=>t.alive).map(t=>t.id),deaths:[],lethal:false,note:true,origin:'sys',cat:'none',place:geo.locate(roles),echo:[]};
+        }
+        variety.record(ev);
+      }
+      const place = geo ? geo.locate(roles) : null;
       const ctx = {};
-      const lexPick = (k) => (ctx[k] != null ? ctx[k] : (ctx[k] = rng.pick(LEX[k] || ['qualcosa'])));
+      if (geo) ctx.luogo = theme.lex.luogo[roles[0].zone];
+      const lexPick = (k) => (ctx[k] != null ? ctx[k] : (ctx[k] = geo?Geography.pickLex(LEX,k,roles[0].zone,theme,geographyZones,rng):rng.pick(LEX[k] || ['qualcosa'])));
       const txt = render(ev.text, roles, lexPick, ev);
       itemLedger.setContext(txt.plain);
       const heldItems = roles.map(t => t.inv.slice());
       const out = [];
       const z = ctx.luogo != null ? theme.lex.luogo.indexOf(ctx.luogo) : roles[0].zone;
-      roles.forEach((t) => { t.events++; if (z >= 0) t.zone = z; });
+      roles.forEach((t) => { t.events++; if (!geo && z >= 0) t.zone = z; });
       // amuleti: salvano una volta da qualunque morte
       const saved = new Set();
       ev.victims.forEach((i) => {
@@ -1250,7 +1281,9 @@
       const deaths = roles.filter((t, i) => ev.victims.includes(i) && !t.alive).map((t) => t.id);
       const cat = ev.lethal && !deaths.length && ev.cat !== 'betray' ? 'hurt' : ev.cat;
       itemLedger.setContext('');
-      return { html: txt.html, plain: txt.plain, ids: roles.map((t) => t.id), deaths, lethal: deaths.length > 0, origin: ev.origin, cat, why: ev.why, reason, echo: out.slice(0, 3), test: ev.testRes || null };
+      if(geo&&Geography.rule(ev.text,geographyZones,ev.location).scatter){const exits=geographyZones[roles[0].zone].links.filter(z=>!closed.has(z));roles.filter(t=>t.alive).forEach((t,i)=>geo.move(t,exits[i%exits.length],'Fugge in una direzione diversa dagli altri',{mode:'event'}));}
+      if(geo)for(const i of Geography.rule(ev.text,geographyZones,ev.location).depart||[]){const t=roles[i];if(t?.alive){const exits=geographyZones[t.zone].links.filter(z=>!closed.has(z));if(exits.length)geo.move(t,rng.pick(exits),'Si allontana dopo l’incontro',{mode:'event'});}}
+      return Object.assign({ html: txt.html, plain: txt.plain, ids: roles.map((t) => t.id), deaths, lethal: deaths.length > 0, origin: ev.origin, cat, why: ev.why, reason, echo: out.slice(0, 3), test: ev.testRes || null },geo?{place}:{});
     }
 
     function lethalProb(kind) {
@@ -1263,7 +1296,12 @@
       return Math.min(0.9, Math.max(0.03, p));
     }
 
-    const { snapshot } = Systems.createSnapshots({ T, syncSt, aff, relTop, alive, closed, edges, M, byId });
+    const { snapshot: originalSnapshot } = Systems.createSnapshots({ T, syncSt, aff, relTop, alive, closed, edges, M, byId });
+    function snapshot() {
+      const snap = originalSnapshot();
+      if (geo) snap.terrain = { traps: traps.map(t=>({zone:t.zone,owner:t.owner,name:t.name})), loot:Object.entries(zoneLoot).filter(([,items])=>items.length).map(([zone,items])=>({zone:+zone,count:items.length})) };
+      return snap;
+    }
 
     function tickStatus() {
       alive().forEach((t) => Object.keys(STATUS_TTL).forEach((s) => { if (t.st[s] != null && phases.length - t.st[s] >= STATUS_TTL[s]) delete t.st[s]; }));
@@ -1274,7 +1312,7 @@
       const g = a[0].allyId;
       if (g != null && a.every((t) => t.allyId === g)) {
         a.forEach((t) => leaveAlliance(t));
-        const s = 'Rimasti soli, gli ultimi alleati si guardano con sospetto: l\'alleanza è finita.';
+        const s = geo&&a.some(t=>t.zone!==a[0].zone)?'Rimasti soli nella gara, gli ultimi alleati rompono il patto: da ora ognuno pensa a sé.':'Rimasti soli, gli ultimi alleati si guardano con sospetto: l\'alleanza è finita.';
         events.push({ html: s, plain: s, ids: a.map((t) => t.id), deaths: [], lethal: false, note: true });
       }
     }
@@ -1300,8 +1338,8 @@
     }
 
     /* ---------- ecosistema: conseguenze automatiche ---------- */
-    const allyMates = (t) => (t.allyId != null ? [...(alliances.get(t.allyId) || [])].map((id) => byId[id]).filter((x) => x && x !== t && x.alive) : []);
-    const buddies = (t) => { const a = allyMates(t); if (t.partner && byId[t.partner] && byId[t.partner].alive && !a.includes(byId[t.partner])) a.push(byId[t.partner]); return a; };
+    const allyMates = (t,anywhere) => (t.allyId != null ? [...(alliances.get(t.allyId) || [])].map((id) => byId[id]).filter((x) => x && x !== t && x.alive && (!geo || anywhere || x.zone === t.zone)) : []);
+    const buddies = (t) => { const a = allyMates(t); if (t.partner && byId[t.partner] && byId[t.partner].alive && (!geo || byId[t.partner].zone === t.zone) && !a.includes(byId[t.partner])) a.push(byId[t.partner]); return a; };
     const zoneName = (z) => theme.lex.luogo[z] || theme.lex.luogo[0];
     const d6 = () => 2 + rng.int(6) + rng.int(6);
 
@@ -1387,7 +1425,8 @@
       // le alleanze dividono il cibo, oppure litigano
       const seenG = new Set();
       A.forEach((t) => {
-        if (t.allyId == null || seenG.has(t.allyId)) return; seenG.add(t.allyId);
+        const camp = geo ? t.allyId+':'+t.zone : t.allyId;
+        if (t.allyId == null || seenG.has(camp)) return; seenG.add(camp);
         const g = [t].concat(allyMates(t));
         g.filter((x) => x.food < 30 && !hasItem(x, 'cibo')).forEach((h) => {
           const donor = g.filter((x) => x !== h && hasItem(x, 'cibo') && x.food >= 35).sort((a, b) => b.attr.emp - a.attr.emp)[0];
@@ -1439,7 +1478,8 @@
       A.forEach((t) => {
         if (!t.alive) return;
         const mates = buddies(t), alone = !mates.length;
-        let rest = 12 + t.attr.res * 1.1 + (t.allyId != null ? 10 : 0) + (t.partner ? 6 : 0) + ZP[t.zone][2] * 12 - (hasTrait(t, 'sonnambulo') ? 10 : 0) - (meterBad(t) ? 8 : 0) - (t.st.lutto != null ? 6 : 0);
+        const localAlly = geo ? allyMates(t).length > 0 : t.allyId != null, localPartner = t.partner && (!geo || mates.some(x=>x.id===t.partner));
+        let rest = 12 + t.attr.res * 1.1 + (localAlly ? 10 : 0) + (localPartner ? 6 : 0) + ZP[t.zone][2] * 12 - (hasTrait(t, 'sonnambulo') ? 10 : 0) - (meterBad(t) ? 8 : 0) - (t.st.lutto != null ? 6 : 0);
         if (alone && MOD.nightAlone) rest -= 10 * MOD.nightAlone;
         t.en += rest / Math.max(0.8, wx('en', 1));
         if (t.allyId != null && !watchMsg && rng.chance(0.12)) { const m = allyMates(t)[0]; if (m) { watchMsg++; sys('watch', [t, m], {}, { cat: 'ally', why: 'riposo' }, 0); } }
@@ -1456,7 +1496,7 @@
           sys('woundSick', [t], {}, { cat: 'hurt', why: 'ferite' }, 2);
         }
         const rc = itemOf(t, 'ricordo');
-        let dm = (rc ? (rc.from && byId[rc.from] && !byId[rc.from].alive ? 7 : 4) : 0) + (t.allyId != null ? 4 : 0) + (t.partner ? 6 : 0) + (mates.some((x) => hasTrait(x, 'leader')) ? 3 : 0) + (t.fame >= 3 ? 2 : 0) +
+        let dm = (rc ? (rc.from && byId[rc.from] && !byId[rc.from].alive ? 7 : 4) : 0) + (localAlly ? 4 : 0) + (localPartner ? 6 : 0) + (mates.some((x) => hasTrait(x, 'leader')) ? 3 : 0) + (t.fame >= 3 ? 2 : 0) +
           (alone ? (hasTrait(t, 'solitario') ? 2 : -3) : 0) - (t.food < 25 ? 6 : 0) - (t.hp < 40 ? 6 : 0) - (meterBad(t) ? 5 : 0);
         if (dm < 0) dm *= DR.mo;
         if (rc) itemLedger.record('comfort', t, t, rc, null, 'Contributo al morale notturno: +' + (rc.from && byId[rc.from] && !byId[rc.from].alive ? 7 : 4) + ' nel calcolo complessivo');
@@ -1466,7 +1506,7 @@
       // il morale a pezzi: conforto, furti tra alleati, abbandoni
       A.forEach((t) => {
         if (!t.alive || t.mo >= 24) return;
-        const p = t.partner && byId[t.partner] && byId[t.partner].alive ? byId[t.partner] : null;
+        const p = t.partner && byId[t.partner] && byId[t.partner].alive && (!geo || byId[t.partner].zone === t.zone) ? byId[t.partner] : null;
         if (p && rng.chance(0.7)) { t.mo += 22; addAff(t, p, 8); sys('comfort', [p, t], {}, { cat: 'love', why: 'morale' }, 2); }
         else if (t.allyId != null && !hasTrait(t, 'leale')) {
           const mark = allyMates(t).find((x) => hasItem(x, 'cibo'));
@@ -1556,7 +1596,7 @@
         syncSt(t);
       });
       // la tempesta del Battle Royale
-      if (closed.size) {
+      if (closed.size && !geo) {
         let msgs = 0;
         alive().forEach((t) => {
           if (!closed.has(t.zone)) return;
@@ -1571,12 +1611,17 @@
         });
       }
       // le trappole scattano
+      triggerTraps();
+    }
+    function triggerTraps(arriving) {
       for (let k = traps.length - 1; k >= 0; k--) {
         const tp = traps[k], owner = byId[tp.owner];
         if (phases.length - tp.ph > 9) { traps.splice(k, 1); continue; }
         if (tp.ph >= phases.length) continue;
-        const here = rng.shuffle(alive().filter((x) => x.zone === tp.zone && x.id !== tp.owner));
+        let checked=trapChecks.get(tp);if(!checked||checked.ph!==phases.length){checked={ph:phases.length,ids:new Set()};trapChecks.set(tp,checked);}
+        const here = rng.shuffle(alive().filter((x) => x.zone === tp.zone && x.id !== tp.owner && (!geo || (!arriving||x===arriving)&&!checked.ids.has(x.id))));
         for (const v of here) {
+          if(geo)checked.ids.add(v.id);
           if (!rng.chance(0.16 * MOD.trap * wx('trap', 1))) continue;
           traps.splice(k, 1);
           const z = zoneName(tp.zone);
@@ -1617,13 +1662,14 @@
         let mercy = null;
         if (c.k === 'infect') { mercy = buddies(t).find((x) => x.attr.cor >= 6); if (mercy && rng.chance(0.5)) { k = 'mercy'; people = [t, mercy]; mercy.mo -= 20; } else mercy = null; }
         const z = (c.k === 'storm' && t.stormZ) || (c.k === 'trap' && t.trapZ) || zoneName(t.zone);
-        const tx = sysText(k, people, { z, i: t.accItem || '', m: M ? M.name.toLowerCase() : '' }) || sysText('woundDeathAny', [t], {});
+        const tx = sysText(k, people, { z, i: t.accItem || '', m: M ? M.name.toLowerCase() : '' }) || sysText('woundDeathAny', [t], {}) || fmt([theme.soft ? '{0} cede e viene ritirat[0:o/a] dalla gara.' : '{0} non riesce più a resistere e perde la vita.'],[t]);
+        const place = geo ? geo.locate(people,t.zone) : null;
         const out = [];
         t.deathKind = c.k;
         kill(t, K ? [K] : [], tx, out);
         if (K && c.k === 'trap') { K.trapKills++; }
         stats.causes[c.k] = (stats.causes[c.k] || 0) + 1;
-        SYS.push({ pri: 9, ev: { html: tx.html, plain: tx.plain, ids: people.filter((p) => p === t || p.alive).map((p) => p.id), deaths: [t.id], lethal: true, origin: 'sys', cat: K ? 'kill' : 'death', why, echo: out.slice(0, 3) } });
+        SYS.push({ pri: 9, ev: Object.assign({ html: tx.html, plain: tx.plain, ids: people.filter((p) => p === t || p.alive).map((p) => p.id), deaths: [t.id], lethal: true, origin: 'sys', cat: K ? 'kill' : 'death', why, echo: out.slice(0, 3) },geo?{place}:{}) });
       });
     }
 
@@ -1647,8 +1693,11 @@
       });
     }
     // un evento di sistema già scritto
+    function proseDepartures(text){return Geography.rule(text.replace(/\{(\d)\}/g,(_,i)=>'{'+String.fromCharCode(65+(+i))+'}'),geographyZones).depart||[];}
+    function moveAfterProse(tx,people){for(const i of proseDepartures(Geography.adaptText(tx.src||'',theme))){const t=people[i];if(!t?.alive)continue;const exits=geographyZones[t.zone].links.filter(z=>!closed.has(z));if(exits.length)geo.move(t,rng.pick(exits),'Si allontana dal gruppo',{mode:'event'});}}
     function sys2(tx, people, cat, whyTxt, pri, ids) {
-      SYS.push({ pri: pri || 1, ev: { html: tx.html, plain: tx.plain, ids: ids || people.map((p) => p.id), deaths: [], lethal: false, origin: 'sys', cat: cat || 'none', why: 'carattere', whyTxt: whyTxt || '', echo: [] } });
+      SYS.push({ pri: pri || 1, ev: Object.assign({ html: tx.html, plain: tx.plain, ids: ids || people.map((p) => p.id), deaths: [], lethal: false, origin: 'sys', cat: cat || 'none', why: 'carattere', whyTxt: whyTxt || '', echo: [] },geo?{place:geo.locate(ids?people.filter(p=>ids.includes(p.id)):people)}:{}) });
+      if(geo)moveAfterProse(tx,people);
     }
 
     // l'obiettivo del momento nasce da stato, legami e carattere
@@ -1687,6 +1736,7 @@
     }
     // gli spostamenti di giorno seguono l'obiettivo e il gruppo
     function moveByGoals() {
+      if (geo) return spatialGoals();
       const open = [...Array(zoneCount).keys()].filter((i) => !closed.has(i));
       if (!open.length) return;
       const best = (f) => open.slice().sort((a, b) => f(b) - f(a))[0];
@@ -1707,6 +1757,67 @@
         if (scary && rng.chance(0.6)) { const safe = open.filter((i) => i !== scary.zone); if (safe.length) z = best((i) => (safe.includes(i) ? 1 : -9) + ZP[i][2] - ZP[i][1] * 0.3 + rng.f() * 0.4); }
         if (z != null && !closed.has(z)) t.zone = z;
       });
+    }
+
+    function spatialGoals(night) {
+      // Le destinazioni sono fotografate prima delle partenze: l'ordine del
+      // cast non fa inseguire posizioni già modificate nello stesso giro.
+      const positions = Object.fromEntries(alive().map(t=>[t.id,t.zone]));
+      for (const t of alive()) {
+        const g=t.goal||{k:'sopravvivere'}, target=aliveId(g.tg)?byId[g.tg]:null;
+        const reachable=geographyZones.filter(z=>!closed.has(z.id)&&Geography.path(geographyZones,t.zone,z.id,closed));
+        let destination=t.zone, reason='Esplora i passaggi vicini', tg=null;
+        const allies=allyMates(t,true).concat(t.partner&&aliveId(t.partner)?[byId[t.partner]]:[]);
+        if (night && allies.length && !hasTrait(t,'solitario')) {
+          const party=[...new Map([t,...allies].map(x=>[x.id,x])).values()];
+          const meeting=Geography.camp(geographyZones,party.map(x=>positions[x.id]),closed);
+          if(meeting!=null){destination=meeting;reason='Raggiunge il riparo scelto per ricongiungersi al gruppo';}
+        } else if (target && ['vendetta','caccia','proteggere','cotta','tradire'].includes(g.k)) {
+          destination=positions[target.id]; tg=target.id;
+          if(['proteggere','cotta'].includes(g.k)&&target.goal?.tg===t.id&&['proteggere','cotta'].includes(target.goal.k))destination=positions[t.ix<target.ix?t.id:target.id];
+          reason={vendetta:'Segue le tracce del bersaglio della vendetta',caccia:'Cerca il proprio bersaglio',proteggere:'Cerca la persona che vuole proteggere',cotta:'Cerca una persona a cui tiene',tradire:'Cerca un compagno dell’alleanza'}[g.k];
+        } else if (['cibo','curarsi','nascondersi'].includes(g.k)) {
+          const scores=reachable.map(z=>({z:z.id,score:(g.k==='cibo'?z.resources:z.shelter-z.danger*0.45)-(Geography.path(geographyZones,t.zone,z.id,closed).length-1)*0.12+rng.f()*0.15})).sort((a,b)=>b.score-a.score||a.z-b.z);
+          destination=scores[0]?.z??t.zone; reason=g.k==='cibo'?'Cerca una zona con più provviste':'Cerca un luogo più riparato';
+        } else if (allies.length && rng.chance(0.65)) {
+          const leader=[t,...allies].sort((a,b)=>(hasTrait(b,'leader')?1:0)-(hasTrait(a,'leader')?1:0)||a.ix-b.ix)[0];
+          destination=positions[leader.id]; tg=leader.id; reason='Cerca di ricongiungersi all’alleanza';
+        } else if (rng.chance(night?0.2:0.55)) {
+          const neighbors=geographyZones[t.zone].links.filter(z=>!closed.has(z));
+          if (neighbors.length) destination=rng.wpick(neighbors,z=>1+geographyZones[z].shelter+geographyZones[z].resources/(1+alive().filter(x=>x.zone===z).length));
+        }
+        const scary=alive().find(x=>x!==t&&x.zone===destination&&!isAlly(t,x)&&fearOf(t,x)>=50&&tg!==x.id);
+        if (scary) {
+          const safe=reachable.filter(z=>z.id!==scary.zone).sort((a,b)=>(b.shelter-b.danger*0.4)-(a.shelter-a.danger*0.4)||a.id-b.id);
+          if (safe.length) { destination=safe[0].id; reason='Evita una persona che teme'; tg=null; }
+        }
+        geo.move(t,destination,reason,{target:tg});
+      }
+    }
+    function gather(kind) {
+      const def=Geography.definitions[theme.id], preferred=def[kind];
+      const open=geographyZones.filter(z=>!closed.has(z.id));
+      const target=closed.has(preferred)?open.sort((a,b)=>b.resources-a.resources||a.id-b.id)[0].id:preferred;
+      alive().forEach(t=>geo.move(t,target,kind==='finale'?'Converge verso lo scontro finale':'Raggiunge il punto dei rifornimenti',{forced:true,mode:'gather'}));
+      return target;
+    }
+    function sealFinale(meeting) {
+      while(geographyZones.filter(z=>!closed.has(z.id)).length>1){
+        const next=geographyZones.find(z=>z.id!==meeting&&!closed.has(z.id)&&Geography.connected(geographyZones,new Set([...closed,z.id])));
+        if(!next)break;geo.closure(next.id,'finale');
+      }
+    }
+    function evacuate() {
+      for (const t of alive()) {
+        if (!closed.has(t.zone)) continue;
+        const z=zoneName(t.zone), chance=0.3+t.attr.agi*0.05+t.en/260+(hasItem(t,'mappa')?0.2:0)+(hasItem(t,'attrezzo')?0.15:0);
+        if (hasItem(t,'mappa')) itemLedger.record('bonus',t,t,itemOf(t,'mappa'),null,'+0,20 al calcolo della probabilità di fuga dalla tempesta');
+        if (!rng.chance(chance)) { hurt(t,(14+rng.int(14))*wx('storm',1),null,'storm',true); t.stormZ=z; if(t.hp>0) sys('storm',[t],{z},{cat:'hurt',why:'tempesta'},2); }
+        if(t.hp<=0){resolveVitals();if(!t.alive)continue;}
+        const routes=geographyZones.filter(x=>!closed.has(x.id)).map(x=>Geography.path(geographyZones,t.zone,x.id,new Set())).filter(Boolean).sort((a,b)=>a.length-b.length||a[a.length-1]-b[b.length-1]);
+        if(routes.length) geo.move(t,routes[0][routes[0].length-1],'Esce dalla zona chiusa dalla tempesta',{forced:true,mode:'evacuate'});
+      }
+      resolveVitals();
     }
 
     // complotti, cotte e confessioni nascono e muoiono di notte
@@ -1732,6 +1843,7 @@
       alive().forEach((t) => {
         if (!aliveId(t.crush) || t.partner || phases.length - (t.crushPh || 0) < 3) return;
         const u = byId[t.crush];
+        if(geo&&t.zone!==u.zone)return;
         if (u.partner || !rng.chance(hasTrait(t, 'romantico') ? 0.45 : 0.2 + t.attr.cor * 0.02)) return;
         if (cfg.teamWin && u.team !== t.team) return;
         const yes = u.crush === t.id || rng.chance(clamp((attractOf(u, t) - 15) / 55 + (like(u, t) - 20) / 120 + (hasTrait(u, 'romantico') ? 0.15 : 0) + (t.attr.car - 5) * 0.03, 0.05, 0.85));
@@ -1821,7 +1933,7 @@
         // rito portafortuna
         if (tr('superstizioso')) add(0.9, () => { t.mo += 8; if (M && !M.infect) t.pr -= 10; const am = itemOf(t, 'amuleto'); return say('ritual', [t], { i: am ? am.name : '' }, 'none', traitName('superstizioso'), 0); });
         // sonnambulismo
-        if (tr('sonnambulo')) add(1.1, () => { const z = rng.pick([...Array(zoneCount).keys()].filter((i) => i !== t.zone && !closed.has(i))); if (z == null) return false; t.zone = z; t.en -= 6; return say('sleepwalk', [t], { z: zoneName(z) }, 'none', traitName('sonnambulo'), 1); });
+        if (tr('sonnambulo')) add(1.1, () => { const choices=geo?geographyZones[t.zone].links:[...Array(zoneCount).keys()]; const z = rng.pick(choices.filter((i) => i !== t.zone && !closed.has(i))); if (z == null) return false; if(geo){if(!geo.move(t,z,'Si allontana durante il sonno',{mode:'sleepwalk'})) return false;if(!t.alive)return true;}else t.zone = z; t.en -= 6; return say('sleepwalk', [t], { z: zoneName(z) }, 'none', traitName('sonnambulo'), 1); });
         // follia
         if (tr('folle')) add(0.9, () => { t.mo += 6; return say('madness', [t], {}, 'none', traitName('folle'), 0); });
         // sfortuna
@@ -1852,7 +1964,7 @@
         }
         // spiare e smascherare i complotti
         if (tr('furtivo') || tr('paranoico') || t.attr.int >= 8) {
-          const plotter = allyMates(t).find((x) => x.plot && aliveId(x.plot) && isAlly(x, byId[x.plot]));
+          const plotter = allyMates(t).find((x) => x.plot && aliveId(x.plot) && isAlly(x, byId[x.plot]) && (!geo||byId[x.plot].zone===t.zone));
           if (plotter) add(2.6, () => {
             const victim = byId[plotter.plot];
             if (!rng.chance((0.3 + t.attr.furt * 0.03 + t.attr.int * 0.02) * clamp((trustOf(victim, t) + 70) / 100, 0.3, 1.3))) return false;
@@ -2071,6 +2183,7 @@
     // testimoni: chi vede un'uccisione o un salvataggio cambia idea su chi l'ha fatto
     function witness(actor, kind, victim, roles) {
       if (!actor || !actor.alive) return;
+      if (geo && victim && victim.zone !== actor.zone) return;
       const seen = alive().filter((w) => w.zone === actor.zone && !roles.includes(w));
       rng.shuffle(seen).slice(0, 4).forEach((w, i) => {
         remember(w, actor, kind === 'kill' ? 'sawKill' : 'sawSave', victim, kind === 'kill' ? 1 + Math.min(1, actor.kills * 0.15) : 1);
@@ -2137,13 +2250,13 @@
       });
       // triangoli: due cotte per la stessa persona
       A.forEach((a) => A.forEach((b) => {
-        if (a.ix >= b.ix || !a.crush || a.crush !== b.crush || hasMem(a, b, 'rivalLove')) return;
+        if (a.ix >= b.ix || !a.crush || a.crush !== b.crush || hasMem(a, b, 'rivalLove') || geo&&a.zone!==b.zone) return;
         remember(a, b, 'rivalLove'); remember(b, a, 'rivalLove');
         const e = useFmt(BA('triangle'), [a, b, byId[a.crush]]); if (e) sys2(e, [a, b], 'love', 'Triangolo', 3);
       }));
       // le coppie in crisi si lasciano
       A.forEach((a) => {
-        const b = aliveId(a.partner) ? byId[a.partner] : null; if (!b || a.ix > b.ix) return;
+        const b = aliveId(a.partner) ? byId[a.partner] : null; if (!b || a.ix > b.ix || geo && a.zone !== b.zone) return;
         const strain = (like(a, b) < 0 ? 0.35 : 0) + (trustOf(a, b) < -25 || trustOf(b, a) < -25 ? 0.35 : 0) + (a.grudges[b.id] || b.grudges[a.id] ? 0.4 : 0) + (a.crush || b.crush ? 0.25 : 0);
         if (!strain || !rng.chance(Math.min(0.7, strain))) return;
         a.partner = null; b.partner = null; a.exPartner = b.id; b.exPartner = a.id; a.mo -= 15 * DR.mo; b.mo -= 15 * DR.mo;
@@ -2238,11 +2351,19 @@
       const events = pendingNotes.splice(0);
       SYS = [];
       ORIGIN = kind === 'f' ? 'festino' : null; CURKIND = kind;
+      const before = alive().length;
+      if (geo) {
+        geo.reset(); evacuate();
+        if (kind === 'n') spatialGoals(true);
+        if (kind === 'f') { const target=gather('feast'); intro+=' Punto di ritrovo: '+zoneName(target)+'.'; }
+        if (kind === 'b' && theme.id === 'liceo') intro='Suona la campanella: in Aula magna tutti cercano il banco migliore.';
+        if (kind === 'b' && theme.id === 'ufficio') intro='Nell’Open space comincia la corsa alla scrivania vicino alla finestra.';
+        if (kind === 'n' && theme.id === 'liceo') intro='Le lezioni sono finite: chi resta a scuola si sposta tra le aule, riprende fiato e scrive sulla chat di classe.';
+      }
       tickStatus();
       if (kind === 'd') moveByGoals();
       maybeDissolve(events);
       if (kind === 'd' && day >= 2) sponsorDrop(events);
-      const before = alive().length;
       const order = rng.shuffle(alive());
       const un = new Set(order.map((t) => t.id));
       const fallback = pools.fallback.length ? pools.fallback : parseBlock(D.core.fallback);
@@ -2257,8 +2378,11 @@
         let n = 0; un.forEach((id) => { if (byId[id].alive) n++; });
         const wc = new Map();
         const wOf = (e) => { let w = wc.get(e); if (w === undefined) { w = weightFor(e, P); wc.set(e, w); } return w; };
-        const candL = pool.filter((e) => e.lethal && e.n <= n && e.victims.length < nAlive && !e.risky);
-        const candS = pool.filter((e) => !e.lethal && e.n <= n && (!e.risky || nAlive > 2));
+        const present=geo?order.filter(t=>un.has(t.id)&&t.alive&&t.zone===P.zone).length:n;
+        const usable=e=>e.n<=present&&(!geo||(e.space||[]).every(s=>(s.at==null||s.at===P.zone)&&(s.travel==null||s.travel===P.zone||geographyZones[P.zone].links.includes(s.travel)&&!closed.has(s.travel)&&geo.budget(P)>0)));
+        const affected=!geo||kind!=='dis'||!opt?.affectedZones||opt.affectedZones.includes(P.zone);
+        const candL = affected?pool.filter((e) => e.lethal && usable(e) && e.victims.length < nAlive && !e.risky):[];
+        const candS = affected?pool.filter((e) => !e.lethal && usable(e) && (!e.risky || nAlive > 2)):[];
         for (let attempt = 0; attempt < 25 && !done; attempt++) {
           const wantLethal = nAlive > 1 && rng.chance(pL);
           const cand = wantLethal ? candL : candS;
@@ -2273,7 +2397,7 @@
           roles.forEach((t) => un.delete(t.id));
           done = true;
         }
-        if (!done) { events.push(apply(rng.wpick(fallback, (e) => variety.weight(e)), [P])); un.delete(P.id); }
+        if (!done) { const safe=fallback.filter(e=>!geo||geo.accepts(e,[P])); const ev=rng.wpick(safe, (e) => variety.weight(e))||parseLine('1 | {A} osserva i passaggi della zona e aspetta il momento giusto.'); events.push(apply(ev, [P])); un.delete(P.id); }
       }
       // conseguenze automatiche della fase
       if (kind === 'n') nightEnd();
@@ -2294,10 +2418,11 @@
         A2.forEach((a) => A2.forEach((b) => {
           if (a.ix >= b.ix || a.zone !== b.zone || hs >= 1 || like(a, b) > -25 || a.grudges[b.id] && a.grudges[b.id].why === 'kill' || !rng.chance(0.3)) return;
           remember(a, b, 'hardship'); remember(b, a, 'hardship'); hs++;
-          const e = useFmt(BA('hardship'), [a, b]); if (e) events.push({ html: e.html, plain: e.plain, ids: [a.id, b.id], deaths: [], lethal: false, origin: 'sys', cat: 'heal', why: 'carattere', whyTxt: 'Legame', echo: [] });
+          const e = useFmt(BA('hardship'), [a, b]); if (e) events.push(Object.assign({ html: e.html, plain: e.plain, ids: [a.id, b.id], deaths: [], lethal: false, origin: 'sys', cat: 'heal', why: 'carattere', whyTxt: 'Legame', echo: [] },geo?{place:geo.locate([a,b])}:{}));
         }));
       }
       if (kind === 'd' || kind === 'dis' || kind === 'f') diaryNight(0.35);
+      if(geo)events.sort((a,b)=>(a.place?.seq??-1)-(b.place?.seq??-1));
       const died = before - alive().length;
       noDeathStreak = died ? 0 : noDeathStreak + 1;
       phases.push(Object.assign({ kind, day, title, intro, events, snap: snapshot(), meteo: W.n ? { n: W.n, d: W.d } : null }, opt || {}));
@@ -2308,21 +2433,26 @@
       const pool = pools.lovers.filter((e) => e.n === 2);
       if (!pool.length) return false;
       const events = [];
+      if (geo) { SYS=[];geo.reset(); gather('finale'); }
       for (let k = 0; k < 10 && !isEnded(); k++) {
         const ev = rng.wpick(pool, (e) => e.w * variety.weight(e));
         const roles = rng.chance(0.5) ? [A, B] : [B, A];
         if (!checkReq(ev, roles)) continue;
         events.push(apply(ev, roles));
       }
-      if (!isEnded()) return false;
+      if (!isEnded() && (!geo || !events.length)) return false;
+      if(geo){events.push(...SYS.map(x=>x.ev));SYS=[];events.sort((a,b)=>(a.place?.seq??-1)-(b.place?.seq??-1));}
       phases.push({ kind: 'finale', day, title: 'L\'ultimo atto', intro: 'Restano in due, e si amano. L\'arena ha previsto anche questo.', events, snap: snapshot() });
-      return true;
+      return isEnded();
     }
 
     function runFinale() {
       const events = [];
+      let meeting=null;
+      if(geo){SYS=[];geo.reset();meeting=gather('finale');sealFinale(meeting);}
       alive().forEach((t) => leaveAlliance(t));
-      const pool = pools.finale;
+      let pool = geo ? pools.finale.filter(e=>e.space.every(s=>(s.at==null||s.at===meeting)&&(s.travel==null||s.travel===meeting))) : pools.finale;
+      if(geo&&!pool.length)pool=[parseLine(theme.soft?'2 k:A>B | {A} vince lo scontro decisivo con {B}.':'2 k:A>B | {A} prevale nello scontro con {B}, che perde la vita.')];
       let rounds = 0;
       while (!isEnded() && rounds++ < 40) {
         const order = rng.shuffle(alive());
@@ -2342,7 +2472,8 @@
         }
         if (cfg.teamWin && !isEnded() && rounds > 30) break;
       }
-      phases.push({ kind: 'finale', day, title: 'Lo scontro finale', intro: theme.intro.finale, events, snap: snapshot() });
+      if(geo){events.push(...SYS.map(x=>x.ev));SYS=[];events.sort((a,b)=>(a.place?.seq??-1)-(b.place?.seq??-1));}
+      phases.push({ kind: 'finale', day, title: 'Lo scontro finale', intro: theme.intro.finale+(geo?' Punto di ritrovo: '+zoneName(meeting)+'. Gli altri passaggi vengono chiusi prima dello scontro.':''), events, snap: snapshot() });
     }
 
     // il meteo del giorno e, nel Battle Royale, la zona che si stringe
@@ -2350,8 +2481,13 @@
       const list = R.meteo || [];
       if (list.length) {
         const calm = { n: '', d: '', fx: {} };
-        const pick = rng.chance(day === 1 ? 0.35 : 0.72) ? rng.pick(list.filter((m) => m.n !== W.n)) : calm;
+        const pick = rng.chance(day === 1 ? 0.35 : 0.72) ? rng.pick(list.filter((m) => m.n !== (geo?previousWeather:W.n))) : calm;
+        if(geo)previousWeather=pick?.n||'';
         W = pick || calm;
+        if(geo){
+          const corrections={scifi:{'Silenzio radio':{d:'Le comunicazioni tra i moduli sono interrotte: i rumori locali restano l’unico avvertimento.'},Blackout:{d:'Luci spente e comandi fuori uso: i passaggi di servizio restano percorribili, ma si combatte al buio.'}},liceo:{'Gita scolastica':{n:'Giornata di attività libere',d:'Niente lezione frontale: gli studenti girano per gli spazi della scuola, con panini e tempo per parlare.'},'Ondata di influenza':{d:'Molte aule sono vuote per l’influenza. Chi resta a scuola cerca di tenersi in forze.'},'Giornata dello sport':{d:'Gare in Palestra e attività negli altri spazi: chi corre, chi cerca una scusa per fermarsi.'}}};
+          W=Object.assign({},W,corrections[theme.id]?.[W.n]||{});
+        }
         if (W.n) {
           stats.meteo.push({ day, n: W.n });
           const html = ((ECO.txt && ECO.txt.meteo) || '<b>{n}.</b> {d}').replace('{n}', esc(W.n)).replace('{d}', esc(W.d));
@@ -2362,7 +2498,10 @@
         const open = [...Array(zoneCount).keys()].filter((i) => !closed.has(i));
         const n = wx('storm', 1) > 1.3 ? 2 : 1;
         for (let k = 0; k < n && open.length > 2; k++) {
-          const z = open.splice(rng.int(open.length), 1)[0]; closed.add(z);
+          const candidates=geo?open.filter(z=>Geography.connected(geographyZones,new Set([...closed,z]))):open;
+          if(!candidates.length) break;
+          const z = candidates[rng.int(candidates.length)]; open.splice(open.indexOf(z),1);
+          if(geo) geo.closure(z); else closed.add(z);
           const tx = sysText('stormClose', [], { z: zoneName(z) });
           if (tx) pendingNotes.push({ html: tx.html, plain: tx.plain, ids: [], deaths: [], lethal: false, note: true });
         }
@@ -2412,7 +2551,8 @@
         if (!opts.length) { usedDisasters.clear(); opts = pools.disasters; }
         const dz = rng.pick(opts);
         usedDisasters.add(dz.n); lastDisaster = day;
-        runPhase('dis', dz.out.concat(pools.ds), dz.n, dz.intro, { adult: !!dz.adult });
+        const areas=geo?[...new Set(Geography.mentions(dz.n,geographyZones).map(m=>m.zone))]:[];
+        runPhase('dis', dz.out.concat(pools.ds), dz.n, dz.intro, Object.assign({ adult: !!dz.adult },areas.length?{affectedZones:areas}:{}));
       }
       if (isEnded() || loversEnd()) break;
       runPhase('n', pools.n, theme.phase.n + ' ' + day, theme.intro.n);
@@ -2466,7 +2606,7 @@
       return ['amore', 'amicizia', 'nemesi', 'tradimento', 'pieta', 'nonCorrisposto', 'mentore', 'odio', 'paura'].map((k) => best[k]).filter(Boolean);
     }
     stats.stories = bondStories();
-    return { version: 2, theme: theme.id, adult, seed, days: day, phases, itemFacts: itemLedger.facts, tributes: stripped, winners: winners.map((t) => t.id), stats };
+    return Object.assign({ version: 2, theme: theme.id, adult, seed, days: day, phases, itemFacts: itemLedger.facts, tributes: stripped, winners: winners.map((t) => t.id), stats },geo?{spatial:geo.data}:{});
   }
 
   /* ---------------- Cast casuale ---------------- */

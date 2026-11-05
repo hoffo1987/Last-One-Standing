@@ -12,7 +12,7 @@ Simulatore di battle royale, tutto in italiano. Crei il cast, scegli una delle 9
 - **Seme**: stesso seme, cast completo e impostazioni danno la stessa partita, usando la stessa versione di motore e contenuti.
 - **Ripresa fedele**: la partita generata viene conservata nel browser con il suo risultato completo, così un aggiornamento di testi o motore non cambia la storia già iniziata.
 - **Archivio partite**: nomi personalizzati, confronto tra due risultati, importazione ed esportazione di replay completi.
-- **Diretta** con tabellone, tacche dei superstiti, mappa a zone, elenco dei caduti e riproduzione automatica.
+- **Diretta** con tabellone, tacche dei superstiti, mappa collegata alla simulazione, elenco dei caduti e riproduzione automatica. La mappa mostra presenze, percorsi con motivi e costi, fatti della fase, trappole e bottino; gli incontri richiedono la presenza nello stesso luogo.
 - **Esito** con classifica, statistiche, grafici e locandina generata.
 - Eventi personalizzati con anteprima, importazione ed esportazione in JSON, salvataggio nel browser e tema chiaro o scuro.
 

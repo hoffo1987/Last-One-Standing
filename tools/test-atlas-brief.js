@@ -7,7 +7,7 @@ require(path.join(ROOT, 'src/data-core.js')); require(path.join(ROOT, 'src/data-
 fs.readdirSync(path.join(ROOT, 'src/content')).filter((f) => f.endsWith('.js')).sort().forEach((f) => require(path.join(ROOT, 'src/content', f)));
 require(path.join(ROOT, 'src/engine.js')); require(path.join(ROOT, 'src/atlas.js'));
 const D = global.LOS_DATA, A = global.LOS_ATLAS, B = require('./atlas-brief.js');
-const itemsOf = (t, kind) => (kind === 'luoghi' ? t.lex.luogo : kind === 'pericoli' ? t.lex.mostro : t.lex.arma.slice(0, 10));
+const itemsOf = (t, kind) => (kind === 'luoghi' ? global.LOS_GEOGRAPHY.describe(t,D.eco.arenas[t.id]).map(z=>z.name) : kind === 'pericoli' ? t.lex.mostro : t.lex.arma.slice(0, 10));
 // la guida mostra le prime dieci armi: se cambia in src/ui.js, va cambiato anche qui e in atlas-slots
 assert.ok(/t\.lex\.arma\.slice\(0, 10\)/.test(fs.readFileSync(path.join(ROOT, 'src/ui.js'), 'utf8')), 'la guida mostra ancora le prime dieci armi');
 let n = 0;

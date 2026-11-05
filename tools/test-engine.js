@@ -1,6 +1,6 @@
 // Test headless del motore: node tools/test-engine.js [partite per tema]
 const path = require('path');
-for (const f of ['data-core.js', 'data-themes.js', ...require('fs').readdirSync(path.join(__dirname, '..', 'src', 'content')).filter((x) => x.endsWith('.js')).sort().map((x) => 'content/' + x), 'engine-systems.js', 'engine.js']) require(path.join(__dirname, '..', 'src', f));
+for (const f of ['data-core.js', 'data-themes.js', ...require('fs').readdirSync(path.join(__dirname, '..', 'src', 'content')).filter((x) => x.endsWith('.js')).sort().map((x) => 'content/' + x), 'engine-systems.js', 'engine-geography.js', 'engine.js']) require(path.join(__dirname, '..', 'src', f));
 const LOS = globalThis.LOS, D = globalThis.LOS_DATA;
 require(path.join(__dirname, '..', 'src', 'replay.js'));
 const N = +process.argv[2] || 40;

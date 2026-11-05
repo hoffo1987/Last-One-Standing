@@ -2,7 +2,7 @@
 
 _Generato da `node tools/atlas-slots.js` a partire da `tools/atlas-brief.js`: per cambiare un testo o un prompt modifica il brief e rigenera, non questo file._
 
-**Immagini presenti: 85 su 156** (luoghi 50/54, pericoli 35/35, armi 0/67). **Video presenti: 0 su 89** (luoghi e pericoli). Meteo, disastri e oggetti arriveranno dopo.
+**Immagini presenti: 85 su 161** (luoghi 50/59, pericoli 35/35, armi 0/67). **Video presenti: 0 su 94** (luoghi e pericoli). Meteo, disastri e oggetti arriveranno dopo.
 
 ## 1. Lo stile
 
@@ -87,13 +87,13 @@ Sul sito i video partiranno da soli, muti e in loop, con l'immagine ferma mentre
 | Arena | Luoghi | Pericoli | Armi |
 | --- | --- | --- | --- |
 | [Arena Classica](#arena-classica) | 6 | 4 | 10 |
-| [Reame Incantato](#reame-incantato) | 6 | 4 | 8 |
+| [Reame Incantato](#reame-incantato) | 7 | 4 | 8 |
 | [Stazione Orbitale](#stazione-orbitale) | 6 | 4 | 7 |
-| [Città degli Infetti](#città-degli-infetti) | 6 | 4 | 8 |
+| [Città degli Infetti](#città-degli-infetti) | 7 | 4 | 8 |
 | [Isola Battle Royale](#isola-battle-royale) | 6 | 3 | 8 |
-| [Villa Maledetta](#villa-maledetta) | 6 | 4 | 7 |
-| [Terre Desolate](#terre-desolate) | 6 | 4 | 7 |
-| [Liceo Spietato](#liceo-spietato) | 6 | 4 | 6 |
+| [Villa Maledetta](#villa-maledetta) | 7 | 4 | 7 |
+| [Terre Desolate](#terre-desolate) | 7 | 4 | 7 |
+| [Liceo Spietato](#liceo-spietato) | 7 | 4 | 6 |
 | [Ufficio Open Space](#ufficio-open-space) | 6 | 4 | 6 |
 
 ---
@@ -502,6 +502,23 @@ A jagged mountain peak crowned by a dragon lair, with a wide cave mouth glowing 
 
 ```text
 Static camera and a seamless ambient loop: the place itself stays perfectly still and only small elements move, slowly and gently. Smoke rises slowly from the lair, the gold glints softly, embers float upward, clouds drift across the stars. --motion low --loop
+```
+
+#### Altare delle armi
+
+Altare di pietra nella radura centrale, rastrelliere e tre sentieri verso Torre, Foresta e Lago.  
+File: `assets/arene/fantasy/luoghi/altare-delle-armi.webp` · video: `assets/arene/fantasy/luoghi/altare-delle-armi.mp4`
+
+**Immagine**
+
+```text
+A broad weathered stone altar occupies the central third of a circular forest clearing, surrounded by simple wooden weapon racks and low broken standing stones. Three distinct paths disappear toward a ruined tower, dense woodland and a misty lake in the distance. An abandoned leather satchel, a cracked bowl and scattered pale petals rest in the foreground. Abstract carved grooves glow faintly beneath drifting magical haze. Stylized painterly environment concept art with visible expressive brushwork and faceted stone planes. Cool moonlit violet and magenta tones meet glowing turquoise and gold magical light, with deep midnight blue shadows and drifting enchanted mist. --v 8.2 --ar 16:9 --no text, letters, signature, watermark, logo, people, characters, frame, border
+```
+
+**Video (Animate → Manual)**
+
+```text
+Static camera and a seamless ambient loop: the place itself stays perfectly still and only small elements move, slowly and gently. Pale petals drift slowly above the altar, faint light pulses in the carved grooves, and soft mist passes between the standing stones. --motion low --loop
 ```
 
 ### Pericoli · Reame Incantato
@@ -1039,6 +1056,23 @@ A suburban street with a crashed car against a lamp post and an abandoned yellow
 Static camera and a seamless ambient loop: the place itself stays perfectly still and only small elements move, slowly and gently. Smoke rises slowly on the horizon, tall grass sways, a swing creaks gently back and forth, clouds drift. --motion low --loop
 ```
 
+#### Piazza
+
+Piazza del convoglio abbandonato, casse aperte e vie verso ospedale, negozi e metropolitana.  
+File: `assets/arene/zombie/luoghi/piazza.webp` · video: `assets/arene/zombie/luoghi/piazza.mp4`
+
+**Immagine**
+
+```text
+An abandoned supply convoy stands in the central third of a rain soaked city square, its battered truck doors hanging open beside overturned wooden crates. A hospital entrance, shuttered shopping arcade and stairway down to the subway frame three separate exits in the background. Torn plastic sheeting, loose bandages and an empty water can lie across the foreground paving stones. Sickly reflections shimmer in shallow puddles between scattered barricades. Stylized painterly environment concept art with visible expressive brushwork and faceted concrete planes. Sickly green and overcast grey daylight falls on rust and wet concrete, with flickering fluorescent accents, deep olive shadows and low drifting smog. --v 8.2 --ar 16:9 --no text, letters, signature, watermark, logo, people, characters, frame, border
+```
+
+**Video (Animate → Manual)**
+
+```text
+Static camera and a seamless ambient loop: the place itself stays perfectly still and only small elements move, slowly and gently. Loose plastic sheeting lifts gently in the wind, shallow puddles ripple, and a failing fluorescent light flickers near the subway stairs. --motion low --loop
+```
+
 ### Pericoli · Città degli Infetti
 
 #### ✓ Orda di zombi
@@ -1568,6 +1602,23 @@ A derelict Victorian greenhouse with a cracked stone fountain in the central thi
 Static camera and a seamless ambient loop: the place itself stays perfectly still and only small elements move, slowly and gently. Carnivorous plants open and close very slowly, vines sway, fog drifts through the broken panes. --motion low --loop
 ```
 
+#### Salone
+
+Salone del ballo della villa, tavoli con doni e porte verso le diverse ali dell'edificio.  
+File: `assets/arene/horror/luoghi/salone.webp` · video: `assets/arene/horror/luoghi/salone.mp4`
+
+**Immagine**
+
+```text
+A grand abandoned ballroom fills the central third of a decaying gothic mansion, with a cracked marble dance floor and a long table holding small parcels wrapped in black paper. Tall doorways lead toward a staircase, a dark library corridor and a glass garden entrance. A broken masquerade mask, fallen wax and a single overturned chair occupy the foreground. Tarnished mirrors and heavy curtains recede into deep shadow beneath an old chandelier. Stylized painterly environment concept art with visible expressive brushwork and faceted stone planes. Blood crimson moonlight and warm candle gold glow against deep black shadows, with cold creeping fog. --v 8.2 --ar 16:9 --no text, letters, signature, watermark, logo, people, characters, frame, border
+```
+
+**Video (Animate → Manual)**
+
+```text
+Static camera and a seamless ambient loop: the place itself stays perfectly still and only small elements move, slowly and gently. Candle flames sway gently, a loose curtain moves slowly beside a doorway, and thin fog slides across the cracked marble floor. --motion low --loop
+```
+
 ### Pericoli · Villa Maledetta
 
 #### ✓ Spettro urlante
@@ -1830,6 +1881,23 @@ A giant cracked concrete dam with a makeshift settlement of shacks, flags and wa
 Static camera and a seamless ambient loop: the place itself stays perfectly still and only small elements move, slowly and gently. Water trickles through the crack, flags flutter on the shacks, dust drifts, smoke rises from a chimney. --motion low --loop
 ```
 
+#### Deposito
+
+Deposito di rifornimenti con cancello aperto, taniche e casse vicino all'autostrada spezzata.  
+File: `assets/arene/wasteland/luoghi/deposito.webp` · video: `assets/arene/wasteland/luoghi/deposito.mp4`
+
+**Immagine**
+
+```text
+A rusted supply depot stands in the central third of a dusty desert yard, its heavy gate pushed open onto stacked crates and dented water cans. A cracked service road leads toward a broken highway, while low scrap heaps and distant empty buildings mark two other exits. A frayed rope, an overturned metal cup and dry tire tracks cross the foreground sand. Corrugated roofs and leaning fences fade into a thick burnt orange dust haze. Stylized painterly environment concept art with visible expressive brushwork and faceted rock planes. Harsh scorched sunlight bleaches ochre sand and rusted metal, with burnt orange highlights, deep umber shadows and a thick haze of dust. --v 8.2 --ar 16:9 --no text, letters, signature, watermark, logo, people, characters, frame, border
+```
+
+**Video (Animate → Manual)**
+
+```text
+Static camera and a seamless ambient loop: the place itself stays perfectly still and only small elements move, slowly and gently. Fine dust drifts slowly through the open gate, a frayed rope sways gently, and warm heat shimmer rises above the cracked road. --motion low --loop
+```
+
 ### Pericoli · Terre Desolate
 
 #### ✓ Banda di predoni
@@ -2090,6 +2158,23 @@ An assembly hall with a wooden stage and a single microphone under a spotlight i
 
 ```text
 Static camera and a seamless ambient loop: the place itself stays perfectly still and only small elements move, slowly and gently. The spotlight beam shimmers with floating dust, the curtains sway gently, the microphone cable swings slightly. --motion low --loop
+```
+
+#### Aule
+
+Aula scolastica con file di banchi, cattedra e porta aperta sul corridoio delle lezioni.  
+File: `assets/arene/liceo/luoghi/aule.webp` · video: `assets/arene/liceo/luoghi/aule.mp4`
+
+**Immagine**
+
+```text
+Rows of slightly mismatched school desks fill the central third of an Italian classroom, facing a teacher desk and a large chalkboard covered with faint abstract marks. An open door reveals the corridor outside, with a distant glimpse of the library entrance. A forgotten pencil case, an exercise book with blank pages and a crumpled paper ball sit in the foreground. Tall windows and pastel painted walls give the room a gently comic afternoon atmosphere. Stylized painterly environment concept art with visible expressive brushwork and faceted planes. Soft pastel pink and lilac light pours through tall windows, with warm golden highlights, gentle violet shadows and a dreamy afternoon glow, playful satirical comedy mood. --v 8.2 --ar 16:9 --no text, letters, signature, watermark, logo, people, characters, frame, border
+```
+
+**Video (Animate → Manual)**
+
+```text
+Static camera and a seamless ambient loop: the place itself stays perfectly still and only small elements move, slowly and gently. A curtain lifts softly beside the tall windows, a loose exercise book page turns gently, and pale dust motes float in the afternoon light. --motion low --loop
 ```
 
 ### Pericoli · Liceo Spietato

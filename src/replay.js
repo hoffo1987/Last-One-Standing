@@ -95,8 +95,64 @@
         const ok = Object.entries(x).every(([k, v]) => (!['html', 'deathHtml', 'h', 'th'].includes(k) || typeof v !== 'string' || safeHtml(v, ids)) && plainData(v, depth + 1));
         seen.delete(x); return ok;
       }
-      return plainData(result, 0);
+      return plainData(result, 0) && (result.spatial === undefined || validSpatial(result,ids));
     } catch (e) { return false; }
+  }
+  // Il registro deve riprodurre le posizioni salvate, senza affidarsi alla
+  // geografia della versione installata oggi. Si controllano anche gli eventi
+  // in ordine reale: le conseguenze di sistema possono essere mostrate dopo.
+  function validSpatial(result,ids) {
+    const map=result.spatial,phases=result.phases;
+    if(!record(map)||map.version!==1||!Array.isArray(map.zones)||map.zones.length<2||map.zones.length>16||!record(map.start))return false;
+    const zone=z=>integer(z)&&z<map.zones.length;
+    for(const [i,z] of map.zones.entries()){
+      if(!record(z)||z.id!==i||typeof z.name!=='string'||!z.name.length||typeof z.description!=='string'||!Array.isArray(z.links)||new Set(z.links).size!==z.links.length||!z.links.every(n=>zone(n)&&n!==i))return false;
+      if(!['resources','danger','shelter'].every(k=>Number.isFinite(z[k])&&z[k]>=0&&z[k]<=(k==='shelter'?1:3)))return false;
+      if(z.features!==undefined&&(!Array.isArray(z.features)||!z.features.every(x=>typeof x==='string')))return false;
+    }
+    if(map.zones.some(z=>z.links.some(n=>!map.zones[n].links.includes(z.id))))return false;
+    const reachable=new Set([0]),queue=[0];for(let i=0;i<queue.length;i++)for(const n of map.zones[queue[i]].links)if(!reachable.has(n)){reachable.add(n);queue.push(n);}if(reachable.size!==map.zones.length)return false;
+    if(Object.keys(map.start).length!==ids.size||[...ids].some(id=>!zone(map.start[id])))return false;
+    if(!['moves','deaths','closures'].every(k=>Array.isArray(map[k])&&map[k].length<=200000))return false;
+    const known=new Map(result.tributes.map(t=>[t.id,t])),seen=new Set(),entries=phases.map(()=>[]);
+    function add(entry,kind){if(!record(entry)||!integer(entry.seq)||seen.has(entry.seq)||!integer(entry.ph)||entry.ph>=phases.length)return false;seen.add(entry.seq);entries[entry.ph].push({kind,...entry});return true;}
+    for(const m of map.moves){if(!ids.has(m.id)||!zone(m.from)||!zone(m.to)||m.from===m.to||!Array.isArray(m.path)||m.path.length<2||m.path.length>16||m.path[0]!==m.from||m.path[m.path.length-1]!==m.to||!m.path.every(zone)||typeof m.reason!=='string'||!m.reason.length||!['goal','event','gather','evacuate','sleepwalk'].includes(m.mode)||!Number.isFinite(m.cost)||m.cost<0||m.cost>100||m.target!=null&&!ids.has(m.target)||!add(m,'move'))return false;}
+    for(const d of map.deaths)if(!ids.has(d.id)||!zone(d.zone)||known.get(d.id).deathPhase!==d.ph||!add(d,'death'))return false;
+    for(const c of map.closures)if(!zone(c.zone)||c.reason!==undefined&&!['tempesta','finale'].includes(c.reason)||!add(c,'close'))return false;
+    for(const [ph,p] of phases.entries()){
+      if(p.affectedZones!==undefined&&(!Array.isArray(p.affectedZones)||!p.affectedZones.every(zone)))return false;
+      for(const e of p.events){
+        if(!e.place){if(!e.note)return false;continue;}
+        const l=e.place;
+        if(!record(l)||l.zone!=null&&!zone(l.zone)||!record(l.positions)||!Object.entries(l.positions).every(([id,z])=>ids.has(id)&&zone(z))||!add({...l,ph,event:e},'event'))return false;
+      }
+      const terrain=p.snap.terrain;
+      if(!record(terrain)||!Array.isArray(terrain.traps)||!Array.isArray(terrain.loot)||!terrain.traps.every(t=>record(t)&&zone(t.zone)&&ids.has(t.owner)&&typeof t.name==='string')||!terrain.loot.every(l=>record(l)&&zone(l.zone)&&integer(l.count,1)))return false;
+    }
+    const positions={...map.start},dead=new Set(),closed=new Set();let last=-1;
+    for(const [ph,list] of entries.entries()){
+      const ordinary=new Map();
+      for(const entry of list.sort((a,b)=>a.seq-b.seq)){
+        if(entry.seq<=last)return false;last=entry.seq;
+        if(entry.kind==='close'){if(closed.has(entry.zone))return false;closed.add(entry.zone);}
+        if(entry.kind==='move'){
+          const m=entry;if(dead.has(m.id)||positions[m.id]!==m.from)return false;
+          for(let i=1;i<m.path.length;i++)if(!map.zones[m.path[i-1]].links.includes(m.path[i])||closed.has(m.path[i])&&!(m.mode==='evacuate'&&closed.has(m.from)))return false;
+          if(['goal','event','sleepwalk'].includes(m.mode)){ordinary.set(m.id,(ordinary.get(m.id)||0)+m.path.length-1);if(ordinary.get(m.id)>2)return false;}
+          positions[m.id]=m.to;
+        }
+        if(entry.kind==='death'){if(dead.has(entry.id)||positions[entry.id]!==entry.zone)return false;dead.add(entry.id);}
+        if(entry.kind==='event'){
+          if(Object.entries(entry.positions).some(([id,z])=>positions[id]!==z))return false;
+          if(!entry.event.note&&entry.event.ids.some(id=>dead.has(id)))return false;
+          if(entry.event.origin!=='sys'&&!entry.event.note&&(entry.zone==null||entry.event.ids.some(id=>dead.has(id)||entry.positions[id]!==entry.zone)))return false;
+        }
+      }
+      const snap=phases[ph].snap;
+      if([...ids].some(id=>snap.zones[id]!==positions[id]||snap.alive.includes(id)===dead.has(id)))return false;
+      if(snap.closed.length!==closed.size||snap.closed.some(z=>!closed.has(z)))return false;
+    }
+    return [...ids].every(id=>dead.has(id)===!known.get(id).alive);
   }
   function envelopeOk(e, id) {
     return record(e) && e.schema === 1 && e.id === id && typeof e.buildId === 'string' && Number.isFinite(e.createdAt) && e.createdAt > 0 &&

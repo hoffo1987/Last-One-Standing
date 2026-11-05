@@ -6,7 +6,7 @@ const path = require('node:path');
 const vm = require('node:vm');
 
 const src = path.join(__dirname, '..', 'src');
-const files = ['data-core.js', 'data-themes.js', ...fs.readdirSync(path.join(src, 'content')).filter((f) => f.endsWith('.js')).sort().map((f) => 'content/' + f), 'engine-systems.js', 'engine.js'];
+const files = ['data-core.js', 'data-themes.js', ...fs.readdirSync(path.join(src, 'content')).filter((f) => f.endsWith('.js')).sort().map((f) => 'content/' + f), 'engine-systems.js', 'engine-geography.js', 'engine.js'];
 const sources = files.map((f) => [f, fs.readFileSync(path.join(src, f), 'utf8')]);
 let passed = 0;
 function test(name, run) {
@@ -30,7 +30,7 @@ function fixture({ opening, day = '1 | {A} aspetta.', seed = 'storia-0' }) {
     { id: 'b', name: 'Bruno', gender: 'M', team: 2, traits: [], attr: { int: 1, res: 1, fort: 1, emp: 1 } },
     { id: 'c', name: 'Carla', gender: 'F', team: 3, traits: [], attr: { int: 5, res: 1, fort: 1, emp: 1 } },
   ];
-  return ctx.LOS.simulate({ cast, theme: 'audit', seed, difficulty: 'normale', teamsAllied: false, maxDays: 3 });
+  return ctx.LOS.simulate({ cast, theme: 'audit', mapVersion: 0, seed, difficulty: 'normale', teamsAllied: false, maxDays: 3 });
 }
 const find = (result, id) => result.tributes.find((t) => t.id === id);
 const openingEvent = (effects) => '2 att:A>int9 att:B<int2 ' + effects + ' | {A} prepara un agguato contro {B}.';

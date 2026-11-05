@@ -6,6 +6,9 @@
   const $$ = (s, r = document) => [...r.querySelectorAll(s)];
   const esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   const THEMES = Object.fromEntries(D.themes.map((t) => [t.id, t]));
+  const resultTheme = result => result?.spatial ? { ...THEMES[result.theme], lex:{...THEMES[result.theme].lex,luogo:result.spatial.zones.map(z=>z.name)} } : THEMES[result.theme];
+  let mapSelection=null;
+  let lastSideResult=null,lastSidePhase=-1,lastSideTab='';
   const TRAITS = Object.fromEntries(D.traits.map((t) => [t.id, t]));
   const own = (o, k) => typeof k === 'string' && Object.prototype.hasOwnProperty.call(o, k);
   const record = (x) => x != null && typeof x === 'object' && !Array.isArray(x);
@@ -138,10 +141,12 @@
     if (v) { if (v[0] < 25) bits.push(theme.soft ? 'con la reputazione a pezzi' : 'ridott' + G3(t.gender, 'o', 'a', 'ə') + ' male'); else if (v[0] < 55) bits.push(statusLabel('ferito', t, theme).toLowerCase()); if (v[3] < 25) bits.push('affamat' + G3(t.gender, 'o', 'a', 'ə')); if (v[1] < 22) bits.push('sfinit' + G3(t.gender, 'o', 'a', 'ə')); if (v[2] < 22) bits.push('a pezzi'); else if (v[2] >= 80) bits.push('carichissim' + G3(t.gender, 'o', 'a', 'ə')); }
     if (st.includes('ubriaco')) bits.push(statusLabel('ubriaco', t, theme).toLowerCase());
     const allies = snap.allies[t.id] != null ? snap.alive.filter((x) => x !== t.id && snap.allies[x] === snap.allies[t.id]).length : 0;
+    const partner=snap.rel?.[t.id]?.p;
+    const nearby=snap.alive.filter(id=>id!==t.id&&snap.zones[id]===snap.zones[t.id]&&(snap.allies[t.id]!=null&&snap.allies[id]===snap.allies[t.id]||id===partner)).length;
     const where = zone ? zone.replace(/^(il |lo |la |l'|i |gli |le )/i, (a) => a.toLowerCase()) : '';
     const lead = (where ? 'A ' + where : 'In gara') + (bits.length ? ', ' + bits.join(', ') : '') + (allies ? ', in alleanza con ' + plural(allies, 'alleato', 'alleati') : ', senza alleati') + '.';
     const g = m ? (MND.goals || {})[m.g] : null;
-    return '<div class="nowcard"><div class="sub">Adesso</div><p class="nowlead">' + esc(fixA(lead)) + '</p>' +
+    return '<div class="nowcard"><div class="sub">Adesso</div><p class="nowlead">' + esc(fixA(lead)) + '</p><p class="help">'+(nearby?plural(nearby,'compagno presente','compagni presenti')+' in questa zona.':'Nessun compagno presente in questa zona.')+'</p>' +
       (m && g ? '<div class="goal' + (g.secret ? ' secret' : '') + '"><span class="glbl">Obiettivo</span><b>' + esc(goalLabel(m)) + '</b>' + (g.secret ? '<span class="gsec" title="Gli altri concorrenti non lo sanno">segreto</span>' : '') + (m.since != null && m.since < i ? '<span class="gsince">da G' + (SIM.phases[m.since] ? SIM.phases[m.since].day || 1 : 1) + '</span>' : '') + '</div>' : '') +
       (m && m.th ? '<blockquote class="thought">' + linkify(m.th) + '</blockquote>' : '') + '</div>';
   }
@@ -1164,7 +1169,7 @@
     $('#arenaPreview').innerHTML =
       '<header class="dx-hero"><div class="apv-banner" aria-hidden="true">' + ART.scene(t.id) + '</div>' +
         '<div class="dx-title"><span class="dx-kicker">Guida all\'arena</span><h2>' + esc(t.name) + '</h2><p>' + esc(t.tag) + '</p>' + (t.soft ? '<span class="dx-soft">Nessuno muore: si esce dai giochi</span>' : '') + '</div></header>' +
-      '<div class="dx-stats">' + stat(pt.events + (adult ? pt.adultEvents : 0), 'Eventi') + stat(pt.disasters + (adult ? pt.adultDisasters : 0), 'Disastri') + stat(t.lex.luogo.length, 'Zone') + stat((A.meteo || []).length, 'Tipi di meteo') + '</div>' +
+      '<div class="dx-stats">' + stat(pt.events + (adult ? pt.adultEvents : 0), 'Eventi') + stat(pt.disasters + (adult ? pt.adultDisasters : 0), 'Disastri') + stat(window.LOS_GEOGRAPHY.describe(t,A).length, 'Zone') + stat((A.meteo || []).length, 'Tipi di meteo') + '</div>' +
       '<nav class="dx-nav" role="tablist" aria-label="Capitoli della guida">' + CHAPTERS.map(([k, l]) => '<button type="button" role="tab" id="dxt-' + k + '" data-dx="' + k + '" aria-controls="dxp-' + k + '" aria-selected="' + (dxCh === k) + '" tabindex="' + (dxCh === k ? 0 : -1) + '">' + chIcon(k) + '<span>' + l + '</span></button>').join('') + '</nav>' +
       CHAPTERS.map(([k]) => '<section class="dx-panel" role="tabpanel" id="dxp-' + k + '" aria-labelledby="dxt-' + k + '"' + (dxCh === k ? '' : ' hidden') + '>' + (dxCh === k ? chapter(k, t) : '') + '</section>').join('');
     AN.field($('#arenaPreview .apv-banner'), t.id, { intensity: 1.2 });
@@ -1188,14 +1193,16 @@
     return '<div class="zm ' + tone + '"><span>' + label + '</span><i><b style="width:' + pc.toFixed(0) + '%"></b></i><em>' + words + '</em></div>';
   }
   function chMap(t) {
-    const A = arenaOf(t.id), Z = t.lex.luogo.map((_, i) => (A.zones && A.zones[i]) || [1, 1, 0.5]);
+    const A = arenaOf(t.id), geography=window.LOS_GEOGRAPHY.describe(t,A);
+    t=window.LOS_GEOGRAPHY.enrich(t,geography);
+    const Z = geography.map(z=>[z.resources,z.danger,z.shelter]);
     const best = (j, dir) => Z.reduce((bi, z, i) => (dir * z[j] > dir * Z[bi][j] ? i : bi), 0);
     const rich = best(0, 1), risk = best(1, 1), safe = best(2, 1);
     const zones = t.lex.luogo.map((name, i) => {
       const z = Z[i], nm = capFirst(stripArt(name));
       const tags = [i === rich ? '<span class="ztg good">Più ricca</span>' : '', i === risk ? '<span class="ztg bad">Più pericolosa</span>' : '', i === safe ? '<span class="ztg calm">Miglior riparo</span>' : ''].join('');
       return '<article class="zc" style="--i:' + i + '">' + ATL.pic(t.id, 'luoghi', name, t.hue, { index: i }) +
-        '<div class="zc-body"><h4>' + esc(nm) + '</h4>' + (tags ? '<div class="ztgs">' + tags + '</div>' : '') +
+        '<div class="zc-body"><h4>' + esc(nm) + '</h4><p class="help">'+esc(geography[i].description)+'</p><p class="help">Passaggi: '+esc(geography[i].links.map(z=>stripArt(geography[z].name)).join(', '))+'</p>' + (tags ? '<div class="ztgs">' + tags + '</div>' : '') +
         meterRow('Risorse', z[0], 1.8, ['Scarse', 'Medie', 'Ricche'][LEVEL(z[0], 1.35, 0.95)], 'res') +
         meterRow('Pericolo', z[1], 1.8, ['Basso', 'Medio', 'Alto'][LEVEL(z[1], 1.35, 0.95)], 'dng') +
         meterRow('Riparo', z[2], 1, ['Scarso', 'Discreto', 'Buono'][LEVEL(z[2], 0.7, 0.45)], 'shl') + '</div></article>';
@@ -1208,7 +1215,7 @@
       '<div><h5>Da tenere d\'occhio</h5><div class="chips">' + [lb.hp, lb.en, lb.mo, lb.food].map((x) => '<span class="chip dim">' + esc(x) + '</span>').join('') + (m ? '<span class="chip st">' + esc(m.name) + '</span>' : '') + '</div></div></div></div></section>' : '';
     const arms = t.lex.arma.slice(0, 10).map((x) => '<li class="arm">' + ATL.pic(t.id, 'armi', x, t.hue) + '<span>' + esc(capFirst(stripArt(x))) + '</span></li>').join('');
     const beasts = t.lex.mostro.map((x, i) => '<article class="wanted" style="--r:' + ((i % 2 ? 1 : -1) * (1 + i % 3)) + 'deg">' + ATL.pic(t.id, 'pericoli', x, t.hue) + '<div class="wd-body"><span class="wd-tag">' + (t.soft ? 'Attenzione' : 'Pericolo') + '</span><h4>' + esc(capFirst(stripArt(x))) + '</h4></div></article>').join('');
-    return chHead('Il campo di gioco', plural(Z.length, 'zona', 'zone') + ' dove si muovono i concorrenti. Le zone ricche danno più cibo, quelle pericolose più agguati; di notte conta il riparo.') +
+    return chHead('Il campo di gioco', plural(Z.length, 'zona', 'zone') + ' collegate da passaggi. Gli spostamenti consumano energia e gli incontri richiedono la presenza nello stesso luogo. Le zone ricche aiutano a trovare cibo; di notte il riparo e i compagni presenti favoriscono il recupero.') +
       '<div class="zboard">' + zones + '</div>' + plaque +
       '<div class="dx-split"><section class="arsenal"><div class="ch-sub"><h4>' + (t.soft ? 'Armi improprie' : 'Armeria') + '</h4><p>' + (t.soft ? 'Con queste si fanno fuori i rivali, senza versare sangue.' : 'Si raccolgono in giro, si rubano agli altri o arrivano dagli sponsor.') + '</p></div><ul class="rack">' + arms + '</ul></section>' +
       '<section class="bestiary"><div class="ch-sub"><h4>' + (t.soft ? 'Da evitare' : 'Pericoli') + '</h4><p>' + (t.soft ? 'Girano per i corridoi: chi resta da solo rischia di finire nei guai.' : 'Di notte attaccano chi dorme da solo, soprattutto nelle zone pericolose.') + '</p></div><div class="wanted-grid">' + beasts + '</div></section></div>';
@@ -1496,7 +1503,8 @@
     const why = e.test ? '<span title="Tiro ' + e.test.roll + ' contro soglia ' + e.test.dc + '">Prova di ' + esc(ATTRN[e.test.attr] || e.test.attr) + ' · <span class="dice"><span class="roll">' + e.test.roll + '</span>/' + e.test.dc + '</span> · ' + (e.test.pass ? 'superata' : 'fallita') + '</span>' : e.sponsor ? 'Sponsor' : e.whyTxt ? esc(e.whyTxt) : whyLabel(e, theme);
     const echo = ((e.echo || []).length ? '<ul class="echo">' + e.echo.map((x) => '<li class="' + (x.cls || '') + '">' + fix(x.html) + '</li>').join('') + '</ul>' : '') +
       (e.reason ? '<details class="event-reason"><summary>Il contesto</summary><p>' + esc(e.reason) + '</p></details>' : '');
-    return '<div class="ev' + (!tributes && (S.followed || []).some((id) => e.ids.includes(id)) ? ' followed' : '') + (e.deaths.length ? ' lethal' : '') + (anim ? ' in fx-' + cat + (e.sponsor ? ' fx-sponsor' : '') : '') + '" style="--cc:var(--c-' + cat + ');--d:' + (delay || 0) + 'ms">' + avs + '<div class="evbody">' + (why ? '<span class="why' + (e.test ? (e.test.pass ? ' ok' : ' ko') : '') + '">' + why + '</span>' : '') + '<p>' + fix(e.html) + '</p>' + echo + '</div>' + chip + '</div>';
+    const place=e.place?(e.place.zone!=null?'<span class="event-place">'+esc(stripArt(theme.lex.luogo[e.place.zone]||'Zona'))+'</span>':'<span class="event-place">Riferimenti a persone in zone diverse</span>'):'';
+    return '<div class="ev' + (!tributes && (S.followed || []).some((id) => e.ids.includes(id)) ? ' followed' : '') + (e.deaths.length ? ' lethal' : '') + (anim ? ' in fx-' + cat + (e.sponsor ? ' fx-sponsor' : '') : '') + '"'+(e.place?' data-map-step="'+e.place.seq+'"':'')+' style="--cc:var(--c-' + cat + ');--d:' + (delay || 0) + 'ms">' + avs + '<div class="evbody">' + place + (why ? '<span class="why' + (e.test ? (e.test.pass ? ' ok' : ' ko') : '') + '">' + why + '</span>' : '') + '<p>' + fix(e.html) + '</p>' + echo + '</div>' + chip + '</div>';
   }
   function timelineHTML(P, i, seenAt, hideFuture) {
     const days = [];
@@ -1511,7 +1519,7 @@
   function renderLive(fromRoute) {
     $('#liveEmpty').hidden = !!SIM; $('#liveBody').hidden = !SIM;
     if (!SIM) return;
-    const theme = THEMES[SIM.theme], soft = !!theme.soft;
+    const theme = resultTheme(SIM), soft = !!theme.soft;
     const P = SIM.phases, i = Math.max(0, Math.min(P.length - 1, S.run.phase || 0));
     S.run.phase = i; S.run.seen = Math.max(S.run.seen || 0, i);
     const ph = P[i], total = SIM.tributes.length;
@@ -1576,24 +1584,14 @@
     save();
   }
   function renderSide(i) {
-    const theme = THEMES[SIM.theme], ph = SIM.phases[i], soft = !!theme.soft;
+    const theme = resultTheme(SIM), ph = SIM.phases[i], soft = !!theme.soft;
     $$('.stabs button').forEach((b) => { const active = b.dataset.s === sideTab; b.setAttribute('aria-selected', active); b.tabIndex = active ? 0 : -1; });
     $('#sideBody').setAttribute('aria-labelledby', 'side-tab-' + sideTab);
     $('.stabs [data-s="fallen"]').textContent = soft ? (theme.id === 'ufficio' ? 'Licenziati' : 'Eliminati') : 'Caduti';
     const aliveSet = new Set(ph.snap.alive);
     let h = '';
     if (sideTab === 'map') {
-      const zones = theme.lex.luogo.map((z) => z.replace(/^(il |lo |la |l'|i |gli |le )/i, ''));
-      const hot = {};
-      ph.events.forEach((e) => e.deaths.length && e.ids.forEach((id) => (hot[ph.snap.zones[id]] = 1)));
-      const ZP = arenaOf(theme.id).zones || [], shut = new Set(ph.snap.closed || []);
-      const dots = (v) => { const n = v >= 1.35 ? 3 : v >= 0.95 ? 2 : 1; return '<b class="zl" aria-label="' + ['bassa', 'media', 'alta'][n - 1] + '">' + '●'.repeat(n) + '<span>' + '●'.repeat(3 - n) + '</span></b>'; };
-      h = '<div class="map">' + zones.map((z, zi) => {
-        const here = ph.snap.alive.filter((id) => ph.snap.zones[id] === zi);
-        const p = ZP[zi] || [1, 1, 0.5];
-        return '<div class="zone' + (hot[zi] ? ' hot' : '') + (shut.has(zi) ? ' closed' : '') + '"><span class="zn"><span>' + esc(z) + '</span></span><div class="dots">' + here.map((id) => avHTML(BY[id], { btn: true })).join('') + '</div>' +
-          '<span class="zprops" title="Risorse e pericolo della zona"><span>Risorse ' + dots(p[0]) + '</span><span>Pericolo ' + dots(p[1]) + '</span>' + (shut.has(zi) ? '<span class="ztag">tempesta</span>' : '') + '</span></div>';
-      }).join('') + '</div><p class="help" style="margin-top:10px">Le zone ricche danno più cibo, quelle pericolose più agguati' + (shut.size ? '; in grigio quelle inghiottite dalla tempesta' : '') + '. Tocca un volto per aprire la scheda.</p>';
+      h=window.LOS_MAP_VIEW.render(SIM,i,{theme,properties:arenaOf(theme.id).zones,selected:mapSelection,avatar:t=>avHTML(t,{btn:true})});
     } else if (sideTab === 'fallen') {
       const dead = SIM.tributes.filter((t) => !t.alive && t.deathPhase <= i).sort((a, b) => b.order - a.order);
       h = dead.length ? '<div class="plist">' + dead.map((t) => '<button type="button" class="prow" data-prof="' + esc(t.id) + '">' + avHTML(t, { dead: true }) + '<span style="min-width:0"><span class="pn">' + esc(t.name) + '</span><span class="ps">' + (t.killerIds.length ? 'per mano di ' + esc(t.killerIds.map((k) => BY[k].name).join(', ')) + (causeTxt(t, theme) ? ' · ' + causeTxt(t, theme) : '') : causeTxt(t, theme) ? 'per ' + causeTxt(t, theme) : 'vittima dell\'arena') + '</span></span><span class="pk">G' + t.deathDay + '</span></button>').join('') + '</div>' : '<p class="help">Ancora nessuno.</p>';
@@ -1626,9 +1624,15 @@
         (solo.length ? '<div class="agroup"><h4>Senza alleati · ' + solo.length + '</h4><div class="row">' + solo.map(av).join('') + '</div></div>' : '');
     }
     $('#sideBody').innerHTML = h;
+    if(lastSideResult!==SIM||lastSidePhase!==i||lastSideTab!==sideTab)$('#sideBody').scrollTop=0;
+    lastSideResult=SIM;lastSidePhase=i;lastSideTab=sideTab;
   }
   // mappa dei legami: filtri per tipo ed evidenziazione al passaggio
   $('#sideBody').addEventListener('click', (e) => {
+    const zone=e.target.closest('[data-map-zone]');
+    if(zone&&SIM){mapSelection=zone.dataset.mapZone==='all'?null:+zone.dataset.mapZone;renderSide(S.run.phase);$('#sideBody').scrollTop=0;$('#sideBody .map-node[data-map-zone="'+mapSelection+'"]')?.focus({preventScroll:true});return;}
+    const event=e.target.closest('[data-map-event]');
+    if(event&&SIM){const ev=SIM.phases[S.run.phase].events[+event.dataset.mapEvent];if(!ev?.place)return;stopPlay();if(S.settings.followOnly&&!ev.ids.some(id=>(S.followed||[]).includes(id))){S.settings.followOnly=false;renderLive(true);}const card=$('#phBody [data-map-step="'+ev.place.seq+'"]');if(card){card.tabIndex=-1;card.scrollIntoView({block:'center',behavior:AN.reduced?'auto':'smooth'});card.focus({preventScroll:true});}return;}
     const b = e.target.closest('[data-net]'); if (!b || !SIM) return;
     const c = b.dataset.net; if (netOff.has(c)) netOff.delete(c); else netOff.add(c);
     renderSide(S.run.phase);
@@ -1689,7 +1693,7 @@
   function openProfile(id) {
     const t = BY[id]; if (!t) return;
     stopPlay();
-    const theme = THEMES[SIM.theme], soft = !!theme.soft;
+    const theme = resultTheme(SIM), soft = !!theme.soft;
     const atRes = curView === 'esito';
     const i = atRes ? SIM.phases.length - 1 : S.run.phase || 0;
     const snap = SIM.phases[i].snap;
@@ -1827,7 +1831,7 @@
   function renderResults() {
     $('#resEmpty').hidden = !!SIM; $('#resBody').hidden = !SIM;
     if (!SIM) return;
-    const theme = THEMES[SIM.theme], soft = !!theme.soft, st = SIM.stats;
+    const theme = resultTheme(SIM), soft = !!theme.soft, st = SIM.stats;
     const W = SIM.winners.map((id) => BY[id]);
     const kN = (n) => n + ' ' + (soft ? (n === 1 ? 'eliminazione' : 'eliminazioni') : (n === 1 ? 'uccisione' : 'uccisioni'));
     let hero;
@@ -1932,7 +1936,7 @@
     if (first && W.length) { S.run.celebrated = true; save(); setTimeout(() => AN.confetti(theme.id, theme.hue), 650); }
   }
   function summaryText() {
-    const theme = THEMES[SIM.theme], W = SIM.winners.map((id) => BY[id]);
+    const theme = resultTheme(SIM), W = SIM.winners.map((id) => BY[id]);
     const lines = ['LAST ONE STANDING · ' + theme.name, SIM.tributes.length + ' concorrenti · ' + plural(SIM.days, 'giorno', 'giorni') + ' · seme ' + SIM.seed, ''];
     if (W.length === 1) lines.push(G3(W[0].gender, 'Ultimo', 'Ultima', 'Ultimə') + ' in piedi: ' + W[0].name + ' (' + W[0].kills + ')');
     else if (W.length) lines.push('Vince la squadra ' + W[0].team + ': ' + W.map((w) => w.name).join(', '));
@@ -1942,7 +1946,7 @@
   }
   async function drawPoster() {
     try { if (document.fonts && document.fonts.ready) await document.fonts.ready; } catch (e) { /* niente */ }
-    const theme = THEMES[SIM.theme], W = SIM.winners.map((id) => BY[id]), h = theme.hue;
+    const theme = resultTheme(SIM), W = SIM.winners.map((id) => BY[id]), h = theme.hue;
     const cv = document.createElement('canvas'); cv.width = 1080; cv.height = 1350;
     const g = cv.getContext('2d');
     const acc = 'hsl(' + h + ' 90% 62%)', ink = '#eef0f4', mute = 'hsl(' + h + ' 10% 66%)';

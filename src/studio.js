@@ -62,8 +62,8 @@
       }
       const beforeKills = previous?.kills?.[id] || 0, afterKills = current.kills?.[id] || 0;
       if (afterKills > beforeKills) changes.push({ kind: 'credit', before: beforeKills, after: afterKills });
-      return { phase, day: p.day, title: p.title, events, changes, itemFacts: (result.itemFacts || []).filter(f => f.ph === phase && (f.who === id || f.owner === id)), memories: memories.get(phase) || [], diary: diary.get(phase) || [] };
-    }).filter((p) => p.events.length || p.changes.length || p.itemFacts.length || p.memories.length || p.diary.length);
+      return { phase, day: p.day, title: p.title, events, changes, movements:(result.spatial?.moves||[]).filter(m=>m.ph===phase&&m.id===id), itemFacts: (result.itemFacts || []).filter(f => f.ph === phase && (f.who === id || f.owner === id)), memories: memories.get(phase) || [], diary: diary.get(phase) || [] };
+    }).filter((p) => p.events.length || p.changes.length || p.movements.length || p.itemFacts.length || p.memories.length || p.diary.length);
   }
   function seasonScores(season) {
     const rows = new Map(season.configuration.cast.map((t) => [t.id, { id: t.id, name: t.name, points: 0, wins: 0, kills: 0, played: 0, rankSum: 0 }]));
@@ -143,6 +143,7 @@
       const on = (S.followed || []).includes(t.id), heading = $('#h-prof'); if (!heading) return;
       const result = A.getSIM(), theme = D.themes.find((th) => th.id === result.theme), timeline = personalTimeline(result, t.id, phase);
       const history = '<details class="personal-history"><summary>Il percorso fino a questa fase · ' + plural(timeline.length, 'tappa', 'tappe') + '</summary><p class="help">In ordine cronologico: eventi, ricordi, diario e cambiamenti tra fine fase e fine fase. Le variazioni di salute compaiono sempre; per gli altri valori mostriamo quelle di almeno 10 punti. Un oggetto può entrare e uscire nella stessa fase senza comparire nel confronto dello zaino.</p><ol class="causal-path">' + timeline.map((step) => '<li><b>G' + (step.day || 1) + ' · ' + esc(step.title) + '</b>' +
+        (step.movements.length?'<ul class="personal-route">'+step.movements.map(m=>'<li>'+esc(m.path.map(z=>result.spatial.zones[z].name).join(' → '))+' · '+esc(m.reason)+' · Energia −'+m.cost+'</li>').join('')+'</ul>':'')+
         (step.changes.length ? '<ul class="change-list">' + step.changes.map((c) => '<li>' + esc(changeText(c, t, theme, result)) + '</li>').join('') + '</ul>' : '') +
         itemFactsHTML(step.itemFacts, result, theme) + step.events.map((e) => '<p>' + esc(e.plain) + '</p>').join('') + step.memories.map((m) => memoryHTML(t, m, theme)).filter(Boolean).map((m) => '<p class="help">Ricordo: «' + m + '»</p>').join('') + step.diary.map((page) => '<p class="diary-entry"><span class="sub">Diario</span> ' + A.linkify(page.h) + '</p>').join('') +
         '<button class="btn sm" type="button" data-personal-phase="' + step.phase + '">Rivedi la fase ' + (step.phase + 1) + '</button></li>').join('') + '</ol></details>';

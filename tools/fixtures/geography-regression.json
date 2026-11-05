@@ -1,0 +1,1362 @@
+{
+  "seed": 467,
+  "cfg": {
+    "cast": [
+      {
+        "id": "cmw44gr9007zsk",
+        "name": "Paola",
+        "gender": "N",
+        "team": 1,
+        "color": "#e0564b",
+        "img": "",
+        "traits": [
+          "stratega",
+          "leale"
+        ],
+        "attr": {
+          "for": 3,
+          "agi": 9,
+          "int": 7,
+          "car": 6,
+          "fort": 9,
+          "res": 5,
+          "furt": 5,
+          "cor": 6,
+          "emp": 2,
+          "sop": 3
+        }
+      },
+      {
+        "id": "cmw44gr901i6k3",
+        "name": "Pietro",
+        "gender": "N",
+        "team": 1,
+        "color": "#e0564b",
+        "img": "",
+        "traits": [],
+        "attr": {
+          "for": 7,
+          "agi": 6,
+          "int": 4,
+          "car": 7,
+          "fort": 7,
+          "res": 4,
+          "furt": 5,
+          "cor": 9,
+          "emp": 8,
+          "sop": 5
+        }
+      },
+      {
+        "id": "cmw44gr902iuk",
+        "name": "Elena",
+        "gender": "N",
+        "team": 1,
+        "color": "#e0564b",
+        "img": "",
+        "traits": [],
+        "attr": {
+          "for": 5,
+          "agi": 8,
+          "int": 8,
+          "car": 6,
+          "fort": 6,
+          "res": 2,
+          "furt": 4,
+          "cor": 6,
+          "emp": 7,
+          "sop": 7
+        }
+      },
+      {
+        "id": "cmw44gr903bsc0",
+        "name": "Furio",
+        "gender": "N",
+        "team": 2,
+        "color": "#e8913a",
+        "img": "",
+        "traits": [
+          "impulsivo"
+        ],
+        "attr": {
+          "for": 4,
+          "agi": 8,
+          "int": 8,
+          "car": 4,
+          "fort": 3,
+          "res": 4,
+          "furt": 4,
+          "cor": 4,
+          "emp": 7,
+          "sop": 7
+        }
+      },
+      {
+        "id": "cmw44gr904j98d",
+        "name": "Priscilla",
+        "gender": "N",
+        "team": 2,
+        "color": "#e8913a",
+        "img": "",
+        "traits": [
+          "avido",
+          "sfortunato"
+        ],
+        "attr": {
+          "for": 7,
+          "agi": 3,
+          "int": 2,
+          "car": 5,
+          "fort": 2,
+          "res": 7,
+          "furt": 5,
+          "cor": 5,
+          "emp": 5,
+          "sop": 9
+        }
+      },
+      {
+        "id": "cmw44gr905g0q7",
+        "name": "Tommaso",
+        "gender": "N",
+        "team": 2,
+        "color": "#e8913a",
+        "img": "",
+        "traits": [],
+        "attr": {
+          "for": 3,
+          "agi": 2,
+          "int": 9,
+          "car": 5,
+          "fort": 8,
+          "res": 2,
+          "furt": 2,
+          "cor": 8,
+          "emp": 2,
+          "sop": 5
+        }
+      },
+      {
+        "id": "cmw44gr906f2ta",
+        "name": "Alex",
+        "gender": "N",
+        "team": 3,
+        "color": "#d9b334",
+        "img": "",
+        "traits": [
+          "impulsivo"
+        ],
+        "attr": {
+          "for": 9,
+          "agi": 4,
+          "int": 9,
+          "car": 6,
+          "fort": 5,
+          "res": 2,
+          "furt": 6,
+          "cor": 5,
+          "emp": 9,
+          "sop": 7
+        }
+      },
+      {
+        "id": "cmw44gr9078lqc",
+        "name": "Leone",
+        "gender": "N",
+        "team": 3,
+        "color": "#d9b334",
+        "img": "",
+        "traits": [
+          "impulsivo"
+        ],
+        "attr": {
+          "for": 9,
+          "agi": 7,
+          "int": 7,
+          "car": 3,
+          "fort": 2,
+          "res": 6,
+          "furt": 6,
+          "cor": 2,
+          "emp": 7,
+          "sop": 3
+        }
+      },
+      {
+        "id": "cmw44gr90878wc",
+        "name": "Greta",
+        "gender": "N",
+        "team": 3,
+        "color": "#d9b334",
+        "img": "",
+        "traits": [
+          "furtivo"
+        ],
+        "attr": {
+          "for": 7,
+          "agi": 6,
+          "int": 3,
+          "car": 6,
+          "fort": 6,
+          "res": 6,
+          "furt": 5,
+          "cor": 8,
+          "emp": 9,
+          "sop": 7
+        }
+      },
+      {
+        "id": "cmw44gr9099pdp",
+        "name": "Eden",
+        "gender": "N",
+        "team": 4,
+        "color": "#7cb342",
+        "img": "",
+        "traits": [],
+        "attr": {
+          "for": 9,
+          "agi": 8,
+          "int": 2,
+          "car": 9,
+          "fort": 8,
+          "res": 2,
+          "furt": 7,
+          "cor": 3,
+          "emp": 2,
+          "sop": 9
+        }
+      },
+      {
+        "id": "cmw44gr9010ksi8",
+        "name": "Giada",
+        "gender": "N",
+        "team": 4,
+        "color": "#7cb342",
+        "img": "",
+        "traits": [],
+        "attr": {
+          "for": 7,
+          "agi": 5,
+          "int": 6,
+          "car": 4,
+          "fort": 3,
+          "res": 7,
+          "furt": 5,
+          "cor": 7,
+          "emp": 3,
+          "sop": 3
+        }
+      },
+      {
+        "id": "cmw44gr9011j9om",
+        "name": "Cesare",
+        "gender": "N",
+        "team": 4,
+        "color": "#7cb342",
+        "img": "",
+        "traits": [
+          "ubriacone"
+        ],
+        "attr": {
+          "for": 7,
+          "agi": 6,
+          "int": 4,
+          "car": 8,
+          "fort": 8,
+          "res": 9,
+          "furt": 7,
+          "cor": 5,
+          "emp": 5,
+          "sop": 8
+        }
+      },
+      {
+        "id": "cmw44gr9012fwxe",
+        "name": "Ilaria",
+        "gender": "N",
+        "team": 5,
+        "color": "#26a69a",
+        "img": "",
+        "traits": [
+          "sfortunato"
+        ],
+        "attr": {
+          "for": 9,
+          "agi": 9,
+          "int": 8,
+          "car": 2,
+          "fort": 9,
+          "res": 9,
+          "furt": 9,
+          "cor": 5,
+          "emp": 7,
+          "sop": 4
+        }
+      },
+      {
+        "id": "cmw44gr901344u0",
+        "name": "Fabio",
+        "gender": "N",
+        "team": 5,
+        "color": "#26a69a",
+        "img": "",
+        "traits": [],
+        "attr": {
+          "for": 7,
+          "agi": 5,
+          "int": 5,
+          "car": 5,
+          "fort": 3,
+          "res": 3,
+          "furt": 8,
+          "cor": 3,
+          "emp": 8,
+          "sop": 2
+        }
+      },
+      {
+        "id": "cmw44gr9014jpw8",
+        "name": "Rebecca",
+        "gender": "N",
+        "team": 5,
+        "color": "#26a69a",
+        "img": "",
+        "traits": [],
+        "attr": {
+          "for": 9,
+          "agi": 8,
+          "int": 6,
+          "car": 6,
+          "fort": 6,
+          "res": 8,
+          "furt": 5,
+          "cor": 3,
+          "emp": 7,
+          "sop": 6
+        }
+      },
+      {
+        "id": "cmw44gr9015eumu",
+        "name": "Matteo",
+        "gender": "N",
+        "team": 6,
+        "color": "#29a3d6",
+        "img": "",
+        "traits": [
+          "folle",
+          "clemente"
+        ],
+        "attr": {
+          "for": 7,
+          "agi": 6,
+          "int": 6,
+          "car": 2,
+          "fort": 7,
+          "res": 4,
+          "furt": 7,
+          "cor": 8,
+          "emp": 5,
+          "sop": 5
+        }
+      },
+      {
+        "id": "cmw44gr9016z0f",
+        "name": "Sole",
+        "gender": "N",
+        "team": 6,
+        "color": "#29a3d6",
+        "img": "",
+        "traits": [],
+        "attr": {
+          "for": 4,
+          "agi": 2,
+          "int": 8,
+          "car": 5,
+          "fort": 7,
+          "res": 2,
+          "furt": 2,
+          "cor": 2,
+          "emp": 9,
+          "sop": 5
+        }
+      },
+      {
+        "id": "cmw44gr9017jzv6",
+        "name": "Silvio",
+        "gender": "N",
+        "team": 6,
+        "color": "#29a3d6",
+        "img": "",
+        "traits": [],
+        "attr": {
+          "for": 3,
+          "agi": 9,
+          "int": 7,
+          "car": 5,
+          "fort": 9,
+          "res": 6,
+          "furt": 5,
+          "cor": 8,
+          "emp": 9,
+          "sop": 7
+        }
+      },
+      {
+        "id": "cmw44gr9018aiag",
+        "name": "Marta",
+        "gender": "N",
+        "team": 7,
+        "color": "#5c7cfa",
+        "img": "",
+        "traits": [],
+        "attr": {
+          "for": 8,
+          "agi": 3,
+          "int": 7,
+          "car": 9,
+          "fort": 6,
+          "res": 8,
+          "furt": 7,
+          "cor": 9,
+          "emp": 4,
+          "sop": 6
+        }
+      },
+      {
+        "id": "cmw44gr90192pfo",
+        "name": "Lapo",
+        "gender": "N",
+        "team": 7,
+        "color": "#5c7cfa",
+        "img": "",
+        "traits": [
+          "furtivo",
+          "generoso"
+        ],
+        "attr": {
+          "for": 7,
+          "agi": 8,
+          "int": 6,
+          "car": 4,
+          "fort": 5,
+          "res": 6,
+          "furt": 4,
+          "cor": 9,
+          "emp": 9,
+          "sop": 7
+        }
+      },
+      {
+        "id": "cmw44gr90207cqe",
+        "name": "Alba",
+        "gender": "N",
+        "team": 7,
+        "color": "#5c7cfa",
+        "img": "",
+        "traits": [
+          "sonnambulo"
+        ],
+        "attr": {
+          "for": 8,
+          "agi": 4,
+          "int": 2,
+          "car": 3,
+          "fort": 3,
+          "res": 3,
+          "furt": 3,
+          "cor": 9,
+          "emp": 8,
+          "sop": 2
+        }
+      },
+      {
+        "id": "cmw44gr9021fpyf",
+        "name": "Nico",
+        "gender": "N",
+        "team": 8,
+        "color": "#9c6ade",
+        "img": "",
+        "traits": [
+          "fortunato"
+        ],
+        "attr": {
+          "for": 8,
+          "agi": 9,
+          "int": 9,
+          "car": 8,
+          "fort": 8,
+          "res": 2,
+          "furt": 9,
+          "cor": 2,
+          "emp": 2,
+          "sop": 4
+        }
+      },
+      {
+        "id": "cmw44gr9022d1em",
+        "name": "Nora",
+        "gender": "N",
+        "team": 8,
+        "color": "#9c6ade",
+        "img": "",
+        "traits": [
+          "carismatico"
+        ],
+        "attr": {
+          "for": 6,
+          "agi": 5,
+          "int": 7,
+          "car": 2,
+          "fort": 9,
+          "res": 3,
+          "furt": 5,
+          "cor": 3,
+          "emp": 4,
+          "sop": 6
+        }
+      },
+      {
+        "id": "cmw44gr90237cir",
+        "name": "Ivan",
+        "gender": "N",
+        "team": 8,
+        "color": "#9c6ade",
+        "img": "",
+        "traits": [],
+        "attr": {
+          "for": 8,
+          "agi": 9,
+          "int": 2,
+          "car": 9,
+          "fort": 4,
+          "res": 8,
+          "furt": 4,
+          "cor": 4,
+          "emp": 3,
+          "sop": 3
+        }
+      },
+      {
+        "id": "cmw44gr9024g2hx",
+        "name": "Nadia",
+        "gender": "N",
+        "team": 9,
+        "color": "#d65db1",
+        "img": "",
+        "traits": [],
+        "attr": {
+          "for": 2,
+          "agi": 2,
+          "int": 4,
+          "car": 7,
+          "fort": 7,
+          "res": 3,
+          "furt": 3,
+          "cor": 3,
+          "emp": 7,
+          "sop": 6
+        }
+      },
+      {
+        "id": "cmw44gr902583n",
+        "name": "Dario",
+        "gender": "N",
+        "team": 9,
+        "color": "#d65db1",
+        "img": "",
+        "traits": [],
+        "attr": {
+          "for": 8,
+          "agi": 3,
+          "int": 3,
+          "car": 6,
+          "fort": 4,
+          "res": 4,
+          "furt": 6,
+          "cor": 4,
+          "emp": 7,
+          "sop": 5
+        }
+      },
+      {
+        "id": "cmw44gr9026lbeh",
+        "name": "Bianca",
+        "gender": "N",
+        "team": 9,
+        "color": "#d65db1",
+        "img": "",
+        "traits": [],
+        "attr": {
+          "for": 9,
+          "agi": 8,
+          "int": 3,
+          "car": 6,
+          "fort": 5,
+          "res": 8,
+          "furt": 8,
+          "cor": 3,
+          "emp": 7,
+          "sop": 7
+        }
+      },
+      {
+        "id": "cmw44gr9027758l",
+        "name": "Brando",
+        "gender": "N",
+        "team": 10,
+        "color": "#8d6e63",
+        "img": "",
+        "traits": [
+          "sopravvissuto"
+        ],
+        "attr": {
+          "for": 4,
+          "agi": 8,
+          "int": 5,
+          "car": 7,
+          "fort": 6,
+          "res": 6,
+          "furt": 3,
+          "cor": 5,
+          "emp": 8,
+          "sop": 8
+        }
+      },
+      {
+        "id": "cmw44gr90281kjf",
+        "name": "Ottavia",
+        "gender": "N",
+        "team": 10,
+        "color": "#8d6e63",
+        "img": "",
+        "traits": [],
+        "attr": {
+          "for": 7,
+          "agi": 9,
+          "int": 3,
+          "car": 5,
+          "fort": 6,
+          "res": 5,
+          "furt": 8,
+          "cor": 3,
+          "emp": 7,
+          "sop": 3
+        }
+      },
+      {
+        "id": "cmw44gr90293vfe",
+        "name": "Enea",
+        "gender": "N",
+        "team": 10,
+        "color": "#8d6e63",
+        "img": "",
+        "traits": [
+          "carismatico",
+          "sonnambulo"
+        ],
+        "attr": {
+          "for": 2,
+          "agi": 6,
+          "int": 7,
+          "car": 7,
+          "fort": 3,
+          "res": 8,
+          "furt": 2,
+          "cor": 5,
+          "emp": 3,
+          "sop": 2
+        }
+      },
+      {
+        "id": "cmw44gr9030cod8",
+        "name": "Livia",
+        "gender": "N",
+        "team": 11,
+        "color": "#78909c",
+        "img": "",
+        "traits": [
+          "paranoico",
+          "generoso"
+        ],
+        "attr": {
+          "for": 5,
+          "agi": 8,
+          "int": 3,
+          "car": 6,
+          "fort": 8,
+          "res": 4,
+          "furt": 8,
+          "cor": 4,
+          "emp": 5,
+          "sop": 2
+        }
+      },
+      {
+        "id": "cmw44gr9031jq4e",
+        "name": "Walter",
+        "gender": "N",
+        "team": 11,
+        "color": "#78909c",
+        "img": "",
+        "traits": [],
+        "attr": {
+          "for": 9,
+          "agi": 5,
+          "int": 6,
+          "car": 5,
+          "fort": 5,
+          "res": 4,
+          "furt": 5,
+          "cor": 2,
+          "emp": 4,
+          "sop": 7
+        }
+      },
+      {
+        "id": "cmw44gr9032amyi",
+        "name": "Mirta",
+        "gender": "N",
+        "team": 11,
+        "color": "#78909c",
+        "img": "",
+        "traits": [
+          "sopravvissuto"
+        ],
+        "attr": {
+          "for": 6,
+          "agi": 8,
+          "int": 6,
+          "car": 9,
+          "fort": 4,
+          "res": 8,
+          "furt": 4,
+          "cor": 9,
+          "emp": 7,
+          "sop": 4
+        }
+      },
+      {
+        "id": "cmw44gr9033ajkf",
+        "name": "Romeo",
+        "gender": "N",
+        "team": 12,
+        "color": "#ef7d9c",
+        "img": "",
+        "traits": [
+          "carismatico"
+        ],
+        "attr": {
+          "for": 8,
+          "agi": 4,
+          "int": 2,
+          "car": 7,
+          "fort": 6,
+          "res": 2,
+          "furt": 2,
+          "cor": 5,
+          "emp": 2,
+          "sop": 7
+        }
+      },
+      {
+        "id": "cmw44gr90348up9",
+        "name": "Noemi",
+        "gender": "N",
+        "team": 12,
+        "color": "#ef7d9c",
+        "img": "",
+        "traits": [
+          "stratega",
+          "esibizionista"
+        ],
+        "attr": {
+          "for": 2,
+          "agi": 2,
+          "int": 5,
+          "car": 7,
+          "fort": 6,
+          "res": 3,
+          "furt": 4,
+          "cor": 6,
+          "emp": 3,
+          "sop": 9
+        }
+      },
+      {
+        "id": "cmw44gr9035b2n2",
+        "name": "Aldo",
+        "gender": "N",
+        "team": 12,
+        "color": "#ef7d9c",
+        "img": "",
+        "traits": [
+          "generoso"
+        ],
+        "attr": {
+          "for": 4,
+          "agi": 2,
+          "int": 9,
+          "car": 4,
+          "fort": 9,
+          "res": 7,
+          "furt": 5,
+          "cor": 8,
+          "emp": 7,
+          "sop": 8
+        }
+      },
+      {
+        "id": "cmw44gr9036jl0n",
+        "name": "Tea",
+        "gender": "N",
+        "team": 13,
+        "color": "#e0564b",
+        "img": "",
+        "traits": [
+          "esibizionista",
+          "ingegnoso"
+        ],
+        "attr": {
+          "for": 2,
+          "agi": 7,
+          "int": 5,
+          "car": 9,
+          "fort": 7,
+          "res": 6,
+          "furt": 5,
+          "cor": 9,
+          "emp": 4,
+          "sop": 5
+        }
+      },
+      {
+        "id": "cmw44gr90371wwg",
+        "name": "Luca",
+        "gender": "N",
+        "team": 13,
+        "color": "#e0564b",
+        "img": "",
+        "traits": [
+          "vendicativo",
+          "fortunato"
+        ],
+        "attr": {
+          "for": 9,
+          "agi": 8,
+          "int": 9,
+          "car": 9,
+          "fort": 4,
+          "res": 2,
+          "furt": 9,
+          "cor": 5,
+          "emp": 6,
+          "sop": 4
+        }
+      },
+      {
+        "id": "cmw44gr9038kybe",
+        "name": "Kai",
+        "gender": "N",
+        "team": 13,
+        "color": "#e0564b",
+        "img": "",
+        "traits": [
+          "goloso"
+        ],
+        "attr": {
+          "for": 6,
+          "agi": 3,
+          "int": 8,
+          "car": 4,
+          "fort": 8,
+          "res": 4,
+          "furt": 2,
+          "cor": 7,
+          "emp": 8,
+          "sop": 2
+        }
+      },
+      {
+        "id": "cmw44gr9039g2fx",
+        "name": "Oscar",
+        "gender": "N",
+        "team": 14,
+        "color": "#e8913a",
+        "img": "",
+        "traits": [
+          "sfortunato"
+        ],
+        "attr": {
+          "for": 8,
+          "agi": 2,
+          "int": 2,
+          "car": 8,
+          "fort": 6,
+          "res": 6,
+          "furt": 4,
+          "cor": 2,
+          "emp": 7,
+          "sop": 2
+        }
+      },
+      {
+        "id": "cmw44gr9040axyu",
+        "name": "Matilde",
+        "gender": "N",
+        "team": 14,
+        "color": "#e8913a",
+        "img": "",
+        "traits": [
+          "spietato"
+        ],
+        "attr": {
+          "for": 7,
+          "agi": 4,
+          "int": 5,
+          "car": 9,
+          "fort": 3,
+          "res": 5,
+          "furt": 9,
+          "cor": 8,
+          "emp": 4,
+          "sop": 9
+        }
+      },
+      {
+        "id": "cmw44gr9041jly6",
+        "name": "Gianni",
+        "gender": "N",
+        "team": 14,
+        "color": "#e8913a",
+        "img": "",
+        "traits": [
+          "vendicativo",
+          "paranoico"
+        ],
+        "attr": {
+          "for": 8,
+          "agi": 7,
+          "int": 9,
+          "car": 4,
+          "fort": 6,
+          "res": 7,
+          "furt": 7,
+          "cor": 6,
+          "emp": 2,
+          "sop": 6
+        }
+      },
+      {
+        "id": "cmw44gr90423dlu",
+        "name": "Emma",
+        "gender": "N",
+        "team": 15,
+        "color": "#d9b334",
+        "img": "",
+        "traits": [
+          "traditore",
+          "codardo"
+        ],
+        "attr": {
+          "for": 6,
+          "agi": 5,
+          "int": 6,
+          "car": 8,
+          "fort": 8,
+          "res": 7,
+          "furt": 9,
+          "cor": 8,
+          "emp": 9,
+          "sop": 9
+        }
+      },
+      {
+        "id": "cmw44gr9043j2cn",
+        "name": "Saverio",
+        "gender": "N",
+        "team": 15,
+        "color": "#d9b334",
+        "img": "",
+        "traits": [
+          "traditore"
+        ],
+        "attr": {
+          "for": 9,
+          "agi": 8,
+          "int": 5,
+          "car": 8,
+          "fort": 8,
+          "res": 4,
+          "furt": 9,
+          "cor": 4,
+          "emp": 4,
+          "sop": 3
+        }
+      },
+      {
+        "id": "cmw44gr904440k1",
+        "name": "Sara",
+        "gender": "N",
+        "team": 15,
+        "color": "#d9b334",
+        "img": "",
+        "traits": [],
+        "attr": {
+          "for": 8,
+          "agi": 9,
+          "int": 3,
+          "car": 9,
+          "fort": 8,
+          "res": 9,
+          "furt": 2,
+          "cor": 4,
+          "emp": 7,
+          "sop": 6
+        }
+      },
+      {
+        "id": "cmw44gr90454x73",
+        "name": "Ivo",
+        "gender": "N",
+        "team": 16,
+        "color": "#7cb342",
+        "img": "",
+        "traits": [],
+        "attr": {
+          "for": 8,
+          "agi": 2,
+          "int": 2,
+          "car": 6,
+          "fort": 4,
+          "res": 7,
+          "furt": 3,
+          "cor": 7,
+          "emp": 4,
+          "sop": 8
+        }
+      },
+      {
+        "id": "cmw44gr9046gm20",
+        "name": "Aurora",
+        "gender": "N",
+        "team": 16,
+        "color": "#7cb342",
+        "img": "",
+        "traits": [
+          "sopravvissuto"
+        ],
+        "attr": {
+          "for": 7,
+          "agi": 9,
+          "int": 3,
+          "car": 5,
+          "fort": 2,
+          "res": 6,
+          "furt": 9,
+          "cor": 7,
+          "emp": 7,
+          "sop": 4
+        }
+      },
+      {
+        "id": "cmw44gr9047c6bt",
+        "name": "Ettore",
+        "gender": "N",
+        "team": 16,
+        "color": "#7cb342",
+        "img": "",
+        "traits": [],
+        "attr": {
+          "for": 9,
+          "agi": 9,
+          "int": 3,
+          "car": 5,
+          "fort": 4,
+          "res": 8,
+          "furt": 4,
+          "cor": 9,
+          "emp": 6,
+          "sop": 4
+        }
+      },
+      {
+        "id": "cmw44gr90489q74",
+        "name": "Dafne",
+        "gender": "N",
+        "team": 17,
+        "color": "#26a69a",
+        "img": "",
+        "traits": [
+          "goloso",
+          "furtivo"
+        ],
+        "attr": {
+          "for": 3,
+          "agi": 9,
+          "int": 4,
+          "car": 9,
+          "fort": 7,
+          "res": 9,
+          "furt": 8,
+          "cor": 2,
+          "emp": 9,
+          "sop": 9
+        }
+      },
+      {
+        "id": "cmw44gr9049468m",
+        "name": "Marco",
+        "gender": "N",
+        "team": 17,
+        "color": "#26a69a",
+        "img": "",
+        "traits": [],
+        "attr": {
+          "for": 7,
+          "agi": 2,
+          "int": 6,
+          "car": 4,
+          "fort": 8,
+          "res": 8,
+          "furt": 9,
+          "cor": 7,
+          "emp": 2,
+          "sop": 9
+        }
+      },
+      {
+        "id": "cmw44gr9050hulv",
+        "name": "Gemma",
+        "gender": "N",
+        "team": 17,
+        "color": "#26a69a",
+        "img": "",
+        "traits": [],
+        "attr": {
+          "for": 3,
+          "agi": 7,
+          "int": 6,
+          "car": 8,
+          "fort": 7,
+          "res": 3,
+          "furt": 5,
+          "cor": 8,
+          "emp": 6,
+          "sop": 6
+        }
+      },
+      {
+        "id": "cmw44gr9051f5wy",
+        "name": "Teo",
+        "gender": "N",
+        "team": 18,
+        "color": "#29a3d6",
+        "img": "",
+        "traits": [
+          "sonnambulo",
+          "leader"
+        ],
+        "attr": {
+          "for": 3,
+          "agi": 8,
+          "int": 2,
+          "car": 6,
+          "fort": 2,
+          "res": 9,
+          "furt": 2,
+          "cor": 2,
+          "emp": 9,
+          "sop": 8
+        }
+      },
+      {
+        "id": "cmw44gr90526e3f",
+        "name": "Irene",
+        "gender": "N",
+        "team": 18,
+        "color": "#29a3d6",
+        "img": "",
+        "traits": [
+          "generoso"
+        ],
+        "attr": {
+          "for": 8,
+          "agi": 8,
+          "int": 2,
+          "car": 3,
+          "fort": 6,
+          "res": 6,
+          "furt": 4,
+          "cor": 4,
+          "emp": 3,
+          "sop": 9
+        }
+      },
+      {
+        "id": "cmw44gr90535kjt",
+        "name": "Vito",
+        "gender": "N",
+        "team": 18,
+        "color": "#29a3d6",
+        "img": "",
+        "traits": [
+          "bruto"
+        ],
+        "attr": {
+          "for": 4,
+          "agi": 9,
+          "int": 3,
+          "car": 8,
+          "fort": 4,
+          "res": 5,
+          "furt": 2,
+          "cor": 4,
+          "emp": 8,
+          "sop": 2
+        }
+      },
+      {
+        "id": "cmw44gr905414gv",
+        "name": "Carla",
+        "gender": "N",
+        "team": 19,
+        "color": "#5c7cfa",
+        "img": "",
+        "traits": [],
+        "attr": {
+          "for": 4,
+          "agi": 3,
+          "int": 7,
+          "car": 5,
+          "fort": 3,
+          "res": 2,
+          "furt": 7,
+          "cor": 9,
+          "emp": 8,
+          "sop": 6
+        }
+      },
+      {
+        "id": "cmw44gr90552tiy",
+        "name": "Orlando",
+        "gender": "N",
+        "team": 19,
+        "color": "#5c7cfa",
+        "img": "",
+        "traits": [
+          "paranoico"
+        ],
+        "attr": {
+          "for": 8,
+          "agi": 8,
+          "int": 4,
+          "car": 9,
+          "fort": 8,
+          "res": 6,
+          "furt": 4,
+          "cor": 4,
+          "emp": 6,
+          "sop": 3
+        }
+      },
+      {
+        "id": "cmw44gr9056iifm",
+        "name": "Noa",
+        "gender": "N",
+        "team": 19,
+        "color": "#5c7cfa",
+        "img": "",
+        "traits": [
+          "ingegnoso"
+        ],
+        "attr": {
+          "for": 6,
+          "agi": 7,
+          "int": 5,
+          "car": 2,
+          "fort": 6,
+          "res": 3,
+          "furt": 5,
+          "cor": 3,
+          "emp": 5,
+          "sop": 7
+        }
+      },
+      {
+        "id": "cmw44gr9057jwtp",
+        "name": "Elia",
+        "gender": "N",
+        "team": 20,
+        "color": "#9c6ade",
+        "img": "",
+        "traits": [
+          "sfortunato"
+        ],
+        "attr": {
+          "for": 9,
+          "agi": 2,
+          "int": 3,
+          "car": 4,
+          "fort": 4,
+          "res": 2,
+          "furt": 9,
+          "cor": 3,
+          "emp": 7,
+          "sop": 8
+        }
+      },
+      {
+        "id": "cmw44gr90582k3t",
+        "name": "Vera",
+        "gender": "N",
+        "team": 20,
+        "color": "#9c6ade",
+        "img": "",
+        "traits": [
+          "ingegnoso"
+        ],
+        "attr": {
+          "for": 5,
+          "agi": 9,
+          "int": 9,
+          "car": 3,
+          "fort": 7,
+          "res": 6,
+          "furt": 7,
+          "cor": 3,
+          "emp": 9,
+          "sop": 9
+        }
+      },
+      {
+        "id": "cmw44gr90598urz",
+        "name": "Bruno",
+        "gender": "N",
+        "team": 20,
+        "color": "#9c6ade",
+        "img": "",
+        "traits": [],
+        "attr": {
+          "for": 4,
+          "agi": 9,
+          "int": 3,
+          "car": 3,
+          "fort": 9,
+          "res": 2,
+          "furt": 6,
+          "cor": 8,
+          "emp": 7,
+          "sop": 8
+        }
+      }
+    ],
+    "theme": "wasteland",
+    "seed": "z467",
+    "difficulty": "bassa",
+    "maxDays": 10,
+    "teamsAllied": false,
+    "teamWin": false,
+    "adult": true,
+    "custom": []
+  }
+}
