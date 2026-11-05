@@ -37,8 +37,8 @@ function assetsFor(uri) {
   }
   return 'window.LOS_ASSETS = ' + JSON.stringify({ logo: uri('logo.webp', 'image/webp'), icona: uri('icona.webp', 'image/webp'), favicon: uri('favicon.png', 'image/png'), panoramica: uri('panoramica.webp', 'image/webp'), sagome, arene, atlas }) + ';';
 }
-const engineScripts = ['data-core.js', 'data-themes.js', ...content, 'engine.js'];
-const appScripts = ['art.js', 'atlas.js', 'anim.js', 'simulator.js', 'replay.js', 'studio.js', 'ui.js'];
+const engineScripts = ['data-core.js', 'data-themes.js', ...content, 'engine-systems.js', 'engine-systems.js', 'engine.js'];
+const appScripts = ['art.js', 'atlas.js', 'anim.js', 'simulator.js', 'replay.js', 'experiments.js', 'studio.js', 'ui.js'];
 const scripts = [...engineScripts, ...appScripts];
 // Impronta dei sorgenti, indipendente dai fine riga del checkout e dagli output generati.
 const buildHash = require('crypto').createHash('sha256');

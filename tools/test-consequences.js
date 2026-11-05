@@ -6,7 +6,7 @@ const path = require('node:path');
 const vm = require('node:vm');
 
 const src = path.join(__dirname, '..', 'src');
-const files = ['data-core.js', 'data-themes.js', 'content/_systems.js', 'content/_ecology.js', 'content/_items.js', 'content/_relazioni.js', 'engine.js'];
+const files = ['data-core.js', 'data-themes.js', 'content/_systems.js', 'content/_ecology.js', 'content/_items.js', 'content/_relazioni.js', 'engine-systems.js', 'engine.js'];
 const sources = files.map((f) => [f, fs.readFileSync(path.join(src, f), 'utf8')]);
 let passed = 0;
 function test(name, run) {
@@ -57,6 +57,7 @@ test('perdere cibo non aumenta la sazietà', () => {
   assert.equal(bag(s.opening, 'b', 'cibo').length, 1);
   assert.equal(bag(s.day, 'b', 'cibo').length, 0);
   assert.equal(vital(s.day, 'b', 3), vital(s.opening, 'b', 3));
+  assert.equal(s.result.itemFacts.filter(f => f.ph === 1 && f.who === 'b' && f.kind === 'consume').length, 0);
 });
 test('perdere medicine non cura', () => {
   const s = scenario({ item: 'med', effects: '-med:B' });
@@ -73,6 +74,8 @@ test('i vecchi comandi di consumo conservano i loro benefici', () => {
   assert.equal(vital(food.day, 'b', 3), vital(food.opening, 'b', 3) + 40);
   const med = scenario({ item: 'med', effects: 'med:B' });
   assert.equal(vital(med.day, 'b', 0), 70);
+  const fact = med.result.itemFacts.find(f => f.ph === 1 && f.who === 'b' && f.kind === 'consume');
+  assert.ok(fact); assert.equal(fact.item.t, 'med'); assert.equal(fact.before.hp, 30); assert.equal(fact.after.hp, 70);
 });
 for (const type of ['cibo', 'med']) {
   test('il furto di ' + type + ' trasferisce l\'oggetto e lascia un ricordo', () => {

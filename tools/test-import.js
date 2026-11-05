@@ -3,7 +3,7 @@
 const assert = require('node:assert/strict');
 const fs = require('node:fs'), path = require('node:path'), vm = require('node:vm');
 const root = path.join(__dirname, '..');
-for (const f of ['data-core.js', 'data-themes.js', ...fs.readdirSync(path.join(root, 'src/content')).filter((f) => f.endsWith('.js')).sort().map((f) => 'content/' + f), 'engine.js']) require(path.join(root, 'src', f));
+for (const f of ['data-core.js', 'data-themes.js', ...fs.readdirSync(path.join(root, 'src/content')).filter((f) => f.endsWith('.js')).sort().map((f) => 'content/' + f), 'engine-systems.js', 'engine.js']) require(path.join(root, 'src', f));
 const L = globalThis.LOS, D = globalThis.LOS_DATA;
 const ui = fs.readFileSync(path.join(root, 'src/ui.js'), 'utf8');
 function part(start, end) {

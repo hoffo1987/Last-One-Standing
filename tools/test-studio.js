@@ -1,6 +1,6 @@
 const assert = require('node:assert/strict'), fs = require('node:fs'), path = require('node:path'), vm = require('node:vm');
 const src = path.join(__dirname, '..', 'src');
-for (const f of ['data-core.js', 'data-themes.js', ...fs.readdirSync(path.join(src, 'content')).filter(f => f.endsWith('.js')).sort().map(f => 'content/' + f), 'engine.js']) require(path.join(src, f));
+for (const f of ['data-core.js', 'data-themes.js', ...fs.readdirSync(path.join(src, 'content')).filter(f => f.endsWith('.js')).sort().map(f => 'content/' + f), 'engine-systems.js', 'engine.js']) require(path.join(src, f));
 const L = globalThis.LOS, D = globalThis.LOS_DATA, studioCode = fs.readFileSync(path.join(src, 'studio.js'), 'utf8');
 const ctx = vm.createContext({}); vm.runInContext(studioCode, ctx); const Studio = ctx.LOS_STUDIO;
 let passed = 0;
@@ -17,7 +17,7 @@ function uiFixture() {
     if (!elements.has(selector)) elements.set(selector, { value: '', textContent: '', innerHTML: '', disabled: false, insertAdjacentHTML: (_position, value) => { el(selector).innerHTML += value; }, addEventListener: (event, fn) => { handlers[selector + ':' + event] = fn; } });
     return elements.get(selector);
   };
-  const c = vm.createContext({ document: { querySelector: el, querySelectorAll: () => [], addEventListener() {} }, location: { hash: '#arena' } });
+  const c = vm.createContext({ LOS_EXPERIMENTS: require(path.join(src, 'experiments.js')), document: { querySelector: el, querySelectorAll: () => [], addEventListener() {} }, location: { hash: '#arena' } });
   vm.runInContext(studioCode, c);
   const state = { cast, settings: { theme: 'classico', adult: false }, seasons: [], initialRelations: [], followed: [], custom: [] };
   let serial = 0;
@@ -165,6 +165,20 @@ function uiFixture() {
     assert.equal(target.state.seasons[0].rounds.length, 1); assert.equal(target.state.seasons[0].rounds[0].replaySaved, false);
     const quota = uiFixture(); quota.state.seasons = [{ id: 's1', name: 'Fonte', configuration: structuredClone(cfg), rounds: [] }]; quota.api.commitSeasons = () => false;
     quota.controller.recordResult({ ...cfg, seasonId: 's1' }, original, id, Promise.resolve(true)); await Promise.resolve(); assert.equal(quota.state.seasons[0].rounds.length, 0);
+  });
+  await test('il laboratorio controllato completa e copia soltanto coppie valide senza sostituire la partita', async () => {
+    const f = uiFixture(); f.el('#expPerson').value = cast[0].id; f.el('#expAttribute').value = 'for'; f.el('#expLow').value = '2'; f.el('#expHigh').value = '9'; f.el('#expCount').value = '5';
+    f.api.RUNNER.simulate = async input => L.simulate(input); let report;
+    f.api.copyText = raw => { report = JSON.parse(raw); };
+    await f.handlers['#expRun:click'](); f.handlers['#expCopy:click']();
+    assert.equal(report.completed, 5); assert.equal(report.error, null); assert.equal(f.api.busy, false); assert.equal(f.api.getSIM(), original); assert.match(f.el('#expMsg').textContent, /5 \/ 5/);
+    assert.equal(report.configuration.cast[0].attr.for, cfg.cast[0].attr.for);
+  });
+  await test('interrompere un esperimento a metà coppia sblocca i comandi senza contare la coppia', async () => {
+    const f = uiFixture(); f.el('#expPerson').value = cast[0].id; f.el('#expAttribute').value = 'for'; f.el('#expLow').value = '2'; f.el('#expHigh').value = '9'; f.el('#expCount').value = '5';
+    let reject; f.api.RUNNER.simulate = () => new Promise((_, fail) => { reject = fail; }); f.api.RUNNER.cancel = () => reject(new Error('Interrotto'));
+    const pending = f.handlers['#expRun:click'](); f.handlers['#expCancel:click'](); await pending;
+    assert.equal(f.api.busy, false); assert.equal(f.el('#expRun').disabled, false); assert.match(f.el('#expMsg').textContent, /0 coppie complete/);
   });
   console.log('\nOK: ' + passed + ' gruppi di regressioni degli strumenti di gioco');
 })().catch(e => { console.error(e); process.exitCode = 1; });

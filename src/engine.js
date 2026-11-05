@@ -3,6 +3,8 @@
 (function (G) {
   'use strict';
   const D = G.LOS_DATA;
+  const Systems = G.LOS_SYSTEMS || (typeof require === 'function' ? require('./engine-systems.js') : null);
+  if (!Systems) throw new Error('Sistemi del motore non disponibili.');
 
   /* ---------------- RNG con seme ---------------- */
   function xmur3(str) {
@@ -385,16 +387,6 @@
 
   // La storia delle scelte è locale alla partita. Anche copie dello stesso testo
   // in pacchetti diversi condividono frequenza e intervallo di esclusione.
-  function eventVariety() {
-    const counts = new Map(), recent = [];
-    const key = (ev) => ev.text.toLowerCase().replace(/\s+/g, ' ').trim();
-    return {
-      recent: (ev) => recent.includes(key(ev)),
-      weight: (ev) => 1 / Math.pow(1 + (counts.get(key(ev)) || 0), 1.5),
-      record(ev) { const k = key(ev); counts.set(k, (counts.get(k) || 0) + 1); recent.push(k); if (recent.length > 8) recent.shift(); },
-    };
-  }
-
   function normalizeInitialRelations(value, ids) {
     if (value === undefined) return [];
     if (!Array.isArray(value) || value.length > 200) throw new Error('Sono ammessi al massimo 200 legami iniziali.');
@@ -431,7 +423,7 @@
     const rng = makeRng(seed + '|' + theme.id);
     const adult = !!cfg.adult && !theme.noAdult;
     const pools = buildPools(theme, cfg.custom, adult);
-    const variety = eventVariety();
+    const variety = Systems.eventVariety();
     const LEX = pools.lex;
     const E = Object.assign({}, D.echo || {}, theme.soft ? D.echoSoft || {} : {});
     const diff = Object.prototype.hasOwnProperty.call(DIFF, cfg.difficulty) ? DIFF[cfg.difficulty] : 1;
@@ -549,6 +541,7 @@
 
     const alive = () => T.filter((t) => t.alive);
     const phases = [];
+    const itemLedger = Systems.createItemLedger({ phase: () => phases.length, meter: M });
     let day = 0, deathCounter = 0, pendingFallen = [], noDeathStreak = 0;
     const stats = { events: 0, alliances: 0, betrayals: 0, firstBlood: null, deathsByDay: [], envDeaths: 0, killDeaths: 0, items: 0, revenges: 0, couples: 0, debtsRepaid: 0, amulets: 0, sponsors: 0, echoes: 0, tests: 0, testsPassed: 0,
       causes: {}, shared: 0, nursed: 0, foraged: 0, trapsSet: 0, trapHits: 0, beasts: 0, infected: 0, cured: 0, broken: 0, looted: 0, meteo: [], expelled: 0, trades: 0 };
@@ -582,6 +575,8 @@
       if (t.planPh >= phases.length - 3) bonus += 1;
       const die = 2 + rng.int(6) + rng.int(6);
       const roll = base + die + bonus;
+      if ((attr === 'int' || attr === 'sop') && hasItem(t, 'mappa')) itemLedger.record('bonus', t, t, itemOf(t, 'mappa'), null, '+2 alla prova di ' + attr);
+      if (attr === 'for' && hasItem(t, 'arma')) itemLedger.record('bonus', t, t, itemOf(t, 'arma'), null, '+1 alla prova di forza');
       return { roll, dc, pass: roll >= dc, bonus };
     }
 
@@ -856,80 +851,12 @@
     }
     // ricordi dei rapporti (in prima persona) e diario segreto
     // ogni ricordo cambia il legame di chi ricorda verso l'altra persona
-    function remember(a, b, k, x, scale) {
-      if (!a || !b || a === b) return;
-      const l = (a.mem[b.id] = a.mem[b.id] || []);
-      if (l.length && l[l.length - 1].k === k && l[l.length - 1].ph === phases.length) return;
-      const fact = { ph: phases.length, k, x: x ? x.id : null };
-      l.push(fact);
-      (a.memoryHistory[b.id] || (a.memoryHistory[b.id] = [])).push(fact);
-      if (l.length > 8) l.shift();
-      tweak(a, b, (BD.memfx || {})[k], scale);
-      tweak(a, b, { k: 4 });
-    }
-    function remember1(t, html, kind) {
-      if (!t || !html) return;
-      t.diary.push({ ph: phases.length, d: day, h: html, k: kind || 'pensiero' });
-      // Il diario è un documento storico, non una coda di lavoro: le pagine
-      // precedenti restano disponibili anche nelle partite più lunghe.
-    }
-    function syncSt(t) {
-      const ph = phases.length;
-      const set = (k, on) => { if (on) { if (t.st[k] == null) t.st[k] = ph; } else delete t.st[k]; };
-      t.hp = Math.min(100, t.hp); t.en = clamp(t.en, 0, 100); t.mo = clamp(t.mo, 0, 100); t.food = clamp(t.food, 0, 100); t.pr = clamp(t.pr, 0, 100);
-      set('ferito', t.hp < 55); set('grave', t.hp < 25); set('affamato', t.food < 25); set('esausto', t.en < 22); set('disperato', t.mo < 22);
-      if (t.st.avvelenato == null) t.poisonSource = null;
-      if (M) set(M.st, M.infect ? t.infected && t.pr >= M.thr : t.pr >= M.thr);
-    }
-    function hurt(t, dmg, by, cause, inTick) {
-      if (!t.alive) return;
-      dmg *= Math.max(0.55, 1.2 - t.attr.res * 0.04) * (hasTrait(t, 'sopravvissuto') ? 0.85 : 1);
-      const ar = itemOf(t, 'armatura');
-      if (ar && dmg >= 8) {
-        dmg *= 0.62; ar.u = (ar.u || 1) - 1;
-        if (ar.u <= 0) { takeItem(t, ar); sys('armorBreak', [t], { i: ar.name, ip: possessive(ar) }, { cat: 'hurt', why: 'oggetto' }, 1); }
-      }
-      const hp0 = t.hp;
-      t.hp -= dmg; if (!inTick) t.hp = Math.max(Math.min(8, hp0), t.hp);
-      t.hurtPh = phases.length;
-      if (by && by !== t) t.cause = { k: cause === 'trap' ? 'trap' : 'wound', by: by.id, ph: phases.length };
-      else if (cause && !(inTick && t.cause && t.cause.k === cause && t.cause.by)) t.cause = { k: cause, ph: phases.length, by: null };
-      if (M && M.infect && !t.infected && (cause === 'wound' || cause === 'beast' || by) && rng.chance(M.infect * Math.max(0.4, 1.2 - t.attr.res * 0.05))) {
-        t.infected = true; t.pr = Math.max(t.pr, 8); stats.infected++;
-        sys('infect', [t], {}, { cat: 'hurt', why: 'infezione' }, 3);
-      }
-      t.mo -= Math.min(10, dmg / 4);
-      syncSt(t);
-    }
-    const capInv = (t) => { while (t.inv.length > 8) { const k = t.inv.findIndex((x) => x.type !== 'ricordo'); t.inv.splice(k >= 0 ? k : 0, 1); } };
-    const itemName = (type) => {
-      const n = ((IT.names || {})[theme.id] || {})[type] || ((IT.names || {})._ || {})[type];
-      if (n && n.length) return rng.pick(n);
-      return ITEM_NAME[type] || rng.pick(LEX[type] || ['qualcosa']);
-    };
-    const maxUses = (type, q) => (type === 'arma' ? Math.max(2, Math.round((2 + (q || 2) * 2) / (MOD.wear || 1))) : type === 'armatura' ? 3 : 0);
-    function mkItem(type, name, how, from, q) {
-      const it = { type, name: name || itemName(type), how: how || ORIGIN || 'trovato', from: from ? from.id : null, d: day };
-      if (type === 'arma') it.q = q || clamp(Math.round(0.7 + rng.f() * 2.2 * MOD.weapon), 1, 3);
-      const mu = maxUses(type, it.q); if (mu) { it.u = mu; it.um = mu; }
-      return it;
-    }
-    const itemScore = (it) => (it.q || 2) * 10 + (it.u || 0) + (it.x ? 5 : 0);
-    function canReceiveItem(t, it) {
-      if (!t || !t.alive) return false;
-      const old = itemOf(t, it.type);
-      if ((it.type === 'arma' || it.type === 'armatura') && old && itemScore(old) >= itemScore(it)) return false;
-      // capInv eliminerebbe proprio l'oggetto ricevuto da uno zaino pieno di ricordi.
-      return !(t.inv.length >= 8 && it.type !== 'ricordo' && t.inv.every((x) => x.type === 'ricordo'));
-    }
-    function addItem(t, it) {
-      if (it.type === 'arma' || it.type === 'armatura') {
-        const old = itemOf(t, it.type);
-        if (old) { if (itemScore(old) >= itemScore(it)) return false; t.inv.splice(t.inv.indexOf(old), 1); }
-      }
-      t.inv.push(it); capInv(t); return true;
-    }
-    function takeItem(t, it) { const k = t.inv.indexOf(it); if (k >= 0) t.inv.splice(k, 1); return it; }
+    const { remember, remember1 } = Systems.createMemory({ phases, BD, tweak, getDay: () => day });
+
+    const { syncSt, hurt } = Systems.createVitals({ phases, clamp, M, hasTrait, DR, rng, stats, sys, possessive, itemOf, itemLedger, takeItem: (t, it) => takeItem(t, it) });
+
+    const { capInv, itemName, maxUses, mkItem, itemScore, canReceiveItem, addItem, takeItem } = Systems.createInventory({ IT, theme, ITEM_NAME, LEX, rng, MOD, itemOf, clamp, getDay: () => day, getOrigin: () => ORIGIN });
+
     // l'arma si consuma a ogni colpo e alla fine si rompe
     function wear(k, out) {
       const w = itemOf(k, 'arma'); if (!w || !w.u) return;
@@ -942,9 +869,10 @@
     }
     function eat(t) {
       const i = t.inv.findIndex((x) => x.type === 'cibo'); if (i < 0) return false;
+      const it = t.inv[i], before = itemLedger.state(t);
       t.inv.splice(i, 1); t.food += 50; t.mo += 3;
       if (M && M.coffee) t.pr -= 12;
-      syncSt(t); return true;
+      syncSt(t); itemLedger.record('consume', t, t, it, before, 'Pasto consumato'); return true;
     }
 
     // ---------- conseguenze ----------
@@ -1128,6 +1056,8 @@
       const ctx = {};
       const lexPick = (k) => (ctx[k] != null ? ctx[k] : (ctx[k] = rng.pick(LEX[k] || ['qualcosa'])));
       const txt = render(ev.text, roles, lexPick, ev);
+      itemLedger.setContext(txt.plain);
+      const heldItems = roles.map(t => t.inv.slice());
       const out = [];
       const z = ctx.luogo != null ? theme.lex.luogo.indexOf(ctx.luogo) : roles[0].zone;
       roles.forEach((t) => { t.events++; if (z >= 0) t.zone = z; });
@@ -1136,11 +1066,13 @@
       ev.victims.forEach((i) => {
         const v = roles[i], am = itemOf(v, 'amuleto');
         if (v.alive && am && (hasTrait(v, 'superstizioso') || rng.chance(0.85))) {
+          const before = itemLedger.state(v);
           saved.add(i); v.inv.splice(v.inv.indexOf(am), 1); v.amulets++; stats.amulets++;
           const e = echo(theme.soft ? E.amuletSoft : E.amulet, [v], 'twist');
           if (e) out.push({ plain: e.plain.replace('§', possessive(am)), html: e.html.replace('§', esc(possessive(am))), cls: 'twist' });
           const atk = ev.kills.find((k) => k.v.includes(i));
           hurt(v, 30, atk ? roles[atk.by[0]] : null, 'wound');
+          itemLedger.record('protect', v, v, am, before, 'Eliminazione diretta evitata; il portafortuna si consuma');
           ev.kills.forEach((k) => { if (k.v.includes(i)) k.by.forEach((b) => addGrudge(v, roles[b], 'attack')); });
           return;
         }
@@ -1159,9 +1091,11 @@
         // la protezione para il colpo
         const arm = itemOf(v, 'armatura');
         if (v.alive && arm && alive().length > 2 && rng.chance(0.24)) {
+          const before = itemLedger.state(v);
           saved.add(i); takeItem(v, arm);
           const atk2 = ev.kills.find((k) => k.v.includes(i)); const K2 = atk2 ? roles[atk2.by[0]] : null;
           hurt(v, 26, K2, 'wound'); if (K2) { addGrudge(v, K2, 'attack'); remember(v, K2, 'tried'); }
+          itemLedger.record('protect', v, v, arm, before, 'Eliminazione diretta evitata; la protezione si rompe');
           const e = fmt(ACT('armorSave'), [v], { i: arm.name, ip: possessive(arm) }); if (e) out.push(Object.assign(e, { cls: 'twist' }));
           return;
         }
@@ -1225,9 +1159,10 @@
           case 'lose': { const it = itemOf(t, f.item); if (it) takeItem(t, it); break; }
           case 'consume': {
             const it = itemOf(t, f.item); if (!it) break;
-            takeItem(t, it);
+            const before = itemLedger.state(t); takeItem(t, it);
             if (f.item === 'cibo') t.food += 40;
             if (f.item === 'med') { t.hp = Math.max(t.hp, 70); if (t.cause && t.cause.k === 'wound' && t.st.malato == null) t.cause = null; }
+            itemLedger.record('consume', t, t, it, before, 'Consumo esplicito');
             break;
           }
           case 'steal': {
@@ -1266,14 +1201,16 @@
           case 'hit': if (u.alive) {
             const wpn = itemOf(t, 'arma');
             if (rng.chance(0.25)) pushVoice(out, voice('taunt', t, [u]));
-            hurt(u, (28 + rng.int(18)) * (1 + weaponPow(t) / 12), t, 'wound'); u.mo -= 6; remember(u, t, 'hit');
-            if (wpn && wpn.x === 'veleno' && u.st.avvelenato == null) { u.st.avvelenato = phases.length; u.cause = u.poisonSource = { k: 'poison', by: t.id, ph: phases.length }; }
+            itemLedger.use('attack', t, u, wpn, () => hurt(u, (28 + rng.int(18)) * (1 + weaponPow(t) / 12), t, 'wound'), 'Arma usata nell’aggressione'); u.mo -= 6; remember(u, t, 'hit');
+            if (wpn && wpn.x === 'veleno' && u.st.avvelenato == null) { const poisonBefore = itemLedger.state(u); u.st.avvelenato = phases.length; u.cause = u.poisonSource = { k: 'poison', by: t.id, ph: phases.length }; itemLedger.record('poison', t, u, wpn, poisonBefore, 'Arma avvelenata'); }
             wear(t, out); if (addGrudge(u, t, 'attack') && rng.chance(0.6)) { const e = echo(E.hit, [u, t], 'warn'); if (e) out.push(e); } } break;
           case 'poison': if (u.alive) {
+            const before = itemLedger.state(u);
             u.st.avvelenato = phases.length; u.hp -= 8;
             u.cause = u.poisonSource = { k: 'poison', by: t.id, ph: phases.length };
             // Attribuire il veleno non significa che la vittima conosca l'avvelenatore.
             syncSt(u);
+            itemLedger.record('poison', t, u, heldItems[f.r[0]].find(it => it.type === 'veleno'), before, 'Veleno applicato nell’evento');
           } break;
           case 'save': if (u.alive) { u.owes[t.id] = 'vita'; addAff(t, u, 40); u.mo += 15; remember(u, t, 'saved'); tally(u, t, 'sv'); witness(t, 'save', u, roles); settlePromise(t, u, 'protezione', true, out); if (rng.chance(0.35)) pushVoice(out, voice('saved', u, [t])); t.saves++; t.fame += 1; const e = echo(E.saved, [u, t], 'good'); if (e) out.push(e); } break;
           case 'forgive': delete t.grudges[u.id]; addAff(t, u, 35); remember(t, u, 'forgave'); break;
@@ -1312,6 +1249,7 @@
       stats.events++;
       const deaths = roles.filter((t, i) => ev.victims.includes(i) && !t.alive).map((t) => t.id);
       const cat = ev.lethal && !deaths.length && ev.cat !== 'betray' ? 'hurt' : ev.cat;
+      itemLedger.setContext('');
       return { html: txt.html, plain: txt.plain, ids: roles.map((t) => t.id), deaths, lethal: deaths.length > 0, origin: ev.origin, cat, why: ev.why, reason, echo: out.slice(0, 3), test: ev.testRes || null };
     }
 
@@ -1325,19 +1263,7 @@
       return Math.min(0.9, Math.max(0.03, p));
     }
 
-    function snapshot() {
-      const zones = {}, allies = {}, st = {}, inv = {}, kills = {}, rel = {}, vit = {}, mind = {};
-      T.forEach((t) => {
-        if (t.alive) syncSt(t);
-        zones[t.id] = t.zone; allies[t.id] = t.allyId; st[t.id] = Object.keys(t.st); inv[t.id] = t.inv.map((x) => { const o = { t: x.type, n: x.name, h: x.how || 'trovato' }; if (x.q) o.q = x.q; if (x.u != null) { o.u = x.u; o.m = x.um; } if (x.from) o.f = x.from; if (x.d) o.d = x.d; if (x.x) o.x = x.x; return o; }); kills[t.id] = t.kills;
-        if (t.alive && t.goal) mind[t.id] = { g: t.goal.k, tg: t.goal.tg, since: t.goal.ph, th: t.thought };
-        if (t.alive) vit[t.id] = [Math.round(Math.max(0, t.hp)), Math.round(t.en), Math.round(t.mo), Math.round(t.food), M && (!M.infect || t.infected) ? Math.round(t.pr) : -1];
-        const friends = T.filter((u) => u !== t && u.alive && aff(t, u) >= 40).map((u) => u.id);
-        const enemies = T.filter((u) => u !== t && u.alive && aff(t, u) <= -40 && !t.grudges[u.id]).map((u) => u.id);
-        rel[t.id] = { p: t.partner, g: Object.keys(t.grudges).filter((id) => byId[id].alive).map((id) => [id, t.grudges[id].why, t.grudges[id].victim]), o: Object.keys(t.owes).filter((id) => byId[id].alive), f: t.fame, tr: t.traitor, fr: friends, en: enemies, lost: t.lost, top: t.alive ? relTop(t) : [] };
-      });
-      return { alive: alive().map((t) => t.id), zones, allies, st, inv, kills, rel, vit, mind, closed: [...closed], edges: edges() };
-    }
+    const { snapshot } = Systems.createSnapshots({ T, syncSt, aff, relTop, alive, closed, edges, M, byId });
 
     function tickStatus() {
       alive().forEach((t) => Object.keys(STATUS_TTL).forEach((s) => { if (t.st[s] != null && phases.length - t.st[s] >= STATUS_TTL[s]) delete t.st[s]; }));
@@ -1408,7 +1334,7 @@
     function infectionTick(t) {
       if (!M || !M.infect || !t.infected) return;
       if (t.pr >= 28 && t.pr < M.cure && hasItem(t, 'med')) {
-        const it = itemOf(t, 'med'); t.inv.splice(t.inv.indexOf(it), 1); t.infected = false; t.pr = 0; stats.cured++;
+        const it = itemOf(t, 'med'); itemLedger.use('heal', t, t, it, () => { t.inv.splice(t.inv.indexOf(it), 1); t.infected = false; t.pr = 0; stats.cured++; }, 'Kit contro l’infezione');
         sys('selfMed', [t], { i: it.name }, { cat: 'heal', why: 'infezione' }, 3); return;
       }
       if (t.pr >= M.thr && !t.infKnown) {
@@ -1416,7 +1342,7 @@
         const mates = buddies(t);
         const doc = mates.find((x) => hasItem(x, 'med'));
         if (doc && t.pr < M.cure) {
-          const it = itemOf(doc, 'med'); doc.inv.splice(doc.inv.indexOf(it), 1); t.infected = false; t.pr = 0; stats.cured++;
+          const it = itemOf(doc, 'med'); itemLedger.use('heal', doc, t, it, () => { doc.inv.splice(doc.inv.indexOf(it), 1); t.infected = false; t.pr = 0; stats.cured++; }, 'Kit di un alleato contro l’infezione');
           t.owes[doc.id] = 'cura'; addAff(t, doc, 30); doc.saves++; t.mo += 10;
           sys('cure', [t, doc], {}, { cat: 'heal', why: 'infezione' }, 4); return;
         }
@@ -1445,6 +1371,8 @@
             if (it.type === 'cibo' && t.food < 45) eat(t);
           } else {
             const p = (0.08 + t.attr.sop * 0.045 + (hasTrait(t, 'cacciatore') ? 0.15 : 0) + (hasItem(t, 'mappa') ? 0.12 * MOD.map : 0) + (hasItem(t, 'attrezzo') ? 0.12 : 0)) * ZP[t.zone][0] * MOD.forage * wx('forage', 1) * (t.en < 25 ? 0.6 : 1);
+            if (hasItem(t, 'mappa')) itemLedger.record('bonus', t, t, itemOf(t, 'mappa'), null, 'Ricerca di cibo: termine +0,12 × modificatore mappa prima dei moltiplicatori e del limite');
+            if (hasItem(t, 'attrezzo')) itemLedger.record('bonus', t, t, itemOf(t, 'attrezzo'), null, 'Ricerca di cibo: termine +0,12 prima dei moltiplicatori e del limite');
             if (rng.chance(Math.min(0.92, p))) {
               const hungry = t.food < 40; t.foraged++; stats.foraged++;
               const nm = rng.pick(LEX.cibo || ['delle provviste']);
@@ -1469,7 +1397,7 @@
           const it = itemOf(donor, 'cibo');
           if (rng.chance(clamp(will, 0.05, 0.97))) {
             if (promised && rng.chance(0.5)) { const e = fmt(((BD.promises || {}).kept || {}).cibo, [donor, h]); if (e) remember1(h, e.html, 'fatto'); remember(h, donor, 'promiseKept'); }
-            donor.inv.splice(donor.inv.indexOf(it), 1); h.food += 48; h.mo += 8; h.owes[donor.id] = h.owes[donor.id] || 'dono'; addAff(h, donor, 18); donor.shared++; stats.shared++;
+            itemLedger.use('consume', donor, h, it, () => { donor.inv.splice(donor.inv.indexOf(it), 1); h.food += 48; h.mo += 8; }, 'Pasto condiviso da un alleato'); h.owes[donor.id] = h.owes[donor.id] || 'dono'; addAff(h, donor, 18); donor.shared++; stats.shared++;
             sys('share', [donor, h], { i: it.name }, { cat: 'heal', why: 'alleanza' }, 3);
           } else {
             addAff(h, donor, -25); h.mo -= 8; remember(h, donor, 'denied');
@@ -1486,14 +1414,15 @@
         const mates = buddies(t);
         const doc = mates.find((x) => hasItem(x, 'med')) || mates.find((x) => hasTrait(x, 'guaritore') || (x.attr.int >= 7 && x.attr.emp >= 6) || x.partner === t.id);
         if (doc && (hasItem(doc, 'med') || rng.chance(0.55 + doc.attr.emp * 0.03))) {
-          const it = itemOf(doc, 'med');
+          const it = itemOf(doc, 'med'), before = it ? itemLedger.state(t) : null;
           if (it) { doc.inv.splice(doc.inv.indexOf(it), 1); t.hp += 45 * MOD.heal; delete t.st.avvelenato; }
           else t.hp += (16 + doc.attr.int * 1.5 + (hasTrait(doc, 'guaritore') ? 12 : 0)) * MOD.heal * wx('heal', 1);
           t.owes[doc.id] = t.owes[doc.id] || 'cura'; addAff(t, doc, 16); doc.saves++; doc.nursed++; stats.nursed++; t.mo += 6;
           if (M && M.cure && !M.infect && it) t.pr -= M.cure * 0.6;
+          if (it) itemLedger.record('heal', doc, t, it, before, 'Cura con un kit di un alleato');
           sys(it ? 'nurseMed' : 'nurse', [doc, t], { i: it ? it.name : '' }, { cat: 'heal', why: 'cure' }, 3);
         } else if (hasItem(t, 'med') && t.hp < 45) {
-          const it2 = itemOf(t, 'med'); t.inv.splice(t.inv.indexOf(it2), 1); t.hp += 40 * MOD.heal; delete t.st.avvelenato;
+          const it2 = itemOf(t, 'med'); itemLedger.use('heal', t, t, it2, () => { t.inv.splice(t.inv.indexOf(it2), 1); t.hp += 40 * MOD.heal; delete t.st.avvelenato; }, 'Automedicazione');
           sys('selfMed', [t], { i: it2.name }, { cat: 'heal', why: 'cure' }, 2);
         }
         syncSt(t);
@@ -1530,6 +1459,7 @@
         let dm = (rc ? (rc.from && byId[rc.from] && !byId[rc.from].alive ? 7 : 4) : 0) + (t.allyId != null ? 4 : 0) + (t.partner ? 6 : 0) + (mates.some((x) => hasTrait(x, 'leader')) ? 3 : 0) + (t.fame >= 3 ? 2 : 0) +
           (alone ? (hasTrait(t, 'solitario') ? 2 : -3) : 0) - (t.food < 25 ? 6 : 0) - (t.hp < 40 ? 6 : 0) - (meterBad(t) ? 5 : 0);
         if (dm < 0) dm *= DR.mo;
+        if (rc) itemLedger.record('comfort', t, t, rc, null, 'Contributo al morale notturno: +' + (rc.from && byId[rc.from] && !byId[rc.from].alive ? 7 : 4) + ' nel calcolo complessivo');
         t.mo += dm + (58 - t.mo) * 0.08;
         syncSt(t);
       });
@@ -1566,7 +1496,7 @@
         const tr = itemOf(t, 'trap');
         if (!tr || !t.alive) return;
         if ((t.attr.int >= 6 || hasTrait(t, 'ingegnoso') || hasTrait(t, 'cacciatore') || rng.chance(0.3)) && rng.chance(0.55)) {
-          t.inv.splice(t.inv.indexOf(tr), 1); traps.push({ owner: t.id, zone: t.zone, ph: phases.length, name: tr.name, boom: tr.x === 'bomba' }); t.trapsSet++; stats.trapsSet++;
+          itemLedger.record('deploy', t, t, tr, null, 'Trappola piazzata nella zona ' + zoneName(t.zone)); t.inv.splice(t.inv.indexOf(tr), 1); traps.push({ owner: t.id, zone: t.zone, ph: phases.length, name: tr.name, boom: tr.x === 'bomba' }); t.trapsSet++; stats.trapsSet++;
           if (rng.chance(0.45)) sys('trapSet', [t], { i: tr.name, z: zoneName(t.zone) }, { cat: 'item', why: 'trappola' }, 1);
         }
       });
@@ -1580,6 +1510,8 @@
         attacks++; stats.beasts++;
         const guarded = alive().some((x) => x.guard === t.id && x.zone === t.zone);
         const def = Math.max(t.attr.furt, t.attr.agi, t.attr.cor) + d6() + (hasItem(t, 'arma') ? 2 : 0) + (hasItem(t, 'attrezzo') ? 1 : 0) + (alone ? 0 : 3) + (t.st.esausto != null ? -2 : 0) + (t.vigilPh >= phases.length - 1 ? 2 : 0) + (guarded ? 3 : 0);
+        if (hasItem(t, 'arma')) itemLedger.record('bonus', t, t, itemOf(t, 'arma'), null, '+2 alla difesa dai predatori; totale ' + def + '/14');
+        if (hasItem(t, 'attrezzo')) itemLedger.record('bonus', t, t, itemOf(t, 'attrezzo'), null, '+1 alla difesa dai predatori; totale ' + def + '/14');
         if (def >= 14) { t.survivedBeasts++; if (!alone) { allyMates(t).forEach((x) => addAff(t, x, 6)); sys('beastFend', [t], {}, { cat: 'ally', why: 'predatori' }, 2); } return; }
         hurt(t, 22 + rng.int(18), null, 'beast', true);
         if (t.hp > 0) sys('beastHit', [t], {}, { cat: 'hurt', why: 'predatori' }, 3);
@@ -1611,14 +1543,14 @@
         if (t.en <= 0) hurt(t, 5, null, 'exhaust', true);
         if (t.hp < 25 && t.hp > 0) {
           const it = itemOf(t, 'med');
-          if (it) { t.inv.splice(t.inv.indexOf(it), 1); t.hp += 40 * MOD.heal; delete t.st.avvelenato; sys('selfMed', [t], { i: it.name }, { cat: 'heal', why: 'cure' }, 2); }
+          if (it) { itemLedger.use('heal', t, t, it, () => { t.inv.splice(t.inv.indexOf(it), 1); t.hp += 40 * MOD.heal; delete t.st.avvelenato; }, 'Cura di emergenza'); sys('selfMed', [t], { i: it.name }, { cat: 'heal', why: 'cure' }, 2); }
           else { const c = t.cause; t.hp -= Math.max(2, 7 - t.attr.res * 0.4); if (t.hp < 15 && rng.chance(0.3)) sys('grave', [t], {}, { cat: 'hurt', why: 'ferite' }, 1); t.cause = c; }
         }
         meterTick(t, kind);
         infectionTick(t);
         const ex = itemOf(t, 'esplosivo');
         if (ex && t.st.ubriaco != null && rng.chance(0.15)) {
-          t.inv.splice(t.inv.indexOf(ex), 1); hurt(t, 38, null, 'accident', true); t.accItem = ex.name;
+          itemLedger.use('accident', t, t, ex, () => { t.inv.splice(t.inv.indexOf(ex), 1); hurt(t, 38, null, 'accident', true); }, 'Esplosione accidentale'); t.accItem = ex.name;
           if (t.hp > 0) sys('accident', [t], { i: ex.name }, { cat: 'hurt', why: 'incidente' }, 2);
         }
         syncSt(t);
@@ -1630,6 +1562,8 @@
           if (!closed.has(t.zone)) return;
           const z = zoneName(t.zone);
           const esc2 = 0.3 + t.attr.agi * 0.05 + t.en / 260 + (hasItem(t, 'mappa') ? 0.2 : 0) + (hasItem(t, 'attrezzo') ? 0.15 : 0);
+          if (hasItem(t, 'mappa')) itemLedger.record('bonus', t, t, itemOf(t, 'mappa'), null, '+0,20 al calcolo della probabilità di fuga dalla tempesta');
+          if (hasItem(t, 'attrezzo')) itemLedger.record('bonus', t, t, itemOf(t, 'attrezzo'), null, '+0,15 al calcolo della probabilità di fuga dalla tempesta');
           if (rng.chance(esc2)) { if (msgs < 1 && rng.chance(0.25)) { msgs++; sys('stormEscape', [t], { z }, { cat: 'none', why: 'tempesta' }, 0); } }
           else { hurt(t, (14 + rng.int(14)) * wx('storm', 1), null, 'storm', true); t.stormZ = z; if (t.hp > 0 && msgs < 2) { msgs++; sys('storm', [t], { z }, { cat: 'hurt', why: 'tempesta' }, 2); } }
           const open = [...Array(zoneCount).keys()].filter((i) => !closed.has(i));
@@ -1647,10 +1581,12 @@
           traps.splice(k, 1);
           const z = zoneName(tp.zone);
           const dodge = Math.max(v.attr.furt, v.attr.int, v.attr.agi) + d6() + (hasTrait(v, 'fortunato') ? 1 : 0) + (hasTrait(v, 'paranoico') ? 1 : 0) + (hasItem(v, 'mappa') ? 3 : 0) + (hasItem(v, 'attrezzo') ? 2 : 0);
+          if (hasItem(v, 'mappa')) itemLedger.record('bonus', v, v, itemOf(v, 'mappa'), null, '+3 alla difesa dalla trappola; totale ' + dodge + '/15');
+          if (hasItem(v, 'attrezzo')) itemLedger.record('bonus', v, v, itemOf(v, 'attrezzo'), null, '+2 alla difesa dalla trappola; totale ' + dodge + '/15');
           if (dodge >= 15) { addAff(v, owner, -15); sys('trapDodge', [owner, v], { z }, { cat: 'none', why: 'trappola' }, 2); break; }
           stats.trapHits++;
           const friendly = owner.allyId != null && owner.allyId === v.allyId;
-          hurt(v, (32 + rng.int(22)) * (tp.boom ? 1.5 : 1), !friendly ? owner : null, friendly ? 'wound' : 'trap', true);
+          itemLedger.use('attack', owner, v, { type: 'trap', name: tp.name }, () => hurt(v, (32 + rng.int(22)) * (tp.boom ? 1.5 : 1), !friendly ? owner : null, friendly ? 'wound' : 'trap', true), 'Trappola scattata' + (tp.boom ? ' con esplosivo' : ''));
           remember(v, owner, 'trap');
           v.trapZ = z;
           if (friendly) { addAff(v, owner, -30); if (v.hp > 0) sys('trapAlly', [owner, v], { z }, { cat: 'hurt', why: 'trappola' }, 3); }
@@ -1893,13 +1829,13 @@
         // fortuna
         if (tr('fortunato') || t.attr.fort >= 8) add(0.7 + (tr('fortunato') ? 0.5 : 0), () => { const it = mkItem(rng.pick(['valore', 'attrezzo', 'armatura', 'med', 'amuleto', 'alcol']), null, 'trovato'); addItem(t, it); t.items++; stats.items++; return say('luckyFind', [t], { i: it.name }, 'item', traitName(tr('fortunato') ? 'fortunato' : '') || 'Fortuna', 1); });
         // golosità
-        if (tr('goloso') && hasItem(t, 'cibo') && t.food >= 55) add(1, () => { const it = itemOf(t, 'cibo'); takeItem(t, it); t.food += 20; t.mo += 4; return say('glutton', [t], { i: it.name }, 'none', traitName('goloso'), 0); });
+        if (tr('goloso') && hasItem(t, 'cibo') && t.food >= 55) add(1, () => { const it = itemOf(t, 'cibo'); itemLedger.use('consume', t, t, it, () => { takeItem(t, it); t.food += 20; t.mo += 4; }, 'Pasto per golosità'); return say('glutton', [t], { i: it.name }, 'none', traitName('goloso'), 0); });
         // bere
-        if (hasItem(t, 'alcol') && (tr('ubriacone') || t.mo < 25)) add(1.3 + (tr('ubriacone') ? 1 : 0), () => { const it = itemOf(t, 'alcol'); takeItem(t, it); t.st.ubriaco = phases.length; t.mo += 12; t.en -= 8; if (M && !M.infect && (M.id === 'freddo' || M.id === 'terrore' || M.id === 'ansia' || M.id === 'stress')) t.pr -= 15; syncSt(t); return say('drink', [t], { i: it.name }, 'none', traitName(tr('ubriacone') ? 'ubriacone' : '') || 'Morale', 1); });
+        if (hasItem(t, 'alcol') && (tr('ubriacone') || t.mo < 25)) add(1.3 + (tr('ubriacone') ? 1 : 0), () => { const it = itemOf(t, 'alcol'), before = itemLedger.state(t); takeItem(t, it); t.st.ubriaco = phases.length; t.mo += 12; t.en -= 8; if (M && !M.infect && (M.id === 'freddo' || M.id === 'terrore' || M.id === 'ansia' || M.id === 'stress')) t.pr -= 15; syncSt(t); itemLedger.record('consume', t, t, it, before, 'Bevanda consumata'); return say('drink', [t], { i: it.name }, 'none', traitName(tr('ubriacone') ? 'ubriacone' : '') || 'Morale', 1); });
         // disinfettare una ferita infetta
         if (hasItem(t, 'alcol') && (tr('guaritore') || t.attr.int >= 6)) {
           const u = buddies(t).find((x) => x.st.malato != null);
-          if (u) add(2, () => { const it = itemOf(t, 'alcol'); takeItem(t, it); delete u.st.malato; u.owes[t.id] = 'cura'; addAff(t, u, 15); remember(u, t, 'cured'); return say('disinfect', [t, u], { i: it.name }, 'heal', 'Cure', 2); });
+          if (u) add(2, () => { const it = itemOf(t, 'alcol'); itemLedger.use('heal', t, u, it, () => { takeItem(t, it); delete u.st.malato; }, 'Disinfezione'); u.owes[t.id] = 'cura'; addAff(t, u, 15); remember(u, t, 'cured'); return say('disinfect', [t, u], { i: it.name }, 'heal', 'Cure', 2); });
         }
         // il solitario se ne va
         if (tr('solitario') && t.allyId != null && (alliances.get(t.allyId) || new Set()).size >= 3) add(0.8, () => { const m = allyMates(t); leaveAlliance(t); m.forEach((x) => addAff(x, t, -8)); return say('loner', [t], {}, 'none', traitName('solitario'), 2); });
@@ -1909,10 +1845,10 @@
         if (tr('ingegnoso') || t.attr.int >= 7) {
           const w = itemOf(t, 'arma'), tp = itemOf(t, 'trap'), ex = itemOf(t, 'esplosivo'), vn = itemOf(t, 'veleno'), at = itemOf(t, 'attrezzo');
           const why = traitName(tr('ingegnoso') ? 'ingegnoso' : '') || 'Ingegno';
-          if (tp && ex && !tp.x) add(2, () => { takeItem(t, ex); tp.x = 'bomba'; t.crafts++; return say('craftBomb', [t], {}, 'item', why, 2); });
-          if (w && vn && !w.x && !theme.soft) add(2, () => { takeItem(t, vn); w.x = 'veleno'; t.crafts++; return say('craftPoison', [t], { ip: possessive(w) }, 'item', why, 2); });
-          if (w && at && w.u != null && w.u <= Math.ceil((w.um || 4) / 2)) add(1.8, () => { w.u = Math.min(w.um || 6, w.u + 3); t.crafts++; return say('craftRepair', [t], { ip: possessive(w) }, 'item', why, 1); });
-          if (!tp && at && t.attr.int >= 7) add(0.7, () => { addItem(t, mkItem('trap', null, 'costruito')); t.crafts++; return say('craftTrap', [t], { i: at.name }, 'item', why, 1); });
+          if (tp && ex && !tp.x) add(2, () => { itemLedger.use('craft', t, t, ex, () => { takeItem(t, ex); tp.x = 'bomba'; }, 'Esplosivo incorporato nella trappola'); t.crafts++; return say('craftBomb', [t], {}, 'item', why, 2); });
+          if (w && vn && !w.x && !theme.soft) add(2, () => { itemLedger.use('craft', t, t, vn, () => { takeItem(t, vn); w.x = 'veleno'; }, 'Veleno applicato all’arma'); t.crafts++; return say('craftPoison', [t], { ip: possessive(w) }, 'item', why, 2); });
+          if (w && at && w.u != null && w.u <= Math.ceil((w.um || 4) / 2)) add(1.8, () => { const old = w.u; w.u = Math.min(w.um || 6, w.u + 3); itemLedger.record('craft', t, t, at, null, 'Arma riparata: usi ' + old + ' → ' + w.u); t.crafts++; return say('craftRepair', [t], { ip: possessive(w) }, 'item', why, 1); });
+          if (!tp && at && t.attr.int >= 7) add(0.7, () => { addItem(t, mkItem('trap', null, 'costruito')); itemLedger.record('craft', t, t, at, null, 'Attrezzo usato per costruire una trappola'); t.crafts++; return say('craftTrap', [t], { i: at.name }, 'item', why, 1); });
         }
         // spiare e smascherare i complotti
         if (tr('furtivo') || tr('paranoico') || t.attr.int >= 8) {
@@ -2530,7 +2466,7 @@
       return ['amore', 'amicizia', 'nemesi', 'tradimento', 'pieta', 'nonCorrisposto', 'mentore', 'odio', 'paura'].map((k) => best[k]).filter(Boolean);
     }
     stats.stories = bondStories();
-    return { version: 2, theme: theme.id, adult, seed, days: day, phases, tributes: stripped, winners: winners.map((t) => t.id), stats };
+    return { version: 2, theme: theme.id, adult, seed, days: day, phases, itemFacts: itemLedger.facts, tributes: stripped, winners: winners.map((t) => t.id), stats };
   }
 
   /* ---------------- Cast casuale ---------------- */

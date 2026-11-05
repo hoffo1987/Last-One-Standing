@@ -1743,4 +1743,8 @@ details.card > summary { font-size: 16px; }
 #seasonIO label:has(input[type="checkbox"]) { display: flex; align-items: center; }
 .lab-attributes { margin-top: 14px; }
 .lab-attributes > .help { margin: 12px 0; }
+.controlled-experiment { margin-top: 16px; border-top: 1px solid var(--line); padding-top: 16px; display: grid; gap: 12px; min-width: 0; }
+.controlled-experiment .row > label { flex: 1 1 120px; }
+.item-facts { list-style: none; padding: 0; display: grid; gap: 10px; margin: 10px 0; }
+.item-facts > li { padding: 10px; border-left: 3px solid var(--accent); border-radius: 8px; background: var(--panel-2); }
 .dx-title .dx-kicker { text-shadow: 0 1px 8px rgba(0,0,0,.7); }

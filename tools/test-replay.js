@@ -3,7 +3,7 @@
 const assert = require('node:assert/strict');
 const fs = require('node:fs'), path = require('node:path'), vm = require('node:vm');
 const src = path.join(__dirname, '..', 'src');
-for (const f of ['data-core.js', 'data-themes.js', ...fs.readdirSync(path.join(src, 'content')).filter((f) => f.endsWith('.js')).sort().map((f) => 'content/' + f), 'engine.js']) require(path.join(src, f));
+for (const f of ['data-core.js', 'data-themes.js', ...fs.readdirSync(path.join(src, 'content')).filter((f) => f.endsWith('.js')).sort().map((f) => 'content/' + f), 'engine-systems.js', 'engine.js']) require(path.join(src, f));
 const L = globalThis.LOS, D = globalThis.LOS_DATA, code = fs.readFileSync(path.join(src, 'replay.js'), 'utf8');
 function storage() {
   const data = new Map();
@@ -190,7 +190,7 @@ async function test(name, run) { await run(); passed++; console.log('  OK ' + na
   });
   await test('Il digest di build precede il modulo replay, che precede l’interfaccia', () => {
     const build = fs.readFileSync(path.join(__dirname, 'build.js'), 'utf8');
-    assert.ok(build.includes("'replay.js', 'studio.js', 'ui.js'")); assert.ok(build.includes("createHash('sha256')"));
+    assert.ok(build.includes("'replay.js', 'experiments.js', 'studio.js', 'ui.js'")); assert.ok(build.includes("createHash('sha256')"));
     assert.ok(build.includes('window.LOS_BUILD = '));
   });
   console.log('\nOK: ' + passed + ' gruppi di regressioni dell’archivio replay');

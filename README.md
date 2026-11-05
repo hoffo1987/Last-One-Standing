@@ -159,6 +159,7 @@ src/content/pack2-*.js   secondo pacchetto per ogni arena, legami comuni e sopra
 src/content/pack-*.js    pacchetti per arena (eventi, disastri, 18+), condivisi e per adulti
 src/content/*.js         eventi aggiuntivi e disastri della versione precedente
 src/engine.js        motore di simulazione (funziona anche in Node)
+src/engine-systems.js sistemi isolati: inventario, danni, ricordi, varietà, snapshot e registro oggetti
 src/art.js           usa logo e illustrazioni da assets/ (con ripiego in SVG), icone, coriandoli
 src/atlas.js         immagini della guida delle arene: file in assets/arene/<arena>/ o illustrazioni vettoriali per famiglia
 assets/              logo, icona, panoramica, anteprima dei link, sagome dei concorrenti e illustrazioni delle 9 arene (ottimizzati e incorporati dalla build)
@@ -166,6 +167,7 @@ src/anim.js          motore delle animazioni: atmosfere per arena, effetti degli
 src/replay.js        risultati immutabili nel browser, con IndexedDB e ripiego su localStorage
 src/simulator.js     esecuzione asincrona del motore in Web Worker, annullamento e ripiego compatibile
 src/studio.js        legami iniziali, seguiti, percorsi narrativi, eventi avanzati, laboratorio e stagioni
+src/experiments.js   esperimenti con semi accoppiati e una sola caratteristica variata
 docs/                versione per il web (Vercel o GitHub Pages): pagina leggera e immagini in docs/img con l'impronta nel nome, servite con cache lunga
 src/ui.js            interfaccia
 src/style.css        stile
@@ -196,6 +198,9 @@ node tools/test-variety-history.js # varietà, memoria storica e contesto degli 
 node tools/test-worker.js        # stesso risultato nel worker e nel motore principale
 node tools/test-studio.js        # legami iniziali, eventi avanzati, laboratorio, stagioni e percorsi della vittoria
 node tools/test-storage-ui.js    # scritture fallite, classifica persistita e deduplicazione delle foto
+node tools/test-engine-baseline.js # confronto completo con 36 risultati precedenti al refactoring
+node tools/test-item-facts.js    # registro oggetti, assenza di mutazioni e compatibilità dei replay
+node tools/test-experiments.js   # controllo delle coppie, riproducibilità e annullamento parziale
 node tools/measure-variety.js 10 # misura ripetizioni con cast e semi riproducibili in tutte le arene
 node tools/test-engine.js 40    # 40 partite per arena, metà con i contenuti 18+, controlla regole e determinismo
 node tools/fuzz.js 1500         # partite con impostazioni casuali e casi limite (2-60 concorrenti, una sola squadra, valori estremi)
@@ -267,12 +272,14 @@ La [guida agli eventi](docs-dev/eventi.md) descrive il linguaggio completo. Il w
 
 Il progetto mantiene **tutti i diritti riservati**, secondo [LICENSE](LICENSE). La provenienza documentata delle risorse visive è in [ASSETS.md](ASSETS.md).
 
-### Priorità ancora aperte dalla prima analisi
+### I tre approfondimenti della prima analisi
 
 Gli otto difetti iniziali su oggetti, importazione, conseguenze, danni differiti,
 temporalità, valori vitali, parser e replay sono coperti dai test di regressione.
-Restano questi approfondimenti, in ordine:
+Sono stati completati questi interventi:
 
-1. **Traccia puntuale degli effetti degli oggetti.** La storia dello zaino confronta snapshot e i salvataggi si leggono nei ricordi. Per attribuire un singolo intervento a un oggetto servono fatti strutturati al momento del suo utilizzo: il resoconto attuale non deduce quell'effetto dalla sola presenza dell'oggetto.
-2. **Refactoring incrementale del motore.** Estrarre trasferimenti, danno e responsabilità, relazioni, selezione eventi e snapshot in unità più piccole, preservando l'ordine delle estrazioni casuali e confrontando l'intero risultato prima e dopo. Evitare una riscrittura contemporanea di tutti i sistemi.
-3. **Esperimenti controllati sulle caratteristiche.** Le fasce del laboratorio mostrano associazioni nel cast reale. Per stimare l'effetto di una singola caratteristica occorre un secondo esperimento con cast, tratti e regole controllati, una sola caratteristica variata e semi accoppiati. La tabella attuale non viene presentata come questa misura.
+1. **Registro degli oggetti.** I nuovi risultati includono `itemFacts`: fase, ordine, oggetto e provenienza, proprietario, destinatario, stato prima/dopo e uso registrato. Il percorso personale e quello del vincitore mostrano consumi, cure, protezioni, attacchi con oggetti, lavorazioni e bonus applicati. I replay precedenti restano leggibili e vengono esplicitamente indicati come privi del registro: non si inventano effetti dai soli snapshot.
+2. **Refactoring incrementale del motore.** Inventario, normalizzazione e danno, memoria dei rapporti, varietà della selezione e snapshot sono ora sistemi con dipendenze esplicite in `engine-systems.js`. Lo stesso modulo è incorporato nel worker e nel file portatile; in Node viene caricato automaticamente anche richiedendo soltanto `engine.js`. Le regole di morte e le dinamiche sociali che coordinano più sistemi restano nel motore: questa è una separazione progressiva, non una riscrittura del gioco. Il confronto con 36 risultati completi del commit `b3c8f3b` conserva tutti i campi storici, incluse foto, snapshot, diari, oggetti, ricordi e statistiche; viene escluso soltanto il nuovo campo aggiuntivo `itemFacts`.
+3. **Esperimenti controllati.** Nel laboratorio, scegli concorrente, caratteristica, valore basso, valore alto e 5–200 coppie. In ogni coppia cambia soltanto quel valore: cast, tratti, squadre, regole, eventi e legami sono identici, con lo stesso seme nei due rami. Il resoconto mostra vittorie appaiate, differenze di frequenza, posizione media ed eliminazioni. Si possono interrompere i calcoli; contano soltanto le coppie complete. Il JSON contiene configurazione, versione e semi per riprodurre il campione. L'effetto si riferisce al modello e al campione scelti, senza una stima di incertezza statistica o garanzie per la partita successiva.
+
+La [guida a registro, sistemi ed esperimenti](docs-dev/simulazione.md) descrive i limiti delle misure e il protocollo di verifica.

@@ -62,8 +62,8 @@
       }
       const beforeKills = previous?.kills?.[id] || 0, afterKills = current.kills?.[id] || 0;
       if (afterKills > beforeKills) changes.push({ kind: 'credit', before: beforeKills, after: afterKills });
-      return { phase, day: p.day, title: p.title, events, changes, memories: memories.get(phase) || [], diary: diary.get(phase) || [] };
-    }).filter((p) => p.events.length || p.changes.length || p.memories.length || p.diary.length);
+      return { phase, day: p.day, title: p.title, events, changes, itemFacts: (result.itemFacts || []).filter(f => f.ph === phase && (f.who === id || f.owner === id)), memories: memories.get(phase) || [], diary: diary.get(phase) || [] };
+    }).filter((p) => p.events.length || p.changes.length || p.itemFacts.length || p.memories.length || p.diary.length);
   }
   function seasonScores(season) {
     const rows = new Map(season.configuration.cast.map((t) => [t.id, { id: t.id, name: t.name, points: 0, wins: 0, kills: 0, played: 0, rankSum: 0 }]));
@@ -90,7 +90,7 @@
     const { S, L, D, REPLAY, RUNNER, esc, plural } = A;
     const $ = (s) => document.querySelector(s), $$ = (s) => [...document.querySelectorAll(s)];
     const relationNames = { amicizia: 'Amicizia', rivalita: 'Rivalità', coppia: 'Coppia', fiducia: 'Fiducia →', attrazione: 'Attrazione →' };
-    let editing = null, labToken = 0, labActive = false, labStats = null, seasonRunning = false, seasonIOBusy = false;
+    let editing = null, labToken = 0, labActive = false, labStats = null, seasonRunning = false, seasonIOBusy = false, expToken = 0, expActive = false, expReport = null;
     function keepSeasons(next) { if (!A.commitSeasons(next)) throw new Error('La stagione non è stata salvata: libera spazio nel browser o esporta i dati importanti.'); }
     function renderRelations() {
       const ids = new Set(S.cast.map((t) => t.id));
@@ -127,12 +127,24 @@
       if (S.settings.followOnly) { S.settings.followOnly = false; A.save(); A.toast('Filtro dei seguiti disattivato per mostrare tutta la fase.'); }
       $('#profDlg')?.close?.(); A.go(phase); if (location.hash !== '#diretta') location.hash = '#diretta';
     }
+    function itemFactsHTML(facts, result, theme) {
+      const labels = { consume: 'Consumo', heal: 'Cura', protect: 'Eliminazione diretta evitata', absorb: 'Protezione dai danni', bonus: 'Bonus applicato', craft: 'Lavorazione', deploy: 'Trappola piazzata', attack: 'Attacco con oggetto', poison: 'Veleno', accident: 'Incidente', comfort: 'Ricordo' };
+      const names = Object.fromEntries(result.tributes.map(t => [t.id, t.name])), v = A.vitLabels(theme), keys = { hp: v.hp, en: v.en, mo: v.mo, food: v.food, pr: D.eco?.arenas[theme.id]?.meter?.name || 'Indicatore' };
+      return facts.length ? '<ul class="item-facts">' + facts.map(f => {
+        const changes = Object.entries(keys).filter(([k]) => f.before[k] !== f.after[k]).map(([k, label]) => label + ' ' + f.before[k].toFixed(1) + ' → ' + f.after[k].toFixed(1));
+        if (f.before.infected !== f.after.infected) changes.push(f.after.infected ? 'Infezione presente' : 'Infezione rimossa');
+        const target = result.tributes.find(t => t.id === f.who);
+        f.before.states.filter(s => !f.after.states.includes(s)).forEach(s => changes.push('Termina: ' + A.statusLabel(s, target, theme)));
+        f.after.states.filter(s => !f.before.states.includes(s)).forEach(s => changes.push('Condizione: ' + A.statusLabel(s, target, theme)));
+        return '<li><b>' + labels[f.kind] + ' · ' + esc(f.item.n) + '</b><p>' + esc(names[f.owner]) + (f.owner !== f.who ? ' → ' + esc(names[f.who]) : '') + ' · ' + esc(f.detail) + '</p>' + (changes.length ? '<p class="help">Variazioni nell’azione: ' + esc(changes.join(' · ')) + '</p>' : '') + (f.context ? '<p class="help">Evento: ' + esc(f.context) + '</p>' : '') + '</li>';
+      }).join('') + '</ul>' : '';
+    }
     function renderProfile(t, phase) {
       const on = (S.followed || []).includes(t.id), heading = $('#h-prof'); if (!heading) return;
       const result = A.getSIM(), theme = D.themes.find((th) => th.id === result.theme), timeline = personalTimeline(result, t.id, phase);
       const history = '<details class="personal-history"><summary>Il percorso fino a questa fase · ' + plural(timeline.length, 'tappa', 'tappe') + '</summary><p class="help">In ordine cronologico: eventi, ricordi, diario e cambiamenti tra fine fase e fine fase. Le variazioni di salute compaiono sempre; per gli altri valori mostriamo quelle di almeno 10 punti. Un oggetto può entrare e uscire nella stessa fase senza comparire nel confronto dello zaino.</p><ol class="causal-path">' + timeline.map((step) => '<li><b>G' + (step.day || 1) + ' · ' + esc(step.title) + '</b>' +
         (step.changes.length ? '<ul class="change-list">' + step.changes.map((c) => '<li>' + esc(changeText(c, t, theme, result)) + '</li>').join('') + '</ul>' : '') +
-        step.events.map((e) => '<p>' + esc(e.plain) + '</p>').join('') + step.memories.map((m) => memoryHTML(t, m, theme)).filter(Boolean).map((m) => '<p class="help">Ricordo: «' + m + '»</p>').join('') + step.diary.map((page) => '<p class="diary-entry"><span class="sub">Diario</span> ' + A.linkify(page.h) + '</p>').join('') +
+        itemFactsHTML(step.itemFacts, result, theme) + step.events.map((e) => '<p>' + esc(e.plain) + '</p>').join('') + step.memories.map((m) => memoryHTML(t, m, theme)).filter(Boolean).map((m) => '<p class="help">Ricordo: «' + m + '»</p>').join('') + step.diary.map((page) => '<p class="diary-entry"><span class="sub">Diario</span> ' + A.linkify(page.h) + '</p>').join('') +
         '<button class="btn sm" type="button" data-personal-phase="' + step.phase + '">Rivedi la fase ' + (step.phase + 1) + '</button></li>').join('') + '</ol></details>';
       heading.parentElement.insertAdjacentHTML('afterend', '<div class="follow-control"><button class="btn" type="button" data-follow="' + esc(t.id) + '" aria-pressed="' + on + '">' + (on ? 'Non seguire più' : 'Segui questo concorrente') + '</button></div>' + history);
     }
@@ -151,9 +163,9 @@
       const html = result.winners.map((id) => {
         const steps = causalSteps(result, id);
         const t = result.tributes.find((p) => p.id === id), theme = D.themes.find((th) => th.id === result.theme);
-        const support = personalTimeline(result, id, result.phases.length - 1).map((p) => ({ ...p, memories: p.memories.filter((m) => ['saved', 'cured', 'shared', 'gift', 'spared'].includes(m.k)), changes: p.changes.filter((c) => ['initialItem', 'itemAdded', 'itemRemoved'].includes(c.kind)) })).filter((p) => p.memories.length || p.changes.length);
+        const support = personalTimeline(result, id, result.phases.length - 1).map((p) => ({ ...p, memories: p.memories.filter((m) => ['saved', 'cured', 'shared', 'gift', 'spared'].includes(m.k)), changes: p.changes.filter((c) => ['initialItem', 'itemAdded', 'itemRemoved'].includes(c.kind)) })).filter((p) => p.memories.length || p.changes.length || p.itemFacts.length);
         return '<details><summary>Il percorso di ' + esc(names[id]) + '</summary>' + (steps.length ? '<ol class="causal-path">' + steps.map((step) => '<li><b>' + step.label + '</b><span class="help">G' + step.day + ' · ' + esc(step.title) + '</span><p>' + esc(step.plain) + '</p>' + (step.reason ? '<p class="help">' + esc(step.reason) + '</p>' : '') + '<button class="btn sm" type="button" data-story-phase="' + step.phase + '">Rivedi questa fase</button></li>').join('') + '</ol>' : '<p class="help">La vittoria è arrivata senza altri passaggi registrati di questi tipi.</p>') +
-          '<details><summary>Aiuti ricevuti e storia dello zaino</summary><p class="help">Ricordi degli aiuti ricevuti e oggetti presenti a fine fase. Un ingresso o un’uscita dallo zaino non dimostra da solo quale effetto abbia avuto l’oggetto sulla vittoria.</p><ol class="causal-path">' + support.map((p) => '<li><b>G' + (p.day || 1) + ' · ' + esc(p.title) + '</b>' + p.memories.map((m) => memoryHTML(t, m, theme)).filter(Boolean).map((m) => '<p>«' + m + '»</p>').join('') + '<ul>' + p.changes.map((c) => '<li>' + esc(changeText(c, t, theme, result)) + '</li>').join('') + '</ul><button class="btn sm" type="button" data-story-phase="' + p.phase + '">Rivedi questa fase</button></li>').join('') + '</ol></details></details>';
+          '<details><summary>Aiuti ricevuti e storia dello zaino</summary><p class="help">' + (result.itemFacts ? 'Il registro mostra utilizzi e bonus effettivamente applicati, con le variazioni nell’azione. Il confronto dello zaino resta separato: la presenza di un oggetto non dimostra un effetto sulla vittoria.' : 'Questo replay precede il registro degli oggetti: restano disponibili ricordi e confronti di fine fase, senza ricostruire utilizzi non registrati.') + '</p><ol class="causal-path">' + support.map((p) => '<li><b>G' + (p.day || 1) + ' · ' + esc(p.title) + '</b>' + itemFactsHTML(p.itemFacts, result, theme) + p.memories.map((m) => memoryHTML(t, m, theme)).filter(Boolean).map((m) => '<p>«' + m + '»</p>').join('') + '<ul>' + p.changes.map((c) => '<li>' + esc(changeText(c, t, theme, result)) + '</li>').join('') + '</ul><button class="btn sm" type="button" data-story-phase="' + p.phase + '">Rivedi questa fase</button></li>').join('') + '</ol></details></details>';
       }).join('');
       $('#resBody .resgrid').insertAdjacentHTML('beforebegin', '<section class="block card studio-panel" id="causalReport"><h2>Le svolte della vittoria</h2><p class="help">Eventi e condizioni realmente registrati. Le tappe raccontano il percorso, senza attribuire un effetto decisivo che il motore non ha misurato.</p>' + html + '</section>');
     }
@@ -363,16 +375,53 @@
       const frequency = (g) => g.appearances ? g.wins + ' / ' + g.appearances + ' · ' + g.frequency.toFixed(1) + '%' : '–';
       $('#labResults').insertAdjacentHTML('beforeend', '<details class="lab-attributes"><summary>Caratteristiche e vittorie nel campione</summary><p class="help">Ogni cella mostra vittorie / presenze e frequenza per fascia di caratteristica. Ogni concorrente conta una presenza per partita; ogni componente della squadra vincente conta una vittoria. La differenza confronta fascia alta e bassa in punti percentuali. È un’associazione osservata: tratti, altre caratteristiche e squadre cambiano insieme, quindi non misura da sola l’effetto della caratteristica.</p><div class="tablewrap"><table><caption>Frequenze osservate per caratteristica</caption><thead><tr><th>Caratteristica</th><th>Valore 1–4</th><th>Valore 5–7</th><th>Valore 8–10</th><th>Differenza alta–bassa</th></tr></thead><tbody>' + labStats.attributes.map((a) => '<tr><th scope="row">' + esc(a.name) + '</th>' + a.groups.map((g) => '<td>' + frequency(g) + '</td>').join('') + '<td>' + (a.difference == null ? 'Non confrontabile' : (a.difference > 0 ? '+' : '') + a.difference.toFixed(1) + ' pp') + '</td></tr>').join('') + '</tbody></table></div></details>');
     }
-    function labControls() { $('#labRun').disabled = labActive; $('#labCancel').disabled = !labActive; $('#labCount').disabled = labActive; }
+    function experimentControls() {
+      $('#expRun').disabled = expActive || labActive; $('#expCancel').disabled = !expActive;
+      ['expPerson', 'expAttribute', 'expLow', 'expHigh', 'expCount'].forEach(id => { $('#' + id).disabled = expActive; });
+    }
+    function showExperiment() {
+      if (!expReport) { $('#expResults').innerHTML = ''; return; }
+      const s = expReport.summary, signed = (n, digits) => n == null ? '–' : (n > 0 ? '+' : '') + n.toFixed(digits), pct = n => n == null ? '–' : n.toFixed(1) + '%';
+      const name = expReport.configuration.cast.find(t => t.id === expReport.person).name, attr = D.attrs.find(a => a.id === expReport.attribute).name;
+      $('#expResults').innerHTML = '<h4>' + esc(name) + ' · ' + esc(attr) + ' ' + expReport.low + ' / ' + expReport.high + '</h4><p class="help">' + s.count + ' coppie complete. Le coppie interrotte a metà non entrano nelle statistiche.</p><div class="tablewrap"><table><caption>Confronto accoppiato: alto meno basso</caption><thead><tr><th>Misura</th><th>Basso ' + expReport.low + '</th><th>Alto ' + expReport.high + '</th><th>Differenza</th></tr></thead><tbody><tr><th scope="row">Vittorie</th><td>' + s.lowWins + ' · ' + pct(s.lowRate) + '</td><td>' + s.highWins + ' · ' + pct(s.highRate) + '</td><td>' + signed(s.winDifference, 1) + ' pp</td></tr></tbody></table></div><p>Vittoria solo con valore basso: ' + s.onlyLow + '; solo alto: ' + s.onlyHigh + '; in entrambi: ' + s.both + '; in nessuno: ' + s.neither + '.</p><p>Variazione della posizione media: ' + signed(s.rankDifference, 2) + ' (un valore negativo indica un miglioramento). Variazione delle eliminazioni medie: ' + signed(s.killsDifference, 2) + '.</p><p class="help">Sono differenze osservate nelle coppie del campione, senza una stima di incertezza statistica. Aumentando il valore cambiano anche decisioni ed eventi: lo stesso seme non mantiene identica tutta la sequenza della storia. La configurazione e i semi delle coppie sono inclusi nel JSON.</p>';
+    }
+    function cancelExperiment() {
+      if (!expActive) return;
+      expToken++; expActive = false; RUNNER?.cancel(); if (expReport) expReport.cancelled = true;
+      A.simulationBusy(false); experimentControls(); labControls(); showExperiment();
+      $('#expMsg').textContent = 'Esperimento interrotto: conservate soltanto le ' + (expReport?.completed || 0) + ' coppie complete.';
+    }
+    $('#expRun').addEventListener('click', async () => {
+      if (labActive || expActive) return;
+      const E = G.LOS_EXPERIMENTS; let p;
+      try { p = E.plan(cleanConfiguration(A.currentConfiguration()), $('#expPerson').value, $('#expAttribute').value, +$('#expLow').value, +$('#expHigh').value, +$('#expCount').value); }
+      catch (e) { $('#expMsg').textContent = e.message; return; }
+      const token = ++expToken; expActive = true; experimentControls(); labControls(); A.simulationBusy(true);
+      expReport = { ...copy(p), completed: 0, pairs: [], summary: E.summarize([]), cancelled: false };
+      $('#expProgress').value = 0; $('#expProgress').max = p.count; $('#expMsg').textContent = 'Esperimento in corso: ogni coppia richiede due partite.'; showExperiment();
+      const report = await E.run(p, { simulate: cfg => RUNNER ? RUNNER.simulate(cfg) : Promise.resolve().then(() => L.simulate(cfg)), cancelled: () => token !== expToken,
+        onProgress: report => { if (token !== expToken) return; expReport = report; $('#expProgress').value = report.completed; $('#expMsg').textContent = report.completed + ' / ' + p.count + ' coppie complete.'; showExperiment(); } });
+      if (token !== expToken) return;
+      expReport = report; expActive = false; A.simulationBusy(false); experimentControls(); labControls(); showExperiment();
+      $('#expMsg').textContent = report.error ? 'Esperimento interrotto: ' + report.error : report.completed + ' / ' + p.count + ' coppie complete.';
+    });
+    $('#expCancel').addEventListener('click', cancelExperiment);
+    $('#expCopy').addEventListener('click', () => { if (expReport) A.copyText(JSON.stringify(expReport, null, 2), 'Esperimento copiato.'); else $('#expMsg').textContent = 'Esegui prima un esperimento.'; });
+    function labControls() { $('#labRun').disabled = labActive || expActive; $('#labCancel').disabled = !labActive; $('#labCount').disabled = labActive; experimentControls(); }
     function cancelLab() {
       if (!labActive) return;
       labToken++; labActive = false; RUNNER?.cancel(); A.simulationBusy(false); labControls();
       $('#labMsg').textContent = 'Campione interrotto dopo ' + (labStats ? labStats.completed : 0) + ' partite. I risultati parziali restano disponibili.'; showLab();
     }
-    $('#labOpen').addEventListener('click', () => { $('#labDlg').showModal(); showLab(); });
-    $('#labDlg').addEventListener('close', cancelLab); $('#labCancel').addEventListener('click', cancelLab);
+    $('#labOpen').addEventListener('click', () => {
+      const id = $('#expPerson').value; $('#expPerson').innerHTML = S.cast.map(t => '<option value="' + esc(t.id) + '">' + esc(t.name) + '</option>').join(''); if (S.cast.some(t => t.id === id)) $('#expPerson').value = id;
+      if (!$('#expAttribute').innerHTML) $('#expAttribute').innerHTML = D.attrs.map(a => '<option value="' + a.id + '">' + esc(a.name) + '</option>').join('');
+      $('#labDlg').showModal(); showLab(); showExperiment(); experimentControls();
+    });
+    $('#labDlg').addEventListener('close', () => { cancelLab(); cancelExperiment(); }); $('#labCancel').addEventListener('click', cancelLab);
     $('#labCopy').addEventListener('click', () => { if (!labStats) return; showLab(); A.copyText(JSON.stringify(labStats, null, 2), 'Risultati del campione copiati.'); });
     $('#labRun').addEventListener('click', async () => {
+      if (expActive) return;
       let cfg, count;
       try { cfg = cleanConfiguration(A.currentConfiguration()); count = +$('#labCount').value; if (!Number.isInteger(count) || count < 5 || count > 200) throw new Error('Scegli un campione tra 5 e 200 partite.'); }
       catch (e) { $('#labMsg').textContent = e.message; return; }
@@ -391,7 +440,7 @@
       } catch (e) { if (token === labToken) $('#labMsg').textContent = e.name === 'AbortError' ? 'Campione interrotto.' : 'Campione interrotto: ' + e.message; }
       finally { if (token === labToken) { labActive = false; labControls(); A.simulationBusy(false); showLab(); } }
     });
-    return { renderRelations, renderProfile, renderResults, renderSeasons, restoreSeasons, recordResult, previewAdvanced, exportSeason, importSeason, beforeSimulation: cancelLab };
+    return { renderRelations, renderProfile, renderResults, renderSeasons, restoreSeasons, recordResult, previewAdvanced, exportSeason, importSeason, beforeSimulation: () => { cancelLab(); cancelExperiment(); } };
   }
   G.LOS_STUDIO = { init, seasonScores, causalSteps, personalTimeline, attributeSummary, seasonHighlights };
 })(typeof window === 'object' ? window : globalThis);

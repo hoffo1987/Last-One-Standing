@@ -48,6 +48,11 @@
       const textList = (xs) => Array.isArray(xs) && xs.every((x) => typeof x === 'string');
       const promise = (q) => record(q) && ids.has(q.to) && promiseKinds.has(q.k) && phase(q.ph) && integer(q.d) && (q.done == null || ['mantenuta', 'tradita', 'sciolta'].includes(q.done)) && (q.end == null || phase(q.end) && q.end >= q.ph);
       const item = (it) => record(it) && typeof it.t === 'string' && typeof it.n === 'string' && (it.q == null || integer(it.q, 1) && it.q <= 3) && (it.u == null || Number.isFinite(it.u) && it.u >= 0) && (it.m == null || Number.isFinite(it.m) && it.m > 0) && (it.f == null || ids.has(it.f));
+      if (result.itemFacts !== undefined) {
+        const kinds = new Set(['consume', 'heal', 'protect', 'absorb', 'bonus', 'craft', 'deploy', 'attack', 'poison', 'accident', 'comfort']);
+        const state = (s) => record(s) && ['hp', 'en', 'mo', 'food', 'pr'].every(k => Number.isFinite(s[k]) && s[k] >= 0 && s[k] <= 100) && textList(s.states) && typeof s.infected === 'boolean';
+        if (!Array.isArray(result.itemFacts) || result.itemFacts.length > 200000 || !result.itemFacts.every((f, i) => record(f) && f.seq === i && phase(f.ph) && kinds.has(f.kind) && ids.has(f.owner) && ids.has(f.who) && item(f.item) && state(f.before) && state(f.after) && typeof f.detail === 'string' && typeof f.context === 'string')) return false;
+      }
       const event = (e) => record(e) && safeHtml(e.html, ids) && typeof e.plain === 'string' && refs(e.ids) && refs(e.deaths) && (e.note || categories.has(e.cat)) &&
         (e.echo == null || Array.isArray(e.echo) && e.echo.every((x) => record(x) && safeHtml(x.html, ids) && typeof x.plain === 'string' && classes.has(x.cls || ''))) &&
         (e.test == null || record(e.test) && ids.has(e.test.who) && typeof e.test.attr === 'string' && (!attrs || attrs.has(e.test.attr)) && Number.isFinite(e.test.roll) && Number.isFinite(e.test.dc) && typeof e.test.pass === 'boolean');

@@ -2,7 +2,7 @@
 // node tools/lint-content.js
 const fs = require('fs'), path = require('path');
 const dir = path.join(__dirname, '..', 'src');
-for (const f of ['data-core.js', 'data-themes.js', ...fs.readdirSync(path.join(dir, 'content')).filter((x) => x.endsWith('.js')).sort().map((x) => 'content/' + x), 'engine.js']) require(path.join(dir, f));
+for (const f of ['data-core.js', 'data-themes.js', ...fs.readdirSync(path.join(dir, 'content')).filter((x) => x.endsWith('.js')).sort().map((x) => 'content/' + x), 'engine-systems.js', 'engine.js']) require(path.join(dir, f));
 const D = globalThis.LOS_DATA, LOS = globalThis.LOS;
 const errors = [], warns = [];
 const blocks = [];

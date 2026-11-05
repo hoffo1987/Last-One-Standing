@@ -5,7 +5,7 @@ function extract(start, end) { const a = engine.indexOf(start), b = engine.index
 let passed = 0;
 function test(name, fn) { fn(); passed++; console.log('OK: ' + name); }
 test('copie dello stesso modello condividono frequenza e intervallo di esclusione', () => {
-  const c = vm.createContext({}); vm.runInContext(extract('  function eventVariety(', '  function simulate('), c);
+  const c = vm.createContext({}); vm.runInContext(fs.readFileSync(path.join(src, 'engine-systems.js'), 'utf8'), c); c.eventVariety = c.LOS_SYSTEMS.eventVariety;
   const usage = c.eventVariety(), a = { text: '{A} riposa.' }, duplicate = { text: '  {A}  RIPOSA. ' }, other = { text: '{A} legge.' };
   assert.equal(usage.weight(a), 1); usage.record(a);
   assert.equal(usage.recent(duplicate), true); assert.ok(usage.weight(duplicate) < usage.weight(other));
@@ -15,7 +15,7 @@ test('copie dello stesso modello condividono frequenza e intervallo di esclusion
 });
 test('otto ricordi recenti non cancellano fatti o pagine precedenti', () => {
   const c = { phases: [], day: 1, BD: { memfx: {} }, tweak() {} };
-  vm.createContext(c); vm.runInContext(extract('    function remember(', '    function syncSt('), c);
+  vm.createContext(c); vm.runInContext(fs.readFileSync(path.join(src, 'engine-systems.js'), 'utf8'), c); Object.assign(c, c.LOS_SYSTEMS.createMemory({ ...c, getDay: () => c.day }));
   const a = { id: 'a', mem: {}, memoryHistory: {}, diary: [] }, b = { id: 'b' };
   c.remember(a, b, 'love');
   for (let i = 0; i < 100; i++) { c.phases.push({}); c.remember(a, b, 'shared'); c.remember1(a, '<b>Pagina ' + i + '</b>', 'pensiero'); }
@@ -34,7 +34,7 @@ test('il contesto descrive i requisiti presenti prima dell’evento senza aggiun
   assert.equal(c.eventReason({ req: [] }, [a, b]), '');
 });
 const c = vm.createContext({});
-for (const f of ['data-core.js', 'data-themes.js', ...fs.readdirSync(path.join(src, 'content')).filter(f => f.endsWith('.js')).sort().map(f => 'content/' + f), 'engine.js']) vm.runInContext(fs.readFileSync(path.join(src, f), 'utf8'), c, { filename: f });
+for (const f of ['data-core.js', 'data-themes.js', ...fs.readdirSync(path.join(src, 'content')).filter(f => f.endsWith('.js')).sort().map(f => 'content/' + f), 'engine-systems.js', 'engine.js']) vm.runInContext(fs.readFileSync(path.join(src, f), 'utf8'), c, { filename: f });
 test('anche un catalogo con un solo modello idoneo permette di terminare la partita', () => {
   const D = c.LOS_DATA, ordinary = D.themes[0];
   D.themes = [{ ...ordinary, id: 'audit', soft: true, pool: { b: '1 | {A} aspetta.', d: '1 | {A} aspetta.', n: '1 | {A} aspetta.', fallback: '1 | {A} aspetta.', finale: '2 k:A>B | {A} elimina {B}.' }, disasters: [], extra: {} }];

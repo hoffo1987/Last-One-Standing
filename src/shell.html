@@ -302,6 +302,14 @@
   <label>Partite nel campione<input id="labCount" type="number" min="5" max="200" value="30"></label>
   <div class="row"><button class="btn primary" id="labRun" type="button">Avvia il campione</button><button class="btn" id="labCancel" type="button" disabled>Interrompi</button><button class="btn" id="labCopy" type="button">Copia risultati</button></div>
   <progress id="labProgress" value="0" max="30" aria-label="Partite analizzate nel campione"></progress><p id="labMsg" class="help" role="status"></p><div id="labResults"></div>
+  <section class="controlled-experiment" aria-labelledby="h-exp"><h3 id="h-exp">Esperimento su una caratteristica</h3>
+    <p class="help">Confronta lo stesso concorrente con due valori diversi. Ogni coppia usa lo stesso seme, cast, tratti, legami e regole: cambia soltanto la caratteristica scelta. Le vittorie di squadra contano anche per il concorrente selezionato.</p>
+    <label>Concorrente<select id="expPerson"></select></label><label>Caratteristica<select id="expAttribute"></select></label>
+    <div class="row"><label>Valore basso<input id="expLow" type="number" min="1" max="9" value="3"></label><label>Valore alto<input id="expHigh" type="number" min="2" max="10" value="9"></label><label>Coppie di partite<input id="expCount" type="number" min="5" max="200" value="20"></label></div>
+    <p class="help">Ogni coppia richiede due simulazioni. L’effetto osservato vale per il modello, il cast e i semi scelti; non garantisce il risultato della prossima partita.</p>
+    <div class="row"><button class="btn primary" id="expRun" type="button">Avvia esperimento</button><button class="btn" id="expCancel" type="button" disabled>Interrompi esperimento</button><button class="btn" id="expCopy" type="button">Copia esperimento</button></div>
+    <progress id="expProgress" value="0" max="20" aria-label="Coppie complete nell’esperimento"></progress><p id="expMsg" class="help" role="status"></p><div id="expResults"></div>
+  </section>
 </div></dialog>
 <div class="toast" id="toast" hidden role="status"></div>
 <div class="sim-progress card" id="simProgress" hidden role="status"><span>La partita prende forma…</span><button class="btn sm" type="button" id="cancelSim">Annulla il calcolo</button></div>

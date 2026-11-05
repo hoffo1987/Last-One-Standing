@@ -5,7 +5,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 const vm = require('node:vm');
 const src = path.join(__dirname, '..', 'src');
-const files = ['data-core.js', 'data-themes.js', ...fs.readdirSync(path.join(src, 'content')).filter((f) => f.endsWith('.js')).sort().map((f) => 'content/' + f), 'engine.js'];
+const files = ['data-core.js', 'data-themes.js', ...fs.readdirSync(path.join(src, 'content')).filter((f) => f.endsWith('.js')).sort().map((f) => 'content/' + f), 'engine-systems.js', 'engine.js'];
 const sources = files.map((f) => [f, fs.readFileSync(path.join(src, f), 'utf8')]);
 let passed = 0;
 function test(name, run) {
@@ -125,6 +125,8 @@ test('un amuleto che salva tutte le vittime evita il badge Uccisione', () => {
   assert.ok(event);
   assert.equal(event.deaths.length, 0); assert.equal(event.lethal, false); assert.equal(event.cat, 'hurt');
   assert.ok(event.echo.some((e) => e.cls === 'twist'));
+  const fact = result.itemFacts.find(f => f.ph === 0 && f.kind === 'protect' && f.who === 'b');
+  assert.ok(fact); assert.equal(fact.item.t, 'amuleto'); assert.equal(fact.owner, 'b'); assert.ok(fact.after.hp < fact.before.hp);
 });
 test('un tradimento sventato conserva il badge Tradimento senza dichiarare una morte', () => {
   const result = fixture({ opening: directed('tr:A>B'), traitsB: ['superstizioso'], allied: true });
