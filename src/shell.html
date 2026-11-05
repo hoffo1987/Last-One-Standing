@@ -57,6 +57,12 @@
         <p class="help">Conserva un cast per più round: 1 punto per la partecipazione, 3 per la vittoria e 1 per ogni eliminazione attribuita.</p>
         <div class="row"><label>Nome della stagione<input id="seasonName" type="text" maxlength="80" placeholder="La mia stagione"></label><button class="btn" id="seasonCreate" type="button">Crea con il cast attuale</button></div>
         <label>Stagione<select id="seasonSelect"></select></label><div id="seasonBoard"></div><p class="help" id="seasonMsg" role="status"></p>
+        <details id="seasonIO"><summary>Salva o importa una stagione</summary>
+          <p class="help">Il file conserva cast, regole, classifica e dettagli dei round. Puoi includere i replay disponibili per rivederli su un altro dispositivo. Importare crea una nuova stagione.</p>
+          <label><input id="seasonIncludeReplays" type="checkbox" checked> Includi i replay disponibili</label>
+          <label for="seasonJSON">JSON della stagione</label><textarea id="seasonJSON" rows="6" spellcheck="false"></textarea>
+          <div class="row"><button class="btn" id="seasonExport" type="button">Esporta stagione selezionata</button><button class="btn" id="seasonImport" type="button">Importa stagione</button><button class="btn" id="seasonCopy" type="button">Copia JSON stagione</button><button class="btn" id="seasonDownload" type="button">Scarica stagione</button></div><p id="seasonIOMsg" class="help" role="status"></p>
+        </details>
       </section>
       <div class="howto">
         <div class="how"><span class="hn">1</span><h3>Crea il cast</h3><p>Nomi, genere, squadre, tratti e foto. Puoi incollare un elenco di nomi o generarne uno.</p></div>

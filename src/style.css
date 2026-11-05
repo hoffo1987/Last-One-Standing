@@ -1732,4 +1732,15 @@ details.card > summary { font-size: 16px; }
   .inv-art .ax { width: 120px; height: 120px; }
 }
 .arenapreview h4, .arenapreview h5 { margin: 0; }
+.personal-history { margin: 0 18px 18px; padding: 14px; border: 1px solid var(--line); border-radius: 14px; }
+.personal-history summary, .lab-attributes summary, #seasonIO summary { cursor: pointer; font-weight: 600; }
+.personal-history .causal-path { padding-left: 18px; }
+.personal-history .change-list { padding-left: 18px; margin: 8px 0; font-size: 13px; }
+.personal-history p { margin-top: 8px; }
+.personal-history .diary-entry { padding: 10px; background: var(--panel-2); border-radius: 10px; }
+#seasonIO { margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--line); }
+#seasonIO textarea { width: 100%; }
+#seasonIO label:has(input[type="checkbox"]) { display: flex; align-items: center; }
+.lab-attributes { margin-top: 14px; }
+.lab-attributes > .help { margin: 12px 0; }
 .dx-title .dx-kicker { text-shadow: 0 1px 8px rgba(0,0,0,.7); }

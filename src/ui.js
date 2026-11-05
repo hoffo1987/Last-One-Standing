@@ -231,15 +231,20 @@
   const teamColor = (team) => L.PALETTE[(Math.max(1, team) - 1) % L.PALETTE.length];
 
   let saveTimer = null, warnedQuota = false;
+  function storeState(state) {
+    const imgs = Object.fromEntries(state.cast.map((t) => [t.id, t.img]));
+    const out = state.run && state.run.cfg ? Object.assign({}, state, { run: Object.assign({}, state.run, { cfg: Object.assign({}, state.run.cfg, { cast: state.run.cfg.cast.map((t) => (t.img && imgs[t.id] === t.img ? Object.assign({}, t, { img: '@cast' }) : t)) }) }) }) : state;
+    try { localStorage.setItem(KEY, JSON.stringify(out)); warnedQuota = false; return true; }
+    catch (e) { if (!warnedQuota) { warnedQuota = true; toast('Lo spazio del browser è pieno: le ultime modifiche non sono state salvate. Esporta i dati importanti o prova con foto più piccole.'); } return false; }
+  }
   function save() {
     clearTimeout(saveTimer);
-    saveTimer = setTimeout(() => {
-      // le foto della partita in corso sono quasi sempre quelle del cast: si salvano una volta sola
-      const imgs = Object.fromEntries(S.cast.map((t) => [t.id, t.img]));
-      const out = S.run && S.run.cfg ? Object.assign({}, S, { run: Object.assign({}, S.run, { cfg: Object.assign({}, S.run.cfg, { cast: S.run.cfg.cast.map((t) => (t.img && imgs[t.id] === t.img ? Object.assign({}, t, { img: '@cast' }) : t)) }) }) }) : S;
-      try { localStorage.setItem(KEY, JSON.stringify(out)); }
-      catch (e) { if (!warnedQuota) { warnedQuota = true; toast('Lo spazio del browser è pieno: le ultime modifiche non sono state salvate. Prova con foto più piccole.'); } }
-    }, 250);
+    saveTimer = setTimeout(() => storeState(S), 250);
+  }
+  function commitSeasons(seasons) {
+    clearTimeout(saveTimer);
+    if (!storeState({ ...S, seasons })) return false;
+    S.seasons = seasons; return true;
   }
   function persistRun(run, result) {
     if (!REPLAY) return Promise.resolve(false);
@@ -1718,7 +1723,7 @@
         attrHTML(t, theme, i, atRes) +
         '<div><div class="sub" style="margin-bottom:8px">La sua storia' + (atRes ? '' : ' finora') + '</div><div class="ptl">' + (hist.length ? hist.map(({ e, p }) => '<div class="it" style="--cc:var(--c-' + (e.cat || 'none') + ')"><span>' + (p.kind === 'b' ? 'Inizio' : 'G' + p.day + ' ' + (p.kind === 'n' ? 'notte' : p.kind === 'd' ? 'giorno' : KIND[p.kind].toLowerCase())) + '</span><p>' + linkify(e.html) + '</p></div>').join('') : '<p class="help">Nessun evento ancora.</p>') + '</div></div>' +
       '</div>';
-    if (typeof studio !== 'undefined' && studio) studio.renderProfile(t);
+    if (typeof studio !== 'undefined' && studio) studio.renderProfile(t, i);
     if (!$('#profDlg').open) $('#profDlg').showModal();
     $('#profDlg').scrollTop = 0;
   }
@@ -2055,7 +2060,7 @@
     route();
     if (load.warning) toast(load.warning);
   }
-  const studio = window.LOS_STUDIO ? window.LOS_STUDIO.init({ S, L, D, REPLAY, RUNNER, save, toast, esc, plural, inputId, normalizeCast, normalizeCustoms, sanitizeSettings, renderCustomList, currentConfiguration, runSim, simulationBusy, copyText, openSavedReplay, causeTxt, getSIM: () => SIM, renderLive, go, openProfile }) : null;
+  const studio = window.LOS_STUDIO ? window.LOS_STUDIO.init({ S, L, D, REPLAY, RUNNER, save, commitSeasons, toast, esc, plural, inputId, normalizeCast, normalizeCustoms, sanitizeSettings, renderCustomList, currentConfiguration, runSim, simulationBusy, copyText, openSavedReplay, causeTxt, statusLabel, vitLabels, fill, linkify, getSIM: () => SIM, renderLive, go, openProfile }) : null;
   const H = window.claude && window.claude.hot;
   if (H && typeof H.snapshot === 'function') { try { H.snapshot(() => ({ phase: S.run ? S.run.phase : 0 })); } catch (e) { /* niente */ } }
   if (H && typeof H.ready === 'function') H.ready(boot); else boot((H && H.data) || {});

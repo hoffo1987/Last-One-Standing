@@ -1755,6 +1755,17 @@ details.card > summary { font-size: 16px; }
   .inv-art .ax { width: 120px; height: 120px; }
 }
 .arenapreview h4, .arenapreview h5 { margin: 0; }
+.personal-history { margin: 0 18px 18px; padding: 14px; border: 1px solid var(--line); border-radius: 14px; }
+.personal-history summary, .lab-attributes summary, #seasonIO summary { cursor: pointer; font-weight: 600; }
+.personal-history .causal-path { padding-left: 18px; }
+.personal-history .change-list { padding-left: 18px; margin: 8px 0; font-size: 13px; }
+.personal-history p { margin-top: 8px; }
+.personal-history .diary-entry { padding: 10px; background: var(--panel-2); border-radius: 10px; }
+#seasonIO { margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--line); }
+#seasonIO textarea { width: 100%; }
+#seasonIO label:has(input[type="checkbox"]) { display: flex; align-items: center; }
+.lab-attributes { margin-top: 14px; }
+.lab-attributes > .help { margin: 12px 0; }
 .dx-title .dx-kicker { text-shadow: 0 1px 8px rgba(0,0,0,.7); }
 </style>
 
@@ -1809,6 +1820,12 @@ details.card > summary { font-size: 16px; }
         <p class="help">Conserva un cast per più round: 1 punto per la partecipazione, 3 per la vittoria e 1 per ogni eliminazione attribuita.</p>
         <div class="row"><label>Nome della stagione<input id="seasonName" type="text" maxlength="80" placeholder="La mia stagione"></label><button class="btn" id="seasonCreate" type="button">Crea con il cast attuale</button></div>
         <label>Stagione<select id="seasonSelect"></select></label><div id="seasonBoard"></div><p class="help" id="seasonMsg" role="status"></p>
+        <details id="seasonIO"><summary>Salva o importa una stagione</summary>
+          <p class="help">Il file conserva cast, regole, classifica e dettagli dei round. Puoi includere i replay disponibili per rivederli su un altro dispositivo. Importare crea una nuova stagione.</p>
+          <label><input id="seasonIncludeReplays" type="checkbox" checked> Includi i replay disponibili</label>
+          <label for="seasonJSON">JSON della stagione</label><textarea id="seasonJSON" rows="6" spellcheck="false"></textarea>
+          <div class="row"><button class="btn" id="seasonExport" type="button">Esporta stagione selezionata</button><button class="btn" id="seasonImport" type="button">Importa stagione</button><button class="btn" id="seasonCopy" type="button">Copia JSON stagione</button><button class="btn" id="seasonDownload" type="button">Scarica stagione</button></div><p id="seasonIOMsg" class="help" role="status"></p>
+        </details>
       </section>
       <div class="howto">
         <div class="how"><span class="hn">1</span><h3>Crea il cast</h3><p>Nomi, genere, squadre, tratti e foto. Puoi incollare un elenco di nomi o generarne uno.</p></div>
@@ -10090,7 +10107,7 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
 </script>
 <script>window.LOS_ASSETS = {"logo":"img/logo.f2d5175789.webp","icona":"img/icona.8b02ddeb49.webp","favicon":"img/favicon.86774dc7cf.png","panoramica":"img/panoramica.66c4c27255.webp","sagome":["img/sagome-cappuccio.e8876ba986.webp","img/sagome-esploratore.9a99fd13f8.webp","img/sagome-viaggiatore.5e36435604.webp"],"arene":{"classico":"img/arene-classico.42c6ba42ee.webp","fantasy":"img/arene-fantasy.75b7fb0d32.webp","horror":"img/arene-horror.48052d80b4.webp","liceo":"img/arene-liceo.05ed578a90.webp","royale":"img/arene-royale.36c9952cd7.webp","scifi":"img/arene-scifi.403694f00f.webp","ufficio":"img/arene-ufficio.67b271bea3.webp","wasteland":"img/arene-wasteland.889002ace8.webp","zombie":"img/arene-zombie.36c9135a12.webp"},"atlas":{"classico":{"luoghi":{"altopiano":"img/arene-classico-luoghi-altopiano.36a37512d3.webp","bosco":"img/arene-classico-luoghi-bosco.2e9163544b.webp","cornucopia":"img/arene-classico-luoghi-cornucopia.393b2dabe1.webp","fiume":"img/arene-classico-luoghi-fiume.22b335a914.webp","paludi":"img/arene-classico-luoghi-paludi.77cf115eb4.webp","rovine":"img/arene-classico-luoghi-rovine.9ea4f70ca9.webp"},"pericoli":{"branco-di-lupi-mutanti":"img/arene-classico-pericoli-branco-di-lupi-mutanti.d786a62875.webp","orso-affamato":"img/arene-classico-pericoli-orso-affamato.e4f38a9892.webp","sciame-di-vespe-velenose":"img/arene-classico-pericoli-sciame-di-vespe-velenose.5adb2c7b8d.webp","serpente-gigante":"img/arene-classico-pericoli-serpente-gigante.b17e7f3d91.webp"}},"fantasy":{"luoghi":{"foresta-elfica":"img/arene-fantasy-luoghi-foresta-elfica.0448fcfbd3.webp","lago-nebbioso":"img/arene-fantasy-luoghi-lago-nebbioso.f19abc7c81.webp","miniere":"img/arene-fantasy-luoghi-miniere.5baa916ec9.webp","palude-stregata":"img/arene-fantasy-luoghi-palude-stregata.6a0b2af4a7.webp","picco-del-drago":"img/arene-fantasy-luoghi-picco-del-drago.06bdfd84b1.webp","torre-in-rovina":"img/arene-fantasy-luoghi-torre-in-rovina.ac716863c7.webp"},"pericoli":{"branco-di-lupi-mannari":"img/arene-fantasy-pericoli-branco-di-lupi-mannari.1c9124ceee.webp","spettro-errante":"img/arene-fantasy-pericoli-spettro-errante.056074bc23.webp","troll-di-caverna":"img/arene-fantasy-pericoli-troll-di-caverna.31aa2444f0.webp","viverna":"img/arene-fantasy-pericoli-viverna.577b91a819.webp"}},"horror":{"luoghi":{"biblioteca":"img/arene-horror-luoghi-biblioteca.00d6ab97f4.webp","cappella":"img/arene-horror-luoghi-cappella.a51e505028.webp","cimitero":"img/arene-horror-luoghi-cimitero.7a441de089.webp","serra":"img/arene-horror-luoghi-serra.b3d91121d4.webp","soffitta":"img/arene-horror-luoghi-soffitta.466d40cea3.webp"},"pericoli":{"bambola-posseduta":"img/arene-horror-pericoli-bambola-posseduta.7064eef1d7.webp","entita-senza-volto":"img/arene-horror-pericoli-entita-senza-volto.2c28467bdd.webp","spettro-urlante":"img/arene-horror-pericoli-spettro-urlante.25fa554e05.webp","stormo-di-corvi":"img/arene-horror-pericoli-stormo-di-corvi.fe5c85d7ae.webp"}},"liceo":{"luoghi":{"aula-magna":"img/arene-liceo-luoghi-aula-magna.0478e35c5c.webp","biblioteca":"img/arene-liceo-luoghi-biblioteca.1ae806ae58.webp","cortile":"img/arene-liceo-luoghi-cortile.51bf433337.webp","laboratorio-di-chimica":"img/arene-liceo-luoghi-laboratorio-di-chimica.eba1434683.webp","mensa":"img/arene-liceo-luoghi-mensa.67bcbc7e37.webp","palestra":"img/arene-liceo-luoghi-palestra.8ecb872849.webp"},"pericoli":{"bidello-di-turno":"img/arene-liceo-pericoli-bidello-di-turno.191c43a8bd.webp","ispezione-a-sorpresa":"img/arene-liceo-pericoli-ispezione-a-sorpresa.bef087d9b9.webp","preside":"img/arene-liceo-pericoli-preside.033f6c9aae.webp","professoressa-di-matematica":"img/arene-liceo-pericoli-professoressa-di-matematica.6cb65c6a3f.webp"}},"royale":{"luoghi":{"aeroporto":"img/arene-royale-luoghi-aeroporto.81e8ce98d4.webp","base-militare":"img/arene-royale-luoghi-base-militare.67f3a7de9d.webp","centrale-elettrica":"img/arene-royale-luoghi-centrale-elettrica.05ee57458a.webp","fattoria":"img/arene-royale-luoghi-fattoria.7c780dda87.webp","foresta":"img/arene-royale-luoghi-foresta.03b47644d0.webp","villaggio-costiero":"img/arene-royale-luoghi-villaggio-costiero.568519eb7c.webp"},"pericoli":{"cane-da-guardia-addestrato":"img/arene-royale-pericoli-cane-da-guardia-addestrato.c7853a67a0.webp","drone-armato":"img/arene-royale-pericoli-drone-armato.30d0b73e01.webp","elicottero-da-caccia":"img/arene-royale-pericoli-elicottero-da-caccia.8c68e62346.webp"}},"scifi":{"luoghi":{"hangar":"img/arene-scifi-luoghi-hangar.6de551833b.webp","moduli-abitativi":"img/arene-scifi-luoghi-moduli-abitativi.9f5bb96d39.webp","ponte-di-comando":"img/arene-scifi-luoghi-ponte-di-comando.3e9ffd005a.webp","reattore":"img/arene-scifi-luoghi-reattore.d10a335006.webp","serra-idroponica":"img/arene-scifi-luoghi-serra-idroponica.b6f4407853.webp"},"pericoli":{"androide-da-combattimento":"img/arene-scifi-pericoli-androide-da-combattimento.1a3d3eb38e.webp","creatura-aliena-dai-tentacoli":"img/arene-scifi-pericoli-creatura-aliena-dai-tentacoli.b6b314ddd9.webp","drone-di-sicurezza-impazzito":"img/arene-scifi-pericoli-drone-di-sicurezza-impazzito.c8a9c6f9e3.webp","sciame-di-nanobot":"img/arene-scifi-pericoli-sciame-di-nanobot.d43296f047.webp"}},"ufficio":{"luoghi":{"cucina":"img/arene-ufficio-luoghi-cucina.d968f8861d.webp","open-space":"img/arene-ufficio-luoghi-open-space.b6b7990c99.webp","parcheggio":"img/arene-ufficio-luoghi-parcheggio.d593f2ed83.webp","sala-stampanti":"img/arene-ufficio-luoghi-sala-stampanti.1727f50082.webp","ufficio-del-direttore":"img/arene-ufficio-luoghi-ufficio-del-direttore.bb3b6cabab.webp"},"pericoli":{"consulente-esterno":"img/arene-ufficio-pericoli-consulente-esterno.ce6e200c3f.webp","direttore-generale":"img/arene-ufficio-pericoli-direttore-generale.da2eb1f708.webp","riorganizzazione-aziendale":"img/arene-ufficio-pericoli-riorganizzazione-aziendale.1fd57b76b3.webp","ufficio-risorse-umane":"img/arene-ufficio-pericoli-ufficio-risorse-umane.8392df7518.webp"}},"wasteland":{"luoghi":{"autostrada-spezzata":"img/arene-wasteland-luoghi-autostrada-spezzata.19a72a0b97.webp","citta-fantasma":"img/arene-wasteland-luoghi-citta-fantasma.fe22bb72b2.webp","cratere":"img/arene-wasteland-luoghi-cratere.04de7ca40a.webp","diga":"img/arene-wasteland-luoghi-diga.3be9abe15a.webp","discarica":"img/arene-wasteland-luoghi-discarica.b8783ad9c6.webp","raffineria":"img/arene-wasteland-luoghi-raffineria.081e2d2ad6.webp"},"pericoli":{"banda-di-predoni":"img/arene-wasteland-pericoli-banda-di-predoni.1dfcfd1628.webp","branco-di-cani-mutati":"img/arene-wasteland-pericoli-branco-di-cani-mutati.442fabfc39.webp","scorpione-gigante":"img/arene-wasteland-pericoli-scorpione-gigante.2dd8911367.webp","verme-delle-sabbie":"img/arene-wasteland-pericoli-verme-delle-sabbie.a0d445beeb.webp"}},"zombie":{"luoghi":{"centro-commerciale":"img/arene-zombie-luoghi-centro-commerciale.333f4699d5.webp","metropolitana":"img/arene-zombie-luoghi-metropolitana.878a263605.webp","periferia":"img/arene-zombie-luoghi-periferia.e28a7d70c7.webp","scuola":"img/arene-zombie-luoghi-scuola.153ddbaa75.webp","stazione-di-polizia":"img/arene-zombie-luoghi-stazione-di-polizia.157f7a17f5.webp"},"pericoli":{"cane-infetto":"img/arene-zombie-pericoli-cane-infetto.fdff913d6f.webp","gigante-mutato":"img/arene-zombie-pericoli-gigante-mutato.91fad36b70.webp","infetto-corridore":"img/arene-zombie-pericoli-infetto-corridore.61f48faafd.webp","orda-di-zombi":"img/arene-zombie-pericoli-orda-di-zombi.e0fc6d1b56.webp"}}}};
 ;
-window.LOS_BUILD = "e9e7e6d5602a469288fda3c062d97a22d1b5df1cc44d8e998a8d73e2091c9b2b";
+window.LOS_BUILD = "333b661f47d1e3e7ce18b56216dd47a1725bf57315258bc779b8e780f85cf018";
 ;
 /* Last One Standing — grafica vettoriale: logo, icone delle arene, illustrazioni.
  * Tutto è SVG generato in codice: nessuna immagine esterna. */
@@ -11063,15 +11080,19 @@ window.LOS_BUILD = "e9e7e6d5602a469288fda3c062d97a22d1b5df1cc44d8e998a8d73e2091c
     const stored = await readEnvelope(id); if (!stored) throw new Error('Partita non disponibile.');
     return encode(stored.e);
   }
-  async function importReplay(raw) {
+  function inspectReplay(raw) {
     if (typeof raw !== 'string' || raw.length > 50000000) throw new Error('Il replay deve essere un JSON di massimo 50 MB.');
     const e = decode(raw);
     if (!e || !replayIdOk(e.id) || !envelopeOk(e, e.id) || e.result.tributes.length > 200 || e.result.phases.length > 500) throw new Error('Replay non valido o formato non supportato.');
+    return e;
+  }
+  async function importReplay(raw) {
+    const e = inspectReplay(raw);
     const id = createId();
     await save(id, e.result, { buildId: e.buildId, createdAt: e.createdAt, title: e.title, configuration: e.configuration });
     return id;
   }
-  G.LOS_REPLAY = { createId, save, load, validate, entry, list, rename, exportReplay, importReplay };
+  G.LOS_REPLAY = { createId, save, load, validate, entry, list, rename, exportReplay, inspectReplay, importReplay };
 })(typeof window === 'object' ? window : globalThis);
 
 ;
@@ -11079,6 +11100,69 @@ window.LOS_BUILD = "e9e7e6d5602a469288fda3c062d97a22d1b5df1cc44d8e998a8d73e2091c
 (function (G) {
   'use strict';
   const copy = (x) => JSON.parse(JSON.stringify(x));
+  const METRICS = { saves: 'Aiuti prestati', nursed: 'Cure agli altri', promisesKept: 'Promesse mantenute', testsPassed: 'Prove superate', crafts: 'Oggetti costruiti o modificati', betrayals: 'Tradimenti' };
+  const STORY_KINDS = new Set(['nemesi', 'odio', 'tradimento']);
+  const record = (x) => x !== null && typeof x === 'object' && !Array.isArray(x);
+  function roundDetails(result) {
+    return {
+      participants: result.tributes.map((t) => ({ id: t.id, rank: t.rank, kills: t.kills, winner: result.winners.includes(t.id), achievements: Object.fromEntries(Object.keys(METRICS).map((key) => [key, t[key] || 0])) })),
+      stories: (result.stats.stories || []).filter((s) => STORY_KINDS.has(s.k)).map((s) => ({ k: s.k, a: s.a, b: s.b })),
+    };
+  }
+  function seasonHighlights(season) {
+    const totals = new Map(season.configuration.cast.map((t) => [t.id, { id: t.id, name: t.name, values: Object.fromEntries(Object.keys(METRICS).map((k) => [k, 0])) }])), pairs = new Map();
+    let detailed = 0;
+    for (const round of season.rounds) {
+      if (round.participants.every((p) => record(p.achievements))) detailed++;
+      for (const p of round.participants) if (totals.has(p.id)) for (const key of Object.keys(METRICS)) totals.get(p.id).values[key] += p.achievements?.[key] || 0;
+      const inRound = new Set();
+      for (const story of round.stories || []) {
+        const ids = story.k === 'tradimento' ? [story.a, story.b] : [story.a, story.b].sort(), key = JSON.stringify([story.k, ...ids]);
+        if (inRound.has(key)) continue; inRound.add(key);
+        if (!pairs.has(key)) pairs.set(key, { k: story.k, a: ids[0], b: ids[1], rounds: 0 });
+        pairs.get(key).rounds++;
+      }
+    }
+    const awards = Object.entries(METRICS).map(([key, label]) => {
+      const best = Math.max(0, ...[...totals.values()].map((t) => t.values[key]));
+      return { key, label, value: best, people: [...totals.values()].filter((t) => best > 0 && t.values[key] === best).map((t) => ({ id: t.id, name: t.name })) };
+    }).filter((a) => a.value > 0);
+    return { detailed, awards, rivalries: [...pairs.values()].filter((r) => r.rounds >= 2).sort((a, b) => b.rounds - a.rounds || a.k.localeCompare(b.k) || a.a.localeCompare(b.a)) };
+  }
+  function attributeSummary(cast, people, completed, attrs) {
+    return attrs.map((attr) => {
+      const groups = [{ label: '1–4', people: 0, wins: 0 }, { label: '5–7', people: 0, wins: 0 }, { label: '8–10', people: 0, wins: 0 }];
+      for (const t of cast) { const value = t.attr?.[attr.id] ?? 5, group = groups[value <= 4 ? 0 : value <= 7 ? 1 : 2]; group.people++; group.wins += people[t.id]?.wins || 0; }
+      for (const g of groups) { g.appearances = g.people * completed; g.frequency = g.appearances ? 100 * g.wins / g.appearances : null; }
+      return { id: attr.id, name: attr.name, groups, difference: groups[0].frequency != null && groups[2].frequency != null ? groups[2].frequency - groups[0].frequency : null };
+    });
+  }
+  function personalTimeline(result, id, through) {
+    const t = result.tributes.find((p) => p.id === id); if (!t || !Number.isInteger(through) || through < 0) return [];
+    const phases = result.phases.slice(0, Math.min(through + 1, result.phases.length)), memories = new Map(), diary = new Map();
+    for (const [other, list] of Object.entries(t.mem || {})) for (const m of list) { if (!memories.has(m.ph)) memories.set(m.ph, []); memories.get(m.ph).push({ other, ...m }); }
+    for (const page of t.diary || []) { if (!diary.has(page.ph)) diary.set(page.ph, []); diary.get(page.ph).push(page); }
+    return phases.map((p, phase) => {
+      const events = p.events.map((e, index) => ({ ...e, index })).filter((e) => e.ids.includes(id)), changes = [], previous = phases[phase - 1]?.snap, current = p.snap;
+      const items = current.inv?.[id] || [];
+      if (!previous) items.forEach((item) => changes.push({ kind: 'initialItem', item }));
+      if (previous && previous.alive.includes(id)) {
+        const before = previous.vit?.[id], after = current.vit?.[id];
+        if (before && after) before.forEach((value, index) => { if (value >= 0 && after[index] >= 0 && Math.abs(after[index] - value) >= (index === 0 ? 1 : 10)) changes.push({ kind: 'vital', index, before: value, after: after[index] }); });
+        for (const [oldList, newList, kind] of [[previous.st?.[id] || [], current.st?.[id] || [], 'statusRemoved'], [current.st?.[id] || [], previous.st?.[id] || [], 'statusAdded']]) for (const state of oldList) if (!newList.includes(state)) changes.push({ kind, state });
+        const itemKey = (item) => JSON.stringify([item.t, item.n, item.q || 0, item.x || '', item.f || '', item.h || '']);
+        for (const [oldList, newList, kind] of [[previous.inv?.[id] || [], items, 'itemRemoved'], [items, previous.inv?.[id] || [], 'itemAdded']]) {
+          const remaining = newList.map(itemKey);
+          for (const item of oldList) { const index = remaining.indexOf(itemKey(item)); if (index >= 0) remaining.splice(index, 1); else changes.push({ kind, item }); }
+        }
+        if (previous.rel?.[id]?.p !== current.rel?.[id]?.p) changes.push({ kind: 'partner', before: previous.rel?.[id]?.p || null, after: current.rel?.[id]?.p || null });
+        if (!current.alive.includes(id)) changes.push({ kind: 'exit' });
+      }
+      const beforeKills = previous?.kills?.[id] || 0, afterKills = current.kills?.[id] || 0;
+      if (afterKills > beforeKills) changes.push({ kind: 'credit', before: beforeKills, after: afterKills });
+      return { phase, day: p.day, title: p.title, events, changes, memories: memories.get(phase) || [], diary: diary.get(phase) || [] };
+    }).filter((p) => p.events.length || p.changes.length || p.memories.length || p.diary.length);
+  }
   function seasonScores(season) {
     const rows = new Map(season.configuration.cast.map((t) => [t.id, { id: t.id, name: t.name, points: 0, wins: 0, kills: 0, played: 0, rankSum: 0 }]));
     for (const round of season.rounds) for (const p of round.participants) {
@@ -11104,7 +11188,8 @@ window.LOS_BUILD = "e9e7e6d5602a469288fda3c062d97a22d1b5df1cc44d8e998a8d73e2091c
     const { S, L, D, REPLAY, RUNNER, esc, plural } = A;
     const $ = (s) => document.querySelector(s), $$ = (s) => [...document.querySelectorAll(s)];
     const relationNames = { amicizia: 'Amicizia', rivalita: 'Rivalità', coppia: 'Coppia', fiducia: 'Fiducia →', attrazione: 'Attrazione →' };
-    let editing = null, labToken = 0, labActive = false, labStats = null;
+    let editing = null, labToken = 0, labActive = false, labStats = null, seasonRunning = false, seasonIOBusy = false;
+    function keepSeasons(next) { if (!A.commitSeasons(next)) throw new Error('La stagione non è stata salvata: libera spazio nel browser o esporta i dati importanti.'); }
     function renderRelations() {
       const ids = new Set(S.cast.map((t) => t.id));
       S.initialRelations = (S.initialRelations || []).filter((r) => ids.has(r.from) && ids.has(r.to));
@@ -11123,11 +11208,34 @@ window.LOS_BUILD = "e9e7e6d5602a469288fda3c062d97a22d1b5df1cc44d8e998a8d73e2091c
     });
     $('#relationsList').addEventListener('click', (e) => { const b = e.target.closest('[data-relation-remove]'); if (!b) return; S.initialRelations.splice(+b.dataset.relationRemove, 1); A.save(); renderRelations(); });
 
-    function renderProfile(t) {
+    function memoryHTML(t, m, theme) {
+      const dictionary = { ...(D.mind?.mem || {}), ...(D.bonds?.mem || {}), ...(theme.soft ? { ...(D.mind?.memSoft || {}), ...(D.bonds?.memSoft || {}) } : {}) };
+      return dictionary[m.k] ? A.fill(dictionary[m.k], [t.id, m.other, m.x]) : '';
+    }
+    function changeText(change, t, theme, result) {
+      const name = (id) => result.tributes.find((p) => p.id === id)?.name || 'nessuno';
+      if (change.kind === 'vital') { const labels = A.vitLabels(theme), meter = D.eco?.arenas[theme.id]?.meter; return ([labels.hp, labels.en, labels.mo, labels.food, meter?.name || 'Indicatore dell’arena'][change.index]) + ': ' + change.before + ' → ' + change.after; }
+      if (change.kind === 'statusAdded' || change.kind === 'statusRemoved') return (change.kind === 'statusAdded' ? 'Nuova condizione: ' : 'Condizione terminata: ') + A.statusLabel(change.state, t, theme);
+      if (change.kind === 'partner') return change.after ? 'In coppia con ' + name(change.after) : 'Finisce la coppia con ' + name(change.before);
+      if (change.kind === 'exit') return theme.soft ? 'Fuori dai giochi' : 'Fine della partecipazione';
+      if (change.kind === 'credit') return 'Eliminazioni attribuite: ' + change.before + ' → ' + change.after;
+      return ({ initialItem: 'Zaino alla prima fase: ', itemAdded: 'Nello zaino entra: ', itemRemoved: 'Dallo zaino esce: ' }[change.kind] || '') + change.item.n;
+    }
+    function revisit(phase) {
+      if (S.settings.followOnly) { S.settings.followOnly = false; A.save(); A.toast('Filtro dei seguiti disattivato per mostrare tutta la fase.'); }
+      $('#profDlg')?.close?.(); A.go(phase); if (location.hash !== '#diretta') location.hash = '#diretta';
+    }
+    function renderProfile(t, phase) {
       const on = (S.followed || []).includes(t.id), heading = $('#h-prof'); if (!heading) return;
-      heading.parentElement.insertAdjacentHTML('afterend', '<div class="follow-control"><button class="btn" type="button" data-follow="' + esc(t.id) + '" aria-pressed="' + on + '">' + (on ? 'Non seguire più' : 'Segui questo concorrente') + '</button></div>');
+      const result = A.getSIM(), theme = D.themes.find((th) => th.id === result.theme), timeline = personalTimeline(result, t.id, phase);
+      const history = '<details class="personal-history"><summary>Il percorso fino a questa fase · ' + timeline.length + ' tappe</summary><p class="help">In ordine cronologico: eventi, ricordi, diario e cambiamenti tra fine fase e fine fase. Le variazioni di salute compaiono sempre; per gli altri valori mostriamo quelle di almeno 10 punti. Un oggetto può entrare e uscire nella stessa fase senza comparire nel confronto dello zaino.</p><ol class="causal-path">' + timeline.map((step) => '<li><b>G' + (step.day || 1) + ' · ' + esc(step.title) + '</b>' +
+        (step.changes.length ? '<ul class="change-list">' + step.changes.map((c) => '<li>' + esc(changeText(c, t, theme, result)) + '</li>').join('') + '</ul>' : '') +
+        step.events.map((e) => '<p>' + esc(e.plain) + '</p>').join('') + step.memories.map((m) => memoryHTML(t, m, theme)).filter(Boolean).map((m) => '<p class="help">Ricordo: «' + m + '»</p>').join('') + step.diary.map((page) => '<p class="diary-entry"><span class="sub">Diario</span> ' + A.linkify(page.h) + '</p>').join('') +
+        '<button class="btn sm" type="button" data-personal-phase="' + step.phase + '">Rivedi la fase ' + (step.phase + 1) + '</button></li>').join('') + '</ol></details>';
+      heading.parentElement.insertAdjacentHTML('afterend', '<div class="follow-control"><button class="btn" type="button" data-follow="' + esc(t.id) + '" aria-pressed="' + on + '">' + (on ? 'Non seguire più' : 'Segui questo concorrente') + '</button></div>' + history);
     }
     document.addEventListener('click', (e) => {
+      const phase = e.target.closest('[data-personal-phase]'); if (phase) { revisit(+phase.dataset.personalPhase); return; }
       const b = e.target.closest('[data-follow]'); if (!b) return;
       const result = A.getSIM(); if (!result || !result.tributes.some((t) => t.id === b.dataset.follow)) return;
       const set = new Set(S.followed || []); if (set.has(b.dataset.follow)) set.delete(b.dataset.follow); else set.add(b.dataset.follow);
@@ -11140,13 +11248,15 @@ window.LOS_BUILD = "e9e7e6d5602a469288fda3c062d97a22d1b5df1cc44d8e998a8d73e2091c
       const names = Object.fromEntries(result.tributes.map((t) => [t.id, t.name]));
       const html = result.winners.map((id) => {
         const steps = causalSteps(result, id);
-        return '<details><summary>Il percorso di ' + esc(names[id]) + '</summary>' + (steps.length ? '<ol class="causal-path">' + steps.map((step) => '<li><b>' + step.label + '</b><span class="help">G' + step.day + ' · ' + esc(step.title) + '</span><p>' + esc(step.plain) + '</p>' + (step.reason ? '<p class="help">' + esc(step.reason) + '</p>' : '') + '<button class="btn sm" type="button" data-story-phase="' + step.phase + '">Rivedi questa fase</button></li>').join('') + '</ol>' : '<p class="help">La vittoria è arrivata senza altri passaggi registrati di questi tipi.</p>') + '</details>';
+        const t = result.tributes.find((p) => p.id === id), theme = D.themes.find((th) => th.id === result.theme);
+        const support = personalTimeline(result, id, result.phases.length - 1).map((p) => ({ ...p, memories: p.memories.filter((m) => ['saved', 'cured', 'shared', 'gift', 'spared'].includes(m.k)), changes: p.changes.filter((c) => ['initialItem', 'itemAdded', 'itemRemoved'].includes(c.kind)) })).filter((p) => p.memories.length || p.changes.length);
+        return '<details><summary>Il percorso di ' + esc(names[id]) + '</summary>' + (steps.length ? '<ol class="causal-path">' + steps.map((step) => '<li><b>' + step.label + '</b><span class="help">G' + step.day + ' · ' + esc(step.title) + '</span><p>' + esc(step.plain) + '</p>' + (step.reason ? '<p class="help">' + esc(step.reason) + '</p>' : '') + '<button class="btn sm" type="button" data-story-phase="' + step.phase + '">Rivedi questa fase</button></li>').join('') + '</ol>' : '<p class="help">La vittoria è arrivata senza altri passaggi registrati di questi tipi.</p>') +
+          '<details><summary>Aiuti ricevuti e storia dello zaino</summary><p class="help">Ricordi degli aiuti ricevuti e oggetti presenti a fine fase. Un ingresso o un’uscita dallo zaino non dimostra da solo quale effetto abbia avuto l’oggetto sulla vittoria.</p><ol class="causal-path">' + support.map((p) => '<li><b>G' + (p.day || 1) + ' · ' + esc(p.title) + '</b>' + p.memories.map((m) => memoryHTML(t, m, theme)).filter(Boolean).map((m) => '<p>«' + m + '»</p>').join('') + '<ul>' + p.changes.map((c) => '<li>' + esc(changeText(c, t, theme, result)) + '</li>').join('') + '</ul><button class="btn sm" type="button" data-story-phase="' + p.phase + '">Rivedi questa fase</button></li>').join('') + '</ol></details></details>';
       }).join('');
       $('#resBody .resgrid').insertAdjacentHTML('beforebegin', '<section class="block card studio-panel" id="causalReport"><h2>Le svolte della vittoria</h2><p class="help">Eventi e condizioni realmente registrati. Le tappe raccontano il percorso, senza attribuire un effetto decisivo che il motore non ha misurato.</p>' + html + '</section>');
     }
     $('#resBody').addEventListener('click', (e) => { const b = e.target.closest('[data-story-phase]'); if (!b) return;
-      if (S.settings.followOnly) { S.settings.followOnly = false; A.save(); A.toast('Filtro dei seguiti disattivato per mostrare tutta la fase.'); }
-      A.go(+b.dataset.storyPhase); if (location.hash !== '#diretta') location.hash = '#diretta'; });
+      revisit(+b.dataset.storyPhase); });
 
     // Lo stesso validatore dell'importazione è usato per modifiche e pacchetti.
     const candidateEvent = () => ({ id: editing || A.inputId('e'), phase: $('#advancedPhase').value, raw: $('#advancedLine').value.trim() });
@@ -11198,13 +11308,20 @@ window.LOS_BUILD = "e9e7e6d5602a469288fda3c062d97a22d1b5df1cc44d8e998a8d73e2091c
       for (const season of values.slice(0, 50)) {
         try {
           if (!season || typeof season.id !== 'string' || !/^[\w-]{1,40}$/.test(season.id) || ids.has(season.id) || typeof season.name !== 'string' || !season.name.trim() || season.name.length > 80 || !Array.isArray(season.rounds) || season.rounds.length > 200) throw new Error('Dati della stagione non validi.');
-          const configuration = cleanConfiguration(season.configuration), people = new Set(configuration.cast.map((t) => t.id)), rounds = [], roundIds = new Set();
+          const configuration = cleanConfiguration(season.configuration), people = new Set(configuration.cast.map((t) => t.id)), rounds = [], roundIds = new Set(), replayIds = new Set();
           for (const r of season.rounds) {
-            if (!r || typeof r.id !== 'string' || roundIds.has(r.id) || typeof r.seed !== 'string' || !Array.isArray(r.participants) || r.participants.length !== people.size || (r.replayId != null && !/^[\w-]{1,100}$/.test(r.replayId))) throw new Error('Round non valido.');
+            if (!r || typeof r.id !== 'string' || !/^[\w-]{1,40}$/.test(r.id) || roundIds.has(r.id) || typeof r.seed !== 'string' || r.seed.length > 100 || !Array.isArray(r.participants) || r.participants.length !== people.size || (r.replayId != null && (!/^[\w-]{1,100}$/.test(r.replayId) || replayIds.has(r.replayId)))) throw new Error('Round non valido.');
             const used = new Set();
-            for (const p of r.participants) { if (!people.has(p.id) || used.has(p.id) || !Number.isInteger(p.rank) || p.rank < 1 || p.rank > people.size || !Number.isInteger(p.kills) || p.kills < 0 || p.kills >= people.size || typeof p.winner !== 'boolean') throw new Error('Classifica non valida.'); used.add(p.id); }
+            for (const p of r.participants) {
+              if (!people.has(p.id) || used.has(p.id) || !Number.isInteger(p.rank) || p.rank < 1 || p.rank > people.size || !Number.isInteger(p.kills) || p.kills < 0 || p.kills >= people.size || typeof p.winner !== 'boolean' || (p.rank === 1) !== p.winner) throw new Error('Classifica non valida.');
+              if (p.achievements !== undefined && (!record(p.achievements) || Object.keys(p.achievements).some((k) => !Object.hasOwn(METRICS, k)) || Object.keys(METRICS).some((k) => !Number.isInteger(p.achievements[k]) || p.achievements[k] < 0 || p.achievements[k] > 100000))) throw new Error('Premi del round non validi.');
+              used.add(p.id);
+            }
             if (!r.participants.some((p) => p.winner)) throw new Error('Round senza vittoria.');
-            roundIds.add(r.id); rounds.push({ id: r.id, seed: r.seed, replayId: r.replayId || null, replaySaved: !!r.replaySaved, participants: copy(r.participants) });
+            const losers = r.participants.filter((p) => !p.winner); if (new Set(losers.map((p) => p.rank)).size !== losers.length || losers.some((p) => p.rank <= people.size - losers.length)) throw new Error('Posizioni duplicate o incompatibili con le vittorie.');
+            if (r.stories !== undefined && (!Array.isArray(r.stories) || r.stories.length > 3 || r.stories.some((s) => !record(s) || !STORY_KINDS.has(s.k) || !people.has(s.a) || !people.has(s.b) || s.a === s.b))) throw new Error('Legami del round non validi.');
+            roundIds.add(r.id); if (r.replayId) replayIds.add(r.replayId);
+            rounds.push({ id: r.id, seed: r.seed, replayId: r.replayId || null, replaySaved: !!r.replaySaved && !!r.replayId, participants: r.participants.map((p) => ({ id: p.id, rank: p.rank, kills: p.kills, winner: p.winner, ...(p.achievements ? { achievements: copy(p.achievements) } : {}) })), ...(r.stories ? { stories: r.stories.map((s) => ({ k: s.k, a: s.a, b: s.b })) } : {}) });
           }
           ids.add(season.id); valid.push({ id: season.id, name: season.name, configuration, rounds });
         } catch (e) { warnings.push('Una stagione non valida non è stata caricata: ' + e.message); }
@@ -11217,45 +11334,132 @@ window.LOS_BUILD = "e9e7e6d5602a469288fda3c062d97a22d1b5df1cc44d8e998a8d73e2091c
       if (S.seasons.some((s) => s.id === previous)) $('#seasonSelect').value = previous;
       const season = S.seasons.find((s) => s.id === $('#seasonSelect').value);
       if (!season) { $('#seasonBoard').innerHTML = '<p class="help">Nessuna stagione. Prepara un cast e salvalo qui per giocare più round con gli stessi concorrenti.</p>'; return; }
-      const scores = seasonScores(season), theme = D.themes.find((t) => t.id === season.configuration.theme);
+      const scores = seasonScores(season), theme = D.themes.find((t) => t.id === season.configuration.theme), highlights = seasonHighlights(season), name = (id) => season.configuration.cast.find((t) => t.id === id)?.name || '';
       $('#seasonBoard').innerHTML = '<p class="help">' + esc(theme.name) + ' · ' + season.configuration.cast.length + ' concorrenti · ' + plural(season.rounds.length, 'round completato', 'round completati') + '. Il cast e le regole sono quelli salvati alla creazione.</p>' +
-        (season.rounds.length < 200 ? '<button class="btn primary" type="button" data-season-play="' + esc(season.id) + '">Gioca il round ' + (season.rounds.length + 1) + '</button>' : '<p>Stagione completata: 200 round.</p>') +
+        (season.rounds.length < 200 ? '<button class="btn primary" type="button" data-season-play="' + esc(season.id) + '"' + (seasonRunning || seasonIOBusy ? ' disabled' : '') + '>Gioca il round ' + (season.rounds.length + 1) + '</button>' : '<p>Stagione completata: 200 round.</p>') +
         '<div class="tablewrap"><table><caption>Classifica della stagione</caption><thead><tr><th>Concorrente</th><th>Punti</th><th>Vittorie</th><th>Eliminazioni</th><th>Posizione media</th></tr></thead><tbody>' + scores.map((r) => '<tr><td>' + esc(r.name) + '</td><td>' + r.points + '</td><td>' + r.wins + '</td><td>' + r.kills + '</td><td>' + (r.played ? (r.rankSum / r.played).toFixed(1) : '–') + '</td></tr>').join('') + '</tbody></table></div>' +
-        (season.rounds.length ? '<h3>Albo dei round</h3><ol class="studio-list">' + season.rounds.map((r, i) => '<li>Round ' + (i + 1) + ': ' + esc(r.participants.filter((p) => p.winner).map((p) => season.configuration.cast.find((t) => t.id === p.id).name).join(', ')) + (r.replaySaved ? ' <button class="btn sm" type="button" data-round-replay="' + esc(r.replayId) + '">Rivedi</button>' : ' · replay non salvato') + '</li>').join('') + '</ol>' : '');
+        (season.rounds.length ? '<h3>Premi cumulativi</h3><p class="help">Dettagli disponibili per ' + highlights.detailed + ' round su ' + season.rounds.length + '. I round precedenti senza dettagli continuano a valere per punti, vittorie ed eliminazioni.</p>' + (highlights.awards.length ? '<ul class="studio-list">' + highlights.awards.map((a) => '<li><b>' + a.label + '</b>: ' + esc(a.people.map((p) => p.name).join(', ')) + ' · ' + a.value + '</li>').join('') + '</ul>' : '<p class="help">Nessun premio cumulativo assegnabile con i dettagli disponibili.</p>') +
+          '<h3>Rivalità ricorrenti</h3><p class="help">Legami riconosciuti in almeno due esiti. Ogni round riparte dai legami iniziali salvati nella stagione.</p>' + (highlights.rivalries.length ? '<ul class="studio-list">' + highlights.rivalries.map((r) => '<li>' + esc(name(r.a)) + (r.k === 'tradimento' ? ' → ' : ' ↔ ') + esc(name(r.b)) + ' · ' + ({ nemesi: 'Nemesi', odio: 'Odio', tradimento: 'Tradimento' }[r.k]) + ' · ' + plural(r.rounds, 'round', 'round') + '</li>').join('') + '</ul>' : '<p class="help">Nessun legame ricorrente rilevato finora.</p>') +
+          '<h3>Albo dei round</h3><ol class="studio-list">' + season.rounds.map((r, i) => '<li>Round ' + (i + 1) + ': ' + esc(r.participants.filter((p) => p.winner).map((p) => name(p.id)).join(', ')) + (r.replaySaved ? ' <button class="btn sm" type="button" data-round-replay="' + esc(r.replayId) + '">Rivedi</button>' : ' · replay non disponibile') + '</li>').join('') + '</ol>' : '');
     }
     $('#seasonSelect').addEventListener('change', renderSeasons);
     $('#seasonCreate').addEventListener('click', () => {
       try {
+        if (seasonIOBusy) throw new Error('Attendi il completamento del trasferimento della stagione.');
         const name = $('#seasonName').value.trim(); if (!name) throw new Error('Dai un nome alla stagione.');
         if (S.seasons.length >= 50) throw new Error('Sono ammesse al massimo 50 stagioni su questo browser.');
         const season = { id: A.inputId('s'), name: name.slice(0, 80), configuration: cleanConfiguration(A.currentConfiguration()), rounds: [] };
-        S.seasons.push(season); A.save(); renderSeasons(); $('#seasonSelect').value = season.id; renderSeasons(); $('#seasonMsg').textContent = 'Cast e regole salvati per questa stagione.';
+        keepSeasons([...S.seasons, season]); renderSeasons(); $('#seasonSelect').value = season.id; renderSeasons(); $('#seasonMsg').textContent = 'Cast e regole salvati per questa stagione.';
       } catch (e) { $('#seasonMsg').textContent = e.message; }
     });
     $('#seasonBoard').addEventListener('click', async (e) => {
       const replay = e.target.closest('[data-round-replay]'); if (replay) { try { await A.openSavedReplay(replay.dataset.roundReplay); } catch (error) { A.toast(error.message); } return; }
       const b = e.target.closest('[data-season-play]'); if (!b) return;
+      if (seasonRunning || seasonIOBusy) return;
       const season = S.seasons.find((s) => s.id === b.dataset.seasonPlay); if (!season) return;
       if (season.configuration.adult && !S.settings.adult) return A.toast('Attiva i contenuti 18+ prima di giocare questa stagione.');
-      b.disabled = true;
+      b.disabled = true; seasonRunning = true;
       const cfg = { ...copy(season.configuration), seed: season.configuration.seed.slice(0, 45) + '-round-' + (season.rounds.length + 1), seasonId: season.id };
-      await A.runSim(cfg); renderSeasons();
+      try { await A.runSim(cfg); } finally { seasonRunning = false; renderSeasons(); }
     });
     function recordResult(cfg, result, replayId, stored) {
       if (!cfg.seasonId) return;
       const season = S.seasons.find((s) => s.id === cfg.seasonId); if (!season || season.rounds.some((r) => r.replayId === replayId) || season.rounds.length >= 200) return;
       const ids = new Set(season.configuration.cast.map((t) => t.id));
       if (result.tributes.length !== ids.size || result.tributes.some((t) => !ids.has(t.id))) return;
-      const round = { id: A.inputId('r'), seed: result.seed, replayId, replaySaved: false, participants: result.tributes.map((t) => ({ id: t.id, rank: t.rank, kills: t.kills, winner: result.winners.includes(t.id) })) };
-      season.rounds.push(round); A.save();
-      stored.then((ok) => { round.replaySaved = ok; A.save(); renderSeasons(); });
+      const round = { id: A.inputId('r'), seed: result.seed, replayId, replaySaved: false, ...roundDetails(result) }, next = copy(S.seasons);
+      next.find((s) => s.id === season.id).rounds.push(round);
+      try { keepSeasons(next); } catch (e) { A.toast('Il round non è stato aggiunto alla classifica. ' + e.message); return; }
+      stored.then((ok) => { const updated = copy(S.seasons), savedRound = updated.find((s) => s.id === season.id)?.rounds.find((r) => r.id === round.id); if (!savedRound) return;
+        savedRound.replaySaved = ok; try { keepSeasons(updated); } catch (e) { A.toast(e.message); } renderSeasons(); });
     }
+
+    async function exportSeason(id, includeReplays) {
+      const selected = S.seasons.find((s) => s.id === id); if (!selected) throw new Error('Seleziona una stagione.');
+      const season = copy(selected), replays = [], warnings = [];
+      let size = JSON.stringify(season).length;
+      if (includeReplays) for (const round of season.rounds) {
+        if (!round.replayId) { warnings.push('Il replay del round ' + (season.rounds.indexOf(round) + 1) + ' non è disponibile.'); continue; }
+        let raw; try { raw = await REPLAY.exportReplay(round.replayId); } catch (e) { warnings.push('Il replay del round ' + (season.rounds.indexOf(round) + 1) + ' non è disponibile.'); continue; }
+        size += JSON.stringify(raw).length; if (size > 50000000) throw new Error('Il pacchetto supera 50 MB: esporta la stagione senza includere i replay e salva quelli importanti dall’archivio.');
+        replays.push({ id: round.replayId, raw });
+        // I replay permettono di recuperare i dettagli anche per i primi round.
+        Object.assign(round, roundDetails(REPLAY.inspectReplay(raw).result));
+      }
+      const raw = JSON.stringify({ app: 'last-one-standing-season', version: 1, season, replays });
+      if (raw.length > 50000000) throw new Error('Il pacchetto supera il limite di 50 MB.');
+      return { raw, warnings, count: replays.length };
+    }
+    function validateSeasonPackage(raw) {
+      if (typeof raw !== 'string' || raw.length > 50000000) throw new Error('Usa un pacchetto di stagione di massimo 50 MB.');
+      const data = JSON.parse(raw), warnings = [];
+      if (!record(data) || data.app !== 'last-one-standing-season' || data.version !== 1 || !Array.isArray(data.replays) || data.replays.length > 200) throw new Error('Formato della stagione non supportato.');
+      const season = restoreSeasons([data.season], warnings)[0]; if (!season || warnings.length) throw new Error(warnings.join(' ') || 'Stagione non valida.');
+      const ids = new Set(), files = [];
+      for (const file of data.replays) {
+        if (!record(file) || typeof file.id !== 'string' || ids.has(file.id)) throw new Error('Replay duplicato o non valido nel pacchetto.');
+        ids.add(file.id); const envelope = REPLAY.inspectReplay(file.raw), result = envelope.result, round = season.rounds.find((r) => r.replayId === file.id);
+        if (envelope.id !== file.id || !round || result.seed !== round.seed || result.theme !== season.configuration.theme || result.adult !== season.configuration.adult || result.tributes.length !== season.configuration.cast.length) throw new Error('Il replay non corrisponde al round della stagione.');
+        if (season.configuration.cast.some((person, i) => { const t = result.tributes.find((p) => p.id === person.id); return !t || t.name !== (person.name || 'Concorrente ' + (i + 1)).trim() || t.gender !== person.gender || t.team !== person.team || JSON.stringify(t.traits) !== JSON.stringify(person.traits) || D.attrs.some((attr) => t.attr[attr.id] !== person.attr[attr.id]); })) throw new Error('Il cast non corrisponde al replay.');
+        const details = roundDetails(result), expected = new Map(details.participants.map((p) => [p.id, p]));
+        if (round.participants.some((p) => { const t = expected.get(p.id); return !t || t.rank !== p.rank || t.kills !== p.kills || t.winner !== p.winner || p.achievements && Object.keys(METRICS).some((k) => p.achievements[k] !== t.achievements[k]); })) throw new Error('La classifica o i premi non corrispondono al replay.');
+        if (round.stories && JSON.stringify(round.stories) !== JSON.stringify(details.stories)) throw new Error('I legami del round non corrispondono al replay.');
+        Object.assign(round, details); files.push(file);
+      }
+      return { season, files };
+    }
+    async function importSeason(raw) {
+      if (S.seasons.length >= 50) throw new Error('Sono ammesse al massimo 50 stagioni su questo browser.');
+      const { season, files } = validateSeasonPackage(raw), warnings = [], mapping = new Map();
+      season.id = A.inputId('s'); season.name = season.name.slice(0, 68) + ' (importata)';
+      // Prima si conserva la classifica. Un errore dell'archivio non deve perderla.
+      const originalRefs = season.rounds.map((r) => r.replayId);
+      season.rounds.forEach((r) => { r.replayId = null; r.replaySaved = false; });
+      keepSeasons([...S.seasons, season]);
+      for (const file of files) {
+        try { mapping.set(file.id, await REPLAY.importReplay(file.raw)); }
+        catch (e) { warnings.push('Un replay non è stato salvato nell’archivio: ' + e.message); }
+      }
+      const next = copy(S.seasons), imported = next.find((s) => s.id === season.id);
+      imported.rounds.forEach((r, i) => { r.replayId = mapping.get(originalRefs[i]) || null; r.replaySaved = !!r.replayId; });
+      try { keepSeasons(next); } catch (e) { warnings.push('Classifica importata; i collegamenti ai replay non sono stati salvati. I replay importati restano nell’archivio.'); }
+      const unavailable = originalRefs.length - mapping.size;
+      if (unavailable) warnings.push(plural(unavailable, 'round senza replay disponibile', 'round senza replay disponibile') + '.');
+      return { id: season.id, warnings, count: mapping.size };
+    }
+    async function seasonOperation(action) {
+      if (seasonIOBusy || seasonRunning) return;
+      seasonIOBusy = true; ['seasonExport', 'seasonImport'].forEach((id) => { $('#' + id).disabled = true; }); renderSeasons();
+      try { await action(); } catch (e) { $('#seasonIOMsg').textContent = e.message; }
+      finally { seasonIOBusy = false; ['seasonExport', 'seasonImport'].forEach((id) => { $('#' + id).disabled = false; }); renderSeasons(); }
+    }
+    $('#seasonExport').addEventListener('click', () => seasonOperation(async () => {
+      $('#seasonIOMsg').textContent = 'Preparazione del pacchetto…';
+      const output = await exportSeason($('#seasonSelect').value, $('#seasonIncludeReplays').checked);
+      $('#seasonJSON').value = output.raw; $('#seasonIOMsg').textContent = 'Stagione pronta con ' + plural(output.count, 'replay', 'replay') + '. ' + output.warnings.join(' ');
+    }));
+    $('#seasonImport').addEventListener('click', () => seasonOperation(async () => {
+      $('#seasonIOMsg').textContent = 'Verifica del pacchetto…';
+      const output = await importSeason($('#seasonJSON').value); renderSeasons(); $('#seasonSelect').value = output.id;
+      $('#seasonIOMsg').textContent = 'Stagione importata con ' + plural(output.count, 'replay', 'replay') + '. ' + output.warnings.join(' ');
+    }));
+    $('#seasonCopy').addEventListener('click', () => { if (!$('#seasonJSON').value.trim()) { $('#seasonIOMsg').textContent = 'Esporta prima una stagione.'; return; } A.copyText($('#seasonJSON').value, 'Stagione copiata.'); });
+    let seasonDownloadUrl = null;
+    $('#seasonDownload').addEventListener('click', () => {
+      if (!$('#seasonJSON').value.trim()) { $('#seasonIOMsg').textContent = 'Esporta prima una stagione.'; return; }
+      if (seasonDownloadUrl) URL.revokeObjectURL(seasonDownloadUrl);
+      seasonDownloadUrl = URL.createObjectURL(new Blob([$('#seasonJSON').value], { type: 'application/json' }));
+      const a = document.createElement('a'); a.href = seasonDownloadUrl; a.download = 'last-one-standing-stagione.json'; a.click();
+    });
 
     function showLab() {
       if (!labStats) { $('#labResults').innerHTML = ''; return; }
       const n = labStats.completed;
       const rows = Object.values(labStats.people).sort((a, b) => b.wins - a.wins || a.rank / (n || 1) - b.rank / (n || 1));
       $('#labResults').innerHTML = '<div class="tablewrap"><table><caption>Campione di ' + n + ' partite</caption><thead><tr><th>Concorrente</th><th>Vittorie</th><th>Frequenza</th><th>Posizione media</th><th>Eliminazioni medie</th></tr></thead><tbody>' + rows.map((r) => '<tr><td>' + esc(r.name) + '</td><td>' + r.wins + '</td><td>' + (n ? (100 * r.wins / n).toFixed(1) + '%' : '–') + '</td><td>' + (n ? (r.rank / n).toFixed(2) : '–') + '</td><td>' + (n ? (r.kills / n).toFixed(2) : '–') + '</td></tr>').join('') + '</tbody></table></div><p class="help">Cause di uscita nel campione: ' + esc(Object.entries(labStats.causes).map(([k, v]) => k + ': ' + v).join(' · ') || 'nessuna') + '.</p><p class="help">Sono osservazioni sui semi del campione, non probabilità garantite per la prossima partita.</p>';
+      labStats.attributes = attributeSummary(labStats.configuration.cast, labStats.people, n, D.attrs);
+      const frequency = (g) => g.appearances ? g.wins + ' / ' + g.appearances + ' · ' + g.frequency.toFixed(1) + '%' : '–';
+      $('#labResults').insertAdjacentHTML('beforeend', '<details class="lab-attributes"><summary>Caratteristiche e vittorie nel campione</summary><p class="help">Ogni cella mostra vittorie / presenze e frequenza per fascia di caratteristica. Ogni concorrente conta una presenza per partita; ogni componente della squadra vincente conta una vittoria. La differenza confronta fascia alta e bassa in punti percentuali. È un’associazione osservata: tratti, altre caratteristiche e squadre cambiano insieme, quindi non misura da sola l’effetto della caratteristica.</p><div class="tablewrap"><table><caption>Frequenze osservate per caratteristica</caption><thead><tr><th>Caratteristica</th><th>Valore 1–4</th><th>Valore 5–7</th><th>Valore 8–10</th><th>Differenza alta–bassa</th></tr></thead><tbody>' + labStats.attributes.map((a) => '<tr><th scope="row">' + esc(a.name) + '</th>' + a.groups.map((g) => '<td>' + frequency(g) + '</td>').join('') + '<td>' + (a.difference == null ? 'Non confrontabile' : (a.difference > 0 ? '+' : '') + a.difference.toFixed(1) + ' pp') + '</td></tr>').join('') + '</tbody></table></div></details>');
     }
     function labControls() { $('#labRun').disabled = labActive; $('#labCancel').disabled = !labActive; $('#labCount').disabled = labActive; }
     function cancelLab() {
@@ -11265,13 +11469,13 @@ window.LOS_BUILD = "e9e7e6d5602a469288fda3c062d97a22d1b5df1cc44d8e998a8d73e2091c
     }
     $('#labOpen').addEventListener('click', () => { $('#labDlg').showModal(); showLab(); });
     $('#labDlg').addEventListener('close', cancelLab); $('#labCancel').addEventListener('click', cancelLab);
-    $('#labCopy').addEventListener('click', () => { if (!labStats) return; A.copyText(JSON.stringify(labStats, null, 2), 'Risultati del campione copiati.'); });
+    $('#labCopy').addEventListener('click', () => { if (!labStats) return; showLab(); A.copyText(JSON.stringify(labStats, null, 2), 'Risultati del campione copiati.'); });
     $('#labRun').addEventListener('click', async () => {
       let cfg, count;
       try { cfg = cleanConfiguration(A.currentConfiguration()); count = +$('#labCount').value; if (!Number.isInteger(count) || count < 5 || count > 200) throw new Error('Scegli un campione tra 5 e 200 partite.'); }
       catch (e) { $('#labMsg').textContent = e.message; return; }
       cancelLab(); const token = ++labToken; labActive = true; labControls(); A.simulationBusy(true);
-      labStats = { seed: cfg.seed, theme: cfg.theme, requested: count, completed: 0, causes: {}, people: Object.fromEntries(cfg.cast.map((t) => [t.id, { name: t.name, wins: 0, rank: 0, kills: 0 }])) };
+      labStats = { seed: cfg.seed, theme: cfg.theme, configuration: copy(cfg), requested: count, completed: 0, causes: {}, people: Object.fromEntries(cfg.cast.map((t) => [t.id, { name: t.name, wins: 0, rank: 0, kills: 0 }])) };
       $('#labProgress').max = count; $('#labProgress').value = 0; $('#labMsg').textContent = 'Il campione è in corso…';
       try {
         for (let i = 0; i < count; i++) {
@@ -11285,9 +11489,9 @@ window.LOS_BUILD = "e9e7e6d5602a469288fda3c062d97a22d1b5df1cc44d8e998a8d73e2091c
       } catch (e) { if (token === labToken) $('#labMsg').textContent = e.name === 'AbortError' ? 'Campione interrotto.' : 'Campione interrotto: ' + e.message; }
       finally { if (token === labToken) { labActive = false; labControls(); A.simulationBusy(false); showLab(); } }
     });
-    return { renderRelations, renderProfile, renderResults, renderSeasons, restoreSeasons, recordResult, previewAdvanced, beforeSimulation: cancelLab };
+    return { renderRelations, renderProfile, renderResults, renderSeasons, restoreSeasons, recordResult, previewAdvanced, exportSeason, importSeason, beforeSimulation: cancelLab };
   }
-  G.LOS_STUDIO = { init, seasonScores, causalSteps };
+  G.LOS_STUDIO = { init, seasonScores, causalSteps, personalTimeline, attributeSummary, seasonHighlights };
 })(typeof window === 'object' ? window : globalThis);
 
 ;
@@ -11524,15 +11728,20 @@ window.LOS_BUILD = "e9e7e6d5602a469288fda3c062d97a22d1b5df1cc44d8e998a8d73e2091c
   const teamColor = (team) => L.PALETTE[(Math.max(1, team) - 1) % L.PALETTE.length];
 
   let saveTimer = null, warnedQuota = false;
+  function storeState(state) {
+    const imgs = Object.fromEntries(state.cast.map((t) => [t.id, t.img]));
+    const out = state.run && state.run.cfg ? Object.assign({}, state, { run: Object.assign({}, state.run, { cfg: Object.assign({}, state.run.cfg, { cast: state.run.cfg.cast.map((t) => (t.img && imgs[t.id] === t.img ? Object.assign({}, t, { img: '@cast' }) : t)) }) }) }) : state;
+    try { localStorage.setItem(KEY, JSON.stringify(out)); warnedQuota = false; return true; }
+    catch (e) { if (!warnedQuota) { warnedQuota = true; toast('Lo spazio del browser è pieno: le ultime modifiche non sono state salvate. Esporta i dati importanti o prova con foto più piccole.'); } return false; }
+  }
   function save() {
     clearTimeout(saveTimer);
-    saveTimer = setTimeout(() => {
-      // le foto della partita in corso sono quasi sempre quelle del cast: si salvano una volta sola
-      const imgs = Object.fromEntries(S.cast.map((t) => [t.id, t.img]));
-      const out = S.run && S.run.cfg ? Object.assign({}, S, { run: Object.assign({}, S.run, { cfg: Object.assign({}, S.run.cfg, { cast: S.run.cfg.cast.map((t) => (t.img && imgs[t.id] === t.img ? Object.assign({}, t, { img: '@cast' }) : t)) }) }) }) : S;
-      try { localStorage.setItem(KEY, JSON.stringify(out)); }
-      catch (e) { if (!warnedQuota) { warnedQuota = true; toast('Lo spazio del browser è pieno: le ultime modifiche non sono state salvate. Prova con foto più piccole.'); } }
-    }, 250);
+    saveTimer = setTimeout(() => storeState(S), 250);
+  }
+  function commitSeasons(seasons) {
+    clearTimeout(saveTimer);
+    if (!storeState({ ...S, seasons })) return false;
+    S.seasons = seasons; return true;
   }
   function persistRun(run, result) {
     if (!REPLAY) return Promise.resolve(false);
@@ -13011,7 +13220,7 @@ window.LOS_BUILD = "e9e7e6d5602a469288fda3c062d97a22d1b5df1cc44d8e998a8d73e2091c
         attrHTML(t, theme, i, atRes) +
         '<div><div class="sub" style="margin-bottom:8px">La sua storia' + (atRes ? '' : ' finora') + '</div><div class="ptl">' + (hist.length ? hist.map(({ e, p }) => '<div class="it" style="--cc:var(--c-' + (e.cat || 'none') + ')"><span>' + (p.kind === 'b' ? 'Inizio' : 'G' + p.day + ' ' + (p.kind === 'n' ? 'notte' : p.kind === 'd' ? 'giorno' : KIND[p.kind].toLowerCase())) + '</span><p>' + linkify(e.html) + '</p></div>').join('') : '<p class="help">Nessun evento ancora.</p>') + '</div></div>' +
       '</div>';
-    if (typeof studio !== 'undefined' && studio) studio.renderProfile(t);
+    if (typeof studio !== 'undefined' && studio) studio.renderProfile(t, i);
     if (!$('#profDlg').open) $('#profDlg').showModal();
     $('#profDlg').scrollTop = 0;
   }
@@ -13348,7 +13557,7 @@ window.LOS_BUILD = "e9e7e6d5602a469288fda3c062d97a22d1b5df1cc44d8e998a8d73e2091c
     route();
     if (load.warning) toast(load.warning);
   }
-  const studio = window.LOS_STUDIO ? window.LOS_STUDIO.init({ S, L, D, REPLAY, RUNNER, save, toast, esc, plural, inputId, normalizeCast, normalizeCustoms, sanitizeSettings, renderCustomList, currentConfiguration, runSim, simulationBusy, copyText, openSavedReplay, causeTxt, getSIM: () => SIM, renderLive, go, openProfile }) : null;
+  const studio = window.LOS_STUDIO ? window.LOS_STUDIO.init({ S, L, D, REPLAY, RUNNER, save, commitSeasons, toast, esc, plural, inputId, normalizeCast, normalizeCustoms, sanitizeSettings, renderCustomList, currentConfiguration, runSim, simulationBusy, copyText, openSavedReplay, causeTxt, statusLabel, vitLabels, fill, linkify, getSIM: () => SIM, renderLive, go, openProfile }) : null;
   const H = window.claude && window.claude.hot;
   if (H && typeof H.snapshot === 'function') { try { H.snapshot(() => ({ phase: S.run ? S.run.phase : 0 })); } catch (e) { /* niente */ } }
   if (H && typeof H.ready === 'function') H.ready(boot); else boot((H && H.data) || {});

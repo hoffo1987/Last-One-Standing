@@ -170,6 +170,8 @@ async function test(name, run) { await run(); passed++; console.log('  OK ' + na
     const first = context({ idb: indexedDB() }).replay, id = first.createId();
     await first.save(id, original, { title: 'Viaggio', createdAt: 123, buildId: 'origine', configuration: { custom: [], seed: original.seed } });
     const raw = await first.exportReplay(id), second = context({ idb: indexedDB() }).replay;
+    const inspected = second.inspectReplay(raw); assert.deepEqual(structuredClone(inspected.result), original); assert.equal((await second.list()).length, 0);
+    inspected.result.seed = 'modifica alla copia'; assert.equal(second.inspectReplay(raw).result.seed, original.seed);
     const importedId = await second.importReplay(raw); assert.notEqual(importedId, id);
     assert.deepEqual(await second.load(importedId), original);
     const e = await second.entry(importedId); assert.equal(e.title, 'Viaggio'); assert.equal(e.buildId, 'origine'); assert.equal(e.createdAt, 123);

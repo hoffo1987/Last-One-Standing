@@ -261,13 +261,17 @@
     const stored = await readEnvelope(id); if (!stored) throw new Error('Partita non disponibile.');
     return encode(stored.e);
   }
-  async function importReplay(raw) {
+  function inspectReplay(raw) {
     if (typeof raw !== 'string' || raw.length > 50000000) throw new Error('Il replay deve essere un JSON di massimo 50 MB.');
     const e = decode(raw);
     if (!e || !replayIdOk(e.id) || !envelopeOk(e, e.id) || e.result.tributes.length > 200 || e.result.phases.length > 500) throw new Error('Replay non valido o formato non supportato.');
+    return e;
+  }
+  async function importReplay(raw) {
+    const e = inspectReplay(raw);
     const id = createId();
     await save(id, e.result, { buildId: e.buildId, createdAt: e.createdAt, title: e.title, configuration: e.configuration });
     return id;
   }
-  G.LOS_REPLAY = { createId, save, load, validate, entry, list, rename, exportReplay, importReplay };
+  G.LOS_REPLAY = { createId, save, load, validate, entry, list, rename, exportReplay, inspectReplay, importReplay };
 })(typeof window === 'object' ? window : globalThis);
