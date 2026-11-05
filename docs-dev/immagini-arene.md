@@ -2,7 +2,7 @@
 
 _Generato da `node tools/atlas-slots.js` a partire da `tools/atlas-brief.js`: per cambiare un testo o un prompt modifica il brief e rigenera, non questo file._
 
-**Immagini presenti: 1 su 156** (luoghi 1/54, pericoli 0/35, armi 0/67). **Video presenti: 0 su 89** (luoghi e pericoli). Meteo, disastri e oggetti arriveranno dopo.
+**Immagini presenti: 85 su 156** (luoghi 50/54, pericoli 35/35, armi 0/67). **Video presenti: 0 su 89** (luoghi e pericoli). Meteo, disastri e oggetti arriveranno dopo.
 
 ## 1. Lo stile
 
@@ -124,7 +124,7 @@ A colossal hammered-gold horn-shaped cornucopia rests atop a tiered rocky mound 
 Static camera and a seamless ambient loop: the place itself stays perfectly still and only small elements move, slowly and gently. Gentle heat shimmer above the golden horn, the stream ripples softly and sparkles with sunlight, tattered banners sway slightly in a light breeze, a few glowing embers and dust motes drift upward, thin fog slowly rolls between the distant pines. --motion low --loop
 ```
 
-#### Bosco
+#### ✓ Bosco
 
 Bosco antico e fitto all'imbrunire, lame di luce tra i tronchi e un sentiero nascosto.  
 File: `assets/arene/classico/luoghi/bosco.webp` · video: `assets/arene/classico/luoghi/bosco.mp4`
@@ -141,7 +141,7 @@ A dense ancient pine forest at dusk, with a narrow hidden dirt trail winding int
 Static camera and a seamless ambient loop: the place itself stays perfectly still and only small elements move, slowly and gently. Shafts of sunlight shimmer softly, ferns and leaves sway gently, tiny dust motes and pollen float through the light beams, low fog drifts slowly between the trunks. --motion low --loop
 ```
 
-#### Fiume
+#### ✓ Fiume
 
 Fiume tortuoso tra massi muschiosi, rapide basse e un tronco caduto che fa da ponte.  
 File: `assets/arene/classico/luoghi/fiume.webp` · video: `assets/arene/classico/luoghi/fiume.mp4`
@@ -158,7 +158,7 @@ A winding river cuts through the central third of the frame between mossy facete
 Static camera and a seamless ambient loop: the place itself stays perfectly still and only small elements move, slowly and gently. Water flows gently over the rapids with soft glittering reflections, reeds sway slightly, a thin mist hovers over the river surface, a few leaves float slowly downstream. --motion low --loop
 ```
 
-#### Paludi
+#### ✓ Paludi
 
 Palude scura con canne, alberi morti contorti e nebbia bassa; qualche lucciola.  
 File: `assets/arene/classico/luoghi/paludi.webp` · video: `assets/arene/classico/luoghi/paludi.mp4`
@@ -175,7 +175,7 @@ A murky marsh with black still water stretching through the central third of the
 Static camera and a seamless ambient loop: the place itself stays perfectly still and only small elements move, slowly and gently. Low fog creeps slowly across the water, fireflies blink and drift, reeds sway gently, faint ripples spread across the dark surface. --motion low --loop
 ```
 
-#### Rovine
+#### ✓ Rovine
 
 Rovine di un antico tempio in pietra invase dai rampicanti, colonne spezzate e un arco crollato.  
 File: `assets/arene/classico/luoghi/rovine.webp` · video: `assets/arene/classico/luoghi/rovine.mp4`
@@ -192,7 +192,7 @@ The crumbling stone ruins of an ancient temple stand in the central third of the
 Static camera and a seamless ambient loop: the place itself stays perfectly still and only small elements move, slowly and gently. Vines and grass sway softly in a light breeze, dust motes float in the warm light, a thin haze drifts slowly behind the columns. --motion low --loop
 ```
 
-#### Altopiano
+#### ✓ Altopiano
 
 Altopiano roccioso spazzato dal vento, erba brinata e montagne lontane: il posto più freddo.  
 File: `assets/arene/classico/luoghi/altopiano.webp` · video: `assets/arene/classico/luoghi/altopiano.mp4`
@@ -211,7 +211,7 @@ Static camera and a seamless ambient loop: the place itself stays perfectly stil
 
 ### Pericoli · Arena Classica
 
-#### Branco di lupi mutanti
+#### ✓ Branco di lupi mutanti
 
 Branco di lupi mutanti con occhi ambra e chiazze di pelo metallico, che escono dagli alberi.  
 File: `assets/arene/classico/pericoli/branco-di-lupi-mutanti.webp` · video: `assets/arene/classico/pericoli/branco-di-lupi-mutanti.mp4`
@@ -228,7 +228,7 @@ A pack of three mutated wolves stepping out of shadowy pines, the alpha in front
 Static camera and a seamless ambient loop: the subject keeps the same pose and position, with only subtle living movement, slow and calm. The wolves breathe slowly with subtle chest movement, their fur ripples in the wind, the amber eyes glint faintly, mist drifts behind them. --motion low --loop
 ```
 
-#### Sciame di vespe velenose
+#### ✓ Sciame di vespe velenose
 
 Sciame di vespe giganti e velenose; una in primo piano col pungiglione in vista.  
 File: `assets/arene/classico/pericoli/sciame-di-vespe-velenose.webp` · video: `assets/arene/classico/pericoli/sciame-di-vespe-velenose.mp4`
@@ -245,7 +245,7 @@ A menacing swarm of oversized venomous wasps, each as large as a hand, with glow
 Static camera and a seamless ambient loop: the subject keeps the same pose and position, with only subtle living movement, slow and calm. The wasps hover in place with fast blurred wings, the swarm shifts gently behind, faint glowing pollen floats in the air. --motion low --loop
 ```
 
-#### Orso affamato
+#### ✓ Orso affamato
 
 Enorme orso bruno affamato, ritto sulle zampe posteriori, muso pieno di cicatrici.  
 File: `assets/arene/classico/pericoli/orso-affamato.webp` · video: `assets/arene/classico/pericoli/orso-affamato.mp4`
@@ -262,7 +262,7 @@ A huge starving brown bear rearing up on its hind legs between pine trunks, matt
 Static camera and a seamless ambient loop: the subject keeps the same pose and position, with only subtle living movement, slow and calm. The bear breathes heavily with slow chest movement, its fur stirs in the wind, warm breath steams faintly in the cold air. --motion low --loop
 ```
 
-#### Serpente gigante
+#### ✓ Serpente gigante
 
 Serpente gigante dalle squame smeraldo, avvolto su sé stesso con la testa alzata.  
 File: `assets/arene/classico/pericoli/serpente-gigante.webp` · video: `assets/arene/classico/pericoli/serpente-gigante.mp4`
@@ -402,7 +402,7 @@ Draghi, rune e foreste che sussurrano.
 
 ### Luoghi · Reame Incantato
 
-#### Torre in rovina
+#### ✓ Torre in rovina
 
 Torre di uno stregone mezza crollata, rune accese sui muri, luna enorme.  
 File: `assets/arene/fantasy/luoghi/torre-in-rovina.webp` · video: `assets/arene/fantasy/luoghi/torre-in-rovina.mp4`
@@ -419,7 +419,7 @@ A ruined wizard tower of dark stone rises in the central third of the frame, hal
 Static camera and a seamless ambient loop: the place itself stays perfectly still and only small elements move, slowly and gently. The runes pulse softly with violet light, tiny magical sparks float upward, clouds drift slowly across the moon, ferns sway gently. --motion low --loop
 ```
 
-#### Foresta elfica
+#### ✓ Foresta elfica
 
 Foresta elfica di alberi giganti dalla corteccia argentata, lanterne appese e lucine sospese.  
 File: `assets/arene/fantasy/luoghi/foresta-elfica.webp` · video: `assets/arene/fantasy/luoghi/foresta-elfica.mp4`
@@ -436,7 +436,7 @@ An elven forest of giant silver-barked trees, with a graceful arched wooden brid
 Static camera and a seamless ambient loop: the place itself stays perfectly still and only small elements move, slowly and gently. Lanterns sway gently and glow softly, floating motes of light drift slowly, luminous flowers pulse faintly, mist moves slowly between the trees. --motion low --loop
 ```
 
-#### Lago nebbioso
+#### ✓ Lago nebbioso
 
 Lago incantato di notte, acqua a specchio, pontile di pietra e statua mezza sommersa.  
 File: `assets/arene/fantasy/luoghi/lago-nebbioso.webp` · video: `assets/arene/fantasy/luoghi/lago-nebbioso.mp4`
@@ -453,7 +453,7 @@ A misty enchanted lake at night, its glassy water filling the frame, with a half
 Static camera and a seamless ambient loop: the place itself stays perfectly still and only small elements move, slowly and gently. Soft mist drifts over the mirror-like water, gentle ripples spread around the statue, the rowboat rocks very slightly, moonlight shimmers on the surface. --motion low --loop
 ```
 
-#### Miniere
+#### ✓ Miniere
 
 Miniere naniche nella montagna: impalcature, binari con carrello, vene di cristallo luminose.  
 File: `assets/arene/fantasy/luoghi/miniere.webp` · video: `assets/arene/fantasy/luoghi/miniere.mp4`
@@ -470,7 +470,7 @@ Dwarven mines carved deep into a mountain, with a minecart full of glowing ore o
 Static camera and a seamless ambient loop: the place itself stays perfectly still and only small elements move, slowly and gently. Crystal veins pulse with a slow turquoise glow, lantern flames flicker gently, fine dust floats in the light, a faint haze drifts in the cavern. --motion low --loop
 ```
 
-#### Palude stregata
+#### ✓ Palude stregata
 
 Palude stregata con alberi storti, muschio pendente, capanna su palafitte e fuochi fatui verdi.  
 File: `assets/arene/fantasy/luoghi/palude-stregata.webp` · video: `assets/arene/fantasy/luoghi/palude-stregata.mp4`
@@ -487,7 +487,7 @@ A haunted swamp of crooked trees and hanging moss, with a witch hut on tall stil
 Static camera and a seamless ambient loop: the place itself stays perfectly still and only small elements move, slowly and gently. Will-o-wisps drift and bob slowly, moss sways gently, the hut window flickers warmly, fog creeps across the water. --motion low --loop
 ```
 
-#### Picco del drago
+#### ✓ Picco del drago
 
 Picco frastagliato con la tana del drago: rocce bruciate, mucchi d'oro, fumo che sale.  
 File: `assets/arene/fantasy/luoghi/picco-del-drago.webp` · video: `assets/arene/fantasy/luoghi/picco-del-drago.mp4`
@@ -506,7 +506,7 @@ Static camera and a seamless ambient loop: the place itself stays perfectly stil
 
 ### Pericoli · Reame Incantato
 
-#### Troll di caverna
+#### ✓ Troll di caverna
 
 Troll di caverna enorme, pelle grigia bitorzoluta, clava di pietra, occhi piccoli e luminosi.  
 File: `assets/arene/fantasy/pericoli/troll-di-caverna.webp` · video: `assets/arene/fantasy/pericoli/troll-di-caverna.mp4`
@@ -523,7 +523,7 @@ A hulking cave troll stooping in the mouth of a cave, grey warty skin covered in
 Static camera and a seamless ambient loop: the subject keeps the same pose and position, with only subtle living movement, slow and calm. The troll breathes slowly with heavy shoulders rising and falling, its eyes glow faintly, dust drifts from the cave ceiling. --motion low --loop
 ```
 
-#### Viverna
+#### ✓ Viverna
 
 Viverna con ali membranose spalancate e coda uncinata, appollaiata su una rupe.  
 File: `assets/arene/fantasy/pericoli/viverna.webp` · video: `assets/arene/fantasy/pericoli/viverna.mp4`
@@ -540,7 +540,7 @@ A wyvern perched on a cliff edge with leathery violet wings spread wide, a long 
 Static camera and a seamless ambient loop: the subject keeps the same pose and position, with only subtle living movement, slow and calm. The wyvern breathes slowly, its wing membranes flutter slightly in the wind, wisps of smoke curl from its jaws, clouds drift behind. --motion low --loop
 ```
 
-#### Spettro errante
+#### ✓ Spettro errante
 
 Spettro traslucido in vesti a brandelli, bagliore azzurro, occhi vuoti, nella nebbia.  
 File: `assets/arene/fantasy/pericoli/spettro-errante.webp` · video: `assets/arene/fantasy/pericoli/spettro-errante.mp4`
@@ -557,7 +557,7 @@ A wandering translucent wraith in tattered grey robes drifting through mist, a f
 Static camera and a seamless ambient loop: the subject keeps the same pose and position, with only subtle living movement, slow and calm. The wraith floats in place with a slow hovering motion, its tattered robes ripple softly, the blue glow pulses, mist swirls gently. --motion low --loop
 ```
 
-#### Branco di lupi mannari
+#### ✓ Branco di lupi mannari
 
 Branco di lupi mannari sotto la luna piena, il capobranco in primo piano.  
 File: `assets/arene/fantasy/pericoli/branco-di-lupi-mannari.webp` · video: `assets/arene/fantasy/pericoli/branco-di-lupi-mannari.mp4`
@@ -675,7 +675,7 @@ Ossigeno limitato, droni e un reattore instabile.
 
 ### Luoghi · Stazione Orbitale
 
-#### Hangar
+#### ✓ Hangar
 
 Hangar enorme con una navetta attraccata, container e il portellone aperto sulle stelle.  
 File: `assets/arene/scifi/luoghi/hangar.webp` · video: `assets/arene/scifi/luoghi/hangar.mp4`
@@ -692,7 +692,7 @@ A vast spaceship hangar with a sleek white shuttle docked on a landing pad in th
 Static camera and a seamless ambient loop: the place itself stays perfectly still and only small elements move, slowly and gently. Warning lights blink slowly, a faint mist of coolant drifts across the deck, distant stars twinkle, the planet glows softly. --motion low --loop
 ```
 
-#### Serra idroponica
+#### ✓ Serra idroponica
 
 Serra idroponica: file di piante sotto luci viola, tubi d'acqua e una cupola di vetro.  
 File: `assets/arene/scifi/luoghi/serra-idroponica.webp` · video: `assets/arene/scifi/luoghi/serra-idroponica.mp4`
@@ -709,7 +709,7 @@ A hydroponic greenhouse module under a glass dome, with rows of lush green plant
 Static camera and a seamless ambient loop: the place itself stays perfectly still and only small elements move, slowly and gently. Fine water mist sprays softly, leaves sway gently in the airflow, grow lights hum with a subtle pulse, droplets glisten. --motion low --loop
 ```
 
-#### Reattore
+#### ✓ Reattore
 
 Il nucleo del reattore: sfera ciano incandescente in un anello d'acciaio, passerelle, allarmi.  
 File: `assets/arene/scifi/luoghi/reattore.webp` · video: `assets/arene/scifi/luoghi/reattore.mp4`
@@ -726,7 +726,7 @@ The station reactor core, a glowing cyan sphere of energy suspended inside a mas
 Static camera and a seamless ambient loop: the place itself stays perfectly still and only small elements move, slowly and gently. The core pulses with a slow cyan glow, energy arcs flicker faintly, warning lights blink, heat haze shimmers around the ring. --motion low --loop
 ```
 
-#### Ponte di comando
+#### ✓ Ponte di comando
 
 Ponte di comando con console olografiche e una vetrata enorme sulla Terra.  
 File: `assets/arene/scifi/luoghi/ponte-di-comando.webp` · video: `assets/arene/scifi/luoghi/ponte-di-comando.mp4`
@@ -743,7 +743,7 @@ The command bridge of an orbital station, with an empty captain chair facing a h
 Static camera and a seamless ambient loop: the place itself stays perfectly still and only small elements move, slowly and gently. Holographic displays flicker and scroll softly, console lights blink, the planet drifts very slowly past the window, stars twinkle. --motion low --loop
 ```
 
-#### Moduli abitativi
+#### ✓ Moduli abitativi
 
 Moduli dell'equipaggio: cuccette, armadietti e un piccolo oblò rotondo.  
 File: `assets/arene/scifi/luoghi/moduli-abitativi.webp` · video: `assets/arene/scifi/luoghi/moduli-abitativi.mp4`
@@ -779,7 +779,7 @@ Static camera and a seamless ambient loop: the place itself stays perfectly stil
 
 ### Pericoli · Stazione Orbitale
 
-#### Drone di sicurezza impazzito
+#### ✓ Drone di sicurezza impazzito
 
 Drone di sicurezza fuori controllo con un solo occhio rosso e rotori che sprizzano scintille.  
 File: `assets/arene/scifi/pericoli/drone-di-sicurezza-impazzito.webp` · video: `assets/arene/scifi/pericoli/drone-di-sicurezza-impazzito.mp4`
@@ -796,7 +796,7 @@ A rogue security drone hovering in a dark station corridor, a spherical armoured
 Static camera and a seamless ambient loop: the subject keeps the same pose and position, with only subtle living movement, slow and calm. The drone hovers with a gentle bob, rotors blur, small sparks fall occasionally, the red eye pulses slowly. --motion low --loop
 ```
 
-#### Sciame di nanobot
+#### ✓ Sciame di nanobot
 
 Sciame argentato di nanobot che si avvita in una sagoma minacciosa.  
 File: `assets/arene/scifi/pericoli/sciame-di-nanobot.webp` · video: `assets/arene/scifi/pericoli/sciame-di-nanobot.mp4`
@@ -813,7 +813,7 @@ A swirling silver swarm of millions of nanobots forming a menacing face-like sha
 Static camera and a seamless ambient loop: the subject keeps the same pose and position, with only subtle living movement, slow and calm. The nanobot swarm swirls slowly and continuously, glints shimmer across it, the face shape holds steady. --motion low --loop
 ```
 
-#### Creatura aliena dai tentacoli
+#### ✓ Creatura aliena dai tentacoli
 
 Creatura aliena con tentacoli lucidi e macchie bioluminescenti che esce da una grata.  
 File: `assets/arene/scifi/pericoli/creatura-aliena-dai-tentacoli.webp` · video: `assets/arene/scifi/pericoli/creatura-aliena-dai-tentacoli.mp4`
@@ -830,7 +830,7 @@ An alien creature squeezing out of a vent grate, glossy dark tentacles with biol
 Static camera and a seamless ambient loop: the subject keeps the same pose and position, with only subtle living movement, slow and calm. The tentacles curl and uncurl very slowly, bioluminescent spots pulse softly, the eyes blink, mist drifts from the vent. --motion low --loop
 ```
 
-#### Androide da combattimento
+#### ✓ Androide da combattimento
 
 Androide da combattimento corazzato, visore acceso, pelle sintetica strappata.  
 File: `assets/arene/scifi/pericoli/androide-da-combattimento.webp` · video: `assets/arene/scifi/pericoli/androide-da-combattimento.mp4`
@@ -954,7 +954,7 @@ An abandoned hospital corridor leading to barricaded double doors in the central
 Static camera and a seamless ambient loop: the place itself stays perfectly still and only small elements move, slowly and gently. Ceiling lights flicker irregularly, a torn curtain sways slightly, dust drifts in the light, the IV bag swings gently. --motion low --loop
 ```
 
-#### Centro commerciale
+#### ✓ Centro commerciale
 
 Atrio di un centro commerciale saccheggiato: scale mobili rotte, carrelli, lucernari.  
 File: `assets/arene/zombie/luoghi/centro-commerciale.webp` · video: `assets/arene/zombie/luoghi/centro-commerciale.mp4`
@@ -971,7 +971,7 @@ A looted shopping mall atrium with a broken escalator rising through the central
 Static camera and a seamless ambient loop: the place itself stays perfectly still and only small elements move, slowly and gently. Pale light beams shift softly through the skylights, dust motes float, a loose sign sways slightly, a trolley rolls a few centimetres. --motion low --loop
 ```
 
-#### Metropolitana
+#### ✓ Metropolitana
 
 Banchina della metro al buio, treno deragliato, binari allagati, lampade d'emergenza.  
 File: `assets/arene/zombie/luoghi/metropolitana.webp` · video: `assets/arene/zombie/luoghi/metropolitana.mp4`
@@ -988,7 +988,7 @@ A dark subway platform with a derailed train tilted across the tracks in the cen
 Static camera and a seamless ambient loop: the place itself stays perfectly still and only small elements move, slowly and gently. Emergency lamps flicker, water drips and ripples slowly across the flooded tracks, a light haze drifts in the tunnel. --motion low --loop
 ```
 
-#### Scuola
+#### ✓ Scuola
 
 Corridoio di scuola vuoto, armadietti, fogli a terra, finestre sbarrate con assi.  
 File: `assets/arene/zombie/luoghi/scuola.webp` · video: `assets/arene/zombie/luoghi/scuola.mp4`
@@ -1005,7 +1005,7 @@ An empty school hallway with a line of dented lockers leading to a set of double
 Static camera and a seamless ambient loop: the place itself stays perfectly still and only small elements move, slowly and gently. Loose papers flutter slightly in a draft, thin light beams shimmer, a locker door swings very slowly, dust drifts. --motion low --loop
 ```
 
-#### Stazione di polizia
+#### ✓ Stazione di polizia
 
 Stazione di polizia fortificata: sacchi di sabbia, furgone blindato, fari.  
 File: `assets/arene/zombie/luoghi/stazione-di-polizia.webp` · video: `assets/arene/zombie/luoghi/stazione-di-polizia.mp4`
@@ -1022,7 +1022,7 @@ A fortified police station with an armoured van parked in the central third of t
 Static camera and a seamless ambient loop: the place itself stays perfectly still and only small elements move, slowly and gently. Searchlights sweep slowly through the smog, a torn flag ripples gently, the van hazard lights blink. --motion low --loop
 ```
 
-#### Periferia
+#### ✓ Periferia
 
 Strada di periferia con auto abbandonate, prati incolti e fumo all'orizzonte.  
 File: `assets/arene/zombie/luoghi/periferia.webp` · video: `assets/arene/zombie/luoghi/periferia.mp4`
@@ -1041,7 +1041,7 @@ Static camera and a seamless ambient loop: the place itself stays perfectly stil
 
 ### Pericoli · Città degli Infetti
 
-#### Orda di zombi
+#### ✓ Orda di zombi
 
 Orda fitta di zombi che riempie una strada, tante mani protese in avanti.  
 File: `assets/arene/zombie/pericoli/orda-di-zombi.webp` · video: `assets/arene/zombie/pericoli/orda-di-zombi.mp4`
@@ -1058,7 +1058,7 @@ A dense horde of shambling zombies filling a city street, the closest one in sha
 Static camera and a seamless ambient loop: the subject keeps the same pose and position, with only subtle living movement, slow and calm. The horde sways slowly in place, heads tilt, hands twitch, smog drifts between them. --motion low --loop
 ```
 
-#### Infetto corridore
+#### ✓ Infetto corridore
 
 Infetto corridore pronto allo scatto, vestiti strappati, occhi folli.  
 File: `assets/arene/zombie/pericoli/infetto-corridore.webp` · video: `assets/arene/zombie/pericoli/infetto-corridore.mp4`
@@ -1075,7 +1075,7 @@ A fast infected runner crouched low and ready to sprint, wearing a torn hoodie a
 Static camera and a seamless ambient loop: the subject keeps the same pose and position, with only subtle living movement, slow and calm. The runner breathes rapidly with small shoulder movements, its head twitches, torn clothes flutter, smog drifts behind. --motion low --loop
 ```
 
-#### Cane infetto
+#### ✓ Cane infetto
 
 Cane infetto con pelo a chiazze, denti scoperti e occhi lattiginosi.  
 File: `assets/arene/zombie/pericoli/cane-infetto.webp` · video: `assets/arene/zombie/pericoli/cane-infetto.mp4`
@@ -1092,7 +1092,7 @@ An infected dog with patchy grey fur, bared yellow teeth and milky eyes, a broke
 Static camera and a seamless ambient loop: the subject keeps the same pose and position, with only subtle living movement, slow and calm. The dog growls with slow heavy breathing, lips quiver, fur bristles in the wind. --motion low --loop
 ```
 
-#### Gigante mutato
+#### ✓ Gigante mutato
 
 Gigante mutato con muscoli gonfi ed escrescenze ossee che sfonda un muro.  
 File: `assets/arene/zombie/pericoli/gigante-mutato.webp` · video: `assets/arene/zombie/pericoli/gigante-mutato.mp4`
@@ -1210,7 +1210,7 @@ Un aereo, cento casse e una zona che si stringe.
 
 ### Luoghi · Isola Battle Royale
 
-#### Aeroporto
+#### ✓ Aeroporto
 
 Piccolo aeroporto dell'isola con pista, un cargo arrugginito e la torre di controllo.  
 File: `assets/arene/royale/luoghi/aeroporto.webp` · video: `assets/arene/royale/luoghi/aeroporto.mp4`
@@ -1227,7 +1227,7 @@ A small island airport with a rusty propeller cargo plane parked on a cracked ru
 Static camera and a seamless ambient loop: the place itself stays perfectly still and only small elements move, slowly and gently. The windsock flutters gently, palm fronds sway, heat haze shimmers over the runway, clouds drift slowly. --motion low --loop
 ```
 
-#### Base militare
+#### ✓ Base militare
 
 Base militare con tende, torrette, casse di rifornimento ed eliporto.  
 File: `assets/arene/royale/luoghi/base-militare.webp` · video: `assets/arene/royale/luoghi/base-militare.mp4`
@@ -1244,7 +1244,7 @@ A military base with a helipad and a parked olive green helicopter in the centra
 Static camera and a seamless ambient loop: the place itself stays perfectly still and only small elements move, slowly and gently. Camouflage nets ripple in the breeze, a flag waves gently, a searchlight turns slowly, dust drifts. --motion low --loop
 ```
 
-#### Villaggio costiero
+#### ✓ Villaggio costiero
 
 Villaggio di pescatori con case colorate, pontile di legno e barche.  
 File: `assets/arene/royale/luoghi/villaggio-costiero.webp` · video: `assets/arene/royale/luoghi/villaggio-costiero.mp4`
@@ -1261,7 +1261,7 @@ A coastal fishing village with a long wooden pier and colourful moored boats in 
 Static camera and a seamless ambient loop: the place itself stays perfectly still and only small elements move, slowly and gently. Boats bob gently on the water, small waves lap the pier, nets sway, seagulls glide slowly in the distance. --motion low --loop
 ```
 
-#### Centrale elettrica
+#### ✓ Centrale elettrica
 
 Centrale elettrica con torri di raffreddamento, tralicci e trasformatori.  
 File: `assets/arene/royale/luoghi/centrale-elettrica.webp` · video: `assets/arene/royale/luoghi/centrale-elettrica.mp4`
@@ -1278,7 +1278,7 @@ A power plant with two concrete cooling towers releasing white steam in the cent
 Static camera and a seamless ambient loop: the place itself stays perfectly still and only small elements move, slowly and gently. Steam rises slowly from the cooling towers, transformer lights blink, wires sway slightly, heat haze shimmers. --motion low --loop
 ```
 
-#### Fattoria
+#### ✓ Fattoria
 
 Fattoria con fienile rosso, balle di fieno, silos e campi di grano.  
 File: `assets/arene/royale/luoghi/fattoria.webp` · video: `assets/arene/royale/luoghi/fattoria.mp4`
@@ -1295,7 +1295,7 @@ A farm with a red wooden barn, a tall silver silo and an old windmill in the cen
 Static camera and a seamless ambient loop: the place itself stays perfectly still and only small elements move, slowly and gently. Wheat sways in gentle waves, the windmill turns slowly, a barn door creaks slightly, dust floats in the light. --motion low --loop
 ```
 
-#### Foresta
+#### ✓ Foresta
 
 Foresta tropicale rigogliosa con palme, felci e una cassa di rifornimento nascosta.  
 File: `assets/arene/royale/luoghi/foresta.webp` · video: `assets/arene/royale/luoghi/foresta.mp4`
@@ -1314,7 +1314,7 @@ Static camera and a seamless ambient loop: the place itself stays perfectly stil
 
 ### Pericoli · Isola Battle Royale
 
-#### Drone armato
+#### ✓ Drone armato
 
 Drone quadricottero armato con mitragliatrice e laser di puntamento rosso.  
 File: `assets/arene/royale/pericoli/drone-armato.webp` · video: `assets/arene/royale/pericoli/drone-armato.mp4`
@@ -1331,7 +1331,7 @@ An armed quadcopter drone hovering over the jungle canopy, a black carbon body w
 Static camera and a seamless ambient loop: the subject keeps the same pose and position, with only subtle living movement, slow and calm. The drone hovers with a gentle bob, the rotors blur, the red laser sweeps slowly, leaves sway below. --motion low --loop
 ```
 
-#### Elicottero da caccia
+#### ✓ Elicottero da caccia
 
 Elicottero d'attacco in volo basso con il faro acceso.  
 File: `assets/arene/royale/pericoli/elicottero-da-caccia.webp` · video: `assets/arene/royale/pericoli/elicottero-da-caccia.mp4`
@@ -1348,7 +1348,7 @@ An attack helicopter hovering low over the jungle seen head-on, a dark grey armo
 Static camera and a seamless ambient loop: the subject keeps the same pose and position, with only subtle living movement, slow and calm. The helicopter hovers in place with blurred rotors, the searchlight sways slowly, palm trees bend in the downdraft. --motion low --loop
 ```
 
-#### Cane da guardia addestrato
+#### ✓ Cane da guardia addestrato
 
 Pastore tedesco da guardia con giubbotto tattico, che abbaia.  
 File: `assets/arene/royale/pericoli/cane-da-guardia-addestrato.webp` · video: `assets/arene/royale/pericoli/cane-da-guardia-addestrato.mp4`
@@ -1483,7 +1483,7 @@ A damp wine cellar with a heavy wooden door left ajar in the central third of th
 Static camera and a seamless ambient loop: the place itself stays perfectly still and only small elements move, slowly and gently. The bulb swings very slowly and flickers, cobwebs sway, dust drifts in the light, the door creaks slightly. --motion low --loop
 ```
 
-#### Soffitta
+#### ✓ Soffitta
 
 Soffitta polverosa con mobili coperti da teli, un cavallo a dondolo e luna da un oblò.  
 File: `assets/arene/horror/luoghi/soffitta.webp` · video: `assets/arene/horror/luoghi/soffitta.mp4`
@@ -1500,7 +1500,7 @@ A dusty attic with an old wooden rocking horse in the central third of the frame
 Static camera and a seamless ambient loop: the place itself stays perfectly still and only small elements move, slowly and gently. The rocking horse rocks almost imperceptibly, sheets ripple slightly, dust floats in the moonbeam. --motion low --loop
 ```
 
-#### Cappella
+#### ✓ Cappella
 
 Cappella gotica privata con candele, vetrate rotte e panche vuote.  
 File: `assets/arene/horror/luoghi/cappella.webp` · video: `assets/arene/horror/luoghi/cappella.mp4`
@@ -1517,7 +1517,7 @@ A private gothic chapel with a candle-lit altar in the central third of the fram
 Static camera and a seamless ambient loop: the place itself stays perfectly still and only small elements move, slowly and gently. Candle flames flicker gently, smoke curls upward, coloured moonlight shifts slowly on the floor. --motion low --loop
 ```
 
-#### Cimitero
+#### ✓ Cimitero
 
 Cimitero incolto con lapidi storte, cancello di ferro e nebbia sotto una luna rossa.  
 File: `assets/arene/horror/luoghi/cimitero.webp` · video: `assets/arene/horror/luoghi/cimitero.mp4`
@@ -1534,7 +1534,7 @@ An overgrown cemetery with a tall wrought iron gate standing open in the central
 Static camera and a seamless ambient loop: the place itself stays perfectly still and only small elements move, slowly and gently. Fog creeps slowly between the graves, the gate sways slightly, the lantern flickers, crows shift on the dead tree. --motion low --loop
 ```
 
-#### Biblioteca
+#### ✓ Biblioteca
 
 Biblioteca antica con scaffali altissimi, polvere sospesa e un libro aperto sul leggio.  
 File: `assets/arene/horror/luoghi/biblioteca.webp` · video: `assets/arene/horror/luoghi/biblioteca.mp4`
@@ -1551,7 +1551,7 @@ A grand old library with a heavy book lying open on a carved lectern in the cent
 Static camera and a seamless ambient loop: the place itself stays perfectly still and only small elements move, slowly and gently. Book pages turn slowly by themselves, candle flames flicker, dust floats in the light, shadows shift. --motion low --loop
 ```
 
-#### Serra
+#### ✓ Serra
 
 Serra vittoriana in rovina con vetri rotti, piante carnivore e rampicanti.  
 File: `assets/arene/horror/luoghi/serra.webp` · video: `assets/arene/horror/luoghi/serra.mp4`
@@ -1570,7 +1570,7 @@ Static camera and a seamless ambient loop: the place itself stays perfectly stil
 
 ### Pericoli · Villa Maledetta
 
-#### Spettro urlante
+#### ✓ Spettro urlante
 
 Fantasma che urla con la bocca innaturalmente allungata e capelli pallidi fluttuanti.  
 File: `assets/arene/horror/pericoli/spettro-urlante.webp` · video: `assets/arene/horror/pericoli/spettro-urlante.mp4`
@@ -1587,7 +1587,7 @@ A screaming ghost of a woman with an unnaturally stretched mouth and empty dark 
 Static camera and a seamless ambient loop: the subject keeps the same pose and position, with only subtle living movement, slow and calm. The ghost hovers with a slow floating motion, its hair drifts as if underwater, the glow pulses softly. --motion low --loop
 ```
 
-#### Bambola posseduta
+#### ✓ Bambola posseduta
 
 Bambola di porcellana col viso incrinato e un occhio di vetro, seduta su una sedia.  
 File: `assets/arene/horror/pericoli/bambola-posseduta.webp` · video: `assets/arene/horror/pericoli/bambola-posseduta.mp4`
@@ -1604,7 +1604,7 @@ A porcelain doll with a cracked face and one blue glass eye sitting in a small w
 Static camera and a seamless ambient loop: the subject keeps the same pose and position, with only subtle living movement, slow and calm. The doll head turns very slowly by a few degrees, its glass eye glints, the chair rocks almost imperceptibly. --motion low --loop
 ```
 
-#### Entità senza volto
+#### ✓ Entità senza volto
 
 Entità alta e senza volto in un corridoio buio, braccia troppo lunghe.  
 File: `assets/arene/horror/pericoli/entita-senza-volto.webp` · video: `assets/arene/horror/pericoli/entita-senza-volto.mp4`
@@ -1621,7 +1621,7 @@ A tall faceless entity in an old black suit standing at the end of a dark corrid
 Static camera and a seamless ambient loop: the subject keeps the same pose and position, with only subtle living movement, slow and calm. The entity stands still while its shape subtly flickers, the corridor light buzzes and dims, fog crawls at its feet. --motion low --loop
 ```
 
-#### Stormo di corvi
+#### ✓ Stormo di corvi
 
 Stormo di corvi su un albero morto; uno fissa chi guarda.  
 File: `assets/arene/horror/pericoli/stormo-di-corvi.webp` · video: `assets/arene/horror/pericoli/stormo-di-corvi.mp4`
@@ -1728,7 +1728,7 @@ Polvere radioattiva, predoni e motori truccati.
 
 ### Luoghi · Terre Desolate
 
-#### Discarica
+#### ✓ Discarica
 
 Enorme sfasciacarrozze di auto arrugginite, pneumatici e rottami sotto un sole velato.  
 File: `assets/arene/wasteland/luoghi/discarica.webp` · video: `assets/arene/wasteland/luoghi/discarica.mp4`
@@ -1745,7 +1745,7 @@ A vast scrapyard with a towering pile of crushed rusted cars in the central thir
 Static camera and a seamless ambient loop: the place itself stays perfectly still and only small elements move, slowly and gently. Heat haze shimmers, a loose sheet of metal flaps slowly, dust blows across the ground, the crane hook sways. --motion low --loop
 ```
 
-#### Autostrada spezzata
+#### ✓ Autostrada spezzata
 
 Cavalcavia autostradale crollato nel deserto, camion abbandonati.  
 File: `assets/arene/wasteland/luoghi/autostrada-spezzata.webp` · video: `assets/arene/wasteland/luoghi/autostrada-spezzata.mp4`
@@ -1762,7 +1762,7 @@ A broken highway overpass collapsed into the desert, its snapped concrete span h
 Static camera and a seamless ambient loop: the place itself stays perfectly still and only small elements move, slowly and gently. Sand blows slowly across the asphalt, heat haze shimmers, a torn tarp flaps on a truck. --motion low --loop
 ```
 
-#### Raffineria
+#### ✓ Raffineria
 
 Raffineria arrugginita con torce di gas accese e un intrico di tubi.  
 File: `assets/arene/wasteland/luoghi/raffineria.webp` · video: `assets/arene/wasteland/luoghi/raffineria.mp4`
@@ -1779,7 +1779,7 @@ A rusted oil refinery with a tall flare stack burning a bright flame in the cent
 Static camera and a seamless ambient loop: the place itself stays perfectly still and only small elements move, slowly and gently. The flare flame flickers and dances, smoke rises slowly, steam leaks from a valve, heat haze shimmers. --motion low --loop
 ```
 
-#### Città fantasma
+#### ✓ Città fantasma
 
 Città fantasma con edifici mezzi sepolti, cartelloni sbiaditi e rotolacampo.  
 File: `assets/arene/wasteland/luoghi/citta-fantasma.webp` · video: `assets/arene/wasteland/luoghi/citta-fantasma.mp4`
@@ -1796,7 +1796,7 @@ A ghost town main street with a half-buried roadside diner in the central third 
 Static camera and a seamless ambient loop: the place itself stays perfectly still and only small elements move, slowly and gently. Tumbleweeds roll slowly, sand drifts in the wind, a hanging sign sways, the dead traffic light dangles. --motion low --loop
 ```
 
-#### Cratere
+#### ✓ Cratere
 
 Cratere radioattivo enorme con pozze che brillano di verde.  
 File: `assets/arene/wasteland/luoghi/cratere.webp` · video: `assets/arene/wasteland/luoghi/cratere.mp4`
@@ -1813,7 +1813,7 @@ A huge radioactive crater with glowing green pools at its centre in the central 
 Static camera and a seamless ambient loop: the place itself stays perfectly still and only small elements move, slowly and gently. The green pools pulse and bubble softly, toxic vapour rises slowly, dust drifts across the rim. --motion low --loop
 ```
 
-#### Diga
+#### ✓ Diga
 
 Diga di cemento gigante incrinata, con un insediamento di fortuna in cima.  
 File: `assets/arene/wasteland/luoghi/diga.webp` · video: `assets/arene/wasteland/luoghi/diga.mp4`
@@ -1832,7 +1832,7 @@ Static camera and a seamless ambient loop: the place itself stays perfectly stil
 
 ### Pericoli · Terre Desolate
 
-#### Banda di predoni
+#### ✓ Banda di predoni
 
 Banda di predoni con armature di cuoio chiodato e occhialoni, accanto a buggy truccati.  
 File: `assets/arene/wasteland/pericoli/banda-di-predoni.webp` · video: `assets/arene/wasteland/pericoli/banda-di-predoni.mp4`
@@ -1849,7 +1849,7 @@ A gang of raiders standing in front of their modified buggies, the leader in fro
 Static camera and a seamless ambient loop: the subject keeps the same pose and position, with only subtle living movement, slow and calm. The raiders breathe and shift their weight slightly, scarves flutter in the wind, dust blows past, engine heat shimmers. --motion low --loop
 ```
 
-#### Scorpione gigante
+#### ✓ Scorpione gigante
 
 Scorpione gigante del deserto col pungiglione alzato.  
 File: `assets/arene/wasteland/pericoli/scorpione-gigante.webp` · video: `assets/arene/wasteland/pericoli/scorpione-gigante.mp4`
@@ -1866,7 +1866,7 @@ A giant desert scorpion as big as a car, its armoured faceted chitin shining in 
 Static camera and a seamless ambient loop: the subject keeps the same pose and position, with only subtle living movement, slow and calm. The scorpion stinger sways slowly, claws twitch, sand trickles off its shell. --motion low --loop
 ```
 
-#### Branco di cani mutati
+#### ✓ Branco di cani mutati
 
 Branco di cani mutati senza pelo, con occhi in più, che ringhiano.  
 File: `assets/arene/wasteland/pericoli/branco-di-cani-mutati.webp` · video: `assets/arene/wasteland/pericoli/branco-di-cani-mutati.mp4`
@@ -1883,7 +1883,7 @@ A pack of hairless mutated dogs with scarred grey skin, uneven extra eyes and lo
 Static camera and a seamless ambient loop: the subject keeps the same pose and position, with only subtle living movement, slow and calm. The dogs pant and growl with slow breathing, their eyes blink out of sync, dust drifts. --motion low --loop
 ```
 
-#### Verme delle sabbie
+#### ✓ Verme delle sabbie
 
 Verme delle sabbie colossale che erompe dalle dune, bocca circolare piena di denti.  
 File: `assets/arene/wasteland/pericoli/verme-delle-sabbie.webp` · video: `assets/arene/wasteland/pericoli/verme-delle-sabbie.mp4`
@@ -1990,7 +1990,7 @@ Interrogazioni, gossip e alleanze da intervallo. Nessuno muore: si viene elimina
 
 ### Luoghi · Liceo Spietato
 
-#### Palestra
+#### ✓ Palestra
 
 Palestra della scuola con parquet, canestri, funi e tappetini impilati.  
 File: `assets/arene/liceo/luoghi/palestra.webp` · video: `assets/arene/liceo/luoghi/palestra.mp4`
@@ -2007,7 +2007,7 @@ A school gym with a basketball hoop above a polished wooden floor in the central
 Static camera and a seamless ambient loop: the place itself stays perfectly still and only small elements move, slowly and gently. Climbing ropes sway gently, light beams shimmer through the windows, dust floats, the ball rolls a little. --motion low --loop
 ```
 
-#### Mensa
+#### ✓ Mensa
 
 Mensa scolastica dopo pranzo: tavoli lunghi, vassoi abbandonati, bancone fumante.  
 File: `assets/arene/liceo/luoghi/mensa.webp` · video: `assets/arene/liceo/luoghi/mensa.mp4`
@@ -2024,7 +2024,7 @@ An empty school cafeteria after lunch, with a steaming lunch counter and stacked
 Static camera and a seamless ambient loop: the place itself stays perfectly still and only small elements move, slowly and gently. Steam rises softly from the counter, light beams shimmer, a napkin flutters, dust floats. --motion low --loop
 ```
 
-#### Biblioteca
+#### ✓ Biblioteca
 
 Biblioteca scolastica silenziosa con scaffali e tavoli da studio.  
 File: `assets/arene/liceo/luoghi/biblioteca.webp` · video: `assets/arene/liceo/luoghi/biblioteca.mp4`
@@ -2041,7 +2041,7 @@ A quiet school library with a study table lit by a green desk lamp in the centra
 Static camera and a seamless ambient loop: the place itself stays perfectly still and only small elements move, slowly and gently. Pages flutter slightly, dust drifts in the light, the lamp glows softly, light shifts slowly through the windows. --motion low --loop
 ```
 
-#### Laboratorio di chimica
+#### ✓ Laboratorio di chimica
 
 Laboratorio di chimica con becher, cappa aspirante e fiasche colorate che bollono.  
 File: `assets/arene/liceo/luoghi/laboratorio-di-chimica.webp` · video: `assets/arene/liceo/luoghi/laboratorio-di-chimica.mp4`
@@ -2058,7 +2058,7 @@ A chemistry lab with a bench of colourful bubbling flasks connected by glass tub
 Static camera and a seamless ambient loop: the place itself stays perfectly still and only small elements move, slowly and gently. The flasks bubble softly, coloured vapour rises slowly, the burner flame flickers. --motion low --loop
 ```
 
-#### Cortile
+#### ✓ Cortile
 
 Cortile della scuola con panchine, un albero, motorini e zaini a terra.  
 File: `assets/arene/liceo/luoghi/cortile.webp` · video: `assets/arene/liceo/luoghi/cortile.mp4`
@@ -2075,7 +2075,7 @@ The school courtyard with a big leafy tree and a wooden bench in the central thi
 Static camera and a seamless ambient loop: the place itself stays perfectly still and only small elements move, slowly and gently. Leaves rustle and a few drift down, dappled sunlight moves on the ground, a ribbon on a scooter flutters. --motion low --loop
 ```
 
-#### Aula magna
+#### ✓ Aula magna
 
 Aula magna con file di poltroncine, palco e microfono.  
 File: `assets/arene/liceo/luoghi/aula-magna.webp` · video: `assets/arene/liceo/luoghi/aula-magna.mp4`
@@ -2094,7 +2094,7 @@ Static camera and a seamless ambient loop: the place itself stays perfectly stil
 
 ### Pericoli · Liceo Spietato
 
-#### Preside
+#### ✓ Preside
 
 Caricatura della Preside severa, braccia conserte, occhiali abbassati, sulla soglia.  
 File: `assets/arene/liceo/pericoli/preside.webp` · video: `assets/arene/liceo/pericoli/preside.mp4`
@@ -2111,7 +2111,7 @@ A stern school principal standing in a doorway, a sharp grey suit, arms crossed,
 Static camera and a seamless ambient loop: the subject keeps the same pose and position, with only subtle living movement, slow and calm. The principal taps a foot slowly, the eyebrow lifts, the glasses glint, papers flutter on a nearby desk. --motion low --loop
 ```
 
-#### Bidello di turno
+#### ✓ Bidello di turno
 
 Caricatura del bidello brontolone con mocio, secchio e mazzo di chiavi.  
 File: `assets/arene/liceo/pericoli/bidello-di-turno.webp` · video: `assets/arene/liceo/pericoli/bidello-di-turno.mp4`
@@ -2128,7 +2128,7 @@ A grumpy school janitor leaning on a mop beside a yellow bucket, a huge ring of 
 Static camera and a seamless ambient loop: the subject keeps the same pose and position, with only subtle living movement, slow and calm. The janitor leans on the mop and sighs, the keys jingle slightly, soap bubbles float from the bucket. --motion low --loop
 ```
 
-#### Ispezione a sorpresa
+#### ✓ Ispezione a sorpresa
 
 L'ispezione a sorpresa: un ispettore con cartellina e lente che spunta da una porta.  
 File: `assets/arene/liceo/pericoli/ispezione-a-sorpresa.webp` · video: `assets/arene/liceo/pericoli/ispezione-a-sorpresa.mp4`
@@ -2145,7 +2145,7 @@ A school inspector peeking through a half-open classroom door, holding a clipboa
 Static camera and a seamless ambient loop: the subject keeps the same pose and position, with only subtle living movement, slow and calm. The magnifying glass moves slowly, the huge eye blinks, the door sways slightly. --motion low --loop
 ```
 
-#### Professoressa di matematica
+#### ✓ Professoressa di matematica
 
 Caricatura della prof di matematica con la penna rossa, lavagna con formule illeggibili.  
 File: `assets/arene/liceo/pericoli/professoressa-di-matematica.webp` · video: `assets/arene/liceo/pericoli/professoressa-di-matematica.mp4`
@@ -2258,7 +2258,7 @@ A meeting room with a long glass table leading to a glowing projector screen in 
 Static camera and a seamless ambient loop: the place itself stays perfectly still and only small elements move, slowly and gently. The projector beam shimmers with floating dust, a chair turns very slowly, steam rises from a coffee cup. --motion low --loop
 ```
 
-#### Open space
+#### ✓ Open space
 
 Open space sterminato con file di scrivanie, monitor e piante in vaso.  
 File: `assets/arene/ufficio/luoghi/open-space.webp` · video: `assets/arene/ufficio/luoghi/open-space.mp4`
@@ -2275,7 +2275,7 @@ A sprawling open-space office with endless rows of identical desks and glowing m
 Static camera and a seamless ambient loop: the place itself stays perfectly still and only small elements move, slowly and gently. Monitors flicker softly, a ceiling light buzzes and blinks, the plant leaves sway in the air conditioning. --motion low --loop
 ```
 
-#### Cucina
+#### ✓ Cucina
 
 Angolo cucina con macchinetta del caffè, tazze, microonde e frigo pieno di bigliettini.  
 File: `assets/arene/ufficio/luoghi/cucina.webp` · video: `assets/arene/ufficio/luoghi/cucina.mp4`
@@ -2292,7 +2292,7 @@ The office kitchenette with a steaming coffee machine on the counter in the cent
 Static camera and a seamless ambient loop: the place itself stays perfectly still and only small elements move, slowly and gently. Steam rises from the coffee machine, a drip falls slowly, the microwave light glows, sticky notes flutter. --motion low --loop
 ```
 
-#### Ufficio del direttore
+#### ✓ Ufficio del direttore
 
 Ufficio d'angolo del Direttore con poltrona di pelle, vetrata panoramica e premi.  
 File: `assets/arene/ufficio/luoghi/ufficio-del-direttore.webp` · video: `assets/arene/ufficio/luoghi/ufficio-del-direttore.mp4`
@@ -2309,7 +2309,7 @@ The director corner office with a big leather chair turned toward a panoramic wi
 Static camera and a seamless ambient loop: the place itself stays perfectly still and only small elements move, slowly and gently. The leather chair turns very slowly, cigar smoke curls upward, city lights twinkle outside. --motion low --loop
 ```
 
-#### Sala stampanti
+#### ✓ Sala stampanti
 
 Stanzino delle stampanti con una fotocopiatrice inceppata che sputa fogli.  
 File: `assets/arene/ufficio/luoghi/sala-stampanti.webp` · video: `assets/arene/ufficio/luoghi/sala-stampanti.mp4`
@@ -2326,7 +2326,7 @@ A cramped printer room with a big jammed copier in the central third of the fram
 Static camera and a seamless ambient loop: the place itself stays perfectly still and only small elements move, slowly and gently. Sheets slide slowly out of the copier, the warning light blinks, a few papers flutter down. --motion low --loop
 ```
 
-#### Parcheggio
+#### ✓ Parcheggio
 
 Parcheggio aziendale sotterraneo con posti riservati e neon.  
 File: `assets/arene/ufficio/luoghi/parcheggio.webp` · video: `assets/arene/ufficio/luoghi/parcheggio.mp4`
@@ -2345,7 +2345,7 @@ Static camera and a seamless ambient loop: the place itself stays perfectly stil
 
 ### Pericoli · Ufficio Open Space
 
-#### Direttore generale
+#### ✓ Direttore generale
 
 Caricatura dell'amministratore delegato in completo, controluce davanti a una vetrata.  
 File: `assets/arene/ufficio/pericoli/direttore-generale.webp` · video: `assets/arene/ufficio/pericoli/direttore-generale.mp4`
@@ -2362,7 +2362,7 @@ A powerful CEO in a sharp navy suit silhouetted against a tall office window, a 
 Static camera and a seamless ambient loop: the subject keeps the same pose and position, with only subtle living movement, slow and calm. The CEO adjusts the tie very slowly, the smile widens slightly, city lights twinkle behind. --motion low --loop
 ```
 
-#### Ufficio Risorse umane
+#### ✓ Ufficio Risorse umane
 
 Caricatura di una persona delle Risorse umane con sorriso di circostanza e pila di cartelline.  
 File: `assets/arene/ufficio/pericoli/ufficio-risorse-umane.webp` · video: `assets/arene/ufficio/pericoli/ufficio-risorse-umane.mp4`
@@ -2379,7 +2379,7 @@ An HR officer with a polite fake smile and a tidy cardigan, holding a tall wobbl
 Static camera and a seamless ambient loop: the subject keeps the same pose and position, with only subtle living movement, slow and calm. The fake smile holds while one eye twitches, the folder stack wobbles slightly, papers flutter. --motion low --loop
 ```
 
-#### Consulente esterno
+#### ✓ Consulente esterno
 
 Caricatura del consulente con capelli impomatati, portatile e grafico a torta olografico.  
 File: `assets/arene/ufficio/pericoli/consulente-esterno.webp` · video: `assets/arene/ufficio/pericoli/consulente-esterno.mp4`
@@ -2396,7 +2396,7 @@ A slick external consultant with gelled hair, a skinny tie and an open laptop, a
 Static camera and a seamless ambient loop: the subject keeps the same pose and position, with only subtle living movement, slow and calm. The holographic pie chart rotates slowly, the laptop screen glows, the consultant raises an eyebrow. --motion low --loop
 ```
 
-#### Riorganizzazione aziendale
+#### ✓ Riorganizzazione aziendale
 
 La riorganizzazione personificata: un mostro di caselle e frecce di organigramma.  
 File: `assets/arene/ufficio/pericoli/riorganizzazione-aziendale.webp` · video: `assets/arene/ufficio/pericoli/riorganizzazione-aziendale.mp4`
