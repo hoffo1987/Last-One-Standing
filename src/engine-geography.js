@@ -94,9 +94,11 @@
     let out=text;
     for(const [from,to] of sharedCorrections)out=out.replace(from,to);
     if(theme.id==='scifi')out=out.replace('Un fulmine cade a un metro da','Una scarica elettrica colpisce un pannello accanto a').replace('Un fulmine cade su','Una scarica elettrica colpisce').replace('dorme sul terreno umido','dorme su un pannello bagnato').replace('vicino al fuoco','accanto a una bocchetta tiepida').replace('accanto al fuoco','accanto a una bocchetta tiepida').replace('prima ancora che si aprano le capsule','appena esce dalla capsula');
-    if(theme.soft)out=out.replace('vicino al fuoco',theme.id==='liceo'?'accanto a un tavolo di studio':'accanto a un tavolo della pausa');
+    if(theme.soft)out=out.replace('vicino al fuoco',theme.id==='liceo'?'accanto a un tavolo di studio':'accanto a un tavolo della pausa').replace('Attorno al fuoco,','Durante una pausa,').replace("guarda il fuoco di un'altra alleanza in lontananza","guarda un altro gruppo parlare in lontananza");
     if(theme.id==='liceo')for(const [from,to] of [
       ['Da oggi non verrà mai più interrogat[A:o/a] a sorpresa.','Avrà un riferimento in più per prepararsi agli imprevisti.'],
+      ['Al mattino arrivano a scuola tenendosi per mano.','Fra un messaggio e l’altro, si prendono per mano.'],
+      ['Nessuno riuscirà a scalfirl[A:o/a] per almeno una settimana.','La sua reputazione ha una protezione in più.'],
       ['sul bus del ritorno','in un angolo tranquillo della scuola'],
       ["si contendono l'ultimo posto in pullman per la gita","si contendono l'ultima prenotazione per la gita"],
       ['Lo sciopero dei bus','Il controllo dei ritardi'],
