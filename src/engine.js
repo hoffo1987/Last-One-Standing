@@ -265,8 +265,8 @@
     return okTheme && (!pk.adult || (adult && !theme.noAdult));
   });
   const poolCache = {};
-  function buildPools(theme, custom, adult) {
-    const key = theme.id + '|' + (adult ? 1 : 0) + '|' + JSON.stringify(custom || []);
+  function buildPools(theme, custom, adult, worldEnabled = true) {
+    const key = theme.id + '|' + (adult ? 1 : 0) + '|' + (worldEnabled ? 1 : 0) + '|' + JSON.stringify(custom || []);
     if (poolCache[key]) return poolCache[key];
     const src = theme.soft ? theme.pool : D.core;
     const more = (D.more || {})[theme.id] || {};
@@ -291,6 +291,15 @@
     packs.forEach((pk) => { if (pk.dis) pools.disasters = pools.disasters.concat(parseDisasters(pk.dis, pk.adult ? 'adult' : theme.id).map((d) => Object.assign(d, { adult: !!pk.adult }))); });
     pools.lex = Object.assign({}, D.lexDefault || {}, itemLex(theme), theme.lex);
     packs.forEach((pk) => { if (pk.lex) Object.keys(pk.lex).forEach((k) => (pools.lex[k] = pk.lex[k])); });
+    const world = worldEnabled ? D.world?.compile(theme) : null;
+    if (world) {
+      for (const category of ['events','traits','trials','deaths']) for (const row of world[category]) {
+        const event=parseLine(row.raw,'world');event.contentId=row.id;event.contentCategory=category;if(row.afterScene!=null)event.afterScene=row.afterScene;pools[row.phase].push(event);
+      }
+      for(const incident of world.disasters)pools.disasters.push({n:incident.n,intro:incident.intro,out:parseBlock(incident.out,'world').map((event,i)=>Object.assign(event,{contentId:incident.id+'-'+i,contentCategory:'disasters'})),zones:[incident.zone],contentId:incident.id,scene:incident.scene});
+      for(const [type,names] of Object.entries(D.world.itemNames(world)))pools.lex[type]=[...new Set((pools.lex[type]||[]).concat(names))];
+      pools.world=world;
+    }
     const ks = Object.keys(poolCache); if (ks.length > 40) delete poolCache[ks[0]];
     poolCache[key] = pools;
     return pools;
@@ -328,7 +337,9 @@
         let pe = 0; PHASES.forEach((k) => (pe += cnt((pk.ev || {})[k])));
         if (pk.adult) { ea += pe; da += cntDis(pk.dis); } else { e += pe; d += cntDis(pk.dis); }
       });
-      perTheme[t.id] = { events: e, disasters: d, adultEvents: ea, adultDisasters: da };
+      const world=D.world?.compile(t),extra=world?world.counts.events+world.counts.traits+world.counts.trials+world.counts.deaths:0;
+      if(world){events+=extra;disasters+=world.counts.disasters;outcomes+=world.counts.disasters*3;}
+      perTheme[t.id] = { events: e+extra, disasters: d+(world?.counts.disasters||0), adultEvents: ea, adultDisasters: da, ...(world?{world:world.counts}:{}) };
     });
     return { events, disasters, adultEvents, adultDisasters: adultDis, outcomes, themes: D.themes.length, perTheme };
   }
@@ -428,7 +439,7 @@
     const seed = cfg.seed == null || cfg.seed === '' ? String(Date.now()) : String(cfg.seed);
     const rng = makeRng(seed + '|' + theme.id);
     const adult = !!cfg.adult && !theme.noAdult;
-    const originalPools = buildPools(baseTheme, cfg.custom, adult);
+    const originalPools = buildPools(baseTheme, cfg.custom, adult, mapEnabled && cfg.worldVersion !== 0);
     const pools = mapEnabled ? Geography.preparePools(originalPools, theme, geographyZones) : originalPools;
     const variety = Systems.eventVariety();
     const LEX = pools.lex;
@@ -454,7 +465,9 @@
     const traps = []; const zoneLoot = {}, trapChecks=new WeakMap();
     let SYS = []; let pendingNotes = [];
     // oggetti e mente dei concorrenti
-    const IT = D.items || { types: {}, names: {}, how: {} };
+    const world = pools.world;
+    const baseItems = D.items || { types: {}, names: {}, how: {} };
+    const IT = world ? {...baseItems,names:{...baseItems.names,[theme.id]:Object.fromEntries(Object.entries(D.world.itemNames(world)).map(([type,names])=>[type,[...new Set(((baseItems.names||{})[theme.id]?.[type]||[]).concat(names))]]))}} : baseItems;
     const MIND = D.mind || { goals: {}, acts: {}, actsSoft: {}, diary: { trait: {} }, diarySoft: { trait: {} }, mem: {} };
     let ORIGIN = null, CURKIND = '';
     const VO = D.voice || {}, VS = D.voiceSoft || {}, CH = D.chats || {};
@@ -608,6 +621,7 @@
     }
     function checkReq(ev, roles) {
       if (geo && ev.text != null && !geo.accepts(ev,roles)) return false;
+      if(ev.afterScene!=null&&!D.world.follows(ev.afterScene,roles[0].zone,roles,phases))return false;
       for (const r of ev.req) {
         const A = roles[r.r ? r.r[0] : 0], B = r.r && r.r[1] != null ? roles[r.r[1]] : null;
         switch (r.t) {
@@ -846,12 +860,15 @@
     const useFmt = (l, people, vars) => { const pool = fresh(l); const x = fmt(pool, people, vars); if (x) pool.forEach((y) => { if (x.src === y) USED.add(y); }); return x; };
     function voice(kind, speaker, others, vars) {
       if (!speaker) return null;
+      if (geo && !speaker.alive && kind !== 'last') return null;
       const base = (theme.soft && VS[kind]) || VO[kind] || (theme.soft && (BD.voiceSoft || {})[kind]) || (BD.voice || {})[kind] || {};
       const tr = speaker.traits.filter((x) => base.trait && base.trait[x] && fresh(base.trait[x]).some((y) => !USED.has(y)));
       const ar = base.arena && base.arena[theme.id];
       const people = [speaker].concat(others || []);
       let x = null;
-      if (tr.length && rng.chance(0.55)) x = useFmt(base.trait[rng.pick(tr)], people, vars);
+      const local=world?.quotes.filter(q=>q.kind===kind&&q.zone===speaker.zone&&!USED.has(q.text));
+      if(local?.length&&rng.chance(0.5))x=useFmt(local.map(q=>q.text),people,vars);
+      if (!x && tr.length && rng.chance(0.55)) x = useFmt(base.trait[rng.pick(tr)], people, vars);
       if (!x && ar && ar.some((y) => !USED.has(y)) && rng.chance(0.45)) x = useFmt(ar, people, vars);
       if (!x) x = useFmt(base._ || [], people, vars);
       if (!x) return null;
@@ -1013,7 +1030,7 @@
       if (v.promises) v.promises.forEach(dissolvePromise);
     }
     function giveItem(t, type, ctx, lexPick, name, q, how, from, src) {
-      const nm = name || (type === 'arma' ? lexPick('arma') : type === 'cibo' ? ctx.cibo || 'delle provviste' : geo && ctx[type] ? ctx[type] : ITEM_NAME[type] || lexPick(type));
+      const nm = name || (type === 'arma' ? lexPick('arma') : type === 'cibo' ? ctx.cibo || 'delle provviste' : geo && ctx[type] ? ctx[type] : world ? lexPick(type) : ITEM_NAME[type] || lexPick(type));
       const it = src ? Object.assign({}, src, { how: how || 'trovato', from: from ? from.id : null, d: day }) : mkItem(type, nm, how, from, q);
       if (!addItem(t, it)) return false;
       t.items++; stats.items++;
@@ -1169,6 +1186,7 @@
         }
       }
       ev.dies.forEach((i) => { if (!saved.has(i)) kill(roles[i], [], txt, out); });
+      let spentMedicine=null;
       for (const f of ev.fx) {
         const t = roles[f.r[0]], u = f.r[1] != null ? roles[f.r[1]] : null;
         if (!t.alive && f.t !== 'rel') continue;
@@ -1187,7 +1205,7 @@
             break;
           }
           case 'gain': giveItem(t, f.item, ctx, lexPick); break;
-          case 'lose': { const it = itemOf(t, f.item); if (it) takeItem(t, it); break; }
+          case 'lose': { const it = itemOf(t, f.item); if (it) { if(world&&f.item==='med')spentMedicine={owner:t,item:it};takeItem(t, it); } break; }
           case 'consume': {
             const it = itemOf(t, f.item); if (!it) break;
             const before = itemLedger.state(t); takeItem(t, it);
@@ -1220,11 +1238,13 @@
             break;
           }
           case 'cure': {
+            const careBefore=spentMedicine?itemLedger.state(t):null;
             t.st = t.st.lutto != null ? { lutto: t.st.lutto } : {};
             t.cause = null;
             t.hp = Math.max(t.hp, 72); t.en += 10; t.mo += 6;
             if (M && M.cure) { if (M.infect) { if (t.infected && t.pr < M.cure) { t.infected = false; t.pr = 0; stats.cured++; } } else t.pr -= M.cure; }
             syncSt(t);
+            if(spentMedicine){itemLedger.record('heal',spentMedicine.owner,t,spentMedicine.item,careBefore,'Cura con la medicina posseduta dal soccorritore');spentMedicine=null;}
             const helper = roles.find((x) => x !== t && x.alive);
             if (helper && ev.n > 1) { t.owes[helper.id] = 'cura'; addAff(t, helper, 30); helper.saves++; remember(t, helper, 'cured'); if (rng.chance(0.5)) { const e = echo(E.debt, [t, helper], ''); if (e) out.push(e); } }
             break;
@@ -1283,7 +1303,7 @@
       itemLedger.setContext('');
       if(geo&&Geography.rule(ev.text,geographyZones,ev.location).scatter){const exits=geographyZones[roles[0].zone].links.filter(z=>!closed.has(z));roles.filter(t=>t.alive).forEach((t,i)=>geo.move(t,exits[i%exits.length],'Fugge in una direzione diversa dagli altri',{mode:'event'}));}
       if(geo)for(const i of Geography.rule(ev.text,geographyZones,ev.location).depart||[]){const t=roles[i];if(t?.alive){const exits=geographyZones[t.zone].links.filter(z=>!closed.has(z));if(exits.length)geo.move(t,rng.pick(exits),'Si allontana dopo l’incontro',{mode:'event'});}}
-      return Object.assign({ html: txt.html, plain: txt.plain, ids: roles.map((t) => t.id), deaths, lethal: deaths.length > 0, origin: ev.origin, cat, why: ev.why, reason, echo: out.slice(0, 3), test: ev.testRes || null },geo?{place}:{});
+      return Object.assign({ html: txt.html, plain: txt.plain, ids: roles.map((t) => t.id), deaths, lethal: deaths.length > 0, origin: ev.origin, cat, why: ev.why, reason, echo: out.slice(0, 3), test: ev.testRes || null },geo?{place}:{},ev.contentId?{contentId:ev.contentId,contentCategory:ev.contentCategory}:{});
     }
 
     function lethalProb(kind) {
@@ -1696,7 +1716,7 @@
     function proseDepartures(text){return Geography.rule(text.replace(/\{(\d)\}/g,(_,i)=>'{'+String.fromCharCode(65+(+i))+'}'),geographyZones).depart||[];}
     function moveAfterProse(tx,people){for(const i of proseDepartures(Geography.adaptText(tx.src||'',theme))){const t=people[i];if(!t?.alive)continue;const exits=geographyZones[t.zone].links.filter(z=>!closed.has(z));if(exits.length)geo.move(t,rng.pick(exits),'Si allontana dal gruppo',{mode:'event'});}}
     function sys2(tx, people, cat, whyTxt, pri, ids) {
-      SYS.push({ pri: pri || 1, ev: Object.assign({ html: tx.html, plain: tx.plain, ids: ids || people.map((p) => p.id), deaths: [], lethal: false, origin: 'sys', cat: cat || 'none', why: 'carattere', whyTxt: whyTxt || '', echo: [] },geo?{place:geo.locate(ids?people.filter(p=>ids.includes(p.id)):people)}:{}) });
+      SYS.push({ pri: pri || 1, ev: Object.assign({ html: tx.html, plain: tx.plain, ids: ids || people.map((p) => p.id), deaths: [], lethal: false, origin: 'sys', cat: cat || 'none', why: 'carattere', whyTxt: whyTxt || '', echo: [] },geo?{place:geo.locate(ids?people.filter(p=>ids.includes(p.id)):people)}:{},tx.contentId?{contentId:tx.contentId,contentCategory:tx.contentCategory}:{}) });
       if(geo)moveAfterProse(tx,people);
     }
 
@@ -2025,13 +2045,16 @@
         if (!rng.chance(0.6)) return;
         const kind = a.partner === b.id ? 'coppia' : isAlly(a, b) ? 'alleati' : aff(a, b) <= -30 || a.grudges[b.id] || b.grudges[a.id] ? 'rivali' : 'sconosciuti';
         const ar = CH.arena && CH.arena[theme.id] ? CH.arena[theme.id].filter((x) => !USED.has(x[0])) : [];
-        const list = (rng.chance(0.4) && ar.length ? ar : (CH[kind] || []).filter((x) => !USED.has(x[0]))) || [];
+        const local=D.world?.dialogues(world,a.zone,kind,a,b,phases).filter(x=>!USED.has(x.lines[0]))||[];
+        const chooseLocal=local.length&&rng.chance(0.7);
+        const list = chooseLocal?local.map(x=>x.lines):(!world&&rng.chance(0.4) && ar.length ? ar : (CH[kind] || []).filter((x) => !USED.has(x[0]))) || [];
         if (!list.length) return;
         const pair = rng.pick(list); USED.add(pair[0]);
+        const source=chooseLocal?local.find(row=>row.lines===pair):null;
         const [l1, l2] = pair;
         const x1 = fmt([l1], [a, b]), x2 = fmt([l2], [a, b]); if (!x1 || !x2) return;
         addAff(a, b, kind === 'rivali' ? -4 : 3);
-        sys2({ plain: a.name + ': «' + x1.plain + '» ' + b.name + ': «' + x2.plain + '»', html: nameTag(a) + ': «' + x1.html + '»<br>' + nameTag(b) + ': «' + x2.html + '»' }, [a, b], kind === 'coppia' ? 'love' : kind === 'alleati' ? 'ally' : kind === 'rivali' ? 'hurt' : 'none', 'Dialogo', 1);
+        sys2({ plain: a.name + ': «' + x1.plain + '» ' + b.name + ': «' + x2.plain + '»', html: nameTag(a) + ': «' + x1.html + '»<br>' + nameTag(b) + ': «' + x2.html + '»',...(source?{contentId:source.id,contentCategory:'dialogues'}:{}) }, [a, b], kind === 'coppia' ? 'love' : kind === 'alleati' ? 'ally' : kind === 'rivali' ? 'hurt' : 'none', 'Dialogo', world?2:1);
       });
     }
     // gli scambi della notte: chi ha fame compra da chi ne ha
@@ -2379,7 +2402,7 @@
         const wc = new Map();
         const wOf = (e) => { let w = wc.get(e); if (w === undefined) { w = weightFor(e, P); wc.set(e, w); } return w; };
         const present=geo?order.filter(t=>un.has(t.id)&&t.alive&&t.zone===P.zone).length:n;
-        const usable=e=>e.n<=present&&(!geo||(e.space||[]).every(s=>(s.at==null||s.at===P.zone)&&(s.travel==null||s.travel===P.zone||geographyZones[P.zone].links.includes(s.travel)&&!closed.has(s.travel)&&geo.budget(P)>0)));
+        const usable=e=>e.n<=present&&(e.afterScene==null||D.world.follows(e.afterScene,P.zone,[P],phases))&&(!geo||(e.space||[]).every(s=>(s.at==null||s.at===P.zone)&&(s.travel==null||s.travel===P.zone||geographyZones[P.zone].links.includes(s.travel)&&!closed.has(s.travel)&&geo.budget(P)>0)));
         const affected=!geo||kind!=='dis'||!opt?.affectedZones||opt.affectedZones.includes(P.zone);
         const candL = affected?pool.filter((e) => e.lethal && usable(e) && e.victims.length < nAlive && !e.risky):[];
         const candS = affected?pool.filter((e) => !e.lethal && usable(e) && (!e.risky || nAlive > 2)):[];
@@ -2416,7 +2439,7 @@
       if (kind === 'dis') {
         const A2 = alive(); let hs = 0;
         A2.forEach((a) => A2.forEach((b) => {
-          if (a.ix >= b.ix || a.zone !== b.zone || hs >= 1 || like(a, b) > -25 || a.grudges[b.id] && a.grudges[b.id].why === 'kill' || !rng.chance(0.3)) return;
+          if (a.ix >= b.ix || a.zone !== b.zone || geo&&opt?.affectedZones&&!opt.affectedZones.includes(a.zone) || hs >= 1 || like(a, b) > -25 || a.grudges[b.id] && a.grudges[b.id].why === 'kill' || !rng.chance(0.3)) return;
           remember(a, b, 'hardship'); remember(b, a, 'hardship'); hs++;
           const e = useFmt(BA('hardship'), [a, b]); if (e) events.push(Object.assign({ html: e.html, plain: e.plain, ids: [a.id, b.id], deaths: [], lethal: false, origin: 'sys', cat: 'heal', why: 'carattere', whyTxt: 'Legame', echo: [] },geo?{place:geo.locate([a,b])}:{}));
         }));
@@ -2547,12 +2570,14 @@
         feastDone = true;
         runPhase('f', pools.f, theme.phase.f, theme.intro.f);
       } else if (day >= 2 && pools.disasters.length && day - lastDisaster > 1 && rng.chance(0.32 * Math.min(1.5, diff))) {
-        let opts = pools.disasters.filter((d) => !usedDisasters.has(d.n));
-        if (!opts.length) { usedDisasters.clear(); opts = pools.disasters; }
+        const eligible=pools.disasters.filter(d=>!d.zones||d.zones.some(z=>!closed.has(z)&&alive().some(t=>t.zone===z)));
+        let opts = eligible.filter((d) => !usedDisasters.has(d.n));
+        if (!opts.length) { usedDisasters.clear(); opts = eligible; }
         const dz = rng.pick(opts);
+        if(!dz)throw new Error('Nessun disastro raggiungibile.');
         usedDisasters.add(dz.n); lastDisaster = day;
-        const areas=geo?[...new Set(Geography.mentions(dz.n,geographyZones).map(m=>m.zone))]:[];
-        runPhase('dis', dz.out.concat(pools.ds), dz.n, dz.intro, Object.assign({ adult: !!dz.adult },areas.length?{affectedZones:areas}:{}));
+        const areas=geo?dz.zones||[...new Set(Geography.mentions(dz.n,geographyZones).map(m=>m.zone))]:[];
+        runPhase('dis', dz.contentId?dz.out:dz.out.concat(pools.ds), dz.n, dz.intro, Object.assign({ adult: !!dz.adult },areas.length?{affectedZones:areas}:{},dz.contentId?{contentId:dz.contentId,worldIncident:{scene:dz.scene,exposed:alive().filter(t=>areas.includes(t.zone)).map(t=>t.id)}}:{}));
       }
       if (isEnded() || loversEnd()) break;
       runPhase('n', pools.n, theme.phase.n + ' ' + day, theme.intro.n);

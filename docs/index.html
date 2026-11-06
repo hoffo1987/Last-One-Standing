@@ -7443,6 +7443,436 @@ La miniera | Una vecchia miniera crolla sotto i piedi di chi ci cammina sopra. |
 })(typeof window !== 'undefined' ? window : globalThis);
 
 ;
+/* Famiglie concrete, con nomi grammaticalmente completi. Ogni combinazione
+ * mantiene esclusivamente gli effetti del tipo; nessun potere implicito. */
+(function(G){
+  const D=G.LOS_DATA;
+  const split=s=>s.split('|');
+  const tails={
+    arma:split('con presa in tessuto|con laccio da polso|con presa in cuoio|con contrappeso ad anello|con fodero di recupero'),
+    armatura:split('con bordi rivestiti|con fodera trapuntata|con fissaggi intrecciati|con cuciture doppie|con rinforzi sulle giunture'),
+    attrezzo:split('in una custodia rigida|in un astuccio avvolgibile|in una sacca cerata|in un involto di tessuto|in una scatola a scomparti'),
+    mappa:split('con riferimenti numerati|con legenda a colori|con annotazioni a margine|con simboli in rilievo|con indice delle sezioni'),
+    trap:split('con innesco a pressione|con tirante laterale|con fermo a scatto|con contrappeso nascosto|con chiusura a caduta'),
+    med:split('in una custodia rigida|in un astuccio di tessuto|in una scatola sigillata|in una sacca impermeabile|in un contenitore a scomparti'),
+    amuleto:split('con un nodo di filo rosso|con un bordo inciso|con un segno a spirale|con un anello di rame|con un frammento di quarzo'),
+    valore:split('in un piccolo involto|in una tasca cucita|in una scatola piatta|in una custodia pieghevole|in un sacchetto annodato'),
+    ricordo:split('con una dedica a matita|con una data sul retro|con una piccola stella disegnata|con le iniziali sul bordo|con una nota ripiegata'),
+    cibo:split('in un involto di carta|in un piccolo cestino|in una scatola di latta|in un contenitore di legno|in un sacchetto di tessuto'),
+  };
+  const roots={
+    classico:{
+      arma:'un coltello da campo|una mazza corta|una lancia da caccia|un pugnale da cintura|una falce corta|una scure da legna',
+      armatura:'un corpetto di cuoio|un giubbotto di tela pesante|una protezione di corteccia|uno scudo di vimini|un mantello imbottito|un parabraccio da caccia',
+      attrezzo:'un set di punteruoli|una pinza da campo|un acciarino|un rocchetto di filo|un set di aghi|una pietra per affilare',
+      mappa:'una carta dei dislivelli|uno schema dei guadi|un taccuino dei sentieri|una pianta dei ripari|un rilievo delle sorgenti|una carta dei terreni',
+      trap:'un laccio da cattura|una gabbia pieghevole|un telaio di rami|un blocco di legno|una rete da presa|un arco da trappola',
+      med:'un rotolo di bende|una scorta di garze|un set da medicazione|una fascia pulita|un impacco lenitivo|un tampone sterile',
+      amuleto:'un dente intagliato|una pietra levigata|un ciondolo di legno|un disco di osso|un anello di corda|un bottone di rame',
+      valore:'una manciata di chiodi|un rotolo di filo metallico|una moneta del distretto|un fermaglio di ottone|un blocchetto di sale|un pacchetto di aghi',
+      ricordo:'un ritratto piegato|un foglio di canzoni|un biglietto di saluto|una cartolina del distretto|un disegno a carbone|un cartoncino di auguri',
+      cibo:'del pane secco|delle noci sgusciate|delle gallette di avena|delle fette di mela essiccata|del pesce secco|dei semi tostati',
+    },
+    fantasy:{
+      arma:'una daga dei giuramenti|un martello nanico|una spada da viaggio|una lancia silvana|un falcetto d’argento|una mazza di quercia',
+      armatura:'un corpetto di scaglie|un mantello di feltro|uno scudo di salice|un giaco di cuoio|una protezione di sughero|un parabraccio di bronzo',
+      attrezzo:'un punteruolo nanico|un bulino da rune|un set di aghi d’osso|una pinza da forgia|un pestello di pietra|un acciarino di selce',
+      mappa:'una pergamena dei sentieri|un rilievo delle vene minerali|un codice dei guadi|una carta dei dislivelli|un rotolo dei passaggi|una tavola dei ripari',
+      trap:'un cerchio di radici|una gabbia di salice|un telaio runico|un sigillo di presa|una rete di corda|un arco di frassino',
+      med:'un impacco di erbe|una scorta di bende di lino|un vasetto di unguento|un set da cerusico|una fascia benedetta|un tampone di muschio pulito',
+      amuleto:'un sigillo del pellegrino|una runa di rame|un anello di nocciolo|un ciondolo lunare|un disco di madreperla|una pietra del giuramento',
+      valore:'un frammento d’ambra|un lingottino di rame|una perla di fiume|un pacchetto di spezie|un cristallo da taglio|una moneta del reame',
+      ricordo:'un foglio di ballata|un ritratto in miniatura|una lettera del villaggio|una pagina di fiaba|un disegno del focolare|un biglietto del raccolto',
+      cibo:'del pane di segale|delle nocciole tostate|delle mele essiccate|delle focaccine d’avena|delle bacche candite|dei semi di zucca',
+    },
+    scifi:{
+      arma:'una lama di servizio|un bastone a impulsi|una pistola a scarica|un perforatore portatile|una lancia da abbordaggio|un taglierino ceramico',
+      armatura:'un corpetto da manutenzione|una pettorina isolante|uno schermo portatile|un giubbotto da attracco|una protezione da saldatura|un parabraccio composito',
+      attrezzo:'un multimetro|un set di sonde|una pinza isolata|un attrezzo multifunzione|un set di chiavi magnetiche|un estrattore di fusibili',
+      mappa:'uno schema delle paratie|una pianta dei moduli|un rilievo delle condotte|una carta dei circuiti|un registro dei vani|un atlante dei settori',
+      trap:'un telaio elettromagnetico|una rete di contenimento|un fermo di sicurezza|un cavo da arresto|un blocco di paratia|una morsa di servizio',
+      med:'un set di garze sintetiche|un rotolo di bende sterili|un impacco refrigerante|un set da sutura|una fascia emostatica|un tampone medico',
+      amuleto:'un gettone della prima missione|un disco di rame|un frammento di wafer|un ciondolo orbitale|un anello di ceramica|un sigillo della navetta',
+      valore:'un modulo di memoria|un pacchetto di connettori|una bobina di conduttore|un sensore di ricambio|una serie di fusibili|un disco di calibrazione',
+      ricordo:'una stampa della Terra|una cartolina del primo lancio|un ritratto su pellicola|un foglio di musica|una foto di equipaggio|un messaggio stampato',
+      cibo:'delle cialde proteiche|delle barrette di alghe|dei cracker liofilizzati|dei cubetti di frutta secca|delle gallette nutrienti|dei semi idroponici tostati',
+    },
+    zombie:{
+      arma:'un coltello da campeggio|un machete da potatura|una mazza da lavoro|un’accetta da soccorso|un piede di porco|un martello da carpentiere',
+      armatura:'un giubbotto da motociclista|una protezione da cantiere|uno scudo antisommossa|un corpetto da baseball|una giacca da lavoro|un parabraccio sportivo',
+      attrezzo:'una pinza universale|un set di cacciaviti|un apriscatole|un set di chiavi|una pietra abrasiva|un set da cucito',
+      mappa:'una pianta dei quartieri|un elenco dei passaggi|una carta delle pendenze|uno schema dei collegamenti|un rilievo degli isolati|un taccuino delle vie laterali',
+      trap:'una rete da cantiere|un laccio da cattura|un telaio di recinzione|una gabbia pieghevole|un blocco di porta|un cavo da traino',
+      med:'un rotolo di garze|un pacco di bende|un set da pronto soccorso|una fascia sterile|un tampone medico|un set da medicazione',
+      amuleto:'un gettone del vecchio bar|un ciondolo di rame|una pietra dipinta|un anello di corda|una medaglia del quartiere|un bottone portafortuna',
+      valore:'un pacchetto di batterie|un rotolo di nastro|un mazzo di fascette|una serie di fusibili|una manciata di viti|un tubetto di colla',
+      ricordo:'una fotografia scolorita|una cartolina del mare|un biglietto del cinema|un disegno a pennarello|una lettera di saluto|una foto di compleanno',
+      cibo:'dei cracker salati|delle gallette di riso|delle prugne secche|dei biscotti semplici|delle arachidi tostate|delle fette biscottate',
+    },
+    royale:{
+      arma:'un coltello tattico|una carabina compatta|un manganello|una pistola da segnalazione modificata|una scure da campo|una lancia da sopravvivenza',
+      armatura:'un corpetto tattico|una pettorina da allenamento|uno scudo composito|una giacca imbottita|una protezione da pattuglia|un parabraccio tecnico',
+      attrezzo:'una pinza tascabile|un set di chiavi esagonali|un acciarino|un set di aghi|un avvitatore manuale|una lima corta',
+      mappa:'una carta topografica|un rilievo degli approdi|una pianta dei settori|un taccuino dei dislivelli|uno schema dei tracciati|una carta delle coperture',
+      trap:'un telaio da cattura|una rete tattica|un cavo da arresto|una morsa pieghevole|un blocco da passaggio|un laccio mimetico',
+      med:'una fascia compressiva|un set di garze|un rotolo di bende|un tampone sterile|un impacco refrigerante|un set da soccorso',
+      amuleto:'un gettone della squadra|un ciondolo di ceramica|una moneta commemorativa|una pietra dipinta|un anello di corda|un disco di rame',
+      valore:'un pacchetto di celle|un set di ottiche di ricambio|un rotolo di nastro tecnico|un set di fibbie|un pacchetto di fascette|una serie di connettori',
+      ricordo:'una fotografia di squadra|un biglietto della finale|una cartolina dell’isola|un foglio di autografi|un disegno del vecchio campo|una lettera piegata',
+      cibo:'delle barrette ai cereali|delle noci tostate|dei cracker integrali|delle fette di frutta secca|delle gallette salate|dei biscotti d’avena',
+    },
+    horror:{
+      arma:'un coltello d’argento|un attizzatoio|una daga da cerimonia|una scure da legna|un bastone da passeggio|un pugnale d’epoca',
+      armatura:'un corpetto da scherma|un cappotto imbottito|uno scudo da cerimonia|una protezione da giardiniere|una giacca di cuoio|un parabraccio antico',
+      attrezzo:'un set di chiavi|una pinza da restauro|un punteruolo|un acciarino|un set di aghi|un piccolo scalpello',
+      mappa:'una pianta delle ali|un rilievo dei dislivelli|un taccuino dei passaggi|uno schema delle stanze|una carta dei vani|un indice delle porte',
+      trap:'una rete da cattura|un telaio di ferro|un laccio di seta|una gabbia da uccelli|un fermo da porta|un contrappeso di ottone',
+      med:'un rotolo di bende|un impacco di erbe|una scorta di garze|una fascia di lino pulita|un vasetto di unguento|un set da medicazione',
+      amuleto:'una medaglia votiva|un sigillo di cera|una pietra del rosario|un ciondolo d’argento|un anello di rame|un bottone di madreperla',
+      valore:'una posata d’argento|una moneta antica|un fermaglio di ottone|un cristallo da lampada|un cammeo|un sigillo di famiglia',
+      ricordo:'una lettera scolorita|un ritratto in miniatura|una foto del ballo|una pagina di diario|un biglietto di invito|un disegno della vecchia casa',
+      cibo:'dei biscotti al burro|delle fette di mela secca|delle mandorle|del pane tostato|delle gallette dolci|delle castagne secche',
+    },
+    wasteland:{
+      arma:'una lama di recupero|una mazza di tubi|una lancia di ferraglia|una scure da demolizione|un coltello da strada|un martello da officina',
+      armatura:'un corpetto di pneumatico|uno scudo di lamiera|una giacca da saldatore|una pettorina di cuoio|una protezione di placche|un parabraccio di recupero',
+      attrezzo:'una chiave regolabile|una pinza da officina|un set di punteruoli|una lima|un acciarino|un set di aghi grossi',
+      mappa:'una carta dei dislivelli|un rilievo delle piste|un taccuino delle cisterne|uno schema dei collegamenti|una pianta dei rifugi|una carta delle condotte',
+      trap:'un telaio di ferraglia|un cavo da traino|una morsa da officina|una rete di metallo|un laccio di recupero|un blocco di portiera',
+      med:'una fascia pulita|un set da sutura|un rotolo di bende|un tampone sterile|una scorta di garze|un impacco refrigerante',
+      amuleto:'un dente di ingranaggio|un gettone di rame|una pietra levigata|un dado forato|un ciondolo di ceramica|un anello di filo',
+      valore:'una serie di bulloni|un filtro di ricambio|un rotolo di filo di rame|un pacchetto di fusibili|un blocchetto di sale|un connettore integro',
+      ricordo:'una cartolina ingiallita|una foto prima del crollo|un foglio di canzoni|una lettera di saluto|un disegno di casa|un biglietto di viaggio',
+      cibo:'delle gallette di miglio|dei semi tostati|delle strisce di carne secca|delle focaccine secche|delle fette di cactus essiccato|delle noci del deserto',
+    },
+    liceo:{
+      arma:'un fascicolo di risposte motivate|un riepilogo delle fonti|un prospetto dei contributi|un dossier delle revisioni|un elenco delle correzioni|un quaderno delle verifiche',
+      armatura:'un registro dei contributi|un fascicolo di giustificazioni|un riepilogo delle presenze|un archivio delle consegne|un quaderno delle fonti|un elenco delle conferme',
+      attrezzo:'una calcolatrice|un set di righelli|un astuccio di matite|un set di evidenziatori|un compasso|un correttore a nastro',
+      mappa:'una pianta dell’istituto|un calendario dei turni|un elenco degli sportelli|uno schema delle attività|un prospetto degli orari|un indice delle aule',
+      trap:'un questionario ambiguo|un modulo di adesione|un elenco di prenotazioni|un invito incompleto|un sondaggio di classe|un foglio di correzioni',
+      med:'un fascicolo di recupero|un quaderno di ripasso|una guida alle correzioni|un riepilogo della lezione|un set di schede di sostegno|un elenco di esercizi guidati',
+      amuleto:'un portafortuna di rame|un gettone della gita|una pietra dipinta|un ciondolo di ceramica|un anello di filo|un bottone del vecchio zaino',
+      valore:'un buono della cartoleria|un biglietto del cinema|un voucher della mensa|un coupon dei libri usati|un buono del bar|un carnet delle fotocopie',
+      ricordo:'una foto di classe|un biglietto della gita|un disegno del banco|una cartolina del campo estivo|un foglio di dediche|un invito di compleanno',
+      cibo:'dei biscotti ai cereali|delle mandorle|delle gallette di mais|dei cracker|delle fette di mela secca|dei grissini',
+    },
+    ufficio:{
+      arma:'un dossier dei risultati|un registro delle revisioni|un prospetto delle metriche|un riepilogo delle approvazioni|un fascicolo delle fonti|un elenco dei contributi',
+      armatura:'un registro delle conferme|un fascicolo di riscontri|un riepilogo delle deleghe|un archivio delle consegne|un prospetto delle presenze|un elenco delle approvazioni',
+      attrezzo:'una calcolatrice|un set di penne|un set di evidenziatori|una cucitrice|un perforatore|un righello da tavolo',
+      mappa:'una pianta degli uffici|un calendario dei turni|un indice delle sale|un prospetto degli sportelli|uno schema delle postazioni|un elenco degli orari',
+      trap:'un questionario ambiguo|un invito incompleto|un modulo di richiesta|un foglio di prenotazioni|un sondaggio interno|una scheda di revisione',
+      med:'una guida alle correzioni|un fascicolo di supporto|un riepilogo delle procedure|un set di schede di recupero|un quaderno di affiancamento|un elenco di verifiche guidate',
+      amuleto:'un gettone del primo giorno|un ciondolo di rame|una pietra da scrivania|un anello di filo|un bottone del vecchio cappotto|una medaglia del team',
+      valore:'un buono pasto|un voucher della libreria|un coupon del bar|un biglietto del cinema|un buono della cartoleria|un carnet delle stampe',
+      ricordo:'una foto del team|un biglietto di benvenuto|una cartolina delle ferie|un foglio di dediche|un disegno della scrivania|un invito della vecchia squadra',
+      cibo:'dei cracker integrali|delle mandorle|dei biscotti al cacao|delle gallette|dei grissini|delle fette di frutta secca',
+    },
+  };
+  const paper=split('con riferimenti datati|con annotazioni verificabili|con una copia firmata|con indice analitico|con allegati numerati');
+  D.worldItemData={roots,tails,paper,split};
+})(typeof window!=='undefined'?window:globalThis);
+
+;
+/* Situazioni locali: zona | titolo | elemento | avvertimento | esito fatale
+ * | esito negativo | reazione sicura. Le zone sono gli indici del replay.
+ * I sette campi sono testi editoriali, mai codice eseguito. */
+(function(G){
+  const D=G.LOS_DATA;
+  D.worldScenes={
+    classico:`
+0|Contrappesi liberi|il verricello delle casse|Il freno del verricello salta e i contrappesi oscillano.|resta sotto il contrappeso e perde la vita|si ferisce alla spalla contro la cassa|si abbassa dietro il basamento del verricello
+0|Lame tra i rifornimenti|la rastrelliera centrale|Una rastrelliera si inclina verso il passaggio.|viene travolt[A:o/a] dalle lame e perde la vita|si taglia cercando di fermare la rastrelliera|si tiene fuori dalla traiettoria delle lame
+0|Pedana sfaldata|la pedana delle provviste|Il legno della pedana si apre tra le assi.|precipita sotto la pedana e non sopravvive|si ferisce una gamba tra le assi|distribuisce il peso sulle travi ancora ferme
+0|Cavi in tensione|il tendone dei rifornimenti|Un tirante del tendone si spezza con uno schiocco.|viene colpit[A:o/a] al collo dal cavo e perde la vita|si ferisce al braccio contro il tirante|si ripara sul lato opposto del palo
+0|Braci nel deposito|il braciere del punto di distribuzione|Le braci rotolano verso un mucchio di teli asciutti.|resta nel fumo e non sopravvive all'incendio|si ustiona cercando di spostare i teli|soffoca le prime braci con la terra
+1|Rami sotto carico|il faggio spaccato|La chioma del faggio scricchiola sopra il sentiero.|viene schiacciat[A:o/a] dal ramo principale|si ferisce sotto una pioggia di rami|resta oltre la proiezione della chioma
+1|Laccio dimenticato|il laccio tra le felci|Un laccio teso si confonde con le radici.|resta sospes[A:o/a] nel cappio e soffoca|si ferisce una caviglia nel laccio|blocca il cappio con un ramo caduto
+1|Fossa coperta|il letto di foglie secche|Le foglie nascondono il bordo di una vecchia fossa.|cade sulla palizzata della fossa e perde la vita|si ferisce scivolando sul bordo|sonda il terreno prima di caricarci il peso
+1|Resina incendiata|il tronco resinoso|La resina prende fuoco e gocciola sul terreno.|resta tra le fiamme e non sopravvive|riporta ustioni sulle mani|resta dalla parte libera del tronco
+1|Nido disturbato|il nido nel tronco cavo|Dal legno cavo esce un ronzio sempre più forte.|subisce troppe punture e non sopravvive|si ferisce il viso nel tentativo di coprirsi|protegge il volto e lascia indisturbato il nido
+2|Guado in cedimento|il guado di pietre|Le pietre del guado si spostano sotto la corrente.|finisce tra le rocce sommerse e annega|si ferisce contro una pietra del guado|si ferma sulla sponda prima di entrare in acqua
+2|Chiusa a scatti|la chiusa laterale|La paratia della chiusa si apre a scatti.|viene trascinat[A:o/a] nella chiusa e annega|si ferisce al corrimano della chiusa|si tiene sopra il segno della piena
+2|Riva scavata|la riva sotto le radici|Il terreno sotto le radici si stacca in blocchi.|sprofonda sotto la riva e annega|si ferisce scivolando sull'argine|rimane sul tratto compatto dell'argine
+2|Lenze abbandonate|il pontile dei pescatori|Le vecchie lenze si tendono sotto il pontile.|resta impigliat[A:o/a] sott'acqua e annega|si ferisce liberando il polso da una lenza|controlla le lenze senza sporgersi dal pontile
+2|Mulinello di piena|la conca del mulinello|La corrente gira sopra una conca più profonda.|viene trascinat[A:o/a] sul fondo e annega|si ferisce aggrappandosi alle rocce|resta sul margine asciutto della conca
+3|Crosta di torba|la crosta di torba|La torba si apre sotto una superficie apparentemente asciutta.|sprofonda nel fango e soffoca|si ferisce tentando di liberare una gamba|saggia la torba con un ramo prima di avanzare
+3|Vasche sommerse|la passerella marcia|La passerella si piega sopra le vasche fangose.|cade nella vasca e non riesce a riemergere|si ferisce una mano sulle assi spezzate|resta sulla sezione sostenuta dai pali
+3|Gas tra i canneti|la sacca di gas del canneto|Bolle scure rompono la superficie del fango.|respira il gas concentrato e perde la vita|si ferisce contro le canne cercando aria|resta sopra il livello della sacca
+3|Reticolo di radici|le radici affioranti|Una radice mobile stringe il bordo del passaggio.|resta bloccat[A:o/a] sotto il fango e soffoca|si ferisce liberandosi dalle radici|controlla gli appoggi senza entrare nella pozza
+3|Scavo invaso|la trincea allagata|L'acqua riempie una trincea nascosta tra le erbe.|cade nella trincea e annega|si ferisce sul bordo dello scavo|riconosce il bordo dalla diversa inclinazione delle erbe
+4|Architrave incrinato|l'architrave della sala|Polvere chiara cade da una crepa nell'architrave.|viene schiacciat[A:o/a] dall'architrave|si ferisce sotto i calcinacci|rimane accanto al tratto di muro ancora integro
+4|Scala senza appoggio|la scala delle rovine|L'ultimo sostegno della scala si sgretola.|precipita insieme alla scala e perde la vita|si ferisce sulle pietre della scala|evita i gradini senza sostegno
+4|Pozzo mascherato|il pozzo sotto le macerie|Un'apertura nera compare tra le macerie.|cade nel pozzo e non sopravvive|si ferisce scivolando sulle macerie|segnala il bordo senza avvicinarsi all'apertura
+4|Muro a vela|il muro isolato|Il muro isolato oscilla a ogni raffica.|viene sepolt[A:o/a] dal muro in crollo|si ferisce al riparo dalle prime pietre|rimane fuori dall'ombra del muro
+4|Grata arrugginita|la grata del sotterraneo|I perni della grata cedono uno dopo l'altro.|resta schiacciat[A:o/a] dalla grata|si ferisce contro il metallo arrugginito|blocca il battente contro il muro laterale
+5|Lastra sul vuoto|la lastra sporgente|Una crepa attraversa la pietra sul bordo.|precipita con la lastra e perde la vita|si ferisce ritirandosi dal bordo|rimane dietro la linea della crepa
+5|Ghiaia mobile|il pendio di ghiaia|La ghiaia comincia a scorrere sotto una pietra piatta.|scivola oltre il pendio e non sopravvive|si ferisce trascinando le mani sulla ghiaia|si tiene sul tratto di roccia compatta
+5|Pali spezzati|il segnale di quota|Un palo spezzato rotola lungo il pendio.|viene travolt[A:o/a] e precipita|si ferisce contro il palo|si mette a lato della linea di caduta
+5|Riparo di lastre|il riparo di pietra|La lastra del tetto scivola dai sostegni.|resta schiacciat[A:o/a] sotto il tetto|si ferisce al bordo della lastra|controlla i sostegni restando fuori dal riparo
+5|Fulmini sul crinale|il parafulmine abbandonato|Il parafulmine vibra mentre l'aria si carica.|viene colpit[A:o/a] dalla scarica e perde la vita|si ferisce cadendo durante la scarica|resta lontan[A:o/a] dal sostegno metallico
+`,
+    fantasy:`
+0|Campana senza freno|la campana della Torre|La campana oscilla anche se nessuno la tocca.|viene schiacciat[A:o/a] dal bronzo della campana|si ferisce alla corda della campana|si tiene fuori dall'arco del bronzo
+0|Gradini di cenere|la scala della Torre|I gradini diventano cenere a partire dal bordo.|precipita nel vano della scala e perde la vita|si ferisce sui gradini ancora solidi|poggia i piedi soltanto sulle alzate di pietra
+0|Armatura animata|l'armatura del pianerottolo|Una visiera vuota si gira verso il passaggio.|viene trafitt[A:o/a] dall'armatura incantata|si ferisce contro un guanto di metallo|resta oltre la portata dei guanti
+0|Arazzo avvolgente|l'arazzo dei sovrani|Le frange dell'arazzo cercano qualcosa da stringere.|viene soffocat[A:o/a] tra le pieghe dell'arazzo|si ferisce liberandosi dalle frange|ferma le frange sotto una pietra
+1|Quercia affamata|la quercia dai nodi rossi|La corteccia si apre mostrando denti di legno.|viene divorat[A:o/a] dalla quercia|si ferisce contro una radice|resta fuori dal cerchio delle radici
+1|Rovi di vetro|la siepe di cristallo|I rovi trasparenti crescono verso il sentiero.|viene trapassat[A:o/a] dai rovi e perde la vita|si taglia contro una punta di cristallo|resta sul tratto sgombro della radura
+1|Coro delle spore|il cerchio delle spore|I funghi emettono una nota che invita ad avvicinarsi.|respira le spore e non si risveglia più|si ferisce cadendo tra i funghi|si copre il volto e non entra nel cerchio
+1|Radici in marcia|il ponte di radici|Le radici cambiano intreccio mentre sostengono il passaggio.|resta stritolat[A:o/a] tra le radici|si ferisce il polso nell'intreccio|aspetta che le radici smettano di muoversi
+1|Linfa ardente|il ceppo di linfa azzurra|Dalla corteccia cola una linfa che fuma.|viene avvolt[A:o/a] dalla linfa e perde la vita|si ustiona contro il ceppo|rimane oltre la pozza di linfa
+2|Veli del lago|il velo d'acqua sospeso|Un velo d'acqua si alza senza vento.|resta imprigionat[A:o/a] nel velo e annega|si ferisce contro il bordo della riva|rimane dietro le pietre asciutte
+2|Specchio profondo|il riflesso senza fondo|Un riflesso mostra un appoggio che non esiste.|cade nell'acqua profonda e annega|si ferisce aggrappandosi alla riva|controlla gli appoggi senza seguire il riflesso
+2|Corde delle ninfe|le corde del molo|Le corde si stringono come dita bagnate.|viene trascinat[A:o/a] sott'acqua dalle corde|si ferisce liberando una caviglia|tiene i piedi lontani dalle corde
+2|Ghiaccio delle lune|la lastra di ghiaccio viola|Una lastra di ghiaccio cresce sulla riva.|scivola sotto il ghiaccio e annega|si ferisce contro il ghiaccio|rimane sopra la linea asciutta della riva
+3|Carrello stregato|il carrello delle rune|Il carrello corre sui binari senza essere spinto.|viene travolt[A:o/a] dal carrello|si ferisce contro un binario|resta nella nicchia laterale
+3|Cristalli risonanti|la vena di cristallo|Una nota sottile fa vibrare la parete.|viene trafitt[A:o/a] dalle schegge di cristallo|si taglia contro una scheggia|si ripara dietro il pilastro di pietra
+3|Mantice dei nani|il mantice abbandonato|Il mantice soffia cenere rovente dalla bocca della forgia.|resta nel getto e perde la vita|si ustiona al bordo della forgia|rimane sul lato freddo della forgia
+3|Soffitto di sale|il soffitto di sale nero|Il sale cade in frammenti sempre più grossi.|viene sepolt[A:o/a] dal crollo|si ferisce sotto i frammenti|si tiene accanto alla parete portante
+4|Voci sotto la torba|la pozza delle voci|Dalla pozza arriva una voce che chiama aiuto.|sprofonda nella pozza e soffoca|si ferisce liberandosi dal fango|controlla il fondo restando sulla sponda
+4|Serpe di fango|la tana della serpe|Il fango si muove controcorrente verso la sponda.|viene stritolat[A:o/a] dalla serpe|si ferisce contro una scaglia|resta oltre i segni lasciati dalla coda
+4|Lanterne erranti|la fila delle lanterne|Le lanterne si spostano sopra una buca senza fondo.|segue la luce nella buca e perde la vita|si ferisce prima di fermarsi sul bordo|prende come riferimento le pietre immobili
+4|Cerchio delle sanguisughe|il cerchio d'acqua scura|L'acqua scura si gonfia di piccoli corpi affamati.|cade nell'acqua e non sopravvive all'assalto|si ferisce strappando una sanguisuga|rimane fuori dal cerchio d'acqua
+5|Pietre del drago|il nido di pietre calde|Le pietre del nido si spaccano emettendo vapore.|resta nel vapore e perde la vita|si ustiona al bordo del nido|si mette dietro una roccia fredda
+5|Artiglio nella roccia|l'impronta dell'artiglio|La roccia dell'impronta si solleva come una mano.|viene schiacciat[A:o/a] dalle dita di pietra|si ferisce tra due scaglie di roccia|rimane fuori dal palmo di pietra
+5|Cenere che respira|la conca di cenere|La cenere si solleva a ogni respiro del monte.|soffoca nella nube di cenere|si ferisce cadendo sulle pietre calde|si copre il volto dietro la roccia laterale
+5|Uova incrinate|le uova di basalto|Dalle crepe delle uova esce un sibilo.|viene divorat[A:o/a] da una creatura appena schiusa|si ferisce contro un guscio|si tiene lontan[A:o/a] dalle crepe dei gusci
+6|Altare ribaltato|la mensa delle armi|Una metà della mensa si solleva senza sostegno.|viene schiacciat[A:o/a] dalla mensa|si ferisce contro il bordo di pietra|rimane fuori dalla proiezione della mensa
+6|Giuramento risonante|la pietra dei giuramenti|Le incisioni risuonano con parole mai pronunciate.|viene consumat[A:o/a] dal sigillo e perde la vita|si ferisce contro una runa ardente|non tocca le incisioni accese
+6|Coppe di brace|le coppe del banchetto|Le coppe rovesciano brace al posto del vino.|resta tra le braci e perde la vita|si ustiona alle mani|si tiene oltre il bordo delle coppe
+6|Lance orbitanti|la corona delle lance|Le lance sospese scendono verso la radura.|viene trafitt[A:o/a] da una lancia|si ferisce contro un'asta|rimane sotto il sostegno centrale
+6|Pavimento a sigilli|il mosaico dei sigilli|Le tessere del mosaico si alzano come denti.|viene stritolat[A:o/a] tra le tessere|si ferisce una gamba tra le tessere|resta sulle tessere prive di incisioni
+`,
+    scifi:`
+0|Gancio senza freno|il gancio di carico|Il gancio scende oltre il limite di sicurezza.|viene schiacciat[A:o/a] dal carico|si ferisce contro il gancio|resta oltre la linea del carico
+0|Getto di manovra|l'ugello di attracco|Un ugello scarica propellente nella corsia di servizio.|resta nel getto e perde la vita|si ustiona al bordo della corsia|si tiene dietro il deflettore
+0|Rete di contenimento|la rete delle capsule|La rete di carico si tende da sola.|resta stritolat[A:o/a] nella rete|si ferisce contro una fibbia|resta fuori dal perimetro della rete
+0|Gru magnetica|la gru magnetica|Il magnete trascina i rottami verso la parete.|viene schiacciat[A:o/a] tra i rottami|si ferisce contro un pannello mobile|rimane dietro il paravento non metallico
+0|Pistone di attracco|il pistone del portello|Il pistone completa una corsa non richiesta.|resta schiacciat[A:o/a] nel portello|si ferisce alla leva del portello|rimane fuori dalla guida del pistone
+1|Pompe di nutrienti|il circuito dei nutrienti|Una pompa rompe la tenuta del circuito.|resta immers[A:o/a] nel liquido e soffoca|si ferisce contro una valvola|si tiene sopra il canale di raccolta
+1|Carrello delle colture|il carrello delle colture|Il carrello scorre verso un fine corsa rotto.|viene schiacciat[A:o/a] contro il binario|si ferisce al carrello|rimane nel vano di manutenzione laterale
+1|Lampade ultraviolette|la batteria delle lampade|Le schermature delle lampade si ritirano.|resta espost[A:o/a] al fascio e perde la vita|si ustiona sotto una lampada|resta dietro lo schermo opaco
+1|Ugelli corrosivi|il collettore di lavaggio|Il collettore spruzza detergente concentrato.|viene colpit[A:o/a] dal getto e perde la vita|si ustiona a una mano|resta dal lato del pannello schermante
+1|Vasche di alghe|la vasca di ricircolo|La vasca si svuota attraverso una grata aperta.|viene aspirat[A:o/a] nel ricircolo e soffoca|si ferisce contro la grata|rimane sopra il bordo della vasca
+2|Bus ad alta tensione|il bus di potenza|Un arco elettrico scavalca gli isolatori.|viene colpit[A:o/a] dalla scarica e perde la vita|si ustiona vicino all'isolatore|rimane dietro la paratia isolante
+2|Turbina in deriva|la turbina ausiliaria|La turbina gira oltre il limite previsto.|viene travolt[A:o/a] dai frammenti della turbina|si ferisce sotto una scheggia|resta dietro il blocco di contenimento
+2|Valvola di spurgo|la valvola di spurgo|La valvola libera vapore surriscaldato.|resta nel vapore e perde la vita|si ustiona al bordo del condotto|rimane fuori dall'asse della valvola
+2|Schermatura mobile|la schermatura del nucleo|La schermatura si richiude senza preavviso.|resta schiacciat[A:o/a] tra le piastre|si ferisce contro una piastra|rimane fuori dalla guida di chiusura
+2|Condensatore instabile|il banco dei condensatori|Un condensatore si gonfia sotto il rivestimento.|viene colpit[A:o/a] dall'esplosione e perde la vita|si ferisce contro il rivestimento|resta dietro il divisorio di contenimento
+3|Console in corto|la console delle rotte|Una scintilla corre sotto la tastiera della console.|viene folgorat[A:o/a] dalla console|si ustiona al pannello|non tocca la superficie in tensione
+3|Otturatore ottico|l'otturatore di osservazione|L'otturatore si chiude sulla postazione di osservazione.|resta schiacciat[A:o/a] nell'otturatore|si ferisce al bordo del sedile|rimane oltre la linea dell'otturatore
+3|Drone di comando|il drone cartografo|Il drone non riconosce più le richieste di arresto.|viene colpit[A:o/a] dal braccio del drone e perde la vita|si ferisce al braccio mobile|resta sotto il telaio della postazione
+3|Sedile bloccato|il sedile di comando|Le cinture si tendono mentre il sedile ruota.|viene soffocat[A:o/a] dalle cinture|si ferisce contro una fibbia|tiene le cinture lontane dal collo
+3|Rack inclinato|il rack delle memorie|Il rack si stacca dalla guida superiore.|viene schiacciat[A:o/a] dal rack|si ferisce sotto un modulo|resta oltre l'ingombro del rack
+4|Letto a scomparsa|la cuccetta pieghevole|La cuccetta rientra nella parete senza comando.|resta schiacciat[A:o/a] nella cuccetta|si ferisce contro la cornice|rimane oltre la guida della cuccetta
+4|Portello sanitario|il portello sanitario|La procedura di sterilizzazione parte a vano occupato.|resta espost[A:o/a] al ciclo e perde la vita|si ustiona contro la parete|resta dietro il pannello di schermatura
+4|Distributore pressurizzato|il distributore delle razioni|Il distributore emette un sibilo dalla giunzione.|viene colpit[A:o/a] dal serbatoio e perde la vita|si ferisce contro lo sportello|si tiene a lato del distributore
+4|Armadio di emergenza|l'armadio pressurizzato|Le chiusure dell'armadio saltano una alla volta.|viene travolt[A:o/a] dallo sportello|si ferisce contro una chiusura|rimane fuori dall'asse dello sportello
+4|Tavolo su guida|il tavolo su guida|Il tavolo accelera lungo il pavimento dei moduli.|resta schiacciat[A:o/a] contro la parete|si ferisce contro il piano|resta nel vano laterale della parete
+5|Ventola fuori asse|la ventola di ricircolo|La ventola gratta contro la protezione.|viene trascinat[A:o/a] tra le pale e perde la vita|si ferisce alla rete protettiva|rimane oltre la griglia della ventola
+5|Cavi di servizio|il fascio dei cavi|Un cavo in tensione si stacca dal sostegno.|viene folgorat[A:o/a] dal cavo|si ustiona vicino al sostegno|resta sul pannello isolato
+5|Saracinesca di settore|la saracinesca di settore|La saracinesca scende a intermittenza.|resta schiacciat[A:o/a] sotto la saracinesca|si ferisce al bordo metallico|rimane fuori dalla corsa della saracinesca
+5|Robot saldatore|il robot saldatore|Il saldatore scambia una sagoma per una giunzione.|viene colpit[A:o/a] dal fascio e perde la vita|si ustiona al braccio del robot|resta dietro lo schermo di saldatura
+5|Rullo di manutenzione|il rullo di manutenzione|Il rullo trascina a sé i teli lasciati nella corsia.|resta stritolat[A:o/a] dal rullo|si ferisce liberando una manica|rimane a lato della corsia del rullo
+`,
+    zombie:`
+0|Ascensore aperto|il vano dell'ascensore|La porta dell'ascensore si apre su una cabina assente.|precipita nel vano e perde la vita|si ferisce sul bordo della porta|rimane dietro la soglia
+0|Barelle in corsa|la fila delle barelle|Le barelle rotolano verso il pianerottolo.|viene travolt[A:o/a] dalle barelle|si ferisce contro una sponda|resta nella nicchia laterale
+0|Bombole senza catena|il carrello delle bombole|Una catena cede e le bombole si rovesciano.|viene schiacciat[A:o/a] dalle bombole|si ferisce contro il carrello|rimane fuori dalla corsia del carrello
+0|Porta della quarantena|la porta della quarantena|Mani infette spuntano dalla porta deformata.|viene trascinat[A:o/a] oltre la porta e sbranat[A:o/a]|si ferisce sulla lamiera della porta|resta oltre la portata delle mani
+0|Vetrata delle visite|la vetrata delle visite|La vetrata si piega sotto la spinta degli infetti.|viene travolt[A:o/a] dall'orda e perde la vita|si taglia con una scheggia|rimane dietro il pilastro del corridoio
+1|Serranda sbloccata|la serranda del magazzino|La serranda scende senza più fermarsi.|resta schiacciat[A:o/a] dalla serranda|si ferisce contro la guida|rimane fuori dalla corsa della serranda
+1|Scale mobili incastrate|la scala mobile ferma|Un gradino della scala mobile si apre sotto il peso.|resta stritolat[A:o/a] nel meccanismo|si ferisce contro il gradino|si tiene alla pavimentazione esterna
+1|Manichini e infetti|la vetrina dei manichini|Una sagoma tra i manichini comincia a muoversi.|viene afferrat[A:o/a] dall'infetto e perde la vita|si ferisce contro la cornice della vetrina|rimane fuori dalla vetrina
+1|Scaffali inclinati|la corsia delle conserve|Lo scaffale più alto perde l'appoggio laterale.|viene sepolt[A:o/a] dallo scaffale|si ferisce sotto una scatola|resta oltre la fila degli scaffali
+1|Gabbia di consegna|la gabbia delle consegne|Il cancello della gabbia vibra sotto una spinta.|resta nella gabbia con gli infetti e perde la vita|si ferisce al chiavistello|rimane sul lato libero del cancello
+2|Carrozza in discesa|la carrozza sul binario|Una carrozza si muove sul binario inclinato.|viene travolt[A:o/a] dalla carrozza|si ferisce contro il predellino|resta nella nicchia di servizio
+2|Terza rotaia|la rotaia elettrificata|Una scarica illumina la polvere lungo il binario.|viene folgorat[A:o/a] sulla rotaia|si ustiona vicino al binario|rimane sulla banchina asciutta
+2|Porta del macchinista|la porta del macchinista|Colpi sordi arrivano dalla cabina bloccata.|viene trascinat[A:o/a] nella cabina e perde la vita|si ferisce sulla porta|rimane fuori dall'apertura
+2|Scala invasa|la scala della banchina|Gli infetti si accalcano sui gradini inferiori.|viene travolt[A:o/a] dagli infetti|si ferisce contro il corrimano|resta dietro il cancello laterale
+2|Pozzetto di drenaggio|il pozzetto di drenaggio|Il coperchio del pozzetto scivola nell'acqua.|cade nel pozzetto e annega|si ferisce sul bordo del pozzetto|rimane sopra il gradino asciutto
+3|Armadi sulle scale|l'armadio del corridoio|Un armadio si inclina verso la rampa.|viene schiacciat[A:o/a] dall'armadio|si ferisce contro lo sportello|rimane oltre la proiezione dell'armadio
+3|Porte dell'auditorium|le porte dell'auditorium|Le porte si piegano sotto la pressione interna.|viene travolt[A:o/a] dagli infetti nell'auditorium|si ferisce contro un battente|resta dietro il divisorio laterale
+3|Gabbia della palestra|la gabbia degli attrezzi|Il lucchetto della gabbia cede di colpo.|viene schiacciat[A:o/a] dagli attrezzi|si ferisce contro una sbarra|resta oltre la traiettoria delle sbarre
+3|Finestra al primo piano|la finestra del laboratorio|Il davanzale si stacca dalla parete.|precipita insieme al davanzale e perde la vita|si ferisce al telaio|rimane lontan[A:o/a] dal davanzale
+4|Rastrelliera della polizia|la rastrelliera degli scudi|La rastrelliera perde il fissaggio superiore.|viene schiacciat[A:o/a] sotto gli scudi|si ferisce contro il metallo|rimane oltre il bordo della rastrelliera
+4|Cella senza chiavistello|la cella di fermo|Il chiavistello si ritrae mentre qualcosa gratta dall'interno.|resta nella cella con un infetto e perde la vita|si ferisce contro le sbarre|rimane fuori dall'arco della porta
+4|Cancello del cortile|il cancello dei mezzi|Il cancello esce dalla guida.|viene travolt[A:o/a] dal cancello|si ferisce alla guida|rimane accanto al pilastro portante
+4|Archivio fradicio|l'archivio delle prove|Le mensole cedono sotto i faldoni bagnati.|viene schiacciat[A:o/a] dalle mensole|si ferisce contro uno spigolo|rimane fuori dalla corsia delle mensole
+5|Garage ribaltato|la porta del garage|La porta basculante si stacca da una molla.|viene colpit[A:o/a] dalla porta e perde la vita|si ferisce alla molla|resta fuori dall'ingombro della porta
+5|Cantina affollata|la botola della cantina|La botola si alza sotto colpi irregolari.|cade tra gli infetti e perde la vita|si ferisce contro la botola|rimane oltre il bordo dell'apertura
+5|Recinzione piegata|la recinzione del giardino|Una sezione della recinzione si piega verso il passaggio.|resta impigliat[A:o/a] mentre arrivano gli infetti e perde la vita|si ferisce sul filo|resta dalla parte libera della recinzione
+5|Auto sul cric|l'auto sul cric|Il cric si inclina sotto il peso dell'auto.|viene schiacciat[A:o/a] dall'auto|si ferisce contro il paraurti|rimane fuori dal lato sollevato dell'auto
+6|Convoglio sfrenato|il rimorchio del convoglio|Il rimorchio si muove senza freni.|viene travolt[A:o/a] dal rimorchio|si ferisce contro una ruota|rimane oltre la corsia del convoglio
+6|Fontana degli infetti|la fontana asciutta|Gli infetti ammassati nella vasca si sollevano insieme.|viene trascinat[A:o/a] nella vasca e perde la vita|si ferisce sul bordo della fontana|rimane fuori dalla portata degli infetti
+6|Palco del raduno|il palco del raduno|Le travi del palco scattano sotto una spinta.|viene schiacciat[A:o/a] dal palco|si ferisce sotto una trave|rimane a lato delle travi portanti
+`,
+    royale:`
+0|Elica senza arresto|l'elica del cargo|L'elica gira mentre il cargo sembra spento.|viene colpit[A:o/a] dall'elica e perde la vita|si ferisce contro il carrello|rimane oltre la linea dell'elica
+0|Rampa del cargo|la rampa di carico|La rampa si sgancia dal sostegno.|viene schiacciat[A:o/a] dalla rampa|si ferisce al bordo della rampa|resta accanto al pilastro laterale
+0|Cassone sospeso|il cassone di rifornimento|Un cassone oscilla sopra la piazzola.|viene travolt[A:o/a] dal cassone|si ferisce contro una cinghia|rimane fuori dalla verticale del carico
+0|Scala del radar|la scala del radar|Un fissaggio della scala si stacca.|precipita con la scala e perde la vita|si ferisce a un piolo|resta sul piano della piazzola
+0|Carrello bagagli|il carrello dei bagagli|Il carrello prende velocità verso il muro.|resta schiacciat[A:o/a] contro il muro|si ferisce a un braccio|rimane nella nicchia laterale
+1|Torretta automatica|la torretta della base|La torretta insegue una sagoma senza identificativo.|viene colpit[A:o/a] dalla torretta e perde la vita|si ferisce cercando copertura|rimane dietro il basamento della torretta
+1|Cancello della base|il cancello corazzato|Il cancello comincia a chiudersi senza avviso.|resta schiacciat[A:o/a] nel cancello|si ferisce contro un battente|rimane fuori dall'arco del cancello
+1|Muro di sacchi|il muro di sacchi|La fila superiore dei sacchi scivola dal sostegno.|resta sepolt[A:o/a] sotto i sacchi e soffoca|si ferisce sotto un sacco|rimane oltre il lato caricato del muro
+1|Piattaforma di tiro|la piattaforma di tiro|La piattaforma si inclina verso i bersagli.|precipita sotto la piattaforma e perde la vita|si ferisce sul bordo|rimane sul tratto sostenuto dai pilastri
+1|Porta del bunker|la porta del bunker|La porta perde il fermo e scatta.|resta schiacciat[A:o/a] dalla porta|si ferisce al fermo|rimane oltre la corsa della porta
+2|Molo spezzato|il molo delle barche|Le assi del molo si staccano dai pali.|cade tra i pali e annega|si ferisce a una gamba|rimane sul tratto di molo ancora fissato
+2|Argano del porto|l'argano del porto|L'argano riavvolge il cavo senza comando.|resta impigliat[A:o/a] e viene trascinat[A:o/a] sott'acqua|si ferisce liberando il polso|tiene le mani lontane dal cavo
+2|Serbatoio sul tetto|il serbatoio sul tetto|La staffa del serbatoio cede.|viene travolt[A:o/a] dal serbatoio|si ferisce contro una staffa|rimane fuori dall'ombra del serbatoio
+2|Balcone del villaggio|il balcone sul vicolo|Il balcone si stacca dalla facciata.|viene schiacciat[A:o/a] dal balcone|si ferisce sotto i calcinacci|rimane sotto l'architrave laterale
+2|Rete da pesca|la rete del rimessaggio|La rete cade davanti al passaggio.|resta nella rete durante un assalto e perde la vita|si ferisce contro un galleggiante|resta fuori dall'ingombro della rete
+3|Pressa di riciclo|la pressa della fabbrica|La pressa riparte durante una pausa apparente.|resta schiacciat[A:o/a] nella pressa|si ferisce al pannello|rimane fuori dal vano della pressa
+3|Nastro trasportatore|il nastro dei contenitori|Il nastro trascina i contenitori verso un trituratore.|viene trascinat[A:o/a] nel trituratore|si ferisce al bordo del nastro|rimane sul camminamento laterale
+3|Silos inclinato|il silos della fabbrica|Il silos perde il sostegno inferiore.|viene sepolt[A:o/a] dal materiale del silos|si ferisce contro il sostegno|rimane oltre la linea dei pilastri
+3|Gru a ponte|la gru a ponte|La gru fa scorrere il carico fuori dalla corsia.|viene schiacciat[A:o/a] dal carico|si ferisce sotto una scheggia|resta dietro il pilastro portante
+3|Tubazione di vapore|la tubazione di vapore|Una giunzione si apre con un fischio.|resta nel getto e perde la vita|si ustiona vicino alla giunzione|rimane dal lato schermato della tubazione
+4|Pale del mulino|le pale del mulino|Le pale girano sotto una raffica improvvisa.|viene colpit[A:o/a] da una pala e perde la vita|si ferisce alla mano|rimane fuori dall'arco delle pale
+4|Soppalco del granaio|il soppalco del granaio|La trave del soppalco si spezza al centro.|precipita e resta sotto la trave|si ferisce sulle assi|rimane accanto al muro portante
+4|Rimorchio agricolo|il rimorchio agricolo|Il rimorchio si ribalta sul terreno molle.|viene schiacciat[A:o/a] dal rimorchio|si ferisce contro una sponda|rimane fuori dal lato in discesa
+4|Pozzo del podere|il pozzo del podere|La copertura del pozzo cede.|cade nel pozzo e perde la vita|si ferisce sul bordo|rimane oltre la pietra di coronamento
+4|Balle in equilibrio|la catasta di balle|La catasta si inclina verso il passaggio.|resta sepolt[A:o/a] tra le balle e soffoca|si ferisce sotto una balla|resta oltre la linea della catasta
+5|Torretta di caccia|la torretta di caccia|La torretta perde un appoggio nel terreno.|precipita con la torretta e perde la vita|si ferisce contro un piolo|rimane fuori dall'impronta della torretta
+5|Albero schiantato|il tronco sospeso|Un tronco sospeso ruota tra due appoggi.|viene schiacciat[A:o/a] dal tronco|si ferisce contro un ramo|rimane oltre l'arco del tronco
+5|Filo tra i cespugli|il filo mimetizzato|Un filo teso taglia il passaggio tra i cespugli.|attiva il congegno nascosto e perde la vita|si ferisce al ginocchio|rimane sul tratto sgombro del sentiero
+5|Capanno sfondato|il capanno di osservazione|Il tetto del capanno cede verso l'interno.|viene schiacciat[A:o/a] sotto il tetto|si ferisce contro una trave|rimane accanto al lato aperto del capanno
+5|Fossa dei cacciatori|la fossa coperta di frasche|Le frasche si piegano sopra una cavità.|precipita nella fossa e perde la vita|si ferisce sul bordo|controlla il terreno con un ramo caduto
+`,
+    horror:`
+0|Botte che respira|la botte murata|Il coperchio della botte si solleva come un torace.|viene trascinat[A:o/a] nella botte e soffoca|si ferisce contro un cerchio di ferro|rimane oltre la portata del coperchio
+0|Scale verso il basso|la scala della cantina|I gradini si allungano verso un buio senza fondo.|precipita nel buio e perde la vita|si ferisce contro il corrimano|rimane sul pianerottolo di pietra
+0|Grata sommersa|la grata della cisterna|La grata viene tirata dal basso.|finisce nella cisterna e annega|si ferisce al bordo della grata|rimane sopra il gradino asciutto
+0|Ganci del soffitto|i ganci della dispensa|I ganci oscillano verso ogni suono.|viene afferrat[A:o/a] dai ganci e perde la vita|si ferisce a una spalla|rimane fuori dalla verticale dei ganci
+1|Baule delle voci|il baule delle voci|Il baule chiama con una voce familiare.|viene rinchius[A:o/a] nel baule e soffoca|si ferisce contro il coperchio|rimane oltre l'arco del coperchio
+1|Fili del teatrino|il teatrino della soffitta|I fili delle marionette scendono fino al pavimento.|viene strangolat[A:o/a] dai fili|si ferisce liberando un polso|si tiene fuori dalla tenda dei fili
+1|Pavimento di carta|il pavimento coperto di lettere|Le lettere si sollevano mostrando assi spezzate.|precipita tra le travi e perde la vita|si ferisce al bordo delle assi|rimane sopra la trave portante
+1|Dondolo vuoto|il dondolo della soffitta|Il dondolo accelera senza nessuno a bordo.|viene colpit[A:o/a] alla testa e perde la vita|si ferisce contro un bracciolo|rimane oltre l'arco del dondolo
+2|Campana muta|la campana della cappella|La campana vibra senza produrre suono.|viene schiacciat[A:o/a] dal bronzo|si ferisce contro una corda|resta oltre la linea della campana
+2|Candele all'indietro|il banco delle candele|Le fiamme si piegano verso chi si avvicina.|resta avvolt[A:o/a] dalle fiamme e perde la vita|si ustiona al bordo del banco|rimane fuori dal raggio delle fiamme
+2|Confessionale chiuso|il confessionale intagliato|La porta del confessionale si richiude da sola.|viene soffocat[A:o/a] nel confessionale|si ferisce contro la grata|rimane oltre la soglia del confessionale
+2|Vetrata piangente|la vetrata della cappella|Le figure della vetrata spingono contro il vetro.|viene trafitt[A:o/a] dalle schegge|si taglia a una mano|si ripara dietro il pilastro
+3|Lapide inclinata|la lapide senza nome|La lapide si inclina contro la pendenza del terreno.|viene schiacciat[A:o/a] dalla lapide|si ferisce contro il bordo|rimane oltre la proiezione della lapide
+3|Tomba socchiusa|la tomba socchiusa|Dal taglio della tomba sale un respiro.|viene trascinat[A:o/a] nella tomba e perde la vita|si ferisce contro la lastra|rimane oltre il bordo della tomba
+3|Cancello a denti|il cancello del cimitero|Le punte del cancello si piegano verso il passaggio.|resta trafitt[A:o/a] tra le punte|si ferisce al braccio|rimane fuori dall'arco dei battenti
+3|Radici delle tombe|le radici tra le tombe|Le radici si stringono attorno alle pietre.|viene trascinat[A:o/a] sottoterra e soffoca|si ferisce liberando una gamba|rimane sul tratto lastricato
+4|Scaffale affamato|lo scaffale dei registri|Lo scaffale avanza trascinando il tappeto.|viene schiacciat[A:o/a] contro il muro|si ferisce contro uno spigolo|rimane fuori dalla corsia dello scaffale
+4|Atlante cieco|l'atlante senza pagine|Le copertine dell'atlante si aprono come mascelle.|viene inghiottit[A:o/a] dall'atlante|si ferisce alla copertina|tiene le mani fuori dalla rilegatura
+4|Scala scorrevole|la scala dei volumi alti|La scala scorre contro i propri fermi.|precipita dalla scala e perde la vita|si ferisce a un piolo|rimane sul pavimento libero
+4|Globo delle ombre|il globo della biblioteca|Il globo proietta ombre più solide degli oggetti.|viene stritolat[A:o/a] dalle ombre|si ferisce contro il piedistallo|rimane dietro il paravento
+4|Poltrona che stringe|la poltrona di lettura|I braccioli della poltrona si avvicinano.|viene stritolat[A:o/a] dalla poltrona|si ferisce contro un bracciolo|rimane davanti al tavolino
+5|Fontana delle mani|la fontana del giardino|Dalla vasca si alzano dita d'acqua.|viene trascinat[A:o/a] nella fontana e annega|si ferisce al bordo della vasca|rimane fuori dalla portata delle dita
+5|Rosaio affamato|il rosaio nero|I rami del rosaio si piegano verso i passi.|viene stritolat[A:o/a] dai rovi|si ferisce contro una spina|rimane sul tratto lastricato
+5|Serra appannata|la serra appannata|Le lastre della serra vibrano verso l'interno.|viene trafitt[A:o/a] dai vetri|si taglia a un braccio|rimane dietro il telaio portante
+5|Statua senza volto|la statua della siepe|La statua cambia posizione quando nessuno la guarda.|viene schiacciat[A:o/a] dalla statua|si ferisce contro il basamento|rimane oltre la portata della statua
+6|Lampadario inclinato|il lampadario del Salone|La catena del lampadario perde un anello.|viene schiacciat[A:o/a] dal lampadario|si ferisce sotto un pendente|rimane fuori dal cerchio di luce
+6|Pianoforte serrato|il pianoforte del ballo|Il coperchio del pianoforte batte da solo.|resta schiacciat[A:o/a] nel pianoforte|si ferisce contro un tasto spezzato|rimane oltre l'arco del coperchio
+6|Specchio del saluto|lo specchio dell'ingresso|Il riflesso tende le mani prima della persona.|viene trascinat[A:o/a] nello specchio e perde la vita|si taglia contro la cornice|rimane fuori dalla portata del riflesso
+6|Tappeto che avvolge|il tappeto del ballo|I bordi del tappeto si sollevano come onde.|viene avvolt[A:o/a] dal tappeto e soffoca|si ferisce cadendo sul pavimento|rimane sulla fascia di pavimento scoperta
+6|Orologio del commiato|l'orologio del Salone|Il pendolo esce dalla cassa a ogni rintocco.|viene colpit[A:o/a] dal pendolo e perde la vita|si ferisce al bordo della cassa|rimane oltre l'arco del pendolo
+`,
+    wasteland:`
+0|Magnete della discarica|il magnete dei rottami|Il magnete trascina i rottami verso la gru.|viene schiacciat[A:o/a] tra i rottami|si ferisce contro una lamiera|rimane dietro il blocco di cemento
+0|Pressa senza fermo|la pressa dei rottami|La pressa scatta senza completare il segnale.|resta stritolat[A:o/a] nella pressa|si ferisce contro il pannello|rimane fuori dal vano della pressa
+0|Pneumatici in fiamme|la catasta di pneumatici|Un filo di fumo sale dalla catasta.|soffoca nel fumo dei pneumatici|si ustiona vicino alla catasta|rimane dal lato da cui arriva aria pulita
+0|Montagna di lamiere|il cumulo di lamiere|Le lamiere scivolano verso la base del cumulo.|viene sepolt[A:o/a] dalle lamiere|si taglia a una gamba|rimane oltre la linea del cumulo
+1|Viadotto spaccato|la campata del viadotto|Un giunto della campata si apre.|precipita insieme alla campata e perde la vita|si ferisce al bordo del giunto|rimane sopra il pilone ancora integro
+1|Autocisterna inclinata|l'autocisterna abbandonata|La cisterna si muove sul rimorchio inclinato.|viene travolt[A:o/a] dalla cisterna|si ferisce contro il rimorchio|rimane fuori dal lato in discesa
+1|Guardrail a molla|il guardrail piegato|Il metallo del guardrail si libera dal bullone.|viene colpit[A:o/a] al collo e perde la vita|si ferisce al braccio|rimane oltre la linea del metallo teso
+1|Convoglio cieco|il rimorchio dei predoni|Il rimorchio avanza senza luci né segnali.|viene travolt[A:o/a] dal convoglio|si ferisce contro una ruota|rimane dietro la barriera di cemento
+1|Insegna sospesa|l'insegna autostradale|L'insegna perde il sostegno più basso.|viene schiacciat[A:o/a] dall'insegna|si ferisce sotto un frammento|rimane fuori dall'ombra dell'insegna
+2|Vasca di scorie|la vasca delle scorie|Una bolla solleva la crosta della vasca.|cade nelle scorie e perde la vita|si ustiona al bordo della vasca|rimane dietro la barriera asciutta
+2|Braccio di colata|il braccio di colata|Il braccio ruota anche senza alimentazione apparente.|viene travolt[A:o/a] dal braccio|si ferisce contro la guida|rimane fuori dall'arco del braccio
+2|Silos di polveri|il silos delle polveri|Il silos scarica una nube dal giunto inferiore.|soffoca nella polvere del silos|si ferisce contro il bocchettone|rimane dietro il pannello di contenimento
+2|Tubazione corrosa|la tubazione corrosa|Una goccia fumante allarga un foro nella tubazione.|resta nel getto corrosivo e perde la vita|si ustiona a una mano|rimane fuori dall'asse del foro
+3|Facciata senza appoggi|la facciata del vecchio emporio|La facciata si separa dal muro laterale.|viene schiacciat[A:o/a] dalla facciata|si ferisce sotto i calcinacci|rimane oltre la linea del cornicione
+3|Serranda dell'emporio|la serranda dell'emporio|La serranda cade dal rullo arrugginito.|resta schiacciat[A:o/a] sotto la serranda|si ferisce alla guida|rimane fuori dall'apertura
+3|Scala antincendio|la scala esterna|Un gradino si stacca dai fissaggi corrosi.|precipita dalla scala e perde la vita|si ferisce contro la ringhiera|rimane sul pianerottolo sostenuto
+3|Cassaforte del sindaco|la cassaforte del municipio|La cassaforte si inclina fuori dal muro.|viene schiacciat[A:o/a] dalla cassaforte|si ferisce contro un cardine|rimane oltre l'ingombro del battente
+3|Tetto del mercato|il tetto del mercato|Le lastre vibrano sopra i sostegni spezzati.|viene schiacciat[A:o/a] dalle lastre|si ferisce sotto una scheggia|rimane sul lato privo di copertura
+4|Crosta radioattiva|la crosta del cratere|La crosta si apre lasciando uscire vapore.|cade nella fenditura e perde la vita|si ustiona contro il bordo|rimane dietro la linea della crepa
+4|Fumarola nascosta|la fumarola tra le rocce|Un sibilo cambia ritmo sotto la pietra.|resta nel getto e perde la vita|si ustiona vicino alla fumarola|rimane dal lato della roccia schermante
+4|Pietre a scaglie|il pendio del cratere|Le pietre si sfaldano verso il fondo.|scivola nel cratere e non sopravvive|si ferisce contro una scaglia|rimane sul tratto di roccia compatta
+4|Serbatoio interrato|il serbatoio semisepolto|Il serbatoio si gonfia sotto la sabbia.|viene colpit[A:o/a] dall'esplosione e perde la vita|si ferisce sotto un frammento|rimane dietro il terrapieno
+5|Griglia del bacino|la griglia di aspirazione|La griglia vibra al riavvio della pompa.|viene trascinat[A:o/a] contro la griglia e annega|si ferisce liberando una mano|rimane sopra il bordo del bacino
+5|Paratia deformata|la paratia del bacino|La paratia si solleva fuori dalle guide.|viene travolt[A:o/a] dalla paratia|si ferisce alla guida|rimane sul lato schermato del muro
+5|Molo di servizio|il molo delle pompe|Le assi del molo si staccano dai sostegni.|cade tra i pali e annega|si ferisce al bordo del molo|rimane sopra la trave portante
+5|Condotta in pressione|la condotta di ritorno|La condotta sobbalza prima di perdere una giunzione.|viene colpit[A:o/a] dal getto e annega|si ferisce contro una flangia|rimane oltre la linea della giunzione
+6|Porta del Deposito|la porta del Deposito|La porta perde il fermo superiore.|resta schiacciat[A:o/a] sotto la porta|si ferisce a un cardine|rimane fuori dall'arco del battente
+6|Scaffali di taniche|lo scaffale delle taniche|Lo scaffale si inclina sul lato più carico.|viene sepolt[A:o/a] dalle taniche e perde la vita|si ferisce contro una mensola|rimane oltre la fila delle taniche
+6|Carrello dei ricambi|il carrello dei ricambi|Il carrello si muove verso una parete cieca.|resta schiacciat[A:o/a] contro la parete|si ferisce contro un ricambio|rimane nella nicchia laterale
+6|Verricello del cancello|il verricello del cancello|Il cavo si sfilaccia mentre il motore gira.|viene colpit[A:o/a] dal cavo e perde la vita|si ferisce a una spalla|rimane dietro il pilastro del cancello
+`,
+    liceo:`
+0|Finale con verbale|il tabellone della palestra|Il tabellone mostra un risultato diverso dal verbale.|contesta senza prove e viene esclus[A:o/a] dal torneo scolastico|perde credibilità insistendo sul punteggio sbagliato|confronta i due punteggi prima di intervenire
+0|Coreografia fuori tempo|il segnale della coreografia|Il segnale della coreografia arriva una battuta prima.|interrompe la prova generale e viene esclus[A:o/a] dall'esibizione|perde credibilità entrando fuori tempo|segue il conteggio della prova
+0|Turno di arbitraggio|il foglio degli arbitri|Sul foglio mancano le firme dell'ultimo incontro.|si attribuisce un'autorità inesistente e viene esclus[A:o/a] dal torneo|perde credibilità sul ruolo di arbitro|chiede di verificare le firme
+0|Maglie scambiate|il baule delle maglie|Le etichette delle squadre sono state invertite.|insiste sulla squadra sbagliata e viene esclus[A:o/a] dalla gara|perde credibilità nel cambio delle squadre|controlla il nome prima del colore
+1|Prenotazione dei tavoli|il registro dei tavoli|Due gruppi risultano prenotati allo stesso tavolo.|rivendica entrambi i posti e viene esclus[A:o/a] dal comitato|perde credibilità al tavolo della mensa|confronta le prenotazioni con gli orari
+1|Scontrino collettivo|lo scontrino del pranzo|Il totale dello scontrino non coincide con le quote.|scarica la differenza sugli altri e viene esclus[A:o/a] dal gruppo|perde credibilità facendo un conto sbagliato|ricontrolla le quote una per una
+1|Menu senza allergeni|il foglio del menu|Il menu della mensa è privo delle indicazioni promesse.|pubblica indicazioni inventate e viene esclus[A:o/a] dal comitato|perde credibilità sul menu|si limita alle informazioni verificate
+1|Lista delle merende|la lista delle merende|La stessa merenda compare sotto due nomi.|accusa senza controllare e viene esclus[A:o/a] dal gruppo|perde credibilità sulla raccolta delle quote|controlla prima le due richieste
+2|Prestito scaduto|il registro dei prestiti|Un prestito viene attribuito alla persona sbagliata.|falsifica una restituzione e viene esclus[A:o/a] dal progetto|perde credibilità sulla restituzione|controlla il codice del volume
+2|Bibliografia ricopiata|la bibliografia del progetto|Due citazioni rimandano a pagine inesistenti.|difende citazioni inventate e viene esclus[A:o/a] dalla selezione|perde credibilità sulle fonti|distingue le citazioni controllate dalle altre
+2|Silenzio valutato|il cartello del gruppo di studio|Il cartello promette un turno di studio già assegnato.|si impone sul turno altrui e viene esclus[A:o/a] dal gruppo|perde credibilità nella prenotazione|controlla il turno sul registro
+2|Quaderno anonimo|il quaderno delle correzioni|Il quaderno contiene risposte senza una fonte.|presenta quelle risposte come proprie e viene esclus[A:o/a] dalla prova|perde credibilità sulle correzioni|ricontrolla il ragionamento senza copiare
+3|Esperimento senza registro|il registro dell'esperimento|La tabella dei risultati manca di una misura.|inventa la misura mancante e viene esclus[A:o/a] dal laboratorio|perde credibilità nella relazione|segnala la misura assente
+3|Etichette invertite|le etichette del banco|Due etichette del materiale sono state scambiate.|insiste sull'elenco falso e viene esclus[A:o/a] dal progetto|perde credibilità nella preparazione|confronta i codici senza usare i materiali
+3|Relazione duplicata|la relazione di laboratorio|Due relazioni riportano lo stesso errore insolito.|rivendica il lavoro copiato e viene esclus[A:o/a] dalla valutazione|perde credibilità sulla relazione|ricostruisce i passaggi effettivamente svolti
+3|Presentazione delle misure|il grafico dell'esperimento|Gli assi del grafico sono scambiati.|difende il grafico scorretto e viene esclus[A:o/a] dalla selezione|perde credibilità nella presentazione|controlla le unità prima di spiegare
+4|Messaggio inoltrato|il cartellone del cortile|Un messaggio compare senza il contesto originale.|conferma una voce falsa e viene esclus[A:o/a] dal gruppo|perde credibilità sul messaggio|chiede il contesto prima di commentare
+4|Elezione dei rappresentanti|il foglio delle candidature|Una candidatura porta una firma non verificata.|si attribuisce la firma e viene esclus[A:o/a] dall'elezione|perde credibilità sulla candidatura|distingue la candidatura dalla conferma
+4|Foto di gruppo|il programma della foto|L'orario della foto non coincide con l'avviso ufficiale.|accusa il gruppo sulla base dell'avviso falso e viene esclus[A:o/a]|perde credibilità sull'orario|controlla l'avviso aggiornato
+4|Scambio di appunti|la bacheca degli scambi|Una pagina di appunti è attribuita a due persone.|vende il lavoro altrui come proprio e viene esclus[A:o/a] dal gruppo|perde credibilità sugli appunti|riconosce la provenienza della pagina
+5|Microfono aperto|il microfono dell'assemblea|Il microfono resta aperto durante una pausa.|insulta l'assemblea e viene esclus[A:o/a] dalla rappresentanza|perde credibilità per una battuta fuori luogo|aspetta il proprio turno senza commentare
+5|Ordine del giorno|l'ordine del giorno|Due versioni dell'ordine del giorno circolano insieme.|forza una votazione non prevista e viene esclus[A:o/a] dal comitato|perde credibilità sulla convocazione|controlla la versione firmata
+5|Votazione contestata|il verbale dell'assemblea|Il totale delle preferenze supera i presenti registrati.|certifica il totale impossibile e viene esclus[A:o/a] dalla commissione|perde credibilità sul conteggio|chiede un nuovo conteggio
+5|Premiazione incompleta|l'elenco dei premi|Un nome compare senza la motivazione richiesta.|pretende un premio non assegnato e viene esclus[A:o/a] dalla selezione|perde credibilità sulla premiazione|controlla le motivazioni pubblicate
+6|Interrogazione a sorpresa|il foglio delle domande|Una domanda richiama un capitolo diverso da quello annunciato.|consegna una risposta copiata e viene esclus[A:o/a] dalla prova|perde credibilità nella risposta|espone soltanto ciò che sa motivare
+6|Compito con allegato|l'allegato della verifica|L'allegato contiene dati che contraddicono la traccia.|nasconde l'allegato e viene esclus[A:o/a] dalla prova|perde credibilità nella soluzione|segnala la contraddizione prima di calcolare
+6|Registro dei gruppi|il registro dei gruppi|Lo stesso contributo è stato contato due volte.|si attribuisce il contributo altrui e viene esclus[A:o/a] dal progetto|perde credibilità nella divisione del lavoro|distingue i contributi documentati
+6|Tema fuori traccia|la traccia del tema|La traccia cambia significato leggendo l'ultima riga.|rifiuta di correggere il lavoro copiato e viene esclus[A:o/a] dalla selezione|perde credibilità nell'argomentazione|rilegge tutta la traccia
+6|Quiz senza fonte|il questionario della classe|Una risposta indicata come certa non ha una fonte.|diffonde una soluzione falsa e viene esclus[A:o/a] dalla gara|perde credibilità nella correzione|verifica il passaggio contestato
+6|Cambio di consegna|la consegna del progetto|L'ultima consegna richiede un formato diverso.|presenta il lavoro altrui come aggiornamento proprio e viene esclus[A:o/a]|perde credibilità sulla consegna|controlla la revisione richiesta
+`,
+    ufficio:`
+0|Verbale divergente|il verbale della riunione|Due copie del verbale riportano decisioni opposte.|certifica una decisione inventata e viene licenziat[A:o/a]|perde credibilità sul verbale|confronta le copie con le note approvate
+0|Slide non aggiornate|la presentazione trimestrale|Le slide usano dati del trimestre precedente.|difende i dati falsi e viene licenziat[A:o/a]|perde credibilità nella presentazione|segnala la data dei dati
+0|Budget senza firma|il prospetto del budget|Il totale del budget include una spesa non autorizzata.|si attribuisce l'autorizzazione e viene licenziat[A:o/a]|perde credibilità sul budget|distingue le spese approvate dalle altre
+0|Voto doppio|il registro delle presenze|Un voto compare sotto due deleghe incompatibili.|certifica il voto doppio e viene licenziat[A:o/a]|perde credibilità sulla delega|controlla le deleghe registrate
+0|Demo registrata|il programma della dimostrazione|La demo registrata viene presentata come una prova in diretta.|nasconde la registrazione e viene licenziat[A:o/a]|perde credibilità sulla dimostrazione|dichiara i limiti della demo
+1|Foglio condiviso|il foglio delle scadenze|Due revisioni del foglio assegnano lo stesso incarico.|attribuisce ad altri un errore proprio e viene licenziat[A:o/a]|perde credibilità sulle scadenze|controlla la cronologia delle revisioni
+1|Casella di gruppo|la casella del progetto|Un messaggio inoltrato perde l'allegato originale.|inventa il contenuto dell'allegato e viene licenziat[A:o/a]|perde credibilità sul messaggio|separa i fatti dalle supposizioni
+1|Dashboard congelata|il cruscotto delle metriche|Il cruscotto mostra dati fermi a una vecchia data.|certifica numeri non aggiornati e viene licenziat[A:o/a]|perde credibilità sulle metriche|controlla l'ultimo aggiornamento
+1|Turni sovrapposti|il calendario dei turni|Lo stesso turno compare in due calendari.|falsifica la copertura del turno e viene licenziat[A:o/a]|perde credibilità sul calendario|confronta i due calendari
+1|Cartella duplicata|la cartella della consegna|Due cartelle hanno lo stesso nome e contenuti diversi.|consegna come proprio il lavoro altrui e viene licenziat[A:o/a]|perde credibilità sulla consegna|controlla la provenienza dei file
+2|Quote del pranzo|il prospetto del pranzo|Il totale delle quote non coincide con lo scontrino.|trattiene la differenza e viene licenziat[A:o/a]|perde credibilità sulle quote|ricontrolla quote e scontrino
+2|Turno della cucina|il registro della cucina|Una segnalazione è stata attribuita senza verifica.|falsifica la segnalazione e viene licenziat[A:o/a]|perde credibilità sulla segnalazione|distingue il turno dalla responsabilità
+2|Ordine collettivo|l'ordine del pranzo|Una modifica non compare nella conferma dell'ordine.|addebita consapevolmente la spesa ad altri e viene licenziat[A:o/a]|perde credibilità sull'ordine|controlla la conferma prima di dividere i costi
+2|Premio del team|la bacheca dei ringraziamenti|Un ringraziamento omette il contributo principale.|rivendica il contributo altrui e viene licenziat[A:o/a]|perde credibilità sul lavoro comune|riconosce i contributi documentati
+2|Catering promesso|la lista del catering|La lista promessa non coincide con quella approvata.|finge un'approvazione mai ricevuta e viene licenziat[A:o/a]|perde credibilità sulla lista|separa la proposta dall'approvazione
+3|Colloquio senza riscontri|il dossier del colloquio|Una valutazione cita un episodio non documentato.|fabbrica una testimonianza e viene licenziat[A:o/a]|perde credibilità sulla valutazione|si limita ai fatti verificabili
+3|Obiettivi retroattivi|la scheda degli obiettivi|La data della scheda precede una modifica non comunicata.|nasconde la modifica e viene licenziat[A:o/a]|perde credibilità sugli obiettivi|ricostruisce le versioni della scheda
+3|Nota riservata|la nota della direzione|Una nota riservata viene citata fuori dal proprio contesto.|diffonde una versione falsificata e viene licenziat[A:o/a]|perde credibilità sulla nota|chiede il contesto della nota
+3|Promozione contestata|il verbale delle promozioni|Una motivazione manca degli elementi richiesti.|si attribuisce un risultato inesistente e viene licenziat[A:o/a]|perde credibilità sulla candidatura|distingue i risultati dalle intenzioni
+3|Firma in delega|la delega di approvazione|La delega non copre la decisione presentata.|firma oltre la delega e viene licenziat[A:o/a]|perde credibilità sull'approvazione|controlla i limiti della delega
+4|Coda di stampa|la coda della stampante|La stampante mescola pagine di due relazioni.|certifica la relazione mescolata e viene licenziat[A:o/a]|perde credibilità sulla relazione|ricontrolla intestazioni e numeri di pagina
+4|Toner sul contratto|la copia di revisione|Una macchia copre una clausola della copia.|inventa il testo coperto e viene licenziat[A:o/a]|perde credibilità sulla revisione|segnala il tratto illeggibile
+4|Scanner senza indice|l'indice delle scansioni|L'indice rimanda a un documento diverso.|allega consapevolmente una prova falsa e viene licenziat[A:o/a]|perde credibilità sull'archivio|confronta indice e documento
+4|Fascicolo invertito|il fascicolo della consegna|Le pagine del fascicolo appartengono a versioni diverse.|spaccia il fascicolo per approvato e viene licenziat[A:o/a]|perde credibilità sul fascicolo|riordina soltanto le pagine riconoscibili
+4|Firma fuori pagina|il foglio delle firme|Una firma appare sotto una decisione diversa.|attribuisce una firma alla decisione sbagliata e viene licenziat[A:o/a]|perde credibilità sulle firme|controlla il riferimento della firma
+5|Navetta senza elenco|l'elenco della navetta|L'elenco omette una prenotazione confermata.|falsifica le presenze della trasferta e viene licenziat[A:o/a]|perde credibilità sulla prenotazione|confronta l'elenco con le conferme
+5|Ricevuta del parcheggio|la ricevuta del parcheggio|L'orario della ricevuta non coincide con quello dichiarato.|presenta una ricevuta alterata e viene licenziat[A:o/a]|perde credibilità sulla nota spese|controlla data e orario
+5|Badge del turno|il registro dei badge|Due accessi compaiono nello stesso minuto con dati diversi.|si attribuisce un accesso falso e viene licenziat[A:o/a]|perde credibilità sulla presenza|segnala la discrepanza degli accessi
+5|Passaggio promesso|il calendario dei passaggi|Un passaggio proposto risulta segnato come confermato.|falsifica la conferma e viene licenziat[A:o/a]|perde credibilità sull'organizzazione|distingue proposte e conferme
+5|Inventario del furgone|l'inventario del furgone|L'inventario riporta materiale non caricato.|certifica materiale assente e viene licenziat[A:o/a]|perde credibilità sull'inventario|conta soltanto il materiale presente
+`,
+  };
+})(typeof window!=='undefined'?window:globalThis);
+
+;
 /* Città degli Infetti — eventi aggiuntivi e disastri. */
 (function (G) {
   const D = (G.LOS_DATA = G.LOS_DATA || {}); D.more = D.more || {};
@@ -7522,6 +7952,214 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
 `,
   };
 })(typeof window !== 'undefined' ? window : globalThis);
+
+;
+/* Repertorio modulare del mondo. Compilazione pura e deterministica, una volta
+ * per arena; nessuna casualità nascosta, nessuna modifica ai cataloghi storici. */
+(function(G){
+  'use strict';
+  const D=G.LOS_DATA,cache=new Map();
+  const traits={
+    leale:['2 ally:AB fid:B>A+8 promise:A>B=protezione','{A} controlla {x} insieme a {B} e promette di proteggerl[B:o/a] quando servirà.'],
+    traditore:['2 ally:AB con:B=valore steal:A<B=valore @secret','{A} propone a {B} di controllare {x}, poi approfitta della distrazione per sottrarre {valore:B}.'],
+    codardo:['1 en:A+6 mo:A-3','{A} resta lontan[A:o/a] da {x} e riprende fiato. Evitare il rischio costa un po’ di fiducia in sé.'],
+    spietato:['2 enemy:AB hit:A>B @agg','{A} usa {x} come punto di riferimento per sorprendere {B} e colpir[B:lo/la] senza esitare.'],
+    pacifista:['2 enemy:AB rel:AB+8 pau:B>A-6','{A} propone a {B} di non contendersi {x}. La tensione scende e il confronto diventa meno minaccioso.'],
+    stratega:['1 con:A=mappa en:A+5','{A} confronta {x} con {mappa:A} e rinuncia a una deviazione inutile, risparmiando energie.'],
+    impulsivo:['1 en:A-7 mo:A+3','{A} affronta i preparativi presso {x} senza aspettare. Si sente meglio, ma spende più energie del necessario.'],
+    cacciatore:['1 +cibo:A @food','{A} esamina le tracce di rifornimenti accanto a {x} e recupera {cibo}.'],
+    guaritore:['2 con:A=med need:B=ferito -med:A cure:B @heal','{A} usa {med:A} per aiutare {B}, tenendosi al riparo presso {x}.'],
+    sopravvissuto:['1 stat:A<en45 en:A+10','{A} riconosce la propria stanchezza e si concede una pausa presso {x}, prima che diventi un errore.'],
+    carismatico:['2 fid:B>A+8 ris:B>A+4 @soc','{A} spiega a {B} come orientarsi rispetto a {x}. La spiegazione convince più di uno slogan.'],
+    paranoico:['1 con:A=mappa en:A-3 mo:A+5','{A} ricontrolla {x} sulla propria mappa. Il controllo richiede tempo, ma calma i sospetti.'],
+    fortunato:['1 +attrezzo:A @luck','{A} nota {attrezzo} accanto a {x}: un ritrovamento fortunato, senza proprietario in vista.'],
+    sfortunato:['1 en:A-5 mo:A-3','{A} deve ricominciare i preparativi presso {x} dopo un piccolo contrattempo. La pazienza finisce prima del lavoro.'],
+    furtivo:['2 con:B=cibo steal:A<B=cibo @secret @stl','{A} distrae {B} indicando {x} e sottrae {cibo:B} dallo zaino.'],
+    bruto:['1 en:A-6 +attrezzo:A','{A} apre a forza una cassetta abbandonata presso {x} e recupera {attrezzo}. Le braccia si fanno sentire.'],
+    ingegnoso:['1 con:A=attrezzo +trap:A @int','{A} usa {attrezzo:A} per assemblare {trap} vicino a {x}. Controlla il congegno e lo ripone nello zaino per usarlo al momento giusto.'],
+    folle:['1 mo:A+5 en:A-4','{A} prova tre modi assurdi di descrivere {x}, poi sceglie il meno utile. Almeno si diverte.'],
+    romantico:['2 couple:AB amo:A>B+6 mo:A+4 mo:B+4','{A} racconta a {B} come ricorderà questo momento presso {x}, se la coppia arriverà alla fine.'],
+    vendicativo:['2 grudge:A>B pau:B>A+8 ris:A>B-5','{A} incontra {B} presso {x} e ricorda il rancore ancora aperto. Non attacca, ma non lascia dubbi.'],
+    clemente:['2 grudge:A>B forgive:A>B @soc','{A} ascolta {B} presso {x} e decide di rinunciare al rancore. Il passato rimane, la caccia finisce.'],
+    generoso:['2 con:A=cibo give:A>B=cibo @give','{A} consegna {cibo:A} a {B} presso {x}. Non chiede niente in cambio.'],
+    avido:['2 con:B=valore steal:A<B=valore @secret','{A} usa la discussione su {x} per avvicinarsi a {B} e sottrarre {valore:B}.'],
+    esibizionista:['1 star:A en:A-3 @show','{A} presenta {x} come se fosse una grande scoperta. La spiegazione è così teatrale da attirare attenzione.'],
+    ubriacone:['1 con:A=alcol alcol:A','{A} si ferma presso {x} e beve {alcol:A}, rinunciando a mantenere la testa del tutto lucida.'],
+    superstizioso:['1 con:A=amuleto mo:A+6','{A} osserva {amuleto:A}, poi {x}. Cerca un legame fra i segni e ritrova coraggio.'],
+    goloso:['1 con:A=cibo cibo:A','{A} sceglie una pausa presso {x} e mangia {cibo:A}, senza aspettare il prossimo pasto.'],
+    sonnambulo:['1 en:A+5 mo:A-3','{A} si appisola presso {x} e si sveglia nello stesso punto. Il riposo aiuta, la confusione un po’ meno.'],
+    leader:['3 al:ABC @soc','{A} usa {x} come riferimento comune e propone a {B} e {C} un’alleanza. Entrambi accettano.'],
+    solitario:['1 en:A+7 mo:A-2','{A} si concentra su {x} senza cercare compagnia. La pausa restituisce energie, ma pesa sul morale.'],
+  };
+  const eventActions=[
+    ['1 +cibo:A @food','{A} controlla il materiale rimasto presso {x} e trova {cibo}.','d'],
+    ['1 +med:A @heal','{A} ispeziona una custodia abbandonata presso {x}: contiene {med}.','d'],
+    ['1 +mappa:A @int','{A} raccoglie {mappa} tra i fogli rimasti accanto a {x}. Ora ha un riferimento per orientarsi.','d'],
+    ['2 con:A=cibo give:A>B=cibo @give','{A} raggiunge il punto occupato da {B}, presso {x}, e consegna {cibo:A}.','d'],
+    ['2 con:A=med need:B=ferito -med:A cure:B @heal','{A} usa {med:A} per rimettere in sesto {B}, al riparo presso {x}.','d'],
+    ['2 owe:A>B con:A=valore give:A>B=valore repay:A>B','{A} incontra {B} presso {x}, consegna {valore:A} e salda il debito.','d'],
+    ['2 grudge:A>B forgive:A>B','{A} e {B} si fermano presso {x}. Dopo una spiegazione, {A} rinuncia al rancore.','n'],
+    ['2 ally:AB fid:A>B+6 en:A+4 en:B+4','{A} e {B} riparlano dell’imprevisto vissuto presso {x}. La pausa comune restituisce energie e rafforza la fiducia di {A}.','n'],
+    ['2 couple:AB mo:A+6 mo:B+6','{A} e {B} si concedono una pausa presso {x}. Per un momento, la gara sembra più lontana.','n'],
+    ['2 con:B=attrezzo steal:A<B=attrezzo @secret @stl','{A} finge interesse per {x} e sottrae {attrezzo:B} a {B}.','d'],
+  ];
+  const trials={
+    for:['1','+attrezzo:A','en:A-9',
+      ['{A} libera una cassetta incastrata presso {x} e recupera {attrezzo}.','{A} prova a liberare una cassetta presso {x}, ma deve fermarsi a riprendere fiato.'],
+      ['{A} solleva il materiale che copriva una custodia presso {x}: dentro trova {attrezzo}.','{A} solleva il materiale presso {x}, ma non riesce a raggiungere la custodia e si affatica.'],
+      ['{A} sposta un contenitore pesante presso {x} e ne recupera {attrezzo}.','{A} tenta di spostare un contenitore presso {x}, consuma energie e deve rinunciare.']],
+    agi:['1','+valore:A','en:A-8',
+      ['{A} recupera {valore} da uno spazio stretto presso {x}, senza perdere l’equilibrio.','{A} si piega per recuperare qualcosa presso {x}, ma deve rinunciare dopo diversi tentativi.'],
+      ['{A} mantiene in equilibrio una scatola presso {x} e ne estrae {valore}.','{A} tenta di tenere ferma una scatola presso {x}; non trova niente e si affatica.'],
+      ['{A} raggiunge una custodia tra gli ingombri presso {x} e trova {valore}.','{A} cerca una custodia tra gli ingombri presso {x}, ma deve tornare alla posizione iniziale.']],
+    int:['1','+mappa:A','mo:A-5',
+      ['{A} ricostruisce i riferimenti di {x} e completa {mappa}.','{A} tenta di ricostruire i riferimenti di {x}, ma scarta il disegno perché contraddittorio.'],
+      ['{A} confronta due indicazioni presso {x} e ne ricava {mappa}.','{A} confronta due indicazioni presso {x}, ma non riesce a risolvere il dubbio.'],
+      ['{A} ordina le annotazioni trovate presso {x} e compone {mappa}.','{A} ordina le annotazioni presso {x}, poi riconosce che manca un passaggio e rinuncia.']],
+    car:['2','al:AB','fid:B>A-7',
+      ['{A} propone a {B} un piano presso {x}; {B} accetta di formare un’alleanza.','{A} propone un piano presso {x}, ma {B} trova la spiegazione poco credibile.'],
+      ['{A} chiarisce a {B} il vantaggio di collaborare presso {x}. Nasce un’alleanza.','{A} cerca di convincere {B} presso {x}, ma le parole suonano troppo opportuniste.'],
+      ['{A} lascia parlare {B}, poi formula un accordo presso {x}. I due si alleano.','{A} cerca un accordo presso {x}, ma interrompe {B} nel momento sbagliato.']],
+    fort:['1','+amuleto:A','mo:A-4',
+      ['{A} apre una tasca abbandonata presso {x} e trova {amuleto}.','{A} apre una tasca abbandonata presso {x}: è vuota. La delusione pesa.'],
+      ['{A} nota {amuleto} sotto un involto presso {x}: una coincidenza fortunata.','{A} controlla un involto presso {x}, ma trova soltanto un vecchio nodo.'],
+      ['{A} sceglie una scatola fra quelle rimaste presso {x} e trova {amuleto}.','{A} sceglie una scatola presso {x}. È già stata svuotata.']],
+    res:['1','en:A+8','en:A-8',
+      ['{A} dosa lo sforzo durante i preparativi presso {x} e riesce a recuperare energie.','{A} insiste troppo nei preparativi presso {x} e finisce per stancarsi ancora.'],
+      ['{A} alterna lavoro e pause presso {x}; alla fine si sente più in forze.','{A} salta le pause presso {x} e deve fermarsi per la stanchezza.'],
+      ['{A} conclude con calma i controlli presso {x}, conservando abbastanza energie per riprendersi.','{A} prolunga i controlli presso {x} oltre il necessario e si affatica.']],
+    furt:['1','+med:A','en:A-6',
+      ['{A} cerca senza farsi notare fra gli oggetti abbandonati presso {x} e recupera {med}.','{A} cerca presso {x}, ma produce troppo rumore e interrompe il tentativo senza trovare nulla.'],
+      ['{A} apre in silenzio una custodia incustodita presso {x}: contiene {med}.','{A} prova ad aprire una custodia presso {x}, ma rinuncia quando il fermo fa rumore.'],
+      ['{A} individua una tasca dimenticata presso {x} e ne recupera {med} senza richiamare attenzione.','{A} controlla una tasca presso {x}; il materiale fruscia e deve rinunciare.']],
+    cor:['1','mo:A+9','mo:A-7',
+      ['{A} esamina {x} senza farsi dominare dall’incertezza e ritrova fiducia.','{A} tenta di esaminare {x}, ma l’incertezza ha la meglio e deve fermarsi.'],
+      ['{A} affronta i dubbi su {x} un passo alla volta e si sente più sicur[A:o/a].','{A} lascia che i dubbi su {x} si accumulino e perde fiducia.'],
+      ['{A} mantiene la calma durante i controlli presso {x}; aver resistito alla pressione aiuta.','{A} interrompe i controlli presso {x}, sopraffatt[A:o/a] dalla pressione.']],
+    emp:['2','mo:B+10 fid:B>A+6','mo:A-4',
+      ['{A} ascolta le preoccupazioni di {B} presso {x}. {B} si sente meglio e si fida di più.','{A} prova a rassicurare {B} presso {x}, ma sceglie parole poco utili e si scoraggia.'],
+      ['{A} aiuta {B} a mettere in ordine i pensieri presso {x}. Il morale di {B} risale.','{A} cerca di capire {B} presso {x}, ma insiste su una domanda fuori luogo.'],
+      ['{A} riconosce la tensione di {B} presso {x} e lascia spazio a uno sfogo. {B} ritrova fiducia.','{A} scambia il silenzio di {B} per ostilità presso {x} e ne rimane delus[A:o/a].']],
+    sop:['1','+cibo:A','en:A-6',
+      ['{A} controlla la conservazione di una scorta presso {x} e recupera {cibo}.','{A} controlla una scorta presso {x}, ma deve scartarla dopo una lunga verifica.'],
+      ['{A} riconosce una confezione ancora utilizzabile presso {x} e trova {cibo}.','{A} esamina una confezione presso {x}, ma non si fida abbastanza da conservarla.'],
+      ['{A} distingue le scorte protette da quelle rovinate presso {x} e recupera {cibo}.','{A} cerca scorte protette presso {x}, ma la ricerca costa energie senza risultati.']],
+  };
+  const developments=[
+    ['Segnale coperto','Il rumore copre il primo avvertimento.','non distingue il segnale e','reagisce in ritardo e','si concentra sul movimento e'],
+    ['Passaggio ingombro','Gli ingombri riducono lo spazio per reagire.','si incastra tra gli ingombri e','urta un ostacolo e','evita gli ingombri e'],
+    ['Controllo interrotto','Il controllo di sicurezza viene interrotto a metà.','si affida al controllo incompleto e','esita sul controllo e','riprende il controllo dall’inizio e'],
+    ['Avviso tardivo','Il pericolo diventa evidente soltanto all’ultimo momento.','reagisce troppo tardi e','si accorge tardi del rischio e','riconosce l’ultimo segnale e'],
+    ['Ritmo irregolare','Le pause tra due scatti hanno una durata irregolare.','scambia una pausa per la fine del pericolo e','sbaglia il tempo della reazione e','aspetta il momento più stabile e'],
+    ['Visuale coperta','Un telo caduto copre parte della visuale.','si fida della visuale incompleta e','scosta il telo troppo tardi e','controlla il lato scoperto e'],
+    ['Eco ingannevole','Un’eco rende difficile capire da dove arrivi il segnale.','segue l’eco sbagliata e','si gira dalla parte sbagliata e','cerca il riferimento visibile e'],
+    ['Appoggio incerto','Il punto scelto come appoggio non è stabile.','carica tutto il peso sull’appoggio e','perde l’appoggio e','rinuncia all’appoggio incerto e'],
+    ['Secondo scatto','Un secondo scatto arriva dopo una pausa apparentemente sicura.','abbassa la guardia prima del secondo scatto e','viene sorpres[A:o/a] dal secondo scatto e','aspetta anche il secondo scatto e'],
+    ['Spazio ridotto','Il materiale accumulato lascia poco margine di manovra.','tenta una manovra troppo ampia e','sbaglia la misura della manovra e','riduce i movimenti al necessario e'],
+  ];
+  const softDevelopments=[
+    ['Versioni in conflitto','Circolano due versioni incompatibili della consegna.','non verifica la versione e','si confonde fra le versioni e','ricostruisce le versioni e'],
+    ['Scadenza ridotta','La risposta va preparata con meno tempo del previsto.','risponde senza controllare e','si lascia mettere fretta e','dichiara ciò che ha verificato e'],
+    ['Domanda pubblica','La richiesta di chiarimenti viene fatta davanti agli altri.','improvvisa una certezza falsa e','si contraddice davanti agli altri e','risponde senza fingere certezze e'],
+    ['Controllo incrociato','Le informazioni vengono confrontate con un secondo registro.','ignora il confronto e','confonde i due registri e','confronta i riferimenti e'],
+    ['Fonte mancante','Una delle fonti citate non è disponibile.','inventa la fonte mancante e','si affida a una fonte non controllata e','distingue i fatti dalle ipotesi e'],
+    ['Allegato tardivo','Un allegato arriva quando la discussione è già iniziata.','ignora l’allegato e','interpreta male l’allegato e','legge l’allegato prima di rispondere e'],
+    ['Correzione pubblica','Un errore viene segnalato davanti a chi segue il confronto.','nega un errore verificabile e','si irrigidisce sulla correzione e','accetta di ricontrollare e'],
+    ['Conferma contestata','La conferma citata non coincide con quella registrata.','si attribuisce una conferma inesistente e','cita la conferma sbagliata e','verifica i riferimenti della conferma e'],
+    ['Ordine invertito','Le informazioni vengono presentate in ordine inverso.','confonde l’effetto con la causa e','perde il filo dei passaggi e','ricostruisce l’ordine dei fatti e'],
+    ['Rettifica urgente','Viene chiesta una rettifica prima del prossimo verdetto.','rifiuta ogni rettifica e','corregge senza rileggere e','limita la rettifica ai fatti verificati e'],
+  ];
+  function compile(theme){
+    if(cache.has(theme.id))return cache.get(theme.id);
+    const source=D.worldScenes?.[theme.id];if(!source)return null;
+    const scenes=source.trim().split('\n').map((line,i)=>{const p=line.trim().split('|');if(p.length!==7)throw Error('Situazione incompleta: '+theme.id+'/'+i);return {zone:+p[0],title:p[1],anchor:p[2],warning:p[3],fatal:p[4],hurt:p[5],safe:p[6]};});
+    const out={version:1,scenes,events:[],traits:[],trials:[],deaths:[],disasters:[],dialogues:[],quotes:[],items:[]};
+    const add=(category,scene,index,head,text,phase)=>out[category].push({id:'mondo-'+theme.id+'-'+category+'-'+index,phase:phase||'d',raw:head+' at:'+scene.zone+' | '+text.replaceAll('{x}',scene.anchor),zone:scene.zone,...(category==='events'&&index%10===7?{afterScene:Math.floor(index/10)}:{})});
+    scenes.forEach((s,i)=>{
+      eventActions.forEach(([head,text,phase],j)=>add('events',s,i*10+j,head,text,phase));
+      Object.entries(trials).forEach(([attr,def],j)=>{
+        const [n,ok,ko,...texts]=def,[yes,no]=texts[i%texts.length],dc=10+i%4;
+        const req=attr==='emp'?' stat:B<mo75':attr==='car'?'':attr==='res'?' stat:A<en65':'';
+        add('trials',s,i*10+j,n+req+' test:A='+attr+dc+' ok:'+ok.split(' ').join(' ok:')+' ko:'+ko.split(' ').join(' ko:'),yes+' || '+no,i%3===0?'n':'d');
+      });
+      const ds=theme.soft?softDevelopments:developments;
+      ds.forEach(([name,intro,dead,hurt,safe],j)=>{
+        const id='mondo-'+theme.id+'-disasters-'+(i*10+j),prefix='1 at:'+s.zone+' ';
+        out.disasters.push({id,n:s.title+' — '+name,zone:s.zone,scene:i,intro:'Imprevisto locale presso '+s.anchor+'. '+s.warning+' '+intro,
+          out:[prefix+'d:A | Presso '+s.anchor+', {A} '+dead+' '+s.fatal+'.',prefix+'s:A=ferito | Presso '+s.anchor+', {A} '+hurt+' '+s.hurt+'.',prefix+'en:A-5 | Presso '+s.anchor+', {A} '+safe+' '+s.safe+'. Lo sforzo costa energie.'].join('\n')});
+      });
+      const deathActions=[
+        ['1 d:A','{A} ignora il segnale presso {x}: '+s.warning+' {A} '+s.fatal+'.'],
+        ['2 k:A>B',theme.soft?'{A} mette {B} sotto pressione sul problema di {x}. {B} '+s.fatal.replaceAll('[A:','[B:')+'.':'{A} spinge {B} verso {x} proprio quando il pericolo si manifesta. {B} '+s.fatal.replaceAll('[A:','[B:')+'.'],
+        ['2 tr:A>B','{A} tradisce {B} presso {x}, sfruttando il momento peggiore. {B} '+s.fatal.replaceAll('[A:','[B:')+'.'],
+        ['2 grudge:A>B k:A>B','{A} affronta {B} presso {x} per il rancore ancora aperto. Nel confronto, {B} '+s.fatal.replaceAll('[A:','[B:')+'.'],
+        ['1 stat:A<en25 d:A','{A} arriva al limite delle energie presso {x}. Non riesce a reagire e '+s.fatal+'.'],
+        ['1 stat:A<hp40 d:A','{A} non è in condizioni di affrontare il problema presso {x}. Nel momento decisivo, '+s.fatal+'.'],
+        ['1 need:A=ferito d:A','{A} insiste presso {x} nonostante le difficoltà già presenti. Perde il momento utile e '+s.fatal+'.'],
+        ['2 enemy:AB k:A>B','{A} costringe {B} a occuparsi del problema presso {x}. {B} non riesce a sottrarsi e '+s.fatal.replaceAll('[A:','[B:')+'.'],
+        ['1 d:A','{A} scambia una pausa per la fine del rischio presso {x}. Il problema riparte: {A} '+s.fatal+'.'],
+        ['1 d:A','{A} prova a risolvere da sol[A:o/a] il problema presso {x}, senza controllare l’ultimo passaggio. {A} '+s.fatal+'.'],
+      ];
+      if(theme.soft){
+        const ending=s.fatal.replaceAll('[A:','[B:');
+        deathActions[0][1]='{A} affronta il problema di {x} senza controllare i riferimenti. {A} '+s.fatal+'.';
+        deathActions[1][1]='{A} chiede pubblicamente a {B} di spiegare il problema di {x}. {B} '+ending+'.';
+        deathActions[2][1]='{A} tradisce la fiducia di {B} e porta il problema di {x} davanti a chi decide. {B} '+ending+'.';
+        deathActions[3][1]='{A} sfrutta il rancore verso {B} per contestare il problema di {x}. {B} '+ending+'.';
+        deathActions[4][1]='{A} affronta la discussione su {x} senza più energie per ricontrollare. {A} '+s.fatal+'.';
+        deathActions[5][1]='{A} ha già poca credibilità quando arriva il confronto su {x}. {A} '+s.fatal+'.';
+        deathActions[6][1]='{A} cerca di riscattare le difficoltà precedenti nel confronto su {x}, ma peggiora la situazione: '+s.fatal+'.';
+        deathActions[7][1]='{A} mette {B} alle strette sul problema di {x}. {B} '+ending+'.';
+        deathActions[8][1]='{A} considera chiuso il problema di {x}, ma manca ancora il confronto finale. {A} '+s.fatal+'.';
+        deathActions[9][1]='{A} si presenta al confronto su {x} senza ricontrollare l’ultimo passaggio. {A} '+s.fatal+'.';
+      }
+      deathActions.forEach(([head,text],j)=>add('deaths',s,i*10+j,head+' *0.7',text,i%4===0?'n':'d'));
+      const dialogueActions=[
+        ['alleati','Riparliamo dell’imprevisto che abbiamo vissuto presso '+s.anchor+'?','Sì. Riprendere fiato non significa aver dimenticato.','aftermath'],
+        ['alleati','Se ci separiamo, prendiamo '+s.anchor+' come riferimento?','Come riferimento, sì. Non prometto che il passaggio sarà libero.'],
+        ['coppia','Ti va una pausa vicino a '+s.anchor+'?','Una pausa insieme. Il resto del piano lo discutiamo dopo.'],
+        ['coppia','Quando racconteremo di '+s.anchor+', quale parte salteremo?','Quella in cui fingiamo entrambi di sapere cosa fare.'],
+        ['rivali','Non scambiare il mio silenzio vicino a '+s.anchor+' per fiducia.','Non avevo intenzione di farlo.'],
+        ['rivali','Su '+s.anchor+' abbiamo almeno la stessa prudenza?','La prudenza sì. Il resto resta da vedere.'],
+        ['sconosciuti','Hai capito cosa succede presso '+s.anchor+'?','Non abbastanza da inventare una risposta.'],
+        ['sconosciuti','Posso controllare '+s.anchor+' senza intralciarti?','Finché non metti le mani sulle mie cose.'],
+        ['alleati','Ti devo ancora qualcosa. Ne parliamo dopo '+s.anchor+'?','Sì. Un debito non si cancella soltanto perché ne parliamo.','debt'],
+        ['sconosciuti','Prima controlliamo '+s.anchor+' o le tue condizioni?','Le mie condizioni. Non facciamo finta che non contino.','hurt'],
+      ];
+      dialogueActions.forEach(([kind,a,b,need],j)=>out.dialogues.push({id:'mondo-'+theme.id+'-dialogues-'+(i*10+j),zone:s.zone,kind,need,...(need==='aftermath'?{afterScene:i}:{}),lines:[a,b]}));
+      const quoteActions=[
+        ['kill','Il conto si chiude qui, presso '+s.anchor+'.'],['betray','Il nostro patto non ha superato '+s.anchor+'.'],
+        ['ally','Decidiamo insieme cosa fare con '+s.anchor+'.'],['love','Anche qui, vicino a '+s.anchor+', ti riconoscerei.'],
+        ['saved','Ti devo il fatto di essere ancora qui, vicino a '+s.anchor+'.'],['taunt','Ricordati questo incontro presso '+s.anchor+'.'],
+        ['disaster','La prossima volta controllerò prima '+s.anchor+'.'],['feast','Prima il rifornimento. Poi penserò a '+s.anchor+'.'],
+        ['revenge','Il rancore mi ha portato fin qui, vicino a '+s.anchor+'.'],['spare','Fermiamoci qui, presso '+s.anchor+'.'],
+      ];
+      quoteActions.forEach(([kind,text],j)=>out.quotes.push({id:'mondo-'+theme.id+'-quotes-'+(i*10+j),zone:s.zone,kind,text}));
+    });
+    Object.entries(traits).forEach(([trait,[head,text]],i)=>{
+      for(let j=0;j<10;j++){
+        const s=scenes[(i*7+j*3+j%3)%scenes.length];
+        const body=theme.soft&&trait==='spietato'?'{A} mette {B} sotto pressione su {x} e ne indebolisce la reputazione senza concedere una pausa.':text;
+        add('traits',s,i*10+j,head+' trait:A='+trait+' *2',body,(trait==='sonnambulo'||trait==='romantico'||j%4===0)?'n':'d');
+      }
+    });
+    const data=D.worldItemData,own=data.roots[theme.id],soft=!!theme.soft;
+    Object.entries(own).forEach(([type,roots])=>data.split(roots).forEach((name,i)=>{
+      const endings=soft&&['arma','armatura','trap','med'].includes(type)?data.paper:data.tails[type];
+      endings.forEach((tail,j)=>out.items.push({id:'mondo-'+theme.id+'-item-'+type+'-'+i+'-'+j,type,name:name+' '+tail}));
+    }));
+    out.counts=Object.fromEntries(['events','traits','trials','deaths','disasters','dialogues','quotes','items'].map(k=>[k,out[k].length]));
+    out.counts.scenes=scenes.length;cache.set(theme.id,out);return out;
+  }
+  function follows(scene,zone,people,history){
+    return (history||[]).slice(-8).some(p=>p.worldIncident?.scene===scene&&p.affectedZones?.includes(zone)&&people.every(t=>t.zone===zone&&p.worldIncident.exposed.includes(t.id)));
+  }
+  function dialogues(catalog,zone,kind,a,b,history){
+    return (catalog?.dialogues||[]).filter(x=>x.zone===zone&&x.kind===kind&&(!x.need||x.need==='debt'&&a.owes?.[b.id]||x.need==='hurt'&&(b.hp<55||Object.keys(b.st||{}).some(k=>['ferito','malato','avvelenato'].includes(k)))||x.need==='aftermath'&&follows(x.afterScene,zone,[a,b],history)));
+  }
+  function itemNames(catalog){const result={};for(const item of catalog?.items||[])(result[item.type]||=[]).push(item.name);return result;}
+  D.world={version:1,compile,dialogues,itemNames,follows};
+})(typeof window!=='undefined'?window:globalThis);
 
 ;
 /* Sistemi deterministici isolati. Le dipendenze sono esplicite e il RNG è quello della partita. */
@@ -7750,8 +8388,49 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
     zombie:[['la Cornucopia','la Piazza']],royale:[['la Cornucopia',"l'Aeroporto"]],horror:[['la Cornucopia','il Salone']],
     wasteland:[['la Cornucopia','il Deposito'],['nel Bosco','tra i ruderi della Città fantasma'],['in un bosco','tra i ruderi della Città fantasma'],['nel sottobosco','tra i rottami della Discarica']],
   };
+  const sharedCorrections=[
+      ['{A} si mimetizza così bene che un altro concorrente [A:gli/le] si siede accanto senza vederl[A:o/a]. {A} ne approfitta per sfilargli il kit medico dalla tasca.','{A} cerca senza richiamare attenzione fra gli oggetti abbandonati e recupera {med}.'],
+      ['{A} cerca di mimetizzarsi in un cespuglio. Il cespuglio era occupato da un altro concorrente. Imbarazzo, poi fuga.','{A} tenta di nascondere i propri movimenti, ma il materiale fruscia troppo e deve interrompere la ricerca.'],
+      ['{A} sgattaiola tra i corpi e ruba un kit medico senza che nessuno se ne accorga.','{A} si infila tra le casse e recupera {med} senza richiamare attenzione.'],
+      ['{A} prova a rubare un kit medico, ma pesta un piede a qualcuno e deve fuggire a mani vuote.','{A} tenta di raggiungere una cassetta incustodita, ma scivola, si ferisce contro uno spigolo e deve rinunciare.'],
+      ['{A} si infila nel rifugio di un rivale addormentato e ne esce con {arma}.','{A} apre in silenzio un vecchio involto incustodito e trova {arma}.'],
+      ['{A} si infila nel rifugio di un rivale, inciampa in una pentola e fugge sotto una pioggia di sassi.','{A} tenta di controllare un vecchio involto, ma urta un fermo metallico, si ferisce e deve fermarsi.'],
+      ['Di notte {A} entra in un accampamento nemico e ne esce con le provviste.','Di notte {A} controlla il materiale rimasto in un accampamento abbandonato e recupera {cibo}.'],
+      ['Di notte {A} entra in un accampamento nemico, pesta una mano e deve scappare inseguit[A:o/a].','Di notte {A} controlla un accampamento abbandonato, ma inciampa in un ostacolo, si ferisce e rinuncia alla ricerca.'],
+      ['{A} abbandona {B} nel sonno portandosi via tutto.','{A} rompe il patto con {B} mentre {B} dorme.'],
+      ["dentro c'è {cibo}",'all’interno trova {cibo}'],
+  ];
   function adaptText(text,theme){
     let out=text;
+    for(const [from,to] of sharedCorrections)out=out.replace(from,to);
+    if(theme.id==='scifi')out=out.replace('Un fulmine cade a un metro da','Una scarica elettrica colpisce un pannello accanto a').replace('Un fulmine cade su','Una scarica elettrica colpisce').replace('dorme sul terreno umido','dorme su un pannello bagnato').replace('vicino al fuoco','accanto a una bocchetta tiepida').replace('accanto al fuoco','accanto a una bocchetta tiepida').replace('prima ancora che si aprano le capsule','appena esce dalla capsula');
+    if(theme.soft)out=out.replace('vicino al fuoco',theme.id==='liceo'?'accanto a un tavolo di studio':'accanto a un tavolo della pausa');
+    if(theme.id==='liceo')for(const [from,to] of [
+      ['Da oggi non verrà mai più interrogat[A:o/a] a sorpresa.','Avrà un riferimento in più per prepararsi agli imprevisti.'],
+      ['sul bus del ritorno','in un angolo tranquillo della scuola'],
+      ["si contendono l'ultimo posto in pullman per la gita","si contendono l'ultima prenotazione per la gita"],
+      ['Lo sciopero dei bus','Il controllo dei ritardi'],
+      ['I bus scioperano proprio il giorno della verifica.','La scuola verifica le giustificazioni dei ritardi dovuti allo sciopero.'],
+      ['arriva con due ore di ritardo e viene bocciat[A:o/a]','non riesce a giustificare il ritardo e viene esclus[A:o/a] dai giochi'],
+      ['arriva in ritardo e prende una nota','non chiarisce il ritardo e prende una nota'],
+      ['arriva a piedi con largo anticipo','presenta una giustificazione valida'],
+      ['resta a casa troppi giorni e viene esclus[A:o/a] dai giochi','non riesce a recuperare le verifiche perse e viene esclus[A:o/a] dai giochi'],
+      ['La gita disastrosa','La gita annullata'],
+      ['La gita finisce con il pullman in panne in autostrada.','La gita viene annullata: a scuola cominciano le contestazioni sui rimborsi.'],
+      ["si perde all'autogrill e non torna più in classe",'rifiuta ogni chiarimento sulle quote e viene esclus[A:o/a] dai giochi'],
+      ['dorme sul pullman e si sveglia con la faccia disegnata','perde la calma durante la discussione sui rimborsi'],
+      ['trova un passaggio con i genitori di un amico','chiarisce la propria quota e supera la contestazione'],
+    ])out=out.replace(from,to);
+    if(theme.id==='ufficio')for(const [from,to] of [
+      ['Lo smart working forzato','La prova di collegamento'],
+      ['Tutti a casa per un mese, con controlli a sorpresa via webcam.','L’azienda impone una prova di collegamento in video dalle postazioni di lavoro.'],
+      ['viene sorpres[A:o/a] in pigiama durante una call con il cliente','ignora le regole della call con il cliente e viene licenziat[A:o/a]'],
+      ['lavora meglio da casa che in ufficio','gestisce il collegamento senza imprevisti'],
+      ['lavora da casa per tutta la settimana','limita i contatti e porta avanti il proprio lavoro'],
+      ['resta a casa troppo a lungo e il suo posto viene assegnato a un altro','non recupera gli incarichi persi e il suo posto viene assegnato a un altro'],
+      ['resta a casa troppo a lungo e viene sostituit[A:o/a]','non recupera gli incarichi persi e viene sostituit[A:o/a]'],
+      ['Il Direttore invita tutti a cena: a fine serata, consegna delle buste.','Il Direttore impone un controllo aziendale e ne comunica gli esiti in buste chiuse.'],
+    ])out=out.replace(from,to);
     if(theme.id==='fantasy')out=out.replace('Il pubblico la scarica tre milioni di volte.','I bardi del reame la ricantano in ogni taverna.').replace('logo dello sponsor principale','sigillo del mecenate del reame').replace('pecore sono mutanti','pecore sono stregate').replace('Il programma di cucina viene rinnovato per tre stagioni.','I cantastorie chiedono altre tre esibizioni.').replace('Gli ascolti fanno il record della stagione.','I bardi ne parleranno per il resto della stagione.');
     const editorial=theme.id==='fantasy'?[["Il blackout delle telecamere","Il silenzio delle sfere"],['niente telecamere sui dettagli, niente limiti','le sfere divinatorie vengono oscurate, e non ci sono limiti'],['un nuovo regista','un nuovo cerimoniere'],['di regia','del cerimoniere'],['i droni','i corvi messaggeri']]:theme.id==='scifi'?[['Pioggia di detriti','Sciame di detriti'],['La pioggia di bulloni','La raffica di bulloni'],['La pioggia di coriandoli','Lo sciame di coriandoli'],['La pioggia di sangue','Gli ugelli scarlatti'],["Una pioggia di sangue animale cade sull'arena",'Gli ugelli di manutenzione spruzzano sangue animale nei moduli']]:[];
     for(const [from,to] of editorial.concat(variants[theme.id]||[])){
@@ -7835,6 +8514,8 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
     const coordinated=text.match(/^\{([A-F])\}[^.!?]{0,140}(?:e si dilegua|e si defila|e scappa via|poi si allontana|poi se ne va)/iu);
     const depart=[...new Set(direct.concat(coordinated?[coordinated[1].charCodeAt(0)-65]:[]))];
     if (explicit && (explicit.at!=null||explicit.travel!=null)) return { at:explicit.at??null, travel:explicit.travel??null,needs,scatter,depart };
+    const classroom=zones.find(z=>strip(z.name)==='Aule');
+    if(!found.length&&classroom&&/\b(?:risponde a un['’]interrogazione|prende un\w* \w+ all['’]interrogazione|durante (?:la|una) verifica)\b/iu.test(text))return {at:classroom.id,travel:null,needs,scatter,depart};
     if (!found.length) return { at:null, travel:null,needs,scatter,depart };
     const last = found[found.length-1];
     const prefix = text.slice(Math.max(0,last.index-100),last.index);
@@ -7861,7 +8542,7 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
   function preparePools(pools, theme, zones) {
     const key=JSON.stringify(zones.map(z=>[z.name,z.features]));
     const cached=poolCache.get(pools);if(cached?.key===key)return cached.out;
-    const out = { ...pools, lex:{...pools.lex,luogo:zones.map(z=>z.name),med:[theme.soft?'un aiuto per riprendersi':theme.id==='fantasy'?'una pozione curativa':'un kit medico'],trap:theme.lex.trappola} };
+    const out = { ...pools, lex:{...pools.lex,luogo:zones.map(z=>z.name),med:pools.world?pools.lex.med:[theme.soft?'un aiuto per riprendersi':theme.id==='fantasy'?'una pozione curativa':'un kit medico'],trap:pools.world?pools.lex.trap:theme.lex.trappola} };
     for (const [k,v] of Object.entries(pools)) if (Array.isArray(v) && k !== 'disasters') out[k]=v.map(e=>prepare(e,theme,zones));
     out.disasters=pools.disasters.map(d=>({...d,n:adaptText(d.n,theme),intro:adaptText(d.intro,theme),out:d.out.map(e=>prepare(e,theme,zones))}));
     poolCache.set(pools,{key,out});return out;
@@ -8183,8 +8864,8 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
     return okTheme && (!pk.adult || (adult && !theme.noAdult));
   });
   const poolCache = {};
-  function buildPools(theme, custom, adult) {
-    const key = theme.id + '|' + (adult ? 1 : 0) + '|' + JSON.stringify(custom || []);
+  function buildPools(theme, custom, adult, worldEnabled = true) {
+    const key = theme.id + '|' + (adult ? 1 : 0) + '|' + (worldEnabled ? 1 : 0) + '|' + JSON.stringify(custom || []);
     if (poolCache[key]) return poolCache[key];
     const src = theme.soft ? theme.pool : D.core;
     const more = (D.more || {})[theme.id] || {};
@@ -8209,6 +8890,15 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
     packs.forEach((pk) => { if (pk.dis) pools.disasters = pools.disasters.concat(parseDisasters(pk.dis, pk.adult ? 'adult' : theme.id).map((d) => Object.assign(d, { adult: !!pk.adult }))); });
     pools.lex = Object.assign({}, D.lexDefault || {}, itemLex(theme), theme.lex);
     packs.forEach((pk) => { if (pk.lex) Object.keys(pk.lex).forEach((k) => (pools.lex[k] = pk.lex[k])); });
+    const world = worldEnabled ? D.world?.compile(theme) : null;
+    if (world) {
+      for (const category of ['events','traits','trials','deaths']) for (const row of world[category]) {
+        const event=parseLine(row.raw,'world');event.contentId=row.id;event.contentCategory=category;if(row.afterScene!=null)event.afterScene=row.afterScene;pools[row.phase].push(event);
+      }
+      for(const incident of world.disasters)pools.disasters.push({n:incident.n,intro:incident.intro,out:parseBlock(incident.out,'world').map((event,i)=>Object.assign(event,{contentId:incident.id+'-'+i,contentCategory:'disasters'})),zones:[incident.zone],contentId:incident.id,scene:incident.scene});
+      for(const [type,names] of Object.entries(D.world.itemNames(world)))pools.lex[type]=[...new Set((pools.lex[type]||[]).concat(names))];
+      pools.world=world;
+    }
     const ks = Object.keys(poolCache); if (ks.length > 40) delete poolCache[ks[0]];
     poolCache[key] = pools;
     return pools;
@@ -8246,7 +8936,9 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
         let pe = 0; PHASES.forEach((k) => (pe += cnt((pk.ev || {})[k])));
         if (pk.adult) { ea += pe; da += cntDis(pk.dis); } else { e += pe; d += cntDis(pk.dis); }
       });
-      perTheme[t.id] = { events: e, disasters: d, adultEvents: ea, adultDisasters: da };
+      const world=D.world?.compile(t),extra=world?world.counts.events+world.counts.traits+world.counts.trials+world.counts.deaths:0;
+      if(world){events+=extra;disasters+=world.counts.disasters;outcomes+=world.counts.disasters*3;}
+      perTheme[t.id] = { events: e+extra, disasters: d+(world?.counts.disasters||0), adultEvents: ea, adultDisasters: da, ...(world?{world:world.counts}:{}) };
     });
     return { events, disasters, adultEvents, adultDisasters: adultDis, outcomes, themes: D.themes.length, perTheme };
   }
@@ -8346,7 +9038,7 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
     const seed = cfg.seed == null || cfg.seed === '' ? String(Date.now()) : String(cfg.seed);
     const rng = makeRng(seed + '|' + theme.id);
     const adult = !!cfg.adult && !theme.noAdult;
-    const originalPools = buildPools(baseTheme, cfg.custom, adult);
+    const originalPools = buildPools(baseTheme, cfg.custom, adult, mapEnabled && cfg.worldVersion !== 0);
     const pools = mapEnabled ? Geography.preparePools(originalPools, theme, geographyZones) : originalPools;
     const variety = Systems.eventVariety();
     const LEX = pools.lex;
@@ -8372,7 +9064,9 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
     const traps = []; const zoneLoot = {}, trapChecks=new WeakMap();
     let SYS = []; let pendingNotes = [];
     // oggetti e mente dei concorrenti
-    const IT = D.items || { types: {}, names: {}, how: {} };
+    const world = pools.world;
+    const baseItems = D.items || { types: {}, names: {}, how: {} };
+    const IT = world ? {...baseItems,names:{...baseItems.names,[theme.id]:Object.fromEntries(Object.entries(D.world.itemNames(world)).map(([type,names])=>[type,[...new Set(((baseItems.names||{})[theme.id]?.[type]||[]).concat(names))]]))}} : baseItems;
     const MIND = D.mind || { goals: {}, acts: {}, actsSoft: {}, diary: { trait: {} }, diarySoft: { trait: {} }, mem: {} };
     let ORIGIN = null, CURKIND = '';
     const VO = D.voice || {}, VS = D.voiceSoft || {}, CH = D.chats || {};
@@ -8526,6 +9220,7 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
     }
     function checkReq(ev, roles) {
       if (geo && ev.text != null && !geo.accepts(ev,roles)) return false;
+      if(ev.afterScene!=null&&!D.world.follows(ev.afterScene,roles[0].zone,roles,phases))return false;
       for (const r of ev.req) {
         const A = roles[r.r ? r.r[0] : 0], B = r.r && r.r[1] != null ? roles[r.r[1]] : null;
         switch (r.t) {
@@ -8764,12 +9459,15 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
     const useFmt = (l, people, vars) => { const pool = fresh(l); const x = fmt(pool, people, vars); if (x) pool.forEach((y) => { if (x.src === y) USED.add(y); }); return x; };
     function voice(kind, speaker, others, vars) {
       if (!speaker) return null;
+      if (geo && !speaker.alive && kind !== 'last') return null;
       const base = (theme.soft && VS[kind]) || VO[kind] || (theme.soft && (BD.voiceSoft || {})[kind]) || (BD.voice || {})[kind] || {};
       const tr = speaker.traits.filter((x) => base.trait && base.trait[x] && fresh(base.trait[x]).some((y) => !USED.has(y)));
       const ar = base.arena && base.arena[theme.id];
       const people = [speaker].concat(others || []);
       let x = null;
-      if (tr.length && rng.chance(0.55)) x = useFmt(base.trait[rng.pick(tr)], people, vars);
+      const local=world?.quotes.filter(q=>q.kind===kind&&q.zone===speaker.zone&&!USED.has(q.text));
+      if(local?.length&&rng.chance(0.5))x=useFmt(local.map(q=>q.text),people,vars);
+      if (!x && tr.length && rng.chance(0.55)) x = useFmt(base.trait[rng.pick(tr)], people, vars);
       if (!x && ar && ar.some((y) => !USED.has(y)) && rng.chance(0.45)) x = useFmt(ar, people, vars);
       if (!x) x = useFmt(base._ || [], people, vars);
       if (!x) return null;
@@ -8931,7 +9629,7 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
       if (v.promises) v.promises.forEach(dissolvePromise);
     }
     function giveItem(t, type, ctx, lexPick, name, q, how, from, src) {
-      const nm = name || (type === 'arma' ? lexPick('arma') : type === 'cibo' ? ctx.cibo || 'delle provviste' : geo && ctx[type] ? ctx[type] : ITEM_NAME[type] || lexPick(type));
+      const nm = name || (type === 'arma' ? lexPick('arma') : type === 'cibo' ? ctx.cibo || 'delle provviste' : geo && ctx[type] ? ctx[type] : world ? lexPick(type) : ITEM_NAME[type] || lexPick(type));
       const it = src ? Object.assign({}, src, { how: how || 'trovato', from: from ? from.id : null, d: day }) : mkItem(type, nm, how, from, q);
       if (!addItem(t, it)) return false;
       t.items++; stats.items++;
@@ -9087,6 +9785,7 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
         }
       }
       ev.dies.forEach((i) => { if (!saved.has(i)) kill(roles[i], [], txt, out); });
+      let spentMedicine=null;
       for (const f of ev.fx) {
         const t = roles[f.r[0]], u = f.r[1] != null ? roles[f.r[1]] : null;
         if (!t.alive && f.t !== 'rel') continue;
@@ -9105,7 +9804,7 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
             break;
           }
           case 'gain': giveItem(t, f.item, ctx, lexPick); break;
-          case 'lose': { const it = itemOf(t, f.item); if (it) takeItem(t, it); break; }
+          case 'lose': { const it = itemOf(t, f.item); if (it) { if(world&&f.item==='med')spentMedicine={owner:t,item:it};takeItem(t, it); } break; }
           case 'consume': {
             const it = itemOf(t, f.item); if (!it) break;
             const before = itemLedger.state(t); takeItem(t, it);
@@ -9138,11 +9837,13 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
             break;
           }
           case 'cure': {
+            const careBefore=spentMedicine?itemLedger.state(t):null;
             t.st = t.st.lutto != null ? { lutto: t.st.lutto } : {};
             t.cause = null;
             t.hp = Math.max(t.hp, 72); t.en += 10; t.mo += 6;
             if (M && M.cure) { if (M.infect) { if (t.infected && t.pr < M.cure) { t.infected = false; t.pr = 0; stats.cured++; } } else t.pr -= M.cure; }
             syncSt(t);
+            if(spentMedicine){itemLedger.record('heal',spentMedicine.owner,t,spentMedicine.item,careBefore,'Cura con la medicina posseduta dal soccorritore');spentMedicine=null;}
             const helper = roles.find((x) => x !== t && x.alive);
             if (helper && ev.n > 1) { t.owes[helper.id] = 'cura'; addAff(t, helper, 30); helper.saves++; remember(t, helper, 'cured'); if (rng.chance(0.5)) { const e = echo(E.debt, [t, helper], ''); if (e) out.push(e); } }
             break;
@@ -9201,7 +9902,7 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
       itemLedger.setContext('');
       if(geo&&Geography.rule(ev.text,geographyZones,ev.location).scatter){const exits=geographyZones[roles[0].zone].links.filter(z=>!closed.has(z));roles.filter(t=>t.alive).forEach((t,i)=>geo.move(t,exits[i%exits.length],'Fugge in una direzione diversa dagli altri',{mode:'event'}));}
       if(geo)for(const i of Geography.rule(ev.text,geographyZones,ev.location).depart||[]){const t=roles[i];if(t?.alive){const exits=geographyZones[t.zone].links.filter(z=>!closed.has(z));if(exits.length)geo.move(t,rng.pick(exits),'Si allontana dopo l’incontro',{mode:'event'});}}
-      return Object.assign({ html: txt.html, plain: txt.plain, ids: roles.map((t) => t.id), deaths, lethal: deaths.length > 0, origin: ev.origin, cat, why: ev.why, reason, echo: out.slice(0, 3), test: ev.testRes || null },geo?{place}:{});
+      return Object.assign({ html: txt.html, plain: txt.plain, ids: roles.map((t) => t.id), deaths, lethal: deaths.length > 0, origin: ev.origin, cat, why: ev.why, reason, echo: out.slice(0, 3), test: ev.testRes || null },geo?{place}:{},ev.contentId?{contentId:ev.contentId,contentCategory:ev.contentCategory}:{});
     }
 
     function lethalProb(kind) {
@@ -9614,7 +10315,7 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
     function proseDepartures(text){return Geography.rule(text.replace(/\{(\d)\}/g,(_,i)=>'{'+String.fromCharCode(65+(+i))+'}'),geographyZones).depart||[];}
     function moveAfterProse(tx,people){for(const i of proseDepartures(Geography.adaptText(tx.src||'',theme))){const t=people[i];if(!t?.alive)continue;const exits=geographyZones[t.zone].links.filter(z=>!closed.has(z));if(exits.length)geo.move(t,rng.pick(exits),'Si allontana dal gruppo',{mode:'event'});}}
     function sys2(tx, people, cat, whyTxt, pri, ids) {
-      SYS.push({ pri: pri || 1, ev: Object.assign({ html: tx.html, plain: tx.plain, ids: ids || people.map((p) => p.id), deaths: [], lethal: false, origin: 'sys', cat: cat || 'none', why: 'carattere', whyTxt: whyTxt || '', echo: [] },geo?{place:geo.locate(ids?people.filter(p=>ids.includes(p.id)):people)}:{}) });
+      SYS.push({ pri: pri || 1, ev: Object.assign({ html: tx.html, plain: tx.plain, ids: ids || people.map((p) => p.id), deaths: [], lethal: false, origin: 'sys', cat: cat || 'none', why: 'carattere', whyTxt: whyTxt || '', echo: [] },geo?{place:geo.locate(ids?people.filter(p=>ids.includes(p.id)):people)}:{},tx.contentId?{contentId:tx.contentId,contentCategory:tx.contentCategory}:{}) });
       if(geo)moveAfterProse(tx,people);
     }
 
@@ -9943,13 +10644,16 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
         if (!rng.chance(0.6)) return;
         const kind = a.partner === b.id ? 'coppia' : isAlly(a, b) ? 'alleati' : aff(a, b) <= -30 || a.grudges[b.id] || b.grudges[a.id] ? 'rivali' : 'sconosciuti';
         const ar = CH.arena && CH.arena[theme.id] ? CH.arena[theme.id].filter((x) => !USED.has(x[0])) : [];
-        const list = (rng.chance(0.4) && ar.length ? ar : (CH[kind] || []).filter((x) => !USED.has(x[0]))) || [];
+        const local=D.world?.dialogues(world,a.zone,kind,a,b,phases).filter(x=>!USED.has(x.lines[0]))||[];
+        const chooseLocal=local.length&&rng.chance(0.7);
+        const list = chooseLocal?local.map(x=>x.lines):(!world&&rng.chance(0.4) && ar.length ? ar : (CH[kind] || []).filter((x) => !USED.has(x[0]))) || [];
         if (!list.length) return;
         const pair = rng.pick(list); USED.add(pair[0]);
+        const source=chooseLocal?local.find(row=>row.lines===pair):null;
         const [l1, l2] = pair;
         const x1 = fmt([l1], [a, b]), x2 = fmt([l2], [a, b]); if (!x1 || !x2) return;
         addAff(a, b, kind === 'rivali' ? -4 : 3);
-        sys2({ plain: a.name + ': «' + x1.plain + '» ' + b.name + ': «' + x2.plain + '»', html: nameTag(a) + ': «' + x1.html + '»<br>' + nameTag(b) + ': «' + x2.html + '»' }, [a, b], kind === 'coppia' ? 'love' : kind === 'alleati' ? 'ally' : kind === 'rivali' ? 'hurt' : 'none', 'Dialogo', 1);
+        sys2({ plain: a.name + ': «' + x1.plain + '» ' + b.name + ': «' + x2.plain + '»', html: nameTag(a) + ': «' + x1.html + '»<br>' + nameTag(b) + ': «' + x2.html + '»',...(source?{contentId:source.id,contentCategory:'dialogues'}:{}) }, [a, b], kind === 'coppia' ? 'love' : kind === 'alleati' ? 'ally' : kind === 'rivali' ? 'hurt' : 'none', 'Dialogo', world?2:1);
       });
     }
     // gli scambi della notte: chi ha fame compra da chi ne ha
@@ -10297,7 +11001,7 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
         const wc = new Map();
         const wOf = (e) => { let w = wc.get(e); if (w === undefined) { w = weightFor(e, P); wc.set(e, w); } return w; };
         const present=geo?order.filter(t=>un.has(t.id)&&t.alive&&t.zone===P.zone).length:n;
-        const usable=e=>e.n<=present&&(!geo||(e.space||[]).every(s=>(s.at==null||s.at===P.zone)&&(s.travel==null||s.travel===P.zone||geographyZones[P.zone].links.includes(s.travel)&&!closed.has(s.travel)&&geo.budget(P)>0)));
+        const usable=e=>e.n<=present&&(e.afterScene==null||D.world.follows(e.afterScene,P.zone,[P],phases))&&(!geo||(e.space||[]).every(s=>(s.at==null||s.at===P.zone)&&(s.travel==null||s.travel===P.zone||geographyZones[P.zone].links.includes(s.travel)&&!closed.has(s.travel)&&geo.budget(P)>0)));
         const affected=!geo||kind!=='dis'||!opt?.affectedZones||opt.affectedZones.includes(P.zone);
         const candL = affected?pool.filter((e) => e.lethal && usable(e) && e.victims.length < nAlive && !e.risky):[];
         const candS = affected?pool.filter((e) => !e.lethal && usable(e) && (!e.risky || nAlive > 2)):[];
@@ -10334,7 +11038,7 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
       if (kind === 'dis') {
         const A2 = alive(); let hs = 0;
         A2.forEach((a) => A2.forEach((b) => {
-          if (a.ix >= b.ix || a.zone !== b.zone || hs >= 1 || like(a, b) > -25 || a.grudges[b.id] && a.grudges[b.id].why === 'kill' || !rng.chance(0.3)) return;
+          if (a.ix >= b.ix || a.zone !== b.zone || geo&&opt?.affectedZones&&!opt.affectedZones.includes(a.zone) || hs >= 1 || like(a, b) > -25 || a.grudges[b.id] && a.grudges[b.id].why === 'kill' || !rng.chance(0.3)) return;
           remember(a, b, 'hardship'); remember(b, a, 'hardship'); hs++;
           const e = useFmt(BA('hardship'), [a, b]); if (e) events.push(Object.assign({ html: e.html, plain: e.plain, ids: [a.id, b.id], deaths: [], lethal: false, origin: 'sys', cat: 'heal', why: 'carattere', whyTxt: 'Legame', echo: [] },geo?{place:geo.locate([a,b])}:{}));
         }));
@@ -10465,12 +11169,14 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
         feastDone = true;
         runPhase('f', pools.f, theme.phase.f, theme.intro.f);
       } else if (day >= 2 && pools.disasters.length && day - lastDisaster > 1 && rng.chance(0.32 * Math.min(1.5, diff))) {
-        let opts = pools.disasters.filter((d) => !usedDisasters.has(d.n));
-        if (!opts.length) { usedDisasters.clear(); opts = pools.disasters; }
+        const eligible=pools.disasters.filter(d=>!d.zones||d.zones.some(z=>!closed.has(z)&&alive().some(t=>t.zone===z)));
+        let opts = eligible.filter((d) => !usedDisasters.has(d.n));
+        if (!opts.length) { usedDisasters.clear(); opts = eligible; }
         const dz = rng.pick(opts);
+        if(!dz)throw new Error('Nessun disastro raggiungibile.');
         usedDisasters.add(dz.n); lastDisaster = day;
-        const areas=geo?[...new Set(Geography.mentions(dz.n,geographyZones).map(m=>m.zone))]:[];
-        runPhase('dis', dz.out.concat(pools.ds), dz.n, dz.intro, Object.assign({ adult: !!dz.adult },areas.length?{affectedZones:areas}:{}));
+        const areas=geo?dz.zones||[...new Set(Geography.mentions(dz.n,geographyZones).map(m=>m.zone))]:[];
+        runPhase('dis', dz.contentId?dz.out:dz.out.concat(pools.ds), dz.n, dz.intro, Object.assign({ adult: !!dz.adult },areas.length?{affectedZones:areas}:{},dz.contentId?{contentId:dz.contentId,worldIncident:{scene:dz.scene,exposed:alive().filter(t=>areas.includes(t.zone)).map(t=>t.id)}}:{}));
       }
       if (isEnded() || loversEnd()) break;
       runPhase('n', pools.n, theme.phase.n + ' ' + day, theme.intro.n);
@@ -10589,7 +11295,7 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
 </script>
 <script>window.LOS_ASSETS = {"logo":"img/logo.f2d5175789.webp","icona":"img/icona.8b02ddeb49.webp","favicon":"img/favicon.86774dc7cf.png","panoramica":"img/panoramica.66c4c27255.webp","sagome":["img/sagome-cappuccio.e8876ba986.webp","img/sagome-esploratore.9a99fd13f8.webp","img/sagome-viaggiatore.5e36435604.webp"],"arene":{"classico":"img/arene-classico.42c6ba42ee.webp","fantasy":"img/arene-fantasy.75b7fb0d32.webp","horror":"img/arene-horror.48052d80b4.webp","liceo":"img/arene-liceo.05ed578a90.webp","royale":"img/arene-royale.36c9952cd7.webp","scifi":"img/arene-scifi.403694f00f.webp","ufficio":"img/arene-ufficio.67b271bea3.webp","wasteland":"img/arene-wasteland.889002ace8.webp","zombie":"img/arene-zombie.36c9135a12.webp"},"atlas":{"classico":{"luoghi":{"altopiano":"img/arene-classico-luoghi-altopiano.36a37512d3.webp","bosco":"img/arene-classico-luoghi-bosco.2e9163544b.webp","cornucopia":"img/arene-classico-luoghi-cornucopia.393b2dabe1.webp","fiume":"img/arene-classico-luoghi-fiume.22b335a914.webp","paludi":"img/arene-classico-luoghi-paludi.77cf115eb4.webp","rovine":"img/arene-classico-luoghi-rovine.9ea4f70ca9.webp"},"pericoli":{"branco-di-lupi-mutanti":"img/arene-classico-pericoli-branco-di-lupi-mutanti.d786a62875.webp","orso-affamato":"img/arene-classico-pericoli-orso-affamato.e4f38a9892.webp","sciame-di-vespe-velenose":"img/arene-classico-pericoli-sciame-di-vespe-velenose.5adb2c7b8d.webp","serpente-gigante":"img/arene-classico-pericoli-serpente-gigante.b17e7f3d91.webp"}},"fantasy":{"luoghi":{"foresta-elfica":"img/arene-fantasy-luoghi-foresta-elfica.0448fcfbd3.webp","lago-nebbioso":"img/arene-fantasy-luoghi-lago-nebbioso.f19abc7c81.webp","miniere":"img/arene-fantasy-luoghi-miniere.5baa916ec9.webp","palude-stregata":"img/arene-fantasy-luoghi-palude-stregata.6a0b2af4a7.webp","picco-del-drago":"img/arene-fantasy-luoghi-picco-del-drago.06bdfd84b1.webp","torre-in-rovina":"img/arene-fantasy-luoghi-torre-in-rovina.ac716863c7.webp"},"pericoli":{"branco-di-lupi-mannari":"img/arene-fantasy-pericoli-branco-di-lupi-mannari.1c9124ceee.webp","spettro-errante":"img/arene-fantasy-pericoli-spettro-errante.056074bc23.webp","troll-di-caverna":"img/arene-fantasy-pericoli-troll-di-caverna.31aa2444f0.webp","viverna":"img/arene-fantasy-pericoli-viverna.577b91a819.webp"}},"horror":{"luoghi":{"biblioteca":"img/arene-horror-luoghi-biblioteca.00d6ab97f4.webp","cappella":"img/arene-horror-luoghi-cappella.a51e505028.webp","cimitero":"img/arene-horror-luoghi-cimitero.7a441de089.webp","serra":"img/arene-horror-luoghi-serra.b3d91121d4.webp","soffitta":"img/arene-horror-luoghi-soffitta.466d40cea3.webp"},"pericoli":{"bambola-posseduta":"img/arene-horror-pericoli-bambola-posseduta.7064eef1d7.webp","entita-senza-volto":"img/arene-horror-pericoli-entita-senza-volto.2c28467bdd.webp","spettro-urlante":"img/arene-horror-pericoli-spettro-urlante.25fa554e05.webp","stormo-di-corvi":"img/arene-horror-pericoli-stormo-di-corvi.fe5c85d7ae.webp"}},"liceo":{"luoghi":{"aula-magna":"img/arene-liceo-luoghi-aula-magna.0478e35c5c.webp","biblioteca":"img/arene-liceo-luoghi-biblioteca.1ae806ae58.webp","cortile":"img/arene-liceo-luoghi-cortile.51bf433337.webp","laboratorio-di-chimica":"img/arene-liceo-luoghi-laboratorio-di-chimica.eba1434683.webp","mensa":"img/arene-liceo-luoghi-mensa.67bcbc7e37.webp","palestra":"img/arene-liceo-luoghi-palestra.8ecb872849.webp"},"pericoli":{"bidello-di-turno":"img/arene-liceo-pericoli-bidello-di-turno.191c43a8bd.webp","ispezione-a-sorpresa":"img/arene-liceo-pericoli-ispezione-a-sorpresa.bef087d9b9.webp","preside":"img/arene-liceo-pericoli-preside.033f6c9aae.webp","professoressa-di-matematica":"img/arene-liceo-pericoli-professoressa-di-matematica.6cb65c6a3f.webp"}},"royale":{"luoghi":{"aeroporto":"img/arene-royale-luoghi-aeroporto.81e8ce98d4.webp","base-militare":"img/arene-royale-luoghi-base-militare.67f3a7de9d.webp","centrale-elettrica":"img/arene-royale-luoghi-centrale-elettrica.05ee57458a.webp","fattoria":"img/arene-royale-luoghi-fattoria.7c780dda87.webp","foresta":"img/arene-royale-luoghi-foresta.03b47644d0.webp","villaggio-costiero":"img/arene-royale-luoghi-villaggio-costiero.568519eb7c.webp"},"pericoli":{"cane-da-guardia-addestrato":"img/arene-royale-pericoli-cane-da-guardia-addestrato.c7853a67a0.webp","drone-armato":"img/arene-royale-pericoli-drone-armato.30d0b73e01.webp","elicottero-da-caccia":"img/arene-royale-pericoli-elicottero-da-caccia.8c68e62346.webp"}},"scifi":{"luoghi":{"hangar":"img/arene-scifi-luoghi-hangar.6de551833b.webp","moduli-abitativi":"img/arene-scifi-luoghi-moduli-abitativi.9f5bb96d39.webp","ponte-di-comando":"img/arene-scifi-luoghi-ponte-di-comando.3e9ffd005a.webp","reattore":"img/arene-scifi-luoghi-reattore.d10a335006.webp","serra-idroponica":"img/arene-scifi-luoghi-serra-idroponica.b6f4407853.webp"},"pericoli":{"androide-da-combattimento":"img/arene-scifi-pericoli-androide-da-combattimento.1a3d3eb38e.webp","creatura-aliena-dai-tentacoli":"img/arene-scifi-pericoli-creatura-aliena-dai-tentacoli.b6b314ddd9.webp","drone-di-sicurezza-impazzito":"img/arene-scifi-pericoli-drone-di-sicurezza-impazzito.c8a9c6f9e3.webp","sciame-di-nanobot":"img/arene-scifi-pericoli-sciame-di-nanobot.d43296f047.webp"}},"ufficio":{"luoghi":{"cucina":"img/arene-ufficio-luoghi-cucina.d968f8861d.webp","open-space":"img/arene-ufficio-luoghi-open-space.b6b7990c99.webp","parcheggio":"img/arene-ufficio-luoghi-parcheggio.d593f2ed83.webp","sala-stampanti":"img/arene-ufficio-luoghi-sala-stampanti.1727f50082.webp","ufficio-del-direttore":"img/arene-ufficio-luoghi-ufficio-del-direttore.bb3b6cabab.webp"},"pericoli":{"consulente-esterno":"img/arene-ufficio-pericoli-consulente-esterno.ce6e200c3f.webp","direttore-generale":"img/arene-ufficio-pericoli-direttore-generale.da2eb1f708.webp","riorganizzazione-aziendale":"img/arene-ufficio-pericoli-riorganizzazione-aziendale.1fd57b76b3.webp","ufficio-risorse-umane":"img/arene-ufficio-pericoli-ufficio-risorse-umane.8392df7518.webp"}},"wasteland":{"luoghi":{"autostrada-spezzata":"img/arene-wasteland-luoghi-autostrada-spezzata.19a72a0b97.webp","citta-fantasma":"img/arene-wasteland-luoghi-citta-fantasma.fe22bb72b2.webp","cratere":"img/arene-wasteland-luoghi-cratere.04de7ca40a.webp","diga":"img/arene-wasteland-luoghi-diga.3be9abe15a.webp","discarica":"img/arene-wasteland-luoghi-discarica.b8783ad9c6.webp","raffineria":"img/arene-wasteland-luoghi-raffineria.081e2d2ad6.webp"},"pericoli":{"banda-di-predoni":"img/arene-wasteland-pericoli-banda-di-predoni.1dfcfd1628.webp","branco-di-cani-mutati":"img/arene-wasteland-pericoli-branco-di-cani-mutati.442fabfc39.webp","scorpione-gigante":"img/arene-wasteland-pericoli-scorpione-gigante.2dd8911367.webp","verme-delle-sabbie":"img/arene-wasteland-pericoli-verme-delle-sabbie.a0d445beeb.webp"}},"zombie":{"luoghi":{"centro-commerciale":"img/arene-zombie-luoghi-centro-commerciale.333f4699d5.webp","metropolitana":"img/arene-zombie-luoghi-metropolitana.878a263605.webp","periferia":"img/arene-zombie-luoghi-periferia.e28a7d70c7.webp","scuola":"img/arene-zombie-luoghi-scuola.153ddbaa75.webp","stazione-di-polizia":"img/arene-zombie-luoghi-stazione-di-polizia.157f7a17f5.webp"},"pericoli":{"cane-infetto":"img/arene-zombie-pericoli-cane-infetto.fdff913d6f.webp","gigante-mutato":"img/arene-zombie-pericoli-gigante-mutato.91fad36b70.webp","infetto-corridore":"img/arene-zombie-pericoli-infetto-corridore.61f48faafd.webp","orda-di-zombi":"img/arene-zombie-pericoli-orda-di-zombi.e0fc6d1b56.webp"}}}};
 ;
-window.LOS_BUILD = "b794e23aada3da97e46b0948b4340ce44da6ca1390bd294c8a3cf745c2a15e8b";
+window.LOS_BUILD = "2baf8417a9fb632dedbd3895032c014cf255b9fa8b2de6fac78ba973c0dbbf21";
 ;
 /* Last One Standing — grafica vettoriale: logo, icone delle arene, illustrazioni.
  * Tutto è SVG generato in codice: nessuna immagine esterna. */
@@ -11136,7 +11842,7 @@ window.LOS_BUILD = "b794e23aada3da97e46b0948b4340ce44da6ca1390bd294c8a3cf745c2a1
     const from = opts.from != null ? opts.from : parseFloat(el.textContent) || 0;
     if (reduced || from === to) { el.textContent = to; return; }
     const dur = opts.dur || 900, t0 = performance.now();
-    const step = (now) => { if (reduced) { el.textContent = to; return; } const k = Math.min(1, (now - t0) / dur), e = 1 - Math.pow(1 - k, 3); el.textContent = Math.round(from + (to - from) * e); if (k < 1) requestAnimationFrame(step); };
+    const step = (now) => { if (reduced) { el.textContent = to; return; } const k = Math.max(0, Math.min(1, (now - t0) / dur)), e = 1 - Math.pow(1 - k, 3); el.textContent = Math.round(from + (to - from) * e); if (k < 1) requestAnimationFrame(step); };
     requestAnimationFrame(step);
   }
   function kinetic(el, style) {
@@ -11422,6 +12128,7 @@ window.LOS_BUILD = "b794e23aada3da97e46b0948b4340ce44da6ca1390bd294c8a3cf745c2a1
     for(const c of map.closures)if(!zone(c.zone)||c.reason!==undefined&&!['tempesta','finale'].includes(c.reason)||!add(c,'close'))return false;
     for(const [ph,p] of phases.entries()){
       if(p.affectedZones!==undefined&&(!Array.isArray(p.affectedZones)||!p.affectedZones.every(zone)))return false;
+      if(p.worldIncident!==undefined&&(!record(p.worldIncident)||p.kind!=='dis'||typeof p.contentId!=='string'||!integer(p.worldIncident.scene)||p.worldIncident.scene>=30||!Array.isArray(p.worldIncident.exposed)||!p.worldIncident.exposed.every(id=>ids.has(id))||!p.worldIncident.exposed.length||new Set(p.worldIncident.exposed).size!==p.worldIncident.exposed.length||p.affectedZones?.length!==1))return false;
       for(const e of p.events){
         if(!e.place){if(!e.note)return false;continue;}
         const l=e.place;
@@ -11433,6 +12140,8 @@ window.LOS_BUILD = "b794e23aada3da97e46b0948b4340ce44da6ca1390bd294c8a3cf745c2a1
     const positions={...map.start},dead=new Set(),closed=new Set();let last=-1;
     for(const [ph,list] of entries.entries()){
       const ordinary=new Map();
+      const incident=phases[ph].worldIncident;
+      if(incident&&incident.exposed.some(id=>dead.has(id)||positions[id]!==phases[ph].affectedZones[0]))return false;
       for(const entry of list.sort((a,b)=>a.seq-b.seq)){
         if(entry.seq<=last)return false;last=entry.seq;
         if(entry.kind==='close'){if(closed.has(entry.zone))return false;closed.add(entry.zone);}
@@ -13386,7 +14095,7 @@ window.LOS_BUILD = "b794e23aada3da97e46b0948b4340ce44da6ca1390bd294c8a3cf745c2a1
       '<div><h5>Da tenere d\'occhio</h5><div class="chips">' + [lb.hp, lb.en, lb.mo, lb.food].map((x) => '<span class="chip dim">' + esc(x) + '</span>').join('') + (m ? '<span class="chip st">' + esc(m.name) + '</span>' : '') + '</div></div></div></div></section>' : '';
     const arms = t.lex.arma.slice(0, 10).map((x) => '<li class="arm">' + ATL.pic(t.id, 'armi', x, t.hue) + '<span>' + esc(capFirst(stripArt(x))) + '</span></li>').join('');
     const beasts = t.lex.mostro.map((x, i) => '<article class="wanted" style="--r:' + ((i % 2 ? 1 : -1) * (1 + i % 3)) + 'deg">' + ATL.pic(t.id, 'pericoli', x, t.hue) + '<div class="wd-body"><span class="wd-tag">' + (t.soft ? 'Attenzione' : 'Pericolo') + '</span><h4>' + esc(capFirst(stripArt(x))) + '</h4></div></article>').join('');
-    return chHead('Il campo di gioco', plural(Z.length, 'zona', 'zone') + ' collegate da passaggi. Gli spostamenti consumano energia e gli incontri richiedono la presenza nello stesso luogo. Le zone ricche aiutano a trovare cibo; di notte il riparo e i compagni presenti favoriscono il recupero.') +
+    return chHead('Il campo di gioco', plural(Z.length, 'zona', 'zone') + ' collegate da passaggi. Gli spostamenti consumano energia e gli incontri richiedono la presenza nello stesso luogo. Le zone ricche aiutano a trovare cibo; di notte il riparo e i compagni presenti favoriscono il recupero. Gli imprevisti locali coinvolgono chi è sul posto e possono riemergere nei dialoghi delle fasi successive.') +
       '<div class="zboard">' + zones + '</div>' + plaque +
       '<div class="dx-split"><section class="arsenal"><div class="ch-sub"><h4>' + (t.soft ? 'Armi improprie' : 'Armeria') + '</h4><p>' + (t.soft ? 'Con queste si fanno fuori i rivali, senza versare sangue.' : 'Si raccolgono in giro, si rubano agli altri o arrivano dagli sponsor.') + '</p></div><ul class="rack">' + arms + '</ul></section>' +
       '<section class="bestiary"><div class="ch-sub"><h4>' + (t.soft ? 'Da evitare' : 'Pericoli') + '</h4><p>' + (t.soft ? 'Girano per i corridoi: chi resta da solo rischia di finire nei guai.' : 'Di notte attaccano chi dorme da solo, soprattutto nelle zone pericolose.') + '</p></div><div class="wanted-grid">' + beasts + '</div></section></div>';

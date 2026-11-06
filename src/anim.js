@@ -119,7 +119,7 @@
     const from = opts.from != null ? opts.from : parseFloat(el.textContent) || 0;
     if (reduced || from === to) { el.textContent = to; return; }
     const dur = opts.dur || 900, t0 = performance.now();
-    const step = (now) => { if (reduced) { el.textContent = to; return; } const k = Math.min(1, (now - t0) / dur), e = 1 - Math.pow(1 - k, 3); el.textContent = Math.round(from + (to - from) * e); if (k < 1) requestAnimationFrame(step); };
+    const step = (now) => { if (reduced) { el.textContent = to; return; } const k = Math.max(0, Math.min(1, (now - t0) / dur)), e = 1 - Math.pow(1 - k, 3); el.textContent = Math.round(from + (to - from) * e); if (k < 1) requestAnimationFrame(step); };
     requestAnimationFrame(step);
   }
   function kinetic(el, style) {

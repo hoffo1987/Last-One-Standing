@@ -77,8 +77,49 @@
     zombie:[['la Cornucopia','la Piazza']],royale:[['la Cornucopia',"l'Aeroporto"]],horror:[['la Cornucopia','il Salone']],
     wasteland:[['la Cornucopia','il Deposito'],['nel Bosco','tra i ruderi della Città fantasma'],['in un bosco','tra i ruderi della Città fantasma'],['nel sottobosco','tra i rottami della Discarica']],
   };
+  const sharedCorrections=[
+      ['{A} si mimetizza così bene che un altro concorrente [A:gli/le] si siede accanto senza vederl[A:o/a]. {A} ne approfitta per sfilargli il kit medico dalla tasca.','{A} cerca senza richiamare attenzione fra gli oggetti abbandonati e recupera {med}.'],
+      ['{A} cerca di mimetizzarsi in un cespuglio. Il cespuglio era occupato da un altro concorrente. Imbarazzo, poi fuga.','{A} tenta di nascondere i propri movimenti, ma il materiale fruscia troppo e deve interrompere la ricerca.'],
+      ['{A} sgattaiola tra i corpi e ruba un kit medico senza che nessuno se ne accorga.','{A} si infila tra le casse e recupera {med} senza richiamare attenzione.'],
+      ['{A} prova a rubare un kit medico, ma pesta un piede a qualcuno e deve fuggire a mani vuote.','{A} tenta di raggiungere una cassetta incustodita, ma scivola, si ferisce contro uno spigolo e deve rinunciare.'],
+      ['{A} si infila nel rifugio di un rivale addormentato e ne esce con {arma}.','{A} apre in silenzio un vecchio involto incustodito e trova {arma}.'],
+      ['{A} si infila nel rifugio di un rivale, inciampa in una pentola e fugge sotto una pioggia di sassi.','{A} tenta di controllare un vecchio involto, ma urta un fermo metallico, si ferisce e deve fermarsi.'],
+      ['Di notte {A} entra in un accampamento nemico e ne esce con le provviste.','Di notte {A} controlla il materiale rimasto in un accampamento abbandonato e recupera {cibo}.'],
+      ['Di notte {A} entra in un accampamento nemico, pesta una mano e deve scappare inseguit[A:o/a].','Di notte {A} controlla un accampamento abbandonato, ma inciampa in un ostacolo, si ferisce e rinuncia alla ricerca.'],
+      ['{A} abbandona {B} nel sonno portandosi via tutto.','{A} rompe il patto con {B} mentre {B} dorme.'],
+      ["dentro c'è {cibo}",'all’interno trova {cibo}'],
+  ];
   function adaptText(text,theme){
     let out=text;
+    for(const [from,to] of sharedCorrections)out=out.replace(from,to);
+    if(theme.id==='scifi')out=out.replace('Un fulmine cade a un metro da','Una scarica elettrica colpisce un pannello accanto a').replace('Un fulmine cade su','Una scarica elettrica colpisce').replace('dorme sul terreno umido','dorme su un pannello bagnato').replace('vicino al fuoco','accanto a una bocchetta tiepida').replace('accanto al fuoco','accanto a una bocchetta tiepida').replace('prima ancora che si aprano le capsule','appena esce dalla capsula');
+    if(theme.soft)out=out.replace('vicino al fuoco',theme.id==='liceo'?'accanto a un tavolo di studio':'accanto a un tavolo della pausa');
+    if(theme.id==='liceo')for(const [from,to] of [
+      ['Da oggi non verrà mai più interrogat[A:o/a] a sorpresa.','Avrà un riferimento in più per prepararsi agli imprevisti.'],
+      ['sul bus del ritorno','in un angolo tranquillo della scuola'],
+      ["si contendono l'ultimo posto in pullman per la gita","si contendono l'ultima prenotazione per la gita"],
+      ['Lo sciopero dei bus','Il controllo dei ritardi'],
+      ['I bus scioperano proprio il giorno della verifica.','La scuola verifica le giustificazioni dei ritardi dovuti allo sciopero.'],
+      ['arriva con due ore di ritardo e viene bocciat[A:o/a]','non riesce a giustificare il ritardo e viene esclus[A:o/a] dai giochi'],
+      ['arriva in ritardo e prende una nota','non chiarisce il ritardo e prende una nota'],
+      ['arriva a piedi con largo anticipo','presenta una giustificazione valida'],
+      ['resta a casa troppi giorni e viene esclus[A:o/a] dai giochi','non riesce a recuperare le verifiche perse e viene esclus[A:o/a] dai giochi'],
+      ['La gita disastrosa','La gita annullata'],
+      ['La gita finisce con il pullman in panne in autostrada.','La gita viene annullata: a scuola cominciano le contestazioni sui rimborsi.'],
+      ["si perde all'autogrill e non torna più in classe",'rifiuta ogni chiarimento sulle quote e viene esclus[A:o/a] dai giochi'],
+      ['dorme sul pullman e si sveglia con la faccia disegnata','perde la calma durante la discussione sui rimborsi'],
+      ['trova un passaggio con i genitori di un amico','chiarisce la propria quota e supera la contestazione'],
+    ])out=out.replace(from,to);
+    if(theme.id==='ufficio')for(const [from,to] of [
+      ['Lo smart working forzato','La prova di collegamento'],
+      ['Tutti a casa per un mese, con controlli a sorpresa via webcam.','L’azienda impone una prova di collegamento in video dalle postazioni di lavoro.'],
+      ['viene sorpres[A:o/a] in pigiama durante una call con il cliente','ignora le regole della call con il cliente e viene licenziat[A:o/a]'],
+      ['lavora meglio da casa che in ufficio','gestisce il collegamento senza imprevisti'],
+      ['lavora da casa per tutta la settimana','limita i contatti e porta avanti il proprio lavoro'],
+      ['resta a casa troppo a lungo e il suo posto viene assegnato a un altro','non recupera gli incarichi persi e il suo posto viene assegnato a un altro'],
+      ['resta a casa troppo a lungo e viene sostituit[A:o/a]','non recupera gli incarichi persi e viene sostituit[A:o/a]'],
+      ['Il Direttore invita tutti a cena: a fine serata, consegna delle buste.','Il Direttore impone un controllo aziendale e ne comunica gli esiti in buste chiuse.'],
+    ])out=out.replace(from,to);
     if(theme.id==='fantasy')out=out.replace('Il pubblico la scarica tre milioni di volte.','I bardi del reame la ricantano in ogni taverna.').replace('logo dello sponsor principale','sigillo del mecenate del reame').replace('pecore sono mutanti','pecore sono stregate').replace('Il programma di cucina viene rinnovato per tre stagioni.','I cantastorie chiedono altre tre esibizioni.').replace('Gli ascolti fanno il record della stagione.','I bardi ne parleranno per il resto della stagione.');
     const editorial=theme.id==='fantasy'?[["Il blackout delle telecamere","Il silenzio delle sfere"],['niente telecamere sui dettagli, niente limiti','le sfere divinatorie vengono oscurate, e non ci sono limiti'],['un nuovo regista','un nuovo cerimoniere'],['di regia','del cerimoniere'],['i droni','i corvi messaggeri']]:theme.id==='scifi'?[['Pioggia di detriti','Sciame di detriti'],['La pioggia di bulloni','La raffica di bulloni'],['La pioggia di coriandoli','Lo sciame di coriandoli'],['La pioggia di sangue','Gli ugelli scarlatti'],["Una pioggia di sangue animale cade sull'arena",'Gli ugelli di manutenzione spruzzano sangue animale nei moduli']]:[];
     for(const [from,to] of editorial.concat(variants[theme.id]||[])){
@@ -162,6 +203,8 @@
     const coordinated=text.match(/^\{([A-F])\}[^.!?]{0,140}(?:e si dilegua|e si defila|e scappa via|poi si allontana|poi se ne va)/iu);
     const depart=[...new Set(direct.concat(coordinated?[coordinated[1].charCodeAt(0)-65]:[]))];
     if (explicit && (explicit.at!=null||explicit.travel!=null)) return { at:explicit.at??null, travel:explicit.travel??null,needs,scatter,depart };
+    const classroom=zones.find(z=>strip(z.name)==='Aule');
+    if(!found.length&&classroom&&/\b(?:risponde a un['’]interrogazione|prende un\w* \w+ all['’]interrogazione|durante (?:la|una) verifica)\b/iu.test(text))return {at:classroom.id,travel:null,needs,scatter,depart};
     if (!found.length) return { at:null, travel:null,needs,scatter,depart };
     const last = found[found.length-1];
     const prefix = text.slice(Math.max(0,last.index-100),last.index);
@@ -188,7 +231,7 @@
   function preparePools(pools, theme, zones) {
     const key=JSON.stringify(zones.map(z=>[z.name,z.features]));
     const cached=poolCache.get(pools);if(cached?.key===key)return cached.out;
-    const out = { ...pools, lex:{...pools.lex,luogo:zones.map(z=>z.name),med:[theme.soft?'un aiuto per riprendersi':theme.id==='fantasy'?'una pozione curativa':'un kit medico'],trap:theme.lex.trappola} };
+    const out = { ...pools, lex:{...pools.lex,luogo:zones.map(z=>z.name),med:pools.world?pools.lex.med:[theme.soft?'un aiuto per riprendersi':theme.id==='fantasy'?'una pozione curativa':'un kit medico'],trap:pools.world?pools.lex.trap:theme.lex.trappola} };
     for (const [k,v] of Object.entries(pools)) if (Array.isArray(v) && k !== 'disasters') out[k]=v.map(e=>prepare(e,theme,zones));
     out.disasters=pools.disasters.map(d=>({...d,n:adaptText(d.n,theme),intro:adaptText(d.intro,theme),out:d.out.map(e=>prepare(e,theme,zones))}));
     poolCache.set(pools,{key,out});return out;

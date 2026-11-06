@@ -4,8 +4,8 @@ Simulatore di battle royale, tutto in italiano. Crei il cast, scegli una delle 9
 
 ## Cosa contiene
 - **9 scenari**: Arena Classica, Reame Incantato, Stazione Orbitale, Città degli Infetti, Isola Battle Royale, Villa Maledetta, Terre Desolate, più Liceo Spietato e Ufficio Open Space (senza morti: si viene eliminati o licenziati).
-- **2248 modelli di evento e 529 disastri**, più **122 eventi e 31 disastri 18+** (oltre 1600 esiti di disastro in tutto): ogni arena con tema "con morti" ha oltre 800 eventi e 74-85 disastri, Liceo e Ufficio oltre 400 eventi e 58 disastri. Accordo di genere automatico (lui / lei / neutro con ə) e preposizioni articolate corrette.
-- **Voci dei concorrenti**: oltre 220 battute (ultime parole, frasi dopo un'uccisione, vendette, tradimenti, dichiarazioni, ringraziamenti, provocazioni) scelte secondo tratto, arena e situazione, più oltre 70 conversazioni notturne tra alleati, coppie, rivali e sconosciuti. Nella stessa partita una frase non si ripete finché ce ne sono altre.
+- **13048 modelli di evento e 3229 disastri**, più **122 eventi e 31 disastri 18+** (9780 esiti di disastro complessivi). L'espansione aggiunge in ogni arena 300 eventi ordinari, 300 eventi di tratto, 300 prove con due esiti, 300 eliminazioni e 300 disastri locali, oltre ai repertori precedenti. I cataloghi sono composti da situazioni e strutture narrative riutilizzabili: non sono 13048 scene indipendenti scritte a mano. Accordo di genere automatico (lui / lei / neutro con ə) e preposizioni articolate corrette.
+- **Voci dei concorrenti**: ai repertori precedenti si aggiungono **300 conversazioni a due battute e 300 reazioni brevi per arena**, legate al luogo, al rapporto e alla situazione. Un debito o una difficoltà vengono nominati soltanto quando esistono; gli imprevisti recenti vengono ricordati soltanto da chi era presente. Nella stessa partita una frase non si ripete finché ce ne sono altre compatibili.
 - **83 condizioni meteo** (11 nell'Arena Classica, 9 nelle altre arene) che cambiano la giornata.
 - **Concorrenti** con 10 caratteristiche (forza, agilità, intelligenza, carisma, fortuna, resistenza, furtività, coraggio, empatia, sopravvivenza), fino a 3 dei 30 tratti, squadra e foto.
 - **Motore**: alleanze e tradimenti, oggetti (armi, cibo, medicine, trappole), stati (ferito, avvelenato, malato, affamato), pericolo crescente con i giorni, festino, disastri e scontro finale.
@@ -49,6 +49,7 @@ Le scelte degli eventi tengono conto di tutto questo: chi è ferito evita gli sc
 
 ## Oggetti
 Tredici tipi di oggetto, con nomi diversi in ogni arena: armi, protezioni, cure, cibo, attrezzi, mappe, trappole, esplosivi, veleni, portafortuna, alcol, merce di scambio e ricordi di casa. Nell'Arena c'è la guida completa (sezione "Gli oggetti e a cosa servono").
+L'espansione aggiunge **300 oggetti per arena**, distribuiti in dieci delle famiglie esistenti. Sono combinazioni di modelli, materiali e formati: usano gli effetti, la qualità, l'usura e la provenienza già registrati dal motore, senza attribuire poteri impliciti ai nomi.
 - **Ogni oggetto ha una storia**: lo zaino nella scheda mostra cosa fa, la qualità (★), l'usura, e da dove viene ("Portato da casa", "Rubato a Marco · G3", "Preso a Lapo", "Dono degli sponsor", "Scambiato con Irene"…).
 - **Usura**: le armi si consumano a ogni colpo e si rompono; le protezioni riducono i danni e a volte parano un colpo mortale, poi si spaccano.
 - **Costruire**: chi è ingegnoso intinge l'arma nel veleno (poi avvelena a ogni colpo), unisce trappola ed esplosivo, ripara le armi con un attrezzo, si costruisce trappole.

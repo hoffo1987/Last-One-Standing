@@ -121,6 +121,7 @@
     for(const c of map.closures)if(!zone(c.zone)||c.reason!==undefined&&!['tempesta','finale'].includes(c.reason)||!add(c,'close'))return false;
     for(const [ph,p] of phases.entries()){
       if(p.affectedZones!==undefined&&(!Array.isArray(p.affectedZones)||!p.affectedZones.every(zone)))return false;
+      if(p.worldIncident!==undefined&&(!record(p.worldIncident)||p.kind!=='dis'||typeof p.contentId!=='string'||!integer(p.worldIncident.scene)||p.worldIncident.scene>=30||!Array.isArray(p.worldIncident.exposed)||!p.worldIncident.exposed.every(id=>ids.has(id))||!p.worldIncident.exposed.length||new Set(p.worldIncident.exposed).size!==p.worldIncident.exposed.length||p.affectedZones?.length!==1))return false;
       for(const e of p.events){
         if(!e.place){if(!e.note)return false;continue;}
         const l=e.place;
@@ -132,6 +133,8 @@
     const positions={...map.start},dead=new Set(),closed=new Set();let last=-1;
     for(const [ph,list] of entries.entries()){
       const ordinary=new Map();
+      const incident=phases[ph].worldIncident;
+      if(incident&&incident.exposed.some(id=>dead.has(id)||positions[id]!==phases[ph].affectedZones[0]))return false;
       for(const entry of list.sort((a,b)=>a.seq-b.seq)){
         if(entry.seq<=last)return false;last=entry.seq;
         if(entry.kind==='close'){if(closed.has(entry.zone))return false;closed.add(entry.zone);}

@@ -17,6 +17,12 @@ D.themes.forEach((t) => {
   if (more.extra) Object.keys(more.extra).forEach((k) => add(t.id + '.more.' + k, more.extra[k], t.id));
 });
 const disLines = [];
+// Include anche i repertori modulari realmente collegati al motore.
+D.themes.forEach(theme=>{
+  const world=D.world?.compile(theme);if(!world)return;
+  for(const category of ['events','traits','trials','deaths'])for(const row of world[category])add(row.id,row.raw,theme.id);
+  for(const incident of world.disasters)add(incident.id,incident.out,theme.id);
+});
 (D.packs || []).forEach((pk, i) => {
   const th = typeof pk.theme === 'string' ? (pk.theme === '*' || pk.theme === 'tutte' ? 'classico' : pk.theme) : pk.theme[0];
   if (pk.ev) Object.keys(pk.ev).forEach((k) => add('pack' + i + '(' + pk.theme + (pk.adult ? ',18+' : '') + ').' + k, pk.ev[k], th));
