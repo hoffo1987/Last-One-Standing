@@ -284,3 +284,6 @@ Sono stati completati questi interventi:
 3. **Esperimenti controllati.** Nel laboratorio, scegli concorrente, caratteristica, valore basso, valore alto e 5–200 coppie. In ogni coppia cambia soltanto quel valore: cast, tratti, squadre, regole, eventi e legami sono identici, con lo stesso seme nei due rami. Il resoconto mostra vittorie appaiate, differenze di frequenza, posizione media ed eliminazioni. Si possono interrompere i calcoli; contano soltanto le coppie complete. Il JSON contiene configurazione, versione e semi per riprodurre il campione. L'effetto si riferisce al modello e al campione scelti, senza una stima di incertezza statistica o garanzie per la partita successiva.
 
 La [guida a registro, sistemi ed esperimenti](docs-dev/simulazione.md) descrive i limiti delle misure e il protocollo di verifica.
+
+## Memoria persistente dell’arena
+I fatti vissuti restano nel registro della partita, compresi i finali e le conseguenze sintetizzate nel diario. Le esperienze locali influenzano percorsi, ripari e prudenza; i rapporti mantengono riferimenti agli incontri precedenti. La mappa mostra la memoria della zona o dell’intera arena fino alla fase consultata, e i contesti degli eventi possono richiamare fatti realmente condivisi. Gli incidenti non vengono dimenticati dopo otto fasi. [Regole e verifiche](docs-dev/memoria-arena.md).

@@ -95,6 +95,16 @@
         const ok = Object.entries(x).every(([k, v]) => (!['html', 'deathHtml', 'h', 'th'].includes(k) || typeof v !== 'string' || safeHtml(v, ids)) && plainData(v, depth + 1));
         seen.delete(x); return ok;
       }
+      if(result.chronicle!==undefined){
+        const c=result.chronicle;
+        if(!result.spatial||!record(c)||c.version!==1||!Array.isArray(c.facts)||c.facts.length>200000)return false;
+        let lastPh=-1;
+        for(const [i,f] of c.facts.entries()){
+          if(!record(f)||f.id!==i||!phase(f.ph)||f.ph<lastPh||f.day!==result.phases[f.ph].day||!integer(f.seq)||!integer(f.zone)||!result.spatial.zones[f.zone]||!refs(f.actors)||!f.actors.length||new Set(f.actors).size!==f.actors.length||!refs(f.deaths)||f.deaths.some(id=>!f.actors.includes(id))||!categories.has(f.category)||typeof f.plain!=='string'||typeof f.visible!=='boolean'||!Array.isArray(f.parents)||f.parents.some(id=>!integer(id)||id>=i||!c.facts[id].actors.some(a=>f.actors.includes(a))))return false;
+          lastPh=f.ph;
+        }
+        for(const [ph,p]of result.phases.entries())for(const e of p.events)if(e.memoryId!==undefined){const f=c.facts[e.memoryId];if(!f||f.ph!==ph||f.seq!==e.place?.seq||f.zone!==e.place.zone||f.plain!==e.plain||JSON.stringify(e.memoryRefs||[])!==JSON.stringify(f.parents))return false;}
+      }
       return plainData(result, 0) && (result.spatial === undefined || validSpatial(result,ids));
     } catch (e) { return false; }
   }

@@ -139,7 +139,48 @@
     return { snapshot };
   }
 
-  const api = { eventVariety, createMemory, createVitals, createInventory, createSnapshots, createItemLedger };
+  function createWorldMemory(){
+    const facts=[],personal=new Map(),local=new Map(),shared=new Map();
+    const key=(id,zone)=>JSON.stringify([id,zone]);
+    const pair=(a,b)=>JSON.stringify([a,b].sort());
+    function risk(id,zone){
+      return Math.min(3,local.get(key(id,zone))||0);
+    }
+    function previous(actors,zone){
+      const candidates=new Map();
+      for(let i=0;i<actors.length;i++)for(let j=i+1;j<actors.length;j++){const f=shared.get(pair(actors[i],actors[j]));if(f)candidates.set(f.id,{f,score:6+(f.zone===zone?2:0)+(f.deaths.length?2:0)+f.id/1000000});}
+      for(const id of actors)for(const f of (personal.get(id)||[]).slice(-40)){
+        const common=f.actors.filter(x=>actors.includes(x)).length;
+        if(common>=2||f.zone===zone&&(f.deaths.length||f.category==='hurt'||f.category==='heal'))candidates.set(f.id,{f,score:common*3+(f.zone===zone?2:0)+(f.deaths.length?2:0)+f.id/1000000});
+      }
+      return [...candidates.values()].sort((a,b)=>b.score-a.score).slice(0,2).map(x=>x.f);
+    }
+    function record(event,ph,day,visible=true){
+      if(event.note||!event.place||event.place.zone==null||!event.ids?.length)return null;
+      // Un attore nominato come fonte remota non diventa un testimone locale.
+      const actors=[...new Set(event.ids.filter(id=>event.place.positions[id]===event.place.zone))];
+      if(!actors.length)return null;
+      const parents=previous(actors,event.place.zone).map(f=>f.id);
+      const fact={id:facts.length,ph,day,seq:event.place.seq,zone:event.place.zone,actors,category:event.cat||'none',plain:event.plain,deaths:(event.deaths||[]).slice(),parents,visible};
+      facts.push(fact);
+      for(let i=0;i<actors.length;i++)for(let j=i+1;j<actors.length;j++)shared.set(pair(actors[i],actors[j]),fact);
+      for(const id of actors){if(!personal.has(id))personal.set(id,[]);personal.get(id).push(fact);const k=key(id,fact.zone);local.set(k,(local.get(k)||0)+(fact.deaths.length?1.2:fact.category==='hurt'?0.5:0));}
+      event.memoryId=fact.id;
+      if(parents.length)event.memoryRefs=parents;
+      return fact;
+    }
+    function weight(event,person){
+      const danger=risk(person.id,person.zone);if(!danger)return 1;
+      const cautious=(person.traits||[]).some(t=>['codardo','stratega','paranoico','sopravvissuto'].includes(t));
+      if(cautious&&(event.lethal||event.tags?.includes('agg')))return 1/(1+danger*0.3);
+      if(event.tags?.some(t=>['heal','cow','food'].includes(t)))return 1+danger*0.15;
+      return 1;
+    }
+    function describe(refs,zones){return refs.map(f=>'Giorno '+f.day+', '+zones[f.zone].name+': '+f.plain).join(' ');}
+    return {data:{version:1,facts},risk,previous,record,weight,describe};
+  }
+
+  const api = { createWorldMemory, eventVariety, createMemory, createVitals, createInventory, createSnapshots, createItemLedger };
   G.LOS_SYSTEMS = api;
   if (typeof module === 'object' && module.exports) module.exports = api;
 })(typeof window === 'object' ? window : globalThis);

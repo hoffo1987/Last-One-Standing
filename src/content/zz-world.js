@@ -196,7 +196,7 @@
     out.counts.scenes=scenes.length;cache.set(theme.id,out);return out;
   }
   function follows(scene,zone,people,history){
-    return (history||[]).slice(-8).some(p=>p.worldIncident?.scene===scene&&p.affectedZones?.includes(zone)&&people.every(t=>t.zone===zone&&p.worldIncident.exposed.includes(t.id)));
+    return (history||[]).some(p=>p.worldIncident?.scene===scene&&p.affectedZones?.includes(zone)&&people.every(t=>t.zone===zone&&p.worldIncident.exposed.includes(t.id)));
   }
   function dialogues(catalog,zone,kind,a,b,history){
     return (catalog?.dialogues||[]).filter(x=>x.zone===zone&&x.kind===kind&&(!x.need||x.need==='debt'&&a.owes?.[b.id]||x.need==='hurt'&&(b.hp<55||Object.keys(b.st||{}).some(k=>['ferito','malato','avvelenato'].includes(k)))||x.need==='aftermath'&&follows(x.afterScene,zone,[a,b],history)));

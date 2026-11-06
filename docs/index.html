@@ -8152,7 +8152,7 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
     out.counts.scenes=scenes.length;cache.set(theme.id,out);return out;
   }
   function follows(scene,zone,people,history){
-    return (history||[]).slice(-8).some(p=>p.worldIncident?.scene===scene&&p.affectedZones?.includes(zone)&&people.every(t=>t.zone===zone&&p.worldIncident.exposed.includes(t.id)));
+    return (history||[]).some(p=>p.worldIncident?.scene===scene&&p.affectedZones?.includes(zone)&&people.every(t=>t.zone===zone&&p.worldIncident.exposed.includes(t.id)));
   }
   function dialogues(catalog,zone,kind,a,b,history){
     return (catalog?.dialogues||[]).filter(x=>x.zone===zone&&x.kind===kind&&(!x.need||x.need==='debt'&&a.owes?.[b.id]||x.need==='hurt'&&(b.hp<55||Object.keys(b.st||{}).some(k=>['ferito','malato','avvelenato'].includes(k)))||x.need==='aftermath'&&follows(x.afterScene,zone,[a,b],history)));
@@ -8303,7 +8303,48 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
     return { snapshot };
   }
 
-  const api = { eventVariety, createMemory, createVitals, createInventory, createSnapshots, createItemLedger };
+  function createWorldMemory(){
+    const facts=[],personal=new Map(),local=new Map(),shared=new Map();
+    const key=(id,zone)=>JSON.stringify([id,zone]);
+    const pair=(a,b)=>JSON.stringify([a,b].sort());
+    function risk(id,zone){
+      return Math.min(3,local.get(key(id,zone))||0);
+    }
+    function previous(actors,zone){
+      const candidates=new Map();
+      for(let i=0;i<actors.length;i++)for(let j=i+1;j<actors.length;j++){const f=shared.get(pair(actors[i],actors[j]));if(f)candidates.set(f.id,{f,score:6+(f.zone===zone?2:0)+(f.deaths.length?2:0)+f.id/1000000});}
+      for(const id of actors)for(const f of (personal.get(id)||[]).slice(-40)){
+        const common=f.actors.filter(x=>actors.includes(x)).length;
+        if(common>=2||f.zone===zone&&(f.deaths.length||f.category==='hurt'||f.category==='heal'))candidates.set(f.id,{f,score:common*3+(f.zone===zone?2:0)+(f.deaths.length?2:0)+f.id/1000000});
+      }
+      return [...candidates.values()].sort((a,b)=>b.score-a.score).slice(0,2).map(x=>x.f);
+    }
+    function record(event,ph,day,visible=true){
+      if(event.note||!event.place||event.place.zone==null||!event.ids?.length)return null;
+      // Un attore nominato come fonte remota non diventa un testimone locale.
+      const actors=[...new Set(event.ids.filter(id=>event.place.positions[id]===event.place.zone))];
+      if(!actors.length)return null;
+      const parents=previous(actors,event.place.zone).map(f=>f.id);
+      const fact={id:facts.length,ph,day,seq:event.place.seq,zone:event.place.zone,actors,category:event.cat||'none',plain:event.plain,deaths:(event.deaths||[]).slice(),parents,visible};
+      facts.push(fact);
+      for(let i=0;i<actors.length;i++)for(let j=i+1;j<actors.length;j++)shared.set(pair(actors[i],actors[j]),fact);
+      for(const id of actors){if(!personal.has(id))personal.set(id,[]);personal.get(id).push(fact);const k=key(id,fact.zone);local.set(k,(local.get(k)||0)+(fact.deaths.length?1.2:fact.category==='hurt'?0.5:0));}
+      event.memoryId=fact.id;
+      if(parents.length)event.memoryRefs=parents;
+      return fact;
+    }
+    function weight(event,person){
+      const danger=risk(person.id,person.zone);if(!danger)return 1;
+      const cautious=(person.traits||[]).some(t=>['codardo','stratega','paranoico','sopravvissuto'].includes(t));
+      if(cautious&&(event.lethal||event.tags?.includes('agg')))return 1/(1+danger*0.3);
+      if(event.tags?.some(t=>['heal','cow','food'].includes(t)))return 1+danger*0.15;
+      return 1;
+    }
+    function describe(refs,zones){return refs.map(f=>'Giorno '+f.day+', '+zones[f.zone].name+': '+f.plain).join(' ');}
+    return {data:{version:1,facts},risk,previous,record,weight,describe};
+  }
+
+  const api = { createWorldMemory, eventVariety, createMemory, createVitals, createInventory, createSnapshots, createItemLedger };
   G.LOS_SYSTEMS = api;
   if (typeof module === 'object' && module.exports) module.exports = api;
 })(typeof window === 'object' ? window : globalThis);
@@ -9044,6 +9085,7 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
     const originalPools = buildPools(baseTheme, cfg.custom, adult, mapEnabled && cfg.worldVersion !== 0);
     const pools = mapEnabled ? Geography.preparePools(originalPools, theme, geographyZones) : originalPools;
     const variety = Systems.eventVariety();
+    const worldMemory = mapEnabled ? Systems.createWorldMemory() : null;
     const LEX = pools.lex;
     const E = Object.assign({}, D.echo || {}, theme.soft ? D.echoSoft || {} : {});
     const diff = Object.prototype.hasOwnProperty.call(DIFF, cfg.difficulty) ? DIFF[cfg.difficulty] : 1;
@@ -9301,7 +9343,7 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
         traitor: T.some((t) => t.alive && t.traitor && t !== P), feared: T.some((t) => t.alive && t.kills >= 3 && t !== P) });
     }
     function weightFor(ev, P) {
-      let w = ev.w;
+      let w = ev.w * (worldMemory ? worldMemory.weight(ev,P) : 1);
       for (const tag of ev.tags) {
         for (const id of P.traits) { const m = traitMap[id].m[tag]; if (m != null) w *= m; }
         if (tag === 'soc') w *= 0.6 + P.attr.car / 12;
@@ -10392,14 +10434,15 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
         const allies=allyMates(t,true).concat(t.partner&&aliveId(t.partner)?[byId[t.partner]]:[]);
         if (night && allies.length && !hasTrait(t,'solitario')) {
           const party=[...new Map([t,...allies].map(x=>[x.id,x])).values()];
-          const meeting=Geography.camp(geographyZones,party.map(x=>positions[x.id]),closed);
+          const remembered=geographyZones.map(z=>({...z,danger:z.danger+party.reduce((sum,p)=>sum+worldMemory.risk(p.id,z.id),0)/party.length}));
+          const meeting=Geography.camp(remembered,party.map(x=>positions[x.id]),closed);
           if(meeting!=null){destination=meeting;reason='Raggiunge il riparo scelto per ricongiungersi al gruppo';}
         } else if (target && ['vendetta','caccia','proteggere','cotta','tradire'].includes(g.k)) {
           destination=positions[target.id]; tg=target.id;
           if(['proteggere','cotta'].includes(g.k)&&target.goal?.tg===t.id&&['proteggere','cotta'].includes(target.goal.k))destination=positions[t.ix<target.ix?t.id:target.id];
           reason={vendetta:'Segue le tracce del bersaglio della vendetta',caccia:'Cerca il proprio bersaglio',proteggere:'Cerca la persona che vuole proteggere',cotta:'Cerca una persona a cui tiene',tradire:'Cerca un compagno dell’alleanza'}[g.k];
         } else if (['cibo','curarsi','nascondersi'].includes(g.k)) {
-          const scores=reachable.map(z=>({z:z.id,score:(g.k==='cibo'?z.resources:z.shelter-z.danger*0.45)-(Geography.path(geographyZones,t.zone,z.id,closed).length-1)*0.12+rng.f()*0.15})).sort((a,b)=>b.score-a.score||a.z-b.z);
+          const scores=reachable.map(z=>({z:z.id,score:(g.k==='cibo'?z.resources:z.shelter-z.danger*0.45)-worldMemory.risk(t.id,z.id)*0.35-(Geography.path(geographyZones,t.zone,z.id,closed).length-1)*0.12+rng.f()*0.15})).sort((a,b)=>b.score-a.score||a.z-b.z);
           destination=scores[0]?.z??t.zone; reason=g.k==='cibo'?'Cerca una zona con più provviste':'Cerca un luogo più riparato';
         } else if (allies.length && rng.chance(0.65)) {
           const leader=[t,...allies].sort((a,b)=>(hasTrait(b,'leader')?1:0)-(hasTrait(a,'leader')?1:0)||a.ix-b.ix)[0];
@@ -10413,6 +10456,7 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
           const safe=reachable.filter(z=>z.id!==scary.zone).sort((a,b)=>(b.shelter-b.danger*0.4)-(a.shelter-a.danger*0.4)||a.id-b.id);
           if (safe.length) { destination=safe[0].id; reason='Evita una persona che teme'; tg=null; }
         }
+        if(worldMemory.risk(t.id,t.zone)>0&&destination!==t.zone&&!tg)reason+='; tiene conto dei pericoli vissuti in questa zona';
         geo.move(t,destination,reason,{target:tg});
       }
     }
@@ -11048,6 +11092,13 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
       }
       if (kind === 'd' || kind === 'dis' || kind === 'f') diaryNight(0.35);
       if(geo)events.sort((a,b)=>(a.place?.seq??-1)-(b.place?.seq??-1));
+      if(worldMemory){
+        const visible=new Set(events),all=[...new Set([...events,...valid.map(([x])=>x.ev)])].sort((a,b)=>(a.place?.seq??-1)-(b.place?.seq??-1));
+        for(const event of all){
+          const fact=worldMemory.record(event,phases.length,day,visible.has(event));
+          if(fact&&fact.parents.length)event.reason=(event.reason?event.reason+' ':'')+'Fatti precedenti ricordati: '+worldMemory.describe(fact.parents.map(id=>worldMemory.data.facts[id]),geographyZones);
+        }
+      }
       const died = before - alive().length;
       noDeathStreak = died ? 0 : noDeathStreak + 1;
       phases.push(Object.assign({ kind, day, title, intro, events, snap: snapshot(), meteo: W.n ? { n: W.n, d: W.d } : null }, opt || {}));
@@ -11233,7 +11284,8 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
       return ['amore', 'amicizia', 'nemesi', 'tradimento', 'pieta', 'nonCorrisposto', 'mentore', 'odio', 'paura'].map((k) => best[k]).filter(Boolean);
     }
     stats.stories = bondStories();
-    return Object.assign({ version: 2, theme: theme.id, adult, seed, days: day, phases, itemFacts: itemLedger.facts, tributes: stripped, winners: winners.map((t) => t.id), stats },geo?{spatial:geo.data}:{});
+    if(worldMemory)for(const [ph,p] of phases.entries())for(const event of p.events)if(event.memoryId==null&&!event.note&&ph>=(worldMemory.data.facts.at(-1)?.ph??0))worldMemory.record(event,ph,p.day);
+    return Object.assign({ version: 2, theme: theme.id, adult, seed, days: day, phases, itemFacts: itemLedger.facts, tributes: stripped, winners: winners.map((t) => t.id), stats },geo?{spatial:geo.data,chronicle:worldMemory.data}:{});
   }
 
   /* ---------------- Cast casuale ---------------- */
@@ -11298,7 +11350,7 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
 </script>
 <script>window.LOS_ASSETS = {"logo":"img/logo.f2d5175789.webp","icona":"img/icona.8b02ddeb49.webp","favicon":"img/favicon.86774dc7cf.png","panoramica":"img/panoramica.66c4c27255.webp","sagome":["img/sagome-cappuccio.e8876ba986.webp","img/sagome-esploratore.9a99fd13f8.webp","img/sagome-viaggiatore.5e36435604.webp"],"arene":{"classico":"img/arene-classico.42c6ba42ee.webp","fantasy":"img/arene-fantasy.75b7fb0d32.webp","horror":"img/arene-horror.48052d80b4.webp","liceo":"img/arene-liceo.05ed578a90.webp","royale":"img/arene-royale.36c9952cd7.webp","scifi":"img/arene-scifi.403694f00f.webp","ufficio":"img/arene-ufficio.67b271bea3.webp","wasteland":"img/arene-wasteland.889002ace8.webp","zombie":"img/arene-zombie.36c9135a12.webp"},"atlas":{"classico":{"luoghi":{"altopiano":"img/arene-classico-luoghi-altopiano.36a37512d3.webp","bosco":"img/arene-classico-luoghi-bosco.2e9163544b.webp","cornucopia":"img/arene-classico-luoghi-cornucopia.393b2dabe1.webp","fiume":"img/arene-classico-luoghi-fiume.22b335a914.webp","paludi":"img/arene-classico-luoghi-paludi.77cf115eb4.webp","rovine":"img/arene-classico-luoghi-rovine.9ea4f70ca9.webp"},"pericoli":{"branco-di-lupi-mutanti":"img/arene-classico-pericoli-branco-di-lupi-mutanti.d786a62875.webp","orso-affamato":"img/arene-classico-pericoli-orso-affamato.e4f38a9892.webp","sciame-di-vespe-velenose":"img/arene-classico-pericoli-sciame-di-vespe-velenose.5adb2c7b8d.webp","serpente-gigante":"img/arene-classico-pericoli-serpente-gigante.b17e7f3d91.webp"}},"fantasy":{"luoghi":{"foresta-elfica":"img/arene-fantasy-luoghi-foresta-elfica.0448fcfbd3.webp","lago-nebbioso":"img/arene-fantasy-luoghi-lago-nebbioso.f19abc7c81.webp","miniere":"img/arene-fantasy-luoghi-miniere.5baa916ec9.webp","palude-stregata":"img/arene-fantasy-luoghi-palude-stregata.6a0b2af4a7.webp","picco-del-drago":"img/arene-fantasy-luoghi-picco-del-drago.06bdfd84b1.webp","torre-in-rovina":"img/arene-fantasy-luoghi-torre-in-rovina.ac716863c7.webp"},"pericoli":{"branco-di-lupi-mannari":"img/arene-fantasy-pericoli-branco-di-lupi-mannari.1c9124ceee.webp","spettro-errante":"img/arene-fantasy-pericoli-spettro-errante.056074bc23.webp","troll-di-caverna":"img/arene-fantasy-pericoli-troll-di-caverna.31aa2444f0.webp","viverna":"img/arene-fantasy-pericoli-viverna.577b91a819.webp"}},"horror":{"luoghi":{"biblioteca":"img/arene-horror-luoghi-biblioteca.00d6ab97f4.webp","cappella":"img/arene-horror-luoghi-cappella.a51e505028.webp","cimitero":"img/arene-horror-luoghi-cimitero.7a441de089.webp","serra":"img/arene-horror-luoghi-serra.b3d91121d4.webp","soffitta":"img/arene-horror-luoghi-soffitta.466d40cea3.webp"},"pericoli":{"bambola-posseduta":"img/arene-horror-pericoli-bambola-posseduta.7064eef1d7.webp","entita-senza-volto":"img/arene-horror-pericoli-entita-senza-volto.2c28467bdd.webp","spettro-urlante":"img/arene-horror-pericoli-spettro-urlante.25fa554e05.webp","stormo-di-corvi":"img/arene-horror-pericoli-stormo-di-corvi.fe5c85d7ae.webp"}},"liceo":{"luoghi":{"aula-magna":"img/arene-liceo-luoghi-aula-magna.0478e35c5c.webp","biblioteca":"img/arene-liceo-luoghi-biblioteca.1ae806ae58.webp","cortile":"img/arene-liceo-luoghi-cortile.51bf433337.webp","laboratorio-di-chimica":"img/arene-liceo-luoghi-laboratorio-di-chimica.eba1434683.webp","mensa":"img/arene-liceo-luoghi-mensa.67bcbc7e37.webp","palestra":"img/arene-liceo-luoghi-palestra.8ecb872849.webp"},"pericoli":{"bidello-di-turno":"img/arene-liceo-pericoli-bidello-di-turno.191c43a8bd.webp","ispezione-a-sorpresa":"img/arene-liceo-pericoli-ispezione-a-sorpresa.bef087d9b9.webp","preside":"img/arene-liceo-pericoli-preside.033f6c9aae.webp","professoressa-di-matematica":"img/arene-liceo-pericoli-professoressa-di-matematica.6cb65c6a3f.webp"}},"royale":{"luoghi":{"aeroporto":"img/arene-royale-luoghi-aeroporto.81e8ce98d4.webp","base-militare":"img/arene-royale-luoghi-base-militare.67f3a7de9d.webp","centrale-elettrica":"img/arene-royale-luoghi-centrale-elettrica.05ee57458a.webp","fattoria":"img/arene-royale-luoghi-fattoria.7c780dda87.webp","foresta":"img/arene-royale-luoghi-foresta.03b47644d0.webp","villaggio-costiero":"img/arene-royale-luoghi-villaggio-costiero.568519eb7c.webp"},"pericoli":{"cane-da-guardia-addestrato":"img/arene-royale-pericoli-cane-da-guardia-addestrato.c7853a67a0.webp","drone-armato":"img/arene-royale-pericoli-drone-armato.30d0b73e01.webp","elicottero-da-caccia":"img/arene-royale-pericoli-elicottero-da-caccia.8c68e62346.webp"}},"scifi":{"luoghi":{"hangar":"img/arene-scifi-luoghi-hangar.6de551833b.webp","moduli-abitativi":"img/arene-scifi-luoghi-moduli-abitativi.9f5bb96d39.webp","ponte-di-comando":"img/arene-scifi-luoghi-ponte-di-comando.3e9ffd005a.webp","reattore":"img/arene-scifi-luoghi-reattore.d10a335006.webp","serra-idroponica":"img/arene-scifi-luoghi-serra-idroponica.b6f4407853.webp"},"pericoli":{"androide-da-combattimento":"img/arene-scifi-pericoli-androide-da-combattimento.1a3d3eb38e.webp","creatura-aliena-dai-tentacoli":"img/arene-scifi-pericoli-creatura-aliena-dai-tentacoli.b6b314ddd9.webp","drone-di-sicurezza-impazzito":"img/arene-scifi-pericoli-drone-di-sicurezza-impazzito.c8a9c6f9e3.webp","sciame-di-nanobot":"img/arene-scifi-pericoli-sciame-di-nanobot.d43296f047.webp"}},"ufficio":{"luoghi":{"cucina":"img/arene-ufficio-luoghi-cucina.d968f8861d.webp","open-space":"img/arene-ufficio-luoghi-open-space.b6b7990c99.webp","parcheggio":"img/arene-ufficio-luoghi-parcheggio.d593f2ed83.webp","sala-stampanti":"img/arene-ufficio-luoghi-sala-stampanti.1727f50082.webp","ufficio-del-direttore":"img/arene-ufficio-luoghi-ufficio-del-direttore.bb3b6cabab.webp"},"pericoli":{"consulente-esterno":"img/arene-ufficio-pericoli-consulente-esterno.ce6e200c3f.webp","direttore-generale":"img/arene-ufficio-pericoli-direttore-generale.da2eb1f708.webp","riorganizzazione-aziendale":"img/arene-ufficio-pericoli-riorganizzazione-aziendale.1fd57b76b3.webp","ufficio-risorse-umane":"img/arene-ufficio-pericoli-ufficio-risorse-umane.8392df7518.webp"}},"wasteland":{"luoghi":{"autostrada-spezzata":"img/arene-wasteland-luoghi-autostrada-spezzata.19a72a0b97.webp","citta-fantasma":"img/arene-wasteland-luoghi-citta-fantasma.fe22bb72b2.webp","cratere":"img/arene-wasteland-luoghi-cratere.04de7ca40a.webp","diga":"img/arene-wasteland-luoghi-diga.3be9abe15a.webp","discarica":"img/arene-wasteland-luoghi-discarica.b8783ad9c6.webp","raffineria":"img/arene-wasteland-luoghi-raffineria.081e2d2ad6.webp"},"pericoli":{"banda-di-predoni":"img/arene-wasteland-pericoli-banda-di-predoni.1dfcfd1628.webp","branco-di-cani-mutati":"img/arene-wasteland-pericoli-branco-di-cani-mutati.442fabfc39.webp","scorpione-gigante":"img/arene-wasteland-pericoli-scorpione-gigante.2dd8911367.webp","verme-delle-sabbie":"img/arene-wasteland-pericoli-verme-delle-sabbie.a0d445beeb.webp"}},"zombie":{"luoghi":{"centro-commerciale":"img/arene-zombie-luoghi-centro-commerciale.333f4699d5.webp","metropolitana":"img/arene-zombie-luoghi-metropolitana.878a263605.webp","periferia":"img/arene-zombie-luoghi-periferia.e28a7d70c7.webp","scuola":"img/arene-zombie-luoghi-scuola.153ddbaa75.webp","stazione-di-polizia":"img/arene-zombie-luoghi-stazione-di-polizia.157f7a17f5.webp"},"pericoli":{"cane-infetto":"img/arene-zombie-pericoli-cane-infetto.fdff913d6f.webp","gigante-mutato":"img/arene-zombie-pericoli-gigante-mutato.91fad36b70.webp","infetto-corridore":"img/arene-zombie-pericoli-infetto-corridore.61f48faafd.webp","orda-di-zombi":"img/arene-zombie-pericoli-orda-di-zombi.e0fc6d1b56.webp"}}}};
 ;
-window.LOS_BUILD = "6aeef3aaf6549d0ef6c3dc1621f732a8682793952b121b2a7e58ad62550643f9";
+window.LOS_BUILD = "135a0a4dbaf26e14b94f4bcba092d8639e5ddb1fb15fd46e41411b07dbc7719e";
 ;
 /* Last One Standing — grafica vettoriale: logo, icone delle arene, illustrazioni.
  * Tutto è SVG generato in codice: nessuna immagine esterna. */
@@ -12105,6 +12157,16 @@ window.LOS_BUILD = "6aeef3aaf6549d0ef6c3dc1621f732a8682793952b121b2a7e58ad625506
         const ok = Object.entries(x).every(([k, v]) => (!['html', 'deathHtml', 'h', 'th'].includes(k) || typeof v !== 'string' || safeHtml(v, ids)) && plainData(v, depth + 1));
         seen.delete(x); return ok;
       }
+      if(result.chronicle!==undefined){
+        const c=result.chronicle;
+        if(!result.spatial||!record(c)||c.version!==1||!Array.isArray(c.facts)||c.facts.length>200000)return false;
+        let lastPh=-1;
+        for(const [i,f] of c.facts.entries()){
+          if(!record(f)||f.id!==i||!phase(f.ph)||f.ph<lastPh||f.day!==result.phases[f.ph].day||!integer(f.seq)||!integer(f.zone)||!result.spatial.zones[f.zone]||!refs(f.actors)||!f.actors.length||new Set(f.actors).size!==f.actors.length||!refs(f.deaths)||f.deaths.some(id=>!f.actors.includes(id))||!categories.has(f.category)||typeof f.plain!=='string'||typeof f.visible!=='boolean'||!Array.isArray(f.parents)||f.parents.some(id=>!integer(id)||id>=i||!c.facts[id].actors.some(a=>f.actors.includes(a))))return false;
+          lastPh=f.ph;
+        }
+        for(const [ph,p]of result.phases.entries())for(const e of p.events)if(e.memoryId!==undefined){const f=c.facts[e.memoryId];if(!f||f.ph!==ph||f.seq!==e.place?.seq||f.zone!==e.place.zone||f.plain!==e.plain||JSON.stringify(e.memoryRefs||[])!==JSON.stringify(f.parents))return false;}
+      }
       return plainData(result, 0) && (result.spatial === undefined || validSpatial(result,ids));
     } catch (e) { return false; }
   }
@@ -12426,7 +12488,9 @@ window.LOS_BUILD = "6aeef3aaf6549d0ef6c3dc1621f732a8682793952b121b2a7e58ad625506
       return '<article class="zone'+(closed.has(z.id)?' closed':'')+(fallen.length?' hot':'')+'"><h4><button type="button" data-map-zone="'+z.id+'">'+(z.id+1)+'. '+esc(bare(z.name))+'</button></h4><p class="help">'+esc(z.description)+'</p><p class="map-properties">Risorse '+level(z.resources)+' · Pericolo '+level(z.danger).replace('alte','alto').replace('medie','medio').replace('basse','basso')+' · Riparo '+level(z.shelter,'shelter')+'</p>'+(closed.has(z.id)?'<p class="ztag">'+(closureReason(z.id)==='finale'?'Accesso chiuso per lo scontro finale':'Zona chiusa dalla tempesta')+'</p>':'')+(affected?'<p class="ztag">Area del disastro in questa fase</p>':'')+'<div class="dots">'+here.map(id=>options.avatar?options.avatar(by[id]):person(id)).join('')+'</div><p class="help">'+(here.length?here.map(id=>esc(name(id))).join(', '):'Nessun concorrente presente a fine fase.')+'</p>'+(fallen.length?'<p class="map-fallen">'+(theme.soft?'Usciti dai giochi qui':'Morti qui')+': '+fallen.map(d=>person(d.id)).join(', ')+'</p>':'')+(tz.length?'<details><summary>'+tz.length+' '+(theme.soft?(tz.length===1?'tranello':'tranelli'):(tz.length===1?'trappola':'trappole'))+(tz.length===1?(theme.soft?' ancora attivo':' ancora attiva'):' ancora attivi')+'</summary><ul>'+tz.map(t=>'<li>'+esc(t.name)+' · '+person(t.owner)+'</li>').join('')+'</ul></details>':'')+(lz?'<p class="help">Bottino rimasto: '+lz.count+' '+(lz.count===1?'oggetto':'oggetti')+'.</p>':'')+(spatial?'<p class="map-links">Passaggi: '+z.links.map(id=>'<button type="button" data-map-zone="'+id+'">'+esc(bare(zones[id].name))+(closed.has(id)?' (chiuso)':'')+'</button>').join(' · ')+'</p>':'')+(events.length?'<details><summary>'+events.length+' '+(events.length===1?'fatto avvenuto qui':'fatti avvenuti qui')+'</summary><ol class="map-events">'+events.sort((a,b)=>a.e.place.seq-b.e.place.seq).map(({e,index})=>'<li><button type="button" data-map-event="'+index+'">'+esc(e.plain)+'</button></li>').join('')+'</ol></details>':'')+'</article>';
     }).join('');
     const journeys=moves.filter(m=>selected==null||m.path.includes(selected));
-    return '<div class="map-view"><p class="map-caption"><b>Posizioni a fine fase '+(phaseIndex+1)+'</b><br>'+ (spatial?'I fatti e i percorsi sotto raccontano anche i passaggi precedenti della stessa fase. Le linee indicano i collegamenti, non distanze in metri.':'Replay storico: sono disponibili le posizioni salvate a fine fase. Percorsi e luoghi dei singoli eventi non erano registrati.')+'</p>'+(spatial?graph(zones,closed,zones.map(z=>present(z.id).length),selected):'')+(selected!=null?'<button class="btn sm" type="button" data-map-zone="all">Mostra tutte le zone</button>':'')+'<div class="map">'+cards+'</div>'+(spatial?'<details class="map-journeys"'+(journeys.length<9?' open':'')+'><summary>Spostamenti della fase'+(selected!=null?' in questa zona':'')+' · '+journeys.length+'</summary>'+(journeys.length?'<ol>'+journeys.sort((a,b)=>a.seq-b.seq).map(m=>'<li>'+person(m.id)+'<span class="map-route">'+m.path.map(z=>esc(bare(zones[z].name))).join(' → ')+'</span><span class="help">'+esc(m.reason)+' · Energia −'+m.cost.toLocaleString('it-IT')+'</span></li>').join('')+'</ol>':'<p class="help">Nessun cambio di zona registrato in questa fase.</p>')+'</details>':'')+'</div>';
+    const remembered=(result.chronicle?.facts||[]).filter(f=>f.ph<=phaseIndex&&(selected==null||f.zone===selected));
+    const history=remembered.length?'<details class="map-memory"><summary>Memoria '+(selected==null?'dell’arena':'del luogo')+' · '+remembered.length+' fatti</summary><ol>'+remembered.map(f=>'<li><b>G'+f.day+' · Fase '+(f.ph+1)+' · '+esc(bare(zones[f.zone].name))+'</b><p>'+esc(f.plain)+'</p></li>').join('')+'</ol></details>':'';
+    return '<div class="map-view"><p class="map-caption"><b>Posizioni a fine fase '+(phaseIndex+1)+'</b><br>'+ (spatial?'I fatti e i percorsi sotto raccontano anche i passaggi precedenti della stessa fase. Le linee indicano i collegamenti, non distanze in metri.':'Replay storico: sono disponibili le posizioni salvate a fine fase. Percorsi e luoghi dei singoli eventi non erano registrati.')+'</p>'+(spatial?graph(zones,closed,zones.map(z=>present(z.id).length),selected):'')+(selected!=null?'<button class="btn sm" type="button" data-map-zone="all">Mostra tutte le zone</button>':'')+'<div class="map">'+cards+'</div>'+history+(spatial?'<details class="map-journeys"'+(journeys.length<9?' open':'')+'><summary>Spostamenti della fase'+(selected!=null?' in questa zona':'')+' · '+journeys.length+'</summary>'+(journeys.length?'<ol>'+journeys.sort((a,b)=>a.seq-b.seq).map(m=>'<li>'+person(m.id)+'<span class="map-route">'+m.path.map(z=>esc(bare(zones[z].name))).join(' → ')+'</span><span class="help">'+esc(m.reason)+' · Energia −'+m.cost.toLocaleString('it-IT')+'</span></li>').join('')+'</ol>':'<p class="help">Nessun cambio di zona registrato in questa fase.</p>')+'</details>':'')+'</div>';
   }
   G.LOS_MAP_VIEW={render,graph};if(typeof module==='object'&&module.exports)module.exports=G.LOS_MAP_VIEW;
 })(typeof window!=='undefined'?window:globalThis);

@@ -442,6 +442,7 @@
     const originalPools = buildPools(baseTheme, cfg.custom, adult, mapEnabled && cfg.worldVersion !== 0);
     const pools = mapEnabled ? Geography.preparePools(originalPools, theme, geographyZones) : originalPools;
     const variety = Systems.eventVariety();
+    const worldMemory = mapEnabled ? Systems.createWorldMemory() : null;
     const LEX = pools.lex;
     const E = Object.assign({}, D.echo || {}, theme.soft ? D.echoSoft || {} : {});
     const diff = Object.prototype.hasOwnProperty.call(DIFF, cfg.difficulty) ? DIFF[cfg.difficulty] : 1;
@@ -699,7 +700,7 @@
         traitor: T.some((t) => t.alive && t.traitor && t !== P), feared: T.some((t) => t.alive && t.kills >= 3 && t !== P) });
     }
     function weightFor(ev, P) {
-      let w = ev.w;
+      let w = ev.w * (worldMemory ? worldMemory.weight(ev,P) : 1);
       for (const tag of ev.tags) {
         for (const id of P.traits) { const m = traitMap[id].m[tag]; if (m != null) w *= m; }
         if (tag === 'soc') w *= 0.6 + P.attr.car / 12;
@@ -1790,14 +1791,15 @@
         const allies=allyMates(t,true).concat(t.partner&&aliveId(t.partner)?[byId[t.partner]]:[]);
         if (night && allies.length && !hasTrait(t,'solitario')) {
           const party=[...new Map([t,...allies].map(x=>[x.id,x])).values()];
-          const meeting=Geography.camp(geographyZones,party.map(x=>positions[x.id]),closed);
+          const remembered=geographyZones.map(z=>({...z,danger:z.danger+party.reduce((sum,p)=>sum+worldMemory.risk(p.id,z.id),0)/party.length}));
+          const meeting=Geography.camp(remembered,party.map(x=>positions[x.id]),closed);
           if(meeting!=null){destination=meeting;reason='Raggiunge il riparo scelto per ricongiungersi al gruppo';}
         } else if (target && ['vendetta','caccia','proteggere','cotta','tradire'].includes(g.k)) {
           destination=positions[target.id]; tg=target.id;
           if(['proteggere','cotta'].includes(g.k)&&target.goal?.tg===t.id&&['proteggere','cotta'].includes(target.goal.k))destination=positions[t.ix<target.ix?t.id:target.id];
           reason={vendetta:'Segue le tracce del bersaglio della vendetta',caccia:'Cerca il proprio bersaglio',proteggere:'Cerca la persona che vuole proteggere',cotta:'Cerca una persona a cui tiene',tradire:'Cerca un compagno dell’alleanza'}[g.k];
         } else if (['cibo','curarsi','nascondersi'].includes(g.k)) {
-          const scores=reachable.map(z=>({z:z.id,score:(g.k==='cibo'?z.resources:z.shelter-z.danger*0.45)-(Geography.path(geographyZones,t.zone,z.id,closed).length-1)*0.12+rng.f()*0.15})).sort((a,b)=>b.score-a.score||a.z-b.z);
+          const scores=reachable.map(z=>({z:z.id,score:(g.k==='cibo'?z.resources:z.shelter-z.danger*0.45)-worldMemory.risk(t.id,z.id)*0.35-(Geography.path(geographyZones,t.zone,z.id,closed).length-1)*0.12+rng.f()*0.15})).sort((a,b)=>b.score-a.score||a.z-b.z);
           destination=scores[0]?.z??t.zone; reason=g.k==='cibo'?'Cerca una zona con più provviste':'Cerca un luogo più riparato';
         } else if (allies.length && rng.chance(0.65)) {
           const leader=[t,...allies].sort((a,b)=>(hasTrait(b,'leader')?1:0)-(hasTrait(a,'leader')?1:0)||a.ix-b.ix)[0];
@@ -1811,6 +1813,7 @@
           const safe=reachable.filter(z=>z.id!==scary.zone).sort((a,b)=>(b.shelter-b.danger*0.4)-(a.shelter-a.danger*0.4)||a.id-b.id);
           if (safe.length) { destination=safe[0].id; reason='Evita una persona che teme'; tg=null; }
         }
+        if(worldMemory.risk(t.id,t.zone)>0&&destination!==t.zone&&!tg)reason+='; tiene conto dei pericoli vissuti in questa zona';
         geo.move(t,destination,reason,{target:tg});
       }
     }
@@ -2446,6 +2449,13 @@
       }
       if (kind === 'd' || kind === 'dis' || kind === 'f') diaryNight(0.35);
       if(geo)events.sort((a,b)=>(a.place?.seq??-1)-(b.place?.seq??-1));
+      if(worldMemory){
+        const visible=new Set(events),all=[...new Set([...events,...valid.map(([x])=>x.ev)])].sort((a,b)=>(a.place?.seq??-1)-(b.place?.seq??-1));
+        for(const event of all){
+          const fact=worldMemory.record(event,phases.length,day,visible.has(event));
+          if(fact&&fact.parents.length)event.reason=(event.reason?event.reason+' ':'')+'Fatti precedenti ricordati: '+worldMemory.describe(fact.parents.map(id=>worldMemory.data.facts[id]),geographyZones);
+        }
+      }
       const died = before - alive().length;
       noDeathStreak = died ? 0 : noDeathStreak + 1;
       phases.push(Object.assign({ kind, day, title, intro, events, snap: snapshot(), meteo: W.n ? { n: W.n, d: W.d } : null }, opt || {}));
@@ -2631,7 +2641,8 @@
       return ['amore', 'amicizia', 'nemesi', 'tradimento', 'pieta', 'nonCorrisposto', 'mentore', 'odio', 'paura'].map((k) => best[k]).filter(Boolean);
     }
     stats.stories = bondStories();
-    return Object.assign({ version: 2, theme: theme.id, adult, seed, days: day, phases, itemFacts: itemLedger.facts, tributes: stripped, winners: winners.map((t) => t.id), stats },geo?{spatial:geo.data}:{});
+    if(worldMemory)for(const [ph,p] of phases.entries())for(const event of p.events)if(event.memoryId==null&&!event.note&&ph>=(worldMemory.data.facts.at(-1)?.ph??0))worldMemory.record(event,ph,p.day);
+    return Object.assign({ version: 2, theme: theme.id, adult, seed, days: day, phases, itemFacts: itemLedger.facts, tributes: stripped, winners: winners.map((t) => t.id), stats },geo?{spatial:geo.data,chronicle:worldMemory.data}:{});
   }
 
   /* ---------------- Cast casuale ---------------- */

@@ -27,7 +27,7 @@ I cataloghi vengono compilati senza casualità e conservati in cache per arena. 
 
 Un nuovo disastro è eleggibile solo in una zona aperta e occupata. Durante la sua fase vengono usati i suoi tre esiti, senza mescolarli alle scene di altri disastri. Fuori dalla zona colpita proseguono le azioni di ripiego; l'incidente non attribuisce danni o esperienze condivise a persone lontane.
 
-La fase salva `worldIncident: {scene, exposed}` insieme a `affectedZones` e `contentId`. Le persone esposte sono quelle vive e presenti all'inizio. Trenta eventi e trenta conversazioni per arena sono seguiti specifici di queste situazioni: richiedono un incidente corrispondente nelle otto fasi precedenti, presenza corrente nella stessa zona e partecipazione di tutti gli interlocutori all'incidente originale. Non basta avere lo stesso tratto o trovarsi sul posto in seguito.
+La fase salva `worldIncident: {scene, exposed}` insieme a `affectedZones` e `contentId`. Le persone esposte sono quelle vive e presenti all'inizio. Trenta eventi e trenta conversazioni per arena sono seguiti specifici di queste situazioni: richiedono un incidente corrispondente nella storia precedente della partita, presenza corrente nella stessa zona e partecipazione di tutti gli interlocutori all'incidente originale. Non basta avere lo stesso tratto o trovarsi sul posto in seguito.
 
 Cure, perdoni, debiti saldati, furti, giuramenti e discussioni fra coppie usano i requisiti e gli effetti reali. Una medicina usata su un'altra persona viene sottratta al soccorritore e registrata nel diario degli oggetti con proprietario e beneficiario distinti. Le trappole costruite vengono riposte: il testo non dichiara già piazzato un ostacolo che la simulazione non ha ancora messo sul terreno.
 

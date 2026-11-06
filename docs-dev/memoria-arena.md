@@ -1,0 +1,11 @@
+# Memoria persistente dell'arena
+
+Ogni nuova partita conserva `chronicle.version: 1` e un registro ordinato dei fatti effettivi. Ogni voce indica fase, giorno, ordine geografico, zona, partecipanti locali, testo, categoria, eliminazioni e riferimenti a fatti precedenti condivisi. Restano registrate anche le conseguenze automatiche che la diretta sintetizza nel diario. I finali entrano nello stesso registro.
+
+La memoria personale non è conoscenza globale: un personaggio accumula esperienza di pericolo solo nei fatti ai quali partecipa. Questa esperienza influenza la scelta del riparo, i percorsi verso risorse e cure e i pesi delle azioni prudenti, aggressive o di recupero. I modificatori sono limitati e non rendono inaccessibile un luogo. Gli obiettivi verso persone, le promesse e i trasferimenti forzati continuano a seguire le regole esistenti.
+
+I gruppi valutano insieme le esperienze dei propri componenti per scegliere lo stesso riparo. L'indice dei rapporti conserva l'ultimo incontro anche dopo molti altri eventi; il registro storico conserva tutti i fatti. Gli eventi possono riportare nel proprio contesto gli antecedenti realmente condivisi: sono riferimenti storici, non dichiarazioni che ogni coincidenza abbia causato l'evento attuale.
+
+I richiami agli incidenti non scadono più dopo otto fasi. Restano obbligatori l'incidente corrispondente, la presenza originaria di tutti gli interlocutori e il ritrovarsi nella stessa zona. La mappa permette di aprire la memoria dell'intera arena o della zona selezionata e mostra soltanto fatti fino alla fase consultata.
+
+Il registro è opzionale nei replay versione 2. I salvataggi precedenti restano leggibili senza inventare ricordi; il percorso interno `mapVersion: 0` mantiene i confronti storici. Il validatore controlla cronologia, riferimenti, persone, zone, eliminazioni e corrispondenza fra eventi visibili e memoria. `tools/test-world-memory.js` verifica persistenza, conoscenza personale, effetti decisionali, copertura delle nove arene, determinismo e protezione dalle anticipazioni.

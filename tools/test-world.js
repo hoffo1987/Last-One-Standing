@@ -76,7 +76,7 @@ for(const theme of D.themes){
   assert.ok(D.world.dialogues(world,follow.zone,follow.kind,a,b,history).includes(follow));
   assert.equal(D.world.follows(follow.afterScene,follow.zone,[a,{...b,id:'c'}],history),false,'Nessun ricordo inventato per chi non era presente');
   assert.equal(D.world.follows(follow.afterScene+1,follow.zone,[a,b],history),false,'Nessun ricordo di un altro incidente');
-  assert.equal(D.world.follows(follow.afterScene,follow.zone,[a,b],history.concat(Array(8).fill({}))),false,'Nessun richiamo spacciato per recente oltre otto fasi');
+  assert.equal(D.world.follows(follow.afterScene,follow.zone,[a,b],history.concat(Array(8).fill({}))),true,'Il fatto vissuto resta ricordato oltre otto fasi');
   assert.equal(D.world.follows(follow.afterScene,follow.zone,[a,{...b,zone:(follow.zone+1)%zones.length}],history),false,'Nessun dialogo a distanza');
   const pools=LOS.buildPools(theme,[],false),historical=LOS.buildPools(theme,[],false,false);
   assert.equal(pools.world,world);assert.equal(historical.world,undefined);
