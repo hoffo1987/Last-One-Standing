@@ -88,6 +88,7 @@
       ['Di notte {A} entra in un accampamento nemico, pesta una mano e deve scappare inseguit[A:o/a].','Di notte {A} controlla un accampamento abbandonato, ma inciampa in un ostacolo, si ferisce e rinuncia alla ricerca.'],
       ['{A} abbandona {B} nel sonno portandosi via tutto.','{A} rompe il patto con {B} mentre {B} dorme.'],
       ["dentro c'è {cibo}",'all’interno trova {cibo}'],
+      ['prepara per settimane','prepara con cura'],
   ];
   function adaptText(text,theme){
     let out=text;
