@@ -70,11 +70,11 @@
     const order = ITM.order || [];
     return '<div class="bag">' + items.slice().sort((a, b) => order.indexOf(a.t) - order.indexOf(b.t)).map((it) => {
       const ty = (theme.soft && (ITM.typesSoft || {})[it.t]) || (ITM.types || {})[it.t] || { label: it.t, desc: '' };
-      const how = ((ITM.how || {})[it.h] || 'Trovato').replace('{1}', esc(nmOf(it.f))) + (it.d ? ' · G' + it.d : '');
+      const how = ((ITM.how || {})[it.h] || 'Trovato').replace('{1}', esc(nmOf(it.f))) + (it.d ? ' · ' + (SIM ? whenLabel(resultTheme(SIM), null, it.d) : 'giorno ' + it.d).toLowerCase() : '');
       const stars = it.q ? '<span class="stars" title="Qualità">' + '★'.repeat(it.q) + '<i>' + '★'.repeat(3 - it.q) + '</i></span>' : '';
       const uses = it.u != null && it.m ? '<span class="uses" title="Usura: ' + it.u + ' su ' + it.m + '"><b style="width:' + Math.round((it.u / it.m) * 100) + '%"></b></span>' : '';
       const tag = it.x === 'veleno' ? '<span class="itag bad">Avvelenata</span>' : it.x === 'bomba' ? '<span class="itag bad">Esplosiva</span>' : '';
-      return '<div class="bitem t-' + esc(it.t) + '"><span class="bic">' + (ITIC[it.t] || ITIC.valore) + '</span><div class="bbody"><div class="btop"><b>' + esc(it.n) + '</b>' + stars + tag + '</div>' +
+      return '<div class="bitem t-' + esc(it.t) + '"><span class="bic">' + (ITIC[it.t] || ITIC.valore) + '</span><div class="bbody"><div class="btop"><b>' + esc(capFirst(stripArt(it.n))) + '</b>' + stars + tag + '</div>' +
         '<div class="bmeta"><span class="btype">' + esc(ty.label) + '</span><span>' + how + '</span>' + uses + '</div><p>' + esc(ty.desc) + '</p></div></div>';
     }).join('') + '</div>';
   }
@@ -156,24 +156,29 @@
     const made = (t.promises || []).filter((q) => q.ph <= i);
     const got = []; SIM.tributes.forEach((x) => (x.promises || []).forEach((q) => { if (q.to === t.id && q.ph <= i) got.push([x, q]); }));
     if (!made.length && !got.length) return '';
-    const row = (who, q, dir) => { const s2 = st(q, dir ? t : who, dir ? who : t); return '<div class="prom s-' + s2.replace(' ', '') + '"><span class="pk">' + esc(K[q.k] || q.k) + '</span><span>' + (dir ? 'a ' : 'da ') + '<b>' + esc(who.name) + '</b> · G' + q.d + '</span><span class="ps2">' + s2 + '</span></div>'; };
+    const row = (who, q, dir) => { const s2 = st(q, dir ? t : who, dir ? who : t); return '<div class="prom s-' + s2.replace(' ', '') + '"><span class="pk">' + esc(K[q.k] || q.k) + '</span><span>' + (dir ? 'a ' : 'da ') + '<b>' + esc(who.name) + '</b> · ' + esc(whenLabel(resultTheme(SIM), q.ph, q.d).toLowerCase()) + '</span><span class="ps2">' + s2 + '</span></div>'; };
     return '<div><div class="sub" style="margin-bottom:8px">Promesse</div><div class="proms">' + made.map((q) => row(BY[q.to] || { name: '?' }, q, true)).join('') + got.map(([x, q]) => row(x, q, false)).join('') + '</div></div>';
   }
   function nowHTML(t, snap, i, theme) {
     const m = (snap.mind || {})[t.id]; const v = (snap.vit || {})[t.id]; const st = snap.st[t.id] || [];
-    const zone = theme.lex.luogo[snap.zones[t.id]] || '';
+    const zi = (snap.zones || {})[t.id], zone = (theme.lex && theme.lex.luogo[zi]) || '';
     const bits = [];
     if (v) { if (v[0] < 25) bits.push(theme.soft ? 'con la reputazione a pezzi' : 'ridott' + G3(t.gender, 'o', 'a', 'ə') + ' male'); else if (v[0] < 55) bits.push(statusLabel('ferito', t, theme).toLowerCase()); if (v[3] < 25) bits.push('affamat' + G3(t.gender, 'o', 'a', 'ə')); if (v[1] < 22) bits.push('sfinit' + G3(t.gender, 'o', 'a', 'ə')); if (v[2] < 22) bits.push('a pezzi'); else if (v[2] >= 80) bits.push('carichissim' + G3(t.gender, 'o', 'a', 'ə')); }
     if (st.includes('ubriaco')) bits.push(statusLabel('ubriaco', t, theme).toLowerCase());
     const allies = snap.allies[t.id] != null ? snap.alive.filter((x) => x !== t.id && snap.allies[x] === snap.allies[t.id]).length : 0;
-    const partner=snap.rel?.[t.id]?.p;
-    const nearby=snap.alive.filter(id=>id!==t.id&&snap.zones[id]===snap.zones[t.id]&&(snap.allies[t.id]!=null&&snap.allies[id]===snap.allies[t.id]||id===partner)).length;
-    const where = zone ? zone.replace(/^(il |lo |la |l'|i |gli |le )/i, (a) => a.toLowerCase()) : '';
-    const lead = (where ? 'A ' + where : 'In gara') + (bits.length ? ', ' + bits.join(', ') : '') + (allies ? ', in alleanza con ' + plural(allies, 'alleato', 'alleati') : ', senza alleati') + '.';
+    const partner = snap.rel && snap.rel[t.id] ? snap.rel[t.id].p : null;
+    const nearby = snap.alive.filter((id) => id !== t.id && snap.zones && snap.zones[id] === zi && ((snap.allies[t.id] != null && snap.allies[id] === snap.allies[t.id]) || id === partner)).length;
+    const up = (x) => x.charAt(0).toUpperCase() + x.slice(1);
+    const place = zone ? up(zone.replace(/^(il |lo |la |l'|i |gli |le )/i, '')) : '';
+    const lead = (bits.length ? up(bits.join(', ')) : 'In forma') + ', ' + (allies ? 'in alleanza con ' + plural(allies, 'alleato', 'alleati') : 'senza alleati') + '.';
+    const near = allies || partner ? (nearby ? plural(nearby, 'compagno è', 'compagni sono') + ' qui con ' + G3(t.gender, 'lui', 'lei', 'ləi') + '.' : 'Nessun compagno nella stessa zona.') : '';
     const g = m ? (MND.goals || {})[m.g] : null;
-    return '<div class="nowcard"><div class="sub">Adesso</div><p class="nowlead">' + esc(fixA(lead)) + '</p><p class="help">'+(nearby?plural(nearby,'compagno presente','compagni presenti')+' in questa zona.':'Nessun compagno presente in questa zona.')+'</p>' +
-      (m && g ? '<div class="goal' + (g.secret ? ' secret' : '') + '"><span class="glbl">Obiettivo</span><b>' + esc(goalLabel(m)) + '</b>' + (g.secret ? '<span class="gsec" title="Gli altri concorrenti non lo sanno">segreto</span>' : '') + (m.since != null && m.since < i ? '<span class="gsince">da G' + (SIM.phases[m.since] ? SIM.phases[m.since].day || 1 : 1) + '</span>' : '') + '</div>' : '') +
-      (m && m.th ? '<blockquote class="thought">' + linkify(m.th) + '</blockquote>' : '') + '</div>';
+    const pic = zone && typeof window !== 'undefined' && window.LOS_ATLAS ? window.LOS_ATLAS.pic(theme.id, 'luoghi', zone, theme.hue, { index: zi }) : '';
+    const since = m && m.since != null && m.since < i && SIM.phases[m.since] ? calOf(theme).of(SIM.phases[m.since].day || 1).replace(/^del /, 'dal ') : '';
+    return '<div class="nowcard">' +
+      '<div class="now-place">' + (pic ? '<div class="now-pic">' + pic + '</div>' : '') + '<div class="now-where"><span class="pf-kick">Adesso si trova</span><b>' + esc(place || 'In gara') + '</b><p class="nowlead">' + esc(lead) + '</p>' + (near ? '<p class="now-near">' + esc(near) + '</p>' : '') + '</div></div>' +
+      (m && g ? '<div class="goal' + (g.secret ? ' secret' : '') + '"><span class="glbl">Obiettivo</span><b>' + esc(goalLabel(m)) + '</b>' + (g.secret ? '<span class="gsec" title="Gli altri concorrenti non lo sanno">segreto</span>' : '') + (since ? '<span class="gsince">' + esc(since) + '</span>' : '') + '</div>' : '') +
+      (m && m.th ? '<blockquote class="thought"><span class="pf-kick">Cosa pensa</span>' + linkify(m.th) + '</blockquote>' : '') + '</div>';
   }
   // «a il Fiume» → «al Fiume» per i testi composti qui
   function fixA(s) { return s.replace(/^A (il|lo|la|i|gli|le|l') ?/, (m, a) => ({ il: 'Al ', lo: 'Allo ', la: 'Alla ', i: 'Ai ', gli: 'Agli ', le: 'Alle ', "l'": "All'" }[a])); }
@@ -194,7 +199,7 @@
         '<span class="back">Per ' + esc(nmOf(id)) + ': <b>' + esc(bk || 'indifferenza') + '</b></span>' +
         (mem.length ? '<ul class="pmem">' + mem.filter((m) => MM[m.k]).map((m) => '<li>«' + fill(MM[m.k] || '', [t.id, id, m.x]) + '» <span>' + esc(whenLabel(resultTheme(SIM), m.ph, SIM.phases[m.ph] ? SIM.phases[m.ph].day || 1 : 1)) + '</span></li>').join('') + '</ul>' : '') + '</div></div>';
     }).join('');
-    return '<div><div class="sub" style="margin-bottom:8px">Cosa prova per gli altri</div><div class="people">' + rows + '</div></div>';
+    return '<div><div class="sub" style="margin-bottom:6px">Cosa prova per gli altri</div><p class="help people-legend"><i class="pl-bar" aria-hidden="true"></i>La barra va dall’ostilità (rosso) all’affetto (verde); il segno mostra dove si trova adesso. Sotto, cosa prova l’altra persona in risposta.</p><div class="people">' + rows + '</div></div>';
   }
   function diaryHTML(t, i) {
     const all = (t.diary || []).filter((d) => d.ph <= i);
@@ -279,15 +284,16 @@
     return 'Restano solo ' + before + ' concorrenti: l’arena non aspetta ' + (max ? 'il limite di ' + max + ' ' + c.units : 'la fine del calendario') + ' e chiama lo scontro finale.';
   }
   // un giorno detto per esteso, per tabelle e schede («3º giorno», «finale»)
-  // la durata detta chiaramente: quanti giorni, rispetto al limite scelto
-  function durTxt(theme) { const c = calOf(theme), m = runMaxDays(); return plural(SIM.days, c.unit, c.units) + (m ? (SIM.days >= m ? ' (il limite scelto)' : ' su ' + m + ' al massimo') : ''); }
-  // lo stesso nome di fase per gli strumenti facoltativi (studio.js)
-  if (typeof window !== 'undefined') window.LOS_PHASE_NAME = (result, k) => { try { return result && result.phases[k] ? phaseInfo(result.phases, k, resultTheme(result), false).short : ''; } catch (e) { return ''; } };
   function whenLabel(theme, phaseIndex, day) {
     const P = SIM && SIM.phases; const f = P ? P.findIndex((x) => x.kind === 'finale') : -1;
     if (f >= 0 && phaseIndex != null && phaseIndex >= f) return 'Finale';
     return capW(calOf(theme).short(day || 1).toLowerCase());
   }
+  // la durata detta chiaramente: quanti giorni, rispetto al limite scelto
+  function durTxt(theme) { const c = calOf(theme), m = runMaxDays(); return plural(SIM.days, c.unit, c.units) + (m ? (SIM.days >= m ? ' (il limite scelto)' : ' su ' + m + ' al massimo') : ''); }
+  // lo stesso nome di fase per gli strumenti facoltativi (studio.js)
+  if (typeof window !== 'undefined') window.LOS_PHASE_NAME = (result, k) => { try { return result && result.phases[k] ? phaseInfo(result.phases, k, resultTheme(result), false).short : ''; } catch (e) { return ''; } };
+
   const DIFFS = [
     ['bassa', 'Bassa', 'Partite lunghe, pochi morti', 1], ['normale', 'Normale', 'L\'equilibrio classico', 2],
     ['alta', 'Alta', 'L\'arena non perdona', 3], ['massacro', 'Massacro', 'Finisce in pochi giorni', 4],
@@ -1969,34 +1975,69 @@
     const ally = snap.allies[id] != null && !dead ? snap.alive.filter((x) => x !== id && snap.allies[x] === snap.allies[id]) : [];
     const st = dead ? [] : snap.st[id] || [], inv = dead ? [] : snap.inv[id] || [];
     const winner = atRes && t.alive;
+    let tests = 0, passed = 0;
+    if (atRes) { tests = t.tests || 0; passed = t.testsPassed || 0; } else SIM.phases.slice(0, i + 1).forEach((p) => p.events.forEach((e) => { if (e.test && e.test.who === id) { tests++; if (e.test.pass) passed++; } }));
+    const tc = t.color || (typeof teamColor === 'function' ? teamColor(t.team || 1) : '');
+    const outWhen = dead ? phaseInfo(SIM.phases, t.deathPhase, theme, true).short : '', outShort = dead ? whenLabel(theme, t.deathPhase, t.deathDay) : '';
+    const status = winner ? (soft ? 'Ha vinto' : G3(t.gender, 'Vincitore', 'Vincitrice', 'Vincitorə')) : dead ? (soft ? 'Fuori dai giochi' : G3(t.gender, 'Morto', 'Morta', 'Mortə')) : 'In gara';
+    const tile = (n, l, cls) => '<div class="pf-kpi' + (cls ? ' ' + cls : '') + '"><b>' + n + '</b><span>' + esc(l) + '</span></div>';
+    const traits = t.traits.map((x) => TRAITS[x]).filter(Boolean);
+    const people = !dead ? peopleHTML(t, snap, i) : '';
+    const rel = relHTML(id, snap, dead, atRes), proms = promisesHTML(t, dead ? t.deathPhase : i, atRes);
+    const bondsN = ally.length + (((snap.rel || {})[id] || {}).top || []).length * (dead ? 0 : 1);
+    const tabs = [['now', dead ? 'Com’è finita' : 'Adesso', ''], ['bonds', 'Legami', bondsN || ''], ['story', 'Storia', hist.length || ''], ['self', 'Profilo', '']];
+    const panel = (k, html) => '<section class="pf-panel" role="tabpanel" id="pfp-' + k + '" aria-labelledby="pft-' + k + '"' + (profTab === k ? '' : ' hidden') + '>' + html + '</section>';
+    const sec = (title, body, extra) => '<section class="pf-sec"><h3>' + title + (extra ? ' <small>' + extra + '</small>' : '') + '</h3>' + body + '</section>';
+    const nowPanel = dead
+      ? '<div class="pf-death"><span class="pf-kick">' + esc((soft ? 'Uscit' + G3(t.gender, 'o', 'a', 'ə') : G3(t.gender, 'Morto', 'Morta', 'Mortə')) + ' · ' + outWhen) + '</span><p>' + linkify(t.deathHtml || '') + '</p>' +
+        (t.deathCause && causeTxt(t, theme) ? '<p class="pf-cause"><span>Causa</span> ' + esc(causeTxt(t, theme)) + '</p>' : '') +
+        ((t.killerIds || []).length ? '<div class="pf-killers"><span>Per mano di</span>' + t.killerIds.filter((k) => BY[k]).map((k) => '<button type="button" class="pf-person" data-prof="' + esc(k) + '">' + avHTML(BY[k]) + '<b>' + esc(BY[k].name) + '</b></button>').join('') + '</div>' : '') + '</div>'
+      : nowHTML(t, snap, i, theme) +
+        (snap.vit && snap.vit[id] ? sec('Condizione fisica', vitalsHTML(snap.vit[id], theme) + '<div class="chips pf-st">' + (st.length ? st.map((x) => '<span class="chip st">' + esc(statusLabel(x, t, theme)) + '</span>').join('') : '<span class="chip ok">Nessun malanno</span>') + '</div>') : '') +
+        sec('Zaino', bagHTML(inv, theme), plural(inv.length, 'oggetto', 'oggetti'));
+    const allyHTML = dead ? '' : sec('Alleanza', ally.length ? '<div class="pf-people">' + ally.map((x) => '<button type="button" class="pf-person" data-prof="' + esc(x) + '">' + avHTML(BY[x]) + '<b>' + esc(BY[x].name) + '</b></button>').join('') + '</div>' : '<p class="help">Gioca da sol' + G3(t.gender, 'o', 'a', 'ə') + ', per ora.</p>', ally.length ? plural(ally.length, 'alleato', 'alleati') + ' in gara' : '');
+    const bondsPanel = (allyHTML + rel + people + proms) || '<p class="help">Nessun legame da raccontare.</p>';
+    const storyPanel = '<div id="profHistory"></div>' + sec('Cronaca', chronHTML(hist, theme), plural(hist.length, 'evento', 'eventi')) + diaryHTML(t, dead ? t.deathPhase : i);
+    const selfPanel = sec('Tratti', traits.length ? '<div class="pf-traits-list">' + traits.map((x) => '<div class="pf-trait"><b>' + esc(x.name) + '</b><p>' + esc(x.desc || '') + '</p></div>').join('') + '</div>' : '<p class="help">Nessun tratto: conta solo sulle caratteristiche.</p>') + attrHTML(t, theme, i, atRes);
     $('#profBody').innerHTML =
-      '<div class="dh"><h2 id="h-prof">' + esc(t.name) + '</h2><button class="iconbtn" data-close type="button" aria-label="Chiudi">✕</button></div>' +
-      '<div class="db">' +
-        '<div class="profhead">' + avHTML(t, { dead }) + '<div class="ps"><span class="status-pill ' + (dead ? 'dead' : 'alive') + '">' + (winner ? (soft ? 'Ha vinto' : G3(t.gender, 'Vincitore', 'Vincitrice', 'Vincitorə')) : dead ? (soft ? 'Fuori dai giochi' : G3(t.gender, 'Morto', 'Morta', 'Mortə')) + ' · giorno ' + t.deathDay : 'In gara') + '</span>' +
-          '<span class="muted">Squadra ' + t.team + (atRes ? ' · ' + t.rank + '° posto' : '') + '</span>' +
-          '<div class="chips">' + (t.traits.length ? t.traits.map((x) => '<span class="chip" title="' + esc(TRAITS[x].desc) + '">' + esc(TRAITS[x].name) + '</span>').join('') : '<span class="chip dim">Nessun tratto</span>') + '</div></div></div>' +
-        '<div class="pstats"><div><b>' + kills + '</b><span>' + (soft ? 'eliminazioni' : 'uccisioni') + '</span></div><div><b>' + hist.length + '</b><span>eventi vissuti</span></div><div><b>' + (dead ? t.deathDay : SIM.phases[i].day || 1) + '</b><span>' + (dead ? 'giorno dell\'uscita' : 'giorni in gara') + '</span></div></div>' +
-        (dead ? '<div><div class="sub" style="margin-bottom:6px">Come è andata</div><div class="ev lethal" style="--cc:var(--c-kill);grid-template-columns:minmax(0,1fr)"><p>' + linkify(t.deathHtml) + '</p></div></div>' : '') +
-        (!dead ? nowHTML(t, snap, i, theme) : '') +
-        (!dead && snap.vit && snap.vit[id] ? '<div><div class="sub" style="margin-bottom:8px">Condizione fisica</div>' + vbars(snap.vit[id], theme, true) + '</div>' : '') +
-        (dead && t.deathCause && causeTxt(t, theme) ? '<p class="help">Causa: ' + esc(causeTxt(t, theme)) + (t.killerIds.length ? ', per mano di ' + esc(t.killerIds.map((k) => BY[k].name).join(', ')) : '') + '.</p>' : '') +
-        (!dead ? '<div class="row" style="gap:16px;align-items:flex-start">' +
-          '<div style="flex:1;min-width:140px"><div class="sub" style="margin-bottom:6px">Condizioni</div><div class="chips">' + (st.length ? st.map((s) => '<span class="chip st">' + esc(statusLabel(s, t, theme)) + '</span>').join('') : '<span class="chip dim">In forma</span>') + '</div></div>' +
-          '</div>' +
-          '<div><div class="sub" style="margin-bottom:8px">Zaino · ' + plural(inv.length, 'oggetto', 'oggetti') + '</div>' + bagHTML(inv, theme) + '</div>' +
-          '<div><div class="sub" style="margin-bottom:6px">Alleati</div><div class="row">' + (ally.length ? ally.map((x) => avHTML(BY[x], { btn: true })).join('') : '<span class="help">Nessuno, per ora.</span>') + '</div></div>' : '') +
-        relHTML(id, snap, dead, atRes) +
-        (!dead ? peopleHTML(t, snap, i) : '') +
-        promisesHTML(t, dead ? t.deathPhase : i, atRes) +
-        diaryHTML(t, dead ? t.deathPhase : i) +
-        attrHTML(t, theme, i, atRes) +
-        '<div><div class="sub" style="margin-bottom:8px">La sua storia' + (atRes ? '' : ' finora') + '</div><div class="ptl">' + (hist.length ? hist.map(({ e, p }) => '<div class="it" style="--cc:var(--c-' + (e.cat || 'none') + ')"><span>' + esc(phaseInfo(SIM.phases, SIM.phases.indexOf(p), resultTheme(SIM), true).short) + '</span><p>' + linkify(e.html) + '</p></div>').join('') : '<p class="help">Nessun evento ancora.</p>') + '</div></div>' +
+      '<div class="dh pf-dh" style="--tc:' + esc(tc) + '"><div class="pf-title">' + avHTML(t, { dead }) + '<h2 id="h-prof">' + esc(t.name) + '</h2></div><button class="iconbtn" data-close type="button" aria-label="Chiudi">✕</button>' +
+        '<div class="pf-tabs" role="tablist" aria-label="Sezioni della scheda">' + tabs.map(([k, l, n]) => '<button type="button" role="tab" id="pft-' + k + '" data-ptab="' + k + '" aria-controls="pfp-' + k + '" aria-selected="' + (profTab === k) + '" tabindex="' + (profTab === k ? 0 : -1) + '">' + esc(l) + (n ? '<span class="pf-n">' + n + '</span>' : '') + '</button>').join('') + '</div></div>' +
+      '<div class="db pf-db">' +
+        '<section class="pf-hero ' + (winner ? 's-win' : dead ? 's-dead' : 's-alive') + '" style="--tc:' + esc(tc) + '">' + avHTML(t, { dead }) +
+          '<div class="pf-id"><span class="pf-status">' + esc(status) + (dead ? ' · ' + esc(outShort.toLowerCase()) : '') + (atRes && t.rank ? ' · ' + t.rank + '° posto' : '') + '</span>' +
+            '<p class="pf-team"><i></i>Squadra ' + t.team + '</p>' +
+            '<div class="pf-tchips">' + (traits.length ? traits.map((x) => '<span class="chip" title="' + esc(x.desc || '') + '">' + esc(x.name) + '</span>').join('') : '<span class="chip dim">Nessun tratto</span>') + '</div>' +
+            '<div id="profFollow" class="pf-actions"></div></div></section>' +
+        '<div class="pf-kpis">' + tile(kills, soft ? 'eliminazioni' : 'uccisioni', kills ? 'hot' : '') + tile(hist.length, 'eventi vissuti') + (dead ? tile(esc(outShort), 'uscita', 'txt') : tile(ally.length, ally.length === 1 ? 'alleato in gara' : 'alleati in gara')) + tile(tests ? passed + '<small>/' + tests + '</small>' : '–', 'prove riuscite') + '</div>' +
+        panel('now', nowPanel) + panel('bonds', bondsPanel) + panel('story', storyPanel) + panel('self', selfPanel) +
       '</div>';
     if (typeof studio !== 'undefined' && studio) studio.renderProfile(t, i);
     if (!$('#profDlg').open) $('#profDlg').showModal();
     $('#profDlg').scrollTop = 0;
   }
-
+  // la scheda è divisa in quattro schede interne; resta aperta quella scelta l'ultima volta
+  let profTab = 'now';
+  const VIT_WORD = (x) => (x >= 80 ? 'ottima' : x >= 55 ? 'buona' : x >= 25 ? 'bassa' : 'critica');
+  function vitalsHTML(v, theme) {
+    const lb = vitLabels(theme), m = arenaOf(theme.id).meter;
+    const rows = [['hp', lb.hp, v[0]], ['en', lb.en, v[1]], ['mo', lb.mo, v[2]], ['food', lb.food, v[3]]].map(([k, n, x]) => ({ k, n, x, w: VIT_WORD(x), bad: x < 25 }));
+    if (m && v[4] >= 0) { const thr = m.thr || 60; rows.push({ k: 'pr', n: m.name, x: v[4], w: v[4] >= thr ? 'pericoloso' : v[4] >= thr * 0.6 ? 'in aumento' : 'sotto controllo', bad: v[4] >= thr, note: 'pericoloso da ' + thr }); }
+    return '<div class="pf-vit">' + rows.map((r) => '<div class="pv vbar ' + r.k + (r.bad ? ' bad' : '') + '"><div class="pv-top"><span>' + esc(r.n) + '</span><b>' + r.x + '</b><em>' + esc(r.w) + '</em></div><i><b style="width:' + r.x + '%"></b>' + (r.k === 'pr' && m ? '<u style="left:' + (m.thr || 60) + '%" title="' + esc(r.note) + '"></u>' : '') + '</i></div>').join('') + '</div>';
+  }
+  function chronHTML(hist, theme) {
+    if (!hist.length) return '<p class="help">Nessun evento ancora.</p>';
+    const groups = [];
+    hist.forEach(({ e, k }) => { const inf = phaseInfo(SIM.phases, k, theme, true); let g = groups[groups.length - 1]; if (!g || g.label !== inf.group.label) groups.push((g = { label: inf.group.label, items: [] })); g.items.push({ e, inf }); });
+    return '<ol class="pf-chron">' + groups.map((g) => '<li><span class="pf-day">' + esc(g.label) + '</span><ul>' + g.items.map(({ e, inf }) => '<li class="pf-ev" style="--cc:var(--c-' + esc(e.cat || 'none') + ')"><span class="pf-when">' + esc(inf.short) + '</span><p>' + linkify(e.html) + '</p></li>').join('') + '</ul></li>').join('') + '</ol>';
+  }
+  function setProfTab(k, focus) {
+    if (!$('#pfp-' + k)) return;
+    profTab = k;
+    $$('#profBody [role="tab"]').forEach((b) => { const on = b.dataset.ptab === k; b.setAttribute('aria-selected', on); b.tabIndex = on ? 0 : -1; if (on && focus) b.focus(); });
+    $$('#profBody .pf-panel').forEach((p) => (p.hidden = p.id !== 'pfp-' + k));
+    const dh = $('#profBody .pf-dh'), dlg = $('#profDlg'), top = $('#profBody .pf-kpis');
+    if (dh && top && dlg.scrollTop > top.offsetTop + top.offsetHeight - dh.offsetHeight) dlg.scrollTop = top.offsetTop + top.offsetHeight - dh.offsetHeight;
+  }
   function attrHTML(t, theme, i, atRes) {
     if (!t.attr) return '';
     let total = t.tests || 0, passed = t.testsPassed || 0;
@@ -2006,9 +2047,9 @@
         if (e.test && e.test.who === t.id) { total++; if (e.test.pass) passed++; }
       }));
     }
-    const tests = total ? ' · prove superate ' + passed + ' su ' + total : '';
+    const tests = total ? '<small>prove superate ' + passed + ' su ' + total + '</small>' : '';
     const key = theme ? arenaOf(theme.id).key || [] : [];
-    return '<div><div class="sub" style="margin-bottom:8px">Caratteristiche' + tests + (key.length ? ' · <span class="keymark">★</span> contano di più in quest\'arena' : '') + '</div><div class="abars">' +
+    return '<div><div class="sub" style="margin-bottom:8px">Caratteristiche' + tests + '</div>' + (key.length ? '<p class="help keylegend"><span class="keymark">★</span> Le caratteristiche con la stella contano di più in quest\'arena.</p>' : '') + '<div class="abars">' +
       D.attrs.map((a) => { const v = t.attr[a.id] != null ? t.attr[a.id] : 5; return '<div class="abar' + (key.includes(a.id) ? ' key' : '') + '" title="' + esc((D.attrDesc || {})[a.id] || '') + '"><span>' + (key.includes(a.id) ? '<span class="keymark">★</span> ' : '') + a.name + '</span><i><b style="width:' + v * 10 + '%" class="' + (v >= 8 ? 'hi' : v <= 3 ? 'lo' : '') + '"></b></i><em>' + v + '</em></div>'; }).join('') + '</div></div>';
   }
   function relHTML(id, snap, dead, atRes) {
@@ -2030,8 +2071,16 @@
 
     }
     if (!badges.length && !rows.length) return '';
-    return '<div><div class="sub" style="margin-bottom:8px">Legami e reputazione' + (atRes ? '' : ' adesso') + '</div>' + (badges.length ? '<div class="badges" style="margin-bottom:8px">' + badges.join('') + '</div>' : '') + (rows.length ? '<div class="rel">' + rows.join('') + '</div>' : '') + '</div>';
+    return '<div><div class="sub" style="margin-bottom:8px">' + (rows.length ? 'Reputazione e conti in sospeso' : 'Reputazione') + '</div>' + (badges.length ? '<div class="badges" style="margin-bottom:8px">' + badges.join('') + '</div>' : '') + (rows.length ? '<div class="rel">' + rows.join('') + '</div>' : '') + '</div>';
   }
+
+  $('#profDlg').addEventListener('click', (e) => { const b = e.target.closest('[data-ptab]'); if (b) setProfTab(b.dataset.ptab); });
+  $('#profDlg').addEventListener('keydown', (e) => {
+    const b = e.target.closest('[role="tab"]'); if (!b || !/^(ArrowLeft|ArrowRight|Home|End)$/.test(e.key)) return;
+    const all = $$('#profBody [role="tab"]'), k = all.indexOf(b); e.preventDefault();
+    const n = e.key === 'Home' ? 0 : e.key === 'End' ? all.length - 1 : (k + (e.key === 'ArrowRight' ? 1 : -1) + all.length) % all.length;
+    setProfTab(all[n].dataset.ptab, true);
+  });
 
   /* =============== ESITO =============== */
   const STORY = {
@@ -2111,7 +2160,7 @@
 
     const ranked = SIM.tributes.slice().sort((a, b) => a.rank - b.rank || b.kills - a.kills);
     const podiumT = ranked.slice(0, 3);
-    const podium = podiumT.length >= 3 ? '<div class="podium">' + [podiumT[1], podiumT[0], podiumT[2]].map((t, k) => { const p = [2, 1, 3][k]; return '<button type="button" class="pod p' + p + '" data-prof="' + esc(t.id) + '">' + avHTML(t, { dead: !t.alive }) + '<b>' + esc(t.name) + '</b><small>' + kN(t.kills) + (t.alive ? '' : ' · G' + t.deathDay) + '</small><span class="step">' + p + '</span></button>'; }).join('') + '</div>' : '';
+    const podium = podiumT.length >= 3 ? '<div class="podium">' + [podiumT[1], podiumT[0], podiumT[2]].map((t, k) => { const p = [2, 1, 3][k]; return '<button type="button" class="pod p' + p + '" data-prof="' + esc(t.id) + '">' + avHTML(t, { dead: !t.alive }) + '<b>' + esc(t.name) + '</b><small>' + kN(t.kills) + (t.alive ? '' : ' · ' + esc(whenLabel(resultTheme(SIM), t.deathPhase, t.deathDay).toLowerCase())) + '</small><span class="step">' + p + '</span></button>'; }).join('') + '</div>' : '';
 
     const awards = [];
     const maxBy = (f) => SIM.tributes.slice().sort((a, b) => f(b) - f(a) || a.rank - b.rank)[0];

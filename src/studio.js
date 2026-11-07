@@ -141,22 +141,26 @@
         return '<li><b>' + labels[f.kind] + ' · ' + esc(f.item.n) + '</b><p>' + esc(names[f.owner]) + (f.owner !== f.who ? ' → ' + esc(names[f.who]) : '') + ' · ' + esc(f.detail) + '</p>' + (changes.length ? '<p class="help">Variazioni nell’azione: ' + esc(changes.join(' · ')) + '</p>' : '') + (f.context ? '<p class="help">Evento: ' + esc(f.context) + '</p>' : '') + '</li>';
       }).join('') + '</ul>' : '';
     }
+    const followLabel = (on) => '<span aria-hidden="true">' + (on ? '★' : '☆') + '</span> ' + (on ? 'Seguito nella diretta' : 'Segui nella diretta');
     function renderProfile(t, phase) {
       const on = (S.followed || []).includes(t.id), heading = $('#h-prof'); if (!heading) return;
       const result = A.getSIM(), theme = D.themes.find((th) => th.id === result.theme), timeline = personalTimeline(result, t.id, phase);
-      const history = '<details class="personal-history"><summary>Il percorso fino a questa fase · ' + plural(timeline.length, 'tappa', 'tappe') + '</summary><p class="help">In ordine cronologico: eventi, ricordi, diario e cambiamenti tra fine fase e fine fase. Le variazioni di salute compaiono sempre; per gli altri valori mostriamo quelle di almeno 10 punti. Un oggetto può entrare e uscire nella stessa fase senza comparire nel confronto dello zaino.</p><ol class="causal-path">' + timeline.map((step) => '<li><b>' + esc(phaseName(result, step)) + '</b>' +
+      const history = '<details class="personal-history"><summary><span>Il percorso nel dettaglio</span><small>' + plural(timeline.length, 'tappa', 'tappe') + ' · spostamenti, ricordi e cambiamenti</small></summary><p class="help">In ordine cronologico, fase per fase: eventi, ricordi, diario, spostamenti e cambiamenti. La salute compare sempre; gli altri valori quando cambiano di almeno 10 punti.</p><ol class="causal-path">' + timeline.map((step) => '<li><b>' + esc(phaseName(result, step)) + '</b>' +
         (step.movements.length?'<ul class="personal-route">'+step.movements.map(m=>'<li>'+esc(m.path.map(z=>result.spatial.zones[z].name).join(' → '))+' · '+esc(m.reason)+' · Energia −'+m.cost+'</li>').join('')+'</ul>':'')+
         (step.changes.length ? '<ul class="change-list">' + step.changes.map((c) => '<li>' + esc(changeText(c, t, theme, result)) + '</li>').join('') + '</ul>' : '') +
         itemFactsHTML(step.itemFacts, result, theme) + step.events.map((e) => '<p>' + esc(e.plain) + '</p>').join('') + step.memories.map((m) => memoryHTML(t, m, theme)).filter(Boolean).map((m) => '<p class="help">Ricordo: «' + m + '»</p>').join('') + step.diary.map((page) => '<p class="diary-entry"><span class="sub">Diario</span> ' + A.linkify(page.h) + '</p>').join('') +
         '<button class="btn sm" type="button" data-personal-phase="' + step.phase + '">Rivedi la fase ' + (step.phase + 1) + '</button></li>').join('') + '</ol></details>';
-      heading.parentElement.insertAdjacentHTML('afterend', '<div class="follow-control"><button class="btn" type="button" data-follow="' + esc(t.id) + '" aria-pressed="' + on + '">' + (on ? 'Non seguire più' : 'Segui questo concorrente') + '</button></div>' + history);
+      const follow = '<button class="btn sm pf-follow" type="button" data-follow="' + esc(t.id) + '" aria-pressed="' + on + '">' + followLabel(on) + '</button>';
+      const fSlot = document.getElementById('profFollow'), hSlot = document.getElementById('profHistory');
+      if (fSlot && hSlot) { fSlot.innerHTML = follow; hSlot.innerHTML = timeline.length ? history : ''; return; }
+      heading.parentElement.insertAdjacentHTML('afterend', '<div class="follow-control">' + follow + '</div>' + history);
     }
     document.addEventListener('click', (e) => {
       const phase = e.target.closest('[data-personal-phase]'); if (phase) { revisit(+phase.dataset.personalPhase); return; }
       const b = e.target.closest('[data-follow]'); if (!b) return;
       const result = A.getSIM(); if (!result || !result.tributes.some((t) => t.id === b.dataset.follow)) return;
       const set = new Set(S.followed || []); if (set.has(b.dataset.follow)) set.delete(b.dataset.follow); else set.add(b.dataset.follow);
-      S.followed = [...set]; A.save(); const on = set.has(b.dataset.follow); b.setAttribute('aria-pressed', on); b.textContent = on ? 'Non seguire più' : 'Segui questo concorrente';
+      S.followed = [...set]; A.save(); const on = set.has(b.dataset.follow); b.setAttribute('aria-pressed', on); b.innerHTML = followLabel(on);
       if (location.hash === '#diretta') A.renderLive(true);
     });
     function renderResults() {

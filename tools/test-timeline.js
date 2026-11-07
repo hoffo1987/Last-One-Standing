@@ -20,11 +20,11 @@ test('Il riepilogo Adesso usa le stesse condizioni delle etichette, secondo aren
   const person = { id: 'a', gender: 'F' }, theme = { lex: { luogo: ['la Biblioteca'] }, soft: true };
   const snapshot = { mind: {}, vit: { a: [45, 60, 50, 80, -1] }, st: { a: ['ubriaco'] }, zones: { a: 0 }, allies: {}, alive: ['a'] };
   const soft = c.nowHTML(person, snapshot, 0, theme);
-  assert.match(soft, /in difficoltà/); assert.match(soft, /poca lucidità/); assert.doesNotMatch(soft, /ferita|ubriaca/);
+  assert.match(soft, /in difficoltà/i); assert.match(soft, /poca lucidità/); assert.doesNotMatch(soft, /ferita|ubriaca/);
   const hard = c.nowHTML(person, snapshot, 0, { ...theme, soft: false });
-  assert.match(hard, /ferita/); assert.match(hard, /ubriaca/);
+  assert.match(hard, /ferita/i); assert.match(hard, /ubriaca/);
   snapshot.vit.a[0] = 20;
-  assert.match(c.nowHTML(person, snapshot, 0, theme), /reputazione a pezzi/);
+  assert.match(c.nowHTML(person, snapshot, 0, theme), /reputazione a pezzi/i);
   assert.match(c.nowHTML(person, snapshot, 0, theme), /senza alleati/);
   assert.doesNotMatch(c.nowHTML(person, snapshot, 0, theme), /da sola/);
   snapshot.alive = ['a', 'b']; snapshot.allies = { a: 1, b: 1 };

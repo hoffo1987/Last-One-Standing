@@ -142,6 +142,11 @@ Un interruttore nella sezione Arena, attivo solo dopo la conferma dell'età, agg
   - **Durata chiara**: l'intestazione mostra «Limite: N giorni» e «Fase k di N». Lo scontro finale ha un gruppo a sé nella linea del tempo, con gli atti numerati («Scontro finale · atto 2 di 4»). Il primo atto spiega perché è iniziato: limite raggiunto, pochi superstiti prima del limite o due innamorati rimasti soli. L'esito dice «4 giorni su 10 al massimo».
   - **Linea del tempo** raggruppata per giorno (o ciclo), poi «Finale» e «Da scoprire» in modalità senza spoiler; ogni pulsante ha il nome completo della fase.
   - **Barra di lettura** sopra gli eventi: filtri per tipo con il conteggio (Eliminati, Alleanze, Amore, Aiuti, Oggetti, Colpi bassi, Altro), densità *Comoda* o *Compatta* e il pannello **Opzioni**. Da lì si può scegliere cosa mostrare negli eventi (reazioni, luogo, motivo, contesto aperto, volti), il testo grande, l'ordine (storia o prima i più gravi), solo i concorrenti seguiti, e le opzioni di riproduzione. Le preferenze restano salvate.
+  - **Scheda del concorrente**: intestazione fissa con volto, nome e quattro schede interne. In alto un riquadro nel colore della squadra (stato, squadra, tratti, «Segui nella diretta») e quattro numeri: uccisioni, eventi vissuti, alleati in gara (o fase dell'uscita), prove riuscite.
+    - *Adesso* (o *Com'è finita*): il luogo con la sua immagine, lo stato in una frase, obiettivo e pensiero; la condizione fisica con valore e giudizio («buona», «critica», soglia del pericolo dell'arena) e lo zaino.
+    - *Legami*: alleati con nome, reputazione e conti in sospeso, cosa prova per gli altri (con la legenda della barra) e le promesse.
+    - *Storia*: il percorso nel dettaglio, la cronaca raggruppata per giorno con il colore di ogni tipo di evento e il diario segreto.
+    - *Profilo*: tratti con la loro descrizione e caratteristiche, con le stelle di quelle che contano di più nell'arena.
   - **Eventi tematizzati per tipo**: ogni carta ha colore, bordo, etichetta e filigrana del suo tipo (eliminazione, tradimento tratteggiato, amore, cura, oggetto…), il luogo con il segnaposto e le note di meteo e finale con la loro icona.
 - **Esito**: podio, premi, momenti salienti, grafico dei superstiti, classifica e locandina.
 

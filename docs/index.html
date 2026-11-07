@@ -2141,6 +2141,167 @@ details.card > summary { font-size: 16px; }
 .ph-series label { font-weight: 700; font-size: 14px; }
 .ph-series label small { font-weight: 500; color: var(--muted); }
 .ph-series input { flex: 1 1 220px; min-width: 0; padding: 9px 12px; border-radius: 10px; }
+
+/* ============ SCHEDA DEL CONCORRENTE ============ */
+#profDlg { width: min(580px, 100%); scroll-padding-top: 130px; }
+#profDlg .pf-dh { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 10px 12px; padding: 12px 16px 0; align-items: center; border-bottom: 1px solid var(--line); background: color-mix(in srgb, var(--panel) 92%, transparent); backdrop-filter: blur(10px); }
+.pf-title { display: flex; align-items: center; gap: 10px; min-width: 0; }
+.pf-title .av { --s: 34px; box-shadow: 0 0 0 2px var(--tc, var(--line)); }
+.pf-title h2 { font-size: 22px; line-height: 1.1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pf-tabs { grid-column: 1 / -1; display: flex; gap: 2px; margin: 0 -4px; overflow-x: auto; scrollbar-width: none; }
+.pf-tabs::-webkit-scrollbar { display: none; }
+.pf-tabs [role="tab"] { flex: 1 0 auto; display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 10px 12px 11px; border: 0; background: none; color: var(--muted); font: 700 14.5px/1 var(--f-body); cursor: pointer; border-bottom: 3px solid transparent; border-radius: 8px 8px 0 0; white-space: nowrap; }
+.pf-tabs [role="tab"]:hover { color: var(--ink); background: var(--panel-2); }
+.pf-tabs [role="tab"][aria-selected="true"] { color: var(--ink); border-bottom-color: var(--tc, var(--accent)); }
+.pf-tabs [role="tab"]:focus-visible { outline: 3px solid var(--accent); outline-offset: -3px; }
+.pf-n { font-size: 12px; font-weight: 800; min-width: 20px; padding: 3px 6px; border-radius: 999px; background: var(--panel-2); color: var(--muted); font-variant-numeric: tabular-nums; }
+[aria-selected="true"] .pf-n { background: color-mix(in srgb, var(--tc, var(--accent)) 22%, var(--panel)); color: var(--ink); }
+.pf-db { gap: 18px; padding-top: 16px; }
+.pf-kick { display: block; font-size: 12.5px; font-weight: 700; letter-spacing: .02em; color: var(--muted); }
+
+/* intestazione */
+.pf-hero { position: relative; display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 16px; align-items: center; padding: 18px; border-radius: 18px; overflow: hidden; isolation: isolate;
+  background: radial-gradient(120% 140% at 0% 0%, color-mix(in srgb, var(--tc) 30%, transparent), transparent 60%), linear-gradient(160deg, color-mix(in srgb, var(--tc) 12%, var(--panel)), var(--panel-2)); border: 1px solid color-mix(in srgb, var(--tc) 35%, var(--line)); }
+.pf-hero > .av { --s: 104px; font-size: 38px; box-shadow: 0 0 0 3px var(--panel), 0 0 0 6px var(--tc), 0 14px 30px -14px var(--tc); }
+.pf-hero.s-dead > .av { box-shadow: 0 0 0 3px var(--panel), 0 0 0 6px var(--dead); }
+.pf-hero.s-win > .av { box-shadow: 0 0 0 3px var(--panel), 0 0 0 6px #e3b341, 0 14px 34px -10px #e3b341; }
+.pf-id { display: grid; gap: 8px; min-width: 0; justify-items: start; }
+.pf-status { display: inline-flex; align-items: center; gap: 6px; font-weight: 800; font-size: 13.5px; padding: 5px 11px; border-radius: 999px; background: color-mix(in srgb, var(--alive) 16%, var(--panel)); color: color-mix(in srgb, var(--alive) 75%, var(--ink)); }
+.pf-status::before { content: ''; width: 8px; height: 8px; border-radius: 50%; background: currentColor; }
+.s-dead .pf-status { background: var(--dead-soft); color: color-mix(in srgb, var(--dead) 78%, var(--ink)); }
+.s-win .pf-status { background: color-mix(in srgb, #e3b341 22%, var(--panel)); color: color-mix(in srgb, #b8860b 70%, var(--ink)); }
+.pf-team { margin: 0; display: flex; align-items: center; gap: 7px; font-weight: 700; font-size: 15px; }
+.pf-team i { width: 12px; height: 12px; border-radius: 4px; background: var(--tc); }
+.pf-tchips { display: flex; flex-wrap: wrap; gap: 6px; }
+.pf-tchips .chip { background: color-mix(in srgb, var(--tc) 18%, var(--panel)); font-size: 13px; padding: 4px 11px; }
+.pf-actions:empty { display: none; }
+.pf-follow[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+.pf-follow span { color: #e3b341; }
+.pf-follow[aria-pressed="true"] span { color: inherit; }
+
+/* numeri */
+.pf-kpis { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
+.pf-kpi { display: grid; gap: 4px; align-content: start; padding: 12px; border-radius: 14px; background: var(--panel-2); border: 1px solid var(--line); min-width: 0; }
+.pf-kpi b { font-family: var(--f-display); font-size: 28px; font-weight: 800; line-height: 1; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+.pf-kpi b small { font-size: 16px; color: var(--muted); }
+.pf-kpi span { font-size: 12.5px; color: var(--muted); line-height: 1.25; }
+.pf-kpi.hot b { color: color-mix(in srgb, var(--c-kill) 80%, var(--ink)); }
+.pf-kpi.txt b { font-size: 16px; line-height: 1.2; padding-top: 4px; }
+
+/* pannelli e sezioni */
+.pf-panel { display: grid; gap: 18px; animation: pfIn .22s ease-out both; }
+@keyframes pfIn { from { opacity: 0; transform: translateY(4px); } }
+.pf-panel[hidden] { display: none; }
+.pf-sec { display: grid; gap: 10px; }
+.pf-sec h3, .pf-panel .sub { margin: 0; display: flex; align-items: baseline; gap: 8px; font-family: var(--f-display); font-size: 17px; font-weight: 800; color: var(--ink); letter-spacing: -.01em; }
+.pf-sec h3 small, .pf-panel .sub small { font-family: var(--f-body); font-size: 13px; font-weight: 600; color: var(--muted); }
+.pf-panel > div > .sub { margin-bottom: 10px !important; }
+
+/* adesso */
+#profDlg .nowcard { padding: 0; gap: 0; border-radius: 16px; overflow: hidden; background: var(--panel-2); }
+.now-place { display: grid; grid-template-columns: 112px minmax(0, 1fr); align-items: stretch; }
+.now-place:not(:has(.now-pic)) { grid-template-columns: minmax(0, 1fr); }
+.now-pic { position: relative; min-height: 112px; background: var(--panel); }
+.now-pic > * { position: absolute; inset: 0; width: 100%; height: 100%; margin: 0; border-radius: 0; }
+.now-pic img { object-fit: cover; }
+.now-where { display: grid; gap: 4px; align-content: center; padding: 14px 16px; }
+.now-where > b { font-family: var(--f-display); font-size: 22px; line-height: 1.1; }
+.now-where .nowlead { font-size: 15px; margin: 2px 0 0; }
+.now-near { margin: 0; font-size: 13.5px; color: var(--muted); }
+#profDlg .goal { padding: 12px 16px; border-top: 1px solid var(--line); font-size: 15px; }
+#profDlg .goal .glbl { font-weight: 700; }
+#profDlg .thought { margin: 0; border: 0; border-top: 1px solid var(--line); border-radius: 0; padding: 12px 16px 14px; background: color-mix(in srgb, var(--accent) 7%, var(--panel-2)); font-size: 15.5px; line-height: 1.45; }
+#profDlg .thought .pf-kick { font-style: normal; margin-bottom: 4px; }
+
+.pf-vit { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px 14px; }
+.pv { display: grid !important; grid-template-columns: none !important; gap: 6px; padding: 10px 12px; border-radius: 12px; background: var(--panel-2); }
+.pv-top { display: flex; align-items: baseline; gap: 8px; min-width: 0; }
+.pv-top span { font-weight: 700; font-size: 14px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pv-top b { margin-left: auto; font-family: var(--f-display); font-size: 18px; font-variant-numeric: tabular-nums; }
+.pv-top em { font-style: normal; font-size: 12.5px; color: var(--muted); }
+.pv i { position: relative; height: 8px; border-radius: 99px; background: color-mix(in srgb, var(--vc) 16%, var(--panel)); overflow: visible; display: block; }
+.pv i b { display: block; height: 100%; border-radius: 99px; background: var(--vc); }
+.pv i u { position: absolute; top: -3px; bottom: -3px; width: 2px; background: var(--ink); opacity: .55; border-radius: 2px; }
+.pv.bad { background: color-mix(in srgb, var(--dead) 10%, var(--panel-2)); }
+.pv.bad .pv-top em { color: color-mix(in srgb, var(--dead) 80%, var(--ink)); font-weight: 700; }
+.pf-st { margin-top: 2px; }
+.chip.ok { background: color-mix(in srgb, var(--alive) 15%, var(--panel)); color: color-mix(in srgb, var(--alive) 70%, var(--ink)); }
+
+/* fine dei giochi */
+.pf-death { display: grid; gap: 10px; padding: 16px; border-radius: 16px; background: color-mix(in srgb, var(--dead) 8%, var(--panel-2)); border: 1px solid color-mix(in srgb, var(--dead) 30%, var(--line)); border-left: 4px solid var(--dead); }
+.pf-death p { margin: 0; font-size: 15.5px; line-height: 1.5; }
+.pf-cause { font-size: 14px !important; } .pf-cause span { font-weight: 700; color: var(--muted); margin-right: 4px; }
+.pf-killers { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; } .pf-killers > span { font-weight: 700; color: var(--muted); font-size: 13.5px; }
+
+/* persone */
+.pf-people { display: flex; flex-wrap: wrap; gap: 8px; }
+.pf-person { display: inline-flex; align-items: center; gap: 8px; padding: 5px 12px 5px 5px; border-radius: 999px; border: 1px solid var(--line); background: var(--panel-2); color: var(--ink); cursor: pointer; font: inherit; }
+.pf-person .av { --s: 30px; font-size: 12px; }
+.pf-person b { font-size: 14px; }
+.pf-person:hover { border-color: var(--accent); }
+.pf-person:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+#profDlg .person { padding: 12px; border-radius: 14px; gap: 12px; }
+#profDlg .person .av { --s: 42px; }
+#profDlg .relrow { padding: 8px 10px; border-radius: 12px; font-size: 14px; }
+#profDlg .relrow .lbl { font-size: 13px; font-weight: 600; }
+
+/* storia */
+.personal-history { border: 1px solid var(--line); border-radius: 14px; background: var(--panel-2); }
+.personal-history > summary { display: grid; gap: 2px; padding: 12px 14px; cursor: pointer; list-style: none; position: relative; padding-right: 40px; }
+.personal-history > summary::-webkit-details-marker { display: none; }
+.personal-history > summary::after { content: '▾'; position: absolute; right: 14px; top: 50%; transform: translateY(-50%); color: var(--muted); transition: transform .2s; }
+.personal-history[open] > summary::after { transform: translateY(-50%) rotate(180deg); }
+.personal-history > summary span { font-weight: 800; }
+.personal-history > summary small { color: var(--muted); font-size: 13px; }
+.personal-history > :not(summary) { margin: 0 14px 14px; }
+.pf-chron { list-style: none; margin: 0; padding: 0; display: grid; gap: 14px; }
+.pf-chron > li { display: grid; gap: 8px; }
+.pf-day { position: sticky; top: 112px; z-index: 1; justify-self: start; font-weight: 800; font-size: 13px; padding: 4px 10px; border-radius: 999px; background: var(--panel); border: 1px solid var(--line); box-shadow: 0 2px 8px -4px rgb(0 0 0 / .3); }
+.pf-chron ul { list-style: none; margin: 0 0 0 10px; padding: 0 0 0 14px; border-left: 2px solid var(--line); display: grid; gap: 8px; }
+.pf-ev { position: relative; padding: 9px 12px; border-radius: 12px; background: var(--panel-2); border-left: 3px solid var(--cc); }
+.pf-ev::before { content: ''; position: absolute; left: -21px; top: 14px; width: 10px; height: 10px; border-radius: 50%; background: var(--cc); box-shadow: 0 0 0 3px var(--panel); }
+.pf-when { display: block; font-size: 12.5px; font-weight: 700; color: var(--muted); margin-bottom: 3px; }
+.pf-ev p { margin: 0; font-size: 14.5px; line-height: 1.45; }
+
+/* profilo */
+.pf-traits-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 200px), 1fr)); gap: 8px; }
+.pf-trait { padding: 12px 14px; border-radius: 14px; background: color-mix(in srgb, var(--tc, var(--accent)) 8%, var(--panel-2)); border: 1px solid var(--line); }
+.pf-trait b { font-family: var(--f-display); font-size: 16px; }
+.pf-trait p { margin: 4px 0 0; font-size: 13.5px; color: var(--muted); line-height: 1.4; }
+#profDlg .abars { grid-template-columns: minmax(0, 1fr); gap: 8px; }
+#profDlg .abar { grid-template-columns: 150px minmax(0, 1fr) 26px; font-size: 14px; }
+#profDlg .abar i { height: 10px; border-radius: 99px; }
+
+@media (max-width: 560px) {
+  .pf-hero { gap: 14px; padding: 14px; border-radius: 16px; }
+  .pf-hero > .av { --s: 72px; font-size: 26px; box-shadow: 0 0 0 2px var(--panel), 0 0 0 4px var(--tc); }
+  .pf-hero.s-dead > .av { box-shadow: 0 0 0 2px var(--panel), 0 0 0 4px var(--dead); }
+  .pf-hero.s-win > .av { box-shadow: 0 0 0 2px var(--panel), 0 0 0 4px #e3b341; }
+  .pf-id { gap: 6px; }
+  .pf-status { font-size: 12.5px; padding: 4px 9px; }
+  .pf-team { font-size: 14px; }
+  .pf-tchips .chip { font-size: 12.5px; padding: 3px 9px; }
+  .pf-kpis { gap: 6px; }
+  .pf-kpi { padding: 9px 8px; border-radius: 12px; }
+  .pf-kpi b { font-size: 22px; }
+  .pf-kpi b small { font-size: 13px; }
+  .pf-kpi span { font-size: 11.5px; }
+  .pf-kpi.txt b { font-size: 13px; }
+  .pf-vit { grid-template-columns: minmax(0, 1fr); }
+  .now-place { grid-template-columns: 88px minmax(0, 1fr); }
+  .now-pic { min-height: 100%; }
+  #profDlg .abar { grid-template-columns: 112px minmax(0, 1fr) 24px; }
+  .pf-tabs [role="tab"] { padding: 10px 9px 11px; font-size: 14px; }
+}
+@media (prefers-reduced-motion: reduce) { .pf-panel { animation: none; } }
+
+.pf-tchips .chip { white-space: nowrap; }
+#profDlg .personal-history { margin: 0; padding: 0; }
+#profHistory:empty { display: none; }
+.keylegend { margin: -2px 0 10px; }
+.sub small { margin-left: 2px; }
+.people-legend { display: flex; gap: 10px; align-items: flex-start; margin: 0 0 10px; font-size: 13px; }
+.pl-bar { flex: none; width: 44px; height: 6px; margin-top: 7px; border-radius: 99px; background: linear-gradient(90deg, var(--c-kill), var(--muted) 50%, var(--c-heal)); }
 </style>
 
 <header class="top">
@@ -11938,7 +12099,7 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
 </script>
 <script>window.LOS_ASSETS = {"logo":"img/logo.f2d5175789.webp","icona":"img/icona.8b02ddeb49.webp","favicon":"img/favicon.86774dc7cf.png","panoramica":"img/panoramica.66c4c27255.webp","sagome":["img/sagome-cappuccio.e8876ba986.webp","img/sagome-esploratore.9a99fd13f8.webp","img/sagome-viaggiatore.5e36435604.webp"],"arene":{"classico":"img/arene-classico.42c6ba42ee.webp","fantasy":"img/arene-fantasy.75b7fb0d32.webp","horror":"img/arene-horror.48052d80b4.webp","liceo":"img/arene-liceo.05ed578a90.webp","royale":"img/arene-royale.36c9952cd7.webp","scifi":"img/arene-scifi.403694f00f.webp","ufficio":"img/arene-ufficio.67b271bea3.webp","wasteland":"img/arene-wasteland.889002ace8.webp","zombie":"img/arene-zombie.36c9135a12.webp"},"atlas":{"classico":{"luoghi":{"altopiano":"img/arene-classico-luoghi-altopiano.36a37512d3.webp","bosco":"img/arene-classico-luoghi-bosco.2e9163544b.webp","cornucopia":"img/arene-classico-luoghi-cornucopia.393b2dabe1.webp","fiume":"img/arene-classico-luoghi-fiume.22b335a914.webp","paludi":"img/arene-classico-luoghi-paludi.77cf115eb4.webp","rovine":"img/arene-classico-luoghi-rovine.9ea4f70ca9.webp"},"pericoli":{"branco-di-lupi-mutanti":"img/arene-classico-pericoli-branco-di-lupi-mutanti.d786a62875.webp","orso-affamato":"img/arene-classico-pericoli-orso-affamato.e4f38a9892.webp","sciame-di-vespe-velenose":"img/arene-classico-pericoli-sciame-di-vespe-velenose.5adb2c7b8d.webp","serpente-gigante":"img/arene-classico-pericoli-serpente-gigante.b17e7f3d91.webp"}},"fantasy":{"luoghi":{"foresta-elfica":"img/arene-fantasy-luoghi-foresta-elfica.0448fcfbd3.webp","lago-nebbioso":"img/arene-fantasy-luoghi-lago-nebbioso.f19abc7c81.webp","miniere":"img/arene-fantasy-luoghi-miniere.5baa916ec9.webp","palude-stregata":"img/arene-fantasy-luoghi-palude-stregata.6a0b2af4a7.webp","picco-del-drago":"img/arene-fantasy-luoghi-picco-del-drago.06bdfd84b1.webp","torre-in-rovina":"img/arene-fantasy-luoghi-torre-in-rovina.ac716863c7.webp"},"pericoli":{"branco-di-lupi-mannari":"img/arene-fantasy-pericoli-branco-di-lupi-mannari.1c9124ceee.webp","spettro-errante":"img/arene-fantasy-pericoli-spettro-errante.056074bc23.webp","troll-di-caverna":"img/arene-fantasy-pericoli-troll-di-caverna.31aa2444f0.webp","viverna":"img/arene-fantasy-pericoli-viverna.577b91a819.webp"}},"horror":{"luoghi":{"biblioteca":"img/arene-horror-luoghi-biblioteca.00d6ab97f4.webp","cappella":"img/arene-horror-luoghi-cappella.a51e505028.webp","cimitero":"img/arene-horror-luoghi-cimitero.7a441de089.webp","serra":"img/arene-horror-luoghi-serra.b3d91121d4.webp","soffitta":"img/arene-horror-luoghi-soffitta.466d40cea3.webp"},"pericoli":{"bambola-posseduta":"img/arene-horror-pericoli-bambola-posseduta.7064eef1d7.webp","entita-senza-volto":"img/arene-horror-pericoli-entita-senza-volto.2c28467bdd.webp","spettro-urlante":"img/arene-horror-pericoli-spettro-urlante.25fa554e05.webp","stormo-di-corvi":"img/arene-horror-pericoli-stormo-di-corvi.fe5c85d7ae.webp"}},"liceo":{"luoghi":{"aula-magna":"img/arene-liceo-luoghi-aula-magna.0478e35c5c.webp","biblioteca":"img/arene-liceo-luoghi-biblioteca.1ae806ae58.webp","cortile":"img/arene-liceo-luoghi-cortile.51bf433337.webp","laboratorio-di-chimica":"img/arene-liceo-luoghi-laboratorio-di-chimica.eba1434683.webp","mensa":"img/arene-liceo-luoghi-mensa.67bcbc7e37.webp","palestra":"img/arene-liceo-luoghi-palestra.8ecb872849.webp"},"pericoli":{"bidello-di-turno":"img/arene-liceo-pericoli-bidello-di-turno.191c43a8bd.webp","ispezione-a-sorpresa":"img/arene-liceo-pericoli-ispezione-a-sorpresa.bef087d9b9.webp","preside":"img/arene-liceo-pericoli-preside.033f6c9aae.webp","professoressa-di-matematica":"img/arene-liceo-pericoli-professoressa-di-matematica.6cb65c6a3f.webp"}},"royale":{"luoghi":{"aeroporto":"img/arene-royale-luoghi-aeroporto.81e8ce98d4.webp","base-militare":"img/arene-royale-luoghi-base-militare.67f3a7de9d.webp","centrale-elettrica":"img/arene-royale-luoghi-centrale-elettrica.05ee57458a.webp","fattoria":"img/arene-royale-luoghi-fattoria.7c780dda87.webp","foresta":"img/arene-royale-luoghi-foresta.03b47644d0.webp","villaggio-costiero":"img/arene-royale-luoghi-villaggio-costiero.568519eb7c.webp"},"pericoli":{"cane-da-guardia-addestrato":"img/arene-royale-pericoli-cane-da-guardia-addestrato.c7853a67a0.webp","drone-armato":"img/arene-royale-pericoli-drone-armato.30d0b73e01.webp","elicottero-da-caccia":"img/arene-royale-pericoli-elicottero-da-caccia.8c68e62346.webp"}},"scifi":{"luoghi":{"hangar":"img/arene-scifi-luoghi-hangar.6de551833b.webp","moduli-abitativi":"img/arene-scifi-luoghi-moduli-abitativi.9f5bb96d39.webp","ponte-di-comando":"img/arene-scifi-luoghi-ponte-di-comando.3e9ffd005a.webp","reattore":"img/arene-scifi-luoghi-reattore.d10a335006.webp","serra-idroponica":"img/arene-scifi-luoghi-serra-idroponica.b6f4407853.webp"},"pericoli":{"androide-da-combattimento":"img/arene-scifi-pericoli-androide-da-combattimento.1a3d3eb38e.webp","creatura-aliena-dai-tentacoli":"img/arene-scifi-pericoli-creatura-aliena-dai-tentacoli.b6b314ddd9.webp","drone-di-sicurezza-impazzito":"img/arene-scifi-pericoli-drone-di-sicurezza-impazzito.c8a9c6f9e3.webp","sciame-di-nanobot":"img/arene-scifi-pericoli-sciame-di-nanobot.d43296f047.webp"}},"ufficio":{"luoghi":{"cucina":"img/arene-ufficio-luoghi-cucina.d968f8861d.webp","open-space":"img/arene-ufficio-luoghi-open-space.b6b7990c99.webp","parcheggio":"img/arene-ufficio-luoghi-parcheggio.d593f2ed83.webp","sala-stampanti":"img/arene-ufficio-luoghi-sala-stampanti.1727f50082.webp","ufficio-del-direttore":"img/arene-ufficio-luoghi-ufficio-del-direttore.bb3b6cabab.webp"},"pericoli":{"consulente-esterno":"img/arene-ufficio-pericoli-consulente-esterno.ce6e200c3f.webp","direttore-generale":"img/arene-ufficio-pericoli-direttore-generale.da2eb1f708.webp","riorganizzazione-aziendale":"img/arene-ufficio-pericoli-riorganizzazione-aziendale.1fd57b76b3.webp","ufficio-risorse-umane":"img/arene-ufficio-pericoli-ufficio-risorse-umane.8392df7518.webp"}},"wasteland":{"luoghi":{"autostrada-spezzata":"img/arene-wasteland-luoghi-autostrada-spezzata.19a72a0b97.webp","citta-fantasma":"img/arene-wasteland-luoghi-citta-fantasma.fe22bb72b2.webp","cratere":"img/arene-wasteland-luoghi-cratere.04de7ca40a.webp","diga":"img/arene-wasteland-luoghi-diga.3be9abe15a.webp","discarica":"img/arene-wasteland-luoghi-discarica.b8783ad9c6.webp","raffineria":"img/arene-wasteland-luoghi-raffineria.081e2d2ad6.webp"},"pericoli":{"banda-di-predoni":"img/arene-wasteland-pericoli-banda-di-predoni.1dfcfd1628.webp","branco-di-cani-mutati":"img/arene-wasteland-pericoli-branco-di-cani-mutati.442fabfc39.webp","scorpione-gigante":"img/arene-wasteland-pericoli-scorpione-gigante.2dd8911367.webp","verme-delle-sabbie":"img/arene-wasteland-pericoli-verme-delle-sabbie.a0d445beeb.webp"}},"zombie":{"luoghi":{"centro-commerciale":"img/arene-zombie-luoghi-centro-commerciale.333f4699d5.webp","metropolitana":"img/arene-zombie-luoghi-metropolitana.878a263605.webp","periferia":"img/arene-zombie-luoghi-periferia.e28a7d70c7.webp","scuola":"img/arene-zombie-luoghi-scuola.153ddbaa75.webp","stazione-di-polizia":"img/arene-zombie-luoghi-stazione-di-polizia.157f7a17f5.webp"},"pericoli":{"cane-infetto":"img/arene-zombie-pericoli-cane-infetto.fdff913d6f.webp","gigante-mutato":"img/arene-zombie-pericoli-gigante-mutato.91fad36b70.webp","infetto-corridore":"img/arene-zombie-pericoli-infetto-corridore.61f48faafd.webp","orda-di-zombi":"img/arene-zombie-pericoli-orda-di-zombi.e0fc6d1b56.webp"}}}};
 ;
-window.LOS_BUILD = "bf31936522a4293cf05c36175347d2721e6d255323a35d2248cda7fc14d51a36";
+window.LOS_BUILD = "09c2df516f629652409db6663ac0b75208c861b23ba86e78c67fce2a3a3df9d3";
 ;
 /* Last One Standing — grafica vettoriale: logo, icone delle arene, illustrazioni.
  * Tutto è SVG generato in codice: nessuna immagine esterna. */
@@ -13323,22 +13484,26 @@ window.LOS_BUILD = "bf31936522a4293cf05c36175347d2721e6d255323a35d2248cda7fc14d5
         return '<li><b>' + labels[f.kind] + ' · ' + esc(f.item.n) + '</b><p>' + esc(names[f.owner]) + (f.owner !== f.who ? ' → ' + esc(names[f.who]) : '') + ' · ' + esc(f.detail) + '</p>' + (changes.length ? '<p class="help">Variazioni nell’azione: ' + esc(changes.join(' · ')) + '</p>' : '') + (f.context ? '<p class="help">Evento: ' + esc(f.context) + '</p>' : '') + '</li>';
       }).join('') + '</ul>' : '';
     }
+    const followLabel = (on) => '<span aria-hidden="true">' + (on ? '★' : '☆') + '</span> ' + (on ? 'Seguito nella diretta' : 'Segui nella diretta');
     function renderProfile(t, phase) {
       const on = (S.followed || []).includes(t.id), heading = $('#h-prof'); if (!heading) return;
       const result = A.getSIM(), theme = D.themes.find((th) => th.id === result.theme), timeline = personalTimeline(result, t.id, phase);
-      const history = '<details class="personal-history"><summary>Il percorso fino a questa fase · ' + plural(timeline.length, 'tappa', 'tappe') + '</summary><p class="help">In ordine cronologico: eventi, ricordi, diario e cambiamenti tra fine fase e fine fase. Le variazioni di salute compaiono sempre; per gli altri valori mostriamo quelle di almeno 10 punti. Un oggetto può entrare e uscire nella stessa fase senza comparire nel confronto dello zaino.</p><ol class="causal-path">' + timeline.map((step) => '<li><b>' + esc(phaseName(result, step)) + '</b>' +
+      const history = '<details class="personal-history"><summary><span>Il percorso nel dettaglio</span><small>' + plural(timeline.length, 'tappa', 'tappe') + ' · spostamenti, ricordi e cambiamenti</small></summary><p class="help">In ordine cronologico, fase per fase: eventi, ricordi, diario, spostamenti e cambiamenti. La salute compare sempre; gli altri valori quando cambiano di almeno 10 punti.</p><ol class="causal-path">' + timeline.map((step) => '<li><b>' + esc(phaseName(result, step)) + '</b>' +
         (step.movements.length?'<ul class="personal-route">'+step.movements.map(m=>'<li>'+esc(m.path.map(z=>result.spatial.zones[z].name).join(' → '))+' · '+esc(m.reason)+' · Energia −'+m.cost+'</li>').join('')+'</ul>':'')+
         (step.changes.length ? '<ul class="change-list">' + step.changes.map((c) => '<li>' + esc(changeText(c, t, theme, result)) + '</li>').join('') + '</ul>' : '') +
         itemFactsHTML(step.itemFacts, result, theme) + step.events.map((e) => '<p>' + esc(e.plain) + '</p>').join('') + step.memories.map((m) => memoryHTML(t, m, theme)).filter(Boolean).map((m) => '<p class="help">Ricordo: «' + m + '»</p>').join('') + step.diary.map((page) => '<p class="diary-entry"><span class="sub">Diario</span> ' + A.linkify(page.h) + '</p>').join('') +
         '<button class="btn sm" type="button" data-personal-phase="' + step.phase + '">Rivedi la fase ' + (step.phase + 1) + '</button></li>').join('') + '</ol></details>';
-      heading.parentElement.insertAdjacentHTML('afterend', '<div class="follow-control"><button class="btn" type="button" data-follow="' + esc(t.id) + '" aria-pressed="' + on + '">' + (on ? 'Non seguire più' : 'Segui questo concorrente') + '</button></div>' + history);
+      const follow = '<button class="btn sm pf-follow" type="button" data-follow="' + esc(t.id) + '" aria-pressed="' + on + '">' + followLabel(on) + '</button>';
+      const fSlot = document.getElementById('profFollow'), hSlot = document.getElementById('profHistory');
+      if (fSlot && hSlot) { fSlot.innerHTML = follow; hSlot.innerHTML = timeline.length ? history : ''; return; }
+      heading.parentElement.insertAdjacentHTML('afterend', '<div class="follow-control">' + follow + '</div>' + history);
     }
     document.addEventListener('click', (e) => {
       const phase = e.target.closest('[data-personal-phase]'); if (phase) { revisit(+phase.dataset.personalPhase); return; }
       const b = e.target.closest('[data-follow]'); if (!b) return;
       const result = A.getSIM(); if (!result || !result.tributes.some((t) => t.id === b.dataset.follow)) return;
       const set = new Set(S.followed || []); if (set.has(b.dataset.follow)) set.delete(b.dataset.follow); else set.add(b.dataset.follow);
-      S.followed = [...set]; A.save(); const on = set.has(b.dataset.follow); b.setAttribute('aria-pressed', on); b.textContent = on ? 'Non seguire più' : 'Segui questo concorrente';
+      S.followed = [...set]; A.save(); const on = set.has(b.dataset.follow); b.setAttribute('aria-pressed', on); b.innerHTML = followLabel(on);
       if (location.hash === '#diretta') A.renderLive(true);
     });
     function renderResults() {
@@ -13905,11 +14070,11 @@ window.LOS_BUILD = "bf31936522a4293cf05c36175347d2721e6d255323a35d2248cda7fc14d5
     const order = ITM.order || [];
     return '<div class="bag">' + items.slice().sort((a, b) => order.indexOf(a.t) - order.indexOf(b.t)).map((it) => {
       const ty = (theme.soft && (ITM.typesSoft || {})[it.t]) || (ITM.types || {})[it.t] || { label: it.t, desc: '' };
-      const how = ((ITM.how || {})[it.h] || 'Trovato').replace('{1}', esc(nmOf(it.f))) + (it.d ? ' · G' + it.d : '');
+      const how = ((ITM.how || {})[it.h] || 'Trovato').replace('{1}', esc(nmOf(it.f))) + (it.d ? ' · ' + (SIM ? whenLabel(resultTheme(SIM), null, it.d) : 'giorno ' + it.d).toLowerCase() : '');
       const stars = it.q ? '<span class="stars" title="Qualità">' + '★'.repeat(it.q) + '<i>' + '★'.repeat(3 - it.q) + '</i></span>' : '';
       const uses = it.u != null && it.m ? '<span class="uses" title="Usura: ' + it.u + ' su ' + it.m + '"><b style="width:' + Math.round((it.u / it.m) * 100) + '%"></b></span>' : '';
       const tag = it.x === 'veleno' ? '<span class="itag bad">Avvelenata</span>' : it.x === 'bomba' ? '<span class="itag bad">Esplosiva</span>' : '';
-      return '<div class="bitem t-' + esc(it.t) + '"><span class="bic">' + (ITIC[it.t] || ITIC.valore) + '</span><div class="bbody"><div class="btop"><b>' + esc(it.n) + '</b>' + stars + tag + '</div>' +
+      return '<div class="bitem t-' + esc(it.t) + '"><span class="bic">' + (ITIC[it.t] || ITIC.valore) + '</span><div class="bbody"><div class="btop"><b>' + esc(capFirst(stripArt(it.n))) + '</b>' + stars + tag + '</div>' +
         '<div class="bmeta"><span class="btype">' + esc(ty.label) + '</span><span>' + how + '</span>' + uses + '</div><p>' + esc(ty.desc) + '</p></div></div>';
     }).join('') + '</div>';
   }
@@ -13991,24 +14156,29 @@ window.LOS_BUILD = "bf31936522a4293cf05c36175347d2721e6d255323a35d2248cda7fc14d5
     const made = (t.promises || []).filter((q) => q.ph <= i);
     const got = []; SIM.tributes.forEach((x) => (x.promises || []).forEach((q) => { if (q.to === t.id && q.ph <= i) got.push([x, q]); }));
     if (!made.length && !got.length) return '';
-    const row = (who, q, dir) => { const s2 = st(q, dir ? t : who, dir ? who : t); return '<div class="prom s-' + s2.replace(' ', '') + '"><span class="pk">' + esc(K[q.k] || q.k) + '</span><span>' + (dir ? 'a ' : 'da ') + '<b>' + esc(who.name) + '</b> · G' + q.d + '</span><span class="ps2">' + s2 + '</span></div>'; };
+    const row = (who, q, dir) => { const s2 = st(q, dir ? t : who, dir ? who : t); return '<div class="prom s-' + s2.replace(' ', '') + '"><span class="pk">' + esc(K[q.k] || q.k) + '</span><span>' + (dir ? 'a ' : 'da ') + '<b>' + esc(who.name) + '</b> · ' + esc(whenLabel(resultTheme(SIM), q.ph, q.d).toLowerCase()) + '</span><span class="ps2">' + s2 + '</span></div>'; };
     return '<div><div class="sub" style="margin-bottom:8px">Promesse</div><div class="proms">' + made.map((q) => row(BY[q.to] || { name: '?' }, q, true)).join('') + got.map(([x, q]) => row(x, q, false)).join('') + '</div></div>';
   }
   function nowHTML(t, snap, i, theme) {
     const m = (snap.mind || {})[t.id]; const v = (snap.vit || {})[t.id]; const st = snap.st[t.id] || [];
-    const zone = theme.lex.luogo[snap.zones[t.id]] || '';
+    const zi = (snap.zones || {})[t.id], zone = (theme.lex && theme.lex.luogo[zi]) || '';
     const bits = [];
     if (v) { if (v[0] < 25) bits.push(theme.soft ? 'con la reputazione a pezzi' : 'ridott' + G3(t.gender, 'o', 'a', 'ə') + ' male'); else if (v[0] < 55) bits.push(statusLabel('ferito', t, theme).toLowerCase()); if (v[3] < 25) bits.push('affamat' + G3(t.gender, 'o', 'a', 'ə')); if (v[1] < 22) bits.push('sfinit' + G3(t.gender, 'o', 'a', 'ə')); if (v[2] < 22) bits.push('a pezzi'); else if (v[2] >= 80) bits.push('carichissim' + G3(t.gender, 'o', 'a', 'ə')); }
     if (st.includes('ubriaco')) bits.push(statusLabel('ubriaco', t, theme).toLowerCase());
     const allies = snap.allies[t.id] != null ? snap.alive.filter((x) => x !== t.id && snap.allies[x] === snap.allies[t.id]).length : 0;
-    const partner=snap.rel?.[t.id]?.p;
-    const nearby=snap.alive.filter(id=>id!==t.id&&snap.zones[id]===snap.zones[t.id]&&(snap.allies[t.id]!=null&&snap.allies[id]===snap.allies[t.id]||id===partner)).length;
-    const where = zone ? zone.replace(/^(il |lo |la |l'|i |gli |le )/i, (a) => a.toLowerCase()) : '';
-    const lead = (where ? 'A ' + where : 'In gara') + (bits.length ? ', ' + bits.join(', ') : '') + (allies ? ', in alleanza con ' + plural(allies, 'alleato', 'alleati') : ', senza alleati') + '.';
+    const partner = snap.rel && snap.rel[t.id] ? snap.rel[t.id].p : null;
+    const nearby = snap.alive.filter((id) => id !== t.id && snap.zones && snap.zones[id] === zi && ((snap.allies[t.id] != null && snap.allies[id] === snap.allies[t.id]) || id === partner)).length;
+    const up = (x) => x.charAt(0).toUpperCase() + x.slice(1);
+    const place = zone ? up(zone.replace(/^(il |lo |la |l'|i |gli |le )/i, '')) : '';
+    const lead = (bits.length ? up(bits.join(', ')) : 'In forma') + ', ' + (allies ? 'in alleanza con ' + plural(allies, 'alleato', 'alleati') : 'senza alleati') + '.';
+    const near = allies || partner ? (nearby ? plural(nearby, 'compagno è', 'compagni sono') + ' qui con ' + G3(t.gender, 'lui', 'lei', 'ləi') + '.' : 'Nessun compagno nella stessa zona.') : '';
     const g = m ? (MND.goals || {})[m.g] : null;
-    return '<div class="nowcard"><div class="sub">Adesso</div><p class="nowlead">' + esc(fixA(lead)) + '</p><p class="help">'+(nearby?plural(nearby,'compagno presente','compagni presenti')+' in questa zona.':'Nessun compagno presente in questa zona.')+'</p>' +
-      (m && g ? '<div class="goal' + (g.secret ? ' secret' : '') + '"><span class="glbl">Obiettivo</span><b>' + esc(goalLabel(m)) + '</b>' + (g.secret ? '<span class="gsec" title="Gli altri concorrenti non lo sanno">segreto</span>' : '') + (m.since != null && m.since < i ? '<span class="gsince">da G' + (SIM.phases[m.since] ? SIM.phases[m.since].day || 1 : 1) + '</span>' : '') + '</div>' : '') +
-      (m && m.th ? '<blockquote class="thought">' + linkify(m.th) + '</blockquote>' : '') + '</div>';
+    const pic = zone && typeof window !== 'undefined' && window.LOS_ATLAS ? window.LOS_ATLAS.pic(theme.id, 'luoghi', zone, theme.hue, { index: zi }) : '';
+    const since = m && m.since != null && m.since < i && SIM.phases[m.since] ? calOf(theme).of(SIM.phases[m.since].day || 1).replace(/^del /, 'dal ') : '';
+    return '<div class="nowcard">' +
+      '<div class="now-place">' + (pic ? '<div class="now-pic">' + pic + '</div>' : '') + '<div class="now-where"><span class="pf-kick">Adesso si trova</span><b>' + esc(place || 'In gara') + '</b><p class="nowlead">' + esc(lead) + '</p>' + (near ? '<p class="now-near">' + esc(near) + '</p>' : '') + '</div></div>' +
+      (m && g ? '<div class="goal' + (g.secret ? ' secret' : '') + '"><span class="glbl">Obiettivo</span><b>' + esc(goalLabel(m)) + '</b>' + (g.secret ? '<span class="gsec" title="Gli altri concorrenti non lo sanno">segreto</span>' : '') + (since ? '<span class="gsince">' + esc(since) + '</span>' : '') + '</div>' : '') +
+      (m && m.th ? '<blockquote class="thought"><span class="pf-kick">Cosa pensa</span>' + linkify(m.th) + '</blockquote>' : '') + '</div>';
   }
   // «a il Fiume» → «al Fiume» per i testi composti qui
   function fixA(s) { return s.replace(/^A (il|lo|la|i|gli|le|l') ?/, (m, a) => ({ il: 'Al ', lo: 'Allo ', la: 'Alla ', i: 'Ai ', gli: 'Agli ', le: 'Alle ', "l'": "All'" }[a])); }
@@ -14029,7 +14199,7 @@ window.LOS_BUILD = "bf31936522a4293cf05c36175347d2721e6d255323a35d2248cda7fc14d5
         '<span class="back">Per ' + esc(nmOf(id)) + ': <b>' + esc(bk || 'indifferenza') + '</b></span>' +
         (mem.length ? '<ul class="pmem">' + mem.filter((m) => MM[m.k]).map((m) => '<li>«' + fill(MM[m.k] || '', [t.id, id, m.x]) + '» <span>' + esc(whenLabel(resultTheme(SIM), m.ph, SIM.phases[m.ph] ? SIM.phases[m.ph].day || 1 : 1)) + '</span></li>').join('') + '</ul>' : '') + '</div></div>';
     }).join('');
-    return '<div><div class="sub" style="margin-bottom:8px">Cosa prova per gli altri</div><div class="people">' + rows + '</div></div>';
+    return '<div><div class="sub" style="margin-bottom:6px">Cosa prova per gli altri</div><p class="help people-legend"><i class="pl-bar" aria-hidden="true"></i>La barra va dall’ostilità (rosso) all’affetto (verde); il segno mostra dove si trova adesso. Sotto, cosa prova l’altra persona in risposta.</p><div class="people">' + rows + '</div></div>';
   }
   function diaryHTML(t, i) {
     const all = (t.diary || []).filter((d) => d.ph <= i);
@@ -14114,15 +14284,16 @@ window.LOS_BUILD = "bf31936522a4293cf05c36175347d2721e6d255323a35d2248cda7fc14d5
     return 'Restano solo ' + before + ' concorrenti: l’arena non aspetta ' + (max ? 'il limite di ' + max + ' ' + c.units : 'la fine del calendario') + ' e chiama lo scontro finale.';
   }
   // un giorno detto per esteso, per tabelle e schede («3º giorno», «finale»)
-  // la durata detta chiaramente: quanti giorni, rispetto al limite scelto
-  function durTxt(theme) { const c = calOf(theme), m = runMaxDays(); return plural(SIM.days, c.unit, c.units) + (m ? (SIM.days >= m ? ' (il limite scelto)' : ' su ' + m + ' al massimo') : ''); }
-  // lo stesso nome di fase per gli strumenti facoltativi (studio.js)
-  if (typeof window !== 'undefined') window.LOS_PHASE_NAME = (result, k) => { try { return result && result.phases[k] ? phaseInfo(result.phases, k, resultTheme(result), false).short : ''; } catch (e) { return ''; } };
   function whenLabel(theme, phaseIndex, day) {
     const P = SIM && SIM.phases; const f = P ? P.findIndex((x) => x.kind === 'finale') : -1;
     if (f >= 0 && phaseIndex != null && phaseIndex >= f) return 'Finale';
     return capW(calOf(theme).short(day || 1).toLowerCase());
   }
+  // la durata detta chiaramente: quanti giorni, rispetto al limite scelto
+  function durTxt(theme) { const c = calOf(theme), m = runMaxDays(); return plural(SIM.days, c.unit, c.units) + (m ? (SIM.days >= m ? ' (il limite scelto)' : ' su ' + m + ' al massimo') : ''); }
+  // lo stesso nome di fase per gli strumenti facoltativi (studio.js)
+  if (typeof window !== 'undefined') window.LOS_PHASE_NAME = (result, k) => { try { return result && result.phases[k] ? phaseInfo(result.phases, k, resultTheme(result), false).short : ''; } catch (e) { return ''; } };
+
   const DIFFS = [
     ['bassa', 'Bassa', 'Partite lunghe, pochi morti', 1], ['normale', 'Normale', 'L\'equilibrio classico', 2],
     ['alta', 'Alta', 'L\'arena non perdona', 3], ['massacro', 'Massacro', 'Finisce in pochi giorni', 4],
@@ -15804,34 +15975,69 @@ window.LOS_BUILD = "bf31936522a4293cf05c36175347d2721e6d255323a35d2248cda7fc14d5
     const ally = snap.allies[id] != null && !dead ? snap.alive.filter((x) => x !== id && snap.allies[x] === snap.allies[id]) : [];
     const st = dead ? [] : snap.st[id] || [], inv = dead ? [] : snap.inv[id] || [];
     const winner = atRes && t.alive;
+    let tests = 0, passed = 0;
+    if (atRes) { tests = t.tests || 0; passed = t.testsPassed || 0; } else SIM.phases.slice(0, i + 1).forEach((p) => p.events.forEach((e) => { if (e.test && e.test.who === id) { tests++; if (e.test.pass) passed++; } }));
+    const tc = t.color || (typeof teamColor === 'function' ? teamColor(t.team || 1) : '');
+    const outWhen = dead ? phaseInfo(SIM.phases, t.deathPhase, theme, true).short : '', outShort = dead ? whenLabel(theme, t.deathPhase, t.deathDay) : '';
+    const status = winner ? (soft ? 'Ha vinto' : G3(t.gender, 'Vincitore', 'Vincitrice', 'Vincitorə')) : dead ? (soft ? 'Fuori dai giochi' : G3(t.gender, 'Morto', 'Morta', 'Mortə')) : 'In gara';
+    const tile = (n, l, cls) => '<div class="pf-kpi' + (cls ? ' ' + cls : '') + '"><b>' + n + '</b><span>' + esc(l) + '</span></div>';
+    const traits = t.traits.map((x) => TRAITS[x]).filter(Boolean);
+    const people = !dead ? peopleHTML(t, snap, i) : '';
+    const rel = relHTML(id, snap, dead, atRes), proms = promisesHTML(t, dead ? t.deathPhase : i, atRes);
+    const bondsN = ally.length + (((snap.rel || {})[id] || {}).top || []).length * (dead ? 0 : 1);
+    const tabs = [['now', dead ? 'Com’è finita' : 'Adesso', ''], ['bonds', 'Legami', bondsN || ''], ['story', 'Storia', hist.length || ''], ['self', 'Profilo', '']];
+    const panel = (k, html) => '<section class="pf-panel" role="tabpanel" id="pfp-' + k + '" aria-labelledby="pft-' + k + '"' + (profTab === k ? '' : ' hidden') + '>' + html + '</section>';
+    const sec = (title, body, extra) => '<section class="pf-sec"><h3>' + title + (extra ? ' <small>' + extra + '</small>' : '') + '</h3>' + body + '</section>';
+    const nowPanel = dead
+      ? '<div class="pf-death"><span class="pf-kick">' + esc((soft ? 'Uscit' + G3(t.gender, 'o', 'a', 'ə') : G3(t.gender, 'Morto', 'Morta', 'Mortə')) + ' · ' + outWhen) + '</span><p>' + linkify(t.deathHtml || '') + '</p>' +
+        (t.deathCause && causeTxt(t, theme) ? '<p class="pf-cause"><span>Causa</span> ' + esc(causeTxt(t, theme)) + '</p>' : '') +
+        ((t.killerIds || []).length ? '<div class="pf-killers"><span>Per mano di</span>' + t.killerIds.filter((k) => BY[k]).map((k) => '<button type="button" class="pf-person" data-prof="' + esc(k) + '">' + avHTML(BY[k]) + '<b>' + esc(BY[k].name) + '</b></button>').join('') + '</div>' : '') + '</div>'
+      : nowHTML(t, snap, i, theme) +
+        (snap.vit && snap.vit[id] ? sec('Condizione fisica', vitalsHTML(snap.vit[id], theme) + '<div class="chips pf-st">' + (st.length ? st.map((x) => '<span class="chip st">' + esc(statusLabel(x, t, theme)) + '</span>').join('') : '<span class="chip ok">Nessun malanno</span>') + '</div>') : '') +
+        sec('Zaino', bagHTML(inv, theme), plural(inv.length, 'oggetto', 'oggetti'));
+    const allyHTML = dead ? '' : sec('Alleanza', ally.length ? '<div class="pf-people">' + ally.map((x) => '<button type="button" class="pf-person" data-prof="' + esc(x) + '">' + avHTML(BY[x]) + '<b>' + esc(BY[x].name) + '</b></button>').join('') + '</div>' : '<p class="help">Gioca da sol' + G3(t.gender, 'o', 'a', 'ə') + ', per ora.</p>', ally.length ? plural(ally.length, 'alleato', 'alleati') + ' in gara' : '');
+    const bondsPanel = (allyHTML + rel + people + proms) || '<p class="help">Nessun legame da raccontare.</p>';
+    const storyPanel = '<div id="profHistory"></div>' + sec('Cronaca', chronHTML(hist, theme), plural(hist.length, 'evento', 'eventi')) + diaryHTML(t, dead ? t.deathPhase : i);
+    const selfPanel = sec('Tratti', traits.length ? '<div class="pf-traits-list">' + traits.map((x) => '<div class="pf-trait"><b>' + esc(x.name) + '</b><p>' + esc(x.desc || '') + '</p></div>').join('') + '</div>' : '<p class="help">Nessun tratto: conta solo sulle caratteristiche.</p>') + attrHTML(t, theme, i, atRes);
     $('#profBody').innerHTML =
-      '<div class="dh"><h2 id="h-prof">' + esc(t.name) + '</h2><button class="iconbtn" data-close type="button" aria-label="Chiudi">✕</button></div>' +
-      '<div class="db">' +
-        '<div class="profhead">' + avHTML(t, { dead }) + '<div class="ps"><span class="status-pill ' + (dead ? 'dead' : 'alive') + '">' + (winner ? (soft ? 'Ha vinto' : G3(t.gender, 'Vincitore', 'Vincitrice', 'Vincitorə')) : dead ? (soft ? 'Fuori dai giochi' : G3(t.gender, 'Morto', 'Morta', 'Mortə')) + ' · giorno ' + t.deathDay : 'In gara') + '</span>' +
-          '<span class="muted">Squadra ' + t.team + (atRes ? ' · ' + t.rank + '° posto' : '') + '</span>' +
-          '<div class="chips">' + (t.traits.length ? t.traits.map((x) => '<span class="chip" title="' + esc(TRAITS[x].desc) + '">' + esc(TRAITS[x].name) + '</span>').join('') : '<span class="chip dim">Nessun tratto</span>') + '</div></div></div>' +
-        '<div class="pstats"><div><b>' + kills + '</b><span>' + (soft ? 'eliminazioni' : 'uccisioni') + '</span></div><div><b>' + hist.length + '</b><span>eventi vissuti</span></div><div><b>' + (dead ? t.deathDay : SIM.phases[i].day || 1) + '</b><span>' + (dead ? 'giorno dell\'uscita' : 'giorni in gara') + '</span></div></div>' +
-        (dead ? '<div><div class="sub" style="margin-bottom:6px">Come è andata</div><div class="ev lethal" style="--cc:var(--c-kill);grid-template-columns:minmax(0,1fr)"><p>' + linkify(t.deathHtml) + '</p></div></div>' : '') +
-        (!dead ? nowHTML(t, snap, i, theme) : '') +
-        (!dead && snap.vit && snap.vit[id] ? '<div><div class="sub" style="margin-bottom:8px">Condizione fisica</div>' + vbars(snap.vit[id], theme, true) + '</div>' : '') +
-        (dead && t.deathCause && causeTxt(t, theme) ? '<p class="help">Causa: ' + esc(causeTxt(t, theme)) + (t.killerIds.length ? ', per mano di ' + esc(t.killerIds.map((k) => BY[k].name).join(', ')) : '') + '.</p>' : '') +
-        (!dead ? '<div class="row" style="gap:16px;align-items:flex-start">' +
-          '<div style="flex:1;min-width:140px"><div class="sub" style="margin-bottom:6px">Condizioni</div><div class="chips">' + (st.length ? st.map((s) => '<span class="chip st">' + esc(statusLabel(s, t, theme)) + '</span>').join('') : '<span class="chip dim">In forma</span>') + '</div></div>' +
-          '</div>' +
-          '<div><div class="sub" style="margin-bottom:8px">Zaino · ' + plural(inv.length, 'oggetto', 'oggetti') + '</div>' + bagHTML(inv, theme) + '</div>' +
-          '<div><div class="sub" style="margin-bottom:6px">Alleati</div><div class="row">' + (ally.length ? ally.map((x) => avHTML(BY[x], { btn: true })).join('') : '<span class="help">Nessuno, per ora.</span>') + '</div></div>' : '') +
-        relHTML(id, snap, dead, atRes) +
-        (!dead ? peopleHTML(t, snap, i) : '') +
-        promisesHTML(t, dead ? t.deathPhase : i, atRes) +
-        diaryHTML(t, dead ? t.deathPhase : i) +
-        attrHTML(t, theme, i, atRes) +
-        '<div><div class="sub" style="margin-bottom:8px">La sua storia' + (atRes ? '' : ' finora') + '</div><div class="ptl">' + (hist.length ? hist.map(({ e, p }) => '<div class="it" style="--cc:var(--c-' + (e.cat || 'none') + ')"><span>' + esc(phaseInfo(SIM.phases, SIM.phases.indexOf(p), resultTheme(SIM), true).short) + '</span><p>' + linkify(e.html) + '</p></div>').join('') : '<p class="help">Nessun evento ancora.</p>') + '</div></div>' +
+      '<div class="dh pf-dh" style="--tc:' + esc(tc) + '"><div class="pf-title">' + avHTML(t, { dead }) + '<h2 id="h-prof">' + esc(t.name) + '</h2></div><button class="iconbtn" data-close type="button" aria-label="Chiudi">✕</button>' +
+        '<div class="pf-tabs" role="tablist" aria-label="Sezioni della scheda">' + tabs.map(([k, l, n]) => '<button type="button" role="tab" id="pft-' + k + '" data-ptab="' + k + '" aria-controls="pfp-' + k + '" aria-selected="' + (profTab === k) + '" tabindex="' + (profTab === k ? 0 : -1) + '">' + esc(l) + (n ? '<span class="pf-n">' + n + '</span>' : '') + '</button>').join('') + '</div></div>' +
+      '<div class="db pf-db">' +
+        '<section class="pf-hero ' + (winner ? 's-win' : dead ? 's-dead' : 's-alive') + '" style="--tc:' + esc(tc) + '">' + avHTML(t, { dead }) +
+          '<div class="pf-id"><span class="pf-status">' + esc(status) + (dead ? ' · ' + esc(outShort.toLowerCase()) : '') + (atRes && t.rank ? ' · ' + t.rank + '° posto' : '') + '</span>' +
+            '<p class="pf-team"><i></i>Squadra ' + t.team + '</p>' +
+            '<div class="pf-tchips">' + (traits.length ? traits.map((x) => '<span class="chip" title="' + esc(x.desc || '') + '">' + esc(x.name) + '</span>').join('') : '<span class="chip dim">Nessun tratto</span>') + '</div>' +
+            '<div id="profFollow" class="pf-actions"></div></div></section>' +
+        '<div class="pf-kpis">' + tile(kills, soft ? 'eliminazioni' : 'uccisioni', kills ? 'hot' : '') + tile(hist.length, 'eventi vissuti') + (dead ? tile(esc(outShort), 'uscita', 'txt') : tile(ally.length, ally.length === 1 ? 'alleato in gara' : 'alleati in gara')) + tile(tests ? passed + '<small>/' + tests + '</small>' : '–', 'prove riuscite') + '</div>' +
+        panel('now', nowPanel) + panel('bonds', bondsPanel) + panel('story', storyPanel) + panel('self', selfPanel) +
       '</div>';
     if (typeof studio !== 'undefined' && studio) studio.renderProfile(t, i);
     if (!$('#profDlg').open) $('#profDlg').showModal();
     $('#profDlg').scrollTop = 0;
   }
-
+  // la scheda è divisa in quattro schede interne; resta aperta quella scelta l'ultima volta
+  let profTab = 'now';
+  const VIT_WORD = (x) => (x >= 80 ? 'ottima' : x >= 55 ? 'buona' : x >= 25 ? 'bassa' : 'critica');
+  function vitalsHTML(v, theme) {
+    const lb = vitLabels(theme), m = arenaOf(theme.id).meter;
+    const rows = [['hp', lb.hp, v[0]], ['en', lb.en, v[1]], ['mo', lb.mo, v[2]], ['food', lb.food, v[3]]].map(([k, n, x]) => ({ k, n, x, w: VIT_WORD(x), bad: x < 25 }));
+    if (m && v[4] >= 0) { const thr = m.thr || 60; rows.push({ k: 'pr', n: m.name, x: v[4], w: v[4] >= thr ? 'pericoloso' : v[4] >= thr * 0.6 ? 'in aumento' : 'sotto controllo', bad: v[4] >= thr, note: 'pericoloso da ' + thr }); }
+    return '<div class="pf-vit">' + rows.map((r) => '<div class="pv vbar ' + r.k + (r.bad ? ' bad' : '') + '"><div class="pv-top"><span>' + esc(r.n) + '</span><b>' + r.x + '</b><em>' + esc(r.w) + '</em></div><i><b style="width:' + r.x + '%"></b>' + (r.k === 'pr' && m ? '<u style="left:' + (m.thr || 60) + '%" title="' + esc(r.note) + '"></u>' : '') + '</i></div>').join('') + '</div>';
+  }
+  function chronHTML(hist, theme) {
+    if (!hist.length) return '<p class="help">Nessun evento ancora.</p>';
+    const groups = [];
+    hist.forEach(({ e, k }) => { const inf = phaseInfo(SIM.phases, k, theme, true); let g = groups[groups.length - 1]; if (!g || g.label !== inf.group.label) groups.push((g = { label: inf.group.label, items: [] })); g.items.push({ e, inf }); });
+    return '<ol class="pf-chron">' + groups.map((g) => '<li><span class="pf-day">' + esc(g.label) + '</span><ul>' + g.items.map(({ e, inf }) => '<li class="pf-ev" style="--cc:var(--c-' + esc(e.cat || 'none') + ')"><span class="pf-when">' + esc(inf.short) + '</span><p>' + linkify(e.html) + '</p></li>').join('') + '</ul></li>').join('') + '</ol>';
+  }
+  function setProfTab(k, focus) {
+    if (!$('#pfp-' + k)) return;
+    profTab = k;
+    $$('#profBody [role="tab"]').forEach((b) => { const on = b.dataset.ptab === k; b.setAttribute('aria-selected', on); b.tabIndex = on ? 0 : -1; if (on && focus) b.focus(); });
+    $$('#profBody .pf-panel').forEach((p) => (p.hidden = p.id !== 'pfp-' + k));
+    const dh = $('#profBody .pf-dh'), dlg = $('#profDlg'), top = $('#profBody .pf-kpis');
+    if (dh && top && dlg.scrollTop > top.offsetTop + top.offsetHeight - dh.offsetHeight) dlg.scrollTop = top.offsetTop + top.offsetHeight - dh.offsetHeight;
+  }
   function attrHTML(t, theme, i, atRes) {
     if (!t.attr) return '';
     let total = t.tests || 0, passed = t.testsPassed || 0;
@@ -15841,9 +16047,9 @@ window.LOS_BUILD = "bf31936522a4293cf05c36175347d2721e6d255323a35d2248cda7fc14d5
         if (e.test && e.test.who === t.id) { total++; if (e.test.pass) passed++; }
       }));
     }
-    const tests = total ? ' · prove superate ' + passed + ' su ' + total : '';
+    const tests = total ? '<small>prove superate ' + passed + ' su ' + total + '</small>' : '';
     const key = theme ? arenaOf(theme.id).key || [] : [];
-    return '<div><div class="sub" style="margin-bottom:8px">Caratteristiche' + tests + (key.length ? ' · <span class="keymark">★</span> contano di più in quest\'arena' : '') + '</div><div class="abars">' +
+    return '<div><div class="sub" style="margin-bottom:8px">Caratteristiche' + tests + '</div>' + (key.length ? '<p class="help keylegend"><span class="keymark">★</span> Le caratteristiche con la stella contano di più in quest\'arena.</p>' : '') + '<div class="abars">' +
       D.attrs.map((a) => { const v = t.attr[a.id] != null ? t.attr[a.id] : 5; return '<div class="abar' + (key.includes(a.id) ? ' key' : '') + '" title="' + esc((D.attrDesc || {})[a.id] || '') + '"><span>' + (key.includes(a.id) ? '<span class="keymark">★</span> ' : '') + a.name + '</span><i><b style="width:' + v * 10 + '%" class="' + (v >= 8 ? 'hi' : v <= 3 ? 'lo' : '') + '"></b></i><em>' + v + '</em></div>'; }).join('') + '</div></div>';
   }
   function relHTML(id, snap, dead, atRes) {
@@ -15865,8 +16071,16 @@ window.LOS_BUILD = "bf31936522a4293cf05c36175347d2721e6d255323a35d2248cda7fc14d5
 
     }
     if (!badges.length && !rows.length) return '';
-    return '<div><div class="sub" style="margin-bottom:8px">Legami e reputazione' + (atRes ? '' : ' adesso') + '</div>' + (badges.length ? '<div class="badges" style="margin-bottom:8px">' + badges.join('') + '</div>' : '') + (rows.length ? '<div class="rel">' + rows.join('') + '</div>' : '') + '</div>';
+    return '<div><div class="sub" style="margin-bottom:8px">' + (rows.length ? 'Reputazione e conti in sospeso' : 'Reputazione') + '</div>' + (badges.length ? '<div class="badges" style="margin-bottom:8px">' + badges.join('') + '</div>' : '') + (rows.length ? '<div class="rel">' + rows.join('') + '</div>' : '') + '</div>';
   }
+
+  $('#profDlg').addEventListener('click', (e) => { const b = e.target.closest('[data-ptab]'); if (b) setProfTab(b.dataset.ptab); });
+  $('#profDlg').addEventListener('keydown', (e) => {
+    const b = e.target.closest('[role="tab"]'); if (!b || !/^(ArrowLeft|ArrowRight|Home|End)$/.test(e.key)) return;
+    const all = $$('#profBody [role="tab"]'), k = all.indexOf(b); e.preventDefault();
+    const n = e.key === 'Home' ? 0 : e.key === 'End' ? all.length - 1 : (k + (e.key === 'ArrowRight' ? 1 : -1) + all.length) % all.length;
+    setProfTab(all[n].dataset.ptab, true);
+  });
 
   /* =============== ESITO =============== */
   const STORY = {
@@ -15946,7 +16160,7 @@ window.LOS_BUILD = "bf31936522a4293cf05c36175347d2721e6d255323a35d2248cda7fc14d5
 
     const ranked = SIM.tributes.slice().sort((a, b) => a.rank - b.rank || b.kills - a.kills);
     const podiumT = ranked.slice(0, 3);
-    const podium = podiumT.length >= 3 ? '<div class="podium">' + [podiumT[1], podiumT[0], podiumT[2]].map((t, k) => { const p = [2, 1, 3][k]; return '<button type="button" class="pod p' + p + '" data-prof="' + esc(t.id) + '">' + avHTML(t, { dead: !t.alive }) + '<b>' + esc(t.name) + '</b><small>' + kN(t.kills) + (t.alive ? '' : ' · G' + t.deathDay) + '</small><span class="step">' + p + '</span></button>'; }).join('') + '</div>' : '';
+    const podium = podiumT.length >= 3 ? '<div class="podium">' + [podiumT[1], podiumT[0], podiumT[2]].map((t, k) => { const p = [2, 1, 3][k]; return '<button type="button" class="pod p' + p + '" data-prof="' + esc(t.id) + '">' + avHTML(t, { dead: !t.alive }) + '<b>' + esc(t.name) + '</b><small>' + kN(t.kills) + (t.alive ? '' : ' · ' + esc(whenLabel(resultTheme(SIM), t.deathPhase, t.deathDay).toLowerCase())) + '</small><span class="step">' + p + '</span></button>'; }).join('') + '</div>' : '';
 
     const awards = [];
     const maxBy = (f) => SIM.tributes.slice().sort((a, b) => f(b) - f(a) || a.rank - b.rank)[0];
