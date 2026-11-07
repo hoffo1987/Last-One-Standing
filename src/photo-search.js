@@ -140,15 +140,23 @@
   }
 
   /* ---------- il web, tramite la funzione del sito (la chiave resta sul server) ---------- */
-  let webState = null;
-  function webAvailable() {
-    if (webState) return webState;
-    if (typeof location === 'undefined' || !/^https?:$/.test(location.protocol)) return (webState = Promise.resolve(false));
-    return (webState = fetch('/api/immagini?ping=1', { credentials: 'omit' }).then((r) => (r.ok ? r.json() : {})).then((d) => !!(d && d.enabled)).catch(() => false));
+  // stato della fonte Web: 'on' attiva, 'nokey' funzione senza chiave, 'missing' funzione assente, 'local' file aperto dal disco
+  let webOn = false;
+  async function webStatus() {
+    if (webOn) return 'on';
+    if (typeof location === 'undefined' || !/^https?:$/.test(location.protocol)) return 'local';
+    try {
+      const r = await fetch('/api/immagini?ping=1&t=' + Date.now(), { credentials: 'omit', cache: 'no-store' });
+      if (!r.ok) return 'missing';
+      const d = await r.json().catch(() => null);
+      if (!d || typeof d.enabled !== 'boolean') return 'missing';
+      webOn = d.enabled; return d.enabled ? 'on' : 'nokey';
+    } catch (e) { return 'missing'; }
   }
+  const webAvailable = () => webStatus().then((x) => x === 'on');
   async function web(q, cur, signal) {
     const r = await fetch('/api/immagini?' + qs({ q }), { signal, credentials: 'same-origin' });
-    if (!r.ok) throw new Error('HTTP ' + r.status);
+    if (!r.ok) { const e = new Error('HTTP ' + r.status); e.web = r.status === 503 ? 'nokey' : r.status === 404 ? 'missing' : r.status === 429 ? 'limit' : 'error'; throw e; }
     const d = await r.json();
     return { items: (d.items || []).filter((x) => x && x.src).map((x, k) => ({ id: 'web' + k + x.src, src: x.src, full: x.full || '', title: shortTxt(clean(x.title) || 'Immagine', 70), note: clean(x.site), credit: clean(x.site), link: x.link || '' })), next: null };
   }
@@ -188,5 +196,5 @@
     throw last || new Error('load');
   }
 
-  G.LOS_PHOTO = { SOURCES, search, toDataURL, crop, loadImage, isURL, webAvailable, fandomWikis };
+  G.LOS_PHOTO = { SOURCES, search, toDataURL, crop, loadImage, isURL, webAvailable, webStatus, fandomWikis };
 })(typeof window !== 'undefined' ? window : globalThis);

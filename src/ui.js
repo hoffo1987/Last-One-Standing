@@ -941,9 +941,10 @@
   /* ---------- foto: ricerca sul web (Wikipedia, Openverse, Wikimedia Commons), file, incolla, trascina ---------- */
   const PH = window.LOS_PHOTO;
   let photoSrc0 = 'anime'; try { photoSrc0 = localStorage.getItem('los-photo-src') || 'anime'; } catch (e) { /* niente */ }
-  const photo = { src: photoSrc0, q: '', items: [], next: null, ctl: null, cache: new Map(), timer: 0, web: false };
+  const photo = { src: photoSrc0, q: '', items: [], next: null, ctl: null, cache: new Map(), timer: 0, web: 'local' };
   // le fonti disponibili: «Web» solo se il sito ha la sua funzione di ricerca attiva
-  const photoSources = () => Object.keys(PH.SOURCES).filter((k) => !PH.SOURCES[k].server || photo.web);
+  const photoSources = () => Object.keys(PH.SOURCES).filter((k) => !PH.SOURCES[k].server || photo.web !== 'local');
+  const WEB_OFF = { nokey: 'La ricerca sul web è installata ma manca la chiave: su Vercel aggiungi la variabile BRAVE_API_KEY (Settings → Environment Variables, ambiente Production) e poi rifai il deploy.', missing: 'La funzione di ricerca sul web non risponde su questo sito (/api/immagini). Controlla su Vercel che l’ultimo deploy sia riuscito e includa la cartella api.', limit: 'Il credito mensile della ricerca sul web è finito o le richieste sono troppe: riprova più tardi o usa le altre fonti.', error: 'La ricerca sul web non risponde in questo momento. Riprova tra poco o usa le altre fonti.' };
   function setPhotoSrc(k) {
     photo.src = photoSources().includes(k) ? k : 'anime';
     try { localStorage.setItem('los-photo-src', photo.src); } catch (e) { /* niente */ }
@@ -995,6 +996,7 @@
     if (!q) { photo.q = ''; photo.items = []; photo.next = null; $('#phMore').hidden = true; $('#phMsg').textContent = ''; photoEmpty('Scrivi chi o che cosa cercare: il nome di una persona nota, un personaggio, un animale, un mestiere.'); return; }
     if (PH.isURL(q)) { photoEmpty('Provo a usare l’immagine del link…'); return applyPhotoSrc(q, null); }
     if (!more) { photo.q = q; photo.items = []; photo.next = null; }
+    if (photo.src === 'web' && photo.web !== 'on') { $('#phMore').hidden = true; $('#phMsg').textContent = 'Ricerca sul web non attiva.'; photoEmpty(WEB_OFF[photo.web] || WEB_OFF.missing); return; }
     const series = photo.src === 'anime' ? $('#phSeries').value.trim().slice(0, 60) : '';
     const cursor = more ? photo.next : null, key = photo.src + '|' + q + '|' + series + '|' + JSON.stringify(cursor);
     if (photo.ctl) photo.ctl.abort();
@@ -1019,6 +1021,7 @@
       $('#phMore').hidden = !photo.next;
     } catch (e) {
       if (e && e.name === 'AbortError') return;
+      if (e && e.web) { if (e.web === 'nokey' || e.web === 'missing') photo.web = e.web; photoEmpty(WEB_OFF[e.web]); $('#phMsg').textContent = 'Ricerca sul web non riuscita.'; $('#phMore').hidden = true; return; }
       photoEmpty(navigator.onLine === false ? 'Sei offline: la ricerca ha bisogno di internet. Puoi sempre caricare una foto dal dispositivo.' : src.name + ' non risponde in questo momento. Riprova tra poco o cambia fonte.');
       $('#phMsg').textContent = 'Ricerca non riuscita.'; $('#phMore').hidden = true;
     } finally { if (ctl === photo.ctl) { grid.removeAttribute('aria-busy'); $('#phMore').disabled = false; } }
@@ -1028,7 +1031,7 @@
     photoTarget = id;
     if (!PH) { $('#avatarFile').click(); return; }
     renderPhotoHead(); renderPhotoSrc();
-    PH.webAvailable().then((on) => { if (on === photo.web) return; photo.web = on; renderPhotoSrc(); });
+    PH.webStatus().then((st) => { if (st === photo.web) return; photo.web = st; renderPhotoSrc(); });
     const name = (t.name || '').trim();
     $('#phQuery').value = name; $('#phMore').hidden = true; $('#phMsg').textContent = '';
     $('#photoDlg').showModal();

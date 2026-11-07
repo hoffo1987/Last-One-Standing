@@ -13,7 +13,7 @@ module.exports = async function handler(req, res) {
   const query = req.query || {};
   res.setHeader('X-Content-Type-Options', 'nosniff');
   if (req.method !== 'GET') { res.setHeader('Allow', 'GET'); return res.status(405).json({ error: 'metodo' }); }
-  if (query.ping) { res.setHeader('Cache-Control', 'public, max-age=300'); return res.status(200).json({ enabled: !!key }); }
+  if (query.ping) { res.setHeader('Cache-Control', 'no-store'); return res.status(200).json({ enabled: !!key }); }
   if (!key) { res.setHeader('Cache-Control', 'no-store'); return res.status(503).json({ error: 'spenta', enabled: false }); }
 
   // solo dalle pagine di questo sito: evita che altri consumino il credito della chiave
