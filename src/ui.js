@@ -82,33 +82,58 @@
   const NET_CLS = [['love', 'Amore'], ['friend', 'Amicizia'], ['ally', 'Alleanza'], ['hate', 'Odio'], ['fear', 'Paura'], ['rival', 'Rivalità'], ['plot', 'Segreti']];
   let netOff = new Set();
   // la mappa dei legami: un grafo dei vivi, colorato per tipo di legame
+  let netSel = null;
   function netHTML(ph) {
     const ids = ph.snap.alive.slice();
     if (ids.length < 2) return '';
+    if (netSel && !ids.includes(netSel)) netSel = null;
     const al = ph.snap.allies;
     ids.sort((a, b) => ((al[a] != null ? al[a] : 999) - (al[b] != null ? al[b] : 999)) || (BY[a].team - BY[b].team));
-    const n = ids.length, R = n > 16 ? 132 : 118, C = 160, pos = {};
-    ids.forEach((id, k) => { const ang = -Math.PI / 2 + (2 * Math.PI * k) / n; pos[id] = [C + R * Math.cos(ang), C + R * Math.sin(ang)]; });
+    const n = ids.length, R = n > 16 ? 128 : 112, C = 160, pos = {}, ang = {};
+    ids.forEach((id, k) => { const a = -Math.PI / 2 + (2 * Math.PI * k) / n; ang[id] = a; pos[id] = [C + R * Math.cos(a), C + R * Math.sin(a)]; });
     const T0 = SIM.tributes, L2 = BDS.labels || {};
-    const es = (ph.snap.edges || []).filter((e) => !netOff.has(e[2]));
-    const nm = (ix) => T0[ix] ? T0[ix].name : '';
+    const all = (ph.snap.edges || []).filter((e) => T0[e[0]] && T0[e[1]] && pos[T0[e[0]].id] && pos[T0[e[1]].id]);
+    const count = {}; all.forEach((e) => (count[e[2]] = (count[e[2]] || 0) + 1));
+    const es = all.filter((e) => !netOff.has(e[2]));
+    const touches = (e) => netSel && (T0[e[0]].id === netSel || T0[e[1]].id === netSel);
     const lines = es.map((e) => {
-      const a = T0[e[0]], b = T0[e[1]]; if (!a || !b || !pos[a.id] || !pos[b.id]) return '';
+      const a = T0[e[0]], b = T0[e[1]];
       let [x1, y1] = pos[a.id], [x2, y2] = pos[b.id];
       if (e[4] === 2) { [x1, y1, x2, y2] = [x2, y2, x1, y1]; }
       const mx = (x1 + x2) / 2, my = (y1 + y2) / 2, cx = mx + (C - mx) * 0.35, cy = my + (C - my) * 0.35;
-      const sw = (1.2 + Math.min(3, e[3] / 35)).toFixed(1);
-      const tip = nm(e[0]) + ' → ' + nm(e[1]) + ': ' + ((L2[e[5]] || {}).n || 'nessun legame') + ' · ' + nm(e[1]) + ' → ' + nm(e[0]) + ': ' + ((L2[e[6]] || {}).n || 'nessun legame');
-      return '<path class="edge e-' + e[2] + '" data-a="' + esc(a.id) + '" data-b="' + esc(b.id) + '" d="M' + x1.toFixed(1) + ' ' + y1.toFixed(1) + ' Q' + cx.toFixed(1) + ' ' + cy.toFixed(1) + ' ' + x2.toFixed(1) + ' ' + y2.toFixed(1) + '" stroke-width="' + sw + '"' + (e[4] ? ' marker-end="url(#arr-' + e[2] + ')"' : '') + '><title>' + esc(tip) + '</title></path>';
+      const sw = (1.2 + Math.min(2.6, e[3] / 40)).toFixed(1);
+      const cls = 'edge e-' + e[2] + (netSel ? (touches(e) ? ' on' : ' faded') : '');
+      return '<path class="' + cls + '" data-a="' + esc(a.id) + '" data-b="' + esc(b.id) + '" d="M' + x1.toFixed(1) + ' ' + y1.toFixed(1) + ' Q' + cx.toFixed(1) + ' ' + cy.toFixed(1) + ' ' + x2.toFixed(1) + ' ' + y2.toFixed(1) + '" stroke-width="' + sw + '"' + (e[4] ? ' marker-end="url(#arr-' + e[2] + ')"' : '') + '/>';
     }).join('');
+    const linked = new Set(); if (netSel) all.forEach((e) => { if (touches(e)) { linked.add(T0[e[0]].id); linked.add(T0[e[1]].id); } });
+    const showNames = n <= 14;
     const nodes = ids.map((id) => {
-      const t = BY[id], [x, y] = pos[id];
-      return '<g class="node" data-prof="' + esc(id) + '" tabindex="0" role="button" aria-label="' + esc(t.name) + '"><circle cx="' + x.toFixed(1) + '" cy="' + y.toFixed(1) + '" r="12" style="fill:' + esc(t.color || '#888') + '"/><text x="' + x.toFixed(1) + '" y="' + (y + 3.6).toFixed(1) + '">' + esc(initials(t.name)) + '</text><title>' + esc(t.name) + '</title></g>';
+      const t = BY[id], [x, y] = pos[id], deg = all.filter((e) => T0[e[0]].id === id || T0[e[1]].id === id).length;
+      const cls = 'node' + (netSel === id ? ' sel' : netSel ? (linked.has(id) ? ' near' : ' faded') : '');
+      const c = Math.cos(ang[id]), lx = C + (R + 19) * c, ly = C + (R + 19) * Math.sin(ang[id]) + 3, anchor = c > 0.3 ? 'start' : c < -0.3 ? 'end' : 'middle';
+      return '<g class="' + cls + '" data-net-node="' + esc(id) + '" tabindex="0" role="button" aria-pressed="' + (netSel === id) + '" aria-label="' + esc(t.name) + ': ' + plural(deg, 'legame', 'legami') + '">' +
+        '<circle cx="' + x.toFixed(1) + '" cy="' + y.toFixed(1) + '" r="13" style="fill:' + esc(t.color || '#888') + '"/><text class="ini" x="' + x.toFixed(1) + '" y="' + (y + 3).toFixed(1) + '">' + esc(initials(t.name)) + '</text>' +
+        ((netSel ? (netSel === id || linked.has(id)) : showNames) ? '<text class="nm nm-' + anchor + '" x="' + lx.toFixed(1) + '" y="' + ly.toFixed(1) + '">' + esc(t.name) + '</text>' : '') + '</g>';
     }).join('');
-    const marks = NET_CLS.map(([c]) => '<marker id="arr-' + c + '" viewBox="0 0 8 8" refX="15" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L8 4L0 8z" class="mk-' + c + '"/></marker>').join('');
-    const legend = '<div class="netlegend" role="group" aria-label="Mostra o nascondi i tipi di legame">' + NET_CLS.map(([c, l]) => '<button type="button" class="nl e-' + c + (netOff.has(c) ? ' off' : '') + '" data-net="' + c + '" aria-pressed="' + !netOff.has(c) + '"><i></i>' + l + '</button>').join('') + '</div>';
-    return '<div class="netwrap"><h4>Mappa dei legami</h4><svg class="net" viewBox="0 0 320 320" role="group" aria-label="Mappa dei legami tra i concorrenti in gara"><defs>' + marks + '</defs>' + lines + nodes + '</svg>' + legend +
-      '<p class="help">Le frecce indicano un sentimento non ricambiato. Passa sopra un volto per evidenziarne i legami, toccalo per aprire la scheda.</p></div>';
+    const marks = NET_CLS.map(([c]) => '<marker id="arr-' + c + '" viewBox="0 0 8 8" refX="22" refY="4" markerUnits="userSpaceOnUse" markerWidth="8" markerHeight="8" orient="auto"><path d="M0 0L8 4L0 8z" class="mk-' + c + '"/></marker>').join('');
+    const legend = '<div class="netlegend" role="group" aria-label="Mostra o nascondi i tipi di legame">' + NET_CLS.filter(([c]) => count[c]).map(([c, l]) => '<button type="button" class="nl e-' + c + (netOff.has(c) ? ' off' : '') + '" data-net="' + c + '" aria-pressed="' + !netOff.has(c) + '"><i></i>' + l + '<b>' + count[c] + '</b></button>').join('') + '</div>';
+    // la scheda della persona scelta: tutti i suoi legami, in parole
+    let focus = '';
+    if (netSel) {
+      const me = BY[netSel], mine = all.filter(touches);
+      const row = (e) => {
+        const mineIsA = T0[e[0]].id === netSel, other = mineIsA ? T0[e[1]] : T0[e[0]];
+        const out = (L2[mineIsA ? e[5] : e[6]] || {}).n, back = (L2[mineIsA ? e[6] : e[5]] || {}).n;
+        return '<li class="nf-row">' + avHTML(BY[other.id], { btn: true }) + '<span class="nf-txt"><b>' + esc(other.name) + '</b>' +
+          '<span><em class="e-' + e[2] + '">' + esc(out || 'nessun legame') + '</em> da ' + esc(me.name) + '</span>' +
+          '<span class="nf-back">' + (back ? '<em class="e-' + e[2] + '">' + esc(back) + '</em> in risposta' : 'non ricambiato') + '</span></span></li>';
+      };
+      focus = '<div class="netfocus">' + '<div class="nf-head">' + avHTML(me, { btn: true }) + '<span><b>' + esc(me.name) + '</b><span>' + plural(mine.length, 'legame', 'legami') + '</span></span><button type="button" class="btn sm" data-prof="' + esc(me.id) + '">Apri la scheda</button><button type="button" class="nf-x" data-net-node="' + esc(me.id) + '" aria-label="Chiudi">×</button></div>' +
+        (mine.length ? '<ul class="nf-list">' + mine.sort((a, b) => b[3] - a[3]).map(row).join('') + '</ul>' : '<p class="help">Nessun legame forte con chi è ancora in gara.</p>') + '</div>';
+    }
+    return '<div class="netwrap"><div class="nw-head"><h4>Mappa dei legami</h4><span class="help">' + (netSel ? 'Tocca di nuovo per deselezionare' : 'Tocca un volto per vedere i suoi legami') + '</span></div>' +
+      '<svg class="net' + (netSel ? ' focus' : '') + '" viewBox="-40 -6 400 332" role="group" aria-label="Mappa dei legami tra i concorrenti in gara"><defs>' + marks + '</defs>' + lines + nodes + '</svg>' + legend + focus +
+      '<p class="help nw-note">Le frecce indicano un sentimento non ricambiato; lo spessore, quanto è forte.</p></div>';
   }
   function dimsHTML(d) {
     if (!d) return '';
@@ -1591,7 +1616,7 @@
     const aliveSet = new Set(ph.snap.alive);
     let h = '';
     if (sideTab === 'map') {
-      h=window.LOS_MAP_VIEW.render(SIM,i,{theme,properties:arenaOf(theme.id).zones,selected:mapSelection,avatar:t=>avHTML(t,{btn:true})});
+      h=window.LOS_MAP_VIEW.render(SIM,i,{theme,properties:arenaOf(theme.id).zones,selected:mapSelection,avatar:t=>avHTML(t,{btn:true}),zonePic:z=>window.LOS_ATLAS?window.LOS_ATLAS.pic(theme.id,'luoghi',z.name,theme.hue,{index:z.id}):''});
     } else if (sideTab === 'fallen') {
       const dead = SIM.tributes.filter((t) => !t.alive && t.deathPhase <= i).sort((a, b) => b.order - a.order);
       h = dead.length ? '<div class="plist">' + dead.map((t) => '<button type="button" class="prow" data-prof="' + esc(t.id) + '">' + avHTML(t, { dead: true }) + '<span style="min-width:0"><span class="pn">' + esc(t.name) + '</span><span class="ps">' + (t.killerIds.length ? 'per mano di ' + esc(t.killerIds.map((k) => BY[k].name).join(', ')) + (causeTxt(t, theme) ? ' · ' + causeTxt(t, theme) : '') : causeTxt(t, theme) ? 'per ' + causeTxt(t, theme) : 'vittima dell\'arena') + '</span></span><span class="pk">G' + t.deathDay + '</span></button>').join('') + '</div>' : '<p class="help">Ancora nessuno.</p>';
@@ -1616,12 +1641,17 @@
       const grudges = [], debts = [];
       ph.snap.alive.forEach((id) => { const r = R[id]; if (!r) return; r.g.forEach(([t, why, v]) => alive.has(t) && grudges.push([id, t, why, v])); r.o.forEach((t) => alive.has(t) && debts.push([id, t])); });
       const whyTxt = (why, v) => why === 'kill' && v && BY[v] ? 'per ' + esc(BY[v].name) : { betray: 'per un tradimento', steal: 'per un furto', attack: 'per un agguato', kill: 'per un lutto' }[why] || '';
-      const sec = (title, rows, empty) => '<div class="agroup"><h4>' + title + ' · ' + rows.length + '</h4>' + (rows.length ? '<div class="rel">' + rows.join('') + '</div>' : '<p class="help">' + empty + '</p>') + '</div>';
-      h = netHTML(ph) + (gs.length ? gs.map((g, k) => '<div class="agroup"><h4>Alleanza ' + (k + 1) + ' · ' + g.length + '</h4><div class="row">' + g.map(av).join('') + '</div></div>').join('') : '<p class="help" style="margin-bottom:10px">Nessuna alleanza attiva.</p>') +
-        sec('Coppie', couples.map(([a, b]) => '<div class="relrow">' + av(a) + '<span class="arrow" style="color:var(--c-love)">♥</span>' + av(b) + '<span class="lbl">' + esc(BY[a].name) + ' e ' + esc(BY[b].name) + '</span></div>'), 'Ancora nessuna coppia.') +
-        sec('Vendette giurate', grudges.slice(0, 14).map(([a, b, why, v]) => '<div class="relrow">' + av(a) + '<span class="arrow">→</span>' + av(b) + '<span class="lbl">' + whyTxt(why, v) + '</span></div>'), 'Nessuno ha ancora giurato vendetta.') +
-        sec('Debiti', debts.slice(0, 10).map(([a, b]) => '<div class="relrow">' + av(a) + '<span class="lbl">deve un favore a</span>' + av(b) + '</div>'), 'Nessun debito in sospeso.') +
-        (solo.length ? '<div class="agroup"><h4>Senza alleati · ' + solo.length + '</h4><div class="row">' + solo.map(av).join('') + '</div></div>' : '');
+      const stat = (v, l) => '<div class="rs"><b>' + v + '</b><span>' + l + '</span></div>';
+      const sec = (cls, title, rows, empty) => '<section class="rsec ' + cls + '"><h4>' + title + '<span>' + rows.length + '</span></h4>' + (rows.length ? '<div class="rel">' + rows.join('') + '</div>' : '<p class="help">' + empty + '</p>') + '</section>';
+      const nameOf = (id) => '<button type="button" class="rname" data-prof="' + esc(id) + '">' + esc(BY[id].name) + '</button>';
+      const pair = (a, b, icon, text) => '<div class="relrow"><span class="rpair">' + av(a) + '<span class="ricon">' + icon + '</span>' + av(b) + '</span><span class="rtxt">' + text + '</span></div>';
+      h = '<div class="rstats">' + stat(gs.length, gs.length === 1 ? 'Alleanza' : 'Alleanze') + stat(couples.length, couples.length === 1 ? 'Coppia' : 'Coppie') + stat(grudges.length, grudges.length === 1 ? 'Vendetta' : 'Vendette') + stat(debts.length, debts.length === 1 ? 'Debito' : 'Debiti') + '</div>' +
+        netHTML(ph) +
+        '<section class="rsec r-ally"><h4>Alleanze<span>' + gs.length + '</span></h4>' + (gs.length ? '<div class="rally">' + gs.map((g, k) => '<div class="rteam"><span class="rt-n">' + (k + 1) + '</span><div class="rt-faces">' + g.map(av).join('') + '</div><p>' + g.map(nameOf).join(', ') + '</p></div>').join('') + '</div>' : '<p class="help">Nessuna alleanza attiva.</p>') + '</section>' +
+        sec('r-love', 'Coppie', couples.map(([a, b]) => pair(a, b, '♥', nameOf(a) + ' e ' + nameOf(b) + ' stanno insieme')), 'Ancora nessuna coppia.') +
+        sec('r-hate', 'Vendette giurate', grudges.slice(0, 14).map(([a, b, why, v]) => pair(a, b, '→', nameOf(a) + ' vuole vendicarsi di ' + nameOf(b) + (whyTxt(why, v) ? ' <span class="rwhy">' + whyTxt(why, v) + '</span>' : ''))), 'Nessuno ha ancora giurato vendetta.') +
+        sec('r-debt', 'Debiti', debts.slice(0, 10).map(([a, b]) => pair(a, b, '⇢', nameOf(a) + ' deve un favore a ' + nameOf(b))), 'Nessun debito in sospeso.') +
+        (solo.length ? '<section class="rsec r-solo"><h4>Senza alleati<span>' + solo.length + '</span></h4><div class="rt-faces">' + solo.map(av).join('') + '</div></section>' : '');
     }
     $('#sideBody').innerHTML = h;
     if(lastSideResult!==SIM||lastSidePhase!==i||lastSideTab!==sideTab)$('#sideBody').scrollTop=0;
@@ -1633,20 +1663,27 @@
     if(zone&&SIM){mapSelection=zone.dataset.mapZone==='all'?null:+zone.dataset.mapZone;renderSide(S.run.phase);$('#sideBody').scrollTop=0;$('#sideBody .map-node[data-map-zone="'+mapSelection+'"]')?.focus({preventScroll:true});return;}
     const event=e.target.closest('[data-map-event]');
     if(event&&SIM){const ev=SIM.phases[S.run.phase].events[+event.dataset.mapEvent];if(!ev?.place)return;stopPlay();if(S.settings.followOnly&&!ev.ids.some(id=>(S.followed||[]).includes(id))){S.settings.followOnly=false;renderLive(true);}const card=$('#phBody [data-map-step="'+ev.place.seq+'"]');if(card){card.tabIndex=-1;card.scrollIntoView({block:'center',behavior:AN.reduced?'auto':'smooth'});card.focus({preventScroll:true});}return;}
+    const nn = e.target.closest('[data-net-node]');
+    if (nn && SIM) { const id = nn.dataset.netNode; netSel = netSel === id ? null : id; renderSide(S.run.phase); const back = $('#sideBody .net [data-net-node="' + CSS.escape(id) + '"]'); if (back) back.focus({ preventScroll: true }); return; }
     const b = e.target.closest('[data-net]'); if (!b || !SIM) return;
     const c = b.dataset.net; if (netOff.has(c)) netOff.delete(c); else netOff.add(c);
     renderSide(S.run.phase);
   });
   const netFocus = (id) => {
-    const svg = $('#sideBody .net'); if (!svg) return;
+    const svg = $('#sideBody .net'); if (!svg || netSel) return;
     svg.classList.toggle('focus', !!id);
     $$('.edge', svg).forEach((p) => p.classList.toggle('on', !!id && (p.dataset.a === id || p.dataset.b === id)));
-    $$('.node', svg).forEach((g) => g.classList.toggle('on', g.dataset.prof === id));
+    $$('.node', svg).forEach((g) => g.classList.toggle('on', g.dataset.netNode === id));
   };
-  $('#sideBody').addEventListener('mouseover', (e) => { const g = e.target.closest('.net .node'); netFocus(g ? g.dataset.prof : null); });
-  $('#sideBody').addEventListener('focusin', (e) => { const g = e.target.closest('.net .node'); if (g) netFocus(g.dataset.prof); });
+  $('#sideBody').addEventListener('mouseover', (e) => {
+    const g = e.target.closest('.net .node'); netFocus(g ? g.dataset.netNode : null);
+    // mappa delle zone: al passaggio si accendono i passaggi della zona
+    const z = e.target.closest('.map-node'), svg = $('#sideBody .arena-graph svg');
+    if (svg) $$('.link', svg).forEach((l) => l.classList.toggle('hl', !!z && (l.dataset.a === z.dataset.mapZone || l.dataset.b === z.dataset.mapZone)));
+  });
+  $('#sideBody').addEventListener('focusin', (e) => { const g = e.target.closest('.net .node'); if (g) netFocus(g.dataset.netNode); });
   $('#sideBody').addEventListener('mouseleave', () => netFocus(null));
-  $('#sideBody').addEventListener('keydown', (e) => { const g = e.target.closest('.net .node'); if (g && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); openProfile(g.dataset.prof); } });
+  $('#sideBody').addEventListener('keydown', (e) => { const g = e.target.closest('.net .node'); if (g && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); g.dispatchEvent(new MouseEvent('click', { bubbles: true })); } });
   $('.stabs').addEventListener('click', (e) => { const b = e.target.closest('button'); if (!b || !SIM) return; sideTab = b.dataset.s; renderSide(S.run.phase); });
   function go(k) { if (!SIM) return; S.run.phase = Math.max(0, Math.min(SIM.phases.length - 1, k)); renderLive(false); if (playing) schedulePlay(); }
   function next() {

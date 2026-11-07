@@ -1773,6 +1773,207 @@ details.card > summary { font-size: 16px; }
 .dx-title .dx-kicker { text-shadow: 0 1px 8px rgba(0,0,0,.7); }
 /* Geografia: schema dei passaggi e tracce della sola fase visibile. */
 .map-view{min-width:0}.map-caption{font-size:12px;line-height:1.6;margin:0 0 8px}.arena-graph{position:relative;aspect-ratio:360/320;width:100%;margin:8px auto 20px;max-width:480px}.arena-graph>svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}.arena-graph line,.arena-graph path{fill:none;stroke:currentColor;opacity:.18;stroke-width:1.5}.arena-graph line.shut,.arena-graph path.shut{stroke-dasharray:4 5;opacity:.1}.map-node{position:absolute;transform:translate(-50%,-50%);width:28%;max-width:102px;background:none;border:0;color:inherit;padding:4px;cursor:pointer;font:inherit;line-height:1.2;text-align:center}.map-node b{display:block;border:1px solid currentColor;border-radius:50%;width:28px;height:28px;line-height:26px;margin:0 auto 3px;background:var(--bg);font-size:13px}.map-node span{display:block;font-size:11px;font-weight:650;overflow-wrap:anywhere}.map-node small{display:block;font-size:10px;opacity:.7;margin-top:2px}.map-node.shut{opacity:.45}.map-node.selected b{outline:3px solid currentColor;outline-offset:3px}.map-view .map{display:grid;grid-template-columns:minmax(0,1fr);gap:10px;margin-top:12px}.map-view .zone{display:block;min-width:0}.map-view .zone h4{margin:0 0 5px}.map-view .zone h4 button,.map-links button,.map-person,.map-events button{background:none;border:0;padding:0;color:inherit;font:inherit;cursor:pointer;text-align:left;overflow-wrap:anywhere}.map-links button,.map-person{text-decoration:underline;text-underline-offset:3px}.map-view .zone .help{font-size:11px;margin:5px 0;line-height:1.6}.map-properties,.map-links,.map-fallen{font-size:11px;line-height:1.7;margin:8px 0}.map-view .zone details{font-size:12px;line-height:1.6;margin-top:8px}.map-events{padding-left:18px}.map-events li+li{margin-top:10px}.map-events button:hover{text-decoration:underline}.map-journeys{margin-top:16px;font-size:12px}.map-journeys ol{padding-left:20px}.map-journeys li{margin:12px 0;line-height:1.6}.map-route,.map-journeys .help{display:block;font-size:11px}.event-place{display:block;font-size:10px;letter-spacing:.03em;opacity:.65;margin-bottom:4px}.personal-route{padding-left:18px;font-size:12px;line-height:1.6}.personal-route li+li{margin-top:6px}
+
+/* =====================================================================
+   DIRETTA · MAPPA DELLE ZONE
+   ===================================================================== */
+.map-view { display: grid; gap: 14px; }
+.mv-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
+.mv-title { display: block; font-family: var(--f-display); font-size: 17px; letter-spacing: -.01em; }
+.mv-sub { display: block; font-size: 13px; color: var(--muted); margin-top: 1px; }
+.mv-all { flex: none; }
+.arena-graph { position: relative; aspect-ratio: 360 / 300; width: 100%; max-width: 440px; margin: 0 auto; border-radius: 16px; background: radial-gradient(ellipse at 50% 45%, color-mix(in srgb, var(--accent) 10%, transparent), transparent 70%); }
+.arena-graph > svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+.arena-graph .link { fill: none; stroke: var(--ink); stroke-opacity: .2; stroke-width: 2; stroke-linecap: round; transition: stroke-opacity .25s, stroke .25s, stroke-width .25s; }
+.arena-graph .link.shut { stroke-dasharray: 3 6; stroke-opacity: .14; }
+.arena-graph .link.on, .arena-graph .link.hl { stroke: var(--accent); stroke-opacity: .85; stroke-width: 3; }
+.arena-graph .link.faded { stroke-opacity: .07; }
+.arena-graph .route { fill: none; stroke: var(--c-ally); stroke-opacity: .75; stroke-linecap: round; stroke-dasharray: 6 5; animation: routeFlow 1.4s linear infinite; }
+.arena-graph .route.faded { stroke-opacity: .12; }
+.arena-graph .mv-arrow { fill: var(--c-ally); }
+@keyframes routeFlow { to { stroke-dashoffset: -22; } }
+.map-node { position: absolute; transform: translate(-50%, -50%); display: grid; justify-items: center; gap: 4px; width: auto; max-width: none; background: none; border: 0; padding: 0; color: var(--ink); font: inherit; cursor: pointer; transition: opacity .25s; }
+.map-node .mn-disc { position: relative; width: var(--s); height: var(--s); border-radius: 50%; display: grid; place-items: center; background: var(--panel); box-shadow: 0 0 0 3px var(--ring, var(--alive)), 0 6px 16px -6px rgba(0,0,0,.45); transition: transform .25s cubic-bezier(.2,.9,.3,1.4), box-shadow .25s; }
+.map-node.d1 { --ring: var(--c-item); } .map-node.d2 { --ring: var(--dead); }
+.map-node .mn-disc b { font-family: var(--f-display); font-size: 17px; font-weight: 800; line-height: 1; border: 0; width: auto; height: auto; margin: 0; background: none; }
+.map-node.empty .mn-disc b { color: var(--muted); font-weight: 600; }
+.map-node .mn-name { font-size: 12.5px; font-weight: 700; white-space: nowrap; padding: 1px 7px; border-radius: 999px; background: color-mix(in srgb, var(--panel) 85%, transparent); }
+.map-node:hover .mn-disc, .map-node:focus-visible .mn-disc { transform: scale(1.08); }
+.map-node.selected .mn-disc { transform: scale(1.12); box-shadow: 0 0 0 3px var(--ring, var(--alive)), 0 0 0 7px color-mix(in srgb, var(--accent) 45%, transparent), 0 8px 20px -6px rgba(0,0,0,.5); }
+.map-node.selected .mn-name { background: var(--accent); color: var(--accent-ink); }
+
+.map-node.shut .mn-disc { background: repeating-linear-gradient(135deg, var(--panel-2) 0 5px, var(--panel) 5px 10px); }
+.map-node.selected b { outline: 0; }
+.mn-badges { position: absolute; top: -7px; right: -10px; display: flex; gap: 2px; }
+.mb { display: inline-flex; align-items: center; gap: 1px; height: 18px; min-width: 18px; padding: 0 3px; border-radius: 999px; background: var(--panel); box-shadow: 0 1px 4px rgba(0,0,0,.3); font-style: normal; }
+.mb svg { width: 12px; height: 12px; fill: currentColor; }
+.mb u { text-decoration: none; font-size: 11px; font-weight: 800; }
+.mb-dead { color: var(--dead); } .mb-trap { color: var(--c-item); } .mb-lock { color: var(--muted); } .mb-dis { color: var(--c-hurt); }
+.mv-legend { display: flex; flex-wrap: wrap; justify-content: center; gap: 4px 14px; font-size: 12.5px; color: var(--muted); margin: -4px 0 0; }
+.mv-legend span { display: inline-flex; align-items: center; gap: 6px; }
+.mv-legend i { display: inline-block; }
+.lg-node { width: 12px; height: 12px; border-radius: 50%; background: var(--panel); box-shadow: 0 0 0 2px var(--muted); }
+.lg-route { width: 18px; height: 0; border-top: 2.5px dashed var(--c-ally); }
+.lg-shut { width: 18px; height: 0; border-top: 2px dotted var(--muted); }
+.lg-ring { width: 12px; height: 12px; border-radius: 50%; background: conic-gradient(var(--alive) 0 33%, var(--c-item) 0 66%, var(--dead) 0); }
+.mv-note { margin: 0; }
+/* elenco delle zone */
+.zlist { display: grid; gap: 6px; }
+.zrow { width: 100%; display: grid; grid-template-columns: 30px minmax(0, 1fr) auto; gap: 10px; align-items: center; padding: 10px 12px; border-radius: 14px; border: 1px solid var(--line); background: var(--panel); color: inherit; font: inherit; text-align: left; cursor: pointer; transition: border-color .2s, transform .15s, box-shadow .2s; }
+@media (hover: hover) { .zrow:hover { border-color: color-mix(in srgb, var(--accent) 45%, var(--line)); box-shadow: var(--shadow-sm); } }
+.zrow:active { transform: scale(.99); }
+.zrow.closed { background: repeating-linear-gradient(135deg, var(--panel) 0 10px, color-mix(in srgb, var(--panel-2) 70%, var(--panel)) 10px 20px); }
+.zr-num { width: 30px; height: 30px; border-radius: 10px; display: grid; place-items: center; font-weight: 800; font-size: 14px; background: var(--panel-2); }
+.zr-main { display: grid; gap: 6px; min-width: 0; }
+.zr-name { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; font-weight: 700; font-size: 15px; }
+.zflags { display: inline-flex; gap: 4px; }
+.zflag { display: inline-flex; align-items: center; gap: 3px; font-size: 12px; font-weight: 700; padding: 1px 7px; border-radius: 999px; background: var(--panel-2); }
+.zflag svg { width: 11px; height: 11px; fill: currentColor; }
+.zflag.dead { color: var(--dead); background: color-mix(in srgb, var(--dead) 12%, var(--panel)); }
+.zflag.trap { color: color-mix(in srgb, var(--c-item) 80%, var(--ink)); }
+.zflag.lock { color: var(--muted); }
+.zr-count { display: grid; justify-items: end; line-height: 1.1; }
+.zr-count b { font-family: var(--f-display); font-size: 22px; font-weight: 800; }
+.zr-count small { font-size: 12px; color: var(--muted); }
+.zmeters { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.zm { display: grid; gap: 3px; min-width: 0; font-size: 11.5px; }
+.zm-l { color: var(--muted); }
+.zm i { height: 5px; border-radius: 999px; background: var(--panel-2); overflow: hidden; display: block; }
+.zm i b { display: block; height: 100%; border-radius: inherit; }
+.zm em { display: none; }
+.zm-resources b { background: var(--alive); } .zm-danger b { background: var(--dead); } .zm-shelter b { background: var(--c-ally); }
+.zmeters.wide { grid-template-columns: minmax(0, 1fr); gap: 7px; }
+.zmeters.wide .zm { grid-template-columns: 70px minmax(0, 1fr) 64px; align-items: center; gap: 10px; font-size: 13.5px; }
+.zmeters.wide .zm i { height: 7px; }
+.zmeters.wide .zm em { display: block; font-style: normal; font-weight: 700; text-align: right; }
+/* scheda della zona */
+.zcard { border-radius: 16px; overflow: hidden; border: 1px solid var(--line); background: var(--panel); box-shadow: var(--shadow-sm); animation: viewIn .35s cubic-bezier(.2,.7,.3,1) both; }
+.zcard.hot { border-color: color-mix(in srgb, var(--dead) 40%, var(--line)); }
+.zc-head { position: relative; min-height: 64px; display: flex; align-items: flex-end; background: var(--screen); }
+.zc-pic { position: absolute; inset: 0; }
+.zc-pic .ax { width: 100%; height: 100%; }
+.zc-pic::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(0,0,0,0) 20%, rgba(0,0,0,.75)); }
+.zc-head:has(.zc-pic) { aspect-ratio: 16 / 7; }
+.zc-title { position: relative; z-index: 1; display: flex; align-items: center; gap: 10px; padding: 12px 14px; color: #fff; }
+.zc-num { width: 28px; height: 28px; border-radius: 9px; display: grid; place-items: center; font-weight: 800; font-size: 14px; background: rgba(255,255,255,.18); backdrop-filter: blur(6px); border: 1px solid rgba(255,255,255,.3); }
+.zc-title h4 { margin: 0; font-size: 20px; font-family: var(--f-display); color: #fff; text-shadow: 0 2px 10px rgba(0,0,0,.5); }
+.zc-in { padding: 14px; display: grid; gap: 14px; }
+.zc-desc { font-size: 14px; color: var(--muted); line-height: 1.5; margin: 0; }
+.ztags2 { display: flex; flex-wrap: wrap; gap: 6px; }
+.ztag2 { display: inline-flex; align-items: center; gap: 5px; font-size: 12.5px; font-weight: 700; padding: 3px 10px; border-radius: 999px; }
+.ztag2 svg { width: 12px; height: 12px; fill: currentColor; }
+.ztag2.lock { background: var(--panel-2); color: var(--muted); }
+.ztag2.dis { background: color-mix(in srgb, var(--c-hurt) 14%, var(--panel)); color: color-mix(in srgb, var(--c-hurt) 85%, var(--ink)); }
+.zc-sec h5 { margin: 0 0 8px; font-size: 13.5px; display: flex; align-items: center; gap: 6px; }
+.zc-sec h5 span { font-size: 12px; font-weight: 800; min-width: 20px; height: 20px; padding: 0 6px; border-radius: 999px; display: inline-grid; place-items: center; background: var(--panel-2); color: var(--muted); }
+.zc-faces { display: flex; flex-wrap: wrap; gap: 10px 12px; }
+.zc-face { display: grid; justify-items: center; gap: 3px; width: 54px; font-size: 12px; text-align: center; line-height: 1.2; overflow-wrap: anywhere; }
+.zc-face .av { --s: 40px; }
+.zc-out p { margin: 0; font-size: 14px; }
+.zc-out h5 { color: var(--dead); }
+.zc-traps { margin: 0; padding-left: 18px; font-size: 14px; line-height: 1.6; }
+.zc-loot { margin: 0; font-size: 14px; color: var(--muted); }
+.zc-loot b { color: var(--ink); }
+.zc-links { display: flex; flex-wrap: wrap; gap: 6px; }
+.zc-link { border: 1px solid var(--line); background: var(--panel); color: var(--ink); font: inherit; font-size: 13.5px; font-weight: 600; padding: 5px 12px; border-radius: 999px; cursor: pointer; transition: border-color .2s, background .2s; }
+.zc-link:hover { border-color: var(--accent); background: var(--accent-soft); }
+.zc-link.shut { color: var(--muted); border-style: dashed; }
+.zc-link small { font-weight: 500; }
+.map-person { background: none; border: 0; padding: 0; font: inherit; color: inherit; cursor: pointer; text-decoration: underline; text-decoration-color: color-mix(in srgb, var(--ink) 30%, transparent); text-underline-offset: 3px; }
+.map-view .map-events { margin: 0; padding-left: 20px; display: grid; gap: 8px; font-size: 14px; line-height: 1.5; }
+.map-view .map-events li + li { margin-top: 0; }
+.map-view .map-events button { background: none; border: 0; padding: 0; font: inherit; color: inherit; text-align: left; cursor: pointer; }
+.map-view .map-events button:hover { color: var(--accent-text); }
+/* pieghevoli: spostamenti e memoria */
+.mv-fold { border: 1px solid var(--line); border-radius: 14px; background: var(--panel); margin: 0; font-size: 14px; }
+.mv-fold > summary { list-style: none; cursor: pointer; display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 11px 14px; font-weight: 700; }
+.mv-fold > summary::-webkit-details-marker { display: none; }
+.mv-fold > summary b { font-size: 12.5px; min-width: 24px; height: 22px; padding: 0 7px; border-radius: 999px; display: inline-grid; place-items: center; background: var(--panel-2); color: var(--muted); }
+.mv-fold > summary::after { content: "▾"; color: var(--muted); margin-left: -4px; transition: transform .2s; }
+.mv-fold[open] > summary::after { transform: rotate(180deg); }
+.mv-fold > summary span { flex: 1; }
+.mv-fold > ol, .mv-fold > .help { margin: 0; padding: 0 14px 14px 32px; }
+.map-journeys ol { display: grid; gap: 12px; }
+.map-journeys li { margin: 0; line-height: 1.5; }
+.map-route { display: flex; flex-wrap: wrap; align-items: center; gap: 4px; margin: 4px 0 2px; font-size: 13px; }
+.mr-stop { padding: 1px 8px; border-radius: 999px; background: color-mix(in srgb, var(--c-ally) 12%, var(--panel)); font-weight: 600; }
+.mr-arrow { color: var(--c-ally); }
+.mr-why { display: block; font-size: 12.5px; color: var(--muted); }
+.map-memory ol { display: grid; gap: 10px; }
+.map-memory li p { margin: 2px 0 0; line-height: 1.5; }
+.mm-when { font-size: 12.5px; font-weight: 700; color: var(--accent-text); }
+
+/* =====================================================================
+   DIRETTA · LEGAMI
+   ===================================================================== */
+.rstats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); border: 1px solid var(--line); border-radius: 14px; background: var(--panel); margin-bottom: 14px; overflow: hidden; }
+.rs { position: relative; display: grid; gap: 1px; padding: 10px 8px; text-align: center; }
+.rs + .rs::before { content: ""; position: absolute; left: 0; top: 12px; bottom: 12px; width: 1px; background: var(--line); }
+.rs b { font-family: var(--f-display); font-size: 22px; font-weight: 800; line-height: 1.1; }
+.rs span { font-size: 12.5px; color: var(--muted); }
+.netwrap { margin-bottom: 16px; gap: 10px; }
+.nw-head { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+.nw-head h4 { font-size: 16px; font-family: var(--f-display); }
+.nw-head .help { font-size: 12.5px; }
+.net { max-width: 400px; border-radius: 16px; background: radial-gradient(circle at 50% 48%, color-mix(in srgb, var(--accent) 9%, transparent), transparent 70%); }
+.net .edge { opacity: .7; transition: opacity .25s, stroke-width .25s; }
+.net .edge.faded { opacity: .06; }
+.net .edge.on { opacity: 1; }
+.net.focus .edge:not(.on):not(.faded) { opacity: .15; }
+.net .node { cursor: pointer; transition: opacity .25s; }
+.net .node circle { stroke: var(--panel); stroke-width: 2.5; transition: stroke .2s, stroke-width .2s; }
+.net .node .ini { font: 800 9px var(--f-body); fill: #fff; text-anchor: middle; pointer-events: none; text-shadow: 0 1px 2px rgba(0,0,0,.6); }
+.net .node .nm { font: 700 10.5px var(--f-body); fill: var(--ink); pointer-events: none; }
+.net .node.sel circle { stroke: var(--accent); stroke-width: 4; }
+.net .node.faded { opacity: .3; }
+.net .node:focus-visible circle { stroke: var(--focus); stroke-width: 4; }
+.netlegend { gap: 6px; }
+.netlegend .nl { font-size: 13px; padding: 4px 6px 4px 10px; gap: 6px; }
+.netlegend .nl b { font-size: 11.5px; min-width: 20px; height: 18px; padding: 0 5px; border-radius: 999px; display: inline-grid; place-items: center; background: var(--panel-2); color: var(--muted); }
+.netlegend .nl i { width: 14px; height: 4px; }
+.netfocus { border: 1px solid color-mix(in srgb, var(--accent) 40%, var(--line)); border-radius: 16px; background: var(--panel); box-shadow: var(--shadow-sm); padding: 12px; display: grid; gap: 10px; animation: viewIn .3s cubic-bezier(.2,.7,.3,1) both; }
+.nf-head { display: grid; grid-template-columns: auto minmax(0, 1fr) auto auto; gap: 10px; align-items: center; }
+.nf-head .av { --s: 40px; }
+.nf-head > span b { display: block; font-size: 16px; }
+.nf-head > span span { font-size: 13px; color: var(--muted); }
+.nf-x { border: 0; background: var(--panel-2); width: 30px; height: 30px; border-radius: 50%; font-size: 18px; line-height: 1; cursor: pointer; color: var(--muted); }
+.nf-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.nf-row { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 10px; align-items: center; }
+.nf-row .av { --s: 34px; }
+.nf-txt { display: grid; font-size: 13.5px; line-height: 1.35; }
+.nf-txt b { font-size: 14px; }
+.nf-txt em { font-style: normal; font-weight: 700; color: var(--ec2, var(--ink)); }
+.nf-back { color: var(--muted); font-size: 12.5px; }
+.nw-note { margin: 0; font-size: 12.5px; }
+.rsec { margin-bottom: 12px; }
+.rsec h4 { display: flex; align-items: center; gap: 8px; margin: 0 0 8px; font-size: 14.5px; font-family: var(--f-body); }
+.rsec h4 span { font-size: 12px; min-width: 22px; height: 20px; padding: 0 6px; border-radius: 999px; display: inline-grid; place-items: center; background: var(--panel-2); color: var(--muted); font-weight: 800; }
+.rally { display: grid; gap: 8px; }
+.rteam { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 4px 10px; align-items: center; padding: 10px 12px; border-radius: 14px; border: 1px solid var(--line); background: var(--panel); }
+.rt-n { grid-row: span 2; width: 28px; height: 28px; border-radius: 9px; display: grid; place-items: center; font-weight: 800; font-size: 13.5px; background: color-mix(in srgb, var(--c-ally) 15%, var(--panel)); color: color-mix(in srgb, var(--c-ally) 85%, var(--ink)); }
+.rt-faces { display: flex; flex-wrap: wrap; gap: 4px; }
+.rt-faces .av { --s: 32px; }
+.rteam p { margin: 0; font-size: 13px; color: var(--muted); }
+.rname { background: none; border: 0; padding: 0; font: inherit; color: var(--ink); font-weight: 700; cursor: pointer; }
+.rname:hover { text-decoration: underline; text-underline-offset: 3px; }
+.rsec .relrow { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 10px; padding: 8px 12px; border-radius: 14px; border: 1px solid var(--line); background: var(--panel); flex-wrap: nowrap; }
+.rpair { display: inline-flex; align-items: center; gap: 2px; }
+.rpair .av { --s: 30px; }
+.ricon { width: 18px; text-align: center; font-weight: 800; color: var(--muted); }
+.r-love .ricon { color: var(--c-love); } .r-hate .ricon { color: var(--c-kill); } .r-debt .ricon { color: var(--c-item); }
+.rtxt { font-size: 13.5px; line-height: 1.4; color: var(--muted); }
+.rwhy { display: block; font-size: 12.5px; }
+.r-solo .rt-faces .av { --s: 30px; opacity: .85; }
+@media (prefers-reduced-motion: reduce) { .arena-graph .route { animation: none; } .zcard, .netfocus { animation: none; } }
+.map-node.faded { opacity: .45; }
+.zmeters .zm { grid-template-columns: minmax(0, 1fr); align-items: stretch; }
+.net .node .nm { text-shadow: none; }
+.net .node .nm-start { text-anchor: start; } .net .node .nm-end { text-anchor: end; } .net .node .nm-middle { text-anchor: middle; }
+.net .node .nm { text-decoration: none; }
+.map-node.selected .mn-name { background: var(--accent-text); color: #fff; }
+:root[data-theme="dark"] .map-node.selected .mn-name { background: var(--accent); color: var(--accent-ink); }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .map-node.selected .mn-name { background: var(--accent); color: var(--accent-ink); } }
+.nf-txt em { color: color-mix(in srgb, var(--ec2) 62%, var(--ink)); }
 </style>
 
 <header class="top">
@@ -11530,7 +11731,7 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
 </script>
 <script>window.LOS_ASSETS = {"logo":"img/logo.f2d5175789.webp","icona":"img/icona.8b02ddeb49.webp","favicon":"img/favicon.86774dc7cf.png","panoramica":"img/panoramica.66c4c27255.webp","sagome":["img/sagome-cappuccio.e8876ba986.webp","img/sagome-esploratore.9a99fd13f8.webp","img/sagome-viaggiatore.5e36435604.webp"],"arene":{"classico":"img/arene-classico.42c6ba42ee.webp","fantasy":"img/arene-fantasy.75b7fb0d32.webp","horror":"img/arene-horror.48052d80b4.webp","liceo":"img/arene-liceo.05ed578a90.webp","royale":"img/arene-royale.36c9952cd7.webp","scifi":"img/arene-scifi.403694f00f.webp","ufficio":"img/arene-ufficio.67b271bea3.webp","wasteland":"img/arene-wasteland.889002ace8.webp","zombie":"img/arene-zombie.36c9135a12.webp"},"atlas":{"classico":{"luoghi":{"altopiano":"img/arene-classico-luoghi-altopiano.36a37512d3.webp","bosco":"img/arene-classico-luoghi-bosco.2e9163544b.webp","cornucopia":"img/arene-classico-luoghi-cornucopia.393b2dabe1.webp","fiume":"img/arene-classico-luoghi-fiume.22b335a914.webp","paludi":"img/arene-classico-luoghi-paludi.77cf115eb4.webp","rovine":"img/arene-classico-luoghi-rovine.9ea4f70ca9.webp"},"pericoli":{"branco-di-lupi-mutanti":"img/arene-classico-pericoli-branco-di-lupi-mutanti.d786a62875.webp","orso-affamato":"img/arene-classico-pericoli-orso-affamato.e4f38a9892.webp","sciame-di-vespe-velenose":"img/arene-classico-pericoli-sciame-di-vespe-velenose.5adb2c7b8d.webp","serpente-gigante":"img/arene-classico-pericoli-serpente-gigante.b17e7f3d91.webp"}},"fantasy":{"luoghi":{"foresta-elfica":"img/arene-fantasy-luoghi-foresta-elfica.0448fcfbd3.webp","lago-nebbioso":"img/arene-fantasy-luoghi-lago-nebbioso.f19abc7c81.webp","miniere":"img/arene-fantasy-luoghi-miniere.5baa916ec9.webp","palude-stregata":"img/arene-fantasy-luoghi-palude-stregata.6a0b2af4a7.webp","picco-del-drago":"img/arene-fantasy-luoghi-picco-del-drago.06bdfd84b1.webp","torre-in-rovina":"img/arene-fantasy-luoghi-torre-in-rovina.ac716863c7.webp"},"pericoli":{"branco-di-lupi-mannari":"img/arene-fantasy-pericoli-branco-di-lupi-mannari.1c9124ceee.webp","spettro-errante":"img/arene-fantasy-pericoli-spettro-errante.056074bc23.webp","troll-di-caverna":"img/arene-fantasy-pericoli-troll-di-caverna.31aa2444f0.webp","viverna":"img/arene-fantasy-pericoli-viverna.577b91a819.webp"}},"horror":{"luoghi":{"biblioteca":"img/arene-horror-luoghi-biblioteca.00d6ab97f4.webp","cappella":"img/arene-horror-luoghi-cappella.a51e505028.webp","cimitero":"img/arene-horror-luoghi-cimitero.7a441de089.webp","serra":"img/arene-horror-luoghi-serra.b3d91121d4.webp","soffitta":"img/arene-horror-luoghi-soffitta.466d40cea3.webp"},"pericoli":{"bambola-posseduta":"img/arene-horror-pericoli-bambola-posseduta.7064eef1d7.webp","entita-senza-volto":"img/arene-horror-pericoli-entita-senza-volto.2c28467bdd.webp","spettro-urlante":"img/arene-horror-pericoli-spettro-urlante.25fa554e05.webp","stormo-di-corvi":"img/arene-horror-pericoli-stormo-di-corvi.fe5c85d7ae.webp"}},"liceo":{"luoghi":{"aula-magna":"img/arene-liceo-luoghi-aula-magna.0478e35c5c.webp","biblioteca":"img/arene-liceo-luoghi-biblioteca.1ae806ae58.webp","cortile":"img/arene-liceo-luoghi-cortile.51bf433337.webp","laboratorio-di-chimica":"img/arene-liceo-luoghi-laboratorio-di-chimica.eba1434683.webp","mensa":"img/arene-liceo-luoghi-mensa.67bcbc7e37.webp","palestra":"img/arene-liceo-luoghi-palestra.8ecb872849.webp"},"pericoli":{"bidello-di-turno":"img/arene-liceo-pericoli-bidello-di-turno.191c43a8bd.webp","ispezione-a-sorpresa":"img/arene-liceo-pericoli-ispezione-a-sorpresa.bef087d9b9.webp","preside":"img/arene-liceo-pericoli-preside.033f6c9aae.webp","professoressa-di-matematica":"img/arene-liceo-pericoli-professoressa-di-matematica.6cb65c6a3f.webp"}},"royale":{"luoghi":{"aeroporto":"img/arene-royale-luoghi-aeroporto.81e8ce98d4.webp","base-militare":"img/arene-royale-luoghi-base-militare.67f3a7de9d.webp","centrale-elettrica":"img/arene-royale-luoghi-centrale-elettrica.05ee57458a.webp","fattoria":"img/arene-royale-luoghi-fattoria.7c780dda87.webp","foresta":"img/arene-royale-luoghi-foresta.03b47644d0.webp","villaggio-costiero":"img/arene-royale-luoghi-villaggio-costiero.568519eb7c.webp"},"pericoli":{"cane-da-guardia-addestrato":"img/arene-royale-pericoli-cane-da-guardia-addestrato.c7853a67a0.webp","drone-armato":"img/arene-royale-pericoli-drone-armato.30d0b73e01.webp","elicottero-da-caccia":"img/arene-royale-pericoli-elicottero-da-caccia.8c68e62346.webp"}},"scifi":{"luoghi":{"hangar":"img/arene-scifi-luoghi-hangar.6de551833b.webp","moduli-abitativi":"img/arene-scifi-luoghi-moduli-abitativi.9f5bb96d39.webp","ponte-di-comando":"img/arene-scifi-luoghi-ponte-di-comando.3e9ffd005a.webp","reattore":"img/arene-scifi-luoghi-reattore.d10a335006.webp","serra-idroponica":"img/arene-scifi-luoghi-serra-idroponica.b6f4407853.webp"},"pericoli":{"androide-da-combattimento":"img/arene-scifi-pericoli-androide-da-combattimento.1a3d3eb38e.webp","creatura-aliena-dai-tentacoli":"img/arene-scifi-pericoli-creatura-aliena-dai-tentacoli.b6b314ddd9.webp","drone-di-sicurezza-impazzito":"img/arene-scifi-pericoli-drone-di-sicurezza-impazzito.c8a9c6f9e3.webp","sciame-di-nanobot":"img/arene-scifi-pericoli-sciame-di-nanobot.d43296f047.webp"}},"ufficio":{"luoghi":{"cucina":"img/arene-ufficio-luoghi-cucina.d968f8861d.webp","open-space":"img/arene-ufficio-luoghi-open-space.b6b7990c99.webp","parcheggio":"img/arene-ufficio-luoghi-parcheggio.d593f2ed83.webp","sala-stampanti":"img/arene-ufficio-luoghi-sala-stampanti.1727f50082.webp","ufficio-del-direttore":"img/arene-ufficio-luoghi-ufficio-del-direttore.bb3b6cabab.webp"},"pericoli":{"consulente-esterno":"img/arene-ufficio-pericoli-consulente-esterno.ce6e200c3f.webp","direttore-generale":"img/arene-ufficio-pericoli-direttore-generale.da2eb1f708.webp","riorganizzazione-aziendale":"img/arene-ufficio-pericoli-riorganizzazione-aziendale.1fd57b76b3.webp","ufficio-risorse-umane":"img/arene-ufficio-pericoli-ufficio-risorse-umane.8392df7518.webp"}},"wasteland":{"luoghi":{"autostrada-spezzata":"img/arene-wasteland-luoghi-autostrada-spezzata.19a72a0b97.webp","citta-fantasma":"img/arene-wasteland-luoghi-citta-fantasma.fe22bb72b2.webp","cratere":"img/arene-wasteland-luoghi-cratere.04de7ca40a.webp","diga":"img/arene-wasteland-luoghi-diga.3be9abe15a.webp","discarica":"img/arene-wasteland-luoghi-discarica.b8783ad9c6.webp","raffineria":"img/arene-wasteland-luoghi-raffineria.081e2d2ad6.webp"},"pericoli":{"banda-di-predoni":"img/arene-wasteland-pericoli-banda-di-predoni.1dfcfd1628.webp","branco-di-cani-mutati":"img/arene-wasteland-pericoli-branco-di-cani-mutati.442fabfc39.webp","scorpione-gigante":"img/arene-wasteland-pericoli-scorpione-gigante.2dd8911367.webp","verme-delle-sabbie":"img/arene-wasteland-pericoli-verme-delle-sabbie.a0d445beeb.webp"}},"zombie":{"luoghi":{"centro-commerciale":"img/arene-zombie-luoghi-centro-commerciale.333f4699d5.webp","metropolitana":"img/arene-zombie-luoghi-metropolitana.878a263605.webp","periferia":"img/arene-zombie-luoghi-periferia.e28a7d70c7.webp","scuola":"img/arene-zombie-luoghi-scuola.153ddbaa75.webp","stazione-di-polizia":"img/arene-zombie-luoghi-stazione-di-polizia.157f7a17f5.webp"},"pericoli":{"cane-infetto":"img/arene-zombie-pericoli-cane-infetto.fdff913d6f.webp","gigante-mutato":"img/arene-zombie-pericoli-gigante-mutato.91fad36b70.webp","infetto-corridore":"img/arene-zombie-pericoli-infetto-corridore.61f48faafd.webp","orda-di-zombi":"img/arene-zombie-pericoli-orda-di-zombi.e0fc6d1b56.webp"}}}};
 ;
-window.LOS_BUILD = "055234080750fa05be49332774e92dc060105b12b0561bdaeee56e5d5829c63c";
+window.LOS_BUILD = "ebc825610bc00998ab95e97b1dad8a9eb6ce6bee58bd3d4b23c6785929adcf38";
 ;
 /* Last One Standing — grafica vettoriale: logo, icone delle arene, illustrazioni.
  * Tutto è SVG generato in codice: nessuna immagine esterna. */
@@ -12643,47 +12844,133 @@ window.LOS_BUILD = "055234080750fa05be49332774e92dc060105b12b0561bdaeee56e5d5829
 })(typeof window === 'object' ? window : globalThis);
 
 ;
-/* Lettura della geografia registrata, senza ricostruire la partita. */
-(function(G){
+/* Lettura della geografia registrata, senza ricostruire la partita.
+   Mappa interattiva: zone come segnaposti (grandezza = presenti, anello = pericolo), passaggi,
+   percorsi della fase; sotto, l'elenco delle zone oppure la scheda della zona scelta. */
+(function (G) {
   'use strict';
-  const esc=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-  const bare=s=>s.replace(/^(?:il |lo |la |l['’]|i |gli |le )/i,'');
-  const level=(v,kind)=>kind==='shelter'?(v>=0.7?'buono':v>=0.45?'discreto':'scarso'):(v>=1.35?'alte':v>=0.95?'medie':'basse');
-  function graph(zones,closed,counts,selected){
-    const points=zones.map((z,i)=>i===6?[180,160]:[180+126*Math.sin(i*Math.PI/3),160-123*Math.cos(i*Math.PI/3)]);
-    const lines=zones.flatMap(z=>z.links.filter(to=>to>z.id).map(to=>{
-      const a=points[z.id],b=points[to],cls=closed.has(z.id)||closed.has(to)?'shut':'',dx=b[0]-a[0],dy=b[1]-a[1],length=Math.hypot(dx,dy);
-      const acrossHub=zones.length===7&&z.id!==6&&to!==6&&Math.abs(dx*(160-a[1])-dy*(180-a[0]))/length<27;
-      if(acrossHub)return '<path d="M '+a[0]+' '+a[1]+' Q '+((a[0]+b[0])/2-dy/length*90)+' '+((a[1]+b[1])/2+dx/length*90)+' '+b[0]+' '+b[1]+'" class="'+cls+'"/>';
-      return '<line x1="'+a[0]+'" y1="'+a[1]+'" x2="'+b[0]+'" y2="'+b[1]+'" class="'+cls+'"/>';
+  const esc = (x) => String(x ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  const bare = (s) => String(s).replace(/^(?:il |lo |la |l['’]|i |gli |le )/i, '');
+  const cap = (s) => s.charAt(0).toUpperCase() + s.slice(1);
+  const lv = (v, kind) => (kind === 'shelter' ? (v >= 0.7 ? 2 : v >= 0.45 ? 1 : 0) : (v >= 1.35 ? 2 : v >= 0.95 ? 1 : 0));
+  const WORDS = { resources: ['scarse', 'medie', 'ricche'], danger: ['basso', 'medio', 'alto'], shelter: ['scarso', 'discreto', 'buono'] };
+  const LABEL = { resources: 'Risorse', danger: 'Pericolo', shelter: 'Riparo' };
+  const plural = (n, one, many) => n + ' ' + (n === 1 ? one : many);
+  const ICON = {
+    skull: '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 1.5c-3.3 0-5.5 2.3-5.5 5.2 0 1.7.8 3.1 2 4V13h1.6v-1.3h.9V13h2v-1.3h.9V13h1.6v-2.3c1.2-.9 2-2.3 2-4C13.5 3.8 11.3 1.5 8 1.5zM5.6 8.6a1.3 1.3 0 1 1 0-2.6 1.3 1.3 0 0 1 0 2.6zm4.8 0a1.3 1.3 0 1 1 0-2.6 1.3 1.3 0 0 1 0 2.6z"/></svg>',
+    trap: '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M1.5 11h13v1.6h-13zM2.5 10 4 5l1.5 3L8 3l2.5 5L12 5l1.5 5z"/></svg>',
+    lock: '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4.5 7V5.3a3.5 3.5 0 0 1 7 0V7h1v7h-9V7zm1.6 0h3.8V5.3a1.9 1.9 0 0 0-3.8 0z"/></svg>',
+    bolt: '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M9 1 3 9h4l-1 6 6-8H8z"/></svg>',
+  };
+
+  // tre barre corte con la parola accanto (per l'elenco e per la scheda)
+  function meters(z, wide) {
+    return '<span class="zmeters' + (wide ? ' wide' : '') + '">' + ['resources', 'danger', 'shelter'].map((k) => {
+      const v = z[k] ?? (k === 'shelter' ? 0.5 : 1), n = lv(v, k), pc = Math.max(10, Math.min(100, (k === 'shelter' ? v : v / 1.8) * 100));
+      return '<span class="zm zm-' + k + '" title="' + LABEL[k] + ' ' + WORDS[k][n] + '"><span class="zm-l">' + LABEL[k] + '</span><i><b style="width:' + pc.toFixed(0) + '%"></b></i><em>' + WORDS[k][n] + '</em></span>';
+    }).join('') + '</span>';
+  }
+
+  function graph(zones, closed, counts, selected, extra) {
+    extra = extra || {};
+    const points = zones.map((z, i) => (i === 6 ? [180, 150] : [180 + 122 * Math.sin(i * Math.PI / 3), 150 - 112 * Math.cos(i * Math.PI / 3)]));
+    const curve = (a, b, bend) => {
+      const dx = b[0] - a[0], dy = b[1] - a[1], len = Math.hypot(dx, dy) || 1;
+      const mx = (a[0] + b[0]) / 2 - dy / len * bend, my = (a[1] + b[1]) / 2 + dx / len * bend;
+      return 'M ' + a[0].toFixed(1) + ' ' + a[1].toFixed(1) + ' Q ' + mx.toFixed(1) + ' ' + my.toFixed(1) + ' ' + b[0].toFixed(1) + ' ' + b[1].toFixed(1);
+    };
+    const bendFor = (z, to) => {
+      const a = points[z], b = points[to], dx = b[0] - a[0], dy = b[1] - a[1], len = Math.hypot(dx, dy) || 1;
+      // i passaggi che taglierebbero il centro si curvano attorno
+      const nearHub = zones.length === 7 && z !== 6 && to !== 6 && Math.abs(dx * (150 - a[1]) - dy * (180 - a[0])) / len < 27;
+      return nearHub ? 80 : 14;
+    };
+    const lines = zones.flatMap((z) => z.links.filter((to) => to > z.id).map((to) => {
+      const shut = closed.has(z.id) || closed.has(to), touch = selected != null && (z.id === selected || to === selected);
+      const cls = 'link' + (shut ? ' shut' : '') + (touch ? ' on' : selected != null ? ' faded' : '');
+      return '<path class="' + cls + '" data-a="' + z.id + '" data-b="' + to + '" d="' + curve(points[z.id], points[to], bendFor(z.id, to)) + '"/>';
     })).join('');
-    return '<div class="arena-graph" role="group" aria-label="Collegamenti tra le zone: le linee tratteggiate indicano i passaggi chiusi"><svg viewBox="0 0 360 320" aria-hidden="true">'+lines+'</svg>'+zones.map((z,i)=>{const occupancy=counts[i]+' '+(counts[i]===1?'presente':'presenti');return '<button type="button" class="map-node'+(closed.has(i)?' shut':'')+(selected===i?' selected':'')+'" style="left:'+(points[i][0]/3.6)+'%;top:'+(points[i][1]/3.2)+'%" data-map-zone="'+i+'" aria-pressed="'+(selected===i)+'" aria-label="'+esc(bare(z.name))+': '+occupancy+(closed.has(i)?', zona chiusa':'')+'"><b>'+(i+1)+'</b><span>'+esc(bare(z.name))+'</span><small>'+occupancy+'</small></button>';}).join('')+'</div>';
-  }
-  function render(result,phaseIndex,options={}){
-    const phase=result.phases[phaseIndex];if(!phase)return '';
-    const spatial=result.spatial,theme=options.theme,by=Object.fromEntries(result.tributes.map(t=>[t.id,t]));
-    const zones=spatial?.zones||theme.lex.luogo.map((name,id)=>({id,name,links:[],resources:options.properties?.[id]?.[0]??1,danger:options.properties?.[id]?.[1]??1,shelter:options.properties?.[id]?.[2]??0.5,description:''}));
-    const closureReason=id=>spatial?.closures.filter(c=>c.zone===id&&c.ph<=phaseIndex).at(-1)?.reason;
-    const closed=new Set(phase.snap.closed||[]),selected=zones[options.selected]?options.selected:null;
-    const present=z=>phase.snap.alive.filter(id=>phase.snap.zones[id]===z);
-    const name=id=>by[id]?.name||'Concorrente';
-    const person=id=>'<button type="button" class="map-person" data-prof="'+esc(id)+'">'+esc(name(id))+'</button>';
-    const deaths=spatial?.deaths.filter(d=>d.ph===phaseIndex)||[];
-    const moves=spatial?.moves.filter(m=>m.ph===phaseIndex)||[];
-    const locations=phase.events.map((e,index)=>({e,index})).filter(({e})=>e.place&&e.place.zone!=null);
-    const traps=phase.snap.terrain?.traps||[],loot=phase.snap.terrain?.loot||[];
-    const cards=zones.filter(z=>selected==null||selected===z.id).map(z=>{
-      const here=present(z.id),fallen=deaths.filter(d=>d.zone===z.id),events=locations.filter(x=>x.e.place.zone===z.id&&!x.e.note);
-      const tz=traps.filter(t=>t.zone===z.id),lz=loot.find(x=>x.zone===z.id),affected=phase.affectedZones?.includes(z.id);
-      return '<article class="zone'+(closed.has(z.id)?' closed':'')+(fallen.length?' hot':'')+'"><h4><button type="button" data-map-zone="'+z.id+'">'+(z.id+1)+'. '+esc(bare(z.name))+'</button></h4><p class="help">'+esc(z.description)+'</p><p class="map-properties">Risorse '+level(z.resources)+' · Pericolo '+level(z.danger).replace('alte','alto').replace('medie','medio').replace('basse','basso')+' · Riparo '+level(z.shelter,'shelter')+'</p>'+(closed.has(z.id)?'<p class="ztag">'+(closureReason(z.id)==='finale'?'Accesso chiuso per lo scontro finale':'Zona chiusa dalla tempesta')+'</p>':'')+(affected?'<p class="ztag">Area del disastro in questa fase</p>':'')+'<div class="dots">'+here.map(id=>options.avatar?options.avatar(by[id]):person(id)).join('')+'</div><p class="help">'+(here.length?here.map(id=>esc(name(id))).join(', '):'Nessun concorrente presente a fine fase.')+'</p>'+(fallen.length?'<p class="map-fallen">'+(theme.soft?'Usciti dai giochi qui':'Morti qui')+': '+fallen.map(d=>person(d.id)).join(', ')+'</p>':'')+(tz.length?'<details><summary>'+tz.length+' '+(theme.soft?(tz.length===1?'tranello':'tranelli'):(tz.length===1?'trappola':'trappole'))+(tz.length===1?(theme.soft?' ancora attivo':' ancora attiva'):' ancora attivi')+'</summary><ul>'+tz.map(t=>'<li>'+esc(t.name)+' · '+person(t.owner)+'</li>').join('')+'</ul></details>':'')+(lz?'<p class="help">Bottino rimasto: '+lz.count+' '+(lz.count===1?'oggetto':'oggetti')+'.</p>':'')+(spatial?'<p class="map-links">Passaggi: '+z.links.map(id=>'<button type="button" data-map-zone="'+id+'">'+esc(bare(zones[id].name))+(closed.has(id)?' (chiuso)':'')+'</button>').join(' · ')+'</p>':'')+(events.length?'<details><summary>'+events.length+' '+(events.length===1?'fatto avvenuto qui':'fatti avvenuti qui')+'</summary><ol class="map-events">'+events.sort((a,b)=>a.e.place.seq-b.e.place.seq).map(({e,index})=>'<li><button type="button" data-map-event="'+index+'">'+esc(e.plain)+'</button></li>').join('')+'</ol></details>':'')+'</article>';
+    // percorsi della fase: ogni tratto, più spesso se percorso da più concorrenti
+    const seg = {};
+    (extra.moves || []).forEach((m) => { for (let k = 1; k < m.path.length; k++) { const a = m.path[k - 1], b = m.path[k]; if (a === b) continue; const key = a + '>' + b; seg[key] = (seg[key] || 0) + 1; } });
+    const routes = Object.entries(seg).map(([key, n]) => {
+      const [a, b] = key.split('>').map(Number); if (!points[a] || !points[b]) return '';
+      const touch = selected == null || a === selected || b === selected;
+      return '<path class="route' + (touch ? '' : ' faded') + '" d="' + curve(points[a], points[b], bendFor(Math.min(a, b), Math.max(a, b)) * (a < b ? 1 : -1)) + '" style="stroke-width:' + Math.min(6, 1.6 + n * 0.8).toFixed(1) + '" marker-end="url(#mv-arrow)"/>';
     }).join('');
-    const journeys=moves.filter(m=>selected==null||m.path.includes(selected));
-    const remembered=(result.chronicle?.facts||[]).filter(f=>f.ph<=phaseIndex&&(selected==null||f.zone===selected));
-    const history=remembered.length?'<details class="map-memory"><summary>Memoria '+(selected==null?'dell’arena':'del luogo')+' · '+remembered.length+' fatti</summary><ol>'+remembered.map(f=>'<li><b>G'+f.day+' · Fase '+(f.ph+1)+' · '+esc(bare(zones[f.zone].name))+'</b><p>'+esc(f.plain)+'</p></li>').join('')+'</ol></details>':'';
-    return '<div class="map-view"><p class="map-caption"><b>Posizioni a fine fase '+(phaseIndex+1)+'</b><br>'+ (spatial?'I fatti e i percorsi sotto raccontano anche i passaggi precedenti della stessa fase. Le linee indicano i collegamenti, non distanze in metri.':'Replay storico: sono disponibili le posizioni salvate a fine fase. Percorsi e luoghi dei singoli eventi non erano registrati.')+'</p>'+(spatial?graph(zones,closed,zones.map(z=>present(z.id).length),selected):'')+(selected!=null?'<button class="btn sm" type="button" data-map-zone="all">Mostra tutte le zone</button>':'')+'<div class="map">'+cards+'</div>'+history+(spatial?'<details class="map-journeys"'+(journeys.length<9?' open':'')+'><summary>Spostamenti della fase'+(selected!=null?' in questa zona':'')+' · '+journeys.length+'</summary>'+(journeys.length?'<ol>'+journeys.sort((a,b)=>a.seq-b.seq).map(m=>'<li>'+person(m.id)+'<span class="map-route">'+m.path.map(z=>esc(bare(zones[z].name))).join(' → ')+'</span><span class="help">'+esc(m.reason)+' · Energia −'+m.cost.toLocaleString('it-IT')+'</span></li>').join('')+'</ol>':'<p class="help">Nessun cambio di zona registrato in questa fase.</p>')+'</details>':'')+'</div>';
+    const nodes = zones.map((z, i) => {
+      const n = counts[i] || 0, size = Math.round(40 + Math.min(n, 10) * 3), d = lv(z.danger ?? 1);
+      const deaths = (extra.deaths || []).filter((x) => x.zone === i).length, traps = (extra.traps || []).filter((x) => x.zone === i).length;
+      const badges = (closed.has(i) ? '<i class="mb mb-lock" title="Zona chiusa">' + ICON.lock + '</i>' : '') + (deaths ? '<i class="mb mb-dead" title="' + deaths + ' in questa fase">' + ICON.skull + (deaths > 1 ? '<u>' + deaths + '</u>' : '') + '</i>' : '') +
+        (traps ? '<i class="mb mb-trap" title="' + plural(traps, 'trappola', 'trappole') + '">' + ICON.trap + '</i>' : '') + ((extra.affected || []).includes(i) ? '<i class="mb mb-dis" title="Area del disastro">' + ICON.bolt + '</i>' : '');
+      const label = esc(cap(bare(z.name))) + ': ' + plural(n, 'presente', 'presenti') + (closed.has(i) ? ', zona chiusa' : '') + (deaths ? ', ' + deaths + ' fuori in questa fase' : '');
+      return '<button type="button" class="map-node d' + d + (closed.has(i) ? ' shut' : '') + (selected === i ? ' selected' : '') + (selected != null && selected !== i ? ' faded' : '') + (n ? '' : ' empty') + '" style="left:' + (points[i][0] / 3.6).toFixed(2) + '%;top:' + (points[i][1] / 3).toFixed(2) + '%;--s:' + size + 'px" data-map-zone="' + i + '" aria-pressed="' + (selected === i) + '" aria-label="' + label + '">' +
+        '<span class="mn-disc"><b>' + n + '</b>' + (badges ? '<span class="mn-badges">' + badges + '</span>' : '') + '</span><span class="mn-name">' + esc(cap(bare(z.name))) + '</span></button>';
+    }).join('');
+    return '<div class="arena-graph" role="group" aria-label="Mappa delle zone: ogni cerchio è una zona con il numero di presenti; le linee sono i passaggi, tratteggiate se chiusi; le frecce colorate sono gli spostamenti di questa fase">' +
+      '<svg viewBox="0 0 360 300" aria-hidden="true"><defs><marker id="mv-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerUnits="userSpaceOnUse" markerWidth="9" markerHeight="9" orient="auto"><path d="M0 0 L10 5 L0 10 z" class="mv-arrow"/></marker></defs>' + lines + routes + '</svg>' + nodes + '</div>';
   }
-  G.LOS_MAP_VIEW={render,graph};if(typeof module==='object'&&module.exports)module.exports=G.LOS_MAP_VIEW;
-})(typeof window!=='undefined'?window:globalThis);
+
+  function render(result, phaseIndex, options = {}) {
+    const phase = result.phases[phaseIndex]; if (!phase) return '';
+    const spatial = result.spatial, theme = options.theme, soft = !!(theme && theme.soft), by = Object.fromEntries(result.tributes.map((t) => [t.id, t]));
+    const zones = spatial?.zones || theme.lex.luogo.map((name, id) => ({ id, name, links: [], resources: options.properties?.[id]?.[0] ?? 1, danger: options.properties?.[id]?.[1] ?? 1, shelter: options.properties?.[id]?.[2] ?? 0.5, description: '' }));
+    const closureReason = (id) => spatial?.closures.filter((c) => c.zone === id && c.ph <= phaseIndex).at(-1)?.reason;
+    const closed = new Set(phase.snap.closed || []), selected = zones[options.selected] ? options.selected : null;
+    const present = (z) => phase.snap.alive.filter((id) => phase.snap.zones[id] === z);
+    const name = (id) => by[id]?.name || 'Concorrente';
+    const person = (id) => '<button type="button" class="map-person" data-prof="' + esc(id) + '">' + esc(name(id)) + '</button>';
+    const face = (id) => (options.avatar && by[id] ? options.avatar(by[id]) : person(id));
+    const deaths = spatial?.deaths.filter((d) => d.ph === phaseIndex) || [];
+    const moves = spatial?.moves.filter((m) => m.ph === phaseIndex) || [];
+    const locations = phase.events.map((e, index) => ({ e, index })).filter(({ e }) => e.place && e.place.zone != null);
+    const traps = phase.snap.terrain?.traps || [], loot = phase.snap.terrain?.loot || [];
+    const zname = (id) => esc(cap(bare(zones[id]?.name || '')));
+    const outWord = soft ? 'Fuori dai giochi' : 'Caduti';
+
+    // elenco compatto di tutte le zone
+    const list = () => '<div class="zlist" role="list">' + zones.map((z) => {
+      const n = present(z.id).length, f = deaths.filter((d) => d.zone === z.id).length, tz = traps.filter((t) => t.zone === z.id).length;
+      const flags = [closed.has(z.id) ? '<span class="zflag lock">' + ICON.lock + 'chiusa</span>' : '', f ? '<span class="zflag dead">' + ICON.skull + f + '</span>' : '', tz ? '<span class="zflag trap">' + ICON.trap + tz + '</span>' : ''].join('');
+      return '<div role="listitem"><button type="button" class="zrow' + (closed.has(z.id) ? ' closed' : '') + '" data-map-zone="' + z.id + '">' +
+        '<span class="zr-num">' + (z.id + 1) + '</span><span class="zr-main"><span class="zr-name">' + zname(z.id) + (flags ? '<span class="zflags">' + flags + '</span>' : '') + '</span>' + meters(z) + '</span>' +
+        '<span class="zr-count"><b>' + n + '</b><small>' + (n === 1 ? 'presente' : 'presenti') + '</small></span></button></div>';
+    }).join('') + '</div>';
+
+    // scheda della zona scelta
+    const card = (z) => {
+      const here = present(z.id), fallen = deaths.filter((d) => d.zone === z.id), events = locations.filter((x) => x.e.place.zone === z.id && !x.e.note);
+      const tz = traps.filter((t) => t.zone === z.id), lz = loot.find((x) => x.zone === z.id), affected = phase.affectedZones?.includes(z.id);
+      const pic = options.zonePic ? options.zonePic(z) : '';
+      const tags = (closed.has(z.id) ? '<span class="ztag2 lock">' + ICON.lock + (closureReason(z.id) === 'finale' ? 'Accesso chiuso per lo scontro finale' : 'Zona chiusa dalla tempesta') + '</span>' : '') + (affected ? '<span class="ztag2 dis">' + ICON.bolt + 'Area del disastro in questa fase</span>' : '');
+      return '<article class="zcard' + (closed.has(z.id) ? ' closed' : '') + (fallen.length ? ' hot' : '') + '">' +
+        '<header class="zc-head">' + (pic ? '<span class="zc-pic">' + pic + '</span>' : '') + '<span class="zc-title"><span class="zc-num">' + (z.id + 1) + '</span><h4>' + zname(z.id) + '</h4></span></header>' +
+        '<div class="zc-in">' + (z.description ? '<p class="zc-desc">' + esc(z.description) + '</p>' : '') + (tags ? '<div class="ztags2">' + tags + '</div>' : '') + meters(z, true) +
+        '<section class="zc-sec"><h5>Presenti a fine fase <span>' + here.length + '</span></h5>' + (here.length ? '<div class="zc-faces">' + here.map((id) => '<span class="zc-face">' + face(id) + '<span>' + esc(name(id)) + '</span></span>').join('') + '</div>' : '<p class="help">Nessun concorrente presente a fine fase.</p>') + '</section>' +
+        (fallen.length ? '<section class="zc-sec zc-out"><h5>' + (soft ? 'Usciti dai giochi qui' : 'Morti qui') + ' <span>' + fallen.length + '</span></h5><p>' + fallen.map((d) => person(d.id)).join(', ') + '</p></section>' : '') +
+        (tz.length ? '<section class="zc-sec"><h5>' + (soft ? (tz.length === 1 ? 'Tranello ancora attivo' : 'Tranelli ancora attivi') : (tz.length === 1 ? 'Trappola ancora attiva' : 'Trappole ancora attive')) + ' <span>' + tz.length + '</span></h5><ul class="zc-traps">' + tz.map((t) => '<li>' + esc(t.name) + ' <span class="help">di</span> ' + person(t.owner) + '</li>').join('') + '</ul></section>' : '') +
+        (lz ? '<p class="zc-loot">Bottino rimasto: <b>' + plural(lz.count, 'oggetto', 'oggetti') + '</b></p>' : '') +
+        (spatial && z.links.length ? '<section class="zc-sec"><h5>Passaggi</h5><div class="zc-links">' + z.links.map((id) => '<button type="button" class="zc-link' + (closed.has(id) ? ' shut' : '') + '" data-map-zone="' + id + '">' + zname(id) + (closed.has(id) ? ' <small>chiuso</small>' : '') + ' <span aria-hidden="true">→</span></button>').join('') + '</div></section>' : '') +
+        (events.length ? '<section class="zc-sec"><h5>Fatti avvenuti qui <span>' + events.length + '</span></h5><ol class="map-events">' + events.sort((a, b) => a.e.place.seq - b.e.place.seq).map(({ e, index }) => '<li><button type="button" data-map-event="' + index + '">' + esc(e.plain) + '</button></li>').join('') + '</ol></section>' : '') +
+        '</div></article>';
+    };
+
+    const journeys = moves.filter((m) => selected == null || m.path.includes(selected));
+    const remembered = (result.chronicle?.facts || []).filter((f) => f.ph <= phaseIndex && (selected == null || f.zone === selected));
+    const history = remembered.length ? '<details class="map-memory mv-fold"><summary><span>Memoria ' + (selected == null ? 'dell’arena' : 'del luogo') + '</span><b>' + remembered.length + '</b></summary><ol>' + remembered.map((f) => '<li><span class="mm-when">Giorno ' + f.day + ' · fase ' + (f.ph + 1) + ' · ' + zname(f.zone) + '</span><p>' + esc(f.plain) + '</p></li>').join('') + '</ol></details>' : '';
+    const route = (m) => '<li>' + person(m.id) + '<span class="map-route">' + m.path.map((z) => '<span class="mr-stop">' + zname(z) + '</span>').join('<span class="mr-arrow" aria-hidden="true">→</span>') + '</span><span class="mr-why">' + esc(m.reason) + ' · energia −' + m.cost.toLocaleString('it-IT') + '</span></li>';
+    const travel = spatial ? '<details class="map-journeys mv-fold"' + (journeys.length && journeys.length < 9 ? ' open' : '') + '><summary><span>Spostamenti della fase' + (selected != null ? ' in questa zona' : '') + '</span><b>' + journeys.length + '</b></summary>' + (journeys.length ? '<ol>' + journeys.sort((a, b) => a.seq - b.seq).map(route).join('') + '</ol>' : '<p class="help">Nessun cambio di zona registrato in questa fase.</p>') + '</details>' : '';
+
+    const totalHere = phase.snap.alive.length;
+    const head = '<div class="mv-head"><div><b class="mv-title">Posizioni a fine fase ' + (phaseIndex + 1) + '</b><span class="mv-sub">' + plural(totalHere, 'concorrente in gara', 'concorrenti in gara') + (deaths.length ? ' · ' + deaths.length + ' ' + outWord.toLowerCase() + ' in questa fase' : '') + '</span></div>' +
+      (selected != null ? '<button class="btn sm mv-all" type="button" data-map-zone="all"><span aria-hidden="true">←</span> Tutte le zone</button>' : '') + '</div>';
+    const legend = spatial ? '<p class="mv-legend"><span><i class="lg-node"></i>presenti</span><span><i class="lg-route"></i>spostamenti</span><span><i class="lg-shut"></i>passaggio chiuso</span><span><i class="lg-ring"></i>anello: pericolo</span></p>' : '<p class="help mv-note">Replay storico: sono disponibili le posizioni salvate a fine fase. Percorsi e luoghi dei singoli eventi non erano registrati.</p>';
+    return '<div class="map-view">' + head +
+      (spatial ? graph(zones, closed, zones.map((z) => present(z.id).length), selected, { moves, deaths, traps, affected: phase.affectedZones || [] }) : '') + legend +
+      (selected != null ? card(zones[selected]) : list()) + travel + history + '</div>';
+  }
+  G.LOS_MAP_VIEW = { render, graph }; if (typeof module === 'object' && module.exports) module.exports = G.LOS_MAP_VIEW;
+})(typeof window !== 'undefined' ? window : globalThis);
 
 ;
 /* Strumenti facoltativi: legami iniziali, eventi, campioni e stagioni. */
@@ -13219,33 +13506,58 @@ window.LOS_BUILD = "055234080750fa05be49332774e92dc060105b12b0561bdaeee56e5d5829
   const NET_CLS = [['love', 'Amore'], ['friend', 'Amicizia'], ['ally', 'Alleanza'], ['hate', 'Odio'], ['fear', 'Paura'], ['rival', 'Rivalità'], ['plot', 'Segreti']];
   let netOff = new Set();
   // la mappa dei legami: un grafo dei vivi, colorato per tipo di legame
+  let netSel = null;
   function netHTML(ph) {
     const ids = ph.snap.alive.slice();
     if (ids.length < 2) return '';
+    if (netSel && !ids.includes(netSel)) netSel = null;
     const al = ph.snap.allies;
     ids.sort((a, b) => ((al[a] != null ? al[a] : 999) - (al[b] != null ? al[b] : 999)) || (BY[a].team - BY[b].team));
-    const n = ids.length, R = n > 16 ? 132 : 118, C = 160, pos = {};
-    ids.forEach((id, k) => { const ang = -Math.PI / 2 + (2 * Math.PI * k) / n; pos[id] = [C + R * Math.cos(ang), C + R * Math.sin(ang)]; });
+    const n = ids.length, R = n > 16 ? 128 : 112, C = 160, pos = {}, ang = {};
+    ids.forEach((id, k) => { const a = -Math.PI / 2 + (2 * Math.PI * k) / n; ang[id] = a; pos[id] = [C + R * Math.cos(a), C + R * Math.sin(a)]; });
     const T0 = SIM.tributes, L2 = BDS.labels || {};
-    const es = (ph.snap.edges || []).filter((e) => !netOff.has(e[2]));
-    const nm = (ix) => T0[ix] ? T0[ix].name : '';
+    const all = (ph.snap.edges || []).filter((e) => T0[e[0]] && T0[e[1]] && pos[T0[e[0]].id] && pos[T0[e[1]].id]);
+    const count = {}; all.forEach((e) => (count[e[2]] = (count[e[2]] || 0) + 1));
+    const es = all.filter((e) => !netOff.has(e[2]));
+    const touches = (e) => netSel && (T0[e[0]].id === netSel || T0[e[1]].id === netSel);
     const lines = es.map((e) => {
-      const a = T0[e[0]], b = T0[e[1]]; if (!a || !b || !pos[a.id] || !pos[b.id]) return '';
+      const a = T0[e[0]], b = T0[e[1]];
       let [x1, y1] = pos[a.id], [x2, y2] = pos[b.id];
       if (e[4] === 2) { [x1, y1, x2, y2] = [x2, y2, x1, y1]; }
       const mx = (x1 + x2) / 2, my = (y1 + y2) / 2, cx = mx + (C - mx) * 0.35, cy = my + (C - my) * 0.35;
-      const sw = (1.2 + Math.min(3, e[3] / 35)).toFixed(1);
-      const tip = nm(e[0]) + ' → ' + nm(e[1]) + ': ' + ((L2[e[5]] || {}).n || 'nessun legame') + ' · ' + nm(e[1]) + ' → ' + nm(e[0]) + ': ' + ((L2[e[6]] || {}).n || 'nessun legame');
-      return '<path class="edge e-' + e[2] + '" data-a="' + esc(a.id) + '" data-b="' + esc(b.id) + '" d="M' + x1.toFixed(1) + ' ' + y1.toFixed(1) + ' Q' + cx.toFixed(1) + ' ' + cy.toFixed(1) + ' ' + x2.toFixed(1) + ' ' + y2.toFixed(1) + '" stroke-width="' + sw + '"' + (e[4] ? ' marker-end="url(#arr-' + e[2] + ')"' : '') + '><title>' + esc(tip) + '</title></path>';
+      const sw = (1.2 + Math.min(2.6, e[3] / 40)).toFixed(1);
+      const cls = 'edge e-' + e[2] + (netSel ? (touches(e) ? ' on' : ' faded') : '');
+      return '<path class="' + cls + '" data-a="' + esc(a.id) + '" data-b="' + esc(b.id) + '" d="M' + x1.toFixed(1) + ' ' + y1.toFixed(1) + ' Q' + cx.toFixed(1) + ' ' + cy.toFixed(1) + ' ' + x2.toFixed(1) + ' ' + y2.toFixed(1) + '" stroke-width="' + sw + '"' + (e[4] ? ' marker-end="url(#arr-' + e[2] + ')"' : '') + '/>';
     }).join('');
+    const linked = new Set(); if (netSel) all.forEach((e) => { if (touches(e)) { linked.add(T0[e[0]].id); linked.add(T0[e[1]].id); } });
+    const showNames = n <= 14;
     const nodes = ids.map((id) => {
-      const t = BY[id], [x, y] = pos[id];
-      return '<g class="node" data-prof="' + esc(id) + '" tabindex="0" role="button" aria-label="' + esc(t.name) + '"><circle cx="' + x.toFixed(1) + '" cy="' + y.toFixed(1) + '" r="12" style="fill:' + esc(t.color || '#888') + '"/><text x="' + x.toFixed(1) + '" y="' + (y + 3.6).toFixed(1) + '">' + esc(initials(t.name)) + '</text><title>' + esc(t.name) + '</title></g>';
+      const t = BY[id], [x, y] = pos[id], deg = all.filter((e) => T0[e[0]].id === id || T0[e[1]].id === id).length;
+      const cls = 'node' + (netSel === id ? ' sel' : netSel ? (linked.has(id) ? ' near' : ' faded') : '');
+      const c = Math.cos(ang[id]), lx = C + (R + 19) * c, ly = C + (R + 19) * Math.sin(ang[id]) + 3, anchor = c > 0.3 ? 'start' : c < -0.3 ? 'end' : 'middle';
+      return '<g class="' + cls + '" data-net-node="' + esc(id) + '" tabindex="0" role="button" aria-pressed="' + (netSel === id) + '" aria-label="' + esc(t.name) + ': ' + plural(deg, 'legame', 'legami') + '">' +
+        '<circle cx="' + x.toFixed(1) + '" cy="' + y.toFixed(1) + '" r="13" style="fill:' + esc(t.color || '#888') + '"/><text class="ini" x="' + x.toFixed(1) + '" y="' + (y + 3).toFixed(1) + '">' + esc(initials(t.name)) + '</text>' +
+        ((netSel ? (netSel === id || linked.has(id)) : showNames) ? '<text class="nm nm-' + anchor + '" x="' + lx.toFixed(1) + '" y="' + ly.toFixed(1) + '">' + esc(t.name) + '</text>' : '') + '</g>';
     }).join('');
-    const marks = NET_CLS.map(([c]) => '<marker id="arr-' + c + '" viewBox="0 0 8 8" refX="15" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L8 4L0 8z" class="mk-' + c + '"/></marker>').join('');
-    const legend = '<div class="netlegend" role="group" aria-label="Mostra o nascondi i tipi di legame">' + NET_CLS.map(([c, l]) => '<button type="button" class="nl e-' + c + (netOff.has(c) ? ' off' : '') + '" data-net="' + c + '" aria-pressed="' + !netOff.has(c) + '"><i></i>' + l + '</button>').join('') + '</div>';
-    return '<div class="netwrap"><h4>Mappa dei legami</h4><svg class="net" viewBox="0 0 320 320" role="group" aria-label="Mappa dei legami tra i concorrenti in gara"><defs>' + marks + '</defs>' + lines + nodes + '</svg>' + legend +
-      '<p class="help">Le frecce indicano un sentimento non ricambiato. Passa sopra un volto per evidenziarne i legami, toccalo per aprire la scheda.</p></div>';
+    const marks = NET_CLS.map(([c]) => '<marker id="arr-' + c + '" viewBox="0 0 8 8" refX="22" refY="4" markerUnits="userSpaceOnUse" markerWidth="8" markerHeight="8" orient="auto"><path d="M0 0L8 4L0 8z" class="mk-' + c + '"/></marker>').join('');
+    const legend = '<div class="netlegend" role="group" aria-label="Mostra o nascondi i tipi di legame">' + NET_CLS.filter(([c]) => count[c]).map(([c, l]) => '<button type="button" class="nl e-' + c + (netOff.has(c) ? ' off' : '') + '" data-net="' + c + '" aria-pressed="' + !netOff.has(c) + '"><i></i>' + l + '<b>' + count[c] + '</b></button>').join('') + '</div>';
+    // la scheda della persona scelta: tutti i suoi legami, in parole
+    let focus = '';
+    if (netSel) {
+      const me = BY[netSel], mine = all.filter(touches);
+      const row = (e) => {
+        const mineIsA = T0[e[0]].id === netSel, other = mineIsA ? T0[e[1]] : T0[e[0]];
+        const out = (L2[mineIsA ? e[5] : e[6]] || {}).n, back = (L2[mineIsA ? e[6] : e[5]] || {}).n;
+        return '<li class="nf-row">' + avHTML(BY[other.id], { btn: true }) + '<span class="nf-txt"><b>' + esc(other.name) + '</b>' +
+          '<span><em class="e-' + e[2] + '">' + esc(out || 'nessun legame') + '</em> da ' + esc(me.name) + '</span>' +
+          '<span class="nf-back">' + (back ? '<em class="e-' + e[2] + '">' + esc(back) + '</em> in risposta' : 'non ricambiato') + '</span></span></li>';
+      };
+      focus = '<div class="netfocus">' + '<div class="nf-head">' + avHTML(me, { btn: true }) + '<span><b>' + esc(me.name) + '</b><span>' + plural(mine.length, 'legame', 'legami') + '</span></span><button type="button" class="btn sm" data-prof="' + esc(me.id) + '">Apri la scheda</button><button type="button" class="nf-x" data-net-node="' + esc(me.id) + '" aria-label="Chiudi">×</button></div>' +
+        (mine.length ? '<ul class="nf-list">' + mine.sort((a, b) => b[3] - a[3]).map(row).join('') + '</ul>' : '<p class="help">Nessun legame forte con chi è ancora in gara.</p>') + '</div>';
+    }
+    return '<div class="netwrap"><div class="nw-head"><h4>Mappa dei legami</h4><span class="help">' + (netSel ? 'Tocca di nuovo per deselezionare' : 'Tocca un volto per vedere i suoi legami') + '</span></div>' +
+      '<svg class="net' + (netSel ? ' focus' : '') + '" viewBox="-40 -6 400 332" role="group" aria-label="Mappa dei legami tra i concorrenti in gara"><defs>' + marks + '</defs>' + lines + nodes + '</svg>' + legend + focus +
+      '<p class="help nw-note">Le frecce indicano un sentimento non ricambiato; lo spessore, quanto è forte.</p></div>';
   }
   function dimsHTML(d) {
     if (!d) return '';
@@ -14728,7 +15040,7 @@ window.LOS_BUILD = "055234080750fa05be49332774e92dc060105b12b0561bdaeee56e5d5829
     const aliveSet = new Set(ph.snap.alive);
     let h = '';
     if (sideTab === 'map') {
-      h=window.LOS_MAP_VIEW.render(SIM,i,{theme,properties:arenaOf(theme.id).zones,selected:mapSelection,avatar:t=>avHTML(t,{btn:true})});
+      h=window.LOS_MAP_VIEW.render(SIM,i,{theme,properties:arenaOf(theme.id).zones,selected:mapSelection,avatar:t=>avHTML(t,{btn:true}),zonePic:z=>window.LOS_ATLAS?window.LOS_ATLAS.pic(theme.id,'luoghi',z.name,theme.hue,{index:z.id}):''});
     } else if (sideTab === 'fallen') {
       const dead = SIM.tributes.filter((t) => !t.alive && t.deathPhase <= i).sort((a, b) => b.order - a.order);
       h = dead.length ? '<div class="plist">' + dead.map((t) => '<button type="button" class="prow" data-prof="' + esc(t.id) + '">' + avHTML(t, { dead: true }) + '<span style="min-width:0"><span class="pn">' + esc(t.name) + '</span><span class="ps">' + (t.killerIds.length ? 'per mano di ' + esc(t.killerIds.map((k) => BY[k].name).join(', ')) + (causeTxt(t, theme) ? ' · ' + causeTxt(t, theme) : '') : causeTxt(t, theme) ? 'per ' + causeTxt(t, theme) : 'vittima dell\'arena') + '</span></span><span class="pk">G' + t.deathDay + '</span></button>').join('') + '</div>' : '<p class="help">Ancora nessuno.</p>';
@@ -14753,12 +15065,17 @@ window.LOS_BUILD = "055234080750fa05be49332774e92dc060105b12b0561bdaeee56e5d5829
       const grudges = [], debts = [];
       ph.snap.alive.forEach((id) => { const r = R[id]; if (!r) return; r.g.forEach(([t, why, v]) => alive.has(t) && grudges.push([id, t, why, v])); r.o.forEach((t) => alive.has(t) && debts.push([id, t])); });
       const whyTxt = (why, v) => why === 'kill' && v && BY[v] ? 'per ' + esc(BY[v].name) : { betray: 'per un tradimento', steal: 'per un furto', attack: 'per un agguato', kill: 'per un lutto' }[why] || '';
-      const sec = (title, rows, empty) => '<div class="agroup"><h4>' + title + ' · ' + rows.length + '</h4>' + (rows.length ? '<div class="rel">' + rows.join('') + '</div>' : '<p class="help">' + empty + '</p>') + '</div>';
-      h = netHTML(ph) + (gs.length ? gs.map((g, k) => '<div class="agroup"><h4>Alleanza ' + (k + 1) + ' · ' + g.length + '</h4><div class="row">' + g.map(av).join('') + '</div></div>').join('') : '<p class="help" style="margin-bottom:10px">Nessuna alleanza attiva.</p>') +
-        sec('Coppie', couples.map(([a, b]) => '<div class="relrow">' + av(a) + '<span class="arrow" style="color:var(--c-love)">♥</span>' + av(b) + '<span class="lbl">' + esc(BY[a].name) + ' e ' + esc(BY[b].name) + '</span></div>'), 'Ancora nessuna coppia.') +
-        sec('Vendette giurate', grudges.slice(0, 14).map(([a, b, why, v]) => '<div class="relrow">' + av(a) + '<span class="arrow">→</span>' + av(b) + '<span class="lbl">' + whyTxt(why, v) + '</span></div>'), 'Nessuno ha ancora giurato vendetta.') +
-        sec('Debiti', debts.slice(0, 10).map(([a, b]) => '<div class="relrow">' + av(a) + '<span class="lbl">deve un favore a</span>' + av(b) + '</div>'), 'Nessun debito in sospeso.') +
-        (solo.length ? '<div class="agroup"><h4>Senza alleati · ' + solo.length + '</h4><div class="row">' + solo.map(av).join('') + '</div></div>' : '');
+      const stat = (v, l) => '<div class="rs"><b>' + v + '</b><span>' + l + '</span></div>';
+      const sec = (cls, title, rows, empty) => '<section class="rsec ' + cls + '"><h4>' + title + '<span>' + rows.length + '</span></h4>' + (rows.length ? '<div class="rel">' + rows.join('') + '</div>' : '<p class="help">' + empty + '</p>') + '</section>';
+      const nameOf = (id) => '<button type="button" class="rname" data-prof="' + esc(id) + '">' + esc(BY[id].name) + '</button>';
+      const pair = (a, b, icon, text) => '<div class="relrow"><span class="rpair">' + av(a) + '<span class="ricon">' + icon + '</span>' + av(b) + '</span><span class="rtxt">' + text + '</span></div>';
+      h = '<div class="rstats">' + stat(gs.length, gs.length === 1 ? 'Alleanza' : 'Alleanze') + stat(couples.length, couples.length === 1 ? 'Coppia' : 'Coppie') + stat(grudges.length, grudges.length === 1 ? 'Vendetta' : 'Vendette') + stat(debts.length, debts.length === 1 ? 'Debito' : 'Debiti') + '</div>' +
+        netHTML(ph) +
+        '<section class="rsec r-ally"><h4>Alleanze<span>' + gs.length + '</span></h4>' + (gs.length ? '<div class="rally">' + gs.map((g, k) => '<div class="rteam"><span class="rt-n">' + (k + 1) + '</span><div class="rt-faces">' + g.map(av).join('') + '</div><p>' + g.map(nameOf).join(', ') + '</p></div>').join('') + '</div>' : '<p class="help">Nessuna alleanza attiva.</p>') + '</section>' +
+        sec('r-love', 'Coppie', couples.map(([a, b]) => pair(a, b, '♥', nameOf(a) + ' e ' + nameOf(b) + ' stanno insieme')), 'Ancora nessuna coppia.') +
+        sec('r-hate', 'Vendette giurate', grudges.slice(0, 14).map(([a, b, why, v]) => pair(a, b, '→', nameOf(a) + ' vuole vendicarsi di ' + nameOf(b) + (whyTxt(why, v) ? ' <span class="rwhy">' + whyTxt(why, v) + '</span>' : ''))), 'Nessuno ha ancora giurato vendetta.') +
+        sec('r-debt', 'Debiti', debts.slice(0, 10).map(([a, b]) => pair(a, b, '⇢', nameOf(a) + ' deve un favore a ' + nameOf(b))), 'Nessun debito in sospeso.') +
+        (solo.length ? '<section class="rsec r-solo"><h4>Senza alleati<span>' + solo.length + '</span></h4><div class="rt-faces">' + solo.map(av).join('') + '</div></section>' : '');
     }
     $('#sideBody').innerHTML = h;
     if(lastSideResult!==SIM||lastSidePhase!==i||lastSideTab!==sideTab)$('#sideBody').scrollTop=0;
@@ -14770,20 +15087,27 @@ window.LOS_BUILD = "055234080750fa05be49332774e92dc060105b12b0561bdaeee56e5d5829
     if(zone&&SIM){mapSelection=zone.dataset.mapZone==='all'?null:+zone.dataset.mapZone;renderSide(S.run.phase);$('#sideBody').scrollTop=0;$('#sideBody .map-node[data-map-zone="'+mapSelection+'"]')?.focus({preventScroll:true});return;}
     const event=e.target.closest('[data-map-event]');
     if(event&&SIM){const ev=SIM.phases[S.run.phase].events[+event.dataset.mapEvent];if(!ev?.place)return;stopPlay();if(S.settings.followOnly&&!ev.ids.some(id=>(S.followed||[]).includes(id))){S.settings.followOnly=false;renderLive(true);}const card=$('#phBody [data-map-step="'+ev.place.seq+'"]');if(card){card.tabIndex=-1;card.scrollIntoView({block:'center',behavior:AN.reduced?'auto':'smooth'});card.focus({preventScroll:true});}return;}
+    const nn = e.target.closest('[data-net-node]');
+    if (nn && SIM) { const id = nn.dataset.netNode; netSel = netSel === id ? null : id; renderSide(S.run.phase); const back = $('#sideBody .net [data-net-node="' + CSS.escape(id) + '"]'); if (back) back.focus({ preventScroll: true }); return; }
     const b = e.target.closest('[data-net]'); if (!b || !SIM) return;
     const c = b.dataset.net; if (netOff.has(c)) netOff.delete(c); else netOff.add(c);
     renderSide(S.run.phase);
   });
   const netFocus = (id) => {
-    const svg = $('#sideBody .net'); if (!svg) return;
+    const svg = $('#sideBody .net'); if (!svg || netSel) return;
     svg.classList.toggle('focus', !!id);
     $$('.edge', svg).forEach((p) => p.classList.toggle('on', !!id && (p.dataset.a === id || p.dataset.b === id)));
-    $$('.node', svg).forEach((g) => g.classList.toggle('on', g.dataset.prof === id));
+    $$('.node', svg).forEach((g) => g.classList.toggle('on', g.dataset.netNode === id));
   };
-  $('#sideBody').addEventListener('mouseover', (e) => { const g = e.target.closest('.net .node'); netFocus(g ? g.dataset.prof : null); });
-  $('#sideBody').addEventListener('focusin', (e) => { const g = e.target.closest('.net .node'); if (g) netFocus(g.dataset.prof); });
+  $('#sideBody').addEventListener('mouseover', (e) => {
+    const g = e.target.closest('.net .node'); netFocus(g ? g.dataset.netNode : null);
+    // mappa delle zone: al passaggio si accendono i passaggi della zona
+    const z = e.target.closest('.map-node'), svg = $('#sideBody .arena-graph svg');
+    if (svg) $$('.link', svg).forEach((l) => l.classList.toggle('hl', !!z && (l.dataset.a === z.dataset.mapZone || l.dataset.b === z.dataset.mapZone)));
+  });
+  $('#sideBody').addEventListener('focusin', (e) => { const g = e.target.closest('.net .node'); if (g) netFocus(g.dataset.netNode); });
   $('#sideBody').addEventListener('mouseleave', () => netFocus(null));
-  $('#sideBody').addEventListener('keydown', (e) => { const g = e.target.closest('.net .node'); if (g && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); openProfile(g.dataset.prof); } });
+  $('#sideBody').addEventListener('keydown', (e) => { const g = e.target.closest('.net .node'); if (g && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); g.dispatchEvent(new MouseEvent('click', { bubbles: true })); } });
   $('.stabs').addEventListener('click', (e) => { const b = e.target.closest('button'); if (!b || !SIM) return; sideTab = b.dataset.s; renderSide(S.run.phase); });
   function go(k) { if (!SIM) return; S.run.phase = Math.max(0, Math.min(SIM.phases.length - 1, k)); renderLive(false); if (playing) schedulePlay(); }
   function next() {
