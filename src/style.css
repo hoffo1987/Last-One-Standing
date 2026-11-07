@@ -2068,3 +2068,48 @@ details.card > summary { font-size: 16px; }
 }
 @media (prefers-reduced-motion: reduce) { .rb-panel { animation: none; } .tph:hover { transform: none; } }
 .readbar { grid-template-columns: minmax(0, 1fr); } .rb-row { min-width: 0; }
+
+/* ============ FOTO DEI CONCORRENTI · RICERCA ============ */
+.photo-dialog { width: min(780px, calc(100% - 24px)); max-height: min(92vh, 980px); }
+.photo-dialog .db { gap: 14px; }
+.ph-head { display: flex; align-items: center; gap: 14px; }
+.ph-head .av { --s: 60px; font-size: 22px; flex: none; }
+.ph-head > div { display: grid; gap: 2px; min-width: 0; flex: 1; }
+.ph-head b { font-family: var(--f-display); font-size: 19px; overflow-wrap: anywhere; }
+.ph-search { display: flex; gap: 8px; }
+.ph-search input { flex: 1; min-width: 0; font-size: 16px; padding: 11px 14px; border-radius: 12px; }
+.ph-tools { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; }
+.ph-tools .seg { flex: none; }
+.ph-tools .help { font-size: 13px; }
+.ph-msg { margin: 0; min-height: 1.4em; }
+.ph-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(124px, 1fr)); gap: 10px; min-height: 132px; }
+.ph-item { position: relative; aspect-ratio: 1; padding: 0; border: 1px solid var(--line); border-radius: 14px; overflow: hidden; background: var(--panel-2); cursor: pointer; isolation: isolate; animation: phIn .32s cubic-bezier(.2,.8,.3,1) both; animation-delay: calc(var(--i, 0) * 22ms); }
+@keyframes phIn { from { opacity: 0; transform: translateY(6px) scale(.97); } }
+.ph-item img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 22%; display: block; transition: transform .3s ease; }
+.ph-item:hover img, .ph-item:focus-visible img { transform: scale(1.06); }
+.ph-item:hover { border-color: var(--accent); }
+.ph-item:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+.ph-cap { position: absolute; inset: auto 0 0 0; z-index: 1; display: grid; gap: 1px; padding: 22px 8px 7px; text-align: left; color: #fff; font-size: 12.5px; font-weight: 700; line-height: 1.2; background: linear-gradient(transparent, rgb(0 0 0 / .82)); text-shadow: 0 1px 2px rgb(0 0 0 / .6); }
+.ph-cap, .ph-cap small { overflow: hidden; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
+.ph-cap small { font-size: 11px; font-weight: 500; opacity: .88; -webkit-line-clamp: 1; }
+.ph-item.loading::after { content: ''; position: absolute; inset: 0; z-index: 2; background: rgb(0 0 0 / .45); }
+.ph-item.loading::before { content: ''; position: absolute; z-index: 3; left: 50%; top: 50%; width: 30px; height: 30px; margin: -15px 0 0 -15px; border-radius: 50%; border: 3px solid rgb(255 255 255 / .35); border-top-color: #fff; animation: phSpin .8s linear infinite; }
+@keyframes phSpin { to { transform: rotate(360deg); } }
+.ph-item.failed { opacity: .45; }
+.ph-item.broken { display: none; }
+.ph-skel { aspect-ratio: 1; border-radius: 14px; background: linear-gradient(100deg, var(--panel-2) 30%, color-mix(in srgb, var(--line) 70%, var(--panel-2)) 50%, var(--panel-2) 70%); background-size: 250% 100%; animation: phSk 1.3s linear infinite; }
+@keyframes phSk { from { background-position: 100% 0; } to { background-position: -150% 0; } }
+.ph-empty { grid-column: 1 / -1; display: grid; place-items: center; gap: 10px; text-align: center; padding: 26px 16px; border-radius: 14px; background: var(--panel-2); color: var(--muted); }
+.ph-empty p { margin: 0; max-width: 46ch; }
+.ph-empty .row { justify-content: center; }
+.ph-more { justify-self: center; }
+.ph-alt { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; padding: 12px 14px; border: 1.5px dashed var(--line); border-radius: 14px; transition: border-color .15s, background-color .15s; }
+.photo-dialog.drop .ph-alt { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 10%, transparent); }
+.photo-dialog.drop { outline: 3px dashed var(--accent); outline-offset: -8px; }
+@media (max-width: 560px) {
+  .ph-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+  .ph-cap { font-size: 11.5px; padding: 18px 6px 5px; }
+  .ph-cap small { display: none; }
+  .ph-tools .help { display: none; }
+}
+@media (prefers-reduced-motion: reduce) { .ph-item, .ph-skel { animation: none; } .ph-item img { transition: none; } }

@@ -668,7 +668,7 @@
     return '<article class="tile" data-id="' + esc(t.id) + '" style="--ti:' + Math.min(i, 30) + ';--c:' + esc(t.color || teamColor(t.team)) + '">' +
       '<button class="grip" type="button" aria-label="Trascina per riordinare" title="Trascina per riordinare">' + GRIP + '</button>' +
       '<div class="thead">' +
-        '<button class="avbtn" type="button" data-act="photo" aria-label="' + (t.img ? 'Cambia la foto di ' : 'Carica una foto per ') + esc(t.name || 'questo concorrente') + '">' + avHTML(t) + '<span class="cam">' + IC.cam + '</span></button>' +
+        '<button class="avbtn" type="button" data-act="photo" aria-label="' + (t.img ? 'Cambia la foto di ' : 'Cerca o carica una foto per ') + esc(t.name || 'questo concorrente') + '">' + avHTML(t) + '<span class="cam">' + IC.cam + '</span></button>' +
         '<div class="tid"><input class="tname" type="text" id="name-' + esc(t.id) + '" data-f="name" value="' + esc(t.name) + '" placeholder="Nome" aria-label="Nome" maxlength="40" autocomplete="off">' +
         '<div class="tsub"><span class="teamchip"><i></i>Squadra ' + t.team + '</span></div></div>' +
       '</div>' +
@@ -863,7 +863,7 @@
     const tile = b.closest('.tile');
     switch (b.dataset.act) {
       case 'edit': return openEditor(t.id);
-      case 'photo': photoTarget = t.id; $('#avatarFile').click(); return;
+      case 'photo': return openPhoto(t.id);
       case 'menu': {
         const m = tile.querySelector('.tpop'); const open = m.hidden;
         closeMenus(m); m.hidden = !open; b.setAttribute('aria-expanded', String(open)); tile.classList.toggle('menuopen', open);
@@ -938,27 +938,125 @@
     rerender(); save();
   });
   $('#castList').addEventListener('dragend', () => { dragId = null; $$('.tile').forEach((c) => { c.draggable = false; c.classList.remove('dragging', 'over'); }); });
-  // foto
-  $('#avatarFile').addEventListener('change', (e) => {
-    const f = e.target.files[0]; e.target.value = '';
-    const t = S.cast.find((x) => x.id === photoTarget); if (!f || !t) return;
+  /* ---------- foto: ricerca sul web (Wikipedia, Openverse, Wikimedia Commons), file, incolla, trascina ---------- */
+  const PH = window.LOS_PHOTO;
+  const photo = { src: 'wiki', q: '', items: [], next: null, ctl: null, cache: new Map(), timer: 0, last: '' };
+  const photoT = () => S.cast.find((x) => x.id === photoTarget);
+  function setPhoto(t, data) {
+    t.img = data; save();
+    if ($('#editDlg').open && editId === t.id) renderEditor();
+    refreshTile(t.id);
+    const nt = $('.tile[data-id="' + CSS.escape(t.id) + '"] .avbtn'); if (nt && !AN.reduced) nt.animate([{ transform: 'scale(.6) rotate(-12deg)' }, { transform: 'scale(1.12)' }, { transform: 'none' }], { duration: 520, easing: 'cubic-bezier(.2,.9,.3,1.3)' });
+  }
+  function photoDone(t, how) { if ($('#photoDlg').open) $('#photoDlg').close(); toast('Foto ' + how + ' per ' + (t.name || 'il concorrente') + '.'); }
+  function applyPhotoFile(f) {
+    const t = photoT(); if (!f || !t) return;
     if (!/^image\//.test(f.type)) return toast('Il file scelto non è un\'immagine.');
     const rd = new FileReader();
-    rd.onload = () => {
-      const img = new Image();
-      img.onload = () => {
-        const s = 160, cv = document.createElement('canvas'); cv.width = cv.height = s;
-        const k = Math.max(s / img.width, s / img.height), w = img.width * k, h = img.height * k;
-        cv.getContext('2d').drawImage(img, (s - w) / 2, (s - h) / 2, w, h);
-        t.img = cv.toDataURL('image/jpeg', 0.82);
-        save(); if ($('#editDlg').open && editId === t.id) renderEditor(); refreshTile(t.id);
-        const nt = $('.tile[data-id="' + CSS.escape(t.id) + '"] .avbtn'); if (nt && !AN.reduced) nt.animate([{ transform: 'scale(.6) rotate(-12deg)' }, { transform: 'scale(1.12)' }, { transform: 'none' }], { duration: 520, easing: 'cubic-bezier(.2,.9,.3,1.3)' });
-      };
-      img.onerror = () => toast('Non riesco a leggere questa immagine.');
-      img.src = rd.result;
-    };
+    rd.onload = () => PH.loadImage(rd.result).then((img) => { setPhoto(t, PH.crop(img, 160)); photoDone(t, 'caricata'); }, () => toast('Non riesco a leggere questa immagine.'));
     rd.readAsDataURL(f);
-  });
+  }
+  async function applyPhotoSrc(src, el) {
+    const t = photoT(); if (!t) return;
+    if (el) { el.classList.add('loading'); el.setAttribute('aria-busy', 'true'); }
+    $('#phMsg').textContent = 'Scarico la foto…';
+    try { setPhoto(t, await PH.toDataURL(src, 160)); photoDone(t, 'applicata'); }
+    catch (e) { $('#phMsg').textContent = 'Questa immagine non si lascia scaricare: scegline un’altra.'; if (el) el.classList.add('failed'); }
+    finally { if (el) { el.classList.remove('loading'); el.removeAttribute('aria-busy'); } }
+  }
+  function renderPhotoHead() {
+    const t = photoT(); if (!t) return;
+    $('#h-photo').textContent = 'Foto di ' + (t.name || 'questo concorrente');
+    $('#phHead').innerHTML = avHTML(t) + '<div><b>' + esc(t.name || 'Senza nome') + '</b><span class="help">' + (t.img ? 'Scegli una nuova foto per sostituire quella attuale.' : 'Cerca una foto e toccala: viene scaricata, ritagliata e applicata.') + '</span></div>' + (t.img ? '<button class="btn sm ghost" type="button" id="phRemove">Togli la foto</button>' : '');
+  }
+  function renderPhotoSrc() {
+    $('#phSrc').innerHTML = Object.keys(PH.SOURCES).map((k) => '<button type="button" data-phsrc="' + k + '" aria-pressed="' + (photo.src === k) + '">' + esc(PH.SOURCES[k].label) + '</button>').join('');
+    $('#phHint').textContent = PH.SOURCES[photo.src].name + ': ' + PH.SOURCES[photo.src].hint;
+  }
+  const phItemHTML = (it, k) => '<button type="button" class="ph-item" data-ph="' + k + '" style="--i:' + (k % PH_PAGE) + '" title="' + esc([it.title, it.note, it.credit].filter(Boolean).join(' · ')) + '" aria-label="Usa la foto: ' + esc([it.title, it.note].filter(Boolean).join(', ')) + '"><img src="' + esc(it.src) + '" alt="" loading="lazy" decoding="async" referrerpolicy="no-referrer"><span class="ph-cap">' + esc(it.title) + (it.note ? '<small>' + esc(it.note) + '</small>' : '') + '</span></button>';
+  const PH_PAGE = 18;
+  function photoEmpty(msg) {
+    const others = Object.keys(PH.SOURCES).filter((k) => k !== photo.src);
+    $('#phGrid').innerHTML = '<div class="ph-empty"><p>' + esc(msg) + '</p>' + (photo.q ? '<div class="row">' + others.map((k) => '<button class="btn sm" type="button" data-phsrc="' + k + '">Cerca in ' + esc(PH.SOURCES[k].label) + '</button>').join('') + '</div>' : '') + '</div>';
+  }
+  async function runPhotoSearch(more) {
+    if (!PH) return;
+    const q = $('#phQuery').value.trim();
+    clearTimeout(photo.timer);
+    if (!q) { photo.q = ''; photo.items = []; photo.next = null; $('#phMore').hidden = true; $('#phMsg').textContent = ''; photoEmpty('Scrivi chi o che cosa cercare: il nome di una persona nota, un personaggio, un animale, un mestiere.'); return; }
+    if (PH.isURL(q)) { photoEmpty('Provo a usare l’immagine del link…'); return applyPhotoSrc(q, null); }
+    if (!more) { photo.q = q; photo.items = []; photo.next = null; }
+    const cursor = more ? photo.next : null, key = photo.src + '|' + q + '|' + JSON.stringify(cursor);
+    if (photo.ctl) photo.ctl.abort();
+    const ctl = (photo.ctl = typeof AbortController === 'function' ? new AbortController() : { signal: undefined, abort() {} });
+    const grid = $('#phGrid'), src = PH.SOURCES[photo.src];
+    grid.setAttribute('aria-busy', 'true'); $('#phMore').disabled = true;
+    if (!more) grid.innerHTML = Array.from({ length: 6 }, () => '<span class="ph-skel" aria-hidden="true"></span>').join('');
+    $('#phMsg').textContent = 'Cerco «' + q + '» in ' + src.name + '…';
+    try {
+      const r = photo.cache.get(key) || (await PH.search(photo.src, q, cursor, ctl.signal));
+      photo.cache.set(key, r);
+      if (ctl !== photo.ctl) return;
+      const seen = new Set(photo.items.map((x) => x.src)), start = photo.items.length;
+      photo.items = photo.items.concat(r.items.filter((x) => !seen.has(x.src) && (seen.add(x.src), true)));
+      photo.next = r.next;
+      if (!photo.items.length) { photoEmpty('Nessuna immagine per «' + q + '» in ' + src.name + '. Prova un’altra fonte o un nome più preciso.'); $('#phMsg').textContent = 'Nessun risultato.'; }
+      else {
+        const html = photo.items.slice(start).map((it, k) => phItemHTML(it, start + k)).join('');
+        if (more) grid.insertAdjacentHTML('beforeend', html); else grid.innerHTML = html;
+        $('#phMsg').textContent = photo.items.length + (photo.items.length === 1 ? ' immagine' : ' immagini') + ' da ' + src.name + '. Tocca quella giusta.';
+      }
+      $('#phMore').hidden = !photo.next;
+    } catch (e) {
+      if (e && e.name === 'AbortError') return;
+      photoEmpty(navigator.onLine === false ? 'Sei offline: la ricerca ha bisogno di internet. Puoi sempre caricare una foto dal dispositivo.' : src.name + ' non risponde in questo momento. Riprova tra poco o cambia fonte.');
+      $('#phMsg').textContent = 'Ricerca non riuscita.'; $('#phMore').hidden = true;
+    } finally { if (ctl === photo.ctl) { grid.removeAttribute('aria-busy'); $('#phMore').disabled = false; } }
+  }
+  function openPhoto(id) {
+    const t = S.cast.find((x) => x.id === id); if (!t) return;
+    photoTarget = id;
+    if (!PH) { $('#avatarFile').click(); return; }
+    renderPhotoHead(); renderPhotoSrc();
+    const name = (t.name || '').trim();
+    $('#phQuery').value = name; $('#phMore').hidden = true; $('#phMsg').textContent = '';
+    $('#photoDlg').showModal();
+    // un nome e cognome è probabilmente una persona nota: si cerca subito; un nome solo darebbe risultati a caso
+    if (name.split(/\s+/).length >= 2) runPhotoSearch(false);
+    else { photo.q = ''; photo.items = []; photoEmpty(name ? 'Premi Cerca per trovare «' + name + '», oppure scrivi chi o che cosa vuoi come foto.' : 'Scrivi chi o che cosa cercare.'); }
+    $('#phQuery').focus(); $('#phQuery').select();
+  }
+  if (PH) {
+    $('#phForm').addEventListener('submit', (e) => { e.preventDefault(); runPhotoSearch(false); });
+    $('#phQuery').addEventListener('input', () => {
+      clearTimeout(photo.timer); const v = $('#phQuery').value.trim();
+      if (v.length >= 3 && !PH.isURL(v) && v !== photo.q) photo.timer = setTimeout(() => runPhotoSearch(false), 700);
+    });
+    $('#phMore').addEventListener('click', () => runPhotoSearch(true));
+    $('#phFile').addEventListener('click', () => $('#avatarFile').click());
+    $('#photoDlg').addEventListener('click', (e) => {
+      const s = e.target.closest('[data-phsrc]');
+      if (s) { photo.src = s.dataset.phsrc; renderPhotoSrc(); if ($('#phQuery').value.trim()) runPhotoSearch(false); else $('#phQuery').focus(); return; }
+      const it = e.target.closest('[data-ph]');
+      if (it && !it.classList.contains('loading')) { const x = photo.items[+it.dataset.ph]; if (x) applyPhotoSrc(x.src, it); return; }
+      if (e.target.closest('#phRemove')) { const t = photoT(); if (t) { t.img = ''; save(); if ($('#editDlg').open && editId === t.id) renderEditor(); refreshTile(t.id); renderPhotoHead(); toast('Foto tolta.'); } }
+    });
+    // le anteprime che non si caricano spariscono dalla griglia
+    $('#phGrid').addEventListener('error', (e) => { const b = e.target.tagName === 'IMG' && e.target.closest('.ph-item'); if (b) b.classList.add('broken'); }, true);
+    $('#photoDlg').addEventListener('paste', (e) => {
+      const f = e.clipboardData && [...e.clipboardData.files].find((x) => /^image\//.test(x.type));
+      if (f) { e.preventDefault(); applyPhotoFile(f); }
+    });
+    const drop = $('#photoDlg');
+    drop.addEventListener('dragover', (e) => { if (e.dataTransfer && [...e.dataTransfer.types].includes('Files')) { e.preventDefault(); drop.classList.add('drop'); } });
+    drop.addEventListener('dragleave', (e) => { if (e.target === drop || !drop.contains(e.relatedTarget)) drop.classList.remove('drop'); });
+    drop.addEventListener('drop', (e) => { drop.classList.remove('drop'); const f = e.dataTransfer && e.dataTransfer.files[0]; if (f) { e.preventDefault(); applyPhotoFile(f); } });
+    $('#photoDlg').addEventListener('close', () => {
+      if (photo.ctl) photo.ctl.abort(); clearTimeout(photo.timer); $('#photoDlg').classList.remove('drop');
+      const back = $('#editDlg').open ? $('#editDlg .avbtn') : photoTarget && $('.tile[data-id="' + CSS.escape(photoTarget) + '"] .avbtn'); if (back) back.focus();
+    });
+  }
+  $('#avatarFile').addEventListener('change', (e) => { const f = e.target.files[0]; e.target.value = ''; applyPhotoFile(f); });
   // barra strumenti
   $('#btnRandom').addEventListener('click', () => {
     S.cast = L.randomCast(+$('#presetSize').value, Math.random().toString(36), +S.settings.teamSize || 2).map(sanitizeTribute);
@@ -1036,7 +1134,7 @@
     const t = S.cast.find((x) => x.id === editId); if (!t) return;
     prevAttr = Object.assign({}, t.attr);
     switch (b.dataset.e) {
-      case 'photo': photoTarget = t.id; $('#avatarFile').click(); return;
+      case 'photo': return openPhoto(t.id);
       case 'rmphoto': t.img = ''; break;
       case 'g': t.gender = b.dataset.v; break;
       case 'trait': t.traits.includes(b.dataset.v) ? (t.traits = t.traits.filter((x) => x !== b.dataset.v)) : t.traits.length < 3 && t.traits.push(b.dataset.v); break;

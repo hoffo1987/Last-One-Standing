@@ -301,6 +301,24 @@
   </div>
 </dialog>
 
+<dialog id="photoDlg" class="modal photo-dialog" aria-labelledby="h-photo">
+  <div class="dh"><h2 id="h-photo">Foto del concorrente</h2><button class="iconbtn" data-close type="button" aria-label="Chiudi">✕</button></div>
+  <div class="db">
+    <div class="ph-head" id="phHead"></div>
+    <form class="ph-search" id="phForm" role="search" autocomplete="off">
+      <label class="sr-only" for="phQuery">Cerca una foto</label>
+      <input type="search" id="phQuery" enterkeyhint="search" placeholder="Un nome, un personaggio, «astronauta», «gatto nero»… o un link">
+      <button class="btn primary" type="submit">Cerca</button>
+    </form>
+    <div class="ph-tools"><div class="seg sm" id="phSrc" role="group" aria-label="Dove cercare"></div><span class="help" id="phHint"></span></div>
+    <p class="help ph-msg" id="phMsg" role="status" aria-live="polite"></p>
+    <div class="ph-grid" id="phGrid" aria-label="Risultati"></div>
+    <button class="btn ph-more" id="phMore" type="button" hidden>Altri risultati</button>
+    <div class="ph-alt" id="phDrop"><button class="btn" id="phFile" type="button">Carica dal dispositivo</button><span class="help">oppure trascina o incolla qui una foto</span></div>
+    <small class="help">La foto scelta viene ritagliata e salvata solo in questo browser. Le immagini trovate restano dei loro autori: usale per giocare, non per pubblicarle.</small>
+  </div>
+</dialog>
+
 <dialog id="editDlg" class="drawer" aria-labelledby="h-edit"><div id="editBody"></div></dialog>
 <dialog id="profDlg" class="drawer" aria-labelledby="h-prof"><div id="profBody"></div></dialog>
 <dialog id="archiveDlg" class="modal tool-dialog" aria-labelledby="h-archive">

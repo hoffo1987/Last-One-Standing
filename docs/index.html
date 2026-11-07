@@ -2091,6 +2091,51 @@ details.card > summary { font-size: 16px; }
 }
 @media (prefers-reduced-motion: reduce) { .rb-panel { animation: none; } .tph:hover { transform: none; } }
 .readbar { grid-template-columns: minmax(0, 1fr); } .rb-row { min-width: 0; }
+
+/* ============ FOTO DEI CONCORRENTI · RICERCA ============ */
+.photo-dialog { width: min(780px, calc(100% - 24px)); max-height: min(92vh, 980px); }
+.photo-dialog .db { gap: 14px; }
+.ph-head { display: flex; align-items: center; gap: 14px; }
+.ph-head .av { --s: 60px; font-size: 22px; flex: none; }
+.ph-head > div { display: grid; gap: 2px; min-width: 0; flex: 1; }
+.ph-head b { font-family: var(--f-display); font-size: 19px; overflow-wrap: anywhere; }
+.ph-search { display: flex; gap: 8px; }
+.ph-search input { flex: 1; min-width: 0; font-size: 16px; padding: 11px 14px; border-radius: 12px; }
+.ph-tools { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; }
+.ph-tools .seg { flex: none; }
+.ph-tools .help { font-size: 13px; }
+.ph-msg { margin: 0; min-height: 1.4em; }
+.ph-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(124px, 1fr)); gap: 10px; min-height: 132px; }
+.ph-item { position: relative; aspect-ratio: 1; padding: 0; border: 1px solid var(--line); border-radius: 14px; overflow: hidden; background: var(--panel-2); cursor: pointer; isolation: isolate; animation: phIn .32s cubic-bezier(.2,.8,.3,1) both; animation-delay: calc(var(--i, 0) * 22ms); }
+@keyframes phIn { from { opacity: 0; transform: translateY(6px) scale(.97); } }
+.ph-item img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 22%; display: block; transition: transform .3s ease; }
+.ph-item:hover img, .ph-item:focus-visible img { transform: scale(1.06); }
+.ph-item:hover { border-color: var(--accent); }
+.ph-item:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+.ph-cap { position: absolute; inset: auto 0 0 0; z-index: 1; display: grid; gap: 1px; padding: 22px 8px 7px; text-align: left; color: #fff; font-size: 12.5px; font-weight: 700; line-height: 1.2; background: linear-gradient(transparent, rgb(0 0 0 / .82)); text-shadow: 0 1px 2px rgb(0 0 0 / .6); }
+.ph-cap, .ph-cap small { overflow: hidden; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
+.ph-cap small { font-size: 11px; font-weight: 500; opacity: .88; -webkit-line-clamp: 1; }
+.ph-item.loading::after { content: ''; position: absolute; inset: 0; z-index: 2; background: rgb(0 0 0 / .45); }
+.ph-item.loading::before { content: ''; position: absolute; z-index: 3; left: 50%; top: 50%; width: 30px; height: 30px; margin: -15px 0 0 -15px; border-radius: 50%; border: 3px solid rgb(255 255 255 / .35); border-top-color: #fff; animation: phSpin .8s linear infinite; }
+@keyframes phSpin { to { transform: rotate(360deg); } }
+.ph-item.failed { opacity: .45; }
+.ph-item.broken { display: none; }
+.ph-skel { aspect-ratio: 1; border-radius: 14px; background: linear-gradient(100deg, var(--panel-2) 30%, color-mix(in srgb, var(--line) 70%, var(--panel-2)) 50%, var(--panel-2) 70%); background-size: 250% 100%; animation: phSk 1.3s linear infinite; }
+@keyframes phSk { from { background-position: 100% 0; } to { background-position: -150% 0; } }
+.ph-empty { grid-column: 1 / -1; display: grid; place-items: center; gap: 10px; text-align: center; padding: 26px 16px; border-radius: 14px; background: var(--panel-2); color: var(--muted); }
+.ph-empty p { margin: 0; max-width: 46ch; }
+.ph-empty .row { justify-content: center; }
+.ph-more { justify-self: center; }
+.ph-alt { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; padding: 12px 14px; border: 1.5px dashed var(--line); border-radius: 14px; transition: border-color .15s, background-color .15s; }
+.photo-dialog.drop .ph-alt { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 10%, transparent); }
+.photo-dialog.drop { outline: 3px dashed var(--accent); outline-offset: -8px; }
+@media (max-width: 560px) {
+  .ph-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+  .ph-cap { font-size: 11.5px; padding: 18px 6px 5px; }
+  .ph-cap small { display: none; }
+  .ph-tools .help { display: none; }
+}
+@media (prefers-reduced-motion: reduce) { .ph-item, .ph-skel { animation: none; } .ph-item img { transition: none; } }
 </style>
 
 <header class="top">
@@ -2385,6 +2430,24 @@ details.card > summary { font-size: 16px; }
     <textarea id="bulkText" rows="10" spellcheck="false" placeholder="Giulia, lei, 1&#10;Marco, lui, 1&#10;Sasha, neutro, 2&#10;Elena"></textarea>
     <label class="switch" for="bulkReplace"><input type="checkbox" id="bulkReplace" role="switch"><span class="sw" aria-hidden="true"></span><span>Sostituisci il cast attuale<small>Se disattivato, i nomi vengono aggiunti in fondo.</small></span></label>
     <div class="row"><button class="btn primary" id="bulkGo" type="button">Aggiungi concorrenti</button><span class="help" id="bulkMsg" role="status"></span></div>
+  </div>
+</dialog>
+
+<dialog id="photoDlg" class="modal photo-dialog" aria-labelledby="h-photo">
+  <div class="dh"><h2 id="h-photo">Foto del concorrente</h2><button class="iconbtn" data-close type="button" aria-label="Chiudi">✕</button></div>
+  <div class="db">
+    <div class="ph-head" id="phHead"></div>
+    <form class="ph-search" id="phForm" role="search" autocomplete="off">
+      <label class="sr-only" for="phQuery">Cerca una foto</label>
+      <input type="search" id="phQuery" enterkeyhint="search" placeholder="Un nome, un personaggio, «astronauta», «gatto nero»… o un link">
+      <button class="btn primary" type="submit">Cerca</button>
+    </form>
+    <div class="ph-tools"><div class="seg sm" id="phSrc" role="group" aria-label="Dove cercare"></div><span class="help" id="phHint"></span></div>
+    <p class="help ph-msg" id="phMsg" role="status" aria-live="polite"></p>
+    <div class="ph-grid" id="phGrid" aria-label="Risultati"></div>
+    <button class="btn ph-more" id="phMore" type="button" hidden>Altri risultati</button>
+    <div class="ph-alt" id="phDrop"><button class="btn" id="phFile" type="button">Carica dal dispositivo</button><span class="help">oppure trascina o incolla qui una foto</span></div>
+    <small class="help">La foto scelta viene ritagliata e salvata solo in questo browser. Le immagini trovate restano dei loro autori: usale per giocare, non per pubblicarle.</small>
   </div>
 </dialog>
 
@@ -11869,7 +11932,7 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
 </script>
 <script>window.LOS_ASSETS = {"logo":"img/logo.f2d5175789.webp","icona":"img/icona.8b02ddeb49.webp","favicon":"img/favicon.86774dc7cf.png","panoramica":"img/panoramica.66c4c27255.webp","sagome":["img/sagome-cappuccio.e8876ba986.webp","img/sagome-esploratore.9a99fd13f8.webp","img/sagome-viaggiatore.5e36435604.webp"],"arene":{"classico":"img/arene-classico.42c6ba42ee.webp","fantasy":"img/arene-fantasy.75b7fb0d32.webp","horror":"img/arene-horror.48052d80b4.webp","liceo":"img/arene-liceo.05ed578a90.webp","royale":"img/arene-royale.36c9952cd7.webp","scifi":"img/arene-scifi.403694f00f.webp","ufficio":"img/arene-ufficio.67b271bea3.webp","wasteland":"img/arene-wasteland.889002ace8.webp","zombie":"img/arene-zombie.36c9135a12.webp"},"atlas":{"classico":{"luoghi":{"altopiano":"img/arene-classico-luoghi-altopiano.36a37512d3.webp","bosco":"img/arene-classico-luoghi-bosco.2e9163544b.webp","cornucopia":"img/arene-classico-luoghi-cornucopia.393b2dabe1.webp","fiume":"img/arene-classico-luoghi-fiume.22b335a914.webp","paludi":"img/arene-classico-luoghi-paludi.77cf115eb4.webp","rovine":"img/arene-classico-luoghi-rovine.9ea4f70ca9.webp"},"pericoli":{"branco-di-lupi-mutanti":"img/arene-classico-pericoli-branco-di-lupi-mutanti.d786a62875.webp","orso-affamato":"img/arene-classico-pericoli-orso-affamato.e4f38a9892.webp","sciame-di-vespe-velenose":"img/arene-classico-pericoli-sciame-di-vespe-velenose.5adb2c7b8d.webp","serpente-gigante":"img/arene-classico-pericoli-serpente-gigante.b17e7f3d91.webp"}},"fantasy":{"luoghi":{"foresta-elfica":"img/arene-fantasy-luoghi-foresta-elfica.0448fcfbd3.webp","lago-nebbioso":"img/arene-fantasy-luoghi-lago-nebbioso.f19abc7c81.webp","miniere":"img/arene-fantasy-luoghi-miniere.5baa916ec9.webp","palude-stregata":"img/arene-fantasy-luoghi-palude-stregata.6a0b2af4a7.webp","picco-del-drago":"img/arene-fantasy-luoghi-picco-del-drago.06bdfd84b1.webp","torre-in-rovina":"img/arene-fantasy-luoghi-torre-in-rovina.ac716863c7.webp"},"pericoli":{"branco-di-lupi-mannari":"img/arene-fantasy-pericoli-branco-di-lupi-mannari.1c9124ceee.webp","spettro-errante":"img/arene-fantasy-pericoli-spettro-errante.056074bc23.webp","troll-di-caverna":"img/arene-fantasy-pericoli-troll-di-caverna.31aa2444f0.webp","viverna":"img/arene-fantasy-pericoli-viverna.577b91a819.webp"}},"horror":{"luoghi":{"biblioteca":"img/arene-horror-luoghi-biblioteca.00d6ab97f4.webp","cappella":"img/arene-horror-luoghi-cappella.a51e505028.webp","cimitero":"img/arene-horror-luoghi-cimitero.7a441de089.webp","serra":"img/arene-horror-luoghi-serra.b3d91121d4.webp","soffitta":"img/arene-horror-luoghi-soffitta.466d40cea3.webp"},"pericoli":{"bambola-posseduta":"img/arene-horror-pericoli-bambola-posseduta.7064eef1d7.webp","entita-senza-volto":"img/arene-horror-pericoli-entita-senza-volto.2c28467bdd.webp","spettro-urlante":"img/arene-horror-pericoli-spettro-urlante.25fa554e05.webp","stormo-di-corvi":"img/arene-horror-pericoli-stormo-di-corvi.fe5c85d7ae.webp"}},"liceo":{"luoghi":{"aula-magna":"img/arene-liceo-luoghi-aula-magna.0478e35c5c.webp","biblioteca":"img/arene-liceo-luoghi-biblioteca.1ae806ae58.webp","cortile":"img/arene-liceo-luoghi-cortile.51bf433337.webp","laboratorio-di-chimica":"img/arene-liceo-luoghi-laboratorio-di-chimica.eba1434683.webp","mensa":"img/arene-liceo-luoghi-mensa.67bcbc7e37.webp","palestra":"img/arene-liceo-luoghi-palestra.8ecb872849.webp"},"pericoli":{"bidello-di-turno":"img/arene-liceo-pericoli-bidello-di-turno.191c43a8bd.webp","ispezione-a-sorpresa":"img/arene-liceo-pericoli-ispezione-a-sorpresa.bef087d9b9.webp","preside":"img/arene-liceo-pericoli-preside.033f6c9aae.webp","professoressa-di-matematica":"img/arene-liceo-pericoli-professoressa-di-matematica.6cb65c6a3f.webp"}},"royale":{"luoghi":{"aeroporto":"img/arene-royale-luoghi-aeroporto.81e8ce98d4.webp","base-militare":"img/arene-royale-luoghi-base-militare.67f3a7de9d.webp","centrale-elettrica":"img/arene-royale-luoghi-centrale-elettrica.05ee57458a.webp","fattoria":"img/arene-royale-luoghi-fattoria.7c780dda87.webp","foresta":"img/arene-royale-luoghi-foresta.03b47644d0.webp","villaggio-costiero":"img/arene-royale-luoghi-villaggio-costiero.568519eb7c.webp"},"pericoli":{"cane-da-guardia-addestrato":"img/arene-royale-pericoli-cane-da-guardia-addestrato.c7853a67a0.webp","drone-armato":"img/arene-royale-pericoli-drone-armato.30d0b73e01.webp","elicottero-da-caccia":"img/arene-royale-pericoli-elicottero-da-caccia.8c68e62346.webp"}},"scifi":{"luoghi":{"hangar":"img/arene-scifi-luoghi-hangar.6de551833b.webp","moduli-abitativi":"img/arene-scifi-luoghi-moduli-abitativi.9f5bb96d39.webp","ponte-di-comando":"img/arene-scifi-luoghi-ponte-di-comando.3e9ffd005a.webp","reattore":"img/arene-scifi-luoghi-reattore.d10a335006.webp","serra-idroponica":"img/arene-scifi-luoghi-serra-idroponica.b6f4407853.webp"},"pericoli":{"androide-da-combattimento":"img/arene-scifi-pericoli-androide-da-combattimento.1a3d3eb38e.webp","creatura-aliena-dai-tentacoli":"img/arene-scifi-pericoli-creatura-aliena-dai-tentacoli.b6b314ddd9.webp","drone-di-sicurezza-impazzito":"img/arene-scifi-pericoli-drone-di-sicurezza-impazzito.c8a9c6f9e3.webp","sciame-di-nanobot":"img/arene-scifi-pericoli-sciame-di-nanobot.d43296f047.webp"}},"ufficio":{"luoghi":{"cucina":"img/arene-ufficio-luoghi-cucina.d968f8861d.webp","open-space":"img/arene-ufficio-luoghi-open-space.b6b7990c99.webp","parcheggio":"img/arene-ufficio-luoghi-parcheggio.d593f2ed83.webp","sala-stampanti":"img/arene-ufficio-luoghi-sala-stampanti.1727f50082.webp","ufficio-del-direttore":"img/arene-ufficio-luoghi-ufficio-del-direttore.bb3b6cabab.webp"},"pericoli":{"consulente-esterno":"img/arene-ufficio-pericoli-consulente-esterno.ce6e200c3f.webp","direttore-generale":"img/arene-ufficio-pericoli-direttore-generale.da2eb1f708.webp","riorganizzazione-aziendale":"img/arene-ufficio-pericoli-riorganizzazione-aziendale.1fd57b76b3.webp","ufficio-risorse-umane":"img/arene-ufficio-pericoli-ufficio-risorse-umane.8392df7518.webp"}},"wasteland":{"luoghi":{"autostrada-spezzata":"img/arene-wasteland-luoghi-autostrada-spezzata.19a72a0b97.webp","citta-fantasma":"img/arene-wasteland-luoghi-citta-fantasma.fe22bb72b2.webp","cratere":"img/arene-wasteland-luoghi-cratere.04de7ca40a.webp","diga":"img/arene-wasteland-luoghi-diga.3be9abe15a.webp","discarica":"img/arene-wasteland-luoghi-discarica.b8783ad9c6.webp","raffineria":"img/arene-wasteland-luoghi-raffineria.081e2d2ad6.webp"},"pericoli":{"banda-di-predoni":"img/arene-wasteland-pericoli-banda-di-predoni.1dfcfd1628.webp","branco-di-cani-mutati":"img/arene-wasteland-pericoli-branco-di-cani-mutati.442fabfc39.webp","scorpione-gigante":"img/arene-wasteland-pericoli-scorpione-gigante.2dd8911367.webp","verme-delle-sabbie":"img/arene-wasteland-pericoli-verme-delle-sabbie.a0d445beeb.webp"}},"zombie":{"luoghi":{"centro-commerciale":"img/arene-zombie-luoghi-centro-commerciale.333f4699d5.webp","metropolitana":"img/arene-zombie-luoghi-metropolitana.878a263605.webp","periferia":"img/arene-zombie-luoghi-periferia.e28a7d70c7.webp","scuola":"img/arene-zombie-luoghi-scuola.153ddbaa75.webp","stazione-di-polizia":"img/arene-zombie-luoghi-stazione-di-polizia.157f7a17f5.webp"},"pericoli":{"cane-infetto":"img/arene-zombie-pericoli-cane-infetto.fdff913d6f.webp","gigante-mutato":"img/arene-zombie-pericoli-gigante-mutato.91fad36b70.webp","infetto-corridore":"img/arene-zombie-pericoli-infetto-corridore.61f48faafd.webp","orda-di-zombi":"img/arene-zombie-pericoli-orda-di-zombi.e0fc6d1b56.webp"}}}};
 ;
-window.LOS_BUILD = "d92041a8d41c8cc3c09dfa16ecbfd7c8f0521db486103e9aa61976541863b9bd";
+window.LOS_BUILD = "c766c0fd8013bb8772aca12c5d30e80c7879f8a424f5cb4169c0446633681cb7";
 ;
 /* Last One Standing — grafica vettoriale: logo, icone delle arene, illustrazioni.
  * Tutto è SVG generato in codice: nessuna immagine esterna. */
@@ -13562,6 +13625,106 @@ window.LOS_BUILD = "d92041a8d41c8cc3c09dfa16ecbfd7c8f0521db486103e9aa61976541863
 })(typeof window === 'object' ? window : globalThis);
 
 ;
+/* Ricerca delle foto dei concorrenti, senza chiavi né server propri.
+   Fonti: Wikipedia (persone note, prima in italiano e poi in inglese), Openverse (foto con licenza libera)
+   e Wikimedia Commons (archivio). Tutte rispondono al browser con CORS, quindi la foto scelta si può
+   ritagliare in un canvas e salvare come data URL, come una foto caricata dal dispositivo.
+   Se un sito non concede l'immagine al canvas, si riprova una volta attraverso il proxy d'immagini wsrv.nl. */
+(function (G) {
+  'use strict';
+  const PAGE = 18;
+  const SOURCES = {
+    wiki: { label: 'Persone note', name: 'Wikipedia', hint: 'Attori, sportivi, musicisti, personaggi storici e di fantasia.' },
+    free: { label: 'Foto libere', name: 'Openverse', hint: 'Foto con licenza libera: animali, mestieri, costumi, oggetti, ritratti.' },
+    commons: { label: 'Archivio', name: 'Wikimedia Commons', hint: 'L’archivio di Wikipedia: ritratti d’epoca, eventi, luoghi.' },
+  };
+  const qs = (o) => Object.keys(o).map((k) => encodeURIComponent(k) + '=' + encodeURIComponent(o[k])).join('&');
+  const clean = (s) => String(s == null ? '' : s).replace(/<[^>]*>/g, ' ').replace(/&nbsp;/g, ' ').replace(/&amp;/g, '&').replace(/\s+/g, ' ').trim();
+  const shortTxt = (s, n) => (s.length > n ? s.slice(0, n - 1).trim() + '…' : s);
+  async function getJSON(url, signal) {
+    const r = await fetch(url, { signal, credentials: 'omit' });
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    return r.json();
+  }
+  // le pagine di una query MediaWiki nell'ordine della ricerca
+  const pagesOf = (d) => Object.values((d && d.query && d.query.pages) || {}).sort((a, b) => (a.index || 0) - (b.index || 0));
+
+  async function wiki(q, cur, signal) {
+    const lang = (cur && cur.lang) || 'it', offset = (cur && cur.offset) || 0;
+    const d = await getJSON('https://' + lang + '.wikipedia.org/w/api.php?' + qs({ action: 'query', format: 'json', origin: '*', generator: 'search', gsrsearch: q, gsrnamespace: 0, gsrlimit: PAGE, gsroffset: offset, prop: 'pageimages|description', piprop: 'thumbnail', pithumbsize: 480, pilimit: PAGE }), signal);
+    const items = pagesOf(d).filter((p) => p.thumbnail && p.thumbnail.source && !/\.svg/i.test(p.thumbnail.source)).map((p) => ({
+      id: 'w' + lang + p.pageid, src: p.thumbnail.source, title: clean(p.title), note: shortTxt(clean(p.description), 80),
+      credit: 'Wikipedia (' + lang + ')', link: 'https://' + lang + '.wikipedia.org/?curid=' + p.pageid,
+    }));
+    // finite le pagine italiane, si continua su quella inglese
+    const next = d.continue && d.continue.gsroffset ? { lang, offset: d.continue.gsroffset } : lang === 'it' ? { lang: 'en', offset: 0 } : null;
+    return { items, next };
+  }
+
+  async function free(q, cur, signal) {
+    const page = (cur && cur.page) || 1;
+    const d = await getJSON('https://api.openverse.org/v1/images/?' + qs({ q, page, page_size: PAGE, mature: 'false' }), signal);
+    const items = (d.results || []).filter((r) => r.thumbnail || r.url).map((r) => ({
+      id: 'o' + r.id, src: r.thumbnail || r.url, title: shortTxt(clean(r.title) || 'Senza titolo', 70), note: '',
+      credit: [clean(r.creator), r.license ? (r.license === 'cc0' || r.license === 'pdm' ? r.license.toUpperCase() : 'CC ' + r.license.toUpperCase() + (r.license_version ? ' ' + r.license_version : '')) : ''].filter(Boolean).join(' · '),
+      link: r.foreign_landing_url || '',
+    }));
+    return { items, next: page < Math.min(+d.page_count || 0, 12) ? { page: page + 1 } : null };
+  }
+
+  async function commons(q, cur, signal) {
+    const offset = (cur && cur.offset) || 0;
+    const d = await getJSON('https://commons.wikimedia.org/w/api.php?' + qs({ action: 'query', format: 'json', origin: '*', generator: 'search', gsrsearch: q + ' filetype:bitmap', gsrnamespace: 6, gsrlimit: PAGE, gsroffset: offset, prop: 'imageinfo', iiprop: 'url|extmetadata', iiurlwidth: 480, iiextmetadatafilter: 'Artist|LicenseShortName|ObjectName' }), signal);
+    const items = pagesOf(d).map((p) => {
+      const ii = p.imageinfo && p.imageinfo[0]; if (!ii || !ii.thumburl) return null;
+      const m = ii.extmetadata || {}, val = (k) => clean(m[k] && m[k].value);
+      return {
+        id: 'c' + p.pageid, src: ii.thumburl, title: shortTxt(val('ObjectName') || String(p.title || '').replace(/^File:/, '').replace(/\.[a-z0-9]+$/i, '').replace(/_/g, ' '), 70), note: '',
+        credit: [shortTxt(val('Artist'), 40), val('LicenseShortName')].filter(Boolean).join(' · '), link: ii.descriptionurl || '',
+      };
+    }).filter(Boolean);
+    return { items, next: d.continue && d.continue.gsroffset ? { offset: d.continue.gsroffset } : null };
+  }
+
+  const ENGINES = { wiki, free, commons };
+  function search(source, q, cursor, signal) {
+    const fn = ENGINES[source]; if (!fn) return Promise.reject(new Error('fonte sconosciuta'));
+    return fn(String(q || '').trim().slice(0, 120), cursor || null, signal);
+  }
+
+  const isURL = (s) => /^https?:\/\/\S+$/i.test(String(s || '').trim());
+  const proxy = (u, size) => 'https://wsrv.nl/?' + qs({ url: u, w: size * 2, h: size * 2, fit: 'cover', a: 'attention', output: 'jpg', q: 85 });
+  function loadImage(src, timeout) {
+    return new Promise((resolve, reject) => {
+      const img = new Image(); let done = false;
+      const end = (fn, v) => { if (done) return; done = true; clearTimeout(timer); fn(v); };
+      const timer = setTimeout(() => { end(reject, new Error('timeout')); img.src = ''; }, timeout || 12000);
+      if (!/^(data|blob):/.test(src)) { img.crossOrigin = 'anonymous'; img.referrerPolicy = 'no-referrer'; }
+      img.onload = () => end(resolve, img); img.onerror = () => end(reject, new Error('load'));
+      img.src = src;
+    });
+  }
+  // ritaglio quadrato; nei ritratti verticali si tiene la parte alta, dove di solito c'è il volto
+  function crop(img, size) {
+    const W = img.naturalWidth || img.width, H = img.naturalHeight || img.height; if (!W || !H) throw new Error('vuota');
+    const cv = document.createElement('canvas'); cv.width = cv.height = size;
+    const k = Math.max(size / W, size / H), w = W * k, h = H * k;
+    const x = (size - w) / 2, y = h > w * 1.05 ? (size - h) * 0.22 : (size - h) / 2;
+    const ctx = cv.getContext('2d'); ctx.imageSmoothingQuality = 'high'; ctx.drawImage(img, x, y, w, h);
+    return cv.toDataURL('image/jpeg', 0.85); // lancia SecurityError se il sito non concede l'immagine
+  }
+  async function toDataURL(src, size) {
+    size = size || 160;
+    const tries = /^(data|blob):/.test(src) ? [src] : [src, proxy(src, size)];
+    let last;
+    for (const u of tries) { try { return crop(await loadImage(u), size); } catch (e) { last = e; } }
+    throw last || new Error('load');
+  }
+
+  G.LOS_PHOTO = { SOURCES, search, toDataURL, crop, loadImage, isURL };
+})(typeof window !== 'undefined' ? window : globalThis);
+
+;
 /* Last One Standing — interfaccia */
 (function () {
   'use strict';
@@ -14232,7 +14395,7 @@ window.LOS_BUILD = "d92041a8d41c8cc3c09dfa16ecbfd7c8f0521db486103e9aa61976541863
     return '<article class="tile" data-id="' + esc(t.id) + '" style="--ti:' + Math.min(i, 30) + ';--c:' + esc(t.color || teamColor(t.team)) + '">' +
       '<button class="grip" type="button" aria-label="Trascina per riordinare" title="Trascina per riordinare">' + GRIP + '</button>' +
       '<div class="thead">' +
-        '<button class="avbtn" type="button" data-act="photo" aria-label="' + (t.img ? 'Cambia la foto di ' : 'Carica una foto per ') + esc(t.name || 'questo concorrente') + '">' + avHTML(t) + '<span class="cam">' + IC.cam + '</span></button>' +
+        '<button class="avbtn" type="button" data-act="photo" aria-label="' + (t.img ? 'Cambia la foto di ' : 'Cerca o carica una foto per ') + esc(t.name || 'questo concorrente') + '">' + avHTML(t) + '<span class="cam">' + IC.cam + '</span></button>' +
         '<div class="tid"><input class="tname" type="text" id="name-' + esc(t.id) + '" data-f="name" value="' + esc(t.name) + '" placeholder="Nome" aria-label="Nome" maxlength="40" autocomplete="off">' +
         '<div class="tsub"><span class="teamchip"><i></i>Squadra ' + t.team + '</span></div></div>' +
       '</div>' +
@@ -14427,7 +14590,7 @@ window.LOS_BUILD = "d92041a8d41c8cc3c09dfa16ecbfd7c8f0521db486103e9aa61976541863
     const tile = b.closest('.tile');
     switch (b.dataset.act) {
       case 'edit': return openEditor(t.id);
-      case 'photo': photoTarget = t.id; $('#avatarFile').click(); return;
+      case 'photo': return openPhoto(t.id);
       case 'menu': {
         const m = tile.querySelector('.tpop'); const open = m.hidden;
         closeMenus(m); m.hidden = !open; b.setAttribute('aria-expanded', String(open)); tile.classList.toggle('menuopen', open);
@@ -14502,27 +14665,125 @@ window.LOS_BUILD = "d92041a8d41c8cc3c09dfa16ecbfd7c8f0521db486103e9aa61976541863
     rerender(); save();
   });
   $('#castList').addEventListener('dragend', () => { dragId = null; $$('.tile').forEach((c) => { c.draggable = false; c.classList.remove('dragging', 'over'); }); });
-  // foto
-  $('#avatarFile').addEventListener('change', (e) => {
-    const f = e.target.files[0]; e.target.value = '';
-    const t = S.cast.find((x) => x.id === photoTarget); if (!f || !t) return;
+  /* ---------- foto: ricerca sul web (Wikipedia, Openverse, Wikimedia Commons), file, incolla, trascina ---------- */
+  const PH = window.LOS_PHOTO;
+  const photo = { src: 'wiki', q: '', items: [], next: null, ctl: null, cache: new Map(), timer: 0, last: '' };
+  const photoT = () => S.cast.find((x) => x.id === photoTarget);
+  function setPhoto(t, data) {
+    t.img = data; save();
+    if ($('#editDlg').open && editId === t.id) renderEditor();
+    refreshTile(t.id);
+    const nt = $('.tile[data-id="' + CSS.escape(t.id) + '"] .avbtn'); if (nt && !AN.reduced) nt.animate([{ transform: 'scale(.6) rotate(-12deg)' }, { transform: 'scale(1.12)' }, { transform: 'none' }], { duration: 520, easing: 'cubic-bezier(.2,.9,.3,1.3)' });
+  }
+  function photoDone(t, how) { if ($('#photoDlg').open) $('#photoDlg').close(); toast('Foto ' + how + ' per ' + (t.name || 'il concorrente') + '.'); }
+  function applyPhotoFile(f) {
+    const t = photoT(); if (!f || !t) return;
     if (!/^image\//.test(f.type)) return toast('Il file scelto non è un\'immagine.');
     const rd = new FileReader();
-    rd.onload = () => {
-      const img = new Image();
-      img.onload = () => {
-        const s = 160, cv = document.createElement('canvas'); cv.width = cv.height = s;
-        const k = Math.max(s / img.width, s / img.height), w = img.width * k, h = img.height * k;
-        cv.getContext('2d').drawImage(img, (s - w) / 2, (s - h) / 2, w, h);
-        t.img = cv.toDataURL('image/jpeg', 0.82);
-        save(); if ($('#editDlg').open && editId === t.id) renderEditor(); refreshTile(t.id);
-        const nt = $('.tile[data-id="' + CSS.escape(t.id) + '"] .avbtn'); if (nt && !AN.reduced) nt.animate([{ transform: 'scale(.6) rotate(-12deg)' }, { transform: 'scale(1.12)' }, { transform: 'none' }], { duration: 520, easing: 'cubic-bezier(.2,.9,.3,1.3)' });
-      };
-      img.onerror = () => toast('Non riesco a leggere questa immagine.');
-      img.src = rd.result;
-    };
+    rd.onload = () => PH.loadImage(rd.result).then((img) => { setPhoto(t, PH.crop(img, 160)); photoDone(t, 'caricata'); }, () => toast('Non riesco a leggere questa immagine.'));
     rd.readAsDataURL(f);
-  });
+  }
+  async function applyPhotoSrc(src, el) {
+    const t = photoT(); if (!t) return;
+    if (el) { el.classList.add('loading'); el.setAttribute('aria-busy', 'true'); }
+    $('#phMsg').textContent = 'Scarico la foto…';
+    try { setPhoto(t, await PH.toDataURL(src, 160)); photoDone(t, 'applicata'); }
+    catch (e) { $('#phMsg').textContent = 'Questa immagine non si lascia scaricare: scegline un’altra.'; if (el) el.classList.add('failed'); }
+    finally { if (el) { el.classList.remove('loading'); el.removeAttribute('aria-busy'); } }
+  }
+  function renderPhotoHead() {
+    const t = photoT(); if (!t) return;
+    $('#h-photo').textContent = 'Foto di ' + (t.name || 'questo concorrente');
+    $('#phHead').innerHTML = avHTML(t) + '<div><b>' + esc(t.name || 'Senza nome') + '</b><span class="help">' + (t.img ? 'Scegli una nuova foto per sostituire quella attuale.' : 'Cerca una foto e toccala: viene scaricata, ritagliata e applicata.') + '</span></div>' + (t.img ? '<button class="btn sm ghost" type="button" id="phRemove">Togli la foto</button>' : '');
+  }
+  function renderPhotoSrc() {
+    $('#phSrc').innerHTML = Object.keys(PH.SOURCES).map((k) => '<button type="button" data-phsrc="' + k + '" aria-pressed="' + (photo.src === k) + '">' + esc(PH.SOURCES[k].label) + '</button>').join('');
+    $('#phHint').textContent = PH.SOURCES[photo.src].name + ': ' + PH.SOURCES[photo.src].hint;
+  }
+  const phItemHTML = (it, k) => '<button type="button" class="ph-item" data-ph="' + k + '" style="--i:' + (k % PH_PAGE) + '" title="' + esc([it.title, it.note, it.credit].filter(Boolean).join(' · ')) + '" aria-label="Usa la foto: ' + esc([it.title, it.note].filter(Boolean).join(', ')) + '"><img src="' + esc(it.src) + '" alt="" loading="lazy" decoding="async" referrerpolicy="no-referrer"><span class="ph-cap">' + esc(it.title) + (it.note ? '<small>' + esc(it.note) + '</small>' : '') + '</span></button>';
+  const PH_PAGE = 18;
+  function photoEmpty(msg) {
+    const others = Object.keys(PH.SOURCES).filter((k) => k !== photo.src);
+    $('#phGrid').innerHTML = '<div class="ph-empty"><p>' + esc(msg) + '</p>' + (photo.q ? '<div class="row">' + others.map((k) => '<button class="btn sm" type="button" data-phsrc="' + k + '">Cerca in ' + esc(PH.SOURCES[k].label) + '</button>').join('') + '</div>' : '') + '</div>';
+  }
+  async function runPhotoSearch(more) {
+    if (!PH) return;
+    const q = $('#phQuery').value.trim();
+    clearTimeout(photo.timer);
+    if (!q) { photo.q = ''; photo.items = []; photo.next = null; $('#phMore').hidden = true; $('#phMsg').textContent = ''; photoEmpty('Scrivi chi o che cosa cercare: il nome di una persona nota, un personaggio, un animale, un mestiere.'); return; }
+    if (PH.isURL(q)) { photoEmpty('Provo a usare l’immagine del link…'); return applyPhotoSrc(q, null); }
+    if (!more) { photo.q = q; photo.items = []; photo.next = null; }
+    const cursor = more ? photo.next : null, key = photo.src + '|' + q + '|' + JSON.stringify(cursor);
+    if (photo.ctl) photo.ctl.abort();
+    const ctl = (photo.ctl = typeof AbortController === 'function' ? new AbortController() : { signal: undefined, abort() {} });
+    const grid = $('#phGrid'), src = PH.SOURCES[photo.src];
+    grid.setAttribute('aria-busy', 'true'); $('#phMore').disabled = true;
+    if (!more) grid.innerHTML = Array.from({ length: 6 }, () => '<span class="ph-skel" aria-hidden="true"></span>').join('');
+    $('#phMsg').textContent = 'Cerco «' + q + '» in ' + src.name + '…';
+    try {
+      const r = photo.cache.get(key) || (await PH.search(photo.src, q, cursor, ctl.signal));
+      photo.cache.set(key, r);
+      if (ctl !== photo.ctl) return;
+      const seen = new Set(photo.items.map((x) => x.src)), start = photo.items.length;
+      photo.items = photo.items.concat(r.items.filter((x) => !seen.has(x.src) && (seen.add(x.src), true)));
+      photo.next = r.next;
+      if (!photo.items.length) { photoEmpty('Nessuna immagine per «' + q + '» in ' + src.name + '. Prova un’altra fonte o un nome più preciso.'); $('#phMsg').textContent = 'Nessun risultato.'; }
+      else {
+        const html = photo.items.slice(start).map((it, k) => phItemHTML(it, start + k)).join('');
+        if (more) grid.insertAdjacentHTML('beforeend', html); else grid.innerHTML = html;
+        $('#phMsg').textContent = photo.items.length + (photo.items.length === 1 ? ' immagine' : ' immagini') + ' da ' + src.name + '. Tocca quella giusta.';
+      }
+      $('#phMore').hidden = !photo.next;
+    } catch (e) {
+      if (e && e.name === 'AbortError') return;
+      photoEmpty(navigator.onLine === false ? 'Sei offline: la ricerca ha bisogno di internet. Puoi sempre caricare una foto dal dispositivo.' : src.name + ' non risponde in questo momento. Riprova tra poco o cambia fonte.');
+      $('#phMsg').textContent = 'Ricerca non riuscita.'; $('#phMore').hidden = true;
+    } finally { if (ctl === photo.ctl) { grid.removeAttribute('aria-busy'); $('#phMore').disabled = false; } }
+  }
+  function openPhoto(id) {
+    const t = S.cast.find((x) => x.id === id); if (!t) return;
+    photoTarget = id;
+    if (!PH) { $('#avatarFile').click(); return; }
+    renderPhotoHead(); renderPhotoSrc();
+    const name = (t.name || '').trim();
+    $('#phQuery').value = name; $('#phMore').hidden = true; $('#phMsg').textContent = '';
+    $('#photoDlg').showModal();
+    // un nome e cognome è probabilmente una persona nota: si cerca subito; un nome solo darebbe risultati a caso
+    if (name.split(/\s+/).length >= 2) runPhotoSearch(false);
+    else { photo.q = ''; photo.items = []; photoEmpty(name ? 'Premi Cerca per trovare «' + name + '», oppure scrivi chi o che cosa vuoi come foto.' : 'Scrivi chi o che cosa cercare.'); }
+    $('#phQuery').focus(); $('#phQuery').select();
+  }
+  if (PH) {
+    $('#phForm').addEventListener('submit', (e) => { e.preventDefault(); runPhotoSearch(false); });
+    $('#phQuery').addEventListener('input', () => {
+      clearTimeout(photo.timer); const v = $('#phQuery').value.trim();
+      if (v.length >= 3 && !PH.isURL(v) && v !== photo.q) photo.timer = setTimeout(() => runPhotoSearch(false), 700);
+    });
+    $('#phMore').addEventListener('click', () => runPhotoSearch(true));
+    $('#phFile').addEventListener('click', () => $('#avatarFile').click());
+    $('#photoDlg').addEventListener('click', (e) => {
+      const s = e.target.closest('[data-phsrc]');
+      if (s) { photo.src = s.dataset.phsrc; renderPhotoSrc(); if ($('#phQuery').value.trim()) runPhotoSearch(false); else $('#phQuery').focus(); return; }
+      const it = e.target.closest('[data-ph]');
+      if (it && !it.classList.contains('loading')) { const x = photo.items[+it.dataset.ph]; if (x) applyPhotoSrc(x.src, it); return; }
+      if (e.target.closest('#phRemove')) { const t = photoT(); if (t) { t.img = ''; save(); if ($('#editDlg').open && editId === t.id) renderEditor(); refreshTile(t.id); renderPhotoHead(); toast('Foto tolta.'); } }
+    });
+    // le anteprime che non si caricano spariscono dalla griglia
+    $('#phGrid').addEventListener('error', (e) => { const b = e.target.tagName === 'IMG' && e.target.closest('.ph-item'); if (b) b.classList.add('broken'); }, true);
+    $('#photoDlg').addEventListener('paste', (e) => {
+      const f = e.clipboardData && [...e.clipboardData.files].find((x) => /^image\//.test(x.type));
+      if (f) { e.preventDefault(); applyPhotoFile(f); }
+    });
+    const drop = $('#photoDlg');
+    drop.addEventListener('dragover', (e) => { if (e.dataTransfer && [...e.dataTransfer.types].includes('Files')) { e.preventDefault(); drop.classList.add('drop'); } });
+    drop.addEventListener('dragleave', (e) => { if (e.target === drop || !drop.contains(e.relatedTarget)) drop.classList.remove('drop'); });
+    drop.addEventListener('drop', (e) => { drop.classList.remove('drop'); const f = e.dataTransfer && e.dataTransfer.files[0]; if (f) { e.preventDefault(); applyPhotoFile(f); } });
+    $('#photoDlg').addEventListener('close', () => {
+      if (photo.ctl) photo.ctl.abort(); clearTimeout(photo.timer); $('#photoDlg').classList.remove('drop');
+      const back = $('#editDlg').open ? $('#editDlg .avbtn') : photoTarget && $('.tile[data-id="' + CSS.escape(photoTarget) + '"] .avbtn'); if (back) back.focus();
+    });
+  }
+  $('#avatarFile').addEventListener('change', (e) => { const f = e.target.files[0]; e.target.value = ''; applyPhotoFile(f); });
   // barra strumenti
   $('#btnRandom').addEventListener('click', () => {
     S.cast = L.randomCast(+$('#presetSize').value, Math.random().toString(36), +S.settings.teamSize || 2).map(sanitizeTribute);
@@ -14600,7 +14861,7 @@ window.LOS_BUILD = "d92041a8d41c8cc3c09dfa16ecbfd7c8f0521db486103e9aa61976541863
     const t = S.cast.find((x) => x.id === editId); if (!t) return;
     prevAttr = Object.assign({}, t.attr);
     switch (b.dataset.e) {
-      case 'photo': photoTarget = t.id; $('#avatarFile').click(); return;
+      case 'photo': return openPhoto(t.id);
       case 'rmphoto': t.img = ''; break;
       case 'g': t.gender = b.dataset.v; break;
       case 'trait': t.traits.includes(b.dataset.v) ? (t.traits = t.traits.filter((x) => x !== b.dataset.v)) : t.traits.length < 3 && t.traits.push(b.dataset.v); break;
