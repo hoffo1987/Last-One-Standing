@@ -139,6 +139,54 @@
     return { snapshot };
   }
 
+  // I piani restano nella chiusura: nessuna intenzione entra in istantanee,
+  // diari, grafi o cronaca prima che qualcuno passi davvero all'azione.
+  function createIntrigue({ rng, people, phase, day, ally, like, teamWin }) {
+    const pending = [], counts = new Map();
+    let prepared = 0;
+    const trait = (t, k) => t.traits.includes(k);
+    const opponent = (a, b) => a !== b && a.partner !== b.id && !(teamWin && a.team === b.team);
+    const willing = (a, b) => opponent(a, b) && (!trait(a, 'pacifista') || !!a.grudges[b.id]) && (!ally(a, b) || !trait(a, 'leale') && !trait(a, 'pacifista') && (trait(a, 'traditore') || like(a, b) <= -20));
+    function prepare() {
+      const living = people.filter(t => t.alive);
+      if (living.length < 2 || pending.length >= 4 || prepared >= Math.min(24, people.length * 2) || !rng.chance(0.85)) return false;
+      const candidates = [];
+      for (const owner of living) {
+        if (pending.some(p => p.owner === owner) || (counts.get(owner.id) || 0) >= 2) continue;
+        const devious = trait(owner, 'traditore') || trait(owner, 'stratega') || trait(owner, 'ingegnoso') || trait(owner, 'paranoico');
+        for (const target of living) {
+          if (owner.zone !== target.zone || !willing(owner, target)) continue;
+          const betrayal = ally(owner, target);
+          const helpers = living.filter(h => h !== owner && h !== target && h.zone === owner.zone && willing(h, target) && (ally(owner, h) || like(owner, h) >= 20));
+          const item = target.inv.find(it => it.type === 'arma');
+          const kinds = ['imboscata'];
+          if (item && (owner.attr.int >= 7 || owner.inv.some(it => it.type === 'attrezzo'))) kinds.push('sabotaggio');
+          if (helpers.length) kinds.push('patto');
+          candidates.push({ owner, target, helpers, item, kinds, weight: 1 + (devious ? 4 : 0) + (owner.grudges[target.id] ? 4 : 0) + (betrayal ? 2 : 0) + (living.length <= 6 ? 2 : 0) });
+        }
+      }
+      const c = rng.wpick(candidates, c => c.weight);
+      if (!c) return false;
+      const type = rng.pick(c.kinds);
+      pending.push({ type, owner: c.owner, target: c.target, helper: type === 'patto' ? rng.pick(c.helpers) : null, item: type === 'sabotaggio' ? c.item : null, ph: phase(), day: day(), zone: c.owner.zone });
+      counts.set(c.owner.id, (counts.get(c.owner.id) || 0) + 1); prepared++;
+      return true;
+    }
+    function take(finale = false) {
+      for (let i = pending.length - 1; i >= 0; i--) {
+        const p = pending[i];
+        if (!p.owner.alive || !p.target.alive || !willing(p.owner, p.target) || p.helper && (!p.helper.alive || !willing(p.helper, p.target)) || p.item && !p.target.inv.includes(p.item)) pending.splice(i, 1);
+      }
+      const living = people.filter(t => t.alive).length;
+      const ready = pending.filter(p => phase() - p.ph >= (finale ? 1 : 2) && p.owner.zone === p.target.zone && (!p.helper || p.helper.zone === p.owner.zone));
+      const p = rng.pick(ready);
+      if (!p || !finale && !rng.chance(living <= 6 ? 0.8 : phase() - p.ph >= 6 ? 0.45 : 0.12)) return null;
+      pending.splice(pending.indexOf(p), 1);
+      return p;
+    }
+    return { prepare, take };
+  }
+
   function createWorldMemory(){
     const facts=[],personal=new Map(),local=new Map(),shared=new Map();
     const key=(id,zone)=>JSON.stringify([id,zone]);
@@ -180,7 +228,7 @@
     return {data:{version:1,facts},risk,previous,record,weight,describe};
   }
 
-  const api = { createWorldMemory, eventVariety, createMemory, createVitals, createInventory, createSnapshots, createItemLedger };
+  const api = { createIntrigue, createWorldMemory, eventVariety, createMemory, createVitals, createInventory, createSnapshots, createItemLedger };
   G.LOS_SYSTEMS = api;
   if (typeof module === 'object' && module.exports) module.exports = api;
 })(typeof window === 'object' ? window : globalThis);

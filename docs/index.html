@@ -8303,6 +8303,54 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
     return { snapshot };
   }
 
+  // I piani restano nella chiusura: nessuna intenzione entra in istantanee,
+  // diari, grafi o cronaca prima che qualcuno passi davvero all'azione.
+  function createIntrigue({ rng, people, phase, day, ally, like, teamWin }) {
+    const pending = [], counts = new Map();
+    let prepared = 0;
+    const trait = (t, k) => t.traits.includes(k);
+    const opponent = (a, b) => a !== b && a.partner !== b.id && !(teamWin && a.team === b.team);
+    const willing = (a, b) => opponent(a, b) && (!trait(a, 'pacifista') || !!a.grudges[b.id]) && (!ally(a, b) || !trait(a, 'leale') && !trait(a, 'pacifista') && (trait(a, 'traditore') || like(a, b) <= -20));
+    function prepare() {
+      const living = people.filter(t => t.alive);
+      if (living.length < 2 || pending.length >= 4 || prepared >= Math.min(24, people.length * 2) || !rng.chance(0.85)) return false;
+      const candidates = [];
+      for (const owner of living) {
+        if (pending.some(p => p.owner === owner) || (counts.get(owner.id) || 0) >= 2) continue;
+        const devious = trait(owner, 'traditore') || trait(owner, 'stratega') || trait(owner, 'ingegnoso') || trait(owner, 'paranoico');
+        for (const target of living) {
+          if (owner.zone !== target.zone || !willing(owner, target)) continue;
+          const betrayal = ally(owner, target);
+          const helpers = living.filter(h => h !== owner && h !== target && h.zone === owner.zone && willing(h, target) && (ally(owner, h) || like(owner, h) >= 20));
+          const item = target.inv.find(it => it.type === 'arma');
+          const kinds = ['imboscata'];
+          if (item && (owner.attr.int >= 7 || owner.inv.some(it => it.type === 'attrezzo'))) kinds.push('sabotaggio');
+          if (helpers.length) kinds.push('patto');
+          candidates.push({ owner, target, helpers, item, kinds, weight: 1 + (devious ? 4 : 0) + (owner.grudges[target.id] ? 4 : 0) + (betrayal ? 2 : 0) + (living.length <= 6 ? 2 : 0) });
+        }
+      }
+      const c = rng.wpick(candidates, c => c.weight);
+      if (!c) return false;
+      const type = rng.pick(c.kinds);
+      pending.push({ type, owner: c.owner, target: c.target, helper: type === 'patto' ? rng.pick(c.helpers) : null, item: type === 'sabotaggio' ? c.item : null, ph: phase(), day: day(), zone: c.owner.zone });
+      counts.set(c.owner.id, (counts.get(c.owner.id) || 0) + 1); prepared++;
+      return true;
+    }
+    function take(finale = false) {
+      for (let i = pending.length - 1; i >= 0; i--) {
+        const p = pending[i];
+        if (!p.owner.alive || !p.target.alive || !willing(p.owner, p.target) || p.helper && (!p.helper.alive || !willing(p.helper, p.target)) || p.item && !p.target.inv.includes(p.item)) pending.splice(i, 1);
+      }
+      const living = people.filter(t => t.alive).length;
+      const ready = pending.filter(p => phase() - p.ph >= (finale ? 1 : 2) && p.owner.zone === p.target.zone && (!p.helper || p.helper.zone === p.owner.zone));
+      const p = rng.pick(ready);
+      if (!p || !finale && !rng.chance(living <= 6 ? 0.8 : phase() - p.ph >= 6 ? 0.45 : 0.12)) return null;
+      pending.splice(pending.indexOf(p), 1);
+      return p;
+    }
+    return { prepare, take };
+  }
+
   function createWorldMemory(){
     const facts=[],personal=new Map(),local=new Map(),shared=new Map();
     const key=(id,zone)=>JSON.stringify([id,zone]);
@@ -8344,7 +8392,7 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
     return {data:{version:1,facts},risk,previous,record,weight,describe};
   }
 
-  const api = { createWorldMemory, eventVariety, createMemory, createVitals, createInventory, createSnapshots, createItemLedger };
+  const api = { createIntrigue, createWorldMemory, eventVariety, createMemory, createVitals, createInventory, createSnapshots, createItemLedger };
   G.LOS_SYSTEMS = api;
   if (typeof module === 'object' && module.exports) module.exports = api;
 })(typeof window === 'object' ? window : globalThis);
@@ -10343,7 +10391,63 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
     const zoneMates = (t) => alive().filter((x) => x !== t && x.zone === t.zone);
     const isAlly = (a, b) => a.allyId != null && a.allyId === b.allyId;
     const canFight = (a, b) => !isAlly(a, b) && a.partner !== b.id && !(cfg.teamWin && a.team === b.team);
+    const intrigue = geo ? Systems.createIntrigue({ rng: makeRng('intrigue|' + seed + '|' + theme.id), people: T, phase: () => phases.length, day: () => day, ally: isAlly, like, teamWin: !!cfg.teamWin }) : null;
     const traitName = (id) => (traitMap[id] ? traitMap[id].name : '');
+    function revealIntrigue(events, finale = false) {
+      if (!intrigue || isEnded()) return;
+      const p = intrigue.take(finale); if (!p) return;
+      const { owner: a, target: b, helper: c } = p, people = c ? [a, b, c] : [a, b];
+      const place = geo.locate(people), out = [];
+      const betray = isAlly(a, b);
+      const turn = c ? clamp(0.16 + (like(c, b) - like(c, a) + trustOf(c, b) - trustOf(c, a)) / 240 + (hasTrait(c, 'traditore') ? 0.18 : 0), 0.05, 0.75) : 0;
+      const doubleAgent = c && c.partner !== a.id && !(cfg.teamWin && c.team === a.team) && !(hasTrait(c, 'leale') && isAlly(c, a)) && rng.chance(turn);
+      const contest = doubleAgent ? null : rollTest(b, p.type === 'imboscata' ? 'agi' : 'int', 14 + Math.floor((a.attr.int - 5) / 2));
+      if (contest) { b.tests++; stats.tests++; if (contest.pass) { b.testsPassed++; stats.testsPassed++; } }
+      let outcome = contest?.pass ? 'sventato' : 'riuscito', text, damaged = null;
+      if (betray) {
+        settlePromise(a, b, 'fedelta', false, out); leaveAlliance(a);
+        a.betrayals++; a.traitor = true; stats.betrayals++;
+        remember(b, a, 'betrayed'); addGrudge(b, a, 'betray');
+      }
+      if (p.type === 'patto') {
+        if (doubleAgent) {
+          outcome = 'doppio-gioco'; damaged = a;
+          hurt(a, 30, c, 'wound'); c.saves++;
+          remember(b, c, 'saved'); remember(a, c, 'betrayed'); addGrudge(a, c, 'betray');
+          if (isAlly(a, c)) { settlePromise(c, a, 'fedelta', false, out); leaveAlliance(c); c.betrayals++; c.traitor = true; stats.betrayals++; }
+          settlePromise(c, b, 'protezione', true, out); b.owes[c.id] = 'vita';
+          text = theme.soft ? '{0} dà il segnale per il piano concordato con {2} contro {1}. Ma {2} cambia parte: avverte {1} e fa perdere terreno a {0}. Il patto era vero; l’ultima scelta no.' : '{0} dà a {2} il segnale per accerchiare {1}. Ma {2} cambia parte: avverte {1} e colpisce {0}. Il patto era vero; l’ultima scelta no.';
+        } else {
+          damaged = contest.pass ? a : b; hurt(damaged, contest.pass ? 18 : 38, contest.pass ? b : a, 'wound');
+          remember(a, c, 'fought'); remember(c, a, 'fought');
+          text = contest.pass
+            ? (theme.soft ? '{0} e {2} rivelano il loro accordo contro {1}. {1} legge il segnale in tempo e manda a vuoto la manovra: è {0} a perdere terreno.' : '{0} e {2} scattano insieme contro {1}: si erano accordati in segreto. {1} legge il segnale e reagisce, ferendo {0}.')
+            : (theme.soft ? '{0} e {2} smettono di fingere: il loro accordo era contro {1}. La manovra coordinata costa a {1} energie preziose.' : '{0} e {2} smettono di fingere: il loro accordo era contro {1}. L’attacco coordinato ferisce {1}, prima che riesca a reagire.');
+        }
+      } else if (p.type === 'sabotaggio') {
+        damaged = contest.pass ? a : b;
+        const before = itemLedger.state(b);
+        if (!contest.pass) { p.item.q = Math.max(1, (p.item.q || 1) - 1); if (p.item.u != null) p.item.u = Math.max(1, p.item.u - 1); }
+        hurt(damaged, contest.pass ? 16 : 24, contest.pass ? b : a, 'wound');
+        itemLedger.record('attack', a, b, p.item, before, contest.pass ? 'Sabotaggio riconosciuto prima dell’uso; oggetto integro' : 'Sabotaggio rivelato: qualità e durata ridotte, con minimo 1');
+        text = contest.pass
+          ? (theme.soft ? '{1} riconosce la manomissione di {i} prima di usarlo. {0} ammette di aver preparato il sabotaggio, ma la contromossa di {1} manda a vuoto il piano.' : '{1} riconosce la manomissione di {i} prima di usarlo. {0} rivela il sabotaggio, ma {1} reagisce e ferisce {0}.')
+          : (theme.soft ? 'Il sabotaggio si manifesta quando {1} usa {i}. {0} rivela di averlo preparato: {1} perde tempo ed energie per rimediare.' : 'Il sabotaggio si manifesta quando {1} usa {i}. {0} rivela di averlo preparato e approfitta dell’apertura per ferire {1}.');
+      } else {
+        damaged = contest.pass ? a : b; hurt(damaged, contest.pass ? 20 : 34, contest.pass ? b : a, 'wound');
+        text = contest.pass
+          ? (theme.soft ? '{0} prova la manovra tenuta nascosta contro {1}. {1} riconosce la finta e la ribalta: è {0} a consumare energie per recuperare.' : '{0} prova la finta preparata contro {1}. {1} ne riconosce il ritmo, evita il colpo e ferisce {0}: l’imboscata si ritorce contro chi l’ha ideata.')
+          : (theme.soft ? '{0} cambia improvvisamente ritmo: la finta contro {1} era preparata. {1} abbocca e deve spendere energie per recuperare.' : '{0} cambia improvvisamente ritmo: la finta contro {1} era preparata. {1} abbocca e viene ferit[1:o/a] prima di capire il piano.');
+      }
+      const attacker = damaged === a ? (outcome === 'doppio-gioco' ? c : b) : a;
+      remember(damaged, attacker, 'tried'); addGrudge(damaged, attacker, 'attack');
+      people.forEach(syncSt);
+      const tx = fmt([text], people, { i: p.item?.name || '' });
+      const ev = { html: tx.html, plain: tx.plain, ids: people.map(t => t.id), deaths: [], lethal: false, origin: 'sys', cat: betray || outcome === 'doppio-gioco' ? 'betray' : 'hurt', why: 'complotto', whyTxt: 'Piano rivelato', reason: 'Preparazione: giorno ' + p.day + ', fase ' + (p.ph + 1) + '; luogo: ' + zoneName(p.zone) + '. I partecipanti erano presenti nello stesso luogo; il piano diventa noto soltanto adesso.', echo: out.slice(0, 3), place, intrigue: { type: p.type, outcome, prepared: { ph: p.ph, day: p.day, zone: p.zone } } };
+      if (outcome !== 'doppio-gioco') ev.test = Object.assign({ who: b.id, attr: p.type === 'imboscata' ? 'agi' : 'int' }, contest);
+      stats.intrigues = (stats.intrigues || 0) + 1;
+      events.push(ev); people.forEach(t => remember1(t, ev.html, 'fatto'));
+    }
     // chi ama in segreto qualcuno che si mette con un altro
     function jealousy(a, b) {
       alive().forEach((x) => {
@@ -11016,6 +11120,15 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
       }));
     }
 
+    function rememberPhase(events, extra = []) {
+      if (!worldMemory) return;
+      const visible = new Set(events), all = [...new Set([...events, ...extra])].sort((a,b) => (a.place?.seq ?? -1) - (b.place?.seq ?? -1));
+      for (const event of all) {
+        const fact = worldMemory.record(event, phases.length, day, visible.has(event));
+        if (fact?.parents.length) event.reason = (event.reason ? event.reason + ' ' : '') + 'Fatti precedenti ricordati: ' + worldMemory.describe(fact.parents.map(id => worldMemory.data.facts[id]), geographyZones);
+      }
+    }
+
     function runPhase(kind, pool, title, intro, opt) {
       const events = pendingNotes.splice(0);
       SYS = [];
@@ -11032,6 +11145,7 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
       tickStatus();
       if (kind === 'd') moveByGoals();
       maybeDissolve(events);
+      revealIntrigue(events);
       if (kind === 'd' && day >= 2) sponsorDrop(events);
       const order = rng.shuffle(alive());
       const un = new Set(order.map((t) => t.id));
@@ -11092,13 +11206,8 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
       }
       if (kind === 'd' || kind === 'dis' || kind === 'f') diaryNight(0.35);
       if(geo)events.sort((a,b)=>(a.place?.seq??-1)-(b.place?.seq??-1));
-      if(worldMemory){
-        const visible=new Set(events),all=[...new Set([...events,...valid.map(([x])=>x.ev)])].sort((a,b)=>(a.place?.seq??-1)-(b.place?.seq??-1));
-        for(const event of all){
-          const fact=worldMemory.record(event,phases.length,day,visible.has(event));
-          if(fact&&fact.parents.length)event.reason=(event.reason?event.reason+' ':'')+'Fatti precedenti ricordati: '+worldMemory.describe(fact.parents.map(id=>worldMemory.data.facts[id]),geographyZones);
-        }
-      }
+      rememberPhase(events, valid.map(([x]) => x.ev));
+      if (intrigue) intrigue.prepare();
       const died = before - alive().length;
       noDeathStreak = died ? 0 : noDeathStreak + 1;
       phases.push(Object.assign({ kind, day, title, intro, events, snap: snapshot(), meteo: W.n ? { n: W.n, d: W.d } : null }, opt || {}));
@@ -11118,11 +11227,77 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
       }
       if (!isEnded() && (!geo || !events.length)) return false;
       if(geo){events.push(...SYS.map(x=>x.ev));SYS=[];events.sort((a,b)=>(a.place?.seq??-1)-(b.place?.seq??-1));}
+      rememberPhase(events);
       phases.push({ kind: 'finale', day, title: 'L\'ultimo atto', intro: 'Restano in due, e si amano. L\'arena ha previsto anche questo.', events, snap: snapshot() });
       return isEnded();
     }
 
+    function runClimax() {
+      let meeting = null, round = 0;
+      while (!isEnded() && round < 40) {
+        const pair = alive();
+        if (pair.length === 2 && pair[0].partner === pair[1].id && runLovers()) return;
+        const events = []; SYS = []; ORIGIN = null; CURKIND = 'finale'; geo.reset();
+        if (round === 0) meeting = gather('finale');
+        else alive().forEach(t => geo.move(t, meeting, 'Raggiunge il confronto ancora in corso', { forced: true, mode: 'gather' }));
+        if (round >= 2) sealFinale(meeting);
+        revealIntrigue(events, true);
+        // Una risorsa già posseduta può ancora cambiare l'equilibrio, ma si consuma.
+        const recovery = rng.pick(alive().filter(t => t.hp < 60 && hasItem(t, 'med')));
+        if (recovery && (round === 0 || round < 3 && rng.chance(0.4))) {
+          const ev = parseLine('1 med:A | {A} usa le cure conservate prima del prossimo confronto e ritrova le forze.');
+          events.push(apply(ev, [recovery]));
+        }
+        if (round === 0) {
+          const text = theme.soft ? 'Gli ultimi concorrenti si ritrovano. I patti ancora validi restano in piedi: nessuno conosce tutte le intenzioni altrui.' : 'I superstiti si ritrovano. I patti ancora validi restano in piedi: nessuno conosce tutte le intenzioni altrui.';
+          events.push({ html: text, plain: text, ids: [], deaths: [], lethal: false, note: true });
+        } else {
+          maybeDissolve(events);
+          if (round === 3) {
+            const pact = alive().some(t => t.allyId != null);
+            alive().forEach(leaveAlliance);
+            if (pact) {
+              const text = 'Il confronto si stringe: i patti di convenienza finiscono. Restano i legami personali e le regole di vittoria della partita.';
+              events.push({ html: text, plain: text, ids: [], deaths: [], lethal: false, note: true });
+            }
+          }
+          const available = rng.shuffle(alive());
+          while (available.length > 1 && !isEnded()) {
+            const A = available.shift();
+            const j = available.findIndex(B => A.alive && B.alive && A.zone === B.zone && canFight(A, B));
+            if (j < 0) continue;
+            const B = available.splice(j, 1)[0];
+            if (round < 3 && alive().length > 2 && rng.chance(0.4)) {
+              const ev = parseLine(theme.soft ? '2 hit:A>B | {A} sorprende {B} con una manovra e costringe {B} a consumare energie. Il confronto resta aperto.' : '2 hit:A>B | {A} ferisce {B} con un attacco rapido. Il confronto resta aperto.');
+              events.push(apply(ev, [A, B])); continue;
+            }
+            const attr = rng.pick(theme.soft ? ['int', 'agi', 'car', 'furt', 'res'] : ['for', 'agi', 'int', 'furt', 'res']);
+            const left = rollTest(A, attr, 0), right = rollTest(B, attr, 0);
+            const wins = left.roll >= right.roll, roles = wins ? [A, B] : [B, A];
+            let pool = pools.finale.filter(e => e.n === 2 && e.lethal && e.space.every(s => (s.at == null || s.at === meeting) && (s.travel == null || s.travel === meeting)) && checkReq(e, roles));
+            if (!pool.length) pool = [parseLine(theme.soft ? '2 k:A>B | {A} prevale su {B}, che esce dalla gara.' : '2 k:A>B | {A} prevale nello scontro con {B}, che perde la vita.')];
+            const ev = rng.wpick(pool, e => weightFor(e, roles[0]) * variety.weight(e));
+            const result = apply(ev, roles);
+            result.test = { who: A.id, attr, roll: left.roll, dc: right.roll, pass: wins };
+            result.duel = { a: A.id, b: B.id, attr, left: left.roll, right: right.roll };
+            result.reason = (result.reason ? result.reason + ' ' : '') + 'Confronto opposto di ' + (D.attrs.find(x => x.id === attr)?.name || attr) + ': ' + A.name + ' ' + left.roll + ', ' + B.name + ' ' + right.roll + '. Contano la caratteristica, i dadi, le condizioni e gli oggetti adatti; in parità mantiene l’iniziativa chi agisce per primo.';
+            A.tests++; B.tests++; stats.tests += 2; roles[0].testsPassed++; stats.testsPassed++;
+            events.push(result);
+          }
+        }
+        events.push(...SYS.map(x => x.ev)); SYS = [];
+        events.sort((a,b) => (a.place?.seq ?? -1) - (b.place?.seq ?? -1));
+        rememberPhase(events);
+        if (!isEnded()) intrigue.prepare();
+        const titles = ['Gli ultimi equilibri', 'Le carte sul tavolo', 'Il punto di rottura'];
+        phases.push({ kind: 'finale', day, title: titles[round] || 'L’ultimo rilancio', intro: round === 0 ? 'La partita entra nella stretta finale. Punto di ritrovo: ' + zoneName(meeting) + '. Arrivare qui non significa aver già vinto.' : round === 2 ? 'I passaggi esterni vengono chiusi. Le risorse rimaste e le scelte precedenti possono ancora cambiare il confronto.' : 'Il confronto continua: il vantaggio del momento non garantisce il risultato.', events, snap: snapshot() });
+        round++;
+      }
+      if (!isEnded()) throw new Error('La stretta finale non ha prodotto un vincitore.');
+    }
+
     function runFinale() {
+      if (geo) return runClimax();
       const events = [];
       let meeting=null;
       if(geo){SYS=[];geo.reset();meeting=gather('finale');sealFinale(meeting);}
@@ -11191,6 +11366,11 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
       pendingFallen = [];
     }
     const loversEnd = () => { const a = alive(); return !cfg.teamWin && a.length === 2 && a[0].partner === a[1].id && runLovers(); };
+    const lateEnd = () => {
+      if (loversEnd()) return true;
+      if (geo && day >= 2 && alive().length <= 4 && !isEnded() && rng.chance(0.5)) { runFinale(); return true; }
+      return false;
+    };
 
     // primi sguardi: qualcuno nota subito qualcun altro
     T.forEach((a) => { const n = 1 + (a.traits.includes('romantico') ? 2 : 0) + (rng.chance(0.4) ? 1 : 0); for (let i = 0; i < n; i++) { const b = rng.pick(T); if (b !== a) tweak(a, b, { t: 5 + rng.int(20) + (b.attr.car - 5) * 2 }); } });
@@ -11215,9 +11395,9 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
       day++;
       newDay();
       if (day === 1) runPhase('b', pools.b, theme.phase.b, theme.intro.b);
-      if (isEnded() || loversEnd()) break;
+      if (isEnded() || lateEnd()) break;
       runPhase('d', pools.d, theme.phase.d + ' ' + day, theme.intro.d);
-      if (isEnded() || loversEnd()) break;
+      if (isEnded() || lateEnd()) break;
       const a = alive().length;
       if (!feastDone && day >= 3 && a >= 4 && (rng.chance(0.35) || day >= 6)) {
         feastDone = true;
@@ -11232,9 +11412,9 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
         const areas=geo?dz.zones||[...new Set(Geography.mentions(dz.n,geographyZones).map(m=>m.zone))]:[];
         runPhase('dis', dz.contentId?dz.out:dz.out.concat(pools.ds), dz.n, dz.intro, Object.assign({ adult: !!dz.adult },areas.length?{affectedZones:areas}:{},dz.contentId?{contentId:dz.contentId,worldIncident:{scene:dz.scene,exposed:alive().filter(t=>areas.includes(t.zone)).map(t=>t.id)}}:{}));
       }
-      if (isEnded() || loversEnd()) break;
+      if (isEnded() || lateEnd()) break;
       runPhase('n', pools.n, theme.phase.n + ' ' + day, theme.intro.n);
-      if (isEnded() || loversEnd()) break;
+      if (isEnded() || lateEnd()) break;
       pushFallen();
       if (day >= maxDays) { runFinale(); break; }
     }
@@ -11350,7 +11530,7 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
 </script>
 <script>window.LOS_ASSETS = {"logo":"img/logo.f2d5175789.webp","icona":"img/icona.8b02ddeb49.webp","favicon":"img/favicon.86774dc7cf.png","panoramica":"img/panoramica.66c4c27255.webp","sagome":["img/sagome-cappuccio.e8876ba986.webp","img/sagome-esploratore.9a99fd13f8.webp","img/sagome-viaggiatore.5e36435604.webp"],"arene":{"classico":"img/arene-classico.42c6ba42ee.webp","fantasy":"img/arene-fantasy.75b7fb0d32.webp","horror":"img/arene-horror.48052d80b4.webp","liceo":"img/arene-liceo.05ed578a90.webp","royale":"img/arene-royale.36c9952cd7.webp","scifi":"img/arene-scifi.403694f00f.webp","ufficio":"img/arene-ufficio.67b271bea3.webp","wasteland":"img/arene-wasteland.889002ace8.webp","zombie":"img/arene-zombie.36c9135a12.webp"},"atlas":{"classico":{"luoghi":{"altopiano":"img/arene-classico-luoghi-altopiano.36a37512d3.webp","bosco":"img/arene-classico-luoghi-bosco.2e9163544b.webp","cornucopia":"img/arene-classico-luoghi-cornucopia.393b2dabe1.webp","fiume":"img/arene-classico-luoghi-fiume.22b335a914.webp","paludi":"img/arene-classico-luoghi-paludi.77cf115eb4.webp","rovine":"img/arene-classico-luoghi-rovine.9ea4f70ca9.webp"},"pericoli":{"branco-di-lupi-mutanti":"img/arene-classico-pericoli-branco-di-lupi-mutanti.d786a62875.webp","orso-affamato":"img/arene-classico-pericoli-orso-affamato.e4f38a9892.webp","sciame-di-vespe-velenose":"img/arene-classico-pericoli-sciame-di-vespe-velenose.5adb2c7b8d.webp","serpente-gigante":"img/arene-classico-pericoli-serpente-gigante.b17e7f3d91.webp"}},"fantasy":{"luoghi":{"foresta-elfica":"img/arene-fantasy-luoghi-foresta-elfica.0448fcfbd3.webp","lago-nebbioso":"img/arene-fantasy-luoghi-lago-nebbioso.f19abc7c81.webp","miniere":"img/arene-fantasy-luoghi-miniere.5baa916ec9.webp","palude-stregata":"img/arene-fantasy-luoghi-palude-stregata.6a0b2af4a7.webp","picco-del-drago":"img/arene-fantasy-luoghi-picco-del-drago.06bdfd84b1.webp","torre-in-rovina":"img/arene-fantasy-luoghi-torre-in-rovina.ac716863c7.webp"},"pericoli":{"branco-di-lupi-mannari":"img/arene-fantasy-pericoli-branco-di-lupi-mannari.1c9124ceee.webp","spettro-errante":"img/arene-fantasy-pericoli-spettro-errante.056074bc23.webp","troll-di-caverna":"img/arene-fantasy-pericoli-troll-di-caverna.31aa2444f0.webp","viverna":"img/arene-fantasy-pericoli-viverna.577b91a819.webp"}},"horror":{"luoghi":{"biblioteca":"img/arene-horror-luoghi-biblioteca.00d6ab97f4.webp","cappella":"img/arene-horror-luoghi-cappella.a51e505028.webp","cimitero":"img/arene-horror-luoghi-cimitero.7a441de089.webp","serra":"img/arene-horror-luoghi-serra.b3d91121d4.webp","soffitta":"img/arene-horror-luoghi-soffitta.466d40cea3.webp"},"pericoli":{"bambola-posseduta":"img/arene-horror-pericoli-bambola-posseduta.7064eef1d7.webp","entita-senza-volto":"img/arene-horror-pericoli-entita-senza-volto.2c28467bdd.webp","spettro-urlante":"img/arene-horror-pericoli-spettro-urlante.25fa554e05.webp","stormo-di-corvi":"img/arene-horror-pericoli-stormo-di-corvi.fe5c85d7ae.webp"}},"liceo":{"luoghi":{"aula-magna":"img/arene-liceo-luoghi-aula-magna.0478e35c5c.webp","biblioteca":"img/arene-liceo-luoghi-biblioteca.1ae806ae58.webp","cortile":"img/arene-liceo-luoghi-cortile.51bf433337.webp","laboratorio-di-chimica":"img/arene-liceo-luoghi-laboratorio-di-chimica.eba1434683.webp","mensa":"img/arene-liceo-luoghi-mensa.67bcbc7e37.webp","palestra":"img/arene-liceo-luoghi-palestra.8ecb872849.webp"},"pericoli":{"bidello-di-turno":"img/arene-liceo-pericoli-bidello-di-turno.191c43a8bd.webp","ispezione-a-sorpresa":"img/arene-liceo-pericoli-ispezione-a-sorpresa.bef087d9b9.webp","preside":"img/arene-liceo-pericoli-preside.033f6c9aae.webp","professoressa-di-matematica":"img/arene-liceo-pericoli-professoressa-di-matematica.6cb65c6a3f.webp"}},"royale":{"luoghi":{"aeroporto":"img/arene-royale-luoghi-aeroporto.81e8ce98d4.webp","base-militare":"img/arene-royale-luoghi-base-militare.67f3a7de9d.webp","centrale-elettrica":"img/arene-royale-luoghi-centrale-elettrica.05ee57458a.webp","fattoria":"img/arene-royale-luoghi-fattoria.7c780dda87.webp","foresta":"img/arene-royale-luoghi-foresta.03b47644d0.webp","villaggio-costiero":"img/arene-royale-luoghi-villaggio-costiero.568519eb7c.webp"},"pericoli":{"cane-da-guardia-addestrato":"img/arene-royale-pericoli-cane-da-guardia-addestrato.c7853a67a0.webp","drone-armato":"img/arene-royale-pericoli-drone-armato.30d0b73e01.webp","elicottero-da-caccia":"img/arene-royale-pericoli-elicottero-da-caccia.8c68e62346.webp"}},"scifi":{"luoghi":{"hangar":"img/arene-scifi-luoghi-hangar.6de551833b.webp","moduli-abitativi":"img/arene-scifi-luoghi-moduli-abitativi.9f5bb96d39.webp","ponte-di-comando":"img/arene-scifi-luoghi-ponte-di-comando.3e9ffd005a.webp","reattore":"img/arene-scifi-luoghi-reattore.d10a335006.webp","serra-idroponica":"img/arene-scifi-luoghi-serra-idroponica.b6f4407853.webp"},"pericoli":{"androide-da-combattimento":"img/arene-scifi-pericoli-androide-da-combattimento.1a3d3eb38e.webp","creatura-aliena-dai-tentacoli":"img/arene-scifi-pericoli-creatura-aliena-dai-tentacoli.b6b314ddd9.webp","drone-di-sicurezza-impazzito":"img/arene-scifi-pericoli-drone-di-sicurezza-impazzito.c8a9c6f9e3.webp","sciame-di-nanobot":"img/arene-scifi-pericoli-sciame-di-nanobot.d43296f047.webp"}},"ufficio":{"luoghi":{"cucina":"img/arene-ufficio-luoghi-cucina.d968f8861d.webp","open-space":"img/arene-ufficio-luoghi-open-space.b6b7990c99.webp","parcheggio":"img/arene-ufficio-luoghi-parcheggio.d593f2ed83.webp","sala-stampanti":"img/arene-ufficio-luoghi-sala-stampanti.1727f50082.webp","ufficio-del-direttore":"img/arene-ufficio-luoghi-ufficio-del-direttore.bb3b6cabab.webp"},"pericoli":{"consulente-esterno":"img/arene-ufficio-pericoli-consulente-esterno.ce6e200c3f.webp","direttore-generale":"img/arene-ufficio-pericoli-direttore-generale.da2eb1f708.webp","riorganizzazione-aziendale":"img/arene-ufficio-pericoli-riorganizzazione-aziendale.1fd57b76b3.webp","ufficio-risorse-umane":"img/arene-ufficio-pericoli-ufficio-risorse-umane.8392df7518.webp"}},"wasteland":{"luoghi":{"autostrada-spezzata":"img/arene-wasteland-luoghi-autostrada-spezzata.19a72a0b97.webp","citta-fantasma":"img/arene-wasteland-luoghi-citta-fantasma.fe22bb72b2.webp","cratere":"img/arene-wasteland-luoghi-cratere.04de7ca40a.webp","diga":"img/arene-wasteland-luoghi-diga.3be9abe15a.webp","discarica":"img/arene-wasteland-luoghi-discarica.b8783ad9c6.webp","raffineria":"img/arene-wasteland-luoghi-raffineria.081e2d2ad6.webp"},"pericoli":{"banda-di-predoni":"img/arene-wasteland-pericoli-banda-di-predoni.1dfcfd1628.webp","branco-di-cani-mutati":"img/arene-wasteland-pericoli-branco-di-cani-mutati.442fabfc39.webp","scorpione-gigante":"img/arene-wasteland-pericoli-scorpione-gigante.2dd8911367.webp","verme-delle-sabbie":"img/arene-wasteland-pericoli-verme-delle-sabbie.a0d445beeb.webp"}},"zombie":{"luoghi":{"centro-commerciale":"img/arene-zombie-luoghi-centro-commerciale.333f4699d5.webp","metropolitana":"img/arene-zombie-luoghi-metropolitana.878a263605.webp","periferia":"img/arene-zombie-luoghi-periferia.e28a7d70c7.webp","scuola":"img/arene-zombie-luoghi-scuola.153ddbaa75.webp","stazione-di-polizia":"img/arene-zombie-luoghi-stazione-di-polizia.157f7a17f5.webp"},"pericoli":{"cane-infetto":"img/arene-zombie-pericoli-cane-infetto.fdff913d6f.webp","gigante-mutato":"img/arene-zombie-pericoli-gigante-mutato.91fad36b70.webp","infetto-corridore":"img/arene-zombie-pericoli-infetto-corridore.61f48faafd.webp","orda-di-zombi":"img/arene-zombie-pericoli-orda-di-zombi.e0fc6d1b56.webp"}}}};
 ;
-window.LOS_BUILD = "135a0a4dbaf26e14b94f4bcba092d8639e5ddb1fb15fd46e41411b07dbc7719e";
+window.LOS_BUILD = "055234080750fa05be49332774e92dc060105b12b0561bdaeee56e5d5829c63c";
 ;
 /* Last One Standing — grafica vettoriale: logo, icone delle arene, illustrazioni.
  * Tutto è SVG generato in codice: nessuna immagine esterna. */
@@ -12142,6 +12322,16 @@ window.LOS_BUILD = "135a0a4dbaf26e14b94f4bcba092d8639e5ddb1fb15fd46e41411b07dbc7
         }
         for (const id of s.alive) if (!Array.isArray(s.vit[id]) || s.vit[id].length !== 5 || s.vit[id].some((x, i) => !Number.isFinite(x) || x > 100 || x < (i === 4 ? -1 : 0))) return false;
         if (!s.edges.every((e) => Array.isArray(e) && integer(e[0]) && e[0] < ids.size && integer(e[1]) && e[1] < ids.size && ['love', 'friend', 'ally', 'hate', 'fear', 'rival', 'plot'].includes(e[2]) && Number.isFinite(e[3]) && [0, 1, 2].includes(e[4]))) return false;
+      }
+      for (const [ph, p] of result.phases.entries()) for (const e of p.events) {
+        if (e.intrigue !== undefined) {
+          const x = e.intrigue, start = x?.prepared;
+          if (!result.spatial || !record(x) || !['imboscata', 'sabotaggio', 'patto'].includes(x.type) || !['riuscito', 'sventato', 'doppio-gioco'].includes(x.outcome) || x.outcome === 'doppio-gioco' && x.type !== 'patto' || !record(start) || !phase(start.ph) || start.ph >= ph || start.day !== result.phases[start.ph].day || !integer(start.zone) || !result.spatial.zones[start.zone] || e.ids.length !== (x.type === 'patto' ? 3 : 2) || new Set(e.ids).size !== e.ids.length || e.ids.some(id => !result.phases[start.ph].snap.alive.includes(id) || result.phases[start.ph].snap.zones[id] !== start.zone)) return false;
+        }
+        if (e.duel !== undefined) {
+          const d = e.duel;
+          if (!record(d) || p.kind !== 'finale' || d.a === d.b || !e.ids.includes(d.a) || !e.ids.includes(d.b) || !attrs?.has(d.attr) || !Number.isFinite(d.left) || !Number.isFinite(d.right) || !e.test || e.test.who !== d.a || e.test.attr !== d.attr || e.test.roll !== d.left || e.test.dc !== d.right || e.test.pass !== (d.left >= d.right)) return false;
+        }
       }
       if (!refs(result.winners) || !result.winners.length || result.winners.length !== result.tributes.filter((t) => t.alive).length || result.winners.some((id) => !result.tributes.find((t) => t.id === id).alive)) return false;
       if (!Array.isArray(result.stats.deathsByDay) || !record(result.stats.causes) || !Object.values(result.stats.causes).every((x) => integer(x)) || !Array.isArray(result.stats.meteo) || !Array.isArray(result.stats.stories)) return false;
@@ -14447,7 +14637,7 @@ window.LOS_BUILD = "135a0a4dbaf26e14b94f4bcba092d8639e5ddb1fb15fd46e41411b07dbc7
     const avs = '<span class="avs">' + e.ids.slice(0, 4).map((id) => avHTML(by[id], { dead: e.deaths.includes(id), btn: !plain })).join('') + '</span>';
     const chip = lbl ? '<span class="cat">' + IC[cat] + (e.deaths.length > 1 && (cat === 'kill' || cat === 'death') ? e.deaths.length + ' ' + (theme.soft ? 'fuori' : 'morti') : lbl) + '</span>' : '<span></span>';
     const fix = (h) => (plain ? h.replace(/<b class="nm"[^>]*>/g, '<b>') : linkify(h));
-    const why = e.test ? '<span title="Tiro ' + e.test.roll + ' contro soglia ' + e.test.dc + '">Prova di ' + esc(ATTRN[e.test.attr] || e.test.attr) + ' · <span class="dice"><span class="roll">' + e.test.roll + '</span>/' + e.test.dc + '</span> · ' + (e.test.pass ? 'superata' : 'fallita') + '</span>' : e.sponsor ? 'Sponsor' : e.whyTxt ? esc(e.whyTxt) : whyLabel(e, theme);
+    const why = e.duel ? 'Confronto di ' + esc(ATTRN[e.duel.attr] || e.duel.attr) + ' · ' + esc(by[e.duel.a].name) + ' ' + e.duel.left + ' / ' + esc(by[e.duel.b].name) + ' ' + e.duel.right : e.test ? (e.intrigue ? 'Piano rivelato · ' : '') + '<span title="Tiro ' + e.test.roll + ' contro soglia ' + e.test.dc + '">Prova di ' + esc(ATTRN[e.test.attr] || e.test.attr) + ' · <span class="dice"><span class="roll">' + e.test.roll + '</span>/' + e.test.dc + '</span> · ' + (e.test.pass ? 'superata' : 'fallita') + '</span>' : e.sponsor ? 'Sponsor' : e.whyTxt ? esc(e.whyTxt) : whyLabel(e, theme);
     const echo = ((e.echo || []).length ? '<ul class="echo">' + e.echo.map((x) => '<li class="' + (x.cls || '') + '">' + fix(x.html) + '</li>').join('') + '</ul>' : '') +
       (e.reason ? '<details class="event-reason"><summary>Il contesto</summary><p>' + esc(e.reason) + '</p></details>' : '');
     const place=e.place?(e.place.zone!=null?'<span class="event-place">'+esc(stripArt(theme.lex.luogo[e.place.zone]||'Zona'))+'</span>':'<span class="event-place">Riferimenti a persone in zone diverse</span>'):'';

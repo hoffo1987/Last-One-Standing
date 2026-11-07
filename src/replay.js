@@ -81,6 +81,16 @@
         for (const id of s.alive) if (!Array.isArray(s.vit[id]) || s.vit[id].length !== 5 || s.vit[id].some((x, i) => !Number.isFinite(x) || x > 100 || x < (i === 4 ? -1 : 0))) return false;
         if (!s.edges.every((e) => Array.isArray(e) && integer(e[0]) && e[0] < ids.size && integer(e[1]) && e[1] < ids.size && ['love', 'friend', 'ally', 'hate', 'fear', 'rival', 'plot'].includes(e[2]) && Number.isFinite(e[3]) && [0, 1, 2].includes(e[4]))) return false;
       }
+      for (const [ph, p] of result.phases.entries()) for (const e of p.events) {
+        if (e.intrigue !== undefined) {
+          const x = e.intrigue, start = x?.prepared;
+          if (!result.spatial || !record(x) || !['imboscata', 'sabotaggio', 'patto'].includes(x.type) || !['riuscito', 'sventato', 'doppio-gioco'].includes(x.outcome) || x.outcome === 'doppio-gioco' && x.type !== 'patto' || !record(start) || !phase(start.ph) || start.ph >= ph || start.day !== result.phases[start.ph].day || !integer(start.zone) || !result.spatial.zones[start.zone] || e.ids.length !== (x.type === 'patto' ? 3 : 2) || new Set(e.ids).size !== e.ids.length || e.ids.some(id => !result.phases[start.ph].snap.alive.includes(id) || result.phases[start.ph].snap.zones[id] !== start.zone)) return false;
+        }
+        if (e.duel !== undefined) {
+          const d = e.duel;
+          if (!record(d) || p.kind !== 'finale' || d.a === d.b || !e.ids.includes(d.a) || !e.ids.includes(d.b) || !attrs?.has(d.attr) || !Number.isFinite(d.left) || !Number.isFinite(d.right) || !e.test || e.test.who !== d.a || e.test.attr !== d.attr || e.test.roll !== d.left || e.test.dc !== d.right || e.test.pass !== (d.left >= d.right)) return false;
+        }
+      }
       if (!refs(result.winners) || !result.winners.length || result.winners.length !== result.tributes.filter((t) => t.alive).length || result.winners.some((id) => !result.tributes.find((t) => t.id === id).alive)) return false;
       if (!Array.isArray(result.stats.deathsByDay) || !record(result.stats.causes) || !Object.values(result.stats.causes).every((x) => integer(x)) || !Array.isArray(result.stats.meteo) || !Array.isArray(result.stats.stories)) return false;
       if (!result.stats.meteo.every((x) => record(x) && integer(x.day, 1) && typeof x.n === 'string') || !result.stats.stories.every((x) => record(x) && ids.has(x.a) && ids.has(x.b) && typeof x.k === 'string' && Number.isFinite(x.v))) return false;

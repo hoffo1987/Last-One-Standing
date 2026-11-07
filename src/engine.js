@@ -1700,7 +1700,63 @@
     const zoneMates = (t) => alive().filter((x) => x !== t && x.zone === t.zone);
     const isAlly = (a, b) => a.allyId != null && a.allyId === b.allyId;
     const canFight = (a, b) => !isAlly(a, b) && a.partner !== b.id && !(cfg.teamWin && a.team === b.team);
+    const intrigue = geo ? Systems.createIntrigue({ rng: makeRng('intrigue|' + seed + '|' + theme.id), people: T, phase: () => phases.length, day: () => day, ally: isAlly, like, teamWin: !!cfg.teamWin }) : null;
     const traitName = (id) => (traitMap[id] ? traitMap[id].name : '');
+    function revealIntrigue(events, finale = false) {
+      if (!intrigue || isEnded()) return;
+      const p = intrigue.take(finale); if (!p) return;
+      const { owner: a, target: b, helper: c } = p, people = c ? [a, b, c] : [a, b];
+      const place = geo.locate(people), out = [];
+      const betray = isAlly(a, b);
+      const turn = c ? clamp(0.16 + (like(c, b) - like(c, a) + trustOf(c, b) - trustOf(c, a)) / 240 + (hasTrait(c, 'traditore') ? 0.18 : 0), 0.05, 0.75) : 0;
+      const doubleAgent = c && c.partner !== a.id && !(cfg.teamWin && c.team === a.team) && !(hasTrait(c, 'leale') && isAlly(c, a)) && rng.chance(turn);
+      const contest = doubleAgent ? null : rollTest(b, p.type === 'imboscata' ? 'agi' : 'int', 14 + Math.floor((a.attr.int - 5) / 2));
+      if (contest) { b.tests++; stats.tests++; if (contest.pass) { b.testsPassed++; stats.testsPassed++; } }
+      let outcome = contest?.pass ? 'sventato' : 'riuscito', text, damaged = null;
+      if (betray) {
+        settlePromise(a, b, 'fedelta', false, out); leaveAlliance(a);
+        a.betrayals++; a.traitor = true; stats.betrayals++;
+        remember(b, a, 'betrayed'); addGrudge(b, a, 'betray');
+      }
+      if (p.type === 'patto') {
+        if (doubleAgent) {
+          outcome = 'doppio-gioco'; damaged = a;
+          hurt(a, 30, c, 'wound'); c.saves++;
+          remember(b, c, 'saved'); remember(a, c, 'betrayed'); addGrudge(a, c, 'betray');
+          if (isAlly(a, c)) { settlePromise(c, a, 'fedelta', false, out); leaveAlliance(c); c.betrayals++; c.traitor = true; stats.betrayals++; }
+          settlePromise(c, b, 'protezione', true, out); b.owes[c.id] = 'vita';
+          text = theme.soft ? '{0} dà il segnale per il piano concordato con {2} contro {1}. Ma {2} cambia parte: avverte {1} e fa perdere terreno a {0}. Il patto era vero; l’ultima scelta no.' : '{0} dà a {2} il segnale per accerchiare {1}. Ma {2} cambia parte: avverte {1} e colpisce {0}. Il patto era vero; l’ultima scelta no.';
+        } else {
+          damaged = contest.pass ? a : b; hurt(damaged, contest.pass ? 18 : 38, contest.pass ? b : a, 'wound');
+          remember(a, c, 'fought'); remember(c, a, 'fought');
+          text = contest.pass
+            ? (theme.soft ? '{0} e {2} rivelano il loro accordo contro {1}. {1} legge il segnale in tempo e manda a vuoto la manovra: è {0} a perdere terreno.' : '{0} e {2} scattano insieme contro {1}: si erano accordati in segreto. {1} legge il segnale e reagisce, ferendo {0}.')
+            : (theme.soft ? '{0} e {2} smettono di fingere: il loro accordo era contro {1}. La manovra coordinata costa a {1} energie preziose.' : '{0} e {2} smettono di fingere: il loro accordo era contro {1}. L’attacco coordinato ferisce {1}, prima che riesca a reagire.');
+        }
+      } else if (p.type === 'sabotaggio') {
+        damaged = contest.pass ? a : b;
+        const before = itemLedger.state(b);
+        if (!contest.pass) { p.item.q = Math.max(1, (p.item.q || 1) - 1); if (p.item.u != null) p.item.u = Math.max(1, p.item.u - 1); }
+        hurt(damaged, contest.pass ? 16 : 24, contest.pass ? b : a, 'wound');
+        itemLedger.record('attack', a, b, p.item, before, contest.pass ? 'Sabotaggio riconosciuto prima dell’uso; oggetto integro' : 'Sabotaggio rivelato: qualità e durata ridotte, con minimo 1');
+        text = contest.pass
+          ? (theme.soft ? '{1} riconosce la manomissione di {i} prima di usarlo. {0} ammette di aver preparato il sabotaggio, ma la contromossa di {1} manda a vuoto il piano.' : '{1} riconosce la manomissione di {i} prima di usarlo. {0} rivela il sabotaggio, ma {1} reagisce e ferisce {0}.')
+          : (theme.soft ? 'Il sabotaggio si manifesta quando {1} usa {i}. {0} rivela di averlo preparato: {1} perde tempo ed energie per rimediare.' : 'Il sabotaggio si manifesta quando {1} usa {i}. {0} rivela di averlo preparato e approfitta dell’apertura per ferire {1}.');
+      } else {
+        damaged = contest.pass ? a : b; hurt(damaged, contest.pass ? 20 : 34, contest.pass ? b : a, 'wound');
+        text = contest.pass
+          ? (theme.soft ? '{0} prova la manovra tenuta nascosta contro {1}. {1} riconosce la finta e la ribalta: è {0} a consumare energie per recuperare.' : '{0} prova la finta preparata contro {1}. {1} ne riconosce il ritmo, evita il colpo e ferisce {0}: l’imboscata si ritorce contro chi l’ha ideata.')
+          : (theme.soft ? '{0} cambia improvvisamente ritmo: la finta contro {1} era preparata. {1} abbocca e deve spendere energie per recuperare.' : '{0} cambia improvvisamente ritmo: la finta contro {1} era preparata. {1} abbocca e viene ferit[1:o/a] prima di capire il piano.');
+      }
+      const attacker = damaged === a ? (outcome === 'doppio-gioco' ? c : b) : a;
+      remember(damaged, attacker, 'tried'); addGrudge(damaged, attacker, 'attack');
+      people.forEach(syncSt);
+      const tx = fmt([text], people, { i: p.item?.name || '' });
+      const ev = { html: tx.html, plain: tx.plain, ids: people.map(t => t.id), deaths: [], lethal: false, origin: 'sys', cat: betray || outcome === 'doppio-gioco' ? 'betray' : 'hurt', why: 'complotto', whyTxt: 'Piano rivelato', reason: 'Preparazione: giorno ' + p.day + ', fase ' + (p.ph + 1) + '; luogo: ' + zoneName(p.zone) + '. I partecipanti erano presenti nello stesso luogo; il piano diventa noto soltanto adesso.', echo: out.slice(0, 3), place, intrigue: { type: p.type, outcome, prepared: { ph: p.ph, day: p.day, zone: p.zone } } };
+      if (outcome !== 'doppio-gioco') ev.test = Object.assign({ who: b.id, attr: p.type === 'imboscata' ? 'agi' : 'int' }, contest);
+      stats.intrigues = (stats.intrigues || 0) + 1;
+      events.push(ev); people.forEach(t => remember1(t, ev.html, 'fatto'));
+    }
     // chi ama in segreto qualcuno che si mette con un altro
     function jealousy(a, b) {
       alive().forEach((x) => {
@@ -2373,6 +2429,15 @@
       }));
     }
 
+    function rememberPhase(events, extra = []) {
+      if (!worldMemory) return;
+      const visible = new Set(events), all = [...new Set([...events, ...extra])].sort((a,b) => (a.place?.seq ?? -1) - (b.place?.seq ?? -1));
+      for (const event of all) {
+        const fact = worldMemory.record(event, phases.length, day, visible.has(event));
+        if (fact?.parents.length) event.reason = (event.reason ? event.reason + ' ' : '') + 'Fatti precedenti ricordati: ' + worldMemory.describe(fact.parents.map(id => worldMemory.data.facts[id]), geographyZones);
+      }
+    }
+
     function runPhase(kind, pool, title, intro, opt) {
       const events = pendingNotes.splice(0);
       SYS = [];
@@ -2389,6 +2454,7 @@
       tickStatus();
       if (kind === 'd') moveByGoals();
       maybeDissolve(events);
+      revealIntrigue(events);
       if (kind === 'd' && day >= 2) sponsorDrop(events);
       const order = rng.shuffle(alive());
       const un = new Set(order.map((t) => t.id));
@@ -2449,13 +2515,8 @@
       }
       if (kind === 'd' || kind === 'dis' || kind === 'f') diaryNight(0.35);
       if(geo)events.sort((a,b)=>(a.place?.seq??-1)-(b.place?.seq??-1));
-      if(worldMemory){
-        const visible=new Set(events),all=[...new Set([...events,...valid.map(([x])=>x.ev)])].sort((a,b)=>(a.place?.seq??-1)-(b.place?.seq??-1));
-        for(const event of all){
-          const fact=worldMemory.record(event,phases.length,day,visible.has(event));
-          if(fact&&fact.parents.length)event.reason=(event.reason?event.reason+' ':'')+'Fatti precedenti ricordati: '+worldMemory.describe(fact.parents.map(id=>worldMemory.data.facts[id]),geographyZones);
-        }
-      }
+      rememberPhase(events, valid.map(([x]) => x.ev));
+      if (intrigue) intrigue.prepare();
       const died = before - alive().length;
       noDeathStreak = died ? 0 : noDeathStreak + 1;
       phases.push(Object.assign({ kind, day, title, intro, events, snap: snapshot(), meteo: W.n ? { n: W.n, d: W.d } : null }, opt || {}));
@@ -2475,11 +2536,77 @@
       }
       if (!isEnded() && (!geo || !events.length)) return false;
       if(geo){events.push(...SYS.map(x=>x.ev));SYS=[];events.sort((a,b)=>(a.place?.seq??-1)-(b.place?.seq??-1));}
+      rememberPhase(events);
       phases.push({ kind: 'finale', day, title: 'L\'ultimo atto', intro: 'Restano in due, e si amano. L\'arena ha previsto anche questo.', events, snap: snapshot() });
       return isEnded();
     }
 
+    function runClimax() {
+      let meeting = null, round = 0;
+      while (!isEnded() && round < 40) {
+        const pair = alive();
+        if (pair.length === 2 && pair[0].partner === pair[1].id && runLovers()) return;
+        const events = []; SYS = []; ORIGIN = null; CURKIND = 'finale'; geo.reset();
+        if (round === 0) meeting = gather('finale');
+        else alive().forEach(t => geo.move(t, meeting, 'Raggiunge il confronto ancora in corso', { forced: true, mode: 'gather' }));
+        if (round >= 2) sealFinale(meeting);
+        revealIntrigue(events, true);
+        // Una risorsa già posseduta può ancora cambiare l'equilibrio, ma si consuma.
+        const recovery = rng.pick(alive().filter(t => t.hp < 60 && hasItem(t, 'med')));
+        if (recovery && (round === 0 || round < 3 && rng.chance(0.4))) {
+          const ev = parseLine('1 med:A | {A} usa le cure conservate prima del prossimo confronto e ritrova le forze.');
+          events.push(apply(ev, [recovery]));
+        }
+        if (round === 0) {
+          const text = theme.soft ? 'Gli ultimi concorrenti si ritrovano. I patti ancora validi restano in piedi: nessuno conosce tutte le intenzioni altrui.' : 'I superstiti si ritrovano. I patti ancora validi restano in piedi: nessuno conosce tutte le intenzioni altrui.';
+          events.push({ html: text, plain: text, ids: [], deaths: [], lethal: false, note: true });
+        } else {
+          maybeDissolve(events);
+          if (round === 3) {
+            const pact = alive().some(t => t.allyId != null);
+            alive().forEach(leaveAlliance);
+            if (pact) {
+              const text = 'Il confronto si stringe: i patti di convenienza finiscono. Restano i legami personali e le regole di vittoria della partita.';
+              events.push({ html: text, plain: text, ids: [], deaths: [], lethal: false, note: true });
+            }
+          }
+          const available = rng.shuffle(alive());
+          while (available.length > 1 && !isEnded()) {
+            const A = available.shift();
+            const j = available.findIndex(B => A.alive && B.alive && A.zone === B.zone && canFight(A, B));
+            if (j < 0) continue;
+            const B = available.splice(j, 1)[0];
+            if (round < 3 && alive().length > 2 && rng.chance(0.4)) {
+              const ev = parseLine(theme.soft ? '2 hit:A>B | {A} sorprende {B} con una manovra e costringe {B} a consumare energie. Il confronto resta aperto.' : '2 hit:A>B | {A} ferisce {B} con un attacco rapido. Il confronto resta aperto.');
+              events.push(apply(ev, [A, B])); continue;
+            }
+            const attr = rng.pick(theme.soft ? ['int', 'agi', 'car', 'furt', 'res'] : ['for', 'agi', 'int', 'furt', 'res']);
+            const left = rollTest(A, attr, 0), right = rollTest(B, attr, 0);
+            const wins = left.roll >= right.roll, roles = wins ? [A, B] : [B, A];
+            let pool = pools.finale.filter(e => e.n === 2 && e.lethal && e.space.every(s => (s.at == null || s.at === meeting) && (s.travel == null || s.travel === meeting)) && checkReq(e, roles));
+            if (!pool.length) pool = [parseLine(theme.soft ? '2 k:A>B | {A} prevale su {B}, che esce dalla gara.' : '2 k:A>B | {A} prevale nello scontro con {B}, che perde la vita.')];
+            const ev = rng.wpick(pool, e => weightFor(e, roles[0]) * variety.weight(e));
+            const result = apply(ev, roles);
+            result.test = { who: A.id, attr, roll: left.roll, dc: right.roll, pass: wins };
+            result.duel = { a: A.id, b: B.id, attr, left: left.roll, right: right.roll };
+            result.reason = (result.reason ? result.reason + ' ' : '') + 'Confronto opposto di ' + (D.attrs.find(x => x.id === attr)?.name || attr) + ': ' + A.name + ' ' + left.roll + ', ' + B.name + ' ' + right.roll + '. Contano la caratteristica, i dadi, le condizioni e gli oggetti adatti; in parità mantiene l’iniziativa chi agisce per primo.';
+            A.tests++; B.tests++; stats.tests += 2; roles[0].testsPassed++; stats.testsPassed++;
+            events.push(result);
+          }
+        }
+        events.push(...SYS.map(x => x.ev)); SYS = [];
+        events.sort((a,b) => (a.place?.seq ?? -1) - (b.place?.seq ?? -1));
+        rememberPhase(events);
+        if (!isEnded()) intrigue.prepare();
+        const titles = ['Gli ultimi equilibri', 'Le carte sul tavolo', 'Il punto di rottura'];
+        phases.push({ kind: 'finale', day, title: titles[round] || 'L’ultimo rilancio', intro: round === 0 ? 'La partita entra nella stretta finale. Punto di ritrovo: ' + zoneName(meeting) + '. Arrivare qui non significa aver già vinto.' : round === 2 ? 'I passaggi esterni vengono chiusi. Le risorse rimaste e le scelte precedenti possono ancora cambiare il confronto.' : 'Il confronto continua: il vantaggio del momento non garantisce il risultato.', events, snap: snapshot() });
+        round++;
+      }
+      if (!isEnded()) throw new Error('La stretta finale non ha prodotto un vincitore.');
+    }
+
     function runFinale() {
+      if (geo) return runClimax();
       const events = [];
       let meeting=null;
       if(geo){SYS=[];geo.reset();meeting=gather('finale');sealFinale(meeting);}
@@ -2548,6 +2675,11 @@
       pendingFallen = [];
     }
     const loversEnd = () => { const a = alive(); return !cfg.teamWin && a.length === 2 && a[0].partner === a[1].id && runLovers(); };
+    const lateEnd = () => {
+      if (loversEnd()) return true;
+      if (geo && day >= 2 && alive().length <= 4 && !isEnded() && rng.chance(0.5)) { runFinale(); return true; }
+      return false;
+    };
 
     // primi sguardi: qualcuno nota subito qualcun altro
     T.forEach((a) => { const n = 1 + (a.traits.includes('romantico') ? 2 : 0) + (rng.chance(0.4) ? 1 : 0); for (let i = 0; i < n; i++) { const b = rng.pick(T); if (b !== a) tweak(a, b, { t: 5 + rng.int(20) + (b.attr.car - 5) * 2 }); } });
@@ -2572,9 +2704,9 @@
       day++;
       newDay();
       if (day === 1) runPhase('b', pools.b, theme.phase.b, theme.intro.b);
-      if (isEnded() || loversEnd()) break;
+      if (isEnded() || lateEnd()) break;
       runPhase('d', pools.d, theme.phase.d + ' ' + day, theme.intro.d);
-      if (isEnded() || loversEnd()) break;
+      if (isEnded() || lateEnd()) break;
       const a = alive().length;
       if (!feastDone && day >= 3 && a >= 4 && (rng.chance(0.35) || day >= 6)) {
         feastDone = true;
@@ -2589,9 +2721,9 @@
         const areas=geo?dz.zones||[...new Set(Geography.mentions(dz.n,geographyZones).map(m=>m.zone))]:[];
         runPhase('dis', dz.contentId?dz.out:dz.out.concat(pools.ds), dz.n, dz.intro, Object.assign({ adult: !!dz.adult },areas.length?{affectedZones:areas}:{},dz.contentId?{contentId:dz.contentId,worldIncident:{scene:dz.scene,exposed:alive().filter(t=>areas.includes(t.zone)).map(t=>t.id)}}:{}));
       }
-      if (isEnded() || loversEnd()) break;
+      if (isEnded() || lateEnd()) break;
       runPhase('n', pools.n, theme.phase.n + ' ' + day, theme.intro.n);
-      if (isEnded() || loversEnd()) break;
+      if (isEnded() || lateEnd()) break;
       pushFallen();
       if (day >= maxDays) { runFinale(); break; }
     }

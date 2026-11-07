@@ -287,3 +287,6 @@ La [guida a registro, sistemi ed esperimenti](docs-dev/simulazione.md) descrive 
 
 ## Memoria persistente dell’arena
 I fatti vissuti restano nel registro della partita, compresi i finali e le conseguenze sintetizzate nel diario. Le esperienze locali influenzano percorsi, ripari e prudenza; i rapporti mantengono riferimenti agli incontri precedenti. La mappa mostra la memoria della zona o dell’intera arena fino alla fase consultata, e i contesti degli eventi possono richiamare fatti realmente condivisi. Gli incidenti non vengono dimenticati dopo otto fasi. [Regole e verifiche](docs-dev/memoria-arena.md).
+
+## Complotti riservati e finale aperto
+Nuovi piani di imboscata, sabotaggio e accordo a tre restano nascosti fino all'esecuzione, anche nei diari e nel grafo dei rapporti. Possono fallire o essere ribaltati da un complice. La stretta finale si svolge in più fasi: risorse conservate, schermaglie e confronti su abilità diverse possono cambiare gli equilibri. Preparazioni, oggetti, posizioni e regole di vittoria restano verificabili nel replay. [Regole, limiti e verifiche](docs-dev/complotti-e-finale.md).
