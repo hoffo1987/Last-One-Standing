@@ -106,7 +106,14 @@ Un interruttore nella sezione Arena, attivo solo dopo la conferma dell'età, agg
 ## La sezione Concorrenti
 - **Schede ricche**: volto grande con anello del colore di squadra, squadra, un profilo in miniatura delle dieci caratteristiche (verde i punti forti, rosso quelli deboli) con «Forte in…» e «Debole in…» su due righe, tratti e un invito a aggiungerne.
 - **Modifiche sul posto**: il nome si scrive direttamente sulla scheda, il genere si cambia con un selettore che scivola, il volto si tocca per cercare o caricare una foto.
-- **Cerca una foto**: toccando il volto si apre un piccolo motore di ricerca, già compilato con il nome del concorrente (con nome e cognome parte da solo). Tre fonti senza chiavi né account: *Persone note* (Wikipedia italiana, poi inglese), *Foto libere* (Openverse, immagini con licenza libera) e *Archivio* (Wikimedia Commons). Toccando un risultato la foto viene scaricata, ritagliata in quadrato tenendo la parte alta dei ritratti e applicata. Se un sito non concede l'immagine al browser si riprova una volta tramite il proxy d'immagini wsrv.nl. Si può anche incollare un link, incollare o trascinare un'immagine, o caricarla dal dispositivo. Senza internet resta il caricamento da file. Le immagini restano dei loro autori: la foto è salvata solo nel browser, per giocare.
+- **Cerca una foto**: toccando il volto si apre un piccolo motore di ricerca, già compilato con il nome del concorrente (con nome e cognome parte da solo). Toccando un risultato la foto viene scaricata, ritagliata in quadrato tenendo la parte alta dei ritratti e applicata. Le fonti:
+  - **Anime e giochi** (la prima, e il browser ricorda l'ultima scelta): personaggi da AniList (con MyAnimeList come riserva) e dalla Wikipedia inglese. Con il campo facoltativo *Serie o gioco* («Final Fantasy», «One Piece», «Zelda»…) cerca anche nel wiki Fandom della serie, che ha pure i personaggi minori, e mette prima i personaggi di quella serie.
+  - **Persone note** (Wikipedia italiana, poi inglese, comprese le immagini non libere dei personaggi), **Foto libere** (Openverse) e **Archivio** (Wikimedia Commons).
+  - **Web**, come un motore di ricerca: compare solo sul sito pubblicato e solo se la funzione `api/immagini.js` ha una chiave della [Brave Search API](https://brave.com/search/api/) (vedi sotto). L'API immagini di Google è chiusa ai nuovi utenti dal 2026 e si spegne nel 2027, quindi non si può collegare.
+  
+  Se un sito non concede l'immagine al browser si riprova una volta tramite il proxy d'immagini wsrv.nl. Si può anche incollare un link, incollare o trascinare un'immagine, o caricarla dal dispositivo; senza internet resta il caricamento da file. Le immagini restano dei loro autori: la foto è salvata solo nel browser, per giocare.
+
+  **Attivare la fonte Web**: crea una chiave su [api-dashboard.search.brave.com](https://api-dashboard.search.brave.com) (piano Search; ogni mese c'è un credito gratuito di circa 1.000 ricerche, poi si paga a consumo). Poi in Vercel apri *Project → Settings → Environment Variables*, aggiungi `BRAVE_API_KEY` con la chiave e rifai il deploy. La chiave resta sul server; la funzione risponde solo alle pagine del sito e tiene in cache per un giorno le stesse ricerche.
 - **Menu delle azioni** (⋯) su ogni scheda: sposta prima o dopo, duplica, caratteristiche casuali, elimina. Eliminare (anche tutto il cast) si può **annullare** dal messaggio che compare.
 - **Panoramica del cast**: un pannello con i numeri grandi e la loro parola sotto (concorrenti, squadre con i colori, lui, lei, neutri, media, foto), i tratti più diffusi con il conteggio a parte, e la ricerca per nome, tratto o squadra.
 - **Vista per squadra** con media di ogni squadra e un **+** per aggiungere un concorrente direttamente in quella squadra.
@@ -174,7 +181,8 @@ src/anim.js          motore delle animazioni: atmosfere per arena, effetti degli
 src/replay.js        risultati immutabili nel browser, con IndexedDB e ripiego su localStorage
 src/simulator.js     esecuzione asincrona del motore in Web Worker, annullamento e ripiego compatibile
 src/studio.js        legami iniziali, seguiti, percorsi narrativi, eventi avanzati, laboratorio e stagioni
-src/photo-search.js  ricerca delle foto dei concorrenti (Wikipedia, Openverse, Wikimedia Commons) e ritaglio
+src/photo-search.js  ricerca delle foto dei concorrenti (AniList, Fandom, Wikipedia, Openverse, Commons, web) e ritaglio
+api/immagini.js      funzione Vercel per la fonte Web (Brave Search API, attiva con BRAVE_API_KEY)
 src/experiments.js   esperimenti con semi accoppiati e una sola caratteristica variata
 docs/                versione per il web (Vercel o GitHub Pages): pagina leggera e immagini in docs/img con l'impronta nel nome, servite con cache lunga
 src/ui.js            interfaccia
@@ -206,6 +214,7 @@ node tools/test-variety-history.js # varietà, memoria storica e contesto degli 
 node tools/test-worker.js        # stesso risultato nel worker e nel motore principale
 node tools/test-studio.js        # legami iniziali, eventi avanzati, laboratorio, stagioni e percorsi della vittoria
 node tools/test-storage-ui.js    # scritture fallite, classifica persistita e deduplicazione delle foto
+node tools/test-photo-search.js   # fonti della ricerca foto, unione dei risultati e funzione /api/immagini
 node tools/test-engine-baseline.js # confronto completo con 36 risultati precedenti al refactoring
 node tools/test-item-facts.js    # registro oggetti, assenza di mutazioni e compatibilità dei replay
 node tools/test-experiments.js   # controllo delle coppie, riproducibilità e annullamento parziale

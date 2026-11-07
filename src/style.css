@@ -2113,3 +2113,8 @@ details.card > summary { font-size: 16px; }
   .ph-tools .help { display: none; }
 }
 @media (prefers-reduced-motion: reduce) { .ph-item, .ph-skel { animation: none; } .ph-item img { transition: none; } }
+.ph-tools .seg { flex-wrap: wrap; max-width: 100%; }
+.ph-series { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.ph-series label { font-weight: 700; font-size: 14px; }
+.ph-series label small { font-weight: 500; color: var(--muted); }
+.ph-series input { flex: 1 1 220px; min-width: 0; padding: 9px 12px; border-radius: 10px; }

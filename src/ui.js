@@ -940,7 +940,14 @@
   $('#castList').addEventListener('dragend', () => { dragId = null; $$('.tile').forEach((c) => { c.draggable = false; c.classList.remove('dragging', 'over'); }); });
   /* ---------- foto: ricerca sul web (Wikipedia, Openverse, Wikimedia Commons), file, incolla, trascina ---------- */
   const PH = window.LOS_PHOTO;
-  const photo = { src: 'wiki', q: '', items: [], next: null, ctl: null, cache: new Map(), timer: 0, last: '' };
+  let photoSrc0 = 'anime'; try { photoSrc0 = localStorage.getItem('los-photo-src') || 'anime'; } catch (e) { /* niente */ }
+  const photo = { src: photoSrc0, q: '', items: [], next: null, ctl: null, cache: new Map(), timer: 0, web: false };
+  // le fonti disponibili: «Web» solo se il sito ha la sua funzione di ricerca attiva
+  const photoSources = () => Object.keys(PH.SOURCES).filter((k) => !PH.SOURCES[k].server || photo.web);
+  function setPhotoSrc(k) {
+    photo.src = photoSources().includes(k) ? k : 'anime';
+    try { localStorage.setItem('los-photo-src', photo.src); } catch (e) { /* niente */ }
+  }
   const photoT = () => S.cast.find((x) => x.id === photoTarget);
   function setPhoto(t, data) {
     t.img = data; save();
@@ -970,13 +977,15 @@
     $('#phHead').innerHTML = avHTML(t) + '<div><b>' + esc(t.name || 'Senza nome') + '</b><span class="help">' + (t.img ? 'Scegli una nuova foto per sostituire quella attuale.' : 'Cerca una foto e toccala: viene scaricata, ritagliata e applicata.') + '</span></div>' + (t.img ? '<button class="btn sm ghost" type="button" id="phRemove">Togli la foto</button>' : '');
   }
   function renderPhotoSrc() {
-    $('#phSrc').innerHTML = Object.keys(PH.SOURCES).map((k) => '<button type="button" data-phsrc="' + k + '" aria-pressed="' + (photo.src === k) + '">' + esc(PH.SOURCES[k].label) + '</button>').join('');
-    $('#phHint').textContent = PH.SOURCES[photo.src].name + ': ' + PH.SOURCES[photo.src].hint;
+    if (!photoSources().includes(photo.src)) photo.src = 'anime';
+    $('#phSrc').innerHTML = photoSources().map((k) => '<button type="button" data-phsrc="' + k + '" aria-pressed="' + (photo.src === k) + '">' + esc(PH.SOURCES[k].label) + '</button>').join('');
+    $('#phHint').textContent = PH.SOURCES[photo.src].hint;
+    $('#phSeriesRow').hidden = photo.src !== 'anime';
   }
   const phItemHTML = (it, k) => '<button type="button" class="ph-item" data-ph="' + k + '" style="--i:' + (k % PH_PAGE) + '" title="' + esc([it.title, it.note, it.credit].filter(Boolean).join(' · ')) + '" aria-label="Usa la foto: ' + esc([it.title, it.note].filter(Boolean).join(', ')) + '"><img src="' + esc(it.src) + '" alt="" loading="lazy" decoding="async" referrerpolicy="no-referrer"><span class="ph-cap">' + esc(it.title) + (it.note ? '<small>' + esc(it.note) + '</small>' : '') + '</span></button>';
   const PH_PAGE = 18;
   function photoEmpty(msg) {
-    const others = Object.keys(PH.SOURCES).filter((k) => k !== photo.src);
+    const others = photoSources().filter((k) => k !== photo.src);
     $('#phGrid').innerHTML = '<div class="ph-empty"><p>' + esc(msg) + '</p>' + (photo.q ? '<div class="row">' + others.map((k) => '<button class="btn sm" type="button" data-phsrc="' + k + '">Cerca in ' + esc(PH.SOURCES[k].label) + '</button>').join('') + '</div>' : '') + '</div>';
   }
   async function runPhotoSearch(more) {
@@ -986,7 +995,8 @@
     if (!q) { photo.q = ''; photo.items = []; photo.next = null; $('#phMore').hidden = true; $('#phMsg').textContent = ''; photoEmpty('Scrivi chi o che cosa cercare: il nome di una persona nota, un personaggio, un animale, un mestiere.'); return; }
     if (PH.isURL(q)) { photoEmpty('Provo a usare l’immagine del link…'); return applyPhotoSrc(q, null); }
     if (!more) { photo.q = q; photo.items = []; photo.next = null; }
-    const cursor = more ? photo.next : null, key = photo.src + '|' + q + '|' + JSON.stringify(cursor);
+    const series = photo.src === 'anime' ? $('#phSeries').value.trim().slice(0, 60) : '';
+    const cursor = more ? photo.next : null, key = photo.src + '|' + q + '|' + series + '|' + JSON.stringify(cursor);
     if (photo.ctl) photo.ctl.abort();
     const ctl = (photo.ctl = typeof AbortController === 'function' ? new AbortController() : { signal: undefined, abort() {} });
     const grid = $('#phGrid'), src = PH.SOURCES[photo.src];
@@ -994,7 +1004,7 @@
     if (!more) grid.innerHTML = Array.from({ length: 6 }, () => '<span class="ph-skel" aria-hidden="true"></span>').join('');
     $('#phMsg').textContent = 'Cerco «' + q + '» in ' + src.name + '…';
     try {
-      const r = photo.cache.get(key) || (await PH.search(photo.src, q, cursor, ctl.signal));
+      const r = photo.cache.get(key) || (await PH.search(photo.src, q, cursor, ctl.signal, { series }));
       photo.cache.set(key, r);
       if (ctl !== photo.ctl) return;
       const seen = new Set(photo.items.map((x) => x.src)), start = photo.items.length;
@@ -1013,11 +1023,12 @@
       $('#phMsg').textContent = 'Ricerca non riuscita.'; $('#phMore').hidden = true;
     } finally { if (ctl === photo.ctl) { grid.removeAttribute('aria-busy'); $('#phMore').disabled = false; } }
   }
-  function openPhoto(id) {
+  async function openPhoto(id) {
     const t = S.cast.find((x) => x.id === id); if (!t) return;
     photoTarget = id;
     if (!PH) { $('#avatarFile').click(); return; }
     renderPhotoHead(); renderPhotoSrc();
+    PH.webAvailable().then((on) => { if (on === photo.web) return; photo.web = on; renderPhotoSrc(); });
     const name = (t.name || '').trim();
     $('#phQuery').value = name; $('#phMore').hidden = true; $('#phMsg').textContent = '';
     $('#photoDlg').showModal();
@@ -1033,10 +1044,12 @@
       if (v.length >= 3 && !PH.isURL(v) && v !== photo.q) photo.timer = setTimeout(() => runPhotoSearch(false), 700);
     });
     $('#phMore').addEventListener('click', () => runPhotoSearch(true));
+    $('#phSeries').addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); runPhotoSearch(false); } });
+    $('#phSeries').addEventListener('change', () => { if ($('#phQuery').value.trim()) runPhotoSearch(false); });
     $('#phFile').addEventListener('click', () => $('#avatarFile').click());
     $('#photoDlg').addEventListener('click', (e) => {
       const s = e.target.closest('[data-phsrc]');
-      if (s) { photo.src = s.dataset.phsrc; renderPhotoSrc(); if ($('#phQuery').value.trim()) runPhotoSearch(false); else $('#phQuery').focus(); return; }
+      if (s) { setPhotoSrc(s.dataset.phsrc); renderPhotoSrc(); if ($('#phQuery').value.trim()) runPhotoSearch(false); else $('#phQuery').focus(); return; }
       const it = e.target.closest('[data-ph]');
       if (it && !it.classList.contains('loading')) { const x = photo.items[+it.dataset.ph]; if (x) applyPhotoSrc(x.src, it); return; }
       if (e.target.closest('#phRemove')) { const t = photoT(); if (t) { t.img = ''; save(); if ($('#editDlg').open && editId === t.id) renderEditor(); refreshTile(t.id); renderPhotoHead(); toast('Foto tolta.'); } }
