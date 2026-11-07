@@ -111,7 +111,7 @@ Un interruttore nella sezione Arena, attivo solo dopo la conferma dell'età, agg
   - **Persone note** (Wikipedia italiana, poi inglese, comprese le immagini non libere dei personaggi), **Foto libere** (Openverse) e **Archivio** (Wikimedia Commons).
   - **Web**, come un motore di ricerca: il pulsante compare sul sito pubblicato; se la funzione `api/immagini.js` non risponde o non ha ancora la chiave, la finestra dice esattamente cosa manca. Serve una chiave della [Brave Search API](https://brave.com/search/api/) (vedi sotto). L'API immagini di Google è chiusa ai nuovi utenti dal 2026 e si spegne nel 2027, quindi non si può collegare.
   
-  Se un sito non concede l'immagine al browser si riprova una volta tramite il proxy d'immagini wsrv.nl. Si può anche incollare un link, incollare o trascinare un'immagine, o caricarla dal dispositivo; senza internet resta il caricamento da file. Le immagini restano dei loro autori: la foto è salvata solo nel browser, per giocare.
+  Se un sito non concede l'immagine al browser (capita con i wiki Fandom e con MyAnimeList), la foto la scarica il server del sito tramite `api/immagine.js`, un piccolo proxy senza chiavi che accetta solo immagini da indirizzi https pubblici, fino a 6 MB e solo dalle pagine del sito; se anche questo non basta si prova il proxy pubblico wsrv.nl, poi l'immagine originale al posto della miniatura. Si può anche incollare un link, incollare o trascinare un'immagine, o caricarla dal dispositivo; senza internet resta il caricamento da file. Le immagini restano dei loro autori: la foto è salvata solo nel browser, per giocare.
 
   **Attivare la fonte Web**: crea una chiave su [api-dashboard.search.brave.com](https://api-dashboard.search.brave.com) (piano Search; ogni mese c'è un credito gratuito di circa 1.000 ricerche, poi si paga a consumo). Poi in Vercel apri *Project → Settings → Environment Variables*, aggiungi `BRAVE_API_KEY` con la chiave e rifai il deploy. La chiave resta sul server; la funzione risponde solo alle pagine del sito e tiene in cache per un giorno le stesse ricerche.
 - **Menu delle azioni** (⋯) su ogni scheda: sposta prima o dopo, duplica, caratteristiche casuali, elimina. Eliminare (anche tutto il cast) si può **annullare** dal messaggio che compare.
@@ -188,6 +188,7 @@ src/simulator.js     esecuzione asincrona del motore in Web Worker, annullamento
 src/studio.js        legami iniziali, seguiti, percorsi narrativi, eventi avanzati, laboratorio e stagioni
 src/photo-search.js  ricerca delle foto dei concorrenti (AniList, Fandom, Wikipedia, Openverse, Commons, web) e ritaglio
 api/immagini.js      funzione Vercel per la fonte Web (Brave Search API, attiva con BRAVE_API_KEY)
+api/immagine.js      proxy d'immagini del sito per le foto che i siti non concedono al browser
 src/experiments.js   esperimenti con semi accoppiati e una sola caratteristica variata
 docs/                versione per il web (Vercel o GitHub Pages): pagina leggera e immagini in docs/img con l'impronta nel nome, servite con cache lunga
 src/ui.js            interfaccia

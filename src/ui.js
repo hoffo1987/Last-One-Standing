@@ -970,11 +970,11 @@
     rd.onload = () => PH.loadImage(rd.result).then((img) => { setPhoto(t, PH.crop(img, 160)); photoDone(t, 'caricata'); }, () => toast('Non riesco a leggere questa immagine.'));
     rd.readAsDataURL(f);
   }
-  async function applyPhotoSrc(src, el) {
+  async function applyPhotoSrc(src, el, alts) {
     const t = photoT(); if (!t) return;
     if (el) { el.classList.add('loading'); el.setAttribute('aria-busy', 'true'); }
     $('#phMsg').textContent = 'Scarico la foto…';
-    try { setPhoto(t, await PH.toDataURL(src, 160)); photoDone(t, 'applicata'); }
+    try { setPhoto(t, await PH.toDataURL(src, 160, alts)); photoDone(t, 'applicata'); }
     catch (e) { $('#phMsg').textContent = 'Questa immagine non si lascia scaricare: scegline un’altra.'; if (el) el.classList.add('failed'); }
     finally { if (el) { el.classList.remove('loading'); el.removeAttribute('aria-busy'); } }
   }
@@ -1060,7 +1060,7 @@
       const s = e.target.closest('[data-phsrc]');
       if (s) { setPhotoSrc(s.dataset.phsrc); renderPhotoSrc(); if ($('#phQuery').value.trim()) runPhotoSearch(false); else $('#phQuery').focus(); return; }
       const it = e.target.closest('[data-ph]');
-      if (it && !it.classList.contains('loading')) { const x = photo.items[+it.dataset.ph]; if (x) applyPhotoSrc(x.src, it); return; }
+      if (it && !it.classList.contains('loading')) { const x = photo.items[+it.dataset.ph]; if (x) applyPhotoSrc(x.src, it, [x.full]); return; }
       if (e.target.closest('#phRemove')) { const t = photoT(); if (t) { t.img = ''; save(); if ($('#editDlg').open && editId === t.id) renderEditor(); refreshTile(t.id); renderPhotoHead(); toast('Foto tolta.'); } }
     });
     // le anteprime che non si caricano spariscono dalla griglia

@@ -77,5 +77,33 @@ function load(fetchImpl) {
       assert.equal((await call({ q: 'x' }, { host: 'los.vercel.app' })).code, 400);
     } finally { globalThis.fetch = real; delete process.env.BRAVE_API_KEY; }
   });
+  const dnsP = require('node:dns').promises, realLookup = dnsP.lookup;
+  const proxyFn = require(path.join(root, 'api/immagine.js'));
+  const callP = async (u, headers) => { const res = { code: 0, body: null, headers: {}, setHeader(k, v) { this.headers[k] = v; }, status(c) { this.code = c; return this; }, json(b) { this.body = b; return this; }, send(b) { this.body = b; return this; } }; await proxyFn({ method: 'GET', query: { u }, headers: headers || { host: 'los.vercel.app', referer: 'https://los.vercel.app/' } }, res); return res; };
+  await test('Il proxy d’immagini rifiuta indirizzi interni, http e indirizzi privati dietro un nome', async () => {
+    dnsP.lookup = async (h) => (h === 'interno.esempio.it' ? [{ address: '10.0.0.5' }] : [{ address: '93.184.216.34' }]);
+    try {
+      for (const u of ['http://cdn.esempio.it/a.png', 'https://127.0.0.1/a.png', 'https://localhost/a.png', 'https://[::1]/a.png', 'https://interno.esempio.it/a.png', 'https://user:pw@cdn.esempio.it/a.png', 'https://cdn.esempio.it:8443/a.png', 'nonunurl']) assert.equal((await callP(u)).code, 400, u);
+      assert.equal((await callP('https://cdn.esempio.it/a.png', { host: 'los.vercel.app', origin: 'https://altro.it' })).code, 403);
+    } finally { dnsP.lookup = realLookup; }
+  });
+  await test('Il proxy restituisce solo immagini e controlla anche i reindirizzamenti', async () => {
+    dnsP.lookup = async (h) => (h === 'interno.esempio.it' ? [{ address: '192.168.1.2' }] : [{ address: '93.184.216.34' }]);
+    const real = globalThis.fetch;
+    const hdr = (o) => ({ get: (k) => o[k.toLowerCase()] || null });
+    globalThis.fetch = async (u) => { u = String(u);
+      if (u.endsWith('/ok.png')) return { ok: true, status: 200, headers: hdr({ 'content-type': 'image/png' }), arrayBuffer: async () => new Uint8Array([137, 80, 78, 71]).buffer };
+      if (u.endsWith('/pagina')) return { ok: true, status: 200, headers: hdr({ 'content-type': 'text/html' }), arrayBuffer: async () => new ArrayBuffer(4) };
+      if (u.endsWith('/vai')) return { ok: false, status: 302, headers: hdr({ location: 'https://cdn.esempio.it/ok.png' }) };
+      if (u.endsWith('/dentro')) return { ok: false, status: 302, headers: hdr({ location: 'https://interno.esempio.it/x.png' }) };
+      return { ok: false, status: 404, headers: hdr({}) }; };
+    try {
+      const ok = await callP('https://cdn.esempio.it/ok.png'); assert.equal(ok.code, 200); assert.equal(ok.headers['Content-Type'], 'image/png'); assert.equal(ok.body.length, 4);
+      assert.equal((await callP('https://cdn.esempio.it/pagina')).code, 415);
+      assert.equal((await callP('https://cdn.esempio.it/vai')).code, 200);
+      assert.equal((await callP('https://cdn.esempio.it/dentro')).code, 400);
+      assert.equal((await callP('https://cdn.esempio.it/manca.png')).code, 502);
+    } finally { globalThis.fetch = real; dnsP.lookup = realLookup; }
+  });
   console.log('\nOK: ' + passed + ' gruppi di regressioni della ricerca delle foto');
 })().catch((e) => { console.error(e); process.exit(1); });

@@ -71,13 +71,13 @@
     const P = ((await r.json()).data || {}).Page || {};
     const items = (P.characters || []).filter((c) => c.image && c.image.large && !/\/default\./.test(c.image.large)).map((c) => {
       const m = c.media && c.media.nodes && c.media.nodes[0], serie = m ? clean(m.title.english || m.title.romaji) : '';
-      return { id: 'a' + c.id, src: c.image.large, title: clean(c.name.full || c.name.native), note: serie ? shortTxt(serie, 60) : '', credit: 'AniList', link: c.siteUrl || '' };
+      return { id: 'a' + c.id, src: c.image.large, full: c.image.large.replace('/medium/', '/large/'), title: clean(c.name.full || c.name.native), note: serie ? shortTxt(serie, 60) : '', credit: 'AniList', link: c.siteUrl || '' };
     });
     return { items, more: !!(P.pageInfo && P.pageInfo.hasNextPage) };
   }
   async function jikan(q, page, signal) {
     const d = await getJSON('https://api.jikan.moe/v4/characters?' + qs({ q, page, limit: PAGE, order_by: 'favorites', sort: 'desc' }), signal);
-    const items = (d.data || []).map((c) => { const u = c.images && ((c.images.webp && c.images.webp.image_url) || (c.images.jpg && c.images.jpg.image_url)); return u && !/questionmark/.test(u) ? { id: 'j' + c.mal_id, src: u, title: clean(c.name), note: '', credit: 'MyAnimeList', link: c.url || '' } : null; }).filter(Boolean);
+    const items = (d.data || []).map((c) => { const u = c.images && ((c.images.webp && c.images.webp.image_url) || (c.images.jpg && c.images.jpg.image_url)); return u && !/questionmark/.test(u) ? { id: 'j' + c.mal_id, src: u, full: (c.images.jpg && c.images.jpg.image_url) || '', title: clean(c.name), note: '', credit: 'MyAnimeList', link: c.url || '' } : null; }).filter(Boolean);
     return { items, more: !!(d.pagination && d.pagination.has_next_page) };
   }
   // il wiki Fandom di una serie: prima i nomi noti, poi le forme più comuni del sottodominio
@@ -188,11 +188,18 @@
     const ctx = cv.getContext('2d'); ctx.imageSmoothingQuality = 'high'; ctx.drawImage(img, x, y, w, h);
     return cv.toDataURL('image/jpeg', 0.85); // lancia SecurityError se il sito non concede l'immagine
   }
-  async function toDataURL(src, size) {
+  // il proxy del sito (api/immagine.js) esiste solo sul sito pubblicato, non nel file aperto dal disco
+  const ownProxy = (u) => (typeof location !== 'undefined' && /^https?:$/.test(location.protocol) ? '/api/immagine?' + qs({ u }) : null);
+  // un'immagine passa al ritaglio se il sito la concede al canvas; altrimenti la si chiede al proxy del sito,
+  // poi a wsrv.nl; se la miniatura proprio non arriva, si riprova con l'immagine originale
+  async function toDataURL(src, size, alts) {
     size = size || 160;
-    const tries = /^(data|blob):/.test(src) ? [src] : [src, proxy(src, size)];
+    if (/^(data|blob):/.test(src)) return crop(await loadImage(src), size);
+    const urls = [src].concat((alts || []).filter((x) => x && x !== src && /^https:\/\//.test(x)));
+    const tries = [];
+    urls.forEach((u, k) => { if (!k) tries.push([u, 7000]); const own = ownProxy(u); if (own) tries.push([own, 12000]); tries.push([proxy(u, size), 12000]); });
     let last;
-    for (const u of tries) { try { return crop(await loadImage(u), size); } catch (e) { last = e; } }
+    for (const [u, ms] of tries) { try { return crop(await loadImage(u, ms), size); } catch (e) { last = e; } }
     throw last || new Error('load');
   }
 
