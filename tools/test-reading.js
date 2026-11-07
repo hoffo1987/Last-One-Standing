@@ -3,8 +3,8 @@ const ui = fs.readFileSync(path.join(__dirname, '..', 'src/ui.js'), 'utf8');
 function part(a, b) { const i = ui.indexOf(a), j = ui.indexOf(b, i); assert.ok(i >= 0 && j > i); return ui.slice(i, j); }
 let passed = 0;
 function test(name, run) { run(); passed++; console.log('OK: ' + name); }
-const c = vm.createContext({ IC: { b: 'APERTURA', d: 'GIORNO', dis: 'DISASTRO', finale: 'FINALE' }, esc: String, SPEED: { lenta: 7000, normale: 3800, veloce: 1700 } });
-vm.runInContext(part('  function timelineHTML(', '  function renderLive(') + part('  function phaseReadDelay(', '  function syncPlay('), c);
+const c = vm.createContext({ IC: { b: 'APERTURA', d: 'GIORNO', dis: 'DISASTRO', finale: 'FINALE' }, esc: String, SPEED: { lenta: 7000, normale: 3800, veloce: 1700 }, KIND: { b: 'Apertura', d: 'Giorno', dis: 'Disastro', finale: 'Finale' }, SIM: {}, S: { run: {} }, resultTheme: () => ({ id: 'classico' }) });
+vm.runInContext(part('  /* ---------------- calendario', '  // la durata detta') + part('  function timelineHTML(', '  function renderLive(') + part('  function phaseReadDelay(', '  function syncPlay('), c);
 const phases = [
   { kind: 'b', day: 1, title: 'Inizio', events: [{ deaths: [] }], snap: { alive: ['a', 'b'] } },
   { kind: 'dis', day: 1, title: 'Segreto: eruzione', events: [{ deaths: ['b'] }] },
@@ -13,15 +13,15 @@ const phases = [
 test('la modalità senza spoiler nasconde titoli, icone, giorni e numero delle fasi future', () => {
   const html = c.timelineHTML(phases, 0, 0, true);
   assert.match(html, /Inizio/); assert.match(html, /Prossima fase/);
-  assert.doesNotMatch(html, /eruzione|ultimo scontro|DISASTRO|FINALE|G2|data-k="2"/);
+  assert.doesNotMatch(html, /eruzione|ultimo scontro|DISASTRO|FINALE|Finale|G2|data-k="2"/);
   assert.equal((html.match(/class="tph/g) || []).length, 2);
   assert.match(html, /aria-current="step"/);
 });
 test('le fasi già viste restano note anche tornando indietro; la navigazione libera mostra tutto', () => {
   const seen = c.timelineHTML(phases, 0, 1, true);
-  assert.match(seen, /eruzione/); assert.doesNotMatch(seen, /ultimo scontro|FINALE|G2/);
+  assert.match(seen, /eruzione/); assert.doesNotMatch(seen, /ultimo scontro|FINALE|>Finale<|G2/);
   const free = c.timelineHTML(phases, 0, 0, false);
-  assert.match(free, /eruzione/); assert.match(free, /ultimo scontro/); assert.match(free, /G2/);
+  assert.match(free, /eruzione/); assert.match(free, /ultimo scontro/); assert.match(free, />Finale</); assert.match(free, />Giorno 1</); assert.doesNotMatch(free, /G[0-9]/);
 });
 test('la riproduzione adattiva lascia più tempo alle fasi lunghe e conserva le velocità', () => {
   const short = { title: 'Giorno', intro: '', events: [{ plain: 'Ada riposa.', echo: [] }] };

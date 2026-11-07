@@ -192,7 +192,7 @@
       return '<div class="person c-' + esc(info.c) + '">' + avHTML(BY[id], { btn: true }) + '<div class="pbody"><div class="ptop"><b>' + esc(nmOf(id)) + '</b><span class="plbl" title="' + esc(info.d) + '">' + esc(info.n) + '</span>' + (asym ? '<span class="asym">' + asym + '</span>' : '') + '</div>' +
         '<span class="affbar" title="Affetto ' + a + '"><b style="left:' + pct + '%"></b></span>' + dimsHTML(dims) +
         '<span class="back">Per ' + esc(nmOf(id)) + ': <b>' + esc(bk || 'indifferenza') + '</b></span>' +
-        (mem.length ? '<ul class="pmem">' + mem.filter((m) => MM[m.k]).map((m) => '<li>«' + fill(MM[m.k] || '', [t.id, id, m.x]) + '» <span>G' + (SIM.phases[m.ph] ? SIM.phases[m.ph].day || 1 : '') + '</span></li>').join('') + '</ul>' : '') + '</div></div>';
+        (mem.length ? '<ul class="pmem">' + mem.filter((m) => MM[m.k]).map((m) => '<li>«' + fill(MM[m.k] || '', [t.id, id, m.x]) + '» <span>' + esc(whenLabel(resultTheme(SIM), m.ph, SIM.phases[m.ph] ? SIM.phases[m.ph].day || 1 : 1)) + '</span></li>').join('') + '</ul>' : '') + '</div></div>';
     }).join('');
     return '<div><div class="sub" style="margin-bottom:8px">Cosa prova per gli altri</div><div class="people">' + rows + '</div></div>';
   }
@@ -203,7 +203,7 @@
     const days = {}; all.forEach((d) => (days[d.d] = days[d.d] || []).push(d));
     const ds = Object.keys(days).map(Number).sort((a, b) => b - a);
     return '<div><div class="sub" style="margin-bottom:6px">Diario segreto · ' + plural(all.length, 'pagina', 'pagine') + '</div><p class="help" style="margin-bottom:8px">Quello che la diretta non mostra: pensieri, segreti e fatti fuori onda.</p><div class="diary">' +
-      ds.map((d) => '<div class="dday"><span class="dd">G' + (d || 1) + '</span><div>' + days[d].slice().reverse().map((x) => '<p class="dk-' + esc(x.k) + '"><span class="dk">' + (K[x.k] || '') + '</span>' + linkify(x.h) + '</p>').join('') + '</div></div>').join('') + '</div></div>';
+      ds.map((d) => '<div class="dday"><span class="dd">' + esc(whenLabel(resultTheme(SIM), null, d || 1)) + '</span><div>' + days[d].slice().reverse().map((x) => '<p class="dk-' + esc(x.k) + '"><span class="dk">' + (K[x.k] || '') + '</span>' + linkify(x.h) + '</p>').join('') + '</div></div>').join('') + '</div></div>';
   }
   const arenaOf = (id) => ECO.arenas[id] || {};
   const vitLabels = (th) => (th && th.soft ? ECO.labelsSoft : ECO.labels) || { hp: 'Salute', en: 'Energia', mo: 'Morale', food: 'Sazietà' };
@@ -228,6 +228,66 @@
     return '<div class="vbars">' + rows.map(([k, n, x]) => { const bad = k === 'pr' ? x >= (m.thr || 60) : x < 25; return '<div class="vbar ' + k + (bad ? ' bad' : '') + '"><span>' + esc(n) + '</span><i><b style="width:' + x + '%"></b></i><em>' + x + '</em></div>'; }).join('') + '</div>';
   }
   const KIND = { b: 'Apertura', d: 'Giorno', n: 'Notte', f: 'Evento speciale', dis: 'Disastro', fallen: 'Bilancio', finale: 'Finale' };
+  /* ---------------- calendario: nomi di giorni, notti, bilanci e finale, nel lessico di ogni arena ---------------- */
+  const ORD = ['', 'primo', 'secondo', 'terzo', 'quarto', 'quinto', 'sesto', 'settimo', 'ottavo', 'nono', 'decimo', 'undicesimo', 'dodicesimo', 'tredicesimo', 'quattordicesimo', 'quindicesimo', 'sedicesimo', 'diciassettesimo', 'diciottesimo', 'diciannovesimo', 'ventesimo'];
+  const ordinal = (n, fem) => (ORD[n] ? (fem ? ORD[n].slice(0, -1) + 'a' : ORD[n]) : n + (fem ? 'ª' : 'º'));
+  const capW = (s) => s.charAt(0).toUpperCase() + s.slice(1);
+  // ogni arena: come si chiamano il giorno, la notte, l'unità di tempo e il bilancio dei caduti
+  const CAL = {
+    _: { unit: 'giorno', units: 'giorni', short: (d) => 'Giorno ' + d, day: (d) => capW(ordinal(d)) + ' giorno', night: (d) => capW(ordinal(d, true)) + ' notte', of: (d) => 'del ' + ordinal(d) + ' giorno', recap: 'Il bilancio' },
+    classico: { recap: 'I colpi di cannone' },
+    fantasy: { recap: 'Le campane del reame' },
+    scifi: { unit: 'ciclo', units: 'cicli', short: (d) => 'Ciclo ' + d, day: (d) => capW(ordinal(d)) + ' ciclo diurno', night: (d) => capW(ordinal(d)) + ' ciclo notturno', of: (d) => 'del ' + ordinal(d) + ' ciclo', recap: 'Il rapporto di bordo' },
+    zombie: { recap: 'L’appello via radio' },
+    royale: { recap: 'Il contatore dei giocatori' },
+    horror: { recap: 'I rintocchi del pendolo' },
+    wasteland: { recap: 'Il fumo all’orizzonte' },
+    liceo: { day: (d) => capW(ordinal(d)) + ' giorno di scuola', night: (d) => 'Dopo scuola del ' + ordinal(d) + ' giorno', recap: 'L’appello del mattino' },
+    ufficio: { day: (d) => capW(ordinal(d)) + ' giorno di lavoro', night: (d) => 'Straordinari del ' + ordinal(d) + ' giorno', recap: 'Le scrivanie vuote' },
+  };
+  const calOf = (theme) => Object.assign({}, CAL._, CAL[theme.id] || {});
+  // il limite di giorni scelto prima della partita (null se non si conosce, per esempio in un replay vecchio)
+  function runMaxDays() { const m = S.run && S.run.cfg && +S.run.cfg.maxDays; return m ? Math.max(3, Math.min(60, m)) : null; }
+  // nome, sottotitolo e gruppo di ogni fase, senza i nomignoli «G1»
+  function phaseInfo(P, k, theme, hideTotal) {
+    const p = P[k], c = calOf(theme), d = p.day || 1, meteo = p.meteo && p.meteo.n ? p.meteo.n : '';
+    const firstFinale = P.findIndex((x) => x.kind === 'finale');
+    const inFinale = firstFinale >= 0 && k >= firstFinale;
+    const group = inFinale ? { key: 'finale', label: 'Finale' } : { key: 'd' + d, label: c.short(d) };
+    const join = (...xs) => xs.filter(Boolean).join(' · ');
+    if (p.kind === 'b') return { title: p.title, kicker: join(capW(ordinal(d)) + ' ' + c.unit, 'l’inizio', meteo), short: p.title, group };
+    if (p.kind === 'd') return { title: c.day(d), kicker: meteo, short: c.day(d), group };
+    if (p.kind === 'n') return { title: c.night(d), kicker: meteo, short: c.night(d), group };
+    if (p.kind === 'f') return { title: p.title, kicker: join('Evento speciale', c.of(d)), short: p.title, group };
+    if (p.kind === 'dis') return { title: p.title, kicker: join('Disastro', c.of(d)), short: 'Disastro: ' + p.title, group };
+    if (p.kind === 'finale') {
+      const acts = P.filter((x) => x.kind === 'finale').length, n = k - firstFinale + 1;
+      return { title: p.title, kicker: 'Scontro finale · atto ' + n + (hideTotal ? '' : ' di ' + acts), short: 'Finale, atto ' + n + ': ' + p.title, group };
+    }
+    if (p.kind === 'fallen') {
+      if (inFinale) return { title: 'Il verdetto', kicker: c.recap + ' · dopo lo scontro finale', short: 'Il verdetto', group };
+      return { title: c.recap, kicker: 'Bilancio ' + c.of(d), short: c.recap + ', ' + c.of(d).replace(/^del /, ''), group };
+    }
+    return { title: p.title, kicker: KIND[p.kind] || '', short: p.title, group };
+  }
+  // perché è scattato lo scontro finale: il limite di giorni, pochi superstiti o due innamorati
+  function finaleReason(P, theme) {
+    const f = P.findIndex((x) => x.kind === 'finale'); if (f < 0) return '';
+    const c = calOf(theme), max = runMaxDays(), before = f > 0 ? P[f - 1].snap.alive.length : P[f].snap.alive.length;
+    if (P[f].title === 'L\'ultimo atto') return 'Restano solo due concorrenti, e si amano: l’arena prepara il loro ultimo atto.';
+    if (max && P[f].day >= max) return 'Si è arrivati al limite di ' + max + ' ' + c.units + ' scelto prima della partita: chi è ancora in gara va allo scontro finale, che si gioca dopo l’ultima notte.';
+    return 'Restano solo ' + before + ' concorrenti: l’arena non aspetta ' + (max ? 'il limite di ' + max + ' ' + c.units : 'la fine del calendario') + ' e chiama lo scontro finale.';
+  }
+  // un giorno detto per esteso, per tabelle e schede («3º giorno», «finale»)
+  // la durata detta chiaramente: quanti giorni, rispetto al limite scelto
+  function durTxt(theme) { const c = calOf(theme), m = runMaxDays(); return plural(SIM.days, c.unit, c.units) + (m ? (SIM.days >= m ? ' (il limite scelto)' : ' su ' + m + ' al massimo') : ''); }
+  // lo stesso nome di fase per gli strumenti facoltativi (studio.js)
+  if (typeof window !== 'undefined') window.LOS_PHASE_NAME = (result, k) => { try { return result && result.phases[k] ? phaseInfo(result.phases, k, resultTheme(result), false).short : ''; } catch (e) { return ''; } };
+  function whenLabel(theme, phaseIndex, day) {
+    const P = SIM && SIM.phases; const f = P ? P.findIndex((x) => x.kind === 'finale') : -1;
+    if (f >= 0 && phaseIndex != null && phaseIndex >= f) return 'Finale';
+    return capW(calOf(theme).short(day || 1).toLowerCase());
+  }
   const DIFFS = [
     ['bassa', 'Bassa', 'Partite lunghe, pochi morti', 1], ['normale', 'Normale', 'L\'equilibrio classico', 2],
     ['alta', 'Alta', 'L\'arena non perdona', 3], ['massacro', 'Massacro', 'Finisce in pochi giorni', 4],
@@ -245,7 +305,7 @@
   /* ---------------- stato ---------------- */
   const S = {
     cast: [],
-    settings: { theme: 'classico', difficulty: 'normale', seed: '', maxDays: 20, teamsAllied: true, teamWin: false, speed: 'normale', teamSize: 2, view: 'grid', adult: false, hideFuture: true, adaptivePlay: true, reduceMotion: false, followOnly: false },
+    settings: { theme: 'classico', difficulty: 'normale', seed: '', maxDays: 20, teamsAllied: true, teamWin: false, speed: 'normale', teamSize: 2, view: 'grid', adult: false, hideFuture: true, adaptivePlay: true, reduceMotion: false, followOnly: false, read: { density: 'comoda', size: 'normale', order: 'storia', echo: true, place: true, why: true, context: false, faces: true } },
     initialRelations: [], followed: [], seasons: [],
     custom: [],
     run: null,
@@ -339,6 +399,16 @@
     }
   }
 
+  // preferenze di lettura della diretta, sempre complete e valide
+  function readPrefs(r) {
+    const d = { density: 'comoda', size: 'normale', order: 'storia', echo: true, place: true, why: true, context: false, faces: true }, o = Object.assign({}, d);
+    if (!r || typeof r !== 'object') return o;
+    if (['comoda', 'compatta'].includes(r.density)) o.density = r.density;
+    if (['normale', 'grande'].includes(r.size)) o.size = r.size;
+    if (['storia', 'gravi'].includes(r.order)) o.order = r.order;
+    ['echo', 'place', 'why', 'context', 'faces'].forEach((k) => { if (typeof r[k] === 'boolean') o[k] = r[k]; });
+    return o;
+  }
   function sanitizeSettings(x, base) {
     const st = Object.assign({}, base || S.settings);
     if (!record(x)) return st;
@@ -350,6 +420,7 @@
     if ([1, 2, 3, 4].includes(+x.teamSize)) st.teamSize = +x.teamSize;
     if (x.view === 'grid' || x.view === 'team') st.view = x.view;
     ['teamsAllied', 'teamWin', 'adult', 'hideFuture', 'adaptivePlay', 'reduceMotion', 'followOnly'].forEach((k) => { if (typeof x[k] === 'boolean') st[k] = x[k]; });
+    st.read = readPrefs(record(x.read) ? Object.assign({}, st.read, x.read) : st.read);
     return st;
   }
   function sanitizeTribute(t, i) {
@@ -1519,27 +1590,53 @@
   /* =============== DIRETTA =============== */
   function evHTML(e, tributes, theme, anim, plain, delay) {
     const by = tributes ? Object.fromEntries(tributes.map((t) => [t.id, t])) : BY;
-    if (e.note) return '<div class="ev note' + (e.meteo ? ' meteo' : '') + (anim ? ' in' : '') + '" style="--d:' + (delay || 0) + 'ms"><p>' + e.html + '</p></div>';
+    if (e.note) return '<div class="ev note' + (e.meteo ? ' meteo' : '') + (anim ? ' in' : '') + '" style="--d:' + (delay || 0) + 'ms"><span class="note-ic" aria-hidden="true">' + (e.meteo ? '<svg viewBox="0 0 24 24"><path d="M7 17.5h10a4 4 0 0 0 .6-7.95A6 6 0 0 0 6.2 9.6 4 4 0 0 0 7 17.5z"/></svg>' : '<svg viewBox="0 0 24 24"><path d="M4 12a8 8 0 1 0 16 0 8 8 0 0 0-16 0zM12 8v5M12 16v.5"/></svg>') + '</span><p>' + e.html + '</p></div>';
     const cat = e.cat || 'none';
     const lbl = CAT[cat][theme.soft ? 1 : 0];
     const avs = '<span class="avs">' + e.ids.slice(0, 4).map((id) => avHTML(by[id], { dead: e.deaths.includes(id), btn: !plain })).join('') + '</span>';
-    const chip = lbl ? '<span class="cat">' + IC[cat] + (e.deaths.length > 1 && (cat === 'kill' || cat === 'death') ? e.deaths.length + ' ' + (theme.soft ? 'fuori' : 'morti') : lbl) + '</span>' : '<span></span>';
+    const chip = lbl ? '<span class="cat">' + IC[cat] + (e.deaths.length > 1 && (cat === 'kill' || cat === 'death') ? e.deaths.length + ' ' + (theme.soft ? 'fuori' : 'morti') : lbl) + '</span>' : '';
     const fix = (h) => (plain ? h.replace(/<b class="nm"[^>]*>/g, '<b>') : linkify(h));
     const why = e.duel ? 'Confronto di ' + esc(ATTRN[e.duel.attr] || e.duel.attr) + ' · ' + esc(by[e.duel.a].name) + ' ' + e.duel.left + ' / ' + esc(by[e.duel.b].name) + ' ' + e.duel.right : e.test ? (e.intrigue ? 'Piano rivelato · ' : '') + '<span title="Tiro ' + e.test.roll + ' contro soglia ' + e.test.dc + '">Prova di ' + esc(ATTRN[e.test.attr] || e.test.attr) + ' · <span class="dice"><span class="roll">' + e.test.roll + '</span>/' + e.test.dc + '</span> · ' + (e.test.pass ? 'superata' : 'fallita') + '</span>' : e.sponsor ? 'Sponsor' : e.whyTxt ? esc(e.whyTxt) : whyLabel(e, theme);
     const echo = ((e.echo || []).length ? '<ul class="echo">' + e.echo.map((x) => '<li class="' + (x.cls || '') + '">' + fix(x.html) + '</li>').join('') + '</ul>' : '') +
       (e.reason ? '<details class="event-reason"><summary>Il contesto</summary><p>' + esc(e.reason) + '</p></details>' : '');
-    const place=e.place?(e.place.zone!=null?'<span class="event-place">'+esc(stripArt(theme.lex.luogo[e.place.zone]||'Zona'))+'</span>':'<span class="event-place">Riferimenti a persone in zone diverse</span>'):'';
-    return '<div class="ev' + (!tributes && (S.followed || []).some((id) => e.ids.includes(id)) ? ' followed' : '') + (e.deaths.length ? ' lethal' : '') + (anim ? ' in fx-' + cat + (e.sponsor ? ' fx-sponsor' : '') : '') + '"'+(e.place?' data-map-step="'+e.place.seq+'"':'')+' style="--cc:var(--c-' + cat + ');--d:' + (delay || 0) + 'ms">' + avs + '<div class="evbody">' + place + (why ? '<span class="why' + (e.test ? (e.test.pass ? ' ok' : ' ko') : '') + '">' + why + '</span>' : '') + '<p>' + fix(e.html) + '</p>' + echo + '</div>' + chip + '</div>';
+    const pin = '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 1.5a4.5 4.5 0 0 0-4.5 4.5C3.5 9.5 8 14.5 8 14.5S12.5 9.5 12.5 6A4.5 4.5 0 0 0 8 1.5zm0 6.2a1.7 1.7 0 1 1 0-3.4 1.7 1.7 0 0 1 0 3.4z"/></svg>';
+    const place=e.place?(e.place.zone!=null?'<span class="event-place">'+pin+esc(capFirst(stripArt(theme.lex.luogo[e.place.zone]||'Zona')))+'</span>':'<span class="event-place">'+pin+'Zone diverse</span>'):'';
+    return '<div class="ev c-' + cat + (!tributes && (S.followed || []).some((id) => e.ids.includes(id)) ? ' followed' : '') + (e.deaths.length ? ' lethal' : '') + (anim ? ' in fx-' + cat + (e.sponsor ? ' fx-sponsor' : '') : '') + '"'+(e.place?' data-map-step="'+e.place.seq+'"':'')+' style="--cc:var(--c-' + cat + ');--d:' + (delay || 0) + 'ms">' + avs + '<div class="evbody">' + (chip || place ? '<div class="ev-meta">' + chip + place + '</div>' : '') + (why ? '<span class="why' + (e.test ? (e.test.pass ? ' ok' : ' ko') : '') + '">' + why + '</span>' : '') + '<p>' + fix(e.html) + '</p>' + echo + '</div><span class="ev-mark" aria-hidden="true">' + (IC[cat] || '') + '</span></div>';
   }
   function timelineHTML(P, i, seenAt, hideFuture) {
-    const days = [];
-    P.forEach((p, k) => { if (hideFuture && k > seenAt + 1) return; const d = hideFuture && k > seenAt ? null : p.day || 1; let g = days.find((x) => x.d === d); if (!g) days.push((g = { d, ks: [] })); g.ks.push(k); });
-    return days.map((g) => '<div class="tday"><span>' + (g.d == null ? 'Prossima' : 'G' + g.d) + '</span><div>' + g.ks.map((k) => {
+    const theme = resultTheme(SIM), groups = [];
+    P.forEach((p, k) => {
+      if (hideFuture && k > seenAt + 1) return;
+      const masked = hideFuture && k > seenAt, inf = phaseInfo(P, k, theme, true);
+      const key = masked ? 'next' : inf.group.key, label = masked ? 'Da scoprire' : inf.group.label;
+      let g = groups.find((x) => x.key === key); if (!g) groups.push((g = { key, label, ks: [] })); g.ks.push(k);
+    });
+    return groups.map((g) => '<div class="tday' + (g.key === 'finale' ? ' tfin' : g.key === 'next' ? ' tnext' : '') + (g.ks.includes(i) ? ' tcur' : '') + '"><span class="tdl">' + esc(g.label) + '</span><div>' + g.ks.map((k) => {
       const p = P[k]; const dn = p.kind === 'fallen' ? p.deaths.length : p.events.reduce((s, e) => s + e.deaths.length, 0);
       const seen = k <= (seenAt || 0);
-      const hidden = hideFuture && !seen, title = hidden ? 'Prossima fase' : p.title;
-      return '<button type="button" class="tph' + (k === i ? ' cur' : seen ? ' seen' : ' locked') + '" data-k="' + k + '"' + (k === i ? ' aria-current="step"' : '') + ' title="' + esc(title) + '" aria-label="Fase ' + (k + 1) + ': ' + esc(title) + '">' + (hidden ? '<span aria-hidden="true">?</span>' : IC[p.kind]) + (dn && seen && p.kind !== 'fallen' ? '<span class="dn">' + dn + '</span>' : '') + '</button>';
+      const hidden = hideFuture && !seen, title = hidden ? 'Prossima fase' : phaseInfo(P, k, theme, true).short;
+      return '<button type="button" class="tph k-' + p.kind + (k === i ? ' cur' : seen ? ' seen' : ' locked') + '" data-k="' + k + '"' + (k === i ? ' aria-current="step"' : '') + ' title="' + esc(title) + '" aria-label="Fase ' + (k + 1) + ': ' + esc(title) + '">' + (hidden ? '<span aria-hidden="true">?</span>' : IC[p.kind]) + (dn && seen && p.kind !== 'fallen' ? '<span class="dn">' + dn + '</span>' : '') + '</button>';
     }).join('') + '</div></div>').join('');
+  }
+  const EV_FILTERS = [['dead', ['Morti', 'Eliminati'], ['kill', 'death']], ['betray', ['Tradimenti', 'Tradimenti'], ['betray']], ['ally', ['Alleanze', 'Alleanze'], ['ally']], ['love', ['Amore', 'Amore'], ['love']], ['heal', ['Aiuti', 'Aiuti'], ['heal']], ['item', ['Oggetti', 'Assi nella manica'], ['item']], ['hurt', ['Guai', 'Colpi bassi'], ['hurt']], ['none', ['Altro', 'Altro'], ['none']]];
+  let evFilter = null;
+  const evMatch = (e, f) => { if (f === 'followed') return (S.followed || []).some((id) => e.ids.includes(id)); const F = EV_FILTERS.find((x) => x[0] === f); return !F || F[2].includes(e.cat || 'none'); };
+  function readbarHTML(ph, theme, events) {
+    const real = events.filter((e) => !e.note), soft = !!theme.soft;
+    const chip = (key, label, n, icon) => '<button type="button" class="rbc' + (key ? ' f-' + key : '') + '" data-evf="' + (key || '') + '" aria-pressed="' + (evFilter === key) + '">' + (icon || '') + '<span>' + label + '</span><b>' + n + '</b></button>';
+    const list = EV_FILTERS.map(([k, l, cats]) => [k, l[soft ? 1 : 0], real.filter((e) => cats.includes(e.cat || 'none')).length, IC[cats[0]] || '']).filter((x) => x[2] || evFilter === x[0]);
+    const fol = real.filter((e) => evMatch(e, 'followed')).length;
+    return chip(null, 'Tutti', real.length) + list.map(([k, l, n, ic]) => chip(k, l, n, ic)).join('') + (fol || evFilter === 'followed' ? chip('followed', 'Seguiti', fol, '') : '');
+  }
+  function syncReadControls() {
+    const r = S.settings.read = readPrefs(S.settings.read);
+    $$('#densSeg button').forEach((b) => b.setAttribute('aria-pressed', b.dataset.v === r.density));
+    $$('#sizeSeg button').forEach((b) => b.setAttribute('aria-pressed', b.dataset.v === r.size));
+    $$('#orderSeg button').forEach((b) => b.setAttribute('aria-pressed', b.dataset.v === r.order));
+    $$('#rbPanel [data-read]').forEach((c) => { c.checked = !!r[c.dataset.read]; });
+    const body = $('#phBody');
+    body.classList.toggle('dens-compatta', r.density === 'compatta'); body.classList.toggle('size-grande', r.size === 'grande');
+    ['echo', 'place', 'why', 'faces'].forEach((k) => body.classList.toggle('no-' + k, !r[k]));
   }
   function renderLive(fromRoute) {
     $('#liveEmpty').hidden = !!SIM; $('#liveBody').hidden = !SIM;
@@ -1548,7 +1645,10 @@
     const P = SIM.phases, i = Math.max(0, Math.min(P.length - 1, S.run.phase || 0));
     S.run.phase = i; S.run.seen = Math.max(S.run.seen || 0, i);
     const ph = P[i], total = SIM.tributes.length;
-    const visibleEvents = ph.events.filter((e) => e.note || !S.settings.followOnly || (S.followed || []).some((id) => e.ids.includes(id)));
+    const R0 = S.settings.read = readPrefs(S.settings.read);
+    const followedEvents = ph.events.filter((e) => e.note || !S.settings.followOnly || (S.followed || []).some((id) => e.ids.includes(id)));
+    let visibleEvents = followedEvents.filter((e) => e.note || !evFilter || evMatch(e, evFilter));
+    if (R0.order === 'gravi') visibleEvents = visibleEvents.map((e, k) => [e, k]).sort((a, b) => (Number(!!b[0].note) - Number(!!a[0].note)) || (b[0].deaths.length - a[0].deaths.length) || (Number(b[0].cat === 'betray') - Number(a[0].cat === 'betray')) || (a[1] - b[1])).map((x) => x[0]);
     const forward = !fromRoute && i === lastRendered + 1;
     lastRendered = i;
 
@@ -1557,13 +1657,13 @@
     const prevAlive = i > 0 ? P[i - 1].snap.alive.length : total;
     AN.field(bcs, theme.id, { intensity: AN.intensityFor(ph.kind, ph.snap.alive.length / total) });
     AN.phaseFx($('.broadcast'), ph.kind, theme.id, forward, { deaths: ph.kind === 'fallen' ? ph.deaths.length : 0 });
-    $('#bcPhase').textContent = 'Fase ' + (i + 1) + (S.settings.hideFuture && S.run.seen < P.length - 1 ? '' : ' / ' + P.length);
-    const kparts = [];
-    if (!ph.title.toLowerCase().includes(KIND[ph.kind].toLowerCase())) kparts.push(KIND[ph.kind]);
-    if (ph.day && !ph.title.includes(String(ph.day))) kparts.push('Giorno ' + ph.day);
-    if (ph.meteo && ph.meteo.n) kparts.push(ph.meteo.n);
-    $('#bcKind').textContent = kparts.join(' · ');
-    $('#phTitle').textContent = ph.title; if (forward) AN.kinetic($('#phTitle'), ph.kind === 'dis' ? 'shake' : ph.kind === 'n' ? 'fade' : 'drop');
+    const hideTotal = S.settings.hideFuture && S.run.seen < P.length - 1;
+    const info = phaseInfo(P, i, theme, hideTotal), maxD = runMaxDays();
+    $('#bcPhase').textContent = 'Fase ' + (i + 1) + (hideTotal ? '' : ' di ' + P.length);
+    $('#bcLimit').hidden = !maxD;
+    if (maxD) $('#bcLimit').textContent = 'Limite: ' + maxD + ' ' + calOf(theme).units;
+    $('#bcKind').textContent = info.kicker;
+    $('#phTitle').textContent = info.title; if (forward) AN.kinetic($('#phTitle'), ph.kind === 'dis' ? 'shake' : ph.kind === 'n' ? 'fade' : 'drop');
     $('#phIntro').textContent = ph.intro || '';
     if (forward) AN.countTo($('#aliveBig'), ph.snap.alive.length, { from: prevAlive, dur: 1100 }); else $('#aliveBig').textContent = ph.snap.alive.length; $('#aliveTot').textContent = '/' + total;
     $('#aliveLbl').textContent = soft ? 'ancora in gioco' : 'superstiti';
@@ -1579,9 +1679,14 @@
       $('#phBody').innerHTML = '<div class="memorial' + (forward ? ' rise' : '') + '"><h2>' + (soft ? 'Fuori dai giochi' : 'In memoria') + '</h2>' +
         (ph.deaths.length ? '<div class="memgrid">' + ph.deaths.map((id) => { const t = BY[id]; return '<button type="button" class="mem" data-prof="' + esc(id) + '">' + avHTML(t, { dead: true }) + '<b>' + esc(t.name) + '</b><small>Squadra ' + t.team + (t.killerIds.length ? '<br>per mano di ' + esc(t.killerIds.map((k) => BY[k].name).join(', ')) : '<br>vittima dell\'arena') + '</small><span class="mono">' + (ph.snap.kills[t.id] || 0) + ' ' + (soft ? 'elim.' : 'ucc.') + '</span></button>'; }).join('') + '</div>' : '<div class="emptyday">' + esc(ph.intro) + '</div>') + '</div>';
     } else {
-      $('#phBody').innerHTML = (visibleEvents.length ? visibleEvents.map((e, k) => evHTML(e, null, theme, forward, false, Math.min(k * 90, 1800))).join('') : '<p class="help">Nessun evento per i concorrenti seguiti in questa fase. Puoi seguirne uno dalla sua scheda o disattivare il filtro.</p>');
+      const why = ph.kind === 'finale' && P.findIndex((x) => x.kind === 'finale') === i ? '<div class="ev note finale-why"><p><b>Perché lo scontro finale.</b> ' + esc(finaleReason(P, theme)) + '</p></div>' : '';
+      const empty = evFilter ? '<div class="ev-empty"><p>Nessun evento di questo tipo in questa fase.</p><button type="button" class="btn sm" data-evf="">Mostra tutti</button></div>' : '<p class="help">Nessun evento per i concorrenti seguiti in questa fase. Puoi seguirne uno dalla sua scheda o disattivare il filtro nelle opzioni.</p>';
+      $('#phBody').innerHTML = why + (visibleEvents.filter((e) => !e.note).length || !evFilter ? visibleEvents.map((e, k) => evHTML(e, null, theme, forward, false, Math.min(k * 90, 1800))).join('') : '') + (!visibleEvents.filter((e) => !e.note).length && (evFilter || S.settings.followOnly) ? empty : '');
+      if (R0.context) $$('#phBody .event-reason').forEach((d) => (d.open = true));
     }
     renderSide(i);
+    $('#rbChips').innerHTML = ph.kind === 'fallen' ? '<span class="rb-note">' + esc(phaseInfo(P, i, theme, true).kicker) + '</span>' : readbarHTML(ph, theme, followedEvents);
+    syncReadControls();
     $('#phaseAnnouncement').textContent = 'Fase ' + (i + 1) + ': ' + ph.title + '. ' + plural(visibleEvents.length, 'evento visibile', 'eventi visibili') + ', ' + plural(ph.snap.alive.length, 'concorrente in gara', 'concorrenti in gara') + '.';
     ['hideFuture', 'adaptivePlay', 'reduceMotion', 'followOnly'].forEach((k) => { $('#' + k).checked = !!S.settings[k]; });
     if (forward && !AN.reduced && ph.kind !== 'fallen') {
@@ -1619,7 +1724,7 @@
       h=window.LOS_MAP_VIEW.render(SIM,i,{theme,properties:arenaOf(theme.id).zones,selected:mapSelection,avatar:t=>avHTML(t,{btn:true}),zonePic:z=>window.LOS_ATLAS?window.LOS_ATLAS.pic(theme.id,'luoghi',z.name,theme.hue,{index:z.id}):''});
     } else if (sideTab === 'fallen') {
       const dead = SIM.tributes.filter((t) => !t.alive && t.deathPhase <= i).sort((a, b) => b.order - a.order);
-      h = dead.length ? '<div class="plist">' + dead.map((t) => '<button type="button" class="prow" data-prof="' + esc(t.id) + '">' + avHTML(t, { dead: true }) + '<span style="min-width:0"><span class="pn">' + esc(t.name) + '</span><span class="ps">' + (t.killerIds.length ? 'per mano di ' + esc(t.killerIds.map((k) => BY[k].name).join(', ')) + (causeTxt(t, theme) ? ' · ' + causeTxt(t, theme) : '') : causeTxt(t, theme) ? 'per ' + causeTxt(t, theme) : 'vittima dell\'arena') + '</span></span><span class="pk">G' + t.deathDay + '</span></button>').join('') + '</div>' : '<p class="help">Ancora nessuno.</p>';
+      h = dead.length ? '<div class="plist">' + dead.map((t) => '<button type="button" class="prow" data-prof="' + esc(t.id) + '">' + avHTML(t, { dead: true }) + '<span style="min-width:0"><span class="pn">' + esc(t.name) + '</span><span class="ps">' + (t.killerIds.length ? 'per mano di ' + esc(t.killerIds.map((k) => BY[k].name).join(', ')) + (causeTxt(t, theme) ? ' · ' + causeTxt(t, theme) : '') : causeTxt(t, theme) ? 'per ' + causeTxt(t, theme) : 'vittima dell\'arena') + '</span></span><span class="pk">' + esc(whenLabel(theme, t.deathPhase, t.deathDay)) + '</span></button>').join('') + '</div>' : '<p class="help">Ancora nessuno.</p>';
     } else if (sideTab === 'alive') {
       const al = SIM.tributes.filter((t) => aliveSet.has(t.id)).sort((a, b) => Number((S.followed || []).includes(b.id)) - Number((S.followed || []).includes(a.id)) || (ph.snap.kills[b.id] || 0) - (ph.snap.kills[a.id] || 0));
       h = '<div class="plist">' + al.map((t) => {
@@ -1711,6 +1816,15 @@
   $('#prevBtn').addEventListener('click', () => { stopPlay(); lastRendered = -2; go(S.run.phase - 1); });
   $('#playBtn').addEventListener('click', () => { if (!SIM) return; if (playing) return stopPlay(); if (S.run.phase >= SIM.phases.length - 1) go(0); startPlay(); next(); });
   $('#speedSeg').addEventListener('click', (e) => { const b = e.target.closest('button'); if (!b) return; S.settings.speed = b.dataset.v; save(); $$('#speedSeg button').forEach((x) => x.setAttribute('aria-pressed', x === b)); if (playing) startPlay(); });
+  $('#readBar').addEventListener('click', (e) => {
+    const f = e.target.closest('[data-evf]');
+    if (f) { const k = f.dataset.evf || null; evFilter = evFilter === k ? null : k; if (SIM) renderLive(true); const back = $('#rbChips [data-evf="' + (evFilter || '') + '"]'); if (back) back.focus({ preventScroll: true }); return; }
+    const m = e.target.closest('#rbMore'); if (m) { const p = $('#rbPanel'); p.hidden = !p.hidden; m.setAttribute('aria-expanded', String(!p.hidden)); return; }
+    const sg = e.target.closest('#densSeg button, #sizeSeg button, #orderSeg button');
+    if (sg) { const key = { densSeg: 'density', sizeSeg: 'size', orderSeg: 'order' }[sg.parentElement.id]; S.settings.read = readPrefs(Object.assign({}, S.settings.read, { [key]: sg.dataset.v })); save(); if (SIM) renderLive(true); else syncReadControls(); }
+  });
+  $('#rbPanel').addEventListener('change', (e) => { const c = e.target.closest('[data-read]'); if (!c) return; S.settings.read = readPrefs(Object.assign({}, S.settings.read, { [c.dataset.read]: c.checked })); save(); if (SIM) renderLive(true); });
+  $('#phBody').addEventListener('click', (e) => { const f = e.target.closest('.ev-empty [data-evf]'); if (f) { evFilter = null; if (SIM) renderLive(true); } });
   ['hideFuture', 'adaptivePlay', 'reduceMotion', 'followOnly'].forEach((key) => $('#' + key).addEventListener('change', (e) => {
     S.settings[key] = e.target.checked; save();
     if (key === 'reduceMotion') AN.setReduced(S.settings.reduceMotion);
@@ -1762,7 +1876,7 @@
         promisesHTML(t, dead ? t.deathPhase : i, atRes) +
         diaryHTML(t, dead ? t.deathPhase : i) +
         attrHTML(t, theme, i, atRes) +
-        '<div><div class="sub" style="margin-bottom:8px">La sua storia' + (atRes ? '' : ' finora') + '</div><div class="ptl">' + (hist.length ? hist.map(({ e, p }) => '<div class="it" style="--cc:var(--c-' + (e.cat || 'none') + ')"><span>' + (p.kind === 'b' ? 'Inizio' : 'G' + p.day + ' ' + (p.kind === 'n' ? 'notte' : p.kind === 'd' ? 'giorno' : KIND[p.kind].toLowerCase())) + '</span><p>' + linkify(e.html) + '</p></div>').join('') : '<p class="help">Nessun evento ancora.</p>') + '</div></div>' +
+        '<div><div class="sub" style="margin-bottom:8px">La sua storia' + (atRes ? '' : ' finora') + '</div><div class="ptl">' + (hist.length ? hist.map(({ e, p }) => '<div class="it" style="--cc:var(--c-' + (e.cat || 'none') + ')"><span>' + esc(phaseInfo(SIM.phases, SIM.phases.indexOf(p), resultTheme(SIM), true).short) + '</span><p>' + linkify(e.html) + '</p></div>').join('') : '<p class="help">Nessun evento ancora.</p>') + '</div></div>' +
       '</div>';
     if (typeof studio !== 'undefined' && studio) studio.renderProfile(t, i);
     if (!$('#profDlg').open) $('#profDlg').showModal();
@@ -1874,11 +1988,11 @@
     let hero;
     if (W.length === 1) {
       const w = W[0];
-      hero = '<div class="winhero"><div class="wscene" aria-hidden="true">' + ART.scene(theme.id) + '</div>' + avHTML(w, { btn: true }) + '<div style="min-width:0"><div class="eyebrow">' + ART.icon(theme.id, 13) + ' ' + esc(theme.name) + ' · ' + plural(SIM.days, 'giorno', 'giorni') + ' · ' + SIM.tributes.length + ' concorrenti</div>' +
+      hero = '<div class="winhero"><div class="wscene" aria-hidden="true">' + ART.scene(theme.id) + '</div>' + avHTML(w, { btn: true }) + '<div style="min-width:0"><div class="eyebrow">' + ART.icon(theme.id, 13) + ' ' + esc(theme.name) + ' · ' + durTxt(theme) + ' · ' + SIM.tributes.length + ' concorrenti</div>' +
         '<h1>' + esc(w.name) + '</h1><p><b style="color:var(--screen-ink)">' + G3(w.gender, 'Ultimo', 'Ultima', 'Ultimə') + ' in piedi.</b> Squadra ' + w.team + (w.traits.length ? ' · ' + w.traits.map((x) => TRAITS[x].name).join(', ') : '') + '.</p>' +
         '<div class="wstats"><div><b>' + w.kills + '</b><span>' + (soft ? 'eliminazioni' : 'uccisioni') + '</span></div><div><b>' + w.events + '</b><span>eventi vissuti</span></div><div><b>' + w.alliancesFormed + '</b><span>alleanze</span></div><div><b>' + w.items + '</b><span>oggetti trovati</span></div></div></div></div>';
     } else if (W.length > 1) {
-      hero = '<div class="winhero" style="grid-template-columns:minmax(0,1fr)"><div class="wscene" aria-hidden="true">' + ART.scene(theme.id) + '</div><div><div class="eyebrow">' + ART.icon(theme.id, 13) + ' ' + esc(theme.name) + ' · ' + plural(SIM.days, 'giorno', 'giorni') + '</div><h1>Vince la squadra ' + W[0].team + '</h1><div class="teamavs">' + W.map((w) => avHTML(w, { btn: true })).join('') + '</div><p style="margin-top:12px">' + W.map((w) => esc(w.name) + ' (' + kN(w.kills) + ')').join(' · ') + '</p></div></div>';
+      hero = '<div class="winhero" style="grid-template-columns:minmax(0,1fr)"><div class="wscene" aria-hidden="true">' + ART.scene(theme.id) + '</div><div><div class="eyebrow">' + ART.icon(theme.id, 13) + ' ' + esc(theme.name) + ' · ' + durTxt(theme) + '</div><h1>Vince la squadra ' + W[0].team + '</h1><div class="teamavs">' + W.map((w) => avHTML(w, { btn: true })).join('') + '</div><p style="margin-top:12px">' + W.map((w) => esc(w.name) + ' (' + kN(w.kills) + ')').join(' · ') + '</p></div></div>';
     } else hero = '<div class="winhero" style="grid-template-columns:minmax(0,1fr)"><div><h1>Nessun superstite</h1><p>L\'arena non ha risparmiato nessuno.</p></div></div>';
 
     const ranked = SIM.tributes.slice().sort((a, b) => a.rank - b.rank || b.kills - a.kills);
@@ -1917,7 +2031,7 @@
     pts.forEach(([x, y]) => (path += ' L' + x.toFixed(1) + ' ' + y.toFixed(1)));
     const area = path + ' L' + xs(P.length - 1) + ' ' + ys(0) + ' L' + xs(0) + ' ' + ys(0) + ' Z';
     const ticks = [];
-    let lastDay = 0; P.forEach((p, k) => { if (p.day !== lastDay) { lastDay = p.day; ticks.push('<line x1="' + xs(k) + '" x2="' + xs(k) + '" y1="' + pt + '" y2="' + (Hd - pb) + '" stroke="var(--line)" stroke-dasharray="2 3"/><text x="' + (xs(k) + 3) + '" y="' + (Hd - 8) + '">G' + p.day + '</text>'); } });
+    let lastDay = 0; P.forEach((p, k) => { if (p.day !== lastDay) { lastDay = p.day; ticks.push('<line x1="' + xs(k) + '" x2="' + xs(k) + '" y1="' + pt + '" y2="' + (Hd - pb) + '" stroke="var(--line)" stroke-dasharray="2 3"/><text x="' + (xs(k) + 3) + '" y="' + (Hd - 8) + '">' + p.day + '</text>'); } });
     const yl = [total, Math.round(total / 2), 0].map((n) => '<text x="' + (pl - 6) + '" y="' + (ys(n) + 4) + '" text-anchor="end">' + n + '</text><line x1="' + pl + '" x2="' + (Wd - pr) + '" y1="' + ys(n) + '" y2="' + ys(n) + '" stroke="var(--line)"/>').join('');
     const chart = '<div class="chart"><svg viewBox="0 0 ' + Wd + ' ' + Hd + '" role="img" aria-label="Concorrenti in gara fase per fase">' + yl + ticks.join('') + '<path d="' + area + '" fill="var(--accent)" fill-opacity=".14"/><path d="' + path + '" fill="none" stroke="var(--accent)" stroke-width="2.5" stroke-linejoin="round"/><circle cx="' + pts[pts.length - 1][0] + '" cy="' + pts[pts.length - 1][1] + '" r="5" fill="var(--accent)"/></svg></div>';
 
@@ -1938,7 +2052,7 @@
 
     const rows = ranked.map((t) => '<tr class="' + (t.alive ? 'win' : '') + '"><td class="n">' + t.rank + '°</td><td><button type="button" class="who" data-prof="' + esc(t.id) + '">' + avHTML(t, { dead: !t.alive }) + esc(t.name) + '</button></td><td class="n">' + t.team + '</td><td class="n">' + t.kills + '</td>' +
       '<td>' + (t.alive ? '<b>' + (W.length > 1 ? 'Squadra vincitrice' : G3(t.gender, 'Vincitore', 'Vincitrice', 'Vincitorə')) + '</b>' : t.killerIds.length ? esc(t.killerIds.map((k) => BY[k].name).join(', ')) : '<span class="muted">L\'arena</span>') + '</td>' +
-      '<td class="n">' + (t.alive ? '–' : 'G' + t.deathDay) + '</td><td class="cause">' + (t.alive ? '' : linkify(t.deathHtml)) + '</td></tr>').join('');
+      '<td class="n">' + (t.alive ? '–' : esc(whenLabel(theme, t.deathPhase, t.deathDay))) + '</td><td class="cause">' + (t.alive ? '' : linkify(t.deathHtml)) + '</td></tr>').join('');
     const killers = SIM.tributes.filter((t) => t.kills > 0).sort((a, b) => b.kills - a.kills).slice(0, 8);
     const maxK = Math.max(1, ...killers.map((t) => t.kills));
     const kbars = killers.length ? killers.map((t) => '<div class="bar"><span class="lbl">' + esc(t.name) + '</span><span class="tr"><i style="width:' + (100 * t.kills / maxK) + '%;background:' + esc(t.color) + '"></i></span><span class="v">' + t.kills + '</span></div>').join('') : '<p class="help">Nessuno ha eliminato un rivale.</p>';

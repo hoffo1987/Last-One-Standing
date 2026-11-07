@@ -1974,6 +1974,123 @@ details.card > summary { font-size: 16px; }
 :root[data-theme="dark"] .map-node.selected .mn-name { background: var(--accent); color: var(--accent-ink); }
 @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .map-node.selected .mn-name { background: var(--accent); color: var(--accent-ink); } }
 .nf-txt em { color: color-mix(in srgb, var(--ec2) 62%, var(--ink)); }
+
+/* =====================================================================
+   DIRETTA · EVENTI, BARRA DI LETTURA, LINEA DEL TEMPO
+   ===================================================================== */
+.bc-limit { display: inline-flex; align-items: center; gap: 5px; font-size: 13px; font-weight: 600; color: var(--screen-ink); background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.18); padding: 2px 10px; border-radius: 999px; }
+.bc-limit + .bc-phase { margin-left: 0; }
+.bc-top .bc-limit { margin-left: auto; }
+.bc-kind:empty { display: none; }
+
+/* linea del tempo: un riquadro per ogni giorno, il finale a parte */
+.timeline { gap: 8px; padding: 14px 2px 8px; scroll-behavior: smooth; }
+.tday { padding: 8px 10px 10px; gap: 7px; border-radius: 14px; background: var(--panel); border: 1px solid var(--line); box-shadow: var(--shadow-sm); transition: border-color .25s, background .25s; }
+.tday > .tdl { font-size: 12.5px; font-weight: 700; color: var(--muted); white-space: nowrap; }
+.tday.tcur { border-color: color-mix(in srgb, var(--accent) 55%, var(--line)); background: color-mix(in srgb, var(--accent-soft) 45%, var(--panel)); }
+.tday.tcur > .tdl { color: var(--accent-text); }
+.tday.tfin { background: color-mix(in srgb, var(--c-kill) 7%, var(--panel)); border-color: color-mix(in srgb, var(--c-kill) 25%, var(--line)); }
+.tday.tfin > .tdl { color: color-mix(in srgb, var(--c-kill) 80%, var(--ink)); }
+.tday.tnext { background: transparent; border-style: dashed; box-shadow: none; }
+.tday > div { gap: 4px; }
+.tph { width: 34px; height: 34px; border-radius: 10px; transition: transform .15s, background .2s, box-shadow .2s; }
+.tph:hover { transform: translateY(-2px); }
+.tph svg { width: 16px; height: 16px; }
+.tph.k-dis.seen, .tph.k-dis.cur { color: var(--c-hurt); }
+.tph.k-finale.seen { color: var(--c-kill); }
+.tph.cur, .tph.k-dis.cur { color: var(--accent-ink); }
+
+/* barra di lettura: filtri per tipo, densità, opzioni */
+.readbar { margin: 14px 0; padding: 10px 12px; display: grid; gap: 10px; }
+.rb-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+.rb-chips { display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; flex: 1 1 320px; min-width: 0; padding: 2px; }
+.rb-chips::-webkit-scrollbar { display: none; }
+.rbc { --cc: var(--accent); flex: none; display: inline-flex; align-items: center; gap: 6px; padding: 4px 5px 4px 11px; border-radius: 999px; border: 1px solid var(--line); background: var(--panel); color: var(--ink); font: inherit; font-size: 13.5px; font-weight: 600; cursor: pointer; transition: background .2s, border-color .2s, transform .15s; }
+.rbc:active { transform: scale(.97); }
+.rbc svg { width: 14px; height: 14px; color: var(--cc); }
+.rbc b { min-width: 22px; height: 20px; padding: 0 6px; border-radius: 999px; display: inline-grid; place-items: center; font-size: 12px; background: var(--panel-2); color: var(--muted); }
+.rbc[aria-pressed="true"] { background: color-mix(in srgb, var(--cc) 14%, var(--panel)); border-color: color-mix(in srgb, var(--cc) 60%, var(--line)); }
+.rbc[aria-pressed="true"] b { background: color-mix(in srgb, var(--cc) 80%, var(--ink)); color: #fff; }
+.rbc.f-dead { --cc: var(--c-kill); } .rbc.f-betray { --cc: var(--c-betray); } .rbc.f-ally { --cc: var(--c-ally); } .rbc.f-love { --cc: var(--c-love); }
+.rbc.f-heal { --cc: var(--c-heal); } .rbc.f-item { --cc: var(--c-item); } .rbc.f-hurt { --cc: var(--c-hurt); } .rbc.f-none { --cc: var(--c-none); } .rbc.f-followed { --cc: var(--focus); }
+.rb-note { font-size: 14px; color: var(--muted); padding: 4px 2px; }
+.rb-tools { display: flex; align-items: center; gap: 8px; }
+.rb-more svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; }
+.rb-more[aria-expanded="true"] { background: var(--panel-2); }
+.rb-panel { border-top: 1px solid var(--line); padding-top: 12px; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; animation: viewIn .25s ease-out both; }
+.rb-group { border: 0; margin: 0; padding: 0; display: grid; gap: 9px; align-content: start; min-width: 0; }
+.rb-group legend { font-weight: 700; font-size: 14px; padding: 0; margin-bottom: 8px; }
+.rb-check { display: flex; gap: 9px; align-items: flex-start; font-size: 14px; line-height: 1.4; cursor: pointer; }
+.rb-check input { margin-top: 3px; accent-color: var(--accent); width: 16px; height: 16px; flex: none; }
+.rb-opt { display: grid; gap: 5px; font-size: 13px; color: var(--muted); }
+.rb-opt .seg { justify-self: start; }
+.rb-group .help { font-size: 13px; }
+@media (max-width: 900px) { .rb-panel { grid-template-columns: minmax(0, 1fr); gap: 14px; } }
+
+/* schede degli eventi, a tema per ogni tipo */
+#phBody { display: grid; gap: 10px; align-content: start; }
+.ev { grid-template-columns: auto minmax(0, 1fr); align-items: start; gap: 14px; padding: 14px 18px 14px 16px; border-radius: 16px; border: 1px solid color-mix(in srgb, var(--cc) 22%, var(--line)); border-left: 1px solid color-mix(in srgb, var(--cc) 22%, var(--line)); background: linear-gradient(100deg, color-mix(in srgb, var(--cc) 8%, var(--panel)) 0%, var(--panel) 62%); box-shadow: inset 4px 0 0 var(--cc), 0 1px 2px hsl(var(--h) 30% 10% / .04); }
+.ev .evbody { min-width: 0; display: grid; gap: 6px; position: relative; z-index: 1; }
+.ev p { margin: 0; font-size: 16px; line-height: 1.55; }
+.ev-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 8px; }
+.ev .cat { font-size: 12.5px; padding: 2px 10px 2px 8px; border-radius: 999px; background: color-mix(in srgb, var(--cc) 14%, var(--panel)); color: color-mix(in srgb, var(--cc) 72%, var(--ink)); justify-self: start; }
+.ev .event-place { display: inline-flex; align-items: center; gap: 4px; font-size: 12.5px; font-weight: 600; letter-spacing: 0; opacity: 1; color: var(--muted); margin: 0; }
+.ev .event-place svg { width: 12px; height: 12px; fill: currentColor; }
+.ev .why { margin: 0; }
+.ev .avs { padding-top: 2px; position: relative; z-index: 1; }
+.ev .avs .av { --s: 42px; box-shadow: 0 0 0 2px var(--panel); }
+.ev-mark { position: absolute; right: -12px; bottom: -16px; width: 92px; height: 92px; color: var(--cc); opacity: .08; pointer-events: none; z-index: 0; }
+.ev-mark svg { width: 100%; height: 100%; }
+.ev-mark:empty { display: none; }
+.ev .echo { margin-top: 2px; }
+.ev .event-reason { font-size: 13.5px; }
+.ev .event-reason summary { cursor: pointer; color: var(--muted); font-weight: 600; }
+/* tipi */
+.ev.c-none { box-shadow: inset 4px 0 0 color-mix(in srgb, var(--c-none) 45%, var(--line)), 0 1px 2px hsl(var(--h) 30% 10% / .04); background: var(--panel); border-color: var(--line); }
+.ev.c-kill { background: repeating-linear-gradient(135deg, transparent 0 18px, color-mix(in srgb, var(--cc) 4%, transparent) 18px 20px), linear-gradient(100deg, color-mix(in srgb, var(--cc) 12%, var(--panel)) 0%, var(--panel) 65%); }
+.ev.c-death { background: linear-gradient(100deg, color-mix(in srgb, var(--c-death) 16%, var(--panel)) 0%, color-mix(in srgb, var(--c-death) 4%, var(--panel)) 70%); }
+.ev.c-death p { color: color-mix(in srgb, var(--ink) 88%, var(--c-death)); }
+.ev.c-betray { border-style: dashed; background: repeating-linear-gradient(90deg, transparent 0 10px, color-mix(in srgb, var(--cc) 3%, transparent) 10px 11px), linear-gradient(100deg, color-mix(in srgb, var(--cc) 10%, var(--panel)) 0%, var(--panel) 62%); }
+.ev.c-love { background: radial-gradient(120% 140% at 0% 0%, color-mix(in srgb, var(--cc) 14%, var(--panel)), var(--panel) 60%); }
+.ev.c-heal { background: radial-gradient(120% 140% at 0% 50%, color-mix(in srgb, var(--cc) 12%, var(--panel)), var(--panel) 60%); }
+.ev.c-item { background: linear-gradient(100deg, color-mix(in srgb, var(--cc) 12%, var(--panel)) 0%, var(--panel) 58%); }
+.ev.c-item .ev-mark { opacity: .11; }
+.ev.c-ally .avs .av + .av { margin-left: -6px; }
+.ev.lethal { background-color: transparent; }
+.ev.lethal .ev-mark { opacity: .1; }
+.ev.followed { outline: 2px solid color-mix(in srgb, var(--focus) 60%, transparent); outline-offset: 2px; }
+/* note di sistema e meteo */
+.ev.note { --cc: var(--accent); grid-template-columns: auto minmax(0, 1fr); align-items: center; gap: 12px; padding: 12px 16px; background: color-mix(in srgb, var(--accent-soft) 70%, var(--panel)); border-color: color-mix(in srgb, var(--accent) 25%, var(--line)); box-shadow: none; }
+.ev.note.meteo { --cc: #5c9cf0; background: color-mix(in srgb, #5c9cf0 11%, var(--panel)); border-color: color-mix(in srgb, #5c9cf0 30%, var(--line)); }
+.note-ic { width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; background: color-mix(in srgb, var(--cc) 18%, var(--panel)); color: color-mix(in srgb, var(--cc) 75%, var(--ink)); }
+.note-ic svg { width: 19px; height: 19px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.ev.note p { font-size: 15px; }
+.ev.finale-why { --cc: var(--c-kill); grid-template-columns: minmax(0, 1fr); background: color-mix(in srgb, var(--c-kill) 9%, var(--panel)); border-color: color-mix(in srgb, var(--c-kill) 30%, var(--line)); }
+.ev-empty { display: grid; justify-items: start; gap: 8px; padding: 16px; border-radius: 16px; border: 1px dashed var(--line); color: var(--muted); }
+.ev-empty p { margin: 0; }
+/* preferenze di lettura */
+#phBody.dens-compatta { gap: 6px; }
+.dens-compatta .ev { padding: 9px 14px 9px 12px; gap: 10px; border-radius: 12px; }
+.dens-compatta .ev .avs .av { --s: 30px; }
+.dens-compatta .ev p { font-size: 15px; line-height: 1.45; }
+.dens-compatta .ev .echo, .dens-compatta .ev .event-reason, .dens-compatta .ev-mark { display: none; }
+.dens-compatta .ev .evbody { gap: 3px; }
+.size-grande .ev p { font-size: 18.5px; line-height: 1.6; }
+.size-grande .ev .echo li { font-size: 15.5px; }
+.size-grande .ev .cat, .size-grande .ev .event-place, .size-grande .ev .why { font-size: 14px; }
+.no-echo .ev .echo { display: none; }
+.no-place .ev .event-place { display: none; }
+.no-why .ev .why { display: none; }
+.no-faces .ev:not(.note) { grid-template-columns: minmax(0, 1fr); }
+.no-faces .ev .avs { display: none; }
+@media (max-width: 640px) {
+  .ev { padding: 12px 14px 12px 12px; gap: 10px; }
+  .ev .avs .av { --s: 34px; }
+  .rbc { font-size: 13px; }
+  .rb-tools { width: 100%; justify-content: space-between; }
+}
+@media (prefers-reduced-motion: reduce) { .rb-panel { animation: none; } .tph:hover { transform: none; } }
+.readbar { grid-template-columns: minmax(0, 1fr); } .rb-row { min-width: 0; }
 </style>
 
 <header class="top">
@@ -2167,7 +2284,7 @@ details.card > summary { font-size: 16px; }
         <div class="bc-top">
           <span class="onair"><span class="rec"></span>In diretta</span>
           <span class="bc-arena" id="bcArena"></span>
-          <span class="bc-phase mono" id="bcPhase"></span>
+          <span class="bc-limit" id="bcLimit" hidden></span><span class="bc-phase mono" id="bcPhase"></span>
         </div>
         <div class="bc-main">
           <div class="bc-title">
@@ -2183,14 +2300,35 @@ details.card > summary { font-size: 16px; }
         <div class="tally" id="tally" aria-hidden="true"></div>
       </div>
       <div class="timeline" id="timeline" aria-label="Fasi della partita"></div>
-      <details class="reading-options card">
-        <summary>Opzioni di lettura</summary>
-        <label><input type="checkbox" id="hideFuture"> Nascondi gli eventi futuri e la durata totale</label>
-        <label><input type="checkbox" id="adaptivePlay"> Adatta la riproduzione alla quantità di testo</label>
-        <label><input type="checkbox" id="reduceMotion"> Riduci le animazioni</label>
-        <label><input type="checkbox" id="followOnly"> Mostra solo gli eventi dei concorrenti seguiti</label>
-        <p class="help" id="motionNote">Le preferenze del sistema sulle animazioni vengono sempre rispettate.</p>
-      </details>
+      <div class="readbar card" id="readBar">
+        <div class="rb-row">
+          <div class="rb-chips" id="rbChips" role="group" aria-label="Filtra gli eventi della fase"></div>
+          <div class="rb-tools">
+            <div class="seg rb-dens" id="densSeg" role="group" aria-label="Densità degli eventi"><button type="button" data-v="comoda" aria-pressed="true">Comoda</button><button type="button" data-v="compatta" aria-pressed="false">Compatta</button></div>
+            <button class="btn sm rb-more" type="button" id="rbMore" aria-expanded="false" aria-controls="rbPanel"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/></svg>Opzioni</button>
+          </div>
+        </div>
+        <div class="rb-panel" id="rbPanel" hidden>
+          <fieldset class="rb-group"><legend>Cosa mostrare negli eventi</legend>
+            <label class="rb-check"><input type="checkbox" data-read="echo"> Reazioni e conseguenze</label>
+            <label class="rb-check"><input type="checkbox" data-read="place"> Il luogo dove succede</label>
+            <label class="rb-check"><input type="checkbox" data-read="why"> Prove, dadi e motivi</label>
+            <label class="rb-check"><input type="checkbox" data-read="context"> Il contesto già aperto</label>
+            <label class="rb-check"><input type="checkbox" data-read="faces"> I volti dei protagonisti</label>
+          </fieldset>
+          <fieldset class="rb-group"><legend>Come leggere</legend>
+            <div class="rb-opt"><span>Testo</span><div class="seg" id="sizeSeg" role="group" aria-label="Grandezza del testo"><button type="button" data-v="normale" aria-pressed="true">Normale</button><button type="button" data-v="grande" aria-pressed="false">Grande</button></div></div>
+            <div class="rb-opt"><span>Ordine</span><div class="seg" id="orderSeg" role="group" aria-label="Ordine degli eventi"><button type="button" data-v="storia" aria-pressed="true">Come sono andati</button><button type="button" data-v="gravi" aria-pressed="false">Prima i più gravi</button></div></div>
+            <label class="rb-check"><input type="checkbox" id="followOnly"> Solo i concorrenti seguiti</label>
+          </fieldset>
+          <fieldset class="rb-group"><legend>Riproduzione</legend>
+            <label class="rb-check"><input type="checkbox" id="hideFuture"> Nascondi le fasi future e la durata totale</label>
+            <label class="rb-check"><input type="checkbox" id="adaptivePlay"> Ritmo adattato alla lunghezza dei testi</label>
+            <label class="rb-check"><input type="checkbox" id="reduceMotion"> Riduci le animazioni</label>
+            <p class="help" id="motionNote">Le preferenze del sistema sulle animazioni vengono sempre rispettate.</p>
+          </fieldset>
+        </div>
+      </div>
       <div id="phaseAnnouncement" class="sr-only" role="status" aria-live="polite" aria-atomic="true"></div>
       <div class="livegrid">
         <div class="livefeed" id="phBody" role="region" aria-labelledby="phTitle"></div>
@@ -11731,7 +11869,7 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
 </script>
 <script>window.LOS_ASSETS = {"logo":"img/logo.f2d5175789.webp","icona":"img/icona.8b02ddeb49.webp","favicon":"img/favicon.86774dc7cf.png","panoramica":"img/panoramica.66c4c27255.webp","sagome":["img/sagome-cappuccio.e8876ba986.webp","img/sagome-esploratore.9a99fd13f8.webp","img/sagome-viaggiatore.5e36435604.webp"],"arene":{"classico":"img/arene-classico.42c6ba42ee.webp","fantasy":"img/arene-fantasy.75b7fb0d32.webp","horror":"img/arene-horror.48052d80b4.webp","liceo":"img/arene-liceo.05ed578a90.webp","royale":"img/arene-royale.36c9952cd7.webp","scifi":"img/arene-scifi.403694f00f.webp","ufficio":"img/arene-ufficio.67b271bea3.webp","wasteland":"img/arene-wasteland.889002ace8.webp","zombie":"img/arene-zombie.36c9135a12.webp"},"atlas":{"classico":{"luoghi":{"altopiano":"img/arene-classico-luoghi-altopiano.36a37512d3.webp","bosco":"img/arene-classico-luoghi-bosco.2e9163544b.webp","cornucopia":"img/arene-classico-luoghi-cornucopia.393b2dabe1.webp","fiume":"img/arene-classico-luoghi-fiume.22b335a914.webp","paludi":"img/arene-classico-luoghi-paludi.77cf115eb4.webp","rovine":"img/arene-classico-luoghi-rovine.9ea4f70ca9.webp"},"pericoli":{"branco-di-lupi-mutanti":"img/arene-classico-pericoli-branco-di-lupi-mutanti.d786a62875.webp","orso-affamato":"img/arene-classico-pericoli-orso-affamato.e4f38a9892.webp","sciame-di-vespe-velenose":"img/arene-classico-pericoli-sciame-di-vespe-velenose.5adb2c7b8d.webp","serpente-gigante":"img/arene-classico-pericoli-serpente-gigante.b17e7f3d91.webp"}},"fantasy":{"luoghi":{"foresta-elfica":"img/arene-fantasy-luoghi-foresta-elfica.0448fcfbd3.webp","lago-nebbioso":"img/arene-fantasy-luoghi-lago-nebbioso.f19abc7c81.webp","miniere":"img/arene-fantasy-luoghi-miniere.5baa916ec9.webp","palude-stregata":"img/arene-fantasy-luoghi-palude-stregata.6a0b2af4a7.webp","picco-del-drago":"img/arene-fantasy-luoghi-picco-del-drago.06bdfd84b1.webp","torre-in-rovina":"img/arene-fantasy-luoghi-torre-in-rovina.ac716863c7.webp"},"pericoli":{"branco-di-lupi-mannari":"img/arene-fantasy-pericoli-branco-di-lupi-mannari.1c9124ceee.webp","spettro-errante":"img/arene-fantasy-pericoli-spettro-errante.056074bc23.webp","troll-di-caverna":"img/arene-fantasy-pericoli-troll-di-caverna.31aa2444f0.webp","viverna":"img/arene-fantasy-pericoli-viverna.577b91a819.webp"}},"horror":{"luoghi":{"biblioteca":"img/arene-horror-luoghi-biblioteca.00d6ab97f4.webp","cappella":"img/arene-horror-luoghi-cappella.a51e505028.webp","cimitero":"img/arene-horror-luoghi-cimitero.7a441de089.webp","serra":"img/arene-horror-luoghi-serra.b3d91121d4.webp","soffitta":"img/arene-horror-luoghi-soffitta.466d40cea3.webp"},"pericoli":{"bambola-posseduta":"img/arene-horror-pericoli-bambola-posseduta.7064eef1d7.webp","entita-senza-volto":"img/arene-horror-pericoli-entita-senza-volto.2c28467bdd.webp","spettro-urlante":"img/arene-horror-pericoli-spettro-urlante.25fa554e05.webp","stormo-di-corvi":"img/arene-horror-pericoli-stormo-di-corvi.fe5c85d7ae.webp"}},"liceo":{"luoghi":{"aula-magna":"img/arene-liceo-luoghi-aula-magna.0478e35c5c.webp","biblioteca":"img/arene-liceo-luoghi-biblioteca.1ae806ae58.webp","cortile":"img/arene-liceo-luoghi-cortile.51bf433337.webp","laboratorio-di-chimica":"img/arene-liceo-luoghi-laboratorio-di-chimica.eba1434683.webp","mensa":"img/arene-liceo-luoghi-mensa.67bcbc7e37.webp","palestra":"img/arene-liceo-luoghi-palestra.8ecb872849.webp"},"pericoli":{"bidello-di-turno":"img/arene-liceo-pericoli-bidello-di-turno.191c43a8bd.webp","ispezione-a-sorpresa":"img/arene-liceo-pericoli-ispezione-a-sorpresa.bef087d9b9.webp","preside":"img/arene-liceo-pericoli-preside.033f6c9aae.webp","professoressa-di-matematica":"img/arene-liceo-pericoli-professoressa-di-matematica.6cb65c6a3f.webp"}},"royale":{"luoghi":{"aeroporto":"img/arene-royale-luoghi-aeroporto.81e8ce98d4.webp","base-militare":"img/arene-royale-luoghi-base-militare.67f3a7de9d.webp","centrale-elettrica":"img/arene-royale-luoghi-centrale-elettrica.05ee57458a.webp","fattoria":"img/arene-royale-luoghi-fattoria.7c780dda87.webp","foresta":"img/arene-royale-luoghi-foresta.03b47644d0.webp","villaggio-costiero":"img/arene-royale-luoghi-villaggio-costiero.568519eb7c.webp"},"pericoli":{"cane-da-guardia-addestrato":"img/arene-royale-pericoli-cane-da-guardia-addestrato.c7853a67a0.webp","drone-armato":"img/arene-royale-pericoli-drone-armato.30d0b73e01.webp","elicottero-da-caccia":"img/arene-royale-pericoli-elicottero-da-caccia.8c68e62346.webp"}},"scifi":{"luoghi":{"hangar":"img/arene-scifi-luoghi-hangar.6de551833b.webp","moduli-abitativi":"img/arene-scifi-luoghi-moduli-abitativi.9f5bb96d39.webp","ponte-di-comando":"img/arene-scifi-luoghi-ponte-di-comando.3e9ffd005a.webp","reattore":"img/arene-scifi-luoghi-reattore.d10a335006.webp","serra-idroponica":"img/arene-scifi-luoghi-serra-idroponica.b6f4407853.webp"},"pericoli":{"androide-da-combattimento":"img/arene-scifi-pericoli-androide-da-combattimento.1a3d3eb38e.webp","creatura-aliena-dai-tentacoli":"img/arene-scifi-pericoli-creatura-aliena-dai-tentacoli.b6b314ddd9.webp","drone-di-sicurezza-impazzito":"img/arene-scifi-pericoli-drone-di-sicurezza-impazzito.c8a9c6f9e3.webp","sciame-di-nanobot":"img/arene-scifi-pericoli-sciame-di-nanobot.d43296f047.webp"}},"ufficio":{"luoghi":{"cucina":"img/arene-ufficio-luoghi-cucina.d968f8861d.webp","open-space":"img/arene-ufficio-luoghi-open-space.b6b7990c99.webp","parcheggio":"img/arene-ufficio-luoghi-parcheggio.d593f2ed83.webp","sala-stampanti":"img/arene-ufficio-luoghi-sala-stampanti.1727f50082.webp","ufficio-del-direttore":"img/arene-ufficio-luoghi-ufficio-del-direttore.bb3b6cabab.webp"},"pericoli":{"consulente-esterno":"img/arene-ufficio-pericoli-consulente-esterno.ce6e200c3f.webp","direttore-generale":"img/arene-ufficio-pericoli-direttore-generale.da2eb1f708.webp","riorganizzazione-aziendale":"img/arene-ufficio-pericoli-riorganizzazione-aziendale.1fd57b76b3.webp","ufficio-risorse-umane":"img/arene-ufficio-pericoli-ufficio-risorse-umane.8392df7518.webp"}},"wasteland":{"luoghi":{"autostrada-spezzata":"img/arene-wasteland-luoghi-autostrada-spezzata.19a72a0b97.webp","citta-fantasma":"img/arene-wasteland-luoghi-citta-fantasma.fe22bb72b2.webp","cratere":"img/arene-wasteland-luoghi-cratere.04de7ca40a.webp","diga":"img/arene-wasteland-luoghi-diga.3be9abe15a.webp","discarica":"img/arene-wasteland-luoghi-discarica.b8783ad9c6.webp","raffineria":"img/arene-wasteland-luoghi-raffineria.081e2d2ad6.webp"},"pericoli":{"banda-di-predoni":"img/arene-wasteland-pericoli-banda-di-predoni.1dfcfd1628.webp","branco-di-cani-mutati":"img/arene-wasteland-pericoli-branco-di-cani-mutati.442fabfc39.webp","scorpione-gigante":"img/arene-wasteland-pericoli-scorpione-gigante.2dd8911367.webp","verme-delle-sabbie":"img/arene-wasteland-pericoli-verme-delle-sabbie.a0d445beeb.webp"}},"zombie":{"luoghi":{"centro-commerciale":"img/arene-zombie-luoghi-centro-commerciale.333f4699d5.webp","metropolitana":"img/arene-zombie-luoghi-metropolitana.878a263605.webp","periferia":"img/arene-zombie-luoghi-periferia.e28a7d70c7.webp","scuola":"img/arene-zombie-luoghi-scuola.153ddbaa75.webp","stazione-di-polizia":"img/arene-zombie-luoghi-stazione-di-polizia.157f7a17f5.webp"},"pericoli":{"cane-infetto":"img/arene-zombie-pericoli-cane-infetto.fdff913d6f.webp","gigante-mutato":"img/arene-zombie-pericoli-gigante-mutato.91fad36b70.webp","infetto-corridore":"img/arene-zombie-pericoli-infetto-corridore.61f48faafd.webp","orda-di-zombi":"img/arene-zombie-pericoli-orda-di-zombi.e0fc6d1b56.webp"}}}};
 ;
-window.LOS_BUILD = "ebc825610bc00998ab95e97b1dad8a9eb6ce6bee58bd3d4b23c6785929adcf38";
+window.LOS_BUILD = "d92041a8d41c8cc3c09dfa16ecbfd7c8f0521db486103e9aa61976541863b9bd";
 ;
 /* Last One Standing — grafica vettoriale: logo, icone delle arene, illustrazioni.
  * Tutto è SVG generato in codice: nessuna immagine esterna. */
@@ -12980,6 +13118,8 @@ window.LOS_BUILD = "ebc825610bc00998ab95e97b1dad8a9eb6ce6bee58bd3d4b23c6785929ad
   const METRICS = { saves: 'Aiuti prestati', nursed: 'Cure agli altri', promisesKept: 'Promesse mantenute', testsPassed: 'Prove superate', crafts: 'Oggetti costruiti o modificati', betrayals: 'Tradimenti' };
   const STORY_KINDS = new Set(['nemesi', 'odio', 'tradimento']);
   const record = (x) => x !== null && typeof x === 'object' && !Array.isArray(x);
+  // nome della fase con il calendario della diretta («Secondo giorno», «Finale, atto 2…»), senza «G1»
+  const phaseName = (result, st) => (G.LOS_PHASE_NAME && st.phase != null && G.LOS_PHASE_NAME(result, +st.phase)) || ('Giorno ' + (st.day || 1) + ' · ' + st.title);
   function roundDetails(result) {
     return {
       participants: result.tributes.map((t) => ({ id: t.id, rank: t.rank, kills: t.kills, winner: result.winners.includes(t.id), achievements: Object.fromEntries(Object.keys(METRICS).map((key) => [key, t[key] || 0])) })),
@@ -13117,7 +13257,7 @@ window.LOS_BUILD = "ebc825610bc00998ab95e97b1dad8a9eb6ce6bee58bd3d4b23c6785929ad
     function renderProfile(t, phase) {
       const on = (S.followed || []).includes(t.id), heading = $('#h-prof'); if (!heading) return;
       const result = A.getSIM(), theme = D.themes.find((th) => th.id === result.theme), timeline = personalTimeline(result, t.id, phase);
-      const history = '<details class="personal-history"><summary>Il percorso fino a questa fase · ' + plural(timeline.length, 'tappa', 'tappe') + '</summary><p class="help">In ordine cronologico: eventi, ricordi, diario e cambiamenti tra fine fase e fine fase. Le variazioni di salute compaiono sempre; per gli altri valori mostriamo quelle di almeno 10 punti. Un oggetto può entrare e uscire nella stessa fase senza comparire nel confronto dello zaino.</p><ol class="causal-path">' + timeline.map((step) => '<li><b>G' + (step.day || 1) + ' · ' + esc(step.title) + '</b>' +
+      const history = '<details class="personal-history"><summary>Il percorso fino a questa fase · ' + plural(timeline.length, 'tappa', 'tappe') + '</summary><p class="help">In ordine cronologico: eventi, ricordi, diario e cambiamenti tra fine fase e fine fase. Le variazioni di salute compaiono sempre; per gli altri valori mostriamo quelle di almeno 10 punti. Un oggetto può entrare e uscire nella stessa fase senza comparire nel confronto dello zaino.</p><ol class="causal-path">' + timeline.map((step) => '<li><b>' + esc(phaseName(result, step)) + '</b>' +
         (step.movements.length?'<ul class="personal-route">'+step.movements.map(m=>'<li>'+esc(m.path.map(z=>result.spatial.zones[z].name).join(' → '))+' · '+esc(m.reason)+' · Energia −'+m.cost+'</li>').join('')+'</ul>':'')+
         (step.changes.length ? '<ul class="change-list">' + step.changes.map((c) => '<li>' + esc(changeText(c, t, theme, result)) + '</li>').join('') + '</ul>' : '') +
         itemFactsHTML(step.itemFacts, result, theme) + step.events.map((e) => '<p>' + esc(e.plain) + '</p>').join('') + step.memories.map((m) => memoryHTML(t, m, theme)).filter(Boolean).map((m) => '<p class="help">Ricordo: «' + m + '»</p>').join('') + step.diary.map((page) => '<p class="diary-entry"><span class="sub">Diario</span> ' + A.linkify(page.h) + '</p>').join('') +
@@ -13140,8 +13280,8 @@ window.LOS_BUILD = "ebc825610bc00998ab95e97b1dad8a9eb6ce6bee58bd3d4b23c6785929ad
         const steps = causalSteps(result, id);
         const t = result.tributes.find((p) => p.id === id), theme = D.themes.find((th) => th.id === result.theme);
         const support = personalTimeline(result, id, result.phases.length - 1).map((p) => ({ ...p, memories: p.memories.filter((m) => ['saved', 'cured', 'shared', 'gift', 'spared'].includes(m.k)), changes: p.changes.filter((c) => ['initialItem', 'itemAdded', 'itemRemoved'].includes(c.kind)) })).filter((p) => p.memories.length || p.changes.length || p.itemFacts.length);
-        return '<details><summary>Il percorso di ' + esc(names[id]) + '</summary>' + (steps.length ? '<ol class="causal-path">' + steps.map((step) => '<li><b>' + step.label + '</b><span class="help">G' + step.day + ' · ' + esc(step.title) + '</span><p>' + esc(step.plain) + '</p>' + (step.reason ? '<p class="help">' + esc(step.reason) + '</p>' : '') + '<button class="btn sm" type="button" data-story-phase="' + step.phase + '">Rivedi questa fase</button></li>').join('') + '</ol>' : '<p class="help">La vittoria è arrivata senza altri passaggi registrati di questi tipi.</p>') +
-          '<details><summary>Aiuti ricevuti e storia dello zaino</summary><p class="help">' + (result.itemFacts ? 'Il registro mostra utilizzi e bonus effettivamente applicati, con le variazioni nell’azione. Il confronto dello zaino resta separato: la presenza di un oggetto non dimostra un effetto sulla vittoria.' : 'Questo replay precede il registro degli oggetti: restano disponibili ricordi e confronti di fine fase, senza ricostruire utilizzi non registrati.') + '</p><ol class="causal-path">' + support.map((p) => '<li><b>G' + (p.day || 1) + ' · ' + esc(p.title) + '</b>' + itemFactsHTML(p.itemFacts, result, theme) + p.memories.map((m) => memoryHTML(t, m, theme)).filter(Boolean).map((m) => '<p>«' + m + '»</p>').join('') + '<ul>' + p.changes.map((c) => '<li>' + esc(changeText(c, t, theme, result)) + '</li>').join('') + '</ul><button class="btn sm" type="button" data-story-phase="' + p.phase + '">Rivedi questa fase</button></li>').join('') + '</ol></details></details>';
+        return '<details><summary>Il percorso di ' + esc(names[id]) + '</summary>' + (steps.length ? '<ol class="causal-path">' + steps.map((step) => '<li><b>' + step.label + '</b><span class="help">Giorno ' + step.day + ' · ' + esc(step.title) + '</span><p>' + esc(step.plain) + '</p>' + (step.reason ? '<p class="help">' + esc(step.reason) + '</p>' : '') + '<button class="btn sm" type="button" data-story-phase="' + step.phase + '">Rivedi questa fase</button></li>').join('') + '</ol>' : '<p class="help">La vittoria è arrivata senza altri passaggi registrati di questi tipi.</p>') +
+          '<details><summary>Aiuti ricevuti e storia dello zaino</summary><p class="help">' + (result.itemFacts ? 'Il registro mostra utilizzi e bonus effettivamente applicati, con le variazioni nell’azione. Il confronto dello zaino resta separato: la presenza di un oggetto non dimostra un effetto sulla vittoria.' : 'Questo replay precede il registro degli oggetti: restano disponibili ricordi e confronti di fine fase, senza ricostruire utilizzi non registrati.') + '</p><ol class="causal-path">' + support.map((p) => '<li><b>' + esc(phaseName(result, p)) + '</b>' + itemFactsHTML(p.itemFacts, result, theme) + p.memories.map((m) => memoryHTML(t, m, theme)).filter(Boolean).map((m) => '<p>«' + m + '»</p>').join('') + '<ul>' + p.changes.map((c) => '<li>' + esc(changeText(c, t, theme, result)) + '</li>').join('') + '</ul><button class="btn sm" type="button" data-story-phase="' + p.phase + '">Rivedi questa fase</button></li>').join('') + '</ol></details></details>';
       }).join('');
       $('#resBody .resgrid').insertAdjacentHTML('beforebegin', '<section class="block card studio-panel" id="causalReport"><h2>Le svolte della vittoria</h2><p class="help">Eventi e condizioni realmente registrati. Le tappe raccontano il percorso, senza attribuire un effetto decisivo che il motore non ha misurato.</p>' + html + '</section>');
     }
@@ -13616,7 +13756,7 @@ window.LOS_BUILD = "ebc825610bc00998ab95e97b1dad8a9eb6ce6bee58bd3d4b23c6785929ad
       return '<div class="person c-' + esc(info.c) + '">' + avHTML(BY[id], { btn: true }) + '<div class="pbody"><div class="ptop"><b>' + esc(nmOf(id)) + '</b><span class="plbl" title="' + esc(info.d) + '">' + esc(info.n) + '</span>' + (asym ? '<span class="asym">' + asym + '</span>' : '') + '</div>' +
         '<span class="affbar" title="Affetto ' + a + '"><b style="left:' + pct + '%"></b></span>' + dimsHTML(dims) +
         '<span class="back">Per ' + esc(nmOf(id)) + ': <b>' + esc(bk || 'indifferenza') + '</b></span>' +
-        (mem.length ? '<ul class="pmem">' + mem.filter((m) => MM[m.k]).map((m) => '<li>«' + fill(MM[m.k] || '', [t.id, id, m.x]) + '» <span>G' + (SIM.phases[m.ph] ? SIM.phases[m.ph].day || 1 : '') + '</span></li>').join('') + '</ul>' : '') + '</div></div>';
+        (mem.length ? '<ul class="pmem">' + mem.filter((m) => MM[m.k]).map((m) => '<li>«' + fill(MM[m.k] || '', [t.id, id, m.x]) + '» <span>' + esc(whenLabel(resultTheme(SIM), m.ph, SIM.phases[m.ph] ? SIM.phases[m.ph].day || 1 : 1)) + '</span></li>').join('') + '</ul>' : '') + '</div></div>';
     }).join('');
     return '<div><div class="sub" style="margin-bottom:8px">Cosa prova per gli altri</div><div class="people">' + rows + '</div></div>';
   }
@@ -13627,7 +13767,7 @@ window.LOS_BUILD = "ebc825610bc00998ab95e97b1dad8a9eb6ce6bee58bd3d4b23c6785929ad
     const days = {}; all.forEach((d) => (days[d.d] = days[d.d] || []).push(d));
     const ds = Object.keys(days).map(Number).sort((a, b) => b - a);
     return '<div><div class="sub" style="margin-bottom:6px">Diario segreto · ' + plural(all.length, 'pagina', 'pagine') + '</div><p class="help" style="margin-bottom:8px">Quello che la diretta non mostra: pensieri, segreti e fatti fuori onda.</p><div class="diary">' +
-      ds.map((d) => '<div class="dday"><span class="dd">G' + (d || 1) + '</span><div>' + days[d].slice().reverse().map((x) => '<p class="dk-' + esc(x.k) + '"><span class="dk">' + (K[x.k] || '') + '</span>' + linkify(x.h) + '</p>').join('') + '</div></div>').join('') + '</div></div>';
+      ds.map((d) => '<div class="dday"><span class="dd">' + esc(whenLabel(resultTheme(SIM), null, d || 1)) + '</span><div>' + days[d].slice().reverse().map((x) => '<p class="dk-' + esc(x.k) + '"><span class="dk">' + (K[x.k] || '') + '</span>' + linkify(x.h) + '</p>').join('') + '</div></div>').join('') + '</div></div>';
   }
   const arenaOf = (id) => ECO.arenas[id] || {};
   const vitLabels = (th) => (th && th.soft ? ECO.labelsSoft : ECO.labels) || { hp: 'Salute', en: 'Energia', mo: 'Morale', food: 'Sazietà' };
@@ -13652,6 +13792,66 @@ window.LOS_BUILD = "ebc825610bc00998ab95e97b1dad8a9eb6ce6bee58bd3d4b23c6785929ad
     return '<div class="vbars">' + rows.map(([k, n, x]) => { const bad = k === 'pr' ? x >= (m.thr || 60) : x < 25; return '<div class="vbar ' + k + (bad ? ' bad' : '') + '"><span>' + esc(n) + '</span><i><b style="width:' + x + '%"></b></i><em>' + x + '</em></div>'; }).join('') + '</div>';
   }
   const KIND = { b: 'Apertura', d: 'Giorno', n: 'Notte', f: 'Evento speciale', dis: 'Disastro', fallen: 'Bilancio', finale: 'Finale' };
+  /* ---------------- calendario: nomi di giorni, notti, bilanci e finale, nel lessico di ogni arena ---------------- */
+  const ORD = ['', 'primo', 'secondo', 'terzo', 'quarto', 'quinto', 'sesto', 'settimo', 'ottavo', 'nono', 'decimo', 'undicesimo', 'dodicesimo', 'tredicesimo', 'quattordicesimo', 'quindicesimo', 'sedicesimo', 'diciassettesimo', 'diciottesimo', 'diciannovesimo', 'ventesimo'];
+  const ordinal = (n, fem) => (ORD[n] ? (fem ? ORD[n].slice(0, -1) + 'a' : ORD[n]) : n + (fem ? 'ª' : 'º'));
+  const capW = (s) => s.charAt(0).toUpperCase() + s.slice(1);
+  // ogni arena: come si chiamano il giorno, la notte, l'unità di tempo e il bilancio dei caduti
+  const CAL = {
+    _: { unit: 'giorno', units: 'giorni', short: (d) => 'Giorno ' + d, day: (d) => capW(ordinal(d)) + ' giorno', night: (d) => capW(ordinal(d, true)) + ' notte', of: (d) => 'del ' + ordinal(d) + ' giorno', recap: 'Il bilancio' },
+    classico: { recap: 'I colpi di cannone' },
+    fantasy: { recap: 'Le campane del reame' },
+    scifi: { unit: 'ciclo', units: 'cicli', short: (d) => 'Ciclo ' + d, day: (d) => capW(ordinal(d)) + ' ciclo diurno', night: (d) => capW(ordinal(d)) + ' ciclo notturno', of: (d) => 'del ' + ordinal(d) + ' ciclo', recap: 'Il rapporto di bordo' },
+    zombie: { recap: 'L’appello via radio' },
+    royale: { recap: 'Il contatore dei giocatori' },
+    horror: { recap: 'I rintocchi del pendolo' },
+    wasteland: { recap: 'Il fumo all’orizzonte' },
+    liceo: { day: (d) => capW(ordinal(d)) + ' giorno di scuola', night: (d) => 'Dopo scuola del ' + ordinal(d) + ' giorno', recap: 'L’appello del mattino' },
+    ufficio: { day: (d) => capW(ordinal(d)) + ' giorno di lavoro', night: (d) => 'Straordinari del ' + ordinal(d) + ' giorno', recap: 'Le scrivanie vuote' },
+  };
+  const calOf = (theme) => Object.assign({}, CAL._, CAL[theme.id] || {});
+  // il limite di giorni scelto prima della partita (null se non si conosce, per esempio in un replay vecchio)
+  function runMaxDays() { const m = S.run && S.run.cfg && +S.run.cfg.maxDays; return m ? Math.max(3, Math.min(60, m)) : null; }
+  // nome, sottotitolo e gruppo di ogni fase, senza i nomignoli «G1»
+  function phaseInfo(P, k, theme, hideTotal) {
+    const p = P[k], c = calOf(theme), d = p.day || 1, meteo = p.meteo && p.meteo.n ? p.meteo.n : '';
+    const firstFinale = P.findIndex((x) => x.kind === 'finale');
+    const inFinale = firstFinale >= 0 && k >= firstFinale;
+    const group = inFinale ? { key: 'finale', label: 'Finale' } : { key: 'd' + d, label: c.short(d) };
+    const join = (...xs) => xs.filter(Boolean).join(' · ');
+    if (p.kind === 'b') return { title: p.title, kicker: join(capW(ordinal(d)) + ' ' + c.unit, 'l’inizio', meteo), short: p.title, group };
+    if (p.kind === 'd') return { title: c.day(d), kicker: meteo, short: c.day(d), group };
+    if (p.kind === 'n') return { title: c.night(d), kicker: meteo, short: c.night(d), group };
+    if (p.kind === 'f') return { title: p.title, kicker: join('Evento speciale', c.of(d)), short: p.title, group };
+    if (p.kind === 'dis') return { title: p.title, kicker: join('Disastro', c.of(d)), short: 'Disastro: ' + p.title, group };
+    if (p.kind === 'finale') {
+      const acts = P.filter((x) => x.kind === 'finale').length, n = k - firstFinale + 1;
+      return { title: p.title, kicker: 'Scontro finale · atto ' + n + (hideTotal ? '' : ' di ' + acts), short: 'Finale, atto ' + n + ': ' + p.title, group };
+    }
+    if (p.kind === 'fallen') {
+      if (inFinale) return { title: 'Il verdetto', kicker: c.recap + ' · dopo lo scontro finale', short: 'Il verdetto', group };
+      return { title: c.recap, kicker: 'Bilancio ' + c.of(d), short: c.recap + ', ' + c.of(d).replace(/^del /, ''), group };
+    }
+    return { title: p.title, kicker: KIND[p.kind] || '', short: p.title, group };
+  }
+  // perché è scattato lo scontro finale: il limite di giorni, pochi superstiti o due innamorati
+  function finaleReason(P, theme) {
+    const f = P.findIndex((x) => x.kind === 'finale'); if (f < 0) return '';
+    const c = calOf(theme), max = runMaxDays(), before = f > 0 ? P[f - 1].snap.alive.length : P[f].snap.alive.length;
+    if (P[f].title === 'L\'ultimo atto') return 'Restano solo due concorrenti, e si amano: l’arena prepara il loro ultimo atto.';
+    if (max && P[f].day >= max) return 'Si è arrivati al limite di ' + max + ' ' + c.units + ' scelto prima della partita: chi è ancora in gara va allo scontro finale, che si gioca dopo l’ultima notte.';
+    return 'Restano solo ' + before + ' concorrenti: l’arena non aspetta ' + (max ? 'il limite di ' + max + ' ' + c.units : 'la fine del calendario') + ' e chiama lo scontro finale.';
+  }
+  // un giorno detto per esteso, per tabelle e schede («3º giorno», «finale»)
+  // la durata detta chiaramente: quanti giorni, rispetto al limite scelto
+  function durTxt(theme) { const c = calOf(theme), m = runMaxDays(); return plural(SIM.days, c.unit, c.units) + (m ? (SIM.days >= m ? ' (il limite scelto)' : ' su ' + m + ' al massimo') : ''); }
+  // lo stesso nome di fase per gli strumenti facoltativi (studio.js)
+  if (typeof window !== 'undefined') window.LOS_PHASE_NAME = (result, k) => { try { return result && result.phases[k] ? phaseInfo(result.phases, k, resultTheme(result), false).short : ''; } catch (e) { return ''; } };
+  function whenLabel(theme, phaseIndex, day) {
+    const P = SIM && SIM.phases; const f = P ? P.findIndex((x) => x.kind === 'finale') : -1;
+    if (f >= 0 && phaseIndex != null && phaseIndex >= f) return 'Finale';
+    return capW(calOf(theme).short(day || 1).toLowerCase());
+  }
   const DIFFS = [
     ['bassa', 'Bassa', 'Partite lunghe, pochi morti', 1], ['normale', 'Normale', 'L\'equilibrio classico', 2],
     ['alta', 'Alta', 'L\'arena non perdona', 3], ['massacro', 'Massacro', 'Finisce in pochi giorni', 4],
@@ -13669,7 +13869,7 @@ window.LOS_BUILD = "ebc825610bc00998ab95e97b1dad8a9eb6ce6bee58bd3d4b23c6785929ad
   /* ---------------- stato ---------------- */
   const S = {
     cast: [],
-    settings: { theme: 'classico', difficulty: 'normale', seed: '', maxDays: 20, teamsAllied: true, teamWin: false, speed: 'normale', teamSize: 2, view: 'grid', adult: false, hideFuture: true, adaptivePlay: true, reduceMotion: false, followOnly: false },
+    settings: { theme: 'classico', difficulty: 'normale', seed: '', maxDays: 20, teamsAllied: true, teamWin: false, speed: 'normale', teamSize: 2, view: 'grid', adult: false, hideFuture: true, adaptivePlay: true, reduceMotion: false, followOnly: false, read: { density: 'comoda', size: 'normale', order: 'storia', echo: true, place: true, why: true, context: false, faces: true } },
     initialRelations: [], followed: [], seasons: [],
     custom: [],
     run: null,
@@ -13763,6 +13963,16 @@ window.LOS_BUILD = "ebc825610bc00998ab95e97b1dad8a9eb6ce6bee58bd3d4b23c6785929ad
     }
   }
 
+  // preferenze di lettura della diretta, sempre complete e valide
+  function readPrefs(r) {
+    const d = { density: 'comoda', size: 'normale', order: 'storia', echo: true, place: true, why: true, context: false, faces: true }, o = Object.assign({}, d);
+    if (!r || typeof r !== 'object') return o;
+    if (['comoda', 'compatta'].includes(r.density)) o.density = r.density;
+    if (['normale', 'grande'].includes(r.size)) o.size = r.size;
+    if (['storia', 'gravi'].includes(r.order)) o.order = r.order;
+    ['echo', 'place', 'why', 'context', 'faces'].forEach((k) => { if (typeof r[k] === 'boolean') o[k] = r[k]; });
+    return o;
+  }
   function sanitizeSettings(x, base) {
     const st = Object.assign({}, base || S.settings);
     if (!record(x)) return st;
@@ -13774,6 +13984,7 @@ window.LOS_BUILD = "ebc825610bc00998ab95e97b1dad8a9eb6ce6bee58bd3d4b23c6785929ad
     if ([1, 2, 3, 4].includes(+x.teamSize)) st.teamSize = +x.teamSize;
     if (x.view === 'grid' || x.view === 'team') st.view = x.view;
     ['teamsAllied', 'teamWin', 'adult', 'hideFuture', 'adaptivePlay', 'reduceMotion', 'followOnly'].forEach((k) => { if (typeof x[k] === 'boolean') st[k] = x[k]; });
+    st.read = readPrefs(record(x.read) ? Object.assign({}, st.read, x.read) : st.read);
     return st;
   }
   function sanitizeTribute(t, i) {
@@ -14943,27 +15154,53 @@ window.LOS_BUILD = "ebc825610bc00998ab95e97b1dad8a9eb6ce6bee58bd3d4b23c6785929ad
   /* =============== DIRETTA =============== */
   function evHTML(e, tributes, theme, anim, plain, delay) {
     const by = tributes ? Object.fromEntries(tributes.map((t) => [t.id, t])) : BY;
-    if (e.note) return '<div class="ev note' + (e.meteo ? ' meteo' : '') + (anim ? ' in' : '') + '" style="--d:' + (delay || 0) + 'ms"><p>' + e.html + '</p></div>';
+    if (e.note) return '<div class="ev note' + (e.meteo ? ' meteo' : '') + (anim ? ' in' : '') + '" style="--d:' + (delay || 0) + 'ms"><span class="note-ic" aria-hidden="true">' + (e.meteo ? '<svg viewBox="0 0 24 24"><path d="M7 17.5h10a4 4 0 0 0 .6-7.95A6 6 0 0 0 6.2 9.6 4 4 0 0 0 7 17.5z"/></svg>' : '<svg viewBox="0 0 24 24"><path d="M4 12a8 8 0 1 0 16 0 8 8 0 0 0-16 0zM12 8v5M12 16v.5"/></svg>') + '</span><p>' + e.html + '</p></div>';
     const cat = e.cat || 'none';
     const lbl = CAT[cat][theme.soft ? 1 : 0];
     const avs = '<span class="avs">' + e.ids.slice(0, 4).map((id) => avHTML(by[id], { dead: e.deaths.includes(id), btn: !plain })).join('') + '</span>';
-    const chip = lbl ? '<span class="cat">' + IC[cat] + (e.deaths.length > 1 && (cat === 'kill' || cat === 'death') ? e.deaths.length + ' ' + (theme.soft ? 'fuori' : 'morti') : lbl) + '</span>' : '<span></span>';
+    const chip = lbl ? '<span class="cat">' + IC[cat] + (e.deaths.length > 1 && (cat === 'kill' || cat === 'death') ? e.deaths.length + ' ' + (theme.soft ? 'fuori' : 'morti') : lbl) + '</span>' : '';
     const fix = (h) => (plain ? h.replace(/<b class="nm"[^>]*>/g, '<b>') : linkify(h));
     const why = e.duel ? 'Confronto di ' + esc(ATTRN[e.duel.attr] || e.duel.attr) + ' · ' + esc(by[e.duel.a].name) + ' ' + e.duel.left + ' / ' + esc(by[e.duel.b].name) + ' ' + e.duel.right : e.test ? (e.intrigue ? 'Piano rivelato · ' : '') + '<span title="Tiro ' + e.test.roll + ' contro soglia ' + e.test.dc + '">Prova di ' + esc(ATTRN[e.test.attr] || e.test.attr) + ' · <span class="dice"><span class="roll">' + e.test.roll + '</span>/' + e.test.dc + '</span> · ' + (e.test.pass ? 'superata' : 'fallita') + '</span>' : e.sponsor ? 'Sponsor' : e.whyTxt ? esc(e.whyTxt) : whyLabel(e, theme);
     const echo = ((e.echo || []).length ? '<ul class="echo">' + e.echo.map((x) => '<li class="' + (x.cls || '') + '">' + fix(x.html) + '</li>').join('') + '</ul>' : '') +
       (e.reason ? '<details class="event-reason"><summary>Il contesto</summary><p>' + esc(e.reason) + '</p></details>' : '');
-    const place=e.place?(e.place.zone!=null?'<span class="event-place">'+esc(stripArt(theme.lex.luogo[e.place.zone]||'Zona'))+'</span>':'<span class="event-place">Riferimenti a persone in zone diverse</span>'):'';
-    return '<div class="ev' + (!tributes && (S.followed || []).some((id) => e.ids.includes(id)) ? ' followed' : '') + (e.deaths.length ? ' lethal' : '') + (anim ? ' in fx-' + cat + (e.sponsor ? ' fx-sponsor' : '') : '') + '"'+(e.place?' data-map-step="'+e.place.seq+'"':'')+' style="--cc:var(--c-' + cat + ');--d:' + (delay || 0) + 'ms">' + avs + '<div class="evbody">' + place + (why ? '<span class="why' + (e.test ? (e.test.pass ? ' ok' : ' ko') : '') + '">' + why + '</span>' : '') + '<p>' + fix(e.html) + '</p>' + echo + '</div>' + chip + '</div>';
+    const pin = '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 1.5a4.5 4.5 0 0 0-4.5 4.5C3.5 9.5 8 14.5 8 14.5S12.5 9.5 12.5 6A4.5 4.5 0 0 0 8 1.5zm0 6.2a1.7 1.7 0 1 1 0-3.4 1.7 1.7 0 0 1 0 3.4z"/></svg>';
+    const place=e.place?(e.place.zone!=null?'<span class="event-place">'+pin+esc(capFirst(stripArt(theme.lex.luogo[e.place.zone]||'Zona')))+'</span>':'<span class="event-place">'+pin+'Zone diverse</span>'):'';
+    return '<div class="ev c-' + cat + (!tributes && (S.followed || []).some((id) => e.ids.includes(id)) ? ' followed' : '') + (e.deaths.length ? ' lethal' : '') + (anim ? ' in fx-' + cat + (e.sponsor ? ' fx-sponsor' : '') : '') + '"'+(e.place?' data-map-step="'+e.place.seq+'"':'')+' style="--cc:var(--c-' + cat + ');--d:' + (delay || 0) + 'ms">' + avs + '<div class="evbody">' + (chip || place ? '<div class="ev-meta">' + chip + place + '</div>' : '') + (why ? '<span class="why' + (e.test ? (e.test.pass ? ' ok' : ' ko') : '') + '">' + why + '</span>' : '') + '<p>' + fix(e.html) + '</p>' + echo + '</div><span class="ev-mark" aria-hidden="true">' + (IC[cat] || '') + '</span></div>';
   }
   function timelineHTML(P, i, seenAt, hideFuture) {
-    const days = [];
-    P.forEach((p, k) => { if (hideFuture && k > seenAt + 1) return; const d = hideFuture && k > seenAt ? null : p.day || 1; let g = days.find((x) => x.d === d); if (!g) days.push((g = { d, ks: [] })); g.ks.push(k); });
-    return days.map((g) => '<div class="tday"><span>' + (g.d == null ? 'Prossima' : 'G' + g.d) + '</span><div>' + g.ks.map((k) => {
+    const theme = resultTheme(SIM), groups = [];
+    P.forEach((p, k) => {
+      if (hideFuture && k > seenAt + 1) return;
+      const masked = hideFuture && k > seenAt, inf = phaseInfo(P, k, theme, true);
+      const key = masked ? 'next' : inf.group.key, label = masked ? 'Da scoprire' : inf.group.label;
+      let g = groups.find((x) => x.key === key); if (!g) groups.push((g = { key, label, ks: [] })); g.ks.push(k);
+    });
+    return groups.map((g) => '<div class="tday' + (g.key === 'finale' ? ' tfin' : g.key === 'next' ? ' tnext' : '') + (g.ks.includes(i) ? ' tcur' : '') + '"><span class="tdl">' + esc(g.label) + '</span><div>' + g.ks.map((k) => {
       const p = P[k]; const dn = p.kind === 'fallen' ? p.deaths.length : p.events.reduce((s, e) => s + e.deaths.length, 0);
       const seen = k <= (seenAt || 0);
-      const hidden = hideFuture && !seen, title = hidden ? 'Prossima fase' : p.title;
-      return '<button type="button" class="tph' + (k === i ? ' cur' : seen ? ' seen' : ' locked') + '" data-k="' + k + '"' + (k === i ? ' aria-current="step"' : '') + ' title="' + esc(title) + '" aria-label="Fase ' + (k + 1) + ': ' + esc(title) + '">' + (hidden ? '<span aria-hidden="true">?</span>' : IC[p.kind]) + (dn && seen && p.kind !== 'fallen' ? '<span class="dn">' + dn + '</span>' : '') + '</button>';
+      const hidden = hideFuture && !seen, title = hidden ? 'Prossima fase' : phaseInfo(P, k, theme, true).short;
+      return '<button type="button" class="tph k-' + p.kind + (k === i ? ' cur' : seen ? ' seen' : ' locked') + '" data-k="' + k + '"' + (k === i ? ' aria-current="step"' : '') + ' title="' + esc(title) + '" aria-label="Fase ' + (k + 1) + ': ' + esc(title) + '">' + (hidden ? '<span aria-hidden="true">?</span>' : IC[p.kind]) + (dn && seen && p.kind !== 'fallen' ? '<span class="dn">' + dn + '</span>' : '') + '</button>';
     }).join('') + '</div></div>').join('');
+  }
+  const EV_FILTERS = [['dead', ['Morti', 'Eliminati'], ['kill', 'death']], ['betray', ['Tradimenti', 'Tradimenti'], ['betray']], ['ally', ['Alleanze', 'Alleanze'], ['ally']], ['love', ['Amore', 'Amore'], ['love']], ['heal', ['Aiuti', 'Aiuti'], ['heal']], ['item', ['Oggetti', 'Assi nella manica'], ['item']], ['hurt', ['Guai', 'Colpi bassi'], ['hurt']], ['none', ['Altro', 'Altro'], ['none']]];
+  let evFilter = null;
+  const evMatch = (e, f) => { if (f === 'followed') return (S.followed || []).some((id) => e.ids.includes(id)); const F = EV_FILTERS.find((x) => x[0] === f); return !F || F[2].includes(e.cat || 'none'); };
+  function readbarHTML(ph, theme, events) {
+    const real = events.filter((e) => !e.note), soft = !!theme.soft;
+    const chip = (key, label, n, icon) => '<button type="button" class="rbc' + (key ? ' f-' + key : '') + '" data-evf="' + (key || '') + '" aria-pressed="' + (evFilter === key) + '">' + (icon || '') + '<span>' + label + '</span><b>' + n + '</b></button>';
+    const list = EV_FILTERS.map(([k, l, cats]) => [k, l[soft ? 1 : 0], real.filter((e) => cats.includes(e.cat || 'none')).length, IC[cats[0]] || '']).filter((x) => x[2] || evFilter === x[0]);
+    const fol = real.filter((e) => evMatch(e, 'followed')).length;
+    return chip(null, 'Tutti', real.length) + list.map(([k, l, n, ic]) => chip(k, l, n, ic)).join('') + (fol || evFilter === 'followed' ? chip('followed', 'Seguiti', fol, '') : '');
+  }
+  function syncReadControls() {
+    const r = S.settings.read = readPrefs(S.settings.read);
+    $$('#densSeg button').forEach((b) => b.setAttribute('aria-pressed', b.dataset.v === r.density));
+    $$('#sizeSeg button').forEach((b) => b.setAttribute('aria-pressed', b.dataset.v === r.size));
+    $$('#orderSeg button').forEach((b) => b.setAttribute('aria-pressed', b.dataset.v === r.order));
+    $$('#rbPanel [data-read]').forEach((c) => { c.checked = !!r[c.dataset.read]; });
+    const body = $('#phBody');
+    body.classList.toggle('dens-compatta', r.density === 'compatta'); body.classList.toggle('size-grande', r.size === 'grande');
+    ['echo', 'place', 'why', 'faces'].forEach((k) => body.classList.toggle('no-' + k, !r[k]));
   }
   function renderLive(fromRoute) {
     $('#liveEmpty').hidden = !!SIM; $('#liveBody').hidden = !SIM;
@@ -14972,7 +15209,10 @@ window.LOS_BUILD = "ebc825610bc00998ab95e97b1dad8a9eb6ce6bee58bd3d4b23c6785929ad
     const P = SIM.phases, i = Math.max(0, Math.min(P.length - 1, S.run.phase || 0));
     S.run.phase = i; S.run.seen = Math.max(S.run.seen || 0, i);
     const ph = P[i], total = SIM.tributes.length;
-    const visibleEvents = ph.events.filter((e) => e.note || !S.settings.followOnly || (S.followed || []).some((id) => e.ids.includes(id)));
+    const R0 = S.settings.read = readPrefs(S.settings.read);
+    const followedEvents = ph.events.filter((e) => e.note || !S.settings.followOnly || (S.followed || []).some((id) => e.ids.includes(id)));
+    let visibleEvents = followedEvents.filter((e) => e.note || !evFilter || evMatch(e, evFilter));
+    if (R0.order === 'gravi') visibleEvents = visibleEvents.map((e, k) => [e, k]).sort((a, b) => (Number(!!b[0].note) - Number(!!a[0].note)) || (b[0].deaths.length - a[0].deaths.length) || (Number(b[0].cat === 'betray') - Number(a[0].cat === 'betray')) || (a[1] - b[1])).map((x) => x[0]);
     const forward = !fromRoute && i === lastRendered + 1;
     lastRendered = i;
 
@@ -14981,13 +15221,13 @@ window.LOS_BUILD = "ebc825610bc00998ab95e97b1dad8a9eb6ce6bee58bd3d4b23c6785929ad
     const prevAlive = i > 0 ? P[i - 1].snap.alive.length : total;
     AN.field(bcs, theme.id, { intensity: AN.intensityFor(ph.kind, ph.snap.alive.length / total) });
     AN.phaseFx($('.broadcast'), ph.kind, theme.id, forward, { deaths: ph.kind === 'fallen' ? ph.deaths.length : 0 });
-    $('#bcPhase').textContent = 'Fase ' + (i + 1) + (S.settings.hideFuture && S.run.seen < P.length - 1 ? '' : ' / ' + P.length);
-    const kparts = [];
-    if (!ph.title.toLowerCase().includes(KIND[ph.kind].toLowerCase())) kparts.push(KIND[ph.kind]);
-    if (ph.day && !ph.title.includes(String(ph.day))) kparts.push('Giorno ' + ph.day);
-    if (ph.meteo && ph.meteo.n) kparts.push(ph.meteo.n);
-    $('#bcKind').textContent = kparts.join(' · ');
-    $('#phTitle').textContent = ph.title; if (forward) AN.kinetic($('#phTitle'), ph.kind === 'dis' ? 'shake' : ph.kind === 'n' ? 'fade' : 'drop');
+    const hideTotal = S.settings.hideFuture && S.run.seen < P.length - 1;
+    const info = phaseInfo(P, i, theme, hideTotal), maxD = runMaxDays();
+    $('#bcPhase').textContent = 'Fase ' + (i + 1) + (hideTotal ? '' : ' di ' + P.length);
+    $('#bcLimit').hidden = !maxD;
+    if (maxD) $('#bcLimit').textContent = 'Limite: ' + maxD + ' ' + calOf(theme).units;
+    $('#bcKind').textContent = info.kicker;
+    $('#phTitle').textContent = info.title; if (forward) AN.kinetic($('#phTitle'), ph.kind === 'dis' ? 'shake' : ph.kind === 'n' ? 'fade' : 'drop');
     $('#phIntro').textContent = ph.intro || '';
     if (forward) AN.countTo($('#aliveBig'), ph.snap.alive.length, { from: prevAlive, dur: 1100 }); else $('#aliveBig').textContent = ph.snap.alive.length; $('#aliveTot').textContent = '/' + total;
     $('#aliveLbl').textContent = soft ? 'ancora in gioco' : 'superstiti';
@@ -15003,9 +15243,14 @@ window.LOS_BUILD = "ebc825610bc00998ab95e97b1dad8a9eb6ce6bee58bd3d4b23c6785929ad
       $('#phBody').innerHTML = '<div class="memorial' + (forward ? ' rise' : '') + '"><h2>' + (soft ? 'Fuori dai giochi' : 'In memoria') + '</h2>' +
         (ph.deaths.length ? '<div class="memgrid">' + ph.deaths.map((id) => { const t = BY[id]; return '<button type="button" class="mem" data-prof="' + esc(id) + '">' + avHTML(t, { dead: true }) + '<b>' + esc(t.name) + '</b><small>Squadra ' + t.team + (t.killerIds.length ? '<br>per mano di ' + esc(t.killerIds.map((k) => BY[k].name).join(', ')) : '<br>vittima dell\'arena') + '</small><span class="mono">' + (ph.snap.kills[t.id] || 0) + ' ' + (soft ? 'elim.' : 'ucc.') + '</span></button>'; }).join('') + '</div>' : '<div class="emptyday">' + esc(ph.intro) + '</div>') + '</div>';
     } else {
-      $('#phBody').innerHTML = (visibleEvents.length ? visibleEvents.map((e, k) => evHTML(e, null, theme, forward, false, Math.min(k * 90, 1800))).join('') : '<p class="help">Nessun evento per i concorrenti seguiti in questa fase. Puoi seguirne uno dalla sua scheda o disattivare il filtro.</p>');
+      const why = ph.kind === 'finale' && P.findIndex((x) => x.kind === 'finale') === i ? '<div class="ev note finale-why"><p><b>Perché lo scontro finale.</b> ' + esc(finaleReason(P, theme)) + '</p></div>' : '';
+      const empty = evFilter ? '<div class="ev-empty"><p>Nessun evento di questo tipo in questa fase.</p><button type="button" class="btn sm" data-evf="">Mostra tutti</button></div>' : '<p class="help">Nessun evento per i concorrenti seguiti in questa fase. Puoi seguirne uno dalla sua scheda o disattivare il filtro nelle opzioni.</p>';
+      $('#phBody').innerHTML = why + (visibleEvents.filter((e) => !e.note).length || !evFilter ? visibleEvents.map((e, k) => evHTML(e, null, theme, forward, false, Math.min(k * 90, 1800))).join('') : '') + (!visibleEvents.filter((e) => !e.note).length && (evFilter || S.settings.followOnly) ? empty : '');
+      if (R0.context) $$('#phBody .event-reason').forEach((d) => (d.open = true));
     }
     renderSide(i);
+    $('#rbChips').innerHTML = ph.kind === 'fallen' ? '<span class="rb-note">' + esc(phaseInfo(P, i, theme, true).kicker) + '</span>' : readbarHTML(ph, theme, followedEvents);
+    syncReadControls();
     $('#phaseAnnouncement').textContent = 'Fase ' + (i + 1) + ': ' + ph.title + '. ' + plural(visibleEvents.length, 'evento visibile', 'eventi visibili') + ', ' + plural(ph.snap.alive.length, 'concorrente in gara', 'concorrenti in gara') + '.';
     ['hideFuture', 'adaptivePlay', 'reduceMotion', 'followOnly'].forEach((k) => { $('#' + k).checked = !!S.settings[k]; });
     if (forward && !AN.reduced && ph.kind !== 'fallen') {
@@ -15043,7 +15288,7 @@ window.LOS_BUILD = "ebc825610bc00998ab95e97b1dad8a9eb6ce6bee58bd3d4b23c6785929ad
       h=window.LOS_MAP_VIEW.render(SIM,i,{theme,properties:arenaOf(theme.id).zones,selected:mapSelection,avatar:t=>avHTML(t,{btn:true}),zonePic:z=>window.LOS_ATLAS?window.LOS_ATLAS.pic(theme.id,'luoghi',z.name,theme.hue,{index:z.id}):''});
     } else if (sideTab === 'fallen') {
       const dead = SIM.tributes.filter((t) => !t.alive && t.deathPhase <= i).sort((a, b) => b.order - a.order);
-      h = dead.length ? '<div class="plist">' + dead.map((t) => '<button type="button" class="prow" data-prof="' + esc(t.id) + '">' + avHTML(t, { dead: true }) + '<span style="min-width:0"><span class="pn">' + esc(t.name) + '</span><span class="ps">' + (t.killerIds.length ? 'per mano di ' + esc(t.killerIds.map((k) => BY[k].name).join(', ')) + (causeTxt(t, theme) ? ' · ' + causeTxt(t, theme) : '') : causeTxt(t, theme) ? 'per ' + causeTxt(t, theme) : 'vittima dell\'arena') + '</span></span><span class="pk">G' + t.deathDay + '</span></button>').join('') + '</div>' : '<p class="help">Ancora nessuno.</p>';
+      h = dead.length ? '<div class="plist">' + dead.map((t) => '<button type="button" class="prow" data-prof="' + esc(t.id) + '">' + avHTML(t, { dead: true }) + '<span style="min-width:0"><span class="pn">' + esc(t.name) + '</span><span class="ps">' + (t.killerIds.length ? 'per mano di ' + esc(t.killerIds.map((k) => BY[k].name).join(', ')) + (causeTxt(t, theme) ? ' · ' + causeTxt(t, theme) : '') : causeTxt(t, theme) ? 'per ' + causeTxt(t, theme) : 'vittima dell\'arena') + '</span></span><span class="pk">' + esc(whenLabel(theme, t.deathPhase, t.deathDay)) + '</span></button>').join('') + '</div>' : '<p class="help">Ancora nessuno.</p>';
     } else if (sideTab === 'alive') {
       const al = SIM.tributes.filter((t) => aliveSet.has(t.id)).sort((a, b) => Number((S.followed || []).includes(b.id)) - Number((S.followed || []).includes(a.id)) || (ph.snap.kills[b.id] || 0) - (ph.snap.kills[a.id] || 0));
       h = '<div class="plist">' + al.map((t) => {
@@ -15135,6 +15380,15 @@ window.LOS_BUILD = "ebc825610bc00998ab95e97b1dad8a9eb6ce6bee58bd3d4b23c6785929ad
   $('#prevBtn').addEventListener('click', () => { stopPlay(); lastRendered = -2; go(S.run.phase - 1); });
   $('#playBtn').addEventListener('click', () => { if (!SIM) return; if (playing) return stopPlay(); if (S.run.phase >= SIM.phases.length - 1) go(0); startPlay(); next(); });
   $('#speedSeg').addEventListener('click', (e) => { const b = e.target.closest('button'); if (!b) return; S.settings.speed = b.dataset.v; save(); $$('#speedSeg button').forEach((x) => x.setAttribute('aria-pressed', x === b)); if (playing) startPlay(); });
+  $('#readBar').addEventListener('click', (e) => {
+    const f = e.target.closest('[data-evf]');
+    if (f) { const k = f.dataset.evf || null; evFilter = evFilter === k ? null : k; if (SIM) renderLive(true); const back = $('#rbChips [data-evf="' + (evFilter || '') + '"]'); if (back) back.focus({ preventScroll: true }); return; }
+    const m = e.target.closest('#rbMore'); if (m) { const p = $('#rbPanel'); p.hidden = !p.hidden; m.setAttribute('aria-expanded', String(!p.hidden)); return; }
+    const sg = e.target.closest('#densSeg button, #sizeSeg button, #orderSeg button');
+    if (sg) { const key = { densSeg: 'density', sizeSeg: 'size', orderSeg: 'order' }[sg.parentElement.id]; S.settings.read = readPrefs(Object.assign({}, S.settings.read, { [key]: sg.dataset.v })); save(); if (SIM) renderLive(true); else syncReadControls(); }
+  });
+  $('#rbPanel').addEventListener('change', (e) => { const c = e.target.closest('[data-read]'); if (!c) return; S.settings.read = readPrefs(Object.assign({}, S.settings.read, { [c.dataset.read]: c.checked })); save(); if (SIM) renderLive(true); });
+  $('#phBody').addEventListener('click', (e) => { const f = e.target.closest('.ev-empty [data-evf]'); if (f) { evFilter = null; if (SIM) renderLive(true); } });
   ['hideFuture', 'adaptivePlay', 'reduceMotion', 'followOnly'].forEach((key) => $('#' + key).addEventListener('change', (e) => {
     S.settings[key] = e.target.checked; save();
     if (key === 'reduceMotion') AN.setReduced(S.settings.reduceMotion);
@@ -15186,7 +15440,7 @@ window.LOS_BUILD = "ebc825610bc00998ab95e97b1dad8a9eb6ce6bee58bd3d4b23c6785929ad
         promisesHTML(t, dead ? t.deathPhase : i, atRes) +
         diaryHTML(t, dead ? t.deathPhase : i) +
         attrHTML(t, theme, i, atRes) +
-        '<div><div class="sub" style="margin-bottom:8px">La sua storia' + (atRes ? '' : ' finora') + '</div><div class="ptl">' + (hist.length ? hist.map(({ e, p }) => '<div class="it" style="--cc:var(--c-' + (e.cat || 'none') + ')"><span>' + (p.kind === 'b' ? 'Inizio' : 'G' + p.day + ' ' + (p.kind === 'n' ? 'notte' : p.kind === 'd' ? 'giorno' : KIND[p.kind].toLowerCase())) + '</span><p>' + linkify(e.html) + '</p></div>').join('') : '<p class="help">Nessun evento ancora.</p>') + '</div></div>' +
+        '<div><div class="sub" style="margin-bottom:8px">La sua storia' + (atRes ? '' : ' finora') + '</div><div class="ptl">' + (hist.length ? hist.map(({ e, p }) => '<div class="it" style="--cc:var(--c-' + (e.cat || 'none') + ')"><span>' + esc(phaseInfo(SIM.phases, SIM.phases.indexOf(p), resultTheme(SIM), true).short) + '</span><p>' + linkify(e.html) + '</p></div>').join('') : '<p class="help">Nessun evento ancora.</p>') + '</div></div>' +
       '</div>';
     if (typeof studio !== 'undefined' && studio) studio.renderProfile(t, i);
     if (!$('#profDlg').open) $('#profDlg').showModal();
@@ -15298,11 +15552,11 @@ window.LOS_BUILD = "ebc825610bc00998ab95e97b1dad8a9eb6ce6bee58bd3d4b23c6785929ad
     let hero;
     if (W.length === 1) {
       const w = W[0];
-      hero = '<div class="winhero"><div class="wscene" aria-hidden="true">' + ART.scene(theme.id) + '</div>' + avHTML(w, { btn: true }) + '<div style="min-width:0"><div class="eyebrow">' + ART.icon(theme.id, 13) + ' ' + esc(theme.name) + ' · ' + plural(SIM.days, 'giorno', 'giorni') + ' · ' + SIM.tributes.length + ' concorrenti</div>' +
+      hero = '<div class="winhero"><div class="wscene" aria-hidden="true">' + ART.scene(theme.id) + '</div>' + avHTML(w, { btn: true }) + '<div style="min-width:0"><div class="eyebrow">' + ART.icon(theme.id, 13) + ' ' + esc(theme.name) + ' · ' + durTxt(theme) + ' · ' + SIM.tributes.length + ' concorrenti</div>' +
         '<h1>' + esc(w.name) + '</h1><p><b style="color:var(--screen-ink)">' + G3(w.gender, 'Ultimo', 'Ultima', 'Ultimə') + ' in piedi.</b> Squadra ' + w.team + (w.traits.length ? ' · ' + w.traits.map((x) => TRAITS[x].name).join(', ') : '') + '.</p>' +
         '<div class="wstats"><div><b>' + w.kills + '</b><span>' + (soft ? 'eliminazioni' : 'uccisioni') + '</span></div><div><b>' + w.events + '</b><span>eventi vissuti</span></div><div><b>' + w.alliancesFormed + '</b><span>alleanze</span></div><div><b>' + w.items + '</b><span>oggetti trovati</span></div></div></div></div>';
     } else if (W.length > 1) {
-      hero = '<div class="winhero" style="grid-template-columns:minmax(0,1fr)"><div class="wscene" aria-hidden="true">' + ART.scene(theme.id) + '</div><div><div class="eyebrow">' + ART.icon(theme.id, 13) + ' ' + esc(theme.name) + ' · ' + plural(SIM.days, 'giorno', 'giorni') + '</div><h1>Vince la squadra ' + W[0].team + '</h1><div class="teamavs">' + W.map((w) => avHTML(w, { btn: true })).join('') + '</div><p style="margin-top:12px">' + W.map((w) => esc(w.name) + ' (' + kN(w.kills) + ')').join(' · ') + '</p></div></div>';
+      hero = '<div class="winhero" style="grid-template-columns:minmax(0,1fr)"><div class="wscene" aria-hidden="true">' + ART.scene(theme.id) + '</div><div><div class="eyebrow">' + ART.icon(theme.id, 13) + ' ' + esc(theme.name) + ' · ' + durTxt(theme) + '</div><h1>Vince la squadra ' + W[0].team + '</h1><div class="teamavs">' + W.map((w) => avHTML(w, { btn: true })).join('') + '</div><p style="margin-top:12px">' + W.map((w) => esc(w.name) + ' (' + kN(w.kills) + ')').join(' · ') + '</p></div></div>';
     } else hero = '<div class="winhero" style="grid-template-columns:minmax(0,1fr)"><div><h1>Nessun superstite</h1><p>L\'arena non ha risparmiato nessuno.</p></div></div>';
 
     const ranked = SIM.tributes.slice().sort((a, b) => a.rank - b.rank || b.kills - a.kills);
@@ -15341,7 +15595,7 @@ window.LOS_BUILD = "ebc825610bc00998ab95e97b1dad8a9eb6ce6bee58bd3d4b23c6785929ad
     pts.forEach(([x, y]) => (path += ' L' + x.toFixed(1) + ' ' + y.toFixed(1)));
     const area = path + ' L' + xs(P.length - 1) + ' ' + ys(0) + ' L' + xs(0) + ' ' + ys(0) + ' Z';
     const ticks = [];
-    let lastDay = 0; P.forEach((p, k) => { if (p.day !== lastDay) { lastDay = p.day; ticks.push('<line x1="' + xs(k) + '" x2="' + xs(k) + '" y1="' + pt + '" y2="' + (Hd - pb) + '" stroke="var(--line)" stroke-dasharray="2 3"/><text x="' + (xs(k) + 3) + '" y="' + (Hd - 8) + '">G' + p.day + '</text>'); } });
+    let lastDay = 0; P.forEach((p, k) => { if (p.day !== lastDay) { lastDay = p.day; ticks.push('<line x1="' + xs(k) + '" x2="' + xs(k) + '" y1="' + pt + '" y2="' + (Hd - pb) + '" stroke="var(--line)" stroke-dasharray="2 3"/><text x="' + (xs(k) + 3) + '" y="' + (Hd - 8) + '">' + p.day + '</text>'); } });
     const yl = [total, Math.round(total / 2), 0].map((n) => '<text x="' + (pl - 6) + '" y="' + (ys(n) + 4) + '" text-anchor="end">' + n + '</text><line x1="' + pl + '" x2="' + (Wd - pr) + '" y1="' + ys(n) + '" y2="' + ys(n) + '" stroke="var(--line)"/>').join('');
     const chart = '<div class="chart"><svg viewBox="0 0 ' + Wd + ' ' + Hd + '" role="img" aria-label="Concorrenti in gara fase per fase">' + yl + ticks.join('') + '<path d="' + area + '" fill="var(--accent)" fill-opacity=".14"/><path d="' + path + '" fill="none" stroke="var(--accent)" stroke-width="2.5" stroke-linejoin="round"/><circle cx="' + pts[pts.length - 1][0] + '" cy="' + pts[pts.length - 1][1] + '" r="5" fill="var(--accent)"/></svg></div>';
 
@@ -15362,7 +15616,7 @@ window.LOS_BUILD = "ebc825610bc00998ab95e97b1dad8a9eb6ce6bee58bd3d4b23c6785929ad
 
     const rows = ranked.map((t) => '<tr class="' + (t.alive ? 'win' : '') + '"><td class="n">' + t.rank + '°</td><td><button type="button" class="who" data-prof="' + esc(t.id) + '">' + avHTML(t, { dead: !t.alive }) + esc(t.name) + '</button></td><td class="n">' + t.team + '</td><td class="n">' + t.kills + '</td>' +
       '<td>' + (t.alive ? '<b>' + (W.length > 1 ? 'Squadra vincitrice' : G3(t.gender, 'Vincitore', 'Vincitrice', 'Vincitorə')) + '</b>' : t.killerIds.length ? esc(t.killerIds.map((k) => BY[k].name).join(', ')) : '<span class="muted">L\'arena</span>') + '</td>' +
-      '<td class="n">' + (t.alive ? '–' : 'G' + t.deathDay) + '</td><td class="cause">' + (t.alive ? '' : linkify(t.deathHtml)) + '</td></tr>').join('');
+      '<td class="n">' + (t.alive ? '–' : esc(whenLabel(theme, t.deathPhase, t.deathDay))) + '</td><td class="cause">' + (t.alive ? '' : linkify(t.deathHtml)) + '</td></tr>').join('');
     const killers = SIM.tributes.filter((t) => t.kills > 0).sort((a, b) => b.kills - a.kills).slice(0, 8);
     const maxK = Math.max(1, ...killers.map((t) => t.kills));
     const kbars = killers.length ? killers.map((t) => '<div class="bar"><span class="lbl">' + esc(t.name) + '</span><span class="tr"><i style="width:' + (100 * t.kills / maxK) + '%;background:' + esc(t.color) + '"></i></span><span class="v">' + t.kills + '</span></div>').join('') : '<p class="help">Nessuno ha eliminato un rivale.</p>';

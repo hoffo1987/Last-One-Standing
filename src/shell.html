@@ -197,7 +197,7 @@
         <div class="bc-top">
           <span class="onair"><span class="rec"></span>In diretta</span>
           <span class="bc-arena" id="bcArena"></span>
-          <span class="bc-phase mono" id="bcPhase"></span>
+          <span class="bc-limit" id="bcLimit" hidden></span><span class="bc-phase mono" id="bcPhase"></span>
         </div>
         <div class="bc-main">
           <div class="bc-title">
@@ -213,14 +213,35 @@
         <div class="tally" id="tally" aria-hidden="true"></div>
       </div>
       <div class="timeline" id="timeline" aria-label="Fasi della partita"></div>
-      <details class="reading-options card">
-        <summary>Opzioni di lettura</summary>
-        <label><input type="checkbox" id="hideFuture"> Nascondi gli eventi futuri e la durata totale</label>
-        <label><input type="checkbox" id="adaptivePlay"> Adatta la riproduzione alla quantità di testo</label>
-        <label><input type="checkbox" id="reduceMotion"> Riduci le animazioni</label>
-        <label><input type="checkbox" id="followOnly"> Mostra solo gli eventi dei concorrenti seguiti</label>
-        <p class="help" id="motionNote">Le preferenze del sistema sulle animazioni vengono sempre rispettate.</p>
-      </details>
+      <div class="readbar card" id="readBar">
+        <div class="rb-row">
+          <div class="rb-chips" id="rbChips" role="group" aria-label="Filtra gli eventi della fase"></div>
+          <div class="rb-tools">
+            <div class="seg rb-dens" id="densSeg" role="group" aria-label="Densità degli eventi"><button type="button" data-v="comoda" aria-pressed="true">Comoda</button><button type="button" data-v="compatta" aria-pressed="false">Compatta</button></div>
+            <button class="btn sm rb-more" type="button" id="rbMore" aria-expanded="false" aria-controls="rbPanel"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/></svg>Opzioni</button>
+          </div>
+        </div>
+        <div class="rb-panel" id="rbPanel" hidden>
+          <fieldset class="rb-group"><legend>Cosa mostrare negli eventi</legend>
+            <label class="rb-check"><input type="checkbox" data-read="echo"> Reazioni e conseguenze</label>
+            <label class="rb-check"><input type="checkbox" data-read="place"> Il luogo dove succede</label>
+            <label class="rb-check"><input type="checkbox" data-read="why"> Prove, dadi e motivi</label>
+            <label class="rb-check"><input type="checkbox" data-read="context"> Il contesto già aperto</label>
+            <label class="rb-check"><input type="checkbox" data-read="faces"> I volti dei protagonisti</label>
+          </fieldset>
+          <fieldset class="rb-group"><legend>Come leggere</legend>
+            <div class="rb-opt"><span>Testo</span><div class="seg" id="sizeSeg" role="group" aria-label="Grandezza del testo"><button type="button" data-v="normale" aria-pressed="true">Normale</button><button type="button" data-v="grande" aria-pressed="false">Grande</button></div></div>
+            <div class="rb-opt"><span>Ordine</span><div class="seg" id="orderSeg" role="group" aria-label="Ordine degli eventi"><button type="button" data-v="storia" aria-pressed="true">Come sono andati</button><button type="button" data-v="gravi" aria-pressed="false">Prima i più gravi</button></div></div>
+            <label class="rb-check"><input type="checkbox" id="followOnly"> Solo i concorrenti seguiti</label>
+          </fieldset>
+          <fieldset class="rb-group"><legend>Riproduzione</legend>
+            <label class="rb-check"><input type="checkbox" id="hideFuture"> Nascondi le fasi future e la durata totale</label>
+            <label class="rb-check"><input type="checkbox" id="adaptivePlay"> Ritmo adattato alla lunghezza dei testi</label>
+            <label class="rb-check"><input type="checkbox" id="reduceMotion"> Riduci le animazioni</label>
+            <p class="help" id="motionNote">Le preferenze del sistema sulle animazioni vengono sempre rispettate.</p>
+          </fieldset>
+        </div>
+      </div>
       <div id="phaseAnnouncement" class="sr-only" role="status" aria-live="polite" aria-atomic="true"></div>
       <div class="livegrid">
         <div class="livefeed" id="phBody" role="region" aria-labelledby="phTitle"></div>

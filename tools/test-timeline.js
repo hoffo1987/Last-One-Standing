@@ -8,7 +8,7 @@ function part(start, end) {
   assert.ok(a >= 0 && b > a, 'Blocco dell’interfaccia non trovato: ' + start);
   return ui.slice(a, b);
 }
-const definitions = part('  function promisesHTML(', '  function nowHTML(') +
+const definitions = part('  /* ---------------- calendario', '  // la durata detta') + part('  function promisesHTML(', '  function nowHTML(') +
   part('  function attrHTML(', '  function relHTML(');
 let checks = 0;
 function test(name, fn) { fn(); checks++; console.log('  OK ' + name); }
@@ -38,7 +38,7 @@ function fixture() {
     snap: { kills: { a: i, b: 0 }, alive: ['a', 'b'], allies: {}, st: {}, inv: {}, vit: {}, rel: {} } }));
   const elements = { '#profBody': {}, '#profDlg': { open: false, showModal() { this.open = true; } }, '#phBody': {} };
   const c = { SIM: { tributes: [a, b], phases, theme: 'classico' }, BY: { a, b }, BDS: { promises: { kinds: { fedelta: 'Fedeltà', protezione: 'Protezione', vendetta: 'Vendetta' } } },
-    D: { attrs: [{ id: 'int', name: 'Intelligenza' }], attrDesc: {} }, arenaOf: () => ({ key: ['int'] }), esc: (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'),
+    D: { attrs: [{ id: 'int', name: 'Intelligenza' }], attrDesc: {} }, arenaOf: () => ({ key: ['int'] }), resultTheme: () => ({ id: 'classico' }), esc: (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'),
     $: (s) => { assert.ok(elements[s], 'Elemento inatteso: ' + s); return elements[s]; }, elements, a, b };
   vm.createContext(c); vm.runInContext(definitions, c); return c;
 }
