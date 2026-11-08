@@ -2,7 +2,7 @@
 
 _Generato da `node tools/atlas-slots.js` a partire da `tools/atlas-brief.js`: per cambiare un testo o un prompt modifica il brief e rigenera, non questo file._
 
-**Immagini presenti: 85 su 182** (luoghi 50/66, pericoli 35/39, armi 0/77). **Video presenti: 0 su 105** (luoghi e pericoli). Meteo, disastri e oggetti arriveranno dopo.
+**Immagini presenti: 99 su 182** (luoghi 60/66, pericoli 39/39, armi 0/77). **Video presenti: 0 su 105** (luoghi e pericoli). Meteo, disastri e oggetti arriveranno dopo.
 
 ## 1. Lo stile
 
@@ -778,7 +778,7 @@ Cramped crew living modules, with a round porthole showing stars and the edge of
 Static camera and a seamless ambient loop: the place itself stays perfectly still and only small elements move, slowly and gently. A mug and small objects float slowly in zero gravity, the blanket drifts gently, stars move slowly past the porthole, lights flicker softly. --motion low --loop
 ```
 
-#### Condotti di servizio
+#### ✓ Condotti di servizio
 
 Condotti di servizio angusti con cavi, sfiati di vapore e luci d'emergenza.  
 File: `assets/arene/scifi/luoghi/condotti-di-servizio.webp` · video: `assets/arene/scifi/luoghi/condotti-di-servizio.mp4`
@@ -955,7 +955,7 @@ Ospedali vuoti, orde affamate e radio gracchianti.
 
 ### Luoghi · Città degli Infetti
 
-#### Ospedale
+#### ✓ Ospedale
 
 Corridoio d'ospedale abbandonato con barelle rovesciate, luci tremolanti e porte barricate.  
 File: `assets/arene/zombie/luoghi/ospedale.webp` · video: `assets/arene/zombie/luoghi/ospedale.mp4`
@@ -1501,7 +1501,7 @@ Specchi che sussurrano e porte che si chiudono da sole.
 
 ### Luoghi · Villa Maledetta
 
-#### Cantina
+#### ✓ Cantina
 
 Cantina umida con botti piene di ragnatele, una lampadina che oscilla e una porta socchiusa.  
 File: `assets/arene/horror/luoghi/cantina.webp` · video: `assets/arene/horror/luoghi/cantina.mp4`
@@ -2578,7 +2578,7 @@ Neon, impianti e contratti saltati: un distretto sigillato dove nessuno è indis
 
 ### Luoghi · Night City — Zona Rossa
 
-#### Mercato di Kabuki
+#### ✓ Mercato di Kabuki
 
 Mercato notturno affollato di bancarelle sotto tendoni e insegne olografiche, vapore delle cucine di strada.  
 File: `assets/arene/cyberpunk/luoghi/mercato-di-kabuki.webp` · video: `assets/arene/cyberpunk/luoghi/mercato-di-kabuki.mp4`
@@ -2595,7 +2595,7 @@ A dense night market of improvised stalls under plastic awnings fills the centra
 Static camera and a seamless ambient loop: the place itself stays perfectly still and only small elements move, slowly and gently. Steam rises slowly from the noodle stands, holographic signs flicker gently, raindrops ripple in the puddles. --motion low --loop
 ```
 
-#### Megablocco
+#### ✓ Megablocco
 
 Megablocco residenziale gigantesco, ballatoi su decine di piani e finestre accese.  
 File: `assets/arene/cyberpunk/luoghi/megablocco.webp` · video: `assets/arene/cyberpunk/luoghi/megablocco.mp4`
@@ -2612,7 +2612,7 @@ A colossal residential megablock rises through the central third of the frame, i
 Static camera and a seamless ambient loop: the place itself stays perfectly still and only small elements move, slowly and gently. Window lights blink on and off one by one, laundry sways in the wind, thin rain falls steadily. --motion low --loop
 ```
 
-#### Clinica del ripperdoc
+#### ✓ Clinica del ripperdoc
 
 Clinica clandestina di un ripperdoc con poltrona chirurgica, bracci robotici e luce fredda.  
 File: `assets/arene/cyberpunk/luoghi/clinica-del-ripperdoc.webp` · video: `assets/arene/cyberpunk/luoghi/clinica-del-ripperdoc.mp4`
@@ -2629,7 +2629,7 @@ A cramped back-alley cyber clinic with a worn surgical chair under a cold cyan l
 Static camera and a seamless ambient loop: the place itself stays perfectly still and only small elements move, slowly and gently. The heartbeat lines pulse slowly on the monitors, a robotic arm twitches gently, the lamp hums and flickers faintly. --motion low --loop
 ```
 
-#### Club della braindance
+#### ✓ Club della braindance
 
 Club notturno con pista allagata di luci, poltrone per la braindance e visori appesi.  
 File: `assets/arene/cyberpunk/luoghi/club-della-braindance.webp` · video: `assets/arene/cyberpunk/luoghi/club-della-braindance.mp4`
@@ -2646,7 +2646,7 @@ A neon nightclub with a reflective dance floor in the central third of the frame
 Static camera and a seamless ambient loop: the place itself stays perfectly still and only small elements move, slowly and gently. Laser beams sweep slowly through the haze, headset lights blink, the floor reflections ripple softly. --motion low --loop
 ```
 
-#### Officina dei Maelstrom
+#### ✓ Officina dei Maelstrom
 
 Officina di una gang con moto blindate, pezzi di cromo e una torretta di guardia.  
 File: `assets/arene/cyberpunk/luoghi/officina-dei-maelstrom.webp` · video: `assets/arene/cyberpunk/luoghi/officina-dei-maelstrom.mp4`
@@ -2663,7 +2663,7 @@ A grimy gang workshop with an armoured motorbike raised on a hydraulic lift in t
 Static camera and a seamless ambient loop: the place itself stays perfectly still and only small elements move, slowly and gently. Welding sparks shower in short bursts, the sentry turret pans slowly, red lights pulse, smoke drifts. --motion low --loop
 ```
 
-#### Nodo dati corporativo
+#### ✓ Nodo dati corporativo
 
 Sala server corporativa con colonne di dati luminosi, torrette e porte stagne.  
 File: `assets/arene/cyberpunk/luoghi/nodo-dati-corporativo.webp` · video: `assets/arene/cyberpunk/luoghi/nodo-dati-corporativo.mp4`
@@ -2680,7 +2680,7 @@ A sterile corporate data hub with towering server columns glowing cyan in the ce
 Static camera and a seamless ambient loop: the place itself stays perfectly still and only small elements move, slowly and gently. Data light streams flow upward continuously, the terminal screen blinks, the turrets rotate a few degrees and return. --motion low --loop
 ```
 
-#### Piazza della torre
+#### ✓ Piazza della torre
 
 Piazza centrale ai piedi di una torre altissima, megaschermo, volanti in volo e barriere di sicurezza.  
 File: `assets/arene/cyberpunk/luoghi/piazza-della-torre.webp` · video: `assets/arene/cyberpunk/luoghi/piazza-della-torre.mp4`
@@ -2699,7 +2699,7 @@ Static camera and a seamless ambient loop: the place itself stays perfectly stil
 
 ### Pericoli · Night City — Zona Rossa
 
-#### Squadra di sicurezza corporativa
+#### ✓ Squadra di sicurezza corporativa
 
 Squadra di sicurezza corporativa in armatura tattica senza insegne, visiere luminose.  
 File: `assets/arene/cyberpunk/pericoli/squadra-di-sicurezza-corporativa.webp` · video: `assets/arene/cyberpunk/pericoli/squadra-di-sicurezza-corporativa.mp4`
@@ -2716,7 +2716,7 @@ A corporate security squad in sleek unmarked tactical armour, the leader in fron
 Static camera and a seamless ambient loop: the subject keeps the same pose and position, with only subtle living movement, slow and calm. The visors pulse softly, rain runs down the armour, the squad shifts weight slightly in place. --motion low --loop
 ```
 
-#### Sciame di droni di pattuglia
+#### ✓ Sciame di droni di pattuglia
 
 Sciame di piccoli droni di sorveglianza con luci rosse e scanner.  
 File: `assets/arene/cyberpunk/pericoli/sciame-di-droni-di-pattuglia.webp` · video: `assets/arene/cyberpunk/pericoli/sciame-di-droni-di-pattuglia.mp4`
@@ -2733,7 +2733,7 @@ A swarm of small surveillance drones hovering toward the viewer, the closest one
 Static camera and a seamless ambient loop: the subject keeps the same pose and position, with only subtle living movement, slow and calm. The rotors spin, the drones bob gently in place, scanning beams sweep slowly. --motion low --loop
 ```
 
-#### Banda di Scav
+#### ✓ Banda di Scav
 
 Banda di Scav con stracci, maschere improvvisate e strumenti chirurgici rubati.  
 File: `assets/arene/cyberpunk/pericoli/banda-di-scav.webp` · video: `assets/arene/cyberpunk/pericoli/banda-di-scav.mp4`
@@ -2750,7 +2750,7 @@ A gang of scavengers in layered rags and makeshift breathing masks, the leader i
 Static camera and a seamless ambient loop: the subject keeps the same pose and position, with only subtle living movement, slow and calm. The masks breathe with slow puffs of vapour, the cracked optic flickers, the figures sway slightly. --motion low --loop
 ```
 
-#### Gang di cromati
+#### ✓ Gang di cromati
 
 Gang di cromati con arti metallici, impianti visibili e luci sotto la pelle.  
 File: `assets/arene/cyberpunk/pericoli/gang-di-cromati.webp` · video: `assets/arene/cyberpunk/pericoli/gang-di-cromati.mp4`
