@@ -1039,7 +1039,7 @@ img.scene { object-fit: cover; object-position: center; user-select: none; }
 .person.c-hate .plbl, .person.c-plot .plbl { color: color-mix(in srgb, var(--c-kill) 75%, var(--ink)); }
 .person.c-friend .plbl, .person.c-ally .plbl { color: color-mix(in srgb, var(--c-heal) 75%, var(--ink)); }
 .person.c-fear .plbl { color: color-mix(in srgb, #8a5bd6 75%, var(--ink)); }
-.person.c-rival .plbl { color: color-mix(in srgb, #e08a2b 72%, var(--ink)); }
+.person.c-rival .plbl { color: color-mix(in srgb, #e08a2b 55%, var(--ink)); }
 .asym { font-family: var(--f-body); font-variant-numeric: tabular-nums; font-size: 12.5px; font-weight: 700; color: color-mix(in srgb, var(--c-love) 72%, var(--ink)); background: color-mix(in srgb, var(--c-love) 12%, transparent); border-radius: 5px; padding: 1px 6px; }
 .back { font-size: 12.5px; color: var(--muted); }
 .back b { color: var(--ink); font-weight: 600; }
@@ -1987,7 +1987,7 @@ details.card > summary { font-size: 16px; }
 .rbc svg { width: 14px; height: 14px; color: var(--cc); }
 .rbc b { min-width: 22px; height: 20px; padding: 0 6px; border-radius: 999px; display: inline-grid; place-items: center; font-size: 12px; background: var(--panel-2); color: var(--muted); }
 .rbc[aria-pressed="true"] { background: color-mix(in srgb, var(--cc) 14%, var(--panel)); border-color: color-mix(in srgb, var(--cc) 60%, var(--line)); }
-.rbc[aria-pressed="true"] b { background: color-mix(in srgb, var(--cc) 80%, var(--ink)); color: #fff; }
+.rbc[aria-pressed="true"] b { background: color-mix(in srgb, var(--cc) 30%, var(--panel)); color: var(--ink); }
 .rbc.f-dead { --cc: var(--c-kill); } .rbc.f-betray { --cc: var(--c-betray); } .rbc.f-ally { --cc: var(--c-ally); } .rbc.f-love { --cc: var(--c-love); }
 .rbc.f-heal { --cc: var(--c-heal); } .rbc.f-item { --cc: var(--c-item); } .rbc.f-hurt { --cc: var(--c-hurt); } .rbc.f-none { --cc: var(--c-none); } .rbc.f-followed { --cc: var(--focus); }
 .rb-note { font-size: 14px; color: var(--muted); padding: 4px 2px; }

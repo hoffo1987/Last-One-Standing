@@ -124,7 +124,7 @@
       Object.entries(trials).forEach(([attr,def],j)=>{
         const [n,ok,ko,...texts]=def,[yes,no]=texts[i%texts.length],dc=10+i%4;
         const req=attr==='emp'?' stat:B<mo75':attr==='car'?'':attr==='res'?' stat:A<en65':'';
-        add('trials',s,i*10+j,n+req+' test:A='+attr+dc+' ok:'+ok.split(' ').join(' ok:')+' ko:'+ko.split(' ').join(' ko:'),yes+' || '+no,i%3===0?'n':'d');
+        add('trials',s,i*10+j,n+req+' *0.3 test:A='+attr+dc+' ok:'+ok.split(' ').join(' ok:')+' ko:'+ko.split(' ').join(' ko:'),yes+' || '+no,i%3===0?'n':'d');
       });
       const ds=theme.soft?softDevelopments:developments;
       ds.forEach(([name,intro,dead,hurt,safe],j)=>{
@@ -184,7 +184,7 @@
       for(let j=0;j<10;j++){
         const s=scenes[(i*7+j*3+j%3)%scenes.length];
         const body=theme.soft&&trait==='spietato'?'{A} mette {B} sotto pressione su {x} e ne indebolisce la reputazione senza concedere una pausa.':text;
-        add('traits',s,i*10+j,head+' trait:A='+trait+' *2',body,(trait==='sonnambulo'||trait==='romantico'||j%4===0)?'n':'d');
+        add('traits',s,i*10+j,head+' trait:A='+trait+' *0.6',body,(trait==='sonnambulo'||trait==='romantico'||j%4===0)?'n':'d');
       }
     });
     const data=D.worldItemData,own=data.roots[theme.id],soft=!!theme.soft;

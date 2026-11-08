@@ -517,7 +517,8 @@
     return '<span class="' + cls + '" ' + st + ' title="' + esc(t.name) + '">' + inner + '</span>';
   }
   function silIndex(id) { let h = 0; for (const c of String(id)) h = (h * 31 + c.charCodeAt(0)) >>> 0; return h % ART.assets.sagome.length; }
-  const linkify = (html) => html.replace(/<b class="nm" data-id="/g, '<button type="button" class="nm" data-prof="').replace(/<\/b>/g, '</button>');
+  // solo i nomi diventano pulsanti: gli altri grassetti (oggetti nel diario, numeri) restano grassetti
+  const linkify = (html) => String(html).replace(/<b class="nm" data-id="([^"]*)"([^>]*)>([\s\S]*?)<\/b>/g, '<button type="button" class="nm" data-prof="$1"$2>$3</button>');
   let toastTimer;
   // un messaggio breve, con un'azione facoltativa (per esempio «Annulla»)
   function toast(msg, action) {

@@ -47,6 +47,11 @@ Ogni arena ha poi le sue regole:
 
 Le scelte degli eventi tengono conto di tutto questo: chi è ferito evita gli scontri e cerca cure, chi ha fame cerca cibo, chi è disperato tradisce più volentieri, le vittime più probabili sono i più deboli e stanchi. Nell'esito trovi le cause di morte, le conseguenze e il meteo di ogni giorno.
 
+## Eventi: quanti e da dove vengono
+La sezione Arena dice onestamente da dove vengono gli eventi: quelli **scritti a mano** (propri dell'arena e condivisi con altre arene) e quelli **combinati** dai 30 luoghi descritti di ogni arena con frasi-tipo comuni. Il quarto pacchetto (`src/content/pack4-*.js`) aggiunge circa 690 eventi scritti a mano, da 72 a 95 per arena, ognuno con conseguenze reali.
+
+**Carattere e prove legati alla situazione** (`pack4-carattere.js`, `pack4-carattere-soft.js`): gli eventi di tratto e le prove scattano solo quando la condizione è vera in quel momento: una ferita, la fame, lo sfinimento, il morale a terra, il pericolo dell'arena alto, il meteo, l'obiettivo, un rancore, un debito, una coppia, un oggetto nello zaino. Il tratto o la caratteristica decide l'esito, e l'esito lascia segni concreti: salute, energie, oggetti, rapporti. Le prove e i tratti generici combinati dai luoghi hanno ora un peso molto più basso, quindi in una partita compaiono circa 3 prove generiche e una dozzina scritte a mano.
+
 ## Oggetti
 Tredici tipi di oggetto, con nomi diversi in ogni arena: armi, protezioni, cure, cibo, attrezzi, mappe, trappole, esplosivi, veleni, portafortuna, alcol, merce di scambio e ricordi di casa. Nell'Arena c'è la guida completa (sezione "Gli oggetti e a cosa servono").
 L'espansione aggiunge **300 oggetti per arena**, distribuiti in dieci delle famiglie esistenti. Sono combinazioni di modelli, materiali e formati: usano gli effetti, la qualità, l'usura e la provenienza già registrati dal motore, senza attribuire poteri impliciti ai nomi.
