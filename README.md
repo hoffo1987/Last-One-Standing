@@ -118,6 +118,7 @@ Un interruttore nella sezione Arena, attivo solo dopo la conferma dell'età, agg
 - **Effetti legati agli eventi**: fendente e scossa per le uccisioni, disturbo dell'immagine per i tradimenti, cuori per gli amori, volti che si avvicinano per le alleanze, onda verde per gli aiuti, riflesso per il bottino, dado che gira per le prove di abilità, conseguenze che compaiono una dopo l'altra.
 - **Cambi di fase**: alba, calare della notte, gong d'apertura, festino dorato, cannone per i caduti, faro per il finale; ogni arena ha il suo disastro (fuoco, onda d'urto, sirena, nube tossica, bombardamento, fulmine, tempesta di sabbia, campanella, glitch).
 - **Sezioni**: panoramica con parallasse e braci nella home, locandine che si inclinano seguendo il mouse, schede che entrano a cascata, cerimonia del vincitore con podio che sale, grafico che si disegna e coriandoli a tema con l'arena.
+- **Stacchi**: cambiare sezione fa passare tre lastre in diagonale nei colori dell'arena di arrivo, con il nome della sezione; nella diretta un cartello annuncia il nuovo giorno (il numero vecchio lascia il posto al nuovo), il disastro e i volti dello scontro finale; l'esito ha una regia che si può saltare con un tocco o un tasto. I principi, le fonti e gli asset facoltativi sono in [docs-dev/movimento.md](docs-dev/movimento.md).
 - Tutto si ferma se il sistema chiede di ridurre le animazioni.
 
 ## La sezione Concorrenti

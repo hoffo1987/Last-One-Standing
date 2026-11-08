@@ -805,6 +805,7 @@ img.scene { object-fit: cover; object-position: center; user-select: none; }
 .db-hearts { color: #ff6fa6; } .db-sparks, .db-stars { color: #ffd36b; } .db-skulls { color: #ff5b4b; } .db-heal { color: #59c98b; font-size: 20px; }
 
 /* titoli cinetici */
+.kw { display: inline-block; max-width: 100%; }
 .kc { display: inline-block; animation-duration: .6s; animation-fill-mode: both; animation-timing-function: cubic-bezier(.2,.9,.3,1.3); animation-delay: calc(var(--i) * 30ms); }
 .kc-drop { animation-name: kcDrop; } .kc-rise { animation-name: kcRise; animation-duration: .8s; animation-delay: calc(500ms + var(--i) * 45ms); } .kc-shake { animation-name: kcShake; } .kc-fade { animation-name: kcFade; animation-duration: 1s; }
 @keyframes kcDrop { from { opacity: .001; transform: translateY(-40%) rotate(-6deg); } }
@@ -861,12 +862,8 @@ img.scene { object-fit: cover; object-position: center; user-select: none; }
 @keyframes hotZone { 50% { box-shadow: inset 0 0 0 2px color-mix(in srgb, var(--dead) 70%, transparent), 0 0 14px -2px color-mix(in srgb, var(--dead) 50%, transparent); } }
 
 /* esito: cerimonia del vincitore */
-.ceremony .winhero { animation: winIn 1.2s cubic-bezier(.2,.7,.3,1) both; }
-@keyframes winIn { from { clip-path: inset(0 50% 0 50% round 20px); filter: brightness(2); } }
 .ceremony .winhero > .av, .ceremony .winhero .teamavs .av { animation: winAv 1s cubic-bezier(.2,.9,.3,1.5) .35s both; }
 @keyframes winAv { from { transform: scale(.2) rotate(-25deg); opacity: .001; } }
-.ceremony .winhero .wstats > div { animation: viewIn .6s ease both; }
-.ceremony .winhero .wstats > div:nth-child(1) { animation-delay: 1s; } .ceremony .winhero .wstats > div:nth-child(2) { animation-delay: 1.1s; } .ceremony .winhero .wstats > div:nth-child(3) { animation-delay: 1.2s; } .ceremony .winhero .wstats > div:nth-child(4) { animation-delay: 1.3s; }
 .winhero > .av { animation: winHalo 3.5s ease-in-out 1.5s infinite; }
 @keyframes winHalo { 50% { box-shadow: 0 0 0 5px var(--screen), 0 0 0 9px var(--screen-accent), 0 0 60px 10px hsl(var(--h) 90% 55% / .55); } }
 .ceremony .pod .step { animation: podRise .9s cubic-bezier(.2,.9,.3,1.1) both; transform-origin: bottom; }
@@ -2464,42 +2461,67 @@ html, body { margin: 0; }
 @media (max-width: 760px) { .steps { background: color-mix(in srgb, var(--panel-solid) 92%, transparent); box-shadow: 0 -18px 40px -24px rgba(0,0,0,.6); } }
 
 /* =====================================================================
- * ESITO: un finale da film
- * La rivelazione occupa tutta la scena, dentro il dipinto dell'arena; un alone di luce gira dietro
- * chi ha vinto; i pulsanti sono una barra di vetro che galleggia sul bordo del dipinto; il podio è
- * un palco con un occhio di bue; i premi sono trofei; la classifica ha le sue medaglie.
+ * ESITO: un finale da film, in tre fasce
+ * In alto la testata della partita (arena, durata, concorrenti), al centro chi ha vinto con il ritratto e il nome,
+ * in basso una sola striscia con i numeri. Il dipinto dell'arena fa da scena; tre veli lo scuriscono dove c'è testo.
  * ===================================================================== */
-.winhero.finale { --fh: clamp(440px, 64vh, 660px); min-height: var(--fh); margin-top: 18px; padding: clamp(24px, 4vw, 56px); border-radius: 28px; display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: end; gap: clamp(20px, 4vw, 54px);
+.winhero.finale { --fh: clamp(460px, 66vh, 680px); min-height: var(--fh); margin-top: 18px; padding: clamp(20px, 3.4vw, 44px); border-radius: 28px;
+  display: grid; grid-template-columns: minmax(0, 1fr); grid-template-rows: auto 1fr auto; align-items: stretch; gap: clamp(18px, 3vw, 34px);
   background: var(--screen); isolation: isolate; box-shadow: inset 0 0 0 1px hsl(var(--h) 80% 80% / .12), 0 40px 90px -40px rgba(0,0,0,.85), 0 0 120px -60px hsl(var(--h) 90% 55% / .7); }
-.winhero.finale::before { z-index: 1; background: linear-gradient(90deg, hsl(var(--h) 40% 4% / .82) 0%, hsl(var(--h) 40% 4% / .45) 45%, transparent 75%), linear-gradient(0deg, hsl(var(--h) 40% 4% / .92) 0%, transparent 55%), radial-gradient(ellipse 80% 60% at 70% 30%, transparent, hsl(var(--h) 40% 4% / .35)); }
+.winhero.finale::before { z-index: 1;
+  background: linear-gradient(180deg, hsl(var(--h) 40% 4% / .72) 0%, transparent 24%),
+    linear-gradient(0deg, hsl(var(--h) 40% 4% / .9) 0%, transparent 36%),
+    linear-gradient(90deg, hsl(var(--h) 40% 4% / .8) 0%, hsl(var(--h) 40% 4% / .38) 48%, transparent 78%); }
 .winhero.finale .wscene { inset: 0; opacity: 1; -webkit-mask-image: none; mask-image: none; z-index: 0; }
 .winhero.finale .wscene img.scene, .winhero.finale .wscene svg { width: 100%; height: 100%; object-position: center 40%; animation: kenburns 40s ease-in-out infinite alternate; }
 .winhero.finale .fx-field { z-index: 1; }
-.winhero.finale > .fn-portrait, .winhero.finale > .fn-text { position: relative; z-index: 2; }
-/* l'alone: raggi lenti dietro il ritratto */
-.fn-halo { position: absolute; z-index: 1; left: clamp(24px, 4vw, 56px); bottom: clamp(24px, 4vw, 56px); width: 230px; height: 230px; transform: translate(-25%, 25%); pointer-events: none; border-radius: 50%;
+.winhero.finale > .fn-top, .winhero.finale > .fn-mid, .winhero.finale > .fn-stats, .winhero.finale > .fn-crew { position: relative; z-index: 2; min-width: 0; }
+
+/* in alto: la testata */
+.fn-top { display: flex; align-items: center; justify-content: space-between; gap: 10px 16px; flex-wrap: wrap; }
+.fn-arena, .fn-meta > span { -webkit-backdrop-filter: blur(10px) saturate(1.3); backdrop-filter: blur(10px) saturate(1.3); background: hsl(var(--h) 40% 6% / .5); box-shadow: inset 0 0 0 1px hsl(var(--h) 80% 80% / .15); border-radius: 999px; }
+.fn-arena { display: inline-flex; align-items: center; gap: 10px; padding: 8px 18px 8px 12px; font-family: var(--f-display); font-weight: 800; font-size: 14px; letter-spacing: .14em; text-transform: uppercase; color: #fff; }
+.fn-arena svg { color: var(--screen-accent); flex: none; }
+.fn-meta { display: flex; gap: 8px; flex-wrap: wrap; }
+.fn-meta > span { padding: 7px 13px; font-size: 13px; font-weight: 600; color: hsl(var(--h) 25% 92% / .9); font-variant-numeric: tabular-nums; }
+
+/* al centro: ritratto e nome, allineati sullo stesso asse */
+.fn-mid { display: flex; align-items: center; gap: clamp(22px, 4vw, 56px); align-self: center; position: relative; }
+/* la linea che guida lo sguardo dal ritratto al nome */
+.fn-mid::before { content: ""; position: absolute; z-index: -1; left: -60px; right: 18%; top: 50%; height: clamp(54px, 7vw, 86px); transform: translateY(-50%) skewX(-18deg); transform-origin: left center; pointer-events: none;
+  background: linear-gradient(90deg, hsl(var(--h) 95% 55% / .34), hsl(var(--h) 95% 55% / .1) 55%, transparent); box-shadow: 0 0 60px -20px hsl(var(--h) 95% 55% / .7); }
+.winhero.finale.team .fn-mid::before, .winhero.finale.none .fn-mid::before { left: -60px; right: 30%; }
+.fn-portrait { position: relative; flex: none; isolation: isolate; }
+.winhero.finale .fn-portrait .av { --s: clamp(150px, 15vw, 200px); font-size: 64px; box-shadow: 0 0 0 4px hsl(var(--h) 40% 6%), 0 0 0 8px var(--screen-accent), 0 0 60px 6px hsl(var(--h) 95% 55% / .55), 0 30px 60px -20px rgba(0,0,0,.8); }
+.fn-halo { position: absolute; z-index: -1; left: 50%; top: 50%; width: 200%; aspect-ratio: 1; transform: translate(-50%, -50%); pointer-events: none; border-radius: 50%;
   background: radial-gradient(circle, hsl(var(--h) 95% 65% / .55) 0%, hsl(var(--h) 95% 55% / .18) 32%, transparent 62%), repeating-conic-gradient(from 0deg, hsl(var(--h) 95% 70% / .22) 0 7deg, transparent 7deg 22deg);
   -webkit-mask: radial-gradient(circle, #000 25%, transparent 70%); mask: radial-gradient(circle, #000 25%, transparent 70%); animation: haloSpin 60s linear infinite; mix-blend-mode: screen; }
-@keyframes haloSpin { to { transform: translate(-25%, 25%) rotate(360deg); } }
-.winhero.finale.team .fn-halo, .winhero.finale.none .fn-halo { display: none; }
-.fn-portrait { position: relative; }
-.winhero.finale .fn-portrait .av { --s: clamp(150px, 16vw, 210px); font-size: 64px; box-shadow: 0 0 0 4px hsl(var(--h) 40% 6%), 0 0 0 8px var(--screen-accent), 0 0 60px 6px hsl(var(--h) 95% 55% / .55), 0 30px 60px -20px rgba(0,0,0,.8); }
+@keyframes haloSpin { to { transform: translate(-50%, -50%) rotate(360deg); } }
 .fn-crown { position: absolute; left: 50%; top: -6px; transform: translate(-50%, -60%) rotate(-6deg); width: 54px; height: 54px; filter: drop-shadow(0 6px 14px rgba(0,0,0,.6)) drop-shadow(0 0 16px hsl(45 100% 60% / .7)); }
 .fn-crown svg { width: 100%; height: 100%; fill: #f5c542; stroke: #fff2b8; stroke-width: 1; stroke-linejoin: round; }
-.fn-text { min-width: 0; padding-bottom: 6px; }
-.winhero.finale .eyebrow { color: var(--screen-accent); }
-.fn-title { margin-top: 14px; font-family: var(--f-display); font-weight: 800; font-size: clamp(15px, 1.6vw, 19px); letter-spacing: .22em; text-transform: uppercase; color: #f5c542; text-shadow: 0 0 18px hsl(45 100% 55% / .6); display: inline-flex; align-items: center; gap: 12px; }
-.fn-title::before, .fn-title::after { content: ""; width: 34px; height: 1px; background: currentColor; opacity: .7; }
-.winhero.finale h1 { margin: 6px 0 8px; font-size: clamp(54px, 9vw, 128px); line-height: .95; letter-spacing: -.035em;
-  background: linear-gradient(180deg, #fff 30%, color-mix(in srgb, var(--screen-accent) 55%, #fff) 100%); -webkit-background-clip: text; background-clip: text; color: transparent; filter: drop-shadow(0 6px 30px hsl(var(--h) 90% 40% / .55)); }
-.winhero.finale p { color: hsl(var(--h) 25% 88% / .85); font-size: 17px; }
-.winhero.finale .wstats { margin-top: 22px; gap: 10px; }
-.winhero.finale .wstats > div { padding: 12px 16px 10px; min-width: 104px; border-radius: 14px; background: hsl(var(--h) 40% 8% / .45); -webkit-backdrop-filter: blur(10px) saturate(1.3); backdrop-filter: blur(10px) saturate(1.3); box-shadow: inset 0 0 0 1px hsl(var(--h) 80% 80% / .14), inset 0 1px 0 hsl(0 0% 100% / .08); }
-.winhero.finale .wstats b { font-size: clamp(28px, 3vw, 38px); }
-.winhero.finale.team, .winhero.finale.none { grid-template-columns: minmax(0, 1fr); }
-.winhero.finale .teamavs { margin: 14px 0 6px; }
-/* i pulsanti: una barra di vetro che galleggia sul bordo inferiore del dipinto */
-#resBody .resactions { position: relative; z-index: 3; width: fit-content; max-width: calc(100% - 32px); margin: -30px auto 30px; padding: 10px; border-radius: 18px; justify-content: center;
+.fn-text { min-width: 0; }
+.fn-title { display: flex; width: fit-content; align-items: center; gap: 12px; font-family: var(--f-display); font-weight: 800; font-size: clamp(14px, 1.5vw, 18px); letter-spacing: .22em; text-transform: uppercase; color: #f5c542; text-shadow: 0 0 18px hsl(45 100% 55% / .6); }
+.fn-title::after { content: ""; width: 44px; height: 2px; border-radius: 2px; background: currentColor; opacity: .7; }
+.winhero.finale h1 { position: relative; margin: 8px 0 10px; font-size: clamp(54px, 8.4vw, 124px); line-height: .95; letter-spacing: -.035em; color: #fff; overflow-wrap: anywhere;
+  text-shadow: 0 2px 0 hsl(var(--h) 60% 30% / .5), 0 0 40px hsl(var(--h) 95% 55% / .55), 0 10px 50px rgba(0,0,0,.6); }
+.winhero.finale h1 * { color: inherit; }
+.winhero.finale .fn-sub { margin: 0; color: hsl(var(--h) 25% 90% / .88); font-size: 17px; max-width: 60ch; }
+
+/* in basso: i numeri in una sola striscia */
+.winhero.finale .fn-stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0; margin: 0; border-radius: 18px; overflow: hidden;
+  background: hsl(var(--h) 40% 6% / .52); -webkit-backdrop-filter: blur(14px) saturate(1.3); backdrop-filter: blur(14px) saturate(1.3); box-shadow: inset 0 0 0 1px hsl(var(--h) 80% 80% / .14), inset 0 1px 0 hsl(0 0% 100% / .08); }
+.winhero.finale .fn-stats > div { position: relative; min-width: 0; padding: 14px 22px 12px; text-align: center; }
+.winhero.finale .fn-stats > div + div::before { content: ""; position: absolute; left: 0; top: 22%; bottom: 22%; width: 1px; background: hsl(var(--h) 80% 85% / .18); }
+.winhero.finale .fn-stats b { font-size: clamp(28px, 3vw, 40px); }
+.winhero.finale .fn-stats span { margin-top: 4px; font-size: 13px; letter-spacing: .04em; color: hsl(var(--h) 25% 88% / .75); }
+/* la squadra vincitrice: una fila di schede */
+.fn-crew { display: flex; flex-wrap: wrap; gap: 10px; }
+.fn-mate { display: flex; align-items: center; gap: 10px; padding: 7px 16px 7px 7px; border-radius: 999px; background: hsl(var(--h) 40% 6% / .52); -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); box-shadow: inset 0 0 0 1px hsl(var(--h) 80% 80% / .14); }
+.winhero.finale .fn-mate .av { --s: 48px; font-size: 18px; box-shadow: 0 0 0 2px hsl(var(--h) 40% 6%), 0 0 0 4px var(--screen-accent); }
+.fn-mate b { display: block; font-size: 15px; color: #fff; } .fn-mate small { display: block; font-size: 12.5px; color: hsl(var(--h) 25% 88% / .75); }
+
+/* i pulsanti: sotto il dipinto, senza sovrapporsi ai numeri */
+#resBody .resactions { position: relative; z-index: 3; width: fit-content; max-width: 100%; margin: 16px auto 30px; padding: 10px; border-radius: 18px; justify-content: center;
   background: color-mix(in srgb, var(--panel-solid) 72%, transparent); -webkit-backdrop-filter: blur(18px) saturate(1.4); backdrop-filter: blur(18px) saturate(1.4); box-shadow: var(--sheen), var(--depth); border: 1px solid var(--line); }
 #resBody .resactions .help.mono { padding: 0 8px; }
 /* capitoli numerati */
@@ -2550,31 +2572,135 @@ html, body { margin: 0; }
 #resBody .posterbox img { border-radius: 14px; transform: rotate(-1.2deg); box-shadow: 0 30px 60px -28px rgba(0,0,0,.8), 0 0 0 1px hsl(0 0% 100% / .08); transition: transform .4s cubic-bezier(.2,.8,.2,1); }
 #resBody .posterbox img:hover { transform: rotate(0) scale(1.02); }
 @media (max-width: 760px) {
-  .winhero.finale { grid-template-columns: minmax(0, 1fr); justify-items: center; text-align: center; align-items: end; --fh: auto; min-height: 560px; padding: 28px 18px 46px; }
-  .winhero.finale::before { background: linear-gradient(0deg, hsl(var(--h) 40% 4% / .95) 0%, hsl(var(--h) 40% 4% / .55) 55%, hsl(var(--h) 40% 4% / .2) 100%); }
-  .fn-halo { left: 50%; bottom: auto; top: 60px; transform: translate(-50%, 0); animation-name: haloSpinM; }
-  @keyframes haloSpinM { to { transform: translate(-50%, 0) rotate(360deg); } }
-  .winhero.finale .wstats { justify-content: center; }
-  .winhero.finale .wstats > div { min-width: 0; flex: 1 1 40%; }
-  .fn-title::before, .fn-title::after { width: 18px; }
-  #resBody .resactions { margin-top: -26px; }
+  .winhero.finale { --fh: auto; min-height: 0; padding: 16px 14px 14px; gap: 18px; text-align: center; border-radius: 22px; justify-items: stretch; }
+  .winhero.finale::before { background: linear-gradient(180deg, hsl(var(--h) 40% 4% / .7) 0%, hsl(var(--h) 40% 4% / .35) 30%, hsl(var(--h) 40% 4% / .45) 60%, hsl(var(--h) 40% 4% / .92) 100%); }
+  .fn-top { flex-direction: column; gap: 8px; }
+  .fn-arena { font-size: 12.5px; letter-spacing: .12em; padding: 7px 14px 7px 10px; max-width: 100%; }
+  .fn-meta { justify-content: center; } .fn-meta > span { font-size: 12px; padding: 5px 11px; }
+  .fn-mid { flex-direction: column; gap: 16px; padding: 18px 0 6px; }
+  .fn-mid::before { left: -14px; right: -14px; top: 34%; height: 70px; transform: translateY(-50%) skewY(-8deg); background: linear-gradient(90deg, transparent, hsl(var(--h) 95% 55% / .32) 30%, hsl(var(--h) 95% 55% / .32) 70%, transparent); }
+  .winhero.finale.team .fn-mid::before, .winhero.finale.none .fn-mid::before { left: -14px; right: -14px; top: 50%; }
+  .winhero.finale .fn-portrait .av { --s: 128px; font-size: 48px; }
+  .fn-title { margin-inline: auto; font-size: 13px; }
+  .fn-title::before { content: ""; width: 24px; height: 2px; border-radius: 2px; background: currentColor; opacity: .7; } .fn-title::after { width: 24px; }
+  .winhero.finale h1 { font-size: clamp(42px, 13vw, 64px); }
+  .winhero.finale .fn-sub { font-size: 15px; margin-inline: auto; }
+  .winhero.finale .fn-stats > div { padding: 10px 4px 9px; }
+  .winhero.finale .fn-stats b { font-size: 23px; }
+  .winhero.finale .fn-stats span { font-size: 11px; letter-spacing: 0; }
+  .fn-crew { justify-content: center; }
   .pod.p1 .av { --s: 80px; } .pod .av { --s: 60px; } .pod.p1 .step { height: 120px; }
 }
 @media (prefers-reduced-motion: reduce) { .fn-halo, .pod .step::after, #resBody .chart circle, .winhero.finale .wscene img.scene { animation: none; } }
 [data-reduced-motion] .fn-halo, [data-reduced-motion] .pod .step::after, [data-reduced-motion] #resBody .chart circle, [data-reduced-motion] .winhero.finale .wscene img.scene { animation: none; }
-/* il nome si anima lettera per lettera: niente testo «ritagliato» sul gradiente, che le lettere animate perderebbero */
-.winhero.finale h1 { background: none; -webkit-background-clip: border-box; background-clip: border-box; color: #fff; filter: none;
-  text-shadow: 0 2px 0 hsl(var(--h) 60% 30% / .5), 0 0 40px hsl(var(--h) 95% 55% / .55), 0 10px 50px rgba(0,0,0,.6); }
-.winhero.finale h1 * { color: inherit; }
-.winhero.finale .eyebrow { display: flex; }
-.fn-title { display: flex; width: fit-content; }
-@media (max-width: 760px) { .winhero.finale .eyebrow, .fn-title { justify-content: center; margin-inline: auto; } }
-@media (max-width: 760px) {
-  .winhero.finale .wstats { gap: 6px; flex-wrap: nowrap; width: 100%; }
-  .winhero.finale .wstats > div { flex: 1 1 0; min-width: 0; padding: 9px 6px 7px; border-radius: 12px; }
-  .winhero.finale .wstats b { font-size: 22px; }
-  .winhero.finale .wstats span { font-size: 10.5px; line-height: 1.2; display: block; }
-  .winhero.finale .fn-portrait .av { --s: 132px; font-size: 48px; }
-  .fn-halo { top: 6px; width: 260px; height: 260px; }
-  .winhero.finale h1 { font-size: clamp(44px, 13vw, 64px); }
-}
+
+/* =====================================================================
+ * STACCHI: il linguaggio di movimento
+ * Principi presi dai menu dei Persona e tradotti nel nostro stile dipinto (niente rosso e nero, niente lettere ritagliate):
+ * – ogni cambio di schermata è uno stacco coperto, mai una semplice dissolvenza;
+ * – si entra veloci e si frena, si esce accelerando: le uscite sono più brevi delle entrate;
+ * – gli strati arrivano sfalsati, con tempi leggermente diversi, mai tutti insieme;
+ * – i momenti importanti hanno un cartello: arriva, resta fermo il tempo di leggerlo, se ne va;
+ * – il nuovo stato prende il colore d'accento (il numero del nuovo giorno, il nome di chi vince);
+ * – una linea in diagonale guida lo sguardo verso l'informazione che conta;
+ * – i lampi d'impatto vanno «a due a due», a scatti, come un disegno animato; il resto scorre morbido;
+ * – finita l'entrata la scena non è mai ferma del tutto: respira piano.
+ * ===================================================================== */
+:root { --ease-snap: cubic-bezier(.16,1,.3,1); --ease-kick: cubic-bezier(.34,1.56,.64,1); --ease-cut: cubic-bezier(.7,0,.84,0); }
+
+/* lo stacco tra le sezioni: tre lastre in diagonale e il nome della sezione */
+.stacco { --wh: var(--h); position: fixed; inset: 0; z-index: 9999; pointer-events: none; overflow: hidden; contain: strict; }
+.stacco[hidden] { display: none; }
+.stacco i { position: absolute; top: -12%; bottom: -12%; left: -25%; width: 150%; transform: translateX(-170vw) skewX(-16deg); will-change: transform; }
+.stacco .st-a { background: hsl(var(--wh) 45% 5%); }
+.stacco .st-b { background: linear-gradient(100deg, hsl(var(--wh) 55% 10%) 20%, hsl(var(--wh) 70% 24%) 60%, hsl(var(--wh) 60% 14%) 90%); }
+.stacco .st-b::after { content: ""; position: absolute; inset: 0; opacity: .5; background: repeating-linear-gradient(90deg, transparent 0 46px, hsl(var(--wh) 90% 70% / .06) 46px 48px); }
+.stacco .st-c { left: 26%; width: 30%; background: linear-gradient(90deg, transparent, hsl(var(--wh) 95% 55% / .35) 22%, hsl(var(--wh) 95% 62% / .95) 42%, hsl(var(--wh) 100% 78%) 50%, hsl(var(--wh) 95% 62% / .95) 58%, hsl(var(--wh) 95% 55% / .35) 78%, transparent); }
+.stacco .st-mark { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%) rotate(-7deg); opacity: 0; white-space: nowrap;
+  font-family: var(--f-display); font-weight: 900; font-size: clamp(40px, 9vw, 120px); letter-spacing: -.02em; text-transform: uppercase; color: #fff;
+  text-shadow: 0 0 40px hsl(var(--wh) 95% 55% / .9), 0 6px 0 hsl(var(--wh) 60% 20%); }
+
+/* i cartelli della diretta */
+.broadcast > .stc { position: absolute; inset: 0; z-index: 6; pointer-events: none; display: grid; place-items: center; overflow: hidden; border-radius: inherit; }
+.stc-band { position: absolute; left: -10%; right: -10%; top: 50%; height: 64%; transform: translateY(-50%) skewY(-2.2deg);
+  background: linear-gradient(90deg, hsl(var(--h) 45% 6% / .97), hsl(var(--h) 60% 13% / .97) 60%, hsl(var(--h) 45% 8% / .97));
+  box-shadow: 0 0 0 1px hsl(var(--h) 80% 70% / .14), 0 30px 60px -20px rgba(0,0,0,.8); animation: stcBand var(--stc-dur, 1.6s) both; }
+.stc-line { position: absolute; left: -10%; right: -10%; top: 82%; height: 4px; transform: translateY(-50%) skewY(-2.2deg); background: hsl(var(--h) 95% 62%); box-shadow: 0 0 22px hsl(var(--h) 95% 60%); animation: stcBand var(--stc-dur, 1.6s) 60ms both; }
+@keyframes stcBand {
+  0% { clip-path: inset(0 100% 0 0); animation-timing-function: var(--ease-snap); }
+  16%, 86% { clip-path: inset(0 0 0 0); animation-timing-function: var(--ease-cut); }
+  100% { clip-path: inset(0 0 0 100%); } }
+.stc-in { position: relative; display: flex; align-items: center; gap: 12px 22px; flex-wrap: wrap; justify-content: center; padding: 0 24px; transform: rotate(-2.2deg); text-align: center;
+  animation: stcIn .32s var(--ease-snap) .16s both, stcGone .2s var(--ease-cut) calc(var(--stc-dur, 1.6s) - .5s) forwards; }
+@keyframes stcIn { from { opacity: 0; transform: rotate(-2.2deg) translateX(-60px); } }
+@keyframes stcGone { to { opacity: 0; transform: rotate(-2.2deg) translateX(80px); } }
+.stc-k { font-family: var(--f-display); font-weight: 900; font-size: clamp(13px, 1.8vw, 18px); letter-spacing: .24em; text-transform: uppercase; color: hsl(var(--h) 95% 72%); }
+/* il calendario: il vecchio giorno sale e se ne va, il nuovo arriva dal basso nel colore d'accento */
+.stc-num { display: inline-grid; height: 1em; overflow: hidden; font-family: var(--f-display); font-weight: 900; font-size: clamp(64px, 10vw, 128px); line-height: 1; font-variant-numeric: tabular-nums; }
+.stc-num b { grid-area: 1 / 1; }
+.stc-num .o { color: hsl(0 0% 100% / .92); animation: stcUp .26s var(--ease-cut) .58s both; }
+.stc-num .n { color: hsl(var(--h) 95% 66%); text-shadow: 0 0 30px hsl(var(--h) 95% 55% / .8); animation: stcDrop .42s var(--ease-kick) .7s both; }
+@keyframes stcUp { to { transform: translateY(-110%); opacity: 0; } }
+@keyframes stcDrop { from { transform: translateY(110%); } }
+.stc-sub { flex-basis: 100%; font-size: 15px; font-weight: 600; color: hsl(var(--h) 25% 88% / .8); animation: stcIn .3s var(--ease-snap) .85s both; }
+.stc-cal { gap: 6px 22px; }
+/* il disastro: la fascia ha le strisce di pericolo e il titolo arriva di colpo, con due lampi a scatti */
+.stc-dis .stc-band { background: repeating-linear-gradient(-45deg, hsl(var(--h) 90% 55% / .07) 0 14px, transparent 14px 28px), linear-gradient(90deg, hsl(var(--h) 45% 6% / .97), hsl(var(--h) 70% 16% / .97) 60%, hsl(var(--h) 45% 8% / .97)); }
+.stc-t { font-family: var(--f-display); font-weight: 900; font-size: clamp(30px, 5.4vw, 64px); line-height: 1; color: #fff; text-shadow: 0 0 30px hsl(var(--h) 95% 55% / .9);
+  animation: stcSlam .4s var(--ease-snap) .32s both, stcFlick .2s steps(2) .72s 2; }
+@keyframes stcSlam { from { opacity: 0; transform: scale(2.2); letter-spacing: .2em; } }
+@keyframes stcFlick { 50% { opacity: .35; } }
+/* lo scontro finale: i volti di chi resta entrano da lati alterni */
+.stc-faces { display: flex; gap: 8px; }
+.stc-faces .av { --s: clamp(44px, 6vw, 64px); font-size: 20px; box-shadow: 0 0 0 2px hsl(var(--h) 40% 6%), 0 0 0 4px hsl(var(--h) 95% 62%); animation: stcFace .4s var(--ease-kick) both; }
+.stc-faces .av:nth-child(odd) { --fx: -40px; } .stc-faces .av:nth-child(even) { --fx: 40px; }
+.stc-faces .av:nth-child(1) { animation-delay: .3s; } .stc-faces .av:nth-child(2) { animation-delay: .37s; } .stc-faces .av:nth-child(3) { animation-delay: .44s; }
+.stc-faces .av:nth-child(4) { animation-delay: .51s; } .stc-faces .av:nth-child(5) { animation-delay: .58s; } .stc-faces .av:nth-child(6) { animation-delay: .65s; }
+@keyframes stcFace { from { opacity: 0; transform: translateX(var(--fx, 0)) scale(.6) rotate(-10deg); } }
+.stc-day { --stc-dur: 1.6s; } .stc-dis { --stc-dur: 1.6s; } .stc-fin { --stc-dur: 1.8s; }
+/* mentre il cartello copre la scena il titolo della fase aspetta, poi entra */
+.broadcast.carded #phTitle .kc { animation-delay: calc(1.15s + var(--i) * 30ms); }
+
+/* la rivelazione dell'esito: la regia, passo per passo */
+.fn-play .wscene { animation: fnPush 1.6s var(--ease-snap) both; }
+@keyframes fnPush { from { transform: scale(1.16); filter: brightness(1.9) saturate(1.3); } }
+.fn-play .fn-arena { animation: fnSlideL .5s var(--ease-snap) .2s both; }
+.fn-play .fn-meta > span { animation: fnPop .4s var(--ease-kick) both; }
+.fn-play .fn-meta > span:nth-child(1) { animation-delay: .36s; } .fn-play .fn-meta > span:nth-child(2) { animation-delay: .45s; }
+.fn-play .fn-mid::before { animation: fnSlash .5s var(--ease-snap) .32s both; }
+.fn-play .fn-portrait { animation: fnPunch .72s cubic-bezier(.2,.7,.3,1) .45s both; }
+.fn-play .fn-portrait::after { content: ""; position: absolute; inset: -6px; border-radius: 50%; pointer-events: none; box-shadow: 0 0 0 6px #fff, 0 0 40px 10px hsl(var(--h) 95% 70%); animation: fnRing .5s var(--ease-snap) .78s both; }
+.fn-play .fn-crown { animation: fnCrown .55s var(--ease-kick) 1.05s both; }
+.fn-play .fn-title { animation: fnStamp .42s var(--ease-snap) .72s both, stcFlick .18s steps(2) 1.14s 2; }
+.fn-play h1 .kc-kick { animation: kcKick .5s cubic-bezier(.2,.7,.3,1) both; animation-delay: calc(.9s + var(--i) * 38ms + var(--j, 0ms)); }
+.fn-play .fn-sub { animation: fnRise .45s var(--ease-snap) 1.25s both; }
+.fn-play .fn-stats, .fn-play .fn-crew { animation: fnRise .5s var(--ease-snap) 1.32s both; }
+.fn-play .fn-stats > div, .fn-play .fn-mate { animation: fnPop .42s var(--ease-kick) both; }
+.fn-play .fn-stats > div:nth-child(1), .fn-play .fn-mate:nth-child(1) { animation-delay: 1.42s; } .fn-play .fn-stats > div:nth-child(2), .fn-play .fn-mate:nth-child(2) { animation-delay: 1.5s; }
+.fn-play .fn-stats > div:nth-child(3), .fn-play .fn-mate:nth-child(3) { animation-delay: 1.58s; } .fn-play .fn-stats > div:nth-child(4), .fn-play .fn-mate:nth-child(n+4) { animation-delay: 1.66s; }
+@keyframes fnSlideL { from { opacity: 0; transform: translateX(-70px) skewX(-14deg); } }
+@keyframes fnPop { from { opacity: 0; transform: scale(.6); } }
+@keyframes fnSlash { from { transform: translateY(-50%) skewX(-18deg) scaleX(0); opacity: 0; } }
+@keyframes fnPunch { 0% { opacity: 0; transform: scale(1.7) rotate(-12deg); filter: brightness(3); } 55% { opacity: 1; transform: scale(.94) rotate(2deg); filter: brightness(1.3); } 78% { transform: scale(1.03) rotate(-1deg); } 100% { transform: none; filter: none; } }
+@keyframes fnRing { 0% { opacity: 0; transform: scale(.85); } 1% { opacity: 1; } 100% { opacity: 0; transform: scale(1.6); } }
+@keyframes fnCrown { from { opacity: 0; transform: translate(-50%, -260%) rotate(-30deg); } to { opacity: 1; transform: translate(-50%, -60%) rotate(-6deg); } }
+@keyframes fnStamp { 0% { opacity: 0; transform: scale(1.8); letter-spacing: .5em; } 40% { opacity: 1; } 100% { transform: none; letter-spacing: .22em; } }
+@keyframes fnRise { from { opacity: 0; transform: translateY(18px); } }
+@keyframes kcKick { 0% { opacity: 0; transform: translateY(-.45em) rotate(var(--r, 0deg)) scale(1.35); } 60% { opacity: 1; transform: translateY(.04em) rotate(calc(var(--r, 0deg) * -.25)) scale(.97); } 100% { transform: none; } }
+.winhero.finale h1 .kc-kick { display: inline-block; }
+/* il respiro dopo l'entrata: il ritratto galleggia piano */
+.winhero.finale:not(.fn-play) .fn-portrait > .av { animation: fnFloat 6s ease-in-out infinite alternate; }
+@keyframes fnFloat { from { transform: translateY(-4px); } to { transform: translateY(4px); } }
+/* con il movimento ridotto la regia non parte: tutto è già al suo posto */
+@media (prefers-reduced-motion: reduce) { .winhero.finale .fn-portrait > .av, .broadcast > .stc { animation: none; } .broadcast > .stc { display: none; } }
+[data-reduced-motion] .winhero.finale .fn-portrait > .av { animation: none; }
+[data-reduced-motion] .broadcast > .stc, [data-reduced-motion] .stacco { display: none; }
+
+/* i pulsanti rispondono subito: si schiacciano e tornano con un piccolo rimbalzo */
+.btn { transition: transform .26s var(--ease-kick), background-color .15s, border-color .15s, box-shadow .2s; }
+.btn:active:not(:disabled) { transform: scale(.95) skewX(-3deg); transition-duration: .05s; }
+/* i blocchi dell'esito entrano di taglio, non solo dal basso */
+#resBody .reveal { transform: translateX(-26px) skewX(-4deg); transition: transform .7s var(--ease-snap) calc(var(--ri, 0) * 60ms); }
+#resBody .reveal.revealed { transform: none; }
+[data-reduced-motion] #resBody .reveal { transform: none; }
+@media (prefers-reduced-motion: reduce) { #resBody .reveal { transform: none; } .btn:active:not(:disabled) { transform: none; } }

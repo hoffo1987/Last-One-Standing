@@ -355,10 +355,19 @@
     const step = (now) => { if (reduced) { el.textContent = to; return; } const k = Math.max(0, Math.min(1, (now - t0) / dur)), e = 1 - Math.pow(1 - k, 3); el.textContent = Math.round(from + (to - from) * e); if (k < 1) requestAnimationFrame(step); };
     requestAnimationFrame(step);
   }
+  // --r e --j: ogni lettera ha la sua rotazione e un ritardo un po' sfalsato, perché un ingresso tutto uguale sembra meccanico
   function kinetic(el, style) {
     if (!el || reduced) return;
     const text = el.textContent; el.setAttribute('aria-label', text); el.innerHTML = '';
-    [...text].forEach((ch, i) => { const s = document.createElement('span'); s.className = 'kc kc-' + (style || 'drop'); s.style.setProperty('--i', i); s.setAttribute('aria-hidden', 'true'); s.textContent = ch === ' ' ? ' ' : ch; el.appendChild(s); });
+    // le lettere di una parola stanno in un contenitore che non va a capo: il titolo si spezza solo tra le parole
+    let i = 0;
+    text.split(/(\s+)/).forEach((part) => {
+      if (!part) return;
+      if (/^\s+$/.test(part)) { el.appendChild(document.createTextNode(' ')); i++; return; }
+      const w = document.createElement('span'); w.className = 'kw'; w.setAttribute('aria-hidden', 'true');
+      [...part].forEach((ch) => { const s = document.createElement('span'); s.className = 'kc kc-' + (style || 'drop'); s.style.setProperty('--i', i++); s.style.setProperty('--r', R(-14, 14).toFixed(1) + 'deg'); s.style.setProperty('--j', Math.round(R(-14, 14)) + 'ms'); s.textContent = ch; w.appendChild(s); });
+      el.appendChild(w);
+    });
   }
   function dice(el, roll, dc, pass) {
     if (!el || reduced) return;
@@ -415,6 +424,66 @@
       if (kind === 'fallen' && opt && opt.deaths) f.burst('embers', null, null, 12 + opt.deaths * 4);
     }
   }
+  /* ================= STACCHI =================
+   * Il linguaggio di movimento dell'interfaccia, ricavato dai principi dei menu dei Persona (non dal loro aspetto):
+   * ogni cambio di schermata è uno stacco coperto da lastre in diagonale, a strati sfalsati; si entra veloci e si
+   * frena (uscita esponenziale), si esce accelerando; i momenti importanti hanno un cartello che arriva, resta fermo
+   * il tempo di leggerlo e se ne va; il nuovo stato prende il colore d'accento; le uscite variano di poco i tempi
+   * perché un ritmo tutto uguale sembra meccanico. Con il movimento ridotto non parte niente e il contenuto cambia subito. */
+  const EASE_IN = 'cubic-bezier(.75,0,.25,1)', EASE_OUT = 'cubic-bezier(.16,1,.3,1)', EASE_CUT = 'cubic-bezier(.7,0,.84,0)';
+  let wipeEl = null, wiping = false;
+  function wipe(swap, opt) {
+    opt = opt || {};
+    const body = document.body;
+    if (reduced || wiping || !body || typeof body.animate !== 'function') { swap(); return; }
+    wiping = true;
+    if (!wipeEl || !wipeEl.isConnected) {
+      wipeEl = document.createElement('div'); wipeEl.className = 'stacco'; wipeEl.setAttribute('aria-hidden', 'true');
+      wipeEl.innerHTML = '<i class="st-a"></i><i class="st-b"></i><i class="st-c"></i><b class="st-mark"></b>';
+      body.appendChild(wipeEl);
+    }
+    const el = wipeEl, [a, b, c] = el.querySelectorAll('i'), mark = el.querySelector('.st-mark');
+    if (opt.hue != null) el.style.setProperty('--wh', opt.hue); else el.style.removeProperty('--wh');
+    mark.textContent = opt.label || '';
+    el.hidden = false;
+    const sk = ' skewX(-16deg)', jit = () => Math.round(R(-12, 12));
+    const slide = (n, from, to, o) => n.animate([{ transform: 'translateX(' + from + ')' + sk }, { transform: 'translateX(' + to + ')' + sk }], o);
+    let swapped = false;
+    const doSwap = () => { if (swapped) return; swapped = true; try { swap(); } catch (e) { setTimeout(() => { throw e; }); } };
+    const cover = [[a, 0], [b, 40], [c, 80]].map(([n, d]) => slide(n, '-170vw', '0', { duration: 230, delay: Math.max(0, d + jit()), easing: EASE_IN, fill: 'both' }));
+    mark.animate([{ opacity: 0, transform: 'translate(-50%, -50%) rotate(-7deg) scale(1.8)' }, { opacity: 1, transform: 'translate(-50%, -50%) rotate(-7deg) scale(1)' }], { duration: 200, delay: 220, easing: EASE_OUT, fill: 'both' });
+    Promise.all(cover.map((x) => x.finished))
+      .then(() => new Promise((res) => setTimeout(res, opt.hold || 90)))
+      .then(() => {
+        doSwap();
+        mark.animate([{ opacity: 1, transform: 'translate(-50%, -50%) rotate(-7deg) scale(1)' }, { opacity: 0, transform: 'translate(-20%, -50%) rotate(-7deg) scale(1)' }], { duration: 180, easing: EASE_CUT, fill: 'both' });
+        const out = [[c, 0], [b, 40], [a, 85]].map(([n, d]) => slide(n, '0', '170vw', { duration: 320, delay: Math.max(0, d + jit()), easing: EASE_OUT, fill: 'both' }));
+        return Promise.all(out.map((x) => x.finished));
+      })
+      .catch(() => {})
+      .then(() => { doSwap(); el.hidden = true; wiping = false; [a, b, c, mark].forEach((n) => n.getAnimations().forEach((x) => x.cancel())); });
+  }
+  // un cartello sopra la scena della diretta: arriva, resta fermo il tempo di leggerlo, se ne va (la regia è nel CSS)
+  function card(host, html, cls, dur) {
+    if (reduced || !host) return;
+    host.querySelectorAll(':scope > .stc').forEach((x) => x.remove());
+    clearTimeout(host.__stc);
+    const el = document.createElement('div'); el.className = 'stc ' + (cls || ''); el.setAttribute('aria-hidden', 'true');
+    el.innerHTML = '<i class="stc-band"></i><i class="stc-line"></i>' + html;
+    host.appendChild(el); host.classList.add('carded');
+    host.__stc = setTimeout(() => { el.remove(); host.classList.remove('carded'); }, dur || 1600);
+  }
+  // una regia a classi: la classe accende le animazioni del CSS, un tocco o un tasto chiude tutto subito
+  function stage(el, cls, dur, onSkip) {
+    if (reduced || !el) return;
+    el.classList.add(cls);
+    let done = false;
+    const end = (skipped) => { if (done) return; done = true; el.classList.remove(cls); el.removeEventListener('pointerdown', skip); document.removeEventListener('keydown', skip); if (skipped && onSkip) onSkip(); };
+    const skip = () => end(true);
+    el.addEventListener('pointerdown', skip); document.addEventListener('keydown', skip);
+    setTimeout(() => end(false), dur || 3000);
+  }
+
   function intensityFor(kind, aliveRatio) {
     const base = { b: 1.6, d: 1, n: 0.8, f: 1.5, dis: 2.4, fallen: 0.7, finale: 2 }[kind] || 1;
     return base * (1 + (1 - aliveRatio) * 0.6);
@@ -459,5 +528,5 @@
     })();
   }
 
-  G.LOS_ANIM = { get reduced() { return reduced; }, setReduced, field, countTo, kinetic, dice, domBurst, tilt, parallax, ripple, reveal, phaseFx, intensityFor, confetti };
+  G.LOS_ANIM = { get reduced() { return reduced; }, setReduced, field, countTo, kinetic, dice, domBurst, tilt, parallax, ripple, reveal, phaseFx, wipe, card, stage, intensityFor, confetti };
 })(typeof window !== 'undefined' ? window : globalThis);

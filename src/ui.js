@@ -603,7 +603,15 @@
     if (v === 'esito') renderResults();
     if (changed) { window.scrollTo({ top: 0, behavior: 'auto' }); const sec = $('#v-' + v); sec.classList.remove('view-enter'); void sec.offsetWidth; sec.classList.add('view-enter'); const title = $('h1, h2', sec) || sec; title.tabIndex = -1; title.focus({ preventScroll: true }); }
   }
-  window.addEventListener('hashchange', route);
+  // cambiare sezione è uno stacco: tre lastre in diagonale coprono la pagina nei colori dell'arena di arrivo,
+  // il contenuto cambia mentre è coperto, poi le lastre escono dall'altra parte
+  const VIEW_LABEL = { home: 'Last One Standing', cast: 'Concorrenti', arena: 'Arena', diretta: 'Diretta', esito: 'Esito' };
+  window.addEventListener('hashchange', () => {
+    let v = (location.hash || '').slice(1); if (!VIEWS.includes(v)) v = 'home';
+    if (v === curView) { route(); return; }
+    const t = THEMES[(v === 'diretta' || v === 'esito') && SIM ? SIM.theme : S.settings.theme];
+    AN.wipe(route, { label: VIEW_LABEL[v] || '', hue: v === 'home' ? 162 : t ? t.hue : null });
+  });
   document.addEventListener('click', (e) => {
     const q = e.target.closest('[data-quick]'); if (q) { e.preventDefault(); quickPlay(); return; }
     const p = e.target.closest('[data-prof]'); if (p && SIM) { e.preventDefault(); openProfile(p.dataset.prof); return; }
@@ -1808,6 +1816,15 @@
     const prevAlive = i > 0 ? P[i - 1].snap.alive.length : total;
     AN.field(bcs, theme.id, { intensity: AN.intensityFor(ph.kind, ph.snap.alive.length / total) });
     AN.phaseFx($('.broadcast'), ph.kind, theme.id, forward, { deaths: ph.kind === 'fallen' ? ph.deaths.length : 0 });
+    if (forward) {
+      // i cartelli: il calendario che gira quando cambia il giorno, la fascia del disastro, i volti dello scontro finale
+      const prev = i > 0 ? P[i - 1] : null, cal = calOf(theme);
+      if (ph.kind === 'finale' && P.findIndex((x) => x.kind === 'finale') === i) {
+        const left = (prev ? prev.snap.alive : ph.snap.alive).slice(0, 6);
+        AN.card($('.broadcast'), '<div class="stc-in"><span class="stc-k">Scontro finale</span><div class="stc-faces">' + left.map((id) => avHTML(BY[id])).join('') + '</div></div>', 'stc-fin', 1800);
+      } else if (ph.kind === 'dis') AN.card($('.broadcast'), '<div class="stc-in"><span class="stc-k">Disastro</span><b class="stc-t">' + esc(ph.title) + '</b></div>', 'stc-dis', 1600);
+      else if (prev && ph.day !== prev.day && ph.kind !== 'fallen') AN.card($('.broadcast'), '<div class="stc-in stc-cal"><span class="stc-k">' + esc(cal.unit) + '</span><span class="stc-num"><b class="o">' + prev.day + '</b><b class="n">' + ph.day + '</b></span>' + (ph.meteo && ph.meteo.n ? '<span class="stc-sub">' + esc(ph.meteo.n) + '</span>' : '') + '</div>', 'stc-day', 1600);
+    }
     const hideTotal = S.settings.hideFuture && S.run.seen < P.length - 1;
     const info = phaseInfo(P, i, theme, hideTotal), maxD = runMaxDays();
     $('#bcPhase').textContent = 'Fase ' + (i + 1) + (hideTotal ? '' : ' di ' + P.length);
@@ -2179,19 +2196,25 @@
     const theme = resultTheme(SIM), soft = !!theme.soft, st = SIM.stats;
     const W = SIM.winners.map((id) => BY[id]);
     const kN = (n) => n + ' ' + (soft ? (n === 1 ? 'eliminazione' : 'eliminazioni') : (n === 1 ? 'uccisione' : 'uccisioni'));
-    // la rivelazione: il dipinto dell'arena a tutta scena, un alone che gira dietro chi ha vinto
+    // la rivelazione in tre fasce: in alto la testata della partita, al centro chi ha vinto, in basso i numeri
     const crown = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 18 4.5 7l5 4.5L12 5l2.5 6.5 5-4.5L21 18z"/><path d="M3.5 21h17"/></svg>';
-    const eyeb = '<div class="eyebrow">' + ART.icon(theme.id, 13) + ' ' + esc(theme.name) + ' · ' + durTxt(theme) + ' · ' + SIM.tributes.length + ' concorrenti</div>';
-    const scene = '<div class="wscene" aria-hidden="true">' + ART.scene(theme.id) + '</div><div class="fn-halo" aria-hidden="true"></div>';
+    const cal = calOf(theme), maxD = runMaxDays();
+    const top = '<div class="fn-top"><span class="fn-arena">' + ART.icon(theme.id, 15) + '<span>' + esc(theme.name) + '</span></span><span class="fn-meta"><span>' + plural(SIM.days, cal.unit, cal.units) + (maxD ? ' su ' + maxD : '') + '</span><span>' + SIM.tributes.length + ' concorrenti</span></span></div>';
+    const scene = '<div class="wscene" aria-hidden="true">' + ART.scene(theme.id) + '</div>';
     let hero;
     if (W.length === 1) {
       const w = W[0];
-      hero = '<div class="winhero finale">' + scene + '<div class="fn-portrait">' + avHTML(w, { btn: true }) + '<span class="fn-crown">' + crown + '</span></div><div class="fn-text">' + eyeb +
-        '<div class="fn-title">' + G3(w.gender, 'Ultimo', 'Ultima', 'Ultimə') + ' in piedi</div><h1>' + esc(w.name) + '</h1><p>Squadra ' + w.team + (w.traits.length ? ' · ' + w.traits.map((x) => TRAITS[x].name).join(', ') : '') + '</p>' +
-        '<div class="wstats"><div><b>' + w.kills + '</b><span>' + (soft ? 'eliminazioni' : 'uccisioni') + '</span></div><div><b>' + w.events + '</b><span>eventi vissuti</span></div><div><b>' + w.alliancesFormed + '</b><span>alleanze</span></div><div><b>' + w.items + '</b><span>oggetti trovati</span></div></div></div></div>';
+      const sub = '<p class="fn-sub">Squadra ' + w.team + (w.traits.length ? ' · ' + w.traits.map((x) => TRAITS[x].name).join(', ') : '') + '</p>';
+      const cell = (v, l) => '<div><b>' + v + '</b><span>' + l + '</span></div>';
+      hero = '<div class="winhero finale">' + scene + top +
+        '<div class="fn-mid"><div class="fn-portrait"><div class="fn-halo" aria-hidden="true"></div>' + avHTML(w, { btn: true }) + '<span class="fn-crown">' + crown + '</span></div>' +
+        '<div class="fn-text"><div class="fn-title">' + G3(w.gender, 'Ultimo', 'Ultima', 'Ultimə') + ' in piedi</div><h1>' + esc(w.name) + '</h1>' + sub + '</div></div>' +
+        '<div class="wstats fn-stats">' + cell(w.kills, soft ? 'eliminazioni' : 'uccisioni') + cell(w.events, 'eventi') + cell(w.alliancesFormed, 'alleanze') + cell(w.items, 'oggetti') + '</div></div>';
     } else if (W.length > 1) {
-      hero = '<div class="winhero finale team">' + scene + '<div class="fn-text">' + eyeb + '<div class="fn-title">Squadra vincitrice</div><h1>Vince la squadra ' + W[0].team + '</h1><div class="teamavs">' + W.map((w) => avHTML(w, { btn: true })).join('') + '</div><p>' + W.map((w) => esc(w.name) + ' (' + kN(w.kills) + ')').join(' · ') + '</p></div></div>';
-    } else hero = '<div class="winhero finale none">' + scene + '<div class="fn-text">' + eyeb + '<div class="fn-title">Nessun superstite</div><h1>L\'arena ha vinto</h1><p>Non è rimasto in piedi nessuno.</p></div></div>';
+      hero = '<div class="winhero finale team">' + scene + top +
+        '<div class="fn-mid"><div class="fn-text"><div class="fn-title">Squadra vincitrice</div><h1>Vince la squadra ' + W[0].team + '</h1><p class="fn-sub">' + plural(W.length, 'superstite', 'superstiti') + ', ' + kN(W.reduce((n, w) => n + w.kills, 0)) + ' in tutto</p></div></div>' +
+        '<div class="fn-crew">' + W.map((w) => '<div class="fn-mate">' + avHTML(w, { btn: true }) + '<span><b>' + esc(w.name) + '</b><small>' + kN(w.kills) + '</small></span></div>').join('') + '</div></div>';
+    } else hero = '<div class="winhero finale none">' + scene + top + '<div class="fn-mid"><div class="fn-text"><div class="fn-title">Nessun superstite</div><h1>L\'arena ha vinto</h1><p class="fn-sub">Non è rimasto in piedi nessuno.</p></div></div></div>';
 
     const ranked = SIM.tributes.slice().sort((a, b) => a.rank - b.rank || b.kills - a.kills);
     const podiumT = ranked.slice(0, 3);
@@ -2275,14 +2298,18 @@
     const wh = $('#resBody .winhero');
     if (wh) { AN.field(wh, theme.id, { intensity: 1.6, cls: 'fx-win' }); }
     const first = S.run && !S.run.celebrated;
-    if (first && !AN.reduced) {
+    if (first && !AN.reduced && wh) {
+      // la regia della rivelazione (vedi «STACCHI» nel foglio di stile): un tocco o un tasto la chiude subito
       $('#resBody').classList.add('ceremony');
       setTimeout(() => $('#resBody') && $('#resBody').classList.remove('ceremony'), 4000);
-      $$('#resBody .wstats b').forEach((b) => { const n = parseInt(b.textContent, 10); if (!isNaN(n)) AN.countTo(b, n, { from: 0, dur: 1600 }); });
-      const wn = $('#resBody .winhero h1'); if (wn) AN.kinetic(wn, 'rise');
+      const wn = $('#resBody .winhero h1'); if (wn) AN.kinetic(wn, 'kick');
+      const nums = $$('#resBody .wstats b').map((b) => [b, parseInt(b.textContent, 10)]).filter((x) => !isNaN(x[1]));
+      nums.forEach(([b]) => (b.textContent = '0'));
+      const tc = setTimeout(() => nums.forEach(([b, n]) => AN.countTo(b, n, { from: 0, dur: 1300 })), 1500);
+      AN.stage(wh, 'fn-play', 3200, () => { clearTimeout(tc); nums.forEach(([b, n]) => (b.textContent = n)); });
     }
     AN.reveal($$('#resBody .block, #resBody .award'));
-    if (first && W.length) { S.run.celebrated = true; save(); setTimeout(() => AN.confetti(theme.id, theme.hue), 650); }
+    if (first && W.length) { S.run.celebrated = true; save(); setTimeout(() => AN.confetti(theme.id, theme.hue), 1350); }
   }
   function summaryText() {
     const theme = resultTheme(SIM), W = SIM.winners.map((id) => BY[id]);

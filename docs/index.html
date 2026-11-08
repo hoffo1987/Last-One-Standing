@@ -828,6 +828,7 @@ img.scene { object-fit: cover; object-position: center; user-select: none; }
 .db-hearts { color: #ff6fa6; } .db-sparks, .db-stars { color: #ffd36b; } .db-skulls { color: #ff5b4b; } .db-heal { color: #59c98b; font-size: 20px; }
 
 /* titoli cinetici */
+.kw { display: inline-block; max-width: 100%; }
 .kc { display: inline-block; animation-duration: .6s; animation-fill-mode: both; animation-timing-function: cubic-bezier(.2,.9,.3,1.3); animation-delay: calc(var(--i) * 30ms); }
 .kc-drop { animation-name: kcDrop; } .kc-rise { animation-name: kcRise; animation-duration: .8s; animation-delay: calc(500ms + var(--i) * 45ms); } .kc-shake { animation-name: kcShake; } .kc-fade { animation-name: kcFade; animation-duration: 1s; }
 @keyframes kcDrop { from { opacity: .001; transform: translateY(-40%) rotate(-6deg); } }
@@ -884,12 +885,8 @@ img.scene { object-fit: cover; object-position: center; user-select: none; }
 @keyframes hotZone { 50% { box-shadow: inset 0 0 0 2px color-mix(in srgb, var(--dead) 70%, transparent), 0 0 14px -2px color-mix(in srgb, var(--dead) 50%, transparent); } }
 
 /* esito: cerimonia del vincitore */
-.ceremony .winhero { animation: winIn 1.2s cubic-bezier(.2,.7,.3,1) both; }
-@keyframes winIn { from { clip-path: inset(0 50% 0 50% round 20px); filter: brightness(2); } }
 .ceremony .winhero > .av, .ceremony .winhero .teamavs .av { animation: winAv 1s cubic-bezier(.2,.9,.3,1.5) .35s both; }
 @keyframes winAv { from { transform: scale(.2) rotate(-25deg); opacity: .001; } }
-.ceremony .winhero .wstats > div { animation: viewIn .6s ease both; }
-.ceremony .winhero .wstats > div:nth-child(1) { animation-delay: 1s; } .ceremony .winhero .wstats > div:nth-child(2) { animation-delay: 1.1s; } .ceremony .winhero .wstats > div:nth-child(3) { animation-delay: 1.2s; } .ceremony .winhero .wstats > div:nth-child(4) { animation-delay: 1.3s; }
 .winhero > .av { animation: winHalo 3.5s ease-in-out 1.5s infinite; }
 @keyframes winHalo { 50% { box-shadow: 0 0 0 5px var(--screen), 0 0 0 9px var(--screen-accent), 0 0 60px 10px hsl(var(--h) 90% 55% / .55); } }
 .ceremony .pod .step { animation: podRise .9s cubic-bezier(.2,.9,.3,1.1) both; transform-origin: bottom; }
@@ -2487,42 +2484,67 @@ html, body { margin: 0; }
 @media (max-width: 760px) { .steps { background: color-mix(in srgb, var(--panel-solid) 92%, transparent); box-shadow: 0 -18px 40px -24px rgba(0,0,0,.6); } }
 
 /* =====================================================================
- * ESITO: un finale da film
- * La rivelazione occupa tutta la scena, dentro il dipinto dell'arena; un alone di luce gira dietro
- * chi ha vinto; i pulsanti sono una barra di vetro che galleggia sul bordo del dipinto; il podio è
- * un palco con un occhio di bue; i premi sono trofei; la classifica ha le sue medaglie.
+ * ESITO: un finale da film, in tre fasce
+ * In alto la testata della partita (arena, durata, concorrenti), al centro chi ha vinto con il ritratto e il nome,
+ * in basso una sola striscia con i numeri. Il dipinto dell'arena fa da scena; tre veli lo scuriscono dove c'è testo.
  * ===================================================================== */
-.winhero.finale { --fh: clamp(440px, 64vh, 660px); min-height: var(--fh); margin-top: 18px; padding: clamp(24px, 4vw, 56px); border-radius: 28px; display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: end; gap: clamp(20px, 4vw, 54px);
+.winhero.finale { --fh: clamp(460px, 66vh, 680px); min-height: var(--fh); margin-top: 18px; padding: clamp(20px, 3.4vw, 44px); border-radius: 28px;
+  display: grid; grid-template-columns: minmax(0, 1fr); grid-template-rows: auto 1fr auto; align-items: stretch; gap: clamp(18px, 3vw, 34px);
   background: var(--screen); isolation: isolate; box-shadow: inset 0 0 0 1px hsl(var(--h) 80% 80% / .12), 0 40px 90px -40px rgba(0,0,0,.85), 0 0 120px -60px hsl(var(--h) 90% 55% / .7); }
-.winhero.finale::before { z-index: 1; background: linear-gradient(90deg, hsl(var(--h) 40% 4% / .82) 0%, hsl(var(--h) 40% 4% / .45) 45%, transparent 75%), linear-gradient(0deg, hsl(var(--h) 40% 4% / .92) 0%, transparent 55%), radial-gradient(ellipse 80% 60% at 70% 30%, transparent, hsl(var(--h) 40% 4% / .35)); }
+.winhero.finale::before { z-index: 1;
+  background: linear-gradient(180deg, hsl(var(--h) 40% 4% / .72) 0%, transparent 24%),
+    linear-gradient(0deg, hsl(var(--h) 40% 4% / .9) 0%, transparent 36%),
+    linear-gradient(90deg, hsl(var(--h) 40% 4% / .8) 0%, hsl(var(--h) 40% 4% / .38) 48%, transparent 78%); }
 .winhero.finale .wscene { inset: 0; opacity: 1; -webkit-mask-image: none; mask-image: none; z-index: 0; }
 .winhero.finale .wscene img.scene, .winhero.finale .wscene svg { width: 100%; height: 100%; object-position: center 40%; animation: kenburns 40s ease-in-out infinite alternate; }
 .winhero.finale .fx-field { z-index: 1; }
-.winhero.finale > .fn-portrait, .winhero.finale > .fn-text { position: relative; z-index: 2; }
-/* l'alone: raggi lenti dietro il ritratto */
-.fn-halo { position: absolute; z-index: 1; left: clamp(24px, 4vw, 56px); bottom: clamp(24px, 4vw, 56px); width: 230px; height: 230px; transform: translate(-25%, 25%); pointer-events: none; border-radius: 50%;
+.winhero.finale > .fn-top, .winhero.finale > .fn-mid, .winhero.finale > .fn-stats, .winhero.finale > .fn-crew { position: relative; z-index: 2; min-width: 0; }
+
+/* in alto: la testata */
+.fn-top { display: flex; align-items: center; justify-content: space-between; gap: 10px 16px; flex-wrap: wrap; }
+.fn-arena, .fn-meta > span { -webkit-backdrop-filter: blur(10px) saturate(1.3); backdrop-filter: blur(10px) saturate(1.3); background: hsl(var(--h) 40% 6% / .5); box-shadow: inset 0 0 0 1px hsl(var(--h) 80% 80% / .15); border-radius: 999px; }
+.fn-arena { display: inline-flex; align-items: center; gap: 10px; padding: 8px 18px 8px 12px; font-family: var(--f-display); font-weight: 800; font-size: 14px; letter-spacing: .14em; text-transform: uppercase; color: #fff; }
+.fn-arena svg { color: var(--screen-accent); flex: none; }
+.fn-meta { display: flex; gap: 8px; flex-wrap: wrap; }
+.fn-meta > span { padding: 7px 13px; font-size: 13px; font-weight: 600; color: hsl(var(--h) 25% 92% / .9); font-variant-numeric: tabular-nums; }
+
+/* al centro: ritratto e nome, allineati sullo stesso asse */
+.fn-mid { display: flex; align-items: center; gap: clamp(22px, 4vw, 56px); align-self: center; position: relative; }
+/* la linea che guida lo sguardo dal ritratto al nome */
+.fn-mid::before { content: ""; position: absolute; z-index: -1; left: -60px; right: 18%; top: 50%; height: clamp(54px, 7vw, 86px); transform: translateY(-50%) skewX(-18deg); transform-origin: left center; pointer-events: none;
+  background: linear-gradient(90deg, hsl(var(--h) 95% 55% / .34), hsl(var(--h) 95% 55% / .1) 55%, transparent); box-shadow: 0 0 60px -20px hsl(var(--h) 95% 55% / .7); }
+.winhero.finale.team .fn-mid::before, .winhero.finale.none .fn-mid::before { left: -60px; right: 30%; }
+.fn-portrait { position: relative; flex: none; isolation: isolate; }
+.winhero.finale .fn-portrait .av { --s: clamp(150px, 15vw, 200px); font-size: 64px; box-shadow: 0 0 0 4px hsl(var(--h) 40% 6%), 0 0 0 8px var(--screen-accent), 0 0 60px 6px hsl(var(--h) 95% 55% / .55), 0 30px 60px -20px rgba(0,0,0,.8); }
+.fn-halo { position: absolute; z-index: -1; left: 50%; top: 50%; width: 200%; aspect-ratio: 1; transform: translate(-50%, -50%); pointer-events: none; border-radius: 50%;
   background: radial-gradient(circle, hsl(var(--h) 95% 65% / .55) 0%, hsl(var(--h) 95% 55% / .18) 32%, transparent 62%), repeating-conic-gradient(from 0deg, hsl(var(--h) 95% 70% / .22) 0 7deg, transparent 7deg 22deg);
   -webkit-mask: radial-gradient(circle, #000 25%, transparent 70%); mask: radial-gradient(circle, #000 25%, transparent 70%); animation: haloSpin 60s linear infinite; mix-blend-mode: screen; }
-@keyframes haloSpin { to { transform: translate(-25%, 25%) rotate(360deg); } }
-.winhero.finale.team .fn-halo, .winhero.finale.none .fn-halo { display: none; }
-.fn-portrait { position: relative; }
-.winhero.finale .fn-portrait .av { --s: clamp(150px, 16vw, 210px); font-size: 64px; box-shadow: 0 0 0 4px hsl(var(--h) 40% 6%), 0 0 0 8px var(--screen-accent), 0 0 60px 6px hsl(var(--h) 95% 55% / .55), 0 30px 60px -20px rgba(0,0,0,.8); }
+@keyframes haloSpin { to { transform: translate(-50%, -50%) rotate(360deg); } }
 .fn-crown { position: absolute; left: 50%; top: -6px; transform: translate(-50%, -60%) rotate(-6deg); width: 54px; height: 54px; filter: drop-shadow(0 6px 14px rgba(0,0,0,.6)) drop-shadow(0 0 16px hsl(45 100% 60% / .7)); }
 .fn-crown svg { width: 100%; height: 100%; fill: #f5c542; stroke: #fff2b8; stroke-width: 1; stroke-linejoin: round; }
-.fn-text { min-width: 0; padding-bottom: 6px; }
-.winhero.finale .eyebrow { color: var(--screen-accent); }
-.fn-title { margin-top: 14px; font-family: var(--f-display); font-weight: 800; font-size: clamp(15px, 1.6vw, 19px); letter-spacing: .22em; text-transform: uppercase; color: #f5c542; text-shadow: 0 0 18px hsl(45 100% 55% / .6); display: inline-flex; align-items: center; gap: 12px; }
-.fn-title::before, .fn-title::after { content: ""; width: 34px; height: 1px; background: currentColor; opacity: .7; }
-.winhero.finale h1 { margin: 6px 0 8px; font-size: clamp(54px, 9vw, 128px); line-height: .95; letter-spacing: -.035em;
-  background: linear-gradient(180deg, #fff 30%, color-mix(in srgb, var(--screen-accent) 55%, #fff) 100%); -webkit-background-clip: text; background-clip: text; color: transparent; filter: drop-shadow(0 6px 30px hsl(var(--h) 90% 40% / .55)); }
-.winhero.finale p { color: hsl(var(--h) 25% 88% / .85); font-size: 17px; }
-.winhero.finale .wstats { margin-top: 22px; gap: 10px; }
-.winhero.finale .wstats > div { padding: 12px 16px 10px; min-width: 104px; border-radius: 14px; background: hsl(var(--h) 40% 8% / .45); -webkit-backdrop-filter: blur(10px) saturate(1.3); backdrop-filter: blur(10px) saturate(1.3); box-shadow: inset 0 0 0 1px hsl(var(--h) 80% 80% / .14), inset 0 1px 0 hsl(0 0% 100% / .08); }
-.winhero.finale .wstats b { font-size: clamp(28px, 3vw, 38px); }
-.winhero.finale.team, .winhero.finale.none { grid-template-columns: minmax(0, 1fr); }
-.winhero.finale .teamavs { margin: 14px 0 6px; }
-/* i pulsanti: una barra di vetro che galleggia sul bordo inferiore del dipinto */
-#resBody .resactions { position: relative; z-index: 3; width: fit-content; max-width: calc(100% - 32px); margin: -30px auto 30px; padding: 10px; border-radius: 18px; justify-content: center;
+.fn-text { min-width: 0; }
+.fn-title { display: flex; width: fit-content; align-items: center; gap: 12px; font-family: var(--f-display); font-weight: 800; font-size: clamp(14px, 1.5vw, 18px); letter-spacing: .22em; text-transform: uppercase; color: #f5c542; text-shadow: 0 0 18px hsl(45 100% 55% / .6); }
+.fn-title::after { content: ""; width: 44px; height: 2px; border-radius: 2px; background: currentColor; opacity: .7; }
+.winhero.finale h1 { position: relative; margin: 8px 0 10px; font-size: clamp(54px, 8.4vw, 124px); line-height: .95; letter-spacing: -.035em; color: #fff; overflow-wrap: anywhere;
+  text-shadow: 0 2px 0 hsl(var(--h) 60% 30% / .5), 0 0 40px hsl(var(--h) 95% 55% / .55), 0 10px 50px rgba(0,0,0,.6); }
+.winhero.finale h1 * { color: inherit; }
+.winhero.finale .fn-sub { margin: 0; color: hsl(var(--h) 25% 90% / .88); font-size: 17px; max-width: 60ch; }
+
+/* in basso: i numeri in una sola striscia */
+.winhero.finale .fn-stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0; margin: 0; border-radius: 18px; overflow: hidden;
+  background: hsl(var(--h) 40% 6% / .52); -webkit-backdrop-filter: blur(14px) saturate(1.3); backdrop-filter: blur(14px) saturate(1.3); box-shadow: inset 0 0 0 1px hsl(var(--h) 80% 80% / .14), inset 0 1px 0 hsl(0 0% 100% / .08); }
+.winhero.finale .fn-stats > div { position: relative; min-width: 0; padding: 14px 22px 12px; text-align: center; }
+.winhero.finale .fn-stats > div + div::before { content: ""; position: absolute; left: 0; top: 22%; bottom: 22%; width: 1px; background: hsl(var(--h) 80% 85% / .18); }
+.winhero.finale .fn-stats b { font-size: clamp(28px, 3vw, 40px); }
+.winhero.finale .fn-stats span { margin-top: 4px; font-size: 13px; letter-spacing: .04em; color: hsl(var(--h) 25% 88% / .75); }
+/* la squadra vincitrice: una fila di schede */
+.fn-crew { display: flex; flex-wrap: wrap; gap: 10px; }
+.fn-mate { display: flex; align-items: center; gap: 10px; padding: 7px 16px 7px 7px; border-radius: 999px; background: hsl(var(--h) 40% 6% / .52); -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); box-shadow: inset 0 0 0 1px hsl(var(--h) 80% 80% / .14); }
+.winhero.finale .fn-mate .av { --s: 48px; font-size: 18px; box-shadow: 0 0 0 2px hsl(var(--h) 40% 6%), 0 0 0 4px var(--screen-accent); }
+.fn-mate b { display: block; font-size: 15px; color: #fff; } .fn-mate small { display: block; font-size: 12.5px; color: hsl(var(--h) 25% 88% / .75); }
+
+/* i pulsanti: sotto il dipinto, senza sovrapporsi ai numeri */
+#resBody .resactions { position: relative; z-index: 3; width: fit-content; max-width: 100%; margin: 16px auto 30px; padding: 10px; border-radius: 18px; justify-content: center;
   background: color-mix(in srgb, var(--panel-solid) 72%, transparent); -webkit-backdrop-filter: blur(18px) saturate(1.4); backdrop-filter: blur(18px) saturate(1.4); box-shadow: var(--sheen), var(--depth); border: 1px solid var(--line); }
 #resBody .resactions .help.mono { padding: 0 8px; }
 /* capitoli numerati */
@@ -2573,34 +2595,138 @@ html, body { margin: 0; }
 #resBody .posterbox img { border-radius: 14px; transform: rotate(-1.2deg); box-shadow: 0 30px 60px -28px rgba(0,0,0,.8), 0 0 0 1px hsl(0 0% 100% / .08); transition: transform .4s cubic-bezier(.2,.8,.2,1); }
 #resBody .posterbox img:hover { transform: rotate(0) scale(1.02); }
 @media (max-width: 760px) {
-  .winhero.finale { grid-template-columns: minmax(0, 1fr); justify-items: center; text-align: center; align-items: end; --fh: auto; min-height: 560px; padding: 28px 18px 46px; }
-  .winhero.finale::before { background: linear-gradient(0deg, hsl(var(--h) 40% 4% / .95) 0%, hsl(var(--h) 40% 4% / .55) 55%, hsl(var(--h) 40% 4% / .2) 100%); }
-  .fn-halo { left: 50%; bottom: auto; top: 60px; transform: translate(-50%, 0); animation-name: haloSpinM; }
-  @keyframes haloSpinM { to { transform: translate(-50%, 0) rotate(360deg); } }
-  .winhero.finale .wstats { justify-content: center; }
-  .winhero.finale .wstats > div { min-width: 0; flex: 1 1 40%; }
-  .fn-title::before, .fn-title::after { width: 18px; }
-  #resBody .resactions { margin-top: -26px; }
+  .winhero.finale { --fh: auto; min-height: 0; padding: 16px 14px 14px; gap: 18px; text-align: center; border-radius: 22px; justify-items: stretch; }
+  .winhero.finale::before { background: linear-gradient(180deg, hsl(var(--h) 40% 4% / .7) 0%, hsl(var(--h) 40% 4% / .35) 30%, hsl(var(--h) 40% 4% / .45) 60%, hsl(var(--h) 40% 4% / .92) 100%); }
+  .fn-top { flex-direction: column; gap: 8px; }
+  .fn-arena { font-size: 12.5px; letter-spacing: .12em; padding: 7px 14px 7px 10px; max-width: 100%; }
+  .fn-meta { justify-content: center; } .fn-meta > span { font-size: 12px; padding: 5px 11px; }
+  .fn-mid { flex-direction: column; gap: 16px; padding: 18px 0 6px; }
+  .fn-mid::before { left: -14px; right: -14px; top: 34%; height: 70px; transform: translateY(-50%) skewY(-8deg); background: linear-gradient(90deg, transparent, hsl(var(--h) 95% 55% / .32) 30%, hsl(var(--h) 95% 55% / .32) 70%, transparent); }
+  .winhero.finale.team .fn-mid::before, .winhero.finale.none .fn-mid::before { left: -14px; right: -14px; top: 50%; }
+  .winhero.finale .fn-portrait .av { --s: 128px; font-size: 48px; }
+  .fn-title { margin-inline: auto; font-size: 13px; }
+  .fn-title::before { content: ""; width: 24px; height: 2px; border-radius: 2px; background: currentColor; opacity: .7; } .fn-title::after { width: 24px; }
+  .winhero.finale h1 { font-size: clamp(42px, 13vw, 64px); }
+  .winhero.finale .fn-sub { font-size: 15px; margin-inline: auto; }
+  .winhero.finale .fn-stats > div { padding: 10px 4px 9px; }
+  .winhero.finale .fn-stats b { font-size: 23px; }
+  .winhero.finale .fn-stats span { font-size: 11px; letter-spacing: 0; }
+  .fn-crew { justify-content: center; }
   .pod.p1 .av { --s: 80px; } .pod .av { --s: 60px; } .pod.p1 .step { height: 120px; }
 }
 @media (prefers-reduced-motion: reduce) { .fn-halo, .pod .step::after, #resBody .chart circle, .winhero.finale .wscene img.scene { animation: none; } }
 [data-reduced-motion] .fn-halo, [data-reduced-motion] .pod .step::after, [data-reduced-motion] #resBody .chart circle, [data-reduced-motion] .winhero.finale .wscene img.scene { animation: none; }
-/* il nome si anima lettera per lettera: niente testo «ritagliato» sul gradiente, che le lettere animate perderebbero */
-.winhero.finale h1 { background: none; -webkit-background-clip: border-box; background-clip: border-box; color: #fff; filter: none;
-  text-shadow: 0 2px 0 hsl(var(--h) 60% 30% / .5), 0 0 40px hsl(var(--h) 95% 55% / .55), 0 10px 50px rgba(0,0,0,.6); }
-.winhero.finale h1 * { color: inherit; }
-.winhero.finale .eyebrow { display: flex; }
-.fn-title { display: flex; width: fit-content; }
-@media (max-width: 760px) { .winhero.finale .eyebrow, .fn-title { justify-content: center; margin-inline: auto; } }
-@media (max-width: 760px) {
-  .winhero.finale .wstats { gap: 6px; flex-wrap: nowrap; width: 100%; }
-  .winhero.finale .wstats > div { flex: 1 1 0; min-width: 0; padding: 9px 6px 7px; border-radius: 12px; }
-  .winhero.finale .wstats b { font-size: 22px; }
-  .winhero.finale .wstats span { font-size: 10.5px; line-height: 1.2; display: block; }
-  .winhero.finale .fn-portrait .av { --s: 132px; font-size: 48px; }
-  .fn-halo { top: 6px; width: 260px; height: 260px; }
-  .winhero.finale h1 { font-size: clamp(44px, 13vw, 64px); }
-}
+
+/* =====================================================================
+ * STACCHI: il linguaggio di movimento
+ * Principi presi dai menu dei Persona e tradotti nel nostro stile dipinto (niente rosso e nero, niente lettere ritagliate):
+ * – ogni cambio di schermata è uno stacco coperto, mai una semplice dissolvenza;
+ * – si entra veloci e si frena, si esce accelerando: le uscite sono più brevi delle entrate;
+ * – gli strati arrivano sfalsati, con tempi leggermente diversi, mai tutti insieme;
+ * – i momenti importanti hanno un cartello: arriva, resta fermo il tempo di leggerlo, se ne va;
+ * – il nuovo stato prende il colore d'accento (il numero del nuovo giorno, il nome di chi vince);
+ * – una linea in diagonale guida lo sguardo verso l'informazione che conta;
+ * – i lampi d'impatto vanno «a due a due», a scatti, come un disegno animato; il resto scorre morbido;
+ * – finita l'entrata la scena non è mai ferma del tutto: respira piano.
+ * ===================================================================== */
+:root { --ease-snap: cubic-bezier(.16,1,.3,1); --ease-kick: cubic-bezier(.34,1.56,.64,1); --ease-cut: cubic-bezier(.7,0,.84,0); }
+
+/* lo stacco tra le sezioni: tre lastre in diagonale e il nome della sezione */
+.stacco { --wh: var(--h); position: fixed; inset: 0; z-index: 9999; pointer-events: none; overflow: hidden; contain: strict; }
+.stacco[hidden] { display: none; }
+.stacco i { position: absolute; top: -12%; bottom: -12%; left: -25%; width: 150%; transform: translateX(-170vw) skewX(-16deg); will-change: transform; }
+.stacco .st-a { background: hsl(var(--wh) 45% 5%); }
+.stacco .st-b { background: linear-gradient(100deg, hsl(var(--wh) 55% 10%) 20%, hsl(var(--wh) 70% 24%) 60%, hsl(var(--wh) 60% 14%) 90%); }
+.stacco .st-b::after { content: ""; position: absolute; inset: 0; opacity: .5; background: repeating-linear-gradient(90deg, transparent 0 46px, hsl(var(--wh) 90% 70% / .06) 46px 48px); }
+.stacco .st-c { left: 26%; width: 30%; background: linear-gradient(90deg, transparent, hsl(var(--wh) 95% 55% / .35) 22%, hsl(var(--wh) 95% 62% / .95) 42%, hsl(var(--wh) 100% 78%) 50%, hsl(var(--wh) 95% 62% / .95) 58%, hsl(var(--wh) 95% 55% / .35) 78%, transparent); }
+.stacco .st-mark { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%) rotate(-7deg); opacity: 0; white-space: nowrap;
+  font-family: var(--f-display); font-weight: 900; font-size: clamp(40px, 9vw, 120px); letter-spacing: -.02em; text-transform: uppercase; color: #fff;
+  text-shadow: 0 0 40px hsl(var(--wh) 95% 55% / .9), 0 6px 0 hsl(var(--wh) 60% 20%); }
+
+/* i cartelli della diretta */
+.broadcast > .stc { position: absolute; inset: 0; z-index: 6; pointer-events: none; display: grid; place-items: center; overflow: hidden; border-radius: inherit; }
+.stc-band { position: absolute; left: -10%; right: -10%; top: 50%; height: 64%; transform: translateY(-50%) skewY(-2.2deg);
+  background: linear-gradient(90deg, hsl(var(--h) 45% 6% / .97), hsl(var(--h) 60% 13% / .97) 60%, hsl(var(--h) 45% 8% / .97));
+  box-shadow: 0 0 0 1px hsl(var(--h) 80% 70% / .14), 0 30px 60px -20px rgba(0,0,0,.8); animation: stcBand var(--stc-dur, 1.6s) both; }
+.stc-line { position: absolute; left: -10%; right: -10%; top: 82%; height: 4px; transform: translateY(-50%) skewY(-2.2deg); background: hsl(var(--h) 95% 62%); box-shadow: 0 0 22px hsl(var(--h) 95% 60%); animation: stcBand var(--stc-dur, 1.6s) 60ms both; }
+@keyframes stcBand {
+  0% { clip-path: inset(0 100% 0 0); animation-timing-function: var(--ease-snap); }
+  16%, 86% { clip-path: inset(0 0 0 0); animation-timing-function: var(--ease-cut); }
+  100% { clip-path: inset(0 0 0 100%); } }
+.stc-in { position: relative; display: flex; align-items: center; gap: 12px 22px; flex-wrap: wrap; justify-content: center; padding: 0 24px; transform: rotate(-2.2deg); text-align: center;
+  animation: stcIn .32s var(--ease-snap) .16s both, stcGone .2s var(--ease-cut) calc(var(--stc-dur, 1.6s) - .5s) forwards; }
+@keyframes stcIn { from { opacity: 0; transform: rotate(-2.2deg) translateX(-60px); } }
+@keyframes stcGone { to { opacity: 0; transform: rotate(-2.2deg) translateX(80px); } }
+.stc-k { font-family: var(--f-display); font-weight: 900; font-size: clamp(13px, 1.8vw, 18px); letter-spacing: .24em; text-transform: uppercase; color: hsl(var(--h) 95% 72%); }
+/* il calendario: il vecchio giorno sale e se ne va, il nuovo arriva dal basso nel colore d'accento */
+.stc-num { display: inline-grid; height: 1em; overflow: hidden; font-family: var(--f-display); font-weight: 900; font-size: clamp(64px, 10vw, 128px); line-height: 1; font-variant-numeric: tabular-nums; }
+.stc-num b { grid-area: 1 / 1; }
+.stc-num .o { color: hsl(0 0% 100% / .92); animation: stcUp .26s var(--ease-cut) .58s both; }
+.stc-num .n { color: hsl(var(--h) 95% 66%); text-shadow: 0 0 30px hsl(var(--h) 95% 55% / .8); animation: stcDrop .42s var(--ease-kick) .7s both; }
+@keyframes stcUp { to { transform: translateY(-110%); opacity: 0; } }
+@keyframes stcDrop { from { transform: translateY(110%); } }
+.stc-sub { flex-basis: 100%; font-size: 15px; font-weight: 600; color: hsl(var(--h) 25% 88% / .8); animation: stcIn .3s var(--ease-snap) .85s both; }
+.stc-cal { gap: 6px 22px; }
+/* il disastro: la fascia ha le strisce di pericolo e il titolo arriva di colpo, con due lampi a scatti */
+.stc-dis .stc-band { background: repeating-linear-gradient(-45deg, hsl(var(--h) 90% 55% / .07) 0 14px, transparent 14px 28px), linear-gradient(90deg, hsl(var(--h) 45% 6% / .97), hsl(var(--h) 70% 16% / .97) 60%, hsl(var(--h) 45% 8% / .97)); }
+.stc-t { font-family: var(--f-display); font-weight: 900; font-size: clamp(30px, 5.4vw, 64px); line-height: 1; color: #fff; text-shadow: 0 0 30px hsl(var(--h) 95% 55% / .9);
+  animation: stcSlam .4s var(--ease-snap) .32s both, stcFlick .2s steps(2) .72s 2; }
+@keyframes stcSlam { from { opacity: 0; transform: scale(2.2); letter-spacing: .2em; } }
+@keyframes stcFlick { 50% { opacity: .35; } }
+/* lo scontro finale: i volti di chi resta entrano da lati alterni */
+.stc-faces { display: flex; gap: 8px; }
+.stc-faces .av { --s: clamp(44px, 6vw, 64px); font-size: 20px; box-shadow: 0 0 0 2px hsl(var(--h) 40% 6%), 0 0 0 4px hsl(var(--h) 95% 62%); animation: stcFace .4s var(--ease-kick) both; }
+.stc-faces .av:nth-child(odd) { --fx: -40px; } .stc-faces .av:nth-child(even) { --fx: 40px; }
+.stc-faces .av:nth-child(1) { animation-delay: .3s; } .stc-faces .av:nth-child(2) { animation-delay: .37s; } .stc-faces .av:nth-child(3) { animation-delay: .44s; }
+.stc-faces .av:nth-child(4) { animation-delay: .51s; } .stc-faces .av:nth-child(5) { animation-delay: .58s; } .stc-faces .av:nth-child(6) { animation-delay: .65s; }
+@keyframes stcFace { from { opacity: 0; transform: translateX(var(--fx, 0)) scale(.6) rotate(-10deg); } }
+.stc-day { --stc-dur: 1.6s; } .stc-dis { --stc-dur: 1.6s; } .stc-fin { --stc-dur: 1.8s; }
+/* mentre il cartello copre la scena il titolo della fase aspetta, poi entra */
+.broadcast.carded #phTitle .kc { animation-delay: calc(1.15s + var(--i) * 30ms); }
+
+/* la rivelazione dell'esito: la regia, passo per passo */
+.fn-play .wscene { animation: fnPush 1.6s var(--ease-snap) both; }
+@keyframes fnPush { from { transform: scale(1.16); filter: brightness(1.9) saturate(1.3); } }
+.fn-play .fn-arena { animation: fnSlideL .5s var(--ease-snap) .2s both; }
+.fn-play .fn-meta > span { animation: fnPop .4s var(--ease-kick) both; }
+.fn-play .fn-meta > span:nth-child(1) { animation-delay: .36s; } .fn-play .fn-meta > span:nth-child(2) { animation-delay: .45s; }
+.fn-play .fn-mid::before { animation: fnSlash .5s var(--ease-snap) .32s both; }
+.fn-play .fn-portrait { animation: fnPunch .72s cubic-bezier(.2,.7,.3,1) .45s both; }
+.fn-play .fn-portrait::after { content: ""; position: absolute; inset: -6px; border-radius: 50%; pointer-events: none; box-shadow: 0 0 0 6px #fff, 0 0 40px 10px hsl(var(--h) 95% 70%); animation: fnRing .5s var(--ease-snap) .78s both; }
+.fn-play .fn-crown { animation: fnCrown .55s var(--ease-kick) 1.05s both; }
+.fn-play .fn-title { animation: fnStamp .42s var(--ease-snap) .72s both, stcFlick .18s steps(2) 1.14s 2; }
+.fn-play h1 .kc-kick { animation: kcKick .5s cubic-bezier(.2,.7,.3,1) both; animation-delay: calc(.9s + var(--i) * 38ms + var(--j, 0ms)); }
+.fn-play .fn-sub { animation: fnRise .45s var(--ease-snap) 1.25s both; }
+.fn-play .fn-stats, .fn-play .fn-crew { animation: fnRise .5s var(--ease-snap) 1.32s both; }
+.fn-play .fn-stats > div, .fn-play .fn-mate { animation: fnPop .42s var(--ease-kick) both; }
+.fn-play .fn-stats > div:nth-child(1), .fn-play .fn-mate:nth-child(1) { animation-delay: 1.42s; } .fn-play .fn-stats > div:nth-child(2), .fn-play .fn-mate:nth-child(2) { animation-delay: 1.5s; }
+.fn-play .fn-stats > div:nth-child(3), .fn-play .fn-mate:nth-child(3) { animation-delay: 1.58s; } .fn-play .fn-stats > div:nth-child(4), .fn-play .fn-mate:nth-child(n+4) { animation-delay: 1.66s; }
+@keyframes fnSlideL { from { opacity: 0; transform: translateX(-70px) skewX(-14deg); } }
+@keyframes fnPop { from { opacity: 0; transform: scale(.6); } }
+@keyframes fnSlash { from { transform: translateY(-50%) skewX(-18deg) scaleX(0); opacity: 0; } }
+@keyframes fnPunch { 0% { opacity: 0; transform: scale(1.7) rotate(-12deg); filter: brightness(3); } 55% { opacity: 1; transform: scale(.94) rotate(2deg); filter: brightness(1.3); } 78% { transform: scale(1.03) rotate(-1deg); } 100% { transform: none; filter: none; } }
+@keyframes fnRing { 0% { opacity: 0; transform: scale(.85); } 1% { opacity: 1; } 100% { opacity: 0; transform: scale(1.6); } }
+@keyframes fnCrown { from { opacity: 0; transform: translate(-50%, -260%) rotate(-30deg); } to { opacity: 1; transform: translate(-50%, -60%) rotate(-6deg); } }
+@keyframes fnStamp { 0% { opacity: 0; transform: scale(1.8); letter-spacing: .5em; } 40% { opacity: 1; } 100% { transform: none; letter-spacing: .22em; } }
+@keyframes fnRise { from { opacity: 0; transform: translateY(18px); } }
+@keyframes kcKick { 0% { opacity: 0; transform: translateY(-.45em) rotate(var(--r, 0deg)) scale(1.35); } 60% { opacity: 1; transform: translateY(.04em) rotate(calc(var(--r, 0deg) * -.25)) scale(.97); } 100% { transform: none; } }
+.winhero.finale h1 .kc-kick { display: inline-block; }
+/* il respiro dopo l'entrata: il ritratto galleggia piano */
+.winhero.finale:not(.fn-play) .fn-portrait > .av { animation: fnFloat 6s ease-in-out infinite alternate; }
+@keyframes fnFloat { from { transform: translateY(-4px); } to { transform: translateY(4px); } }
+/* con il movimento ridotto la regia non parte: tutto è già al suo posto */
+@media (prefers-reduced-motion: reduce) { .winhero.finale .fn-portrait > .av, .broadcast > .stc { animation: none; } .broadcast > .stc { display: none; } }
+[data-reduced-motion] .winhero.finale .fn-portrait > .av { animation: none; }
+[data-reduced-motion] .broadcast > .stc, [data-reduced-motion] .stacco { display: none; }
+
+/* i pulsanti rispondono subito: si schiacciano e tornano con un piccolo rimbalzo */
+.btn { transition: transform .26s var(--ease-kick), background-color .15s, border-color .15s, box-shadow .2s; }
+.btn:active:not(:disabled) { transform: scale(.95) skewX(-3deg); transition-duration: .05s; }
+/* i blocchi dell'esito entrano di taglio, non solo dal basso */
+#resBody .reveal { transform: translateX(-26px) skewX(-4deg); transition: transform .7s var(--ease-snap) calc(var(--ri, 0) * 60ms); }
+#resBody .reveal.revealed { transform: none; }
+[data-reduced-motion] #resBody .reveal { transform: none; }
+@media (prefers-reduced-motion: reduce) { #resBody .reveal { transform: none; } .btn:active:not(:disabled) { transform: none; } }
 </style>
 
 <!-- l'atmosfera dipinta: il banner dell'arena attiva, sfocato, dietro tutto il sito -->
@@ -16145,7 +16271,7 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
 </script>
 <script>window.LOS_ASSETS = {"logo":"img/logo.f2d5175789.webp","icona":"img/icona.8b02ddeb49.webp","favicon":"img/favicon.86774dc7cf.png","panoramica":"img/panoramica.66c4c27255.webp","sagome":["img/sagome-cappuccio.e8876ba986.webp","img/sagome-esploratore.9a99fd13f8.webp","img/sagome-viaggiatore.5e36435604.webp"],"arene":{"classico":"img/arene-classico.c2887324d1.webp","cyberpunk":"img/arene-cyberpunk.713b4c77ea.webp","fantasy":"img/arene-fantasy.ee494a9322.webp","horror":"img/arene-horror.76225517ca.webp","liceo":"img/arene-liceo.c591ac5f32.webp","royale":"img/arene-royale.46515caf90.webp","scifi":"img/arene-scifi.bc9d8e04eb.webp","ufficio":"img/arene-ufficio.a2e36d4f7f.webp","wasteland":"img/arene-wasteland.734ed966b2.webp","zombie":"img/arene-zombie.11476cf1ca.webp"},"atlas":{"classico":{"armi":{"arco":"img/arene-classico-armi-arco.57fa716aa9.webp","ascia":"img/arene-classico-armi-ascia.f48629747b.webp","coltello-da-campo":"img/arene-classico-armi-coltello-da-campo.3393de240f.webp","coltello":"img/arene-classico-armi-coltello.a0134af05c.webp","falce-corta":"img/arene-classico-armi-falce-corta.3131158a9f.webp","fionda":"img/arene-classico-armi-fionda.48c8c32c43.webp","lancia-da-caccia":"img/arene-classico-armi-lancia-da-caccia.6f2be560ec.webp","lancia":"img/arene-classico-armi-lancia.115909650b.webp","machete":"img/arene-classico-armi-machete.e1c9ef25d7.webp","mazza-corta":"img/arene-classico-armi-mazza-corta.e1092f0628.webp","mazza":"img/arene-classico-armi-mazza.1fddf37b46.webp","pugnale-da-cintura":"img/arene-classico-armi-pugnale-da-cintura.0bedc8a501.webp","pugnale":"img/arene-classico-armi-pugnale.fda9dbf38a.webp","scure-da-legna":"img/arene-classico-armi-scure-da-legna.837c5d1f78.webp","spada-corta":"img/arene-classico-armi-spada-corta.952e6b7f6a.webp","tridente":"img/arene-classico-armi-tridente.2fcb3547d9.webp"},"luoghi":{"altopiano":"img/arene-classico-luoghi-altopiano.36a37512d3.webp","bosco":"img/arene-classico-luoghi-bosco.2e9163544b.webp","cornucopia":"img/arene-classico-luoghi-cornucopia.393b2dabe1.webp","fiume":"img/arene-classico-luoghi-fiume.22b335a914.webp","paludi":"img/arene-classico-luoghi-paludi.77cf115eb4.webp","rovine":"img/arene-classico-luoghi-rovine.9ea4f70ca9.webp"},"pericoli":{"branco-di-lupi-mutanti":"img/arene-classico-pericoli-branco-di-lupi-mutanti.d786a62875.webp","orso-affamato":"img/arene-classico-pericoli-orso-affamato.e4f38a9892.webp","sciame-di-vespe-velenose":"img/arene-classico-pericoli-sciame-di-vespe-velenose.5adb2c7b8d.webp","serpente-gigante":"img/arene-classico-pericoli-serpente-gigante.b17e7f3d91.webp"}},"cyberpunk":{"armi":{"coltello-vibrante-in-ceramica":"img/arene-cyberpunk-armi-coltello-vibrante-in-ceramica.6bbcd0e9e4.webp","fucile-a-pompa-da-strada":"img/arene-cyberpunk-armi-fucile-a-pompa-da-strada.dbd0de34e1.webp","fucile-a-pompa-elettromagnetico":"img/arene-cyberpunk-armi-fucile-a-pompa-elettromagnetico.0555418cd0.webp","katana-termica":"img/arene-cyberpunk-armi-katana-termica.f1ff597173.webp","mazza-a-impulsi":"img/arene-cyberpunk-armi-mazza-a-impulsi.22d841ed1d.webp","mazza-da-baseball-chiodata":"img/arene-cyberpunk-armi-mazza-da-baseball-chiodata.db2996f744.webp","mitra-compatto":"img/arene-cyberpunk-armi-mitra-compatto.eaa3815798.webp","pistola-a-rotaia-artigianale":"img/arene-cyberpunk-armi-pistola-a-rotaia-artigianale.f9e83bda89.webp","pistola-smart":"img/arene-cyberpunk-armi-pistola-smart.2aa922ba8c.webp","sparachiodi-riprogrammato":"img/arene-cyberpunk-armi-sparachiodi-riprogrammato.70f6190cb0.webp","taser-da-buttafuori":"img/arene-cyberpunk-armi-taser-da-buttafuori.60b58b451d.webp","tirapugni-elettrificato":"img/arene-cyberpunk-armi-tirapugni-elettrificato.1ce19bab37.webp","ventaglio-da-combattimento-in-titanio":"img/arene-cyberpunk-armi-ventaglio-da-combattimento-in-titanio.f3b7bb5a10.webp"},"luoghi":{"clinica-del-ripperdoc":"img/arene-cyberpunk-luoghi-clinica-del-ripperdoc.8ef0cb941b.webp","club-della-braindance":"img/arene-cyberpunk-luoghi-club-della-braindance.7765542e70.webp","megablocco":"img/arene-cyberpunk-luoghi-megablocco.28b72e6ecf.webp","mercato-di-kabuki":"img/arene-cyberpunk-luoghi-mercato-di-kabuki.d5c8ab7b96.webp","nodo-dati-corporativo":"img/arene-cyberpunk-luoghi-nodo-dati-corporativo.56ca3e1335.webp","officina-dei-maelstrom":"img/arene-cyberpunk-luoghi-officina-dei-maelstrom.d69285cf21.webp","piazza-della-torre":"img/arene-cyberpunk-luoghi-piazza-della-torre.1e400212c8.webp"},"pericoli":{"banda-di-scav":"img/arene-cyberpunk-pericoli-banda-di-scav.f1a2b2ccc4.webp","gang-di-cromati":"img/arene-cyberpunk-pericoli-gang-di-cromati.74e5576e23.webp","sciame-di-droni-di-pattuglia":"img/arene-cyberpunk-pericoli-sciame-di-droni-di-pattuglia.6fb4b17ad9.webp","squadra-di-sicurezza-corporativa":"img/arene-cyberpunk-pericoli-squadra-di-sicurezza-corporativa.6195a3b15d.webp"}},"fantasy":{"armi":{"arco-elfico":"img/arene-fantasy-armi-arco-elfico.8012f9136d.webp","ascia-nanica":"img/arene-fantasy-armi-ascia-nanica.6913fdf008.webp","balestra":"img/arene-fantasy-armi-balestra.7767becc83.webp","bastone-magico":"img/arene-fantasy-armi-bastone-magico.0781aee860.webp","daga-dei-giuramenti":"img/arene-fantasy-armi-daga-dei-giuramenti.3b6d4b398c.webp","falcetto-dargento":"img/arene-fantasy-armi-falcetto-dargento.1ce0e4e163.webp","lancia-incantata":"img/arene-fantasy-armi-lancia-incantata.7371199824.webp","lancia-silvana":"img/arene-fantasy-armi-lancia-silvana.08fbc01ede.webp","martello-da-guerra":"img/arene-fantasy-armi-martello-da-guerra.4eb03f4db7.webp","martello-nanico":"img/arene-fantasy-armi-martello-nanico.82ad6b9b14.webp","mazza-di-quercia":"img/arene-fantasy-armi-mazza-di-quercia.0f6a8345a9.webp","pugnale-avvelenato":"img/arene-fantasy-armi-pugnale-avvelenato.aba554d177.webp","spada-da-viaggio":"img/arene-fantasy-armi-spada-da-viaggio.a7bdcab5f4.webp","spada-runica":"img/arene-fantasy-armi-spada-runica.ec4012c6cf.webp"},"luoghi":{"altare-delle-armi":"img/arene-fantasy-luoghi-altare-delle-armi.db06de44c1.webp","foresta-elfica":"img/arene-fantasy-luoghi-foresta-elfica.0448fcfbd3.webp","lago-nebbioso":"img/arene-fantasy-luoghi-lago-nebbioso.f19abc7c81.webp","miniere":"img/arene-fantasy-luoghi-miniere.5baa916ec9.webp","palude-stregata":"img/arene-fantasy-luoghi-palude-stregata.6a0b2af4a7.webp","picco-del-drago":"img/arene-fantasy-luoghi-picco-del-drago.06bdfd84b1.webp","torre-in-rovina":"img/arene-fantasy-luoghi-torre-in-rovina.ac716863c7.webp"},"pericoli":{"branco-di-lupi-mannari":"img/arene-fantasy-pericoli-branco-di-lupi-mannari.1c9124ceee.webp","spettro-errante":"img/arene-fantasy-pericoli-spettro-errante.056074bc23.webp","troll-di-caverna":"img/arene-fantasy-pericoli-troll-di-caverna.31aa2444f0.webp","viverna":"img/arene-fantasy-pericoli-viverna.577b91a819.webp"}},"horror":{"armi":{"ascia":"img/arene-horror-armi-ascia.f6793c220e.webp","attizzatoio":"img/arene-horror-armi-attizzatoio.12b9bf75af.webp","bastone-da-passeggio":"img/arene-horror-armi-bastone-da-passeggio.1a636ce4ab.webp","candelabro-dargento":"img/arene-horror-armi-candelabro-dargento.7d962054de.webp","coltello-dargento":"img/arene-horror-armi-coltello-dargento.73a6bb81ea.webp","crocifisso-appuntito":"img/arene-horror-armi-crocifisso-appuntito.203b41a170.webp","daga-da-cerimonia":"img/arene-horror-armi-daga-da-cerimonia.a597e15c53.webp","falce":"img/arene-horror-armi-falce.6513df8fa2.webp","fucile-da-caccia":"img/arene-horror-armi-fucile-da-caccia.169dc367e1.webp","pugnale-depoca":"img/arene-horror-armi-pugnale-depoca.f148afd005.webp","pugnale-rituale":"img/arene-horror-armi-pugnale-rituale.944cb9056c.webp","scure-da-legna":"img/arene-horror-armi-scure-da-legna.a11379a412.webp"},"luoghi":{"biblioteca":"img/arene-horror-luoghi-biblioteca.00d6ab97f4.webp","cantina":"img/arene-horror-luoghi-cantina.a196828c1d.webp","cappella":"img/arene-horror-luoghi-cappella.a51e505028.webp","cimitero":"img/arene-horror-luoghi-cimitero.7a441de089.webp","salone":"img/arene-horror-luoghi-salone.37f10c88c7.webp","serra":"img/arene-horror-luoghi-serra.b3d91121d4.webp","soffitta":"img/arene-horror-luoghi-soffitta.466d40cea3.webp"},"pericoli":{"bambola-posseduta":"img/arene-horror-pericoli-bambola-posseduta.7064eef1d7.webp","entita-senza-volto":"img/arene-horror-pericoli-entita-senza-volto.2c28467bdd.webp","spettro-urlante":"img/arene-horror-pericoli-spettro-urlante.25fa554e05.webp","stormo-di-corvi":"img/arene-horror-pericoli-stormo-di-corvi.fe5c85d7ae.webp"}},"liceo":{"armi":{"compito-copiato":"img/arene-liceo-armi-compito-copiato.c9ade27d61.webp","dossier-delle-revisioni":"img/arene-liceo-armi-dossier-delle-revisioni.77676a0f5f.webp","elenco-delle-correzioni":"img/arene-liceo-armi-elenco-delle-correzioni.04be1154c8.webp","fascicolo-di-risposte-motivate":"img/arene-liceo-armi-fascicolo-di-risposte-motivate.c29995b581.webp","foto-imbarazzante":"img/arene-liceo-armi-foto-imbarazzante.ff7d3ef284.webp","gossip-esplosivo":"img/arene-liceo-armi-gossip-esplosivo.552b1e6236.webp","pallone-da-dodgeball":"img/arene-liceo-armi-pallone-da-dodgeball.60a2576785.webp","profilo-falso":"img/arene-liceo-armi-profilo-falso.d1dac05a2b.webp","prospetto-dei-contributi":"img/arene-liceo-armi-prospetto-dei-contributi.0c121fd79a.webp","quaderno-delle-verifiche":"img/arene-liceo-armi-quaderno-delle-verifiche.7d8b07341a.webp","registro-rubato":"img/arene-liceo-armi-registro-rubato.67eb4b9eff.webp","riepilogo-delle-fonti":"img/arene-liceo-armi-riepilogo-delle-fonti.3c889a0ed5.webp"},"luoghi":{"aula-magna":"img/arene-liceo-luoghi-aula-magna.0478e35c5c.webp","aule":"img/arene-liceo-luoghi-aule.b3142d07cc.webp","biblioteca":"img/arene-liceo-luoghi-biblioteca.1ae806ae58.webp","cortile":"img/arene-liceo-luoghi-cortile.51bf433337.webp","laboratorio-di-chimica":"img/arene-liceo-luoghi-laboratorio-di-chimica.eba1434683.webp","mensa":"img/arene-liceo-luoghi-mensa.67bcbc7e37.webp","palestra":"img/arene-liceo-luoghi-palestra.8ecb872849.webp"},"pericoli":{"bidello-di-turno":"img/arene-liceo-pericoli-bidello-di-turno.191c43a8bd.webp","ispezione-a-sorpresa":"img/arene-liceo-pericoli-ispezione-a-sorpresa.bef087d9b9.webp","preside":"img/arene-liceo-pericoli-preside.033f6c9aae.webp","professoressa-di-matematica":"img/arene-liceo-pericoli-professoressa-di-matematica.6cb65c6a3f.webp"}},"royale":{"armi":{"balestra":"img/arene-royale-armi-balestra.64563b6cea.webp","carabina-compatta":"img/arene-royale-armi-carabina-compatta.a0fa150fbe.webp","coltello-da-combattimento":"img/arene-royale-armi-coltello-da-combattimento.74a64bca77.webp","coltello-tattico":"img/arene-royale-armi-coltello-tattico.8e9cb56197.webp","fucile-a-pompa":"img/arene-royale-armi-fucile-a-pompa.3d7fc7d83c.webp","fucile-da-cecchino":"img/arene-royale-armi-fucile-da-cecchino.fc3c4f19f1.webp","fucile-dassalto":"img/arene-royale-armi-fucile-dassalto.b91ccb0ec8.webp","granata":"img/arene-royale-armi-granata.fd9c359b27.webp","lancia-da-sopravvivenza":"img/arene-royale-armi-lancia-da-sopravvivenza.8a39c1a5e5.webp","manganello":"img/arene-royale-armi-manganello.dc6284893b.webp","mitraglietta":"img/arene-royale-armi-mitraglietta.6dcc3246e6.webp","pistola-da-segnalazione-modificata":"img/arene-royale-armi-pistola-da-segnalazione-modificata.1c7f899ca7.webp","pistola":"img/arene-royale-armi-pistola.acae268814.webp","scure-da-campo":"img/arene-royale-armi-scure-da-campo.6a5b0becd5.webp"},"luoghi":{"aeroporto":"img/arene-royale-luoghi-aeroporto.81e8ce98d4.webp","base-militare":"img/arene-royale-luoghi-base-militare.67f3a7de9d.webp","centrale-elettrica":"img/arene-royale-luoghi-centrale-elettrica.05ee57458a.webp","fattoria":"img/arene-royale-luoghi-fattoria.7c780dda87.webp","foresta":"img/arene-royale-luoghi-foresta.03b47644d0.webp","villaggio-costiero":"img/arene-royale-luoghi-villaggio-costiero.568519eb7c.webp"},"pericoli":{"cane-da-guardia-addestrato":"img/arene-royale-pericoli-cane-da-guardia-addestrato.c7853a67a0.webp","drone-armato":"img/arene-royale-pericoli-drone-armato.30d0b73e01.webp","elicottero-da-caccia":"img/arene-royale-pericoli-elicottero-da-caccia.8c68e62346.webp"}},"scifi":{"armi":{"bastone-a-impulsi":"img/arene-scifi-armi-bastone-a-impulsi.4e17e074e7.webp","cannone-a-rotaia-portatile":"img/arene-scifi-armi-cannone-a-rotaia-portatile.9a59b97d98.webp","frusta-monofilamento":"img/arene-scifi-armi-frusta-monofilamento.5ee8081aa9.webp","fucile-al-plasma":"img/arene-scifi-armi-fucile-al-plasma.ea2384a239.webp","granata-emp":"img/arene-scifi-armi-granata-emp.04cfd31203.webp","lama-di-servizio":"img/arene-scifi-armi-lama-di-servizio.a47d434464.webp","lama-vibrante":"img/arene-scifi-armi-lama-vibrante.02b0f47ff8.webp","lancia-da-abbordaggio":"img/arene-scifi-armi-lancia-da-abbordaggio.cf167e52ff.webp","perforatore-portatile":"img/arene-scifi-armi-perforatore-portatile.aa7e92ecab.webp","pistola-a-scarica":"img/arene-scifi-armi-pistola-a-scarica.33b3e5929e.webp","pistola-laser":"img/arene-scifi-armi-pistola-laser.aed4bbf3ed.webp","taglierino-ceramico":"img/arene-scifi-armi-taglierino-ceramico.b45d524836.webp","taser-a-impulsi":"img/arene-scifi-armi-taser-a-impulsi.360e29e1d5.webp"},"luoghi":{"condotti-di-servizio":"img/arene-scifi-luoghi-condotti-di-servizio.6817134b5e.webp","hangar":"img/arene-scifi-luoghi-hangar.6de551833b.webp","moduli-abitativi":"img/arene-scifi-luoghi-moduli-abitativi.9f5bb96d39.webp","ponte-di-comando":"img/arene-scifi-luoghi-ponte-di-comando.3e9ffd005a.webp","reattore":"img/arene-scifi-luoghi-reattore.d10a335006.webp","serra-idroponica":"img/arene-scifi-luoghi-serra-idroponica.b6f4407853.webp"},"pericoli":{"androide-da-combattimento":"img/arene-scifi-pericoli-androide-da-combattimento.1a3d3eb38e.webp","creatura-aliena-dai-tentacoli":"img/arene-scifi-pericoli-creatura-aliena-dai-tentacoli.b6b314ddd9.webp","drone-di-sicurezza-impazzito":"img/arene-scifi-pericoli-drone-di-sicurezza-impazzito.c8a9c6f9e3.webp","sciame-di-nanobot":"img/arene-scifi-pericoli-sciame-di-nanobot.d43296f047.webp"}},"ufficio":{"armi":{"badge-clonato-del-capo":"img/arene-ufficio-armi-badge-clonato-del-capo.be9f7381fe.webp","dossier-dei-risultati":"img/arene-ufficio-armi-dossier-dei-risultati.1888e2f671.webp","elenco-dei-contributi":"img/arene-ufficio-armi-elenco-dei-contributi.3de4fbe5bf.webp","fascicolo-delle-fonti":"img/arene-ufficio-armi-fascicolo-delle-fonti.02df27dfbf.webp","foglio-excel-con-le-prove":"img/arene-ufficio-armi-foglio-excel-con-le-prove.944f6ec708.webp","mail-in-copia-a-tutti":"img/arene-ufficio-armi-mail-in-copia-a-tutti.1d4304df14.webp","nota-spese-gonfiata":"img/arene-ufficio-armi-nota-spese-gonfiata.d2683cca4c.webp","presentazione-rubata":"img/arene-ufficio-armi-presentazione-rubata.815dc5c8b4.webp","prospetto-delle-metriche":"img/arene-ufficio-armi-prospetto-delle-metriche.356da1d2d9.webp","registro-delle-revisioni":"img/arene-ufficio-armi-registro-delle-revisioni.509eab44df.webp","report-pieno-di-errori-altrui":"img/arene-ufficio-armi-report-pieno-di-errori-altrui.c01c0ef897.webp","riepilogo-delle-approvazioni":"img/arene-ufficio-armi-riepilogo-delle-approvazioni.9394dadd6b.webp"},"luoghi":{"cucina":"img/arene-ufficio-luoghi-cucina.d968f8861d.webp","open-space":"img/arene-ufficio-luoghi-open-space.b6b7990c99.webp","parcheggio":"img/arene-ufficio-luoghi-parcheggio.d593f2ed83.webp","sala-riunioni":"img/arene-ufficio-luoghi-sala-riunioni.f92c4030a9.webp","sala-stampanti":"img/arene-ufficio-luoghi-sala-stampanti.1727f50082.webp","ufficio-del-direttore":"img/arene-ufficio-luoghi-ufficio-del-direttore.bb3b6cabab.webp"},"pericoli":{"consulente-esterno":"img/arene-ufficio-pericoli-consulente-esterno.ce6e200c3f.webp","direttore-generale":"img/arene-ufficio-pericoli-direttore-generale.da2eb1f708.webp","riorganizzazione-aziendale":"img/arene-ufficio-pericoli-riorganizzazione-aziendale.1fd57b76b3.webp","ufficio-risorse-umane":"img/arene-ufficio-pericoli-ufficio-risorse-umane.8392df7518.webp"}},"wasteland":{"armi":{"balestra-artigianale":"img/arene-wasteland-armi-balestra-artigianale.e09826852f.webp","catena":"img/arene-wasteland-armi-catena.866183d584.webp","coltello-da-strada":"img/arene-wasteland-armi-coltello-da-strada.1083c4429d.webp","fucile-arrugginito":"img/arene-wasteland-armi-fucile-arrugginito.797601f16e.webp","lama-di-recupero":"img/arene-wasteland-armi-lama-di-recupero.1ad13cfc78.webp","lancia-di-ferraglia":"img/arene-wasteland-armi-lancia-di-ferraglia.99d9f41307.webp","lancia-ricavata-da-un-tubo":"img/arene-wasteland-armi-lancia-ricavata-da-un-tubo.53b934e449.webp","lanciachiodi":"img/arene-wasteland-armi-lanciachiodi.e4f51e42e2.webp","mannaia":"img/arene-wasteland-armi-mannaia.518ae9c11c.webp","martello-da-officina":"img/arene-wasteland-armi-martello-da-officina.851055795e.webp","mazza-di-tubi":"img/arene-wasteland-armi-mazza-di-tubi.91babe82ac.webp","molotov":"img/arene-wasteland-armi-molotov.303d6fa315.webp","scure-da-demolizione":"img/arene-wasteland-armi-scure-da-demolizione.066ea5e066.webp"},"luoghi":{"autostrada-spezzata":"img/arene-wasteland-luoghi-autostrada-spezzata.19a72a0b97.webp","citta-fantasma":"img/arene-wasteland-luoghi-citta-fantasma.fe22bb72b2.webp","cratere":"img/arene-wasteland-luoghi-cratere.04de7ca40a.webp","deposito":"img/arene-wasteland-luoghi-deposito.f98aa31220.webp","diga":"img/arene-wasteland-luoghi-diga.3be9abe15a.webp","discarica":"img/arene-wasteland-luoghi-discarica.b8783ad9c6.webp","raffineria":"img/arene-wasteland-luoghi-raffineria.081e2d2ad6.webp"},"pericoli":{"banda-di-predoni":"img/arene-wasteland-pericoli-banda-di-predoni.1dfcfd1628.webp","branco-di-cani-mutati":"img/arene-wasteland-pericoli-branco-di-cani-mutati.442fabfc39.webp","scorpione-gigante":"img/arene-wasteland-pericoli-scorpione-gigante.2dd8911367.webp","verme-delle-sabbie":"img/arene-wasteland-pericoli-verme-delle-sabbie.a0d445beeb.webp"}},"zombie":{"armi":{"accetta-da-soccorso":"img/arene-zombie-armi-accetta-da-soccorso.6d36eb13ac.webp","accetta":"img/arene-zombie-armi-accetta.0eed163720.webp","balestra":"img/arene-zombie-armi-balestra.d705131d17.webp","coltello-da-campeggio":"img/arene-zombie-armi-coltello-da-campeggio.2abab58e78.webp","fucile-a-pompa":"img/arene-zombie-armi-fucile-a-pompa.b00b1d6a70.webp","katana":"img/arene-zombie-armi-katana.f631ad392f.webp","machete-da-potatura":"img/arene-zombie-armi-machete-da-potatura.94a93108a1.webp","martello-da-carpentiere":"img/arene-zombie-armi-martello-da-carpentiere.021e8a80f2.webp","mazza-chiodata":"img/arene-zombie-armi-mazza-chiodata.b4e11dcadb.webp","mazza-da-lavoro":"img/arene-zombie-armi-mazza-da-lavoro.c36a90108f.webp","motosega":"img/arene-zombie-armi-motosega.f74e603615.webp","piede-di-porco":"img/arene-zombie-armi-piede-di-porco.c185a97e0d.webp","pistola":"img/arene-zombie-armi-pistola.6d30022ca6.webp"},"luoghi":{"centro-commerciale":"img/arene-zombie-luoghi-centro-commerciale.333f4699d5.webp","metropolitana":"img/arene-zombie-luoghi-metropolitana.878a263605.webp","ospedale":"img/arene-zombie-luoghi-ospedale.f25de413a4.webp","periferia":"img/arene-zombie-luoghi-periferia.e28a7d70c7.webp","piazza":"img/arene-zombie-luoghi-piazza.b6ed86b3ad.webp","scuola":"img/arene-zombie-luoghi-scuola.153ddbaa75.webp","stazione-di-polizia":"img/arene-zombie-luoghi-stazione-di-polizia.157f7a17f5.webp"},"pericoli":{"cane-infetto":"img/arene-zombie-pericoli-cane-infetto.fdff913d6f.webp","gigante-mutato":"img/arene-zombie-pericoli-gigante-mutato.91fad36b70.webp","infetto-corridore":"img/arene-zombie-pericoli-infetto-corridore.61f48faafd.webp","orda-di-zombi":"img/arene-zombie-pericoli-orda-di-zombi.e0fc6d1b56.webp"}}}};
 ;
-window.LOS_BUILD = "15d054577f1aa06f9b49a83a63a02b7f47433a09a124ca9b7f4e5e2c7436526c";
+window.LOS_BUILD = "055469d9f74f59354aab1938051f6e450d8f919c060ef3192a68dadc8bc83413";
 ;
 /* Last One Standing — grafica vettoriale: logo, icone delle arene, illustrazioni.
  * Tutto è SVG generato in codice: nessuna immagine esterna. */
@@ -16970,10 +17096,19 @@ window.LOS_BUILD = "15d054577f1aa06f9b49a83a63a02b7f47433a09a124ca9b7f4e5e2c7436
     const step = (now) => { if (reduced) { el.textContent = to; return; } const k = Math.max(0, Math.min(1, (now - t0) / dur)), e = 1 - Math.pow(1 - k, 3); el.textContent = Math.round(from + (to - from) * e); if (k < 1) requestAnimationFrame(step); };
     requestAnimationFrame(step);
   }
+  // --r e --j: ogni lettera ha la sua rotazione e un ritardo un po' sfalsato, perché un ingresso tutto uguale sembra meccanico
   function kinetic(el, style) {
     if (!el || reduced) return;
     const text = el.textContent; el.setAttribute('aria-label', text); el.innerHTML = '';
-    [...text].forEach((ch, i) => { const s = document.createElement('span'); s.className = 'kc kc-' + (style || 'drop'); s.style.setProperty('--i', i); s.setAttribute('aria-hidden', 'true'); s.textContent = ch === ' ' ? ' ' : ch; el.appendChild(s); });
+    // le lettere di una parola stanno in un contenitore che non va a capo: il titolo si spezza solo tra le parole
+    let i = 0;
+    text.split(/(\s+)/).forEach((part) => {
+      if (!part) return;
+      if (/^\s+$/.test(part)) { el.appendChild(document.createTextNode(' ')); i++; return; }
+      const w = document.createElement('span'); w.className = 'kw'; w.setAttribute('aria-hidden', 'true');
+      [...part].forEach((ch) => { const s = document.createElement('span'); s.className = 'kc kc-' + (style || 'drop'); s.style.setProperty('--i', i++); s.style.setProperty('--r', R(-14, 14).toFixed(1) + 'deg'); s.style.setProperty('--j', Math.round(R(-14, 14)) + 'ms'); s.textContent = ch; w.appendChild(s); });
+      el.appendChild(w);
+    });
   }
   function dice(el, roll, dc, pass) {
     if (!el || reduced) return;
@@ -17030,6 +17165,66 @@ window.LOS_BUILD = "15d054577f1aa06f9b49a83a63a02b7f47433a09a124ca9b7f4e5e2c7436
       if (kind === 'fallen' && opt && opt.deaths) f.burst('embers', null, null, 12 + opt.deaths * 4);
     }
   }
+  /* ================= STACCHI =================
+   * Il linguaggio di movimento dell'interfaccia, ricavato dai principi dei menu dei Persona (non dal loro aspetto):
+   * ogni cambio di schermata è uno stacco coperto da lastre in diagonale, a strati sfalsati; si entra veloci e si
+   * frena (uscita esponenziale), si esce accelerando; i momenti importanti hanno un cartello che arriva, resta fermo
+   * il tempo di leggerlo e se ne va; il nuovo stato prende il colore d'accento; le uscite variano di poco i tempi
+   * perché un ritmo tutto uguale sembra meccanico. Con il movimento ridotto non parte niente e il contenuto cambia subito. */
+  const EASE_IN = 'cubic-bezier(.75,0,.25,1)', EASE_OUT = 'cubic-bezier(.16,1,.3,1)', EASE_CUT = 'cubic-bezier(.7,0,.84,0)';
+  let wipeEl = null, wiping = false;
+  function wipe(swap, opt) {
+    opt = opt || {};
+    const body = document.body;
+    if (reduced || wiping || !body || typeof body.animate !== 'function') { swap(); return; }
+    wiping = true;
+    if (!wipeEl || !wipeEl.isConnected) {
+      wipeEl = document.createElement('div'); wipeEl.className = 'stacco'; wipeEl.setAttribute('aria-hidden', 'true');
+      wipeEl.innerHTML = '<i class="st-a"></i><i class="st-b"></i><i class="st-c"></i><b class="st-mark"></b>';
+      body.appendChild(wipeEl);
+    }
+    const el = wipeEl, [a, b, c] = el.querySelectorAll('i'), mark = el.querySelector('.st-mark');
+    if (opt.hue != null) el.style.setProperty('--wh', opt.hue); else el.style.removeProperty('--wh');
+    mark.textContent = opt.label || '';
+    el.hidden = false;
+    const sk = ' skewX(-16deg)', jit = () => Math.round(R(-12, 12));
+    const slide = (n, from, to, o) => n.animate([{ transform: 'translateX(' + from + ')' + sk }, { transform: 'translateX(' + to + ')' + sk }], o);
+    let swapped = false;
+    const doSwap = () => { if (swapped) return; swapped = true; try { swap(); } catch (e) { setTimeout(() => { throw e; }); } };
+    const cover = [[a, 0], [b, 40], [c, 80]].map(([n, d]) => slide(n, '-170vw', '0', { duration: 230, delay: Math.max(0, d + jit()), easing: EASE_IN, fill: 'both' }));
+    mark.animate([{ opacity: 0, transform: 'translate(-50%, -50%) rotate(-7deg) scale(1.8)' }, { opacity: 1, transform: 'translate(-50%, -50%) rotate(-7deg) scale(1)' }], { duration: 200, delay: 220, easing: EASE_OUT, fill: 'both' });
+    Promise.all(cover.map((x) => x.finished))
+      .then(() => new Promise((res) => setTimeout(res, opt.hold || 90)))
+      .then(() => {
+        doSwap();
+        mark.animate([{ opacity: 1, transform: 'translate(-50%, -50%) rotate(-7deg) scale(1)' }, { opacity: 0, transform: 'translate(-20%, -50%) rotate(-7deg) scale(1)' }], { duration: 180, easing: EASE_CUT, fill: 'both' });
+        const out = [[c, 0], [b, 40], [a, 85]].map(([n, d]) => slide(n, '0', '170vw', { duration: 320, delay: Math.max(0, d + jit()), easing: EASE_OUT, fill: 'both' }));
+        return Promise.all(out.map((x) => x.finished));
+      })
+      .catch(() => {})
+      .then(() => { doSwap(); el.hidden = true; wiping = false; [a, b, c, mark].forEach((n) => n.getAnimations().forEach((x) => x.cancel())); });
+  }
+  // un cartello sopra la scena della diretta: arriva, resta fermo il tempo di leggerlo, se ne va (la regia è nel CSS)
+  function card(host, html, cls, dur) {
+    if (reduced || !host) return;
+    host.querySelectorAll(':scope > .stc').forEach((x) => x.remove());
+    clearTimeout(host.__stc);
+    const el = document.createElement('div'); el.className = 'stc ' + (cls || ''); el.setAttribute('aria-hidden', 'true');
+    el.innerHTML = '<i class="stc-band"></i><i class="stc-line"></i>' + html;
+    host.appendChild(el); host.classList.add('carded');
+    host.__stc = setTimeout(() => { el.remove(); host.classList.remove('carded'); }, dur || 1600);
+  }
+  // una regia a classi: la classe accende le animazioni del CSS, un tocco o un tasto chiude tutto subito
+  function stage(el, cls, dur, onSkip) {
+    if (reduced || !el) return;
+    el.classList.add(cls);
+    let done = false;
+    const end = (skipped) => { if (done) return; done = true; el.classList.remove(cls); el.removeEventListener('pointerdown', skip); document.removeEventListener('keydown', skip); if (skipped && onSkip) onSkip(); };
+    const skip = () => end(true);
+    el.addEventListener('pointerdown', skip); document.addEventListener('keydown', skip);
+    setTimeout(() => end(false), dur || 3000);
+  }
+
   function intensityFor(kind, aliveRatio) {
     const base = { b: 1.6, d: 1, n: 0.8, f: 1.5, dis: 2.4, fallen: 0.7, finale: 2 }[kind] || 1;
     return base * (1 + (1 - aliveRatio) * 0.6);
@@ -17074,7 +17269,7 @@ window.LOS_BUILD = "15d054577f1aa06f9b49a83a63a02b7f47433a09a124ca9b7f4e5e2c7436
     })();
   }
 
-  G.LOS_ANIM = { get reduced() { return reduced; }, setReduced, field, countTo, kinetic, dice, domBurst, tilt, parallax, ripple, reveal, phaseFx, intensityFor, confetti };
+  G.LOS_ANIM = { get reduced() { return reduced; }, setReduced, field, countTo, kinetic, dice, domBurst, tilt, parallax, ripple, reveal, phaseFx, wipe, card, stage, intensityFor, confetti };
 })(typeof window !== 'undefined' ? window : globalThis);
 
 ;
@@ -18932,7 +19127,15 @@ window.LOS_BUILD = "15d054577f1aa06f9b49a83a63a02b7f47433a09a124ca9b7f4e5e2c7436
     if (v === 'esito') renderResults();
     if (changed) { window.scrollTo({ top: 0, behavior: 'auto' }); const sec = $('#v-' + v); sec.classList.remove('view-enter'); void sec.offsetWidth; sec.classList.add('view-enter'); const title = $('h1, h2', sec) || sec; title.tabIndex = -1; title.focus({ preventScroll: true }); }
   }
-  window.addEventListener('hashchange', route);
+  // cambiare sezione è uno stacco: tre lastre in diagonale coprono la pagina nei colori dell'arena di arrivo,
+  // il contenuto cambia mentre è coperto, poi le lastre escono dall'altra parte
+  const VIEW_LABEL = { home: 'Last One Standing', cast: 'Concorrenti', arena: 'Arena', diretta: 'Diretta', esito: 'Esito' };
+  window.addEventListener('hashchange', () => {
+    let v = (location.hash || '').slice(1); if (!VIEWS.includes(v)) v = 'home';
+    if (v === curView) { route(); return; }
+    const t = THEMES[(v === 'diretta' || v === 'esito') && SIM ? SIM.theme : S.settings.theme];
+    AN.wipe(route, { label: VIEW_LABEL[v] || '', hue: v === 'home' ? 162 : t ? t.hue : null });
+  });
   document.addEventListener('click', (e) => {
     const q = e.target.closest('[data-quick]'); if (q) { e.preventDefault(); quickPlay(); return; }
     const p = e.target.closest('[data-prof]'); if (p && SIM) { e.preventDefault(); openProfile(p.dataset.prof); return; }
@@ -20137,6 +20340,15 @@ window.LOS_BUILD = "15d054577f1aa06f9b49a83a63a02b7f47433a09a124ca9b7f4e5e2c7436
     const prevAlive = i > 0 ? P[i - 1].snap.alive.length : total;
     AN.field(bcs, theme.id, { intensity: AN.intensityFor(ph.kind, ph.snap.alive.length / total) });
     AN.phaseFx($('.broadcast'), ph.kind, theme.id, forward, { deaths: ph.kind === 'fallen' ? ph.deaths.length : 0 });
+    if (forward) {
+      // i cartelli: il calendario che gira quando cambia il giorno, la fascia del disastro, i volti dello scontro finale
+      const prev = i > 0 ? P[i - 1] : null, cal = calOf(theme);
+      if (ph.kind === 'finale' && P.findIndex((x) => x.kind === 'finale') === i) {
+        const left = (prev ? prev.snap.alive : ph.snap.alive).slice(0, 6);
+        AN.card($('.broadcast'), '<div class="stc-in"><span class="stc-k">Scontro finale</span><div class="stc-faces">' + left.map((id) => avHTML(BY[id])).join('') + '</div></div>', 'stc-fin', 1800);
+      } else if (ph.kind === 'dis') AN.card($('.broadcast'), '<div class="stc-in"><span class="stc-k">Disastro</span><b class="stc-t">' + esc(ph.title) + '</b></div>', 'stc-dis', 1600);
+      else if (prev && ph.day !== prev.day && ph.kind !== 'fallen') AN.card($('.broadcast'), '<div class="stc-in stc-cal"><span class="stc-k">' + esc(cal.unit) + '</span><span class="stc-num"><b class="o">' + prev.day + '</b><b class="n">' + ph.day + '</b></span>' + (ph.meteo && ph.meteo.n ? '<span class="stc-sub">' + esc(ph.meteo.n) + '</span>' : '') + '</div>', 'stc-day', 1600);
+    }
     const hideTotal = S.settings.hideFuture && S.run.seen < P.length - 1;
     const info = phaseInfo(P, i, theme, hideTotal), maxD = runMaxDays();
     $('#bcPhase').textContent = 'Fase ' + (i + 1) + (hideTotal ? '' : ' di ' + P.length);
@@ -20508,19 +20720,25 @@ window.LOS_BUILD = "15d054577f1aa06f9b49a83a63a02b7f47433a09a124ca9b7f4e5e2c7436
     const theme = resultTheme(SIM), soft = !!theme.soft, st = SIM.stats;
     const W = SIM.winners.map((id) => BY[id]);
     const kN = (n) => n + ' ' + (soft ? (n === 1 ? 'eliminazione' : 'eliminazioni') : (n === 1 ? 'uccisione' : 'uccisioni'));
-    // la rivelazione: il dipinto dell'arena a tutta scena, un alone che gira dietro chi ha vinto
+    // la rivelazione in tre fasce: in alto la testata della partita, al centro chi ha vinto, in basso i numeri
     const crown = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 18 4.5 7l5 4.5L12 5l2.5 6.5 5-4.5L21 18z"/><path d="M3.5 21h17"/></svg>';
-    const eyeb = '<div class="eyebrow">' + ART.icon(theme.id, 13) + ' ' + esc(theme.name) + ' · ' + durTxt(theme) + ' · ' + SIM.tributes.length + ' concorrenti</div>';
-    const scene = '<div class="wscene" aria-hidden="true">' + ART.scene(theme.id) + '</div><div class="fn-halo" aria-hidden="true"></div>';
+    const cal = calOf(theme), maxD = runMaxDays();
+    const top = '<div class="fn-top"><span class="fn-arena">' + ART.icon(theme.id, 15) + '<span>' + esc(theme.name) + '</span></span><span class="fn-meta"><span>' + plural(SIM.days, cal.unit, cal.units) + (maxD ? ' su ' + maxD : '') + '</span><span>' + SIM.tributes.length + ' concorrenti</span></span></div>';
+    const scene = '<div class="wscene" aria-hidden="true">' + ART.scene(theme.id) + '</div>';
     let hero;
     if (W.length === 1) {
       const w = W[0];
-      hero = '<div class="winhero finale">' + scene + '<div class="fn-portrait">' + avHTML(w, { btn: true }) + '<span class="fn-crown">' + crown + '</span></div><div class="fn-text">' + eyeb +
-        '<div class="fn-title">' + G3(w.gender, 'Ultimo', 'Ultima', 'Ultimə') + ' in piedi</div><h1>' + esc(w.name) + '</h1><p>Squadra ' + w.team + (w.traits.length ? ' · ' + w.traits.map((x) => TRAITS[x].name).join(', ') : '') + '</p>' +
-        '<div class="wstats"><div><b>' + w.kills + '</b><span>' + (soft ? 'eliminazioni' : 'uccisioni') + '</span></div><div><b>' + w.events + '</b><span>eventi vissuti</span></div><div><b>' + w.alliancesFormed + '</b><span>alleanze</span></div><div><b>' + w.items + '</b><span>oggetti trovati</span></div></div></div></div>';
+      const sub = '<p class="fn-sub">Squadra ' + w.team + (w.traits.length ? ' · ' + w.traits.map((x) => TRAITS[x].name).join(', ') : '') + '</p>';
+      const cell = (v, l) => '<div><b>' + v + '</b><span>' + l + '</span></div>';
+      hero = '<div class="winhero finale">' + scene + top +
+        '<div class="fn-mid"><div class="fn-portrait"><div class="fn-halo" aria-hidden="true"></div>' + avHTML(w, { btn: true }) + '<span class="fn-crown">' + crown + '</span></div>' +
+        '<div class="fn-text"><div class="fn-title">' + G3(w.gender, 'Ultimo', 'Ultima', 'Ultimə') + ' in piedi</div><h1>' + esc(w.name) + '</h1>' + sub + '</div></div>' +
+        '<div class="wstats fn-stats">' + cell(w.kills, soft ? 'eliminazioni' : 'uccisioni') + cell(w.events, 'eventi') + cell(w.alliancesFormed, 'alleanze') + cell(w.items, 'oggetti') + '</div></div>';
     } else if (W.length > 1) {
-      hero = '<div class="winhero finale team">' + scene + '<div class="fn-text">' + eyeb + '<div class="fn-title">Squadra vincitrice</div><h1>Vince la squadra ' + W[0].team + '</h1><div class="teamavs">' + W.map((w) => avHTML(w, { btn: true })).join('') + '</div><p>' + W.map((w) => esc(w.name) + ' (' + kN(w.kills) + ')').join(' · ') + '</p></div></div>';
-    } else hero = '<div class="winhero finale none">' + scene + '<div class="fn-text">' + eyeb + '<div class="fn-title">Nessun superstite</div><h1>L\'arena ha vinto</h1><p>Non è rimasto in piedi nessuno.</p></div></div>';
+      hero = '<div class="winhero finale team">' + scene + top +
+        '<div class="fn-mid"><div class="fn-text"><div class="fn-title">Squadra vincitrice</div><h1>Vince la squadra ' + W[0].team + '</h1><p class="fn-sub">' + plural(W.length, 'superstite', 'superstiti') + ', ' + kN(W.reduce((n, w) => n + w.kills, 0)) + ' in tutto</p></div></div>' +
+        '<div class="fn-crew">' + W.map((w) => '<div class="fn-mate">' + avHTML(w, { btn: true }) + '<span><b>' + esc(w.name) + '</b><small>' + kN(w.kills) + '</small></span></div>').join('') + '</div></div>';
+    } else hero = '<div class="winhero finale none">' + scene + top + '<div class="fn-mid"><div class="fn-text"><div class="fn-title">Nessun superstite</div><h1>L\'arena ha vinto</h1><p class="fn-sub">Non è rimasto in piedi nessuno.</p></div></div></div>';
 
     const ranked = SIM.tributes.slice().sort((a, b) => a.rank - b.rank || b.kills - a.kills);
     const podiumT = ranked.slice(0, 3);
@@ -20604,14 +20822,18 @@ window.LOS_BUILD = "15d054577f1aa06f9b49a83a63a02b7f47433a09a124ca9b7f4e5e2c7436
     const wh = $('#resBody .winhero');
     if (wh) { AN.field(wh, theme.id, { intensity: 1.6, cls: 'fx-win' }); }
     const first = S.run && !S.run.celebrated;
-    if (first && !AN.reduced) {
+    if (first && !AN.reduced && wh) {
+      // la regia della rivelazione (vedi «STACCHI» nel foglio di stile): un tocco o un tasto la chiude subito
       $('#resBody').classList.add('ceremony');
       setTimeout(() => $('#resBody') && $('#resBody').classList.remove('ceremony'), 4000);
-      $$('#resBody .wstats b').forEach((b) => { const n = parseInt(b.textContent, 10); if (!isNaN(n)) AN.countTo(b, n, { from: 0, dur: 1600 }); });
-      const wn = $('#resBody .winhero h1'); if (wn) AN.kinetic(wn, 'rise');
+      const wn = $('#resBody .winhero h1'); if (wn) AN.kinetic(wn, 'kick');
+      const nums = $$('#resBody .wstats b').map((b) => [b, parseInt(b.textContent, 10)]).filter((x) => !isNaN(x[1]));
+      nums.forEach(([b]) => (b.textContent = '0'));
+      const tc = setTimeout(() => nums.forEach(([b, n]) => AN.countTo(b, n, { from: 0, dur: 1300 })), 1500);
+      AN.stage(wh, 'fn-play', 3200, () => { clearTimeout(tc); nums.forEach(([b, n]) => (b.textContent = n)); });
     }
     AN.reveal($$('#resBody .block, #resBody .award'));
-    if (first && W.length) { S.run.celebrated = true; save(); setTimeout(() => AN.confetti(theme.id, theme.hue), 650); }
+    if (first && W.length) { S.run.celebrated = true; save(); setTimeout(() => AN.confetti(theme.id, theme.hue), 1350); }
   }
   function summaryText() {
     const theme = resultTheme(SIM), W = SIM.winners.map((id) => BY[id]);

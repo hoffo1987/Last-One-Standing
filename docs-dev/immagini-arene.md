@@ -2,7 +2,7 @@
 
 _Generato da `node tools/atlas-slots.js` a partire da `tools/atlas-brief.js`: per cambiare un testo o un prompt modifica il brief e rigenera, non questo file._
 
-**Immagini presenti: 105 su 182** (luoghi 66/66, pericoli 39/39, armi 0/77). **Video presenti: 0 su 105** (luoghi e pericoli). Meteo, disastri e oggetti arriveranno dopo.
+**Immagini presenti: 182 su 182** (luoghi 66/66, pericoli 39/39, armi 77/77). **Video presenti: 0 su 105** (luoghi e pericoli). Meteo, disastri e oggetti arriveranno dopo.
 
 ## 1. Lo stile
 
@@ -282,7 +282,7 @@ Static camera and a seamless ambient loop: the subject keeps the same pose and p
 
 ### Armi · Arena Classica
 
-#### Coltello
+#### ✓ Coltello
 
 Coltello da sopravvivenza con manico in cuoio.  
 File: `assets/arene/classico/armi/coltello.webp`
@@ -293,7 +293,7 @@ File: `assets/arene/classico/armi/coltello.webp`
 A sturdy survival knife with a clip-point steel blade showing a few nicks and a polished edge, a leather-wrapped handle worn dark by use, and a small brass pommel with a lanyard loop. Single game inventory prop in three-quarter view, laid diagonally from lower left to upper right with a generous empty margin, isolated on a plain flat light grey background. Stylized painterly prop concept art with expressive brushwork, faceted planes and a crisp silhouette with a thin dark outline. Lit by a warm amber sunset key light with a cool indigo rim light. --v 8.2 --ar 1:1 --no text, letters, signature, watermark, hands, person, scenery, background objects, cast shadow, frame, border
 ```
 
-#### Arco
+#### ✓ Arco
 
 Arco ricurvo in legno con una freccia incoccata.  
 File: `assets/arene/classico/armi/arco.webp`
@@ -304,7 +304,7 @@ File: `assets/arene/classico/armi/arco.webp`
 A wooden recurve bow made of dark yew with leather-wrapped grip and pale bone tips, its string taut, with one feathered arrow nocked and ready. Single game inventory prop in three-quarter view, laid diagonally from lower left to upper right with a generous empty margin, isolated on a plain flat light grey background. Stylized painterly prop concept art with expressive brushwork, faceted planes and a crisp silhouette with a thin dark outline. Lit by a warm amber sunset key light with a cool indigo rim light. --v 8.2 --ar 1:1 --no text, letters, signature, watermark, hands, person, scenery, background objects, cast shadow, frame, border
 ```
 
-#### Lancia
+#### ✓ Lancia
 
 Lancia da caccia con asta di frassino e punta a foglia.  
 File: `assets/arene/classico/armi/lancia.webp`
@@ -315,7 +315,7 @@ File: `assets/arene/classico/armi/lancia.webp`
 A hunting spear with a straight ash-wood shaft, a leaf-shaped steel tip bound to it with tight cord, and two small hawk feathers tied below the blade. Single game inventory prop in three-quarter view, laid diagonally from lower left to upper right with a generous empty margin, isolated on a plain flat light grey background. Stylized painterly prop concept art with expressive brushwork, faceted planes and a crisp silhouette with a thin dark outline. Lit by a warm amber sunset key light with a cool indigo rim light. --v 8.2 --ar 1:1 --no text, letters, signature, watermark, hands, person, scenery, background objects, cast shadow, frame, border
 ```
 
-#### Ascia
+#### ✓ Ascia
 
 Ascia da boscaiolo con manico consumato.  
 File: `assets/arene/classico/armi/ascia.webp`
@@ -326,7 +326,7 @@ File: `assets/arene/classico/armi/ascia.webp`
 A woodcutter axe with a long worn hickory handle, a chipped steel head with a bright freshly sharpened edge, and a strip of red cloth tied around the grip. Single game inventory prop in three-quarter view, laid diagonally from lower left to upper right with a generous empty margin, isolated on a plain flat light grey background. Stylized painterly prop concept art with expressive brushwork, faceted planes and a crisp silhouette with a thin dark outline. Lit by a warm amber sunset key light with a cool indigo rim light. --v 8.2 --ar 1:1 --no text, letters, signature, watermark, hands, person, scenery, background objects, cast shadow, frame, border
 ```
 
-#### Machete
+#### ✓ Machete
 
 Machete lungo, lama leggermente curva.  
 File: `assets/arene/classico/armi/machete.webp`
@@ -337,7 +337,7 @@ File: `assets/arene/classico/armi/machete.webp`
 A long machete with a slightly curved, scratched steel blade, a black rubber grip and a frayed canvas sheath strap still hanging from the handle. Single game inventory prop in three-quarter view, laid diagonally from lower left to upper right with a generous empty margin, isolated on a plain flat light grey background. Stylized painterly prop concept art with expressive brushwork, faceted planes and a crisp silhouette with a thin dark outline. Lit by a warm amber sunset key light with a cool indigo rim light. --v 8.2 --ar 1:1 --no text, letters, signature, watermark, hands, person, scenery, background objects, cast shadow, frame, border
 ```
 
-#### Tridente
+#### ✓ Tridente
 
 Tridente da pesca con asta di legno.  
 File: `assets/arene/classico/armi/tridente.webp`
@@ -348,7 +348,7 @@ File: `assets/arene/classico/armi/tridente.webp`
 A three-pronged fishing trident with barbed iron tips, a wooden shaft wrapped in rope binding, and a few strands of river weed caught between the prongs. Single game inventory prop in three-quarter view, laid diagonally from lower left to upper right with a generous empty margin, isolated on a plain flat light grey background. Stylized painterly prop concept art with expressive brushwork, faceted planes and a crisp silhouette with a thin dark outline. Lit by a warm amber sunset key light with a cool indigo rim light. --v 8.2 --ar 1:1 --no text, letters, signature, watermark, hands, person, scenery, background objects, cast shadow, frame, border
 ```
 
-#### Fionda
+#### ✓ Fionda
 
 Fionda di legno a forcella con tasca di cuoio.  
 File: `assets/arene/classico/armi/fionda.webp`
@@ -359,7 +359,7 @@ File: `assets/arene/classico/armi/fionda.webp`
 A forked wooden slingshot carved from a branch, with stretched rubber bands and a small leather pouch holding a smooth river pebble. Single game inventory prop in three-quarter view, laid diagonally from lower left to upper right with a generous empty margin, isolated on a plain flat light grey background. Stylized painterly prop concept art with expressive brushwork, faceted planes and a crisp silhouette with a thin dark outline. Lit by a warm amber sunset key light with a cool indigo rim light. --v 8.2 --ar 1:1 --no text, letters, signature, watermark, hands, person, scenery, background objects, cast shadow, frame, border
 ```
 
-#### Spada corta
+#### ✓ Spada corta
 
 Spada corta tipo gladio, guardia semplice.  
 File: `assets/arene/classico/armi/spada-corta.webp`
@@ -370,7 +370,7 @@ File: `assets/arene/classico/armi/spada-corta.webp`
 A short gladius-style sword with a broad leaf-shaped steel blade, a simple brass crossguard, a leather-wrapped grip and a round wooden pommel. Single game inventory prop in three-quarter view, laid diagonally from lower left to upper right with a generous empty margin, isolated on a plain flat light grey background. Stylized painterly prop concept art with expressive brushwork, faceted planes and a crisp silhouette with a thin dark outline. Lit by a warm amber sunset key light with a cool indigo rim light. --v 8.2 --ar 1:1 --no text, letters, signature, watermark, hands, person, scenery, background objects, cast shadow, frame, border
 ```
 
-#### Pugnale
+#### ✓ Pugnale
 
 Pugnale sottile a doppio taglio.  
 File: `assets/arene/classico/armi/pugnale.webp`
@@ -381,7 +381,7 @@ File: `assets/arene/classico/armi/pugnale.webp`
 A slim double-edged dagger with a narrow polished blade, a cord-wrapped hilt and a small ring pommel, its edge catching a bright line of light. Single game inventory prop in three-quarter view, laid diagonally from lower left to upper right with a generous empty margin, isolated on a plain flat light grey background. Stylized painterly prop concept art with expressive brushwork, faceted planes and a crisp silhouette with a thin dark outline. Lit by a warm amber sunset key light with a cool indigo rim light. --v 8.2 --ar 1:1 --no text, letters, signature, watermark, hands, person, scenery, background objects, cast shadow, frame, border
 ```
 
-#### Mazza
+#### ✓ Mazza
 
 Clava di legno pesante con borchie di ferro.  
 File: `assets/arene/classico/armi/mazza.webp`
@@ -594,7 +594,7 @@ Static camera and a seamless ambient loop: the subject keeps the same pose and p
 
 ### Armi · Reame Incantato
 
-#### Spada runica
+#### ✓ Spada runica
 
 Spada lunga con rune viola luminose sulla lama.  
 File: `assets/arene/fantasy/armi/spada-runica.webp`
@@ -605,7 +605,7 @@ File: `assets/arene/fantasy/armi/spada-runica.webp`
 A longsword with a dark steel blade engraved with glowing violet runes along its length, an ornate silver crossguard shaped like spread wings and a grip wrapped in deep blue leather. Single game inventory prop in three-quarter view, laid diagonally from lower left to upper right with a generous empty margin, isolated on a plain flat light grey background. Stylized painterly prop concept art with expressive brushwork, faceted planes and a crisp silhouette with a thin dark outline. Lit by a cool violet moonlight key light with a glowing turquoise magical rim light. --v 8.2 --ar 1:1 --no text, letters, signature, watermark, hands, person, scenery, background objects, cast shadow, frame, border
 ```
 
-#### Bastone magico
+#### ✓ Bastone magico
 
 Bastone da mago nodoso con un cristallo luminoso sospeso in cima.  
 File: `assets/arene/fantasy/armi/bastone-magico.webp`
@@ -616,7 +616,7 @@ File: `assets/arene/fantasy/armi/bastone-magico.webp`
 A gnarled wizard staff of twisted ancient wood with silver bands, topped by a cage of roots holding a floating violet crystal that glows from within. Single game inventory prop in three-quarter view, laid diagonally from lower left to upper right with a generous empty margin, isolated on a plain flat light grey background. Stylized painterly prop concept art with expressive brushwork, faceted planes and a crisp silhouette with a thin dark outline. Lit by a cool violet moonlight key light with a glowing turquoise magical rim light. --v 8.2 --ar 1:1 --no text, letters, signature, watermark, hands, person, scenery, background objects, cast shadow, frame, border
 ```
 
-#### Arco elfico
+#### ✓ Arco elfico
 
 Arco lungo elfico in legno chiaro con intarsi d'argento a foglia.  
 File: `assets/arene/fantasy/armi/arco-elfico.webp`
@@ -627,7 +627,7 @@ File: `assets/arene/fantasy/armi/arco-elfico.webp`
 An elegant elven longbow of pale curved wood with leaf-shaped silver inlays, a thin glowing string and a small green gem set into the grip. Single game inventory prop in three-quarter view, laid diagonally from lower left to upper right with a generous empty margin, isolated on a plain flat light grey background. Stylized painterly prop concept art with expressive brushwork, faceted planes and a crisp silhouette with a thin dark outline. Lit by a cool violet moonlight key light with a glowing turquoise magical rim light. --v 8.2 --ar 1:1 --no text, letters, signature, watermark, hands, person, scenery, background objects, cast shadow, frame, border
 ```
 
-#### Ascia nanica
+#### ✓ Ascia nanica
 
 Ascia nanica a doppia lama con incisioni a intreccio.  
 File: `assets/arene/fantasy/armi/ascia-nanica.webp`
@@ -638,7 +638,7 @@ File: `assets/arene/fantasy/armi/ascia-nanica.webp`
 A heavy double-bladed dwarven axe with a broad steel head engraved with knotwork patterns, gold inlays and a thick handle wrapped in dark leather. Single game inventory prop in three-quarter view, laid diagonally from lower left to upper right with a generous empty margin, isolated on a plain flat light grey background. Stylized painterly prop concept art with expressive brushwork, faceted planes and a crisp silhouette with a thin dark outline. Lit by a cool violet moonlight key light with a glowing turquoise magical rim light. --v 8.2 --ar 1:1 --no text, letters, signature, watermark, hands, person, scenery, background objects, cast shadow, frame, border
 ```
 
-#### Pugnale avvelenato
+#### ✓ Pugnale avvelenato
 
 Pugnale ricurvo che gocciola veleno verde.  
 File: `assets/arene/fantasy/armi/pugnale-avvelenato.webp`
@@ -649,7 +649,7 @@ File: `assets/arene/fantasy/armi/pugnale-avvelenato.webp`
 A curved dagger with a dark serrated blade dripping bright green poison, a bone handle and a small serpent carved around the pommel. Single game inventory prop in three-quarter view, laid diagonally from lower left to upper right with a generous empty margin, isolated on a plain flat light grey background. Stylized painterly prop concept art with expressive brushwork, faceted planes and a crisp silhouette with a thin dark outline. Lit by a cool violet moonlight key light with a glowing turquoise magical rim light. --v 8.2 --ar 1:1 --no text, letters, signature, watermark, hands, person, scenery, background objects, cast shadow, frame, border
 ```
 
-#### Martello da guerra
+#### ✓ Martello da guerra
 
 Martello da guerra massiccio con testa in ferro incisa di rune.  
 File: `assets/arene/fantasy/armi/martello-da-guerra.webp`
@@ -660,7 +660,7 @@ File: `assets/arene/fantasy/armi/martello-da-guerra.webp`
 A massive war hammer with a square iron head carved with glowing runes, reinforced steel corners and a long handle bound with leather and brass rings. Single game inventory prop in three-quarter view, laid diagonally from lower left to upper right with a generous empty margin, isolated on a plain flat light grey background. Stylized painterly prop concept art with expressive brushwork, faceted planes and a crisp silhouette with a thin dark outline. Lit by a cool violet moonlight key light with a glowing turquoise magical rim light. --v 8.2 --ar 1:1 --no text, letters, signature, watermark, hands, person, scenery, background objects, cast shadow, frame, border
 ```
 
-#### Balestra
+#### ✓ Balestra
 
 Balestra fantasy in legno scuro e ottone.  
 File: `assets/arene/fantasy/armi/balestra.webp`
@@ -671,7 +671,7 @@ File: `assets/arene/fantasy/armi/balestra.webp`
 A fantasy crossbow of dark polished wood with brass fittings, a carved dragon head at the front and a glowing bolt loaded and ready. Single game inventory prop in three-quarter view, laid diagonally from lower left to upper right with a generous empty margin, isolated on a plain flat light grey background. Stylized painterly prop concept art with expressive brushwork, faceted planes and a crisp silhouette with a thin dark outline. Lit by a cool violet moonlight key light with a glowing turquoise magical rim light. --v 8.2 --ar 1:1 --no text, letters, signature, watermark, hands, person, scenery, background objects, cast shadow, frame, border
 ```
 
-#### Lancia incantata
+#### ✓ Lancia incantata
 
 Lancia sottile con la punta avvolta da una luce pallida.  
 File: `assets/arene/fantasy/armi/lancia-incantata.webp`
@@ -867,7 +867,7 @@ Static camera and a seamless ambient loop: the subject keeps the same pose and p
 
 ### Armi · Stazione Orbitale
 
-#### Fucile al plasma
+#### ✓ Fucile al plasma
 
 Fucile al plasma affusolato con celle d'energia ciano.  
 File: `assets/arene/scifi/armi/fucile-al-plasma.webp`
@@ -878,7 +878,7 @@ File: `assets/arene/scifi/armi/fucile-al-plasma.webp`
 A sleek plasma rifle with a white and graphite body, two transparent energy cells glowing cyan along the side, cooling fins near the barrel and a small holographic sight. Single game inventory prop in three-quarter view, laid diagonally from lower left to upper right with a generous empty margin, isolated on a plain flat light grey background. Stylized painterly prop concept art with expressive brushwork, faceted planes and a crisp silhouette with a thin dark outline. Lit by a cold cyan key light with a red warning rim light. --v 8.2 --ar 1:1 --no text, letters, signature, watermark, hands, person, scenery, background objects, cast shadow, frame, border
 ```
 
-#### Lama vibrante
+#### ✓ Lama vibrante
 
 Lama vibrante con il filo traslucido che ronza.  
 File: `assets/arene/scifi/armi/lama-vibrante.webp`
@@ -889,7 +889,7 @@ File: `assets/arene/scifi/armi/lama-vibrante.webp`
 A vibro-blade with a long translucent edge humming with faint blue light, a ribbed black grip with a power switch and a small battery pack at the pommel. Single game inventory prop in three-quarter view, laid diagonally from lower left to upper right with a generous empty margin, isolated on a plain flat light grey background. Stylized painterly prop concept art with expressive brushwork, faceted planes and a crisp silhouette with a thin dark outline. Lit by a cold cyan key light with a red warning rim light. --v 8.2 --ar 1:1 --no text, letters, signature, watermark, hands, person, scenery, background objects, cast shadow, frame, border
 ```
 
-#### Pistola laser
+#### ✓ Pistola laser
 
 Pistola laser compatta con emettitore rosso.  
 File: `assets/arene/scifi/armi/pistola-laser.webp`
@@ -900,7 +900,7 @@ File: `assets/arene/scifi/armi/pistola-laser.webp`
 A compact laser pistol with a matte grey body, a glowing red emitter tip, a charge indicator of small lights and a textured rubber grip. Single game inventory prop in three-quarter view, laid diagonally from lower left to upper right with a generous empty margin, isolated on a plain flat light grey background. Stylized painterly prop concept art with expressive brushwork, faceted planes and a crisp silhouette with a thin dark outline. Lit by a cold cyan key light with a red warning rim light. --v 8.2 --ar 1:1 --no text, letters, signature, watermark, hands, person, scenery, background objects, cast shadow, frame, border
 ```
 
-#### Granata EMP
+#### ✓ Granata EMP
 
 Granata EMP sferica con archi elettrici blu.  
 File: `assets/arene/scifi/armi/granata-emp.webp`
@@ -911,7 +911,7 @@ File: `assets/arene/scifi/armi/granata-emp.webp`
 A spherical EMP grenade made of segmented metal plates, a glowing blue core visible through the gaps and small crackling electric arcs dancing on its surface. Single game inventory prop in three-quarter view, laid diagonally from lower left to upper right with a generous empty margin, isolated on a plain flat light grey background. Stylized painterly prop concept art with expressive brushwork, faceted planes and a crisp silhouette with a thin dark outline. Lit by a cold cyan key light with a red warning rim light. --v 8.2 --ar 1:1 --no text, letters, signature, watermark, hands, person, scenery, background objects, cast shadow, frame, border
 ```
 
-#### Frusta monofilamento
+#### ✓ Frusta monofilamento
 
 Frusta a monofilamento: impugnatura metallica e un filo luminoso quasi invisibile.  
 File: `assets/arene/scifi/armi/frusta-monofilamento.webp`
@@ -922,7 +922,7 @@ File: `assets/arene/scifi/armi/frusta-monofilamento.webp`
 A monofilament whip with a chrome cylindrical handle and a thin glowing cyan line coiled loosely around it, sharp enough to cut steel. Single game inventory prop in three-quarter view, laid diagonally from lower left to upper right with a generous empty margin, isolated on a plain flat light grey background. Stylized painterly prop concept art with expressive brushwork, faceted planes and a crisp silhouette with a thin dark outline. Lit by a cold cyan key light with a red warning rim light. --v 8.2 --ar 1:1 --no text, letters, signature, watermark, hands, person, scenery, background objects, cast shadow, frame, border
 ```
 
-#### Taser a impulsi
+#### ✓ Taser a impulsi
 
 Taser a impulsi con elettrodi che crepitano.  
 File: `assets/arene/scifi/armi/taser-a-impulsi.webp`
@@ -933,7 +933,7 @@ File: `assets/arene/scifi/armi/taser-a-impulsi.webp`
 A pulse taser shaped like a short baton, with two metal electrodes at the tip crackling with bright blue electricity and a glowing charge strip on the handle. Single game inventory prop in three-quarter view, laid diagonally from lower left to upper right with a generous empty margin, isolated on a plain flat light grey background. Stylized painterly prop concept art with expressive brushwork, faceted planes and a crisp silhouette with a thin dark outline. Lit by a cold cyan key light with a red warning rim light. --v 8.2 --ar 1:1 --no text, letters, signature, watermark, hands, person, scenery, background objects, cast shadow, frame, border
 ```
 
-#### Cannone a rotaia portatile
+#### ✓ Cannone a rotaia portatile
 
 Cannone a rotaia portatile con binari magnetici e calcio pesante.  
 File: `assets/arene/scifi/armi/cannone-a-rotaia-portatile.webp`
@@ -1146,7 +1146,7 @@ Static camera and a seamless ambient loop: the subject keeps the same pose and p
 
 ### Armi · Città degli Infetti
 
-#### Mazza chiodata
+#### ✓ Mazza chiodata
 
 Mazza da baseball avvolta nel filo spinato e nei chiodi.  
 File: `assets/arene/zombie/armi/mazza-chiodata.webp`
@@ -1157,7 +1157,7 @@ File: `assets/arene/zombie/armi/mazza-chiodata.webp`
 A wooden baseball bat wrapped in rusty barbed wire and studded with bent nails, its handle taped with black grip tape. Single game inventory prop in three-quarter view, laid diagonally from lower left to upper right with a generous empty margin, isolated on a plain flat light grey background. Stylized painterly prop concept art with expressive brushwork, faceted planes and a crisp silhouette with a thin dark outline. Lit by a sickly green overcast key light with a pale fluorescent rim light. --v 8.2 --ar 1:1 --no text, letters, signature, watermark, hands, person, scenery, background objects, cast shadow, frame, border
 ```
 
-#### Fucile a pompa
+#### ✓ Fucile a pompa
 
 Fucile a pompa con il calcio rattoppato col nastro.  
 File: `assets/arene/zombie/armi/fucile-a-pompa.webp`
@@ -1168,7 +1168,7 @@ File: `assets/arene/zombie/armi/fucile-a-pompa.webp`
 A pump-action shotgun with a scratched black barrel, a wooden pump and a cracked stock held together with grey duct tape, a few red shells strapped to the side. Single game inventory prop in three-quarter view, laid diagonally from lower left to upper right with a generous empty margin, isolated on a plain flat light grey background. Stylized painterly prop concept art with expressive brushwork, faceted planes and a crisp silhouette with a thin dark outline. Lit by a sickly green overcast key light with a pale fluorescent rim light. --v 8.2 --ar 1:1 --no text, letters, signature, watermark, hands, person, scenery, background objects, cast shadow, frame, border
 ```
 
-#### Piede di porco
+#### ✓ Piede di porco
 
 Piede di porco in acciaio rosso.  
 File: `assets/arene/zombie/armi/piede-di-porco.webp`
@@ -1179,7 +1179,7 @@ File: `assets/arene/zombie/armi/piede-di-porco.webp`
 A red steel crowbar with scuffed and chipped paint, a curved claw end and a flat pry end bent from use. Single game inventory prop in three-quarter view, laid diagonally from lower left to upper right with a generous empty margin, isolated on a plain flat light grey background. Stylized painterly prop concept art with expressive brushwork, faceted planes and a crisp silhouette with a thin dark outline. Lit by a sickly green overcast key light with a pale fluorescent rim light. --v 8.2 --ar 1:1 --no text, letters, signature, watermark, hands, person, scenery, background objects, cast shadow, frame, border
 ```
 
-#### Motosega
+#### ✓ Motosega
 
 Motosega con il corpo arancione graffiato.  
 File: `assets/arene/zombie/armi/motosega.webp`
@@ -1190,7 +1190,7 @@ File: `assets/arene/zombie/armi/motosega.webp`
 A chainsaw with a scratched orange body, a long steel bar, a dull chain and a pull-start cord hanging loose. Single game inventory prop in three-quarter view, laid diagonally from lower left to upper right with a generous empty margin, isolated on a plain flat light grey background. Stylized painterly prop concept art with expressive brushwork, faceted planes and a crisp silhouette with a thin dark outline. Lit by a sickly green overcast key light with a pale fluorescent rim light. --v 8.2 --ar 1:1 --no text, letters, signature, watermark, hands, person, scenery, background objects, cast shadow, frame, border
 ```
 
-#### Katana
+#### ✓ Katana
 
 Katana con l'impugnatura consumata.  
 File: `assets/arene/zombie/armi/katana.webp`
@@ -1201,7 +1201,7 @@ File: `assets/arene/zombie/armi/katana.webp`
 A katana with a gently curved polished blade, a round guard and a worn handle wrapped in faded black cord. Single game inventory prop in three-quarter view, laid diagonally from lower left to upper right with a generous empty margin, isolated on a plain flat light grey background. Stylized painterly prop concept art with expressive brushwork, faceted planes and a crisp silhouette with a thin dark outline. Lit by a sickly green overcast key light with a pale fluorescent rim light. --v 8.2 --ar 1:1 --no text, letters, signature, watermark, hands, person, scenery, background objects, cast shadow, frame, border
 ```
 
-#### Balestra
+#### ✓ Balestra
 
 Balestra moderna da caccia con mirino.  
 File: `assets/arene/zombie/armi/balestra.webp`
@@ -1212,7 +1212,7 @@ File: `assets/arene/zombie/armi/balestra.webp`
 A modern hunting crossbow with a black composite frame, a mounted scope, taut cables and a bolt loaded and ready. Single game inventory prop in three-quarter view, laid diagonally from lower left to upper right with a generous empty margin, isolated on a plain flat light grey background. Stylized painterly prop concept art with expressive brushwork, faceted planes and a crisp silhouette with a thin dark outline. Lit by a sickly green overcast key light with a pale fluorescent rim light. --v 8.2 --ar 1:1 --no text, letters, signature, watermark, hands, person, scenery, background objects, cast shadow, frame, border
 ```
 
-#### Pistola
+#### ✓ Pistola
 
 Pistola semiautomatica malridotta.  
 File: `assets/arene/zombie/armi/pistola.webp`
@@ -1223,7 +1223,7 @@ File: `assets/arene/zombie/armi/pistola.webp`
 A battered semi-automatic pistol with worn black finish, scratches along the slide and a magazine slightly sticking out. Single game inventory prop in three-quarter view, laid diagonally from lower left to upper right with a generous empty margin, isolated on a plain flat light grey background. Stylized painterly prop concept art with expressive brushwork, faceted planes and a crisp silhouette with a thin dark outline. Lit by a sickly green overcast key light with a pale fluorescent rim light. --v 8.2 --ar 1:1 --no text, letters, signature, watermark, hands, person, scenery, background objects, cast shadow, frame, border
 ```
 
-#### Accetta
+#### ✓ Accetta
 
 Accetta con impugnatura in gomma.  
 File: `assets/arene/zombie/armi/accetta.webp`
@@ -1402,7 +1402,7 @@ Static camera and a seamless ambient loop: the subject keeps the same pose and p
 
 ### Armi · Isola Battle Royale
 
-#### Fucile d'assalto
+#### ✓ Fucile d'assalto
 
 Fucile d'assalto con mirino a punto rosso.  
 File: `assets/arene/royale/armi/fucile-dassalto.webp`
@@ -1413,7 +1413,7 @@ File: `assets/arene/royale/armi/fucile-dassalto.webp`
 An assault rifle with a black and tan body, a red-dot sight on the top rail, a curved magazine and a short foregrip, with a subtle golden rarity glow along its edges. Single game inventory prop in three-quarter view, laid diagonally from lower left to upper right with a generous empty margin, isolated on a plain flat light grey background. Stylized painterly prop concept art with expressive brushwork, faceted planes and a crisp silhouette with a thin dark outline. Lit by a bright warm afternoon key light with a cool blue rim light. --v 8.2 --ar 1:1 --no text, letters, signature, watermark, hands, person, scenery, background objects, cast shadow, frame, border
 ```
 
-#### Pistola
+#### ✓ Pistola
 
 Pistola semiautomatica nera.  
 File: `assets/arene/royale/armi/pistola.webp`
@@ -1424,7 +1424,7 @@ File: `assets/arene/royale/armi/pistola.webp`
 A black semi-automatic pistol with a textured grip, a short slide and a small flashlight attached under the barrel. Single game inventory prop in three-quarter view, laid diagonally from lower left to upper right with a generous empty margin, isolated on a plain flat light grey background. Stylized painterly prop concept art with expressive brushwork, faceted planes and a crisp silhouette with a thin dark outline. Lit by a bright warm afternoon key light with a cool blue rim light. --v 8.2 --ar 1:1 --no text, letters, signature, watermark, hands, person, scenery, background objects, cast shadow, frame, border
 ```
 
-#### Fucile da cecchino
+#### ✓ Fucile da cecchino
 
 Fucile da cecchino con cannocchiale lungo e bipiede.  
 File: `assets/arene/royale/armi/fucile-da-cecchino.webp`
@@ -1435,7 +1435,7 @@ File: `assets/arene/royale/armi/fucile-da-cecchino.webp`
 A long sniper rifle with a dark green body, a large scope, a folded bipod and a fabric cheek pad on the stock. Single game inventory prop in three-quarter view, laid diagonally from lower left to upper right with a generous empty margin, isolated on a plain flat light grey background. Stylized painterly prop concept art with expressive brushwork, faceted planes and a crisp silhouette with a thin dark outline. Lit by a bright warm afternoon key light with a cool blue rim light. --v 8.2 --ar 1:1 --no text, letters, signature, watermark, hands, person, scenery, background objects, cast shadow, frame, border
 ```
 
-#### Fucile a pompa
+#### ✓ Fucile a pompa
 
 Fucile a pompa tattico.  
 File: `assets/arene/royale/armi/fucile-a-pompa.webp`
@@ -1446,7 +1446,7 @@ File: `assets/arene/royale/armi/fucile-a-pompa.webp`
 A tactical pump shotgun with a black synthetic stock, a ribbed pump and a row of red shells held in a side carrier. Single game inventory prop in three-quarter view, laid diagonally from lower left to upper right with a generous empty margin, isolated on a plain flat light grey background. Stylized painterly prop concept art with expressive brushwork, faceted planes and a crisp silhouette with a thin dark outline. Lit by a bright warm afternoon key light with a cool blue rim light. --v 8.2 --ar 1:1 --no text, letters, signature, watermark, hands, person, scenery, background objects, cast shadow, frame, border
 ```
 
-#### Granata
+#### ✓ Granata
 
 Granata a frammentazione con la spoletta.  
 File: `assets/arene/royale/armi/granata.webp`
@@ -1457,7 +1457,7 @@ File: `assets/arene/royale/armi/granata.webp`
 A round fragmentation grenade with a ridged olive green body, a metal lever and a pull ring with its pin. Single game inventory prop in three-quarter view, laid diagonally from lower left to upper right with a generous empty margin, isolated on a plain flat light grey background. Stylized painterly prop concept art with expressive brushwork, faceted planes and a crisp silhouette with a thin dark outline. Lit by a bright warm afternoon key light with a cool blue rim light. --v 8.2 --ar 1:1 --no text, letters, signature, watermark, hands, person, scenery, background objects, cast shadow, frame, border
 ```
 
-#### Mitraglietta
+#### ✓ Mitraglietta
 
 Mitraglietta compatta.  
 File: `assets/arene/royale/armi/mitraglietta.webp`
@@ -1468,7 +1468,7 @@ File: `assets/arene/royale/armi/mitraglietta.webp`
 A compact submachine gun with a folding stock, a long straight magazine and a short suppressor. Single game inventory prop in three-quarter view, laid diagonally from lower left to upper right with a generous empty margin, isolated on a plain flat light grey background. Stylized painterly prop concept art with expressive brushwork, faceted planes and a crisp silhouette with a thin dark outline. Lit by a bright warm afternoon key light with a cool blue rim light. --v 8.2 --ar 1:1 --no text, letters, signature, watermark, hands, person, scenery, background objects, cast shadow, frame, border
 ```
 
-#### Coltello da combattimento
+#### ✓ Coltello da combattimento
 
 Coltello da combattimento con dorso seghettato.  
 File: `assets/arene/royale/armi/coltello-da-combattimento.webp`
@@ -1479,7 +1479,7 @@ File: `assets/arene/royale/armi/coltello-da-combattimento.webp`
 A combat knife with a black steel blade, a serrated spine, a textured rubber handle and a finger guard. Single game inventory prop in three-quarter view, laid diagonally from lower left to upper right with a generous empty margin, isolated on a plain flat light grey background. Stylized painterly prop concept art with expressive brushwork, faceted planes and a crisp silhouette with a thin dark outline. Lit by a bright warm afternoon key light with a cool blue rim light. --v 8.2 --ar 1:1 --no text, letters, signature, watermark, hands, person, scenery, background objects, cast shadow, frame, border
 ```
 
-#### Balestra
+#### ✓ Balestra
 
 Balestra tattica mimetica.  
 File: `assets/arene/royale/armi/balestra.webp`
@@ -1692,7 +1692,7 @@ Static camera and a seamless ambient loop: the subject keeps the same pose and p
 
 ### Armi · Villa Maledetta
 
-#### Candelabro d'argento
+#### ✓ Candelabro d'argento
 
 Candelabro d'argento pesante con tre candele che colano.  
 File: `assets/arene/horror/armi/candelabro-dargento.webp`
@@ -1703,7 +1703,7 @@ File: `assets/arene/horror/armi/candelabro-dargento.webp`
 A heavy tarnished silver candelabra with three branches and three white candles, wax dripping down the sides, one flame still burning. Single game inventory prop in three-quarter view, laid diagonally from lower left to upper right with a generous empty margin, isolated on a plain flat light grey background. Stylized painterly prop concept art with expressive brushwork, faceted planes and a crisp silhouette with a thin dark outline. Lit by a warm candle gold key light with a crimson moonlight rim light. --v 8.2 --ar 1:1 --no text, letters, signature, watermark, hands, person, scenery, background objects, cast shadow, frame, border
 ```
 
-#### Ascia
+#### ✓ Ascia
 
 Vecchia ascia arrugginita.  
 File: `assets/arene/horror/armi/ascia.webp`
@@ -1714,7 +1714,7 @@ File: `assets/arene/horror/armi/ascia.webp`
 An old rusted axe with a cracked wooden handle, a chipped blade with dark stains of age and a strip of old cloth tied near the head. Single game inventory prop in three-quarter view, laid diagonally from lower left to upper right with a generous empty margin, isolated on a plain flat light grey background. Stylized painterly prop concept art with expressive brushwork, faceted planes and a crisp silhouette with a thin dark outline. Lit by a warm candle gold key light with a crimson moonlight rim light. --v 8.2 --ar 1:1 --no text, letters, signature, watermark, hands, person, scenery, background objects, cast shadow, frame, border
 ```
 
-#### Fucile da caccia
+#### ✓ Fucile da caccia
 
 Doppietta da caccia con calcio in legno.  
 File: `assets/arene/horror/armi/fucile-da-caccia.webp`
@@ -1725,7 +1725,7 @@ File: `assets/arene/horror/armi/fucile-da-caccia.webp`
 A double-barrelled hunting shotgun with a polished walnut stock, engraved silver side plates and worn dark barrels. Single game inventory prop in three-quarter view, laid diagonally from lower left to upper right with a generous empty margin, isolated on a plain flat light grey background. Stylized painterly prop concept art with expressive brushwork, faceted planes and a crisp silhouette with a thin dark outline. Lit by a warm candle gold key light with a crimson moonlight rim light. --v 8.2 --ar 1:1 --no text, letters, signature, watermark, hands, person, scenery, background objects, cast shadow, frame, border
 ```
 
-#### Pugnale rituale
+#### ✓ Pugnale rituale
 
 Pugnale rituale con elsa d'osso e simboli incisi.  
 File: `assets/arene/horror/armi/pugnale-rituale.webp`
@@ -1736,7 +1736,7 @@ File: `assets/arene/horror/armi/pugnale-rituale.webp`
 A ritual dagger with a wavy black blade, a hilt carved from bone and engraved occult symbols that glow faint red. Single game inventory prop in three-quarter view, laid diagonally from lower left to upper right with a generous empty margin, isolated on a plain flat light grey background. Stylized painterly prop concept art with expressive brushwork, faceted planes and a crisp silhouette with a thin dark outline. Lit by a warm candle gold key light with a crimson moonlight rim light. --v 8.2 --ar 1:1 --no text, letters, signature, watermark, hands, person, scenery, background objects, cast shadow, frame, border
 ```
 
-#### Crocifisso appuntito
+#### ✓ Crocifisso appuntito
 
 Crocifisso di legno appuntito come un paletto.  
 File: `assets/arene/horror/armi/crocifisso-appuntito.webp`
@@ -1747,7 +1747,7 @@ File: `assets/arene/horror/armi/crocifisso-appuntito.webp`
 A dark wooden crucifix with a small silver figure, its long bottom end carved into a sharp stake. Single game inventory prop in three-quarter view, laid diagonally from lower left to upper right with a generous empty margin, isolated on a plain flat light grey background. Stylized painterly prop concept art with expressive brushwork, faceted planes and a crisp silhouette with a thin dark outline. Lit by a warm candle gold key light with a crimson moonlight rim light. --v 8.2 --ar 1:1 --no text, letters, signature, watermark, hands, person, scenery, background objects, cast shadow, frame, border
 ```
 
-#### Attizzatoio
+#### ✓ Attizzatoio
 
 Attizzatoio da camino in ferro battuto.  
 File: `assets/arene/horror/armi/attizzatoio.webp`
@@ -1758,7 +1758,7 @@ File: `assets/arene/horror/armi/attizzatoio.webp`
 A wrought iron fireplace poker with a hooked pointed tip, a twisted shaft and a ring handle, its end still glowing faintly from the fire. Single game inventory prop in three-quarter view, laid diagonally from lower left to upper right with a generous empty margin, isolated on a plain flat light grey background. Stylized painterly prop concept art with expressive brushwork, faceted planes and a crisp silhouette with a thin dark outline. Lit by a warm candle gold key light with a crimson moonlight rim light. --v 8.2 --ar 1:1 --no text, letters, signature, watermark, hands, person, scenery, background objects, cast shadow, frame, border
 ```
 
-#### Falce
+#### ✓ Falce
 
 Falce da contadino con la lama lunga e curva.  
 File: `assets/arene/horror/armi/falce.webp`
@@ -1971,7 +1971,7 @@ Static camera and a seamless ambient loop: the subject keeps the same pose and p
 
 ### Armi · Terre Desolate
 
-#### Fucile arrugginito
+#### ✓ Fucile arrugginito
 
 Fucile a otturatore arrugginito con mirino legato col nastro.  
 File: `assets/arene/wasteland/armi/fucile-arrugginito.webp`
@@ -1982,7 +1982,7 @@ File: `assets/arene/wasteland/armi/fucile-arrugginito.webp`
 A rusty bolt-action rifle with a cracked wooden stock, a scope held on with duct tape and a strip of leather as a sling. Single game inventory prop in three-quarter view, laid diagonally from lower left to upper right with a generous empty margin, isolated on a plain flat light grey background. Stylized painterly prop concept art with expressive brushwork, faceted planes and a crisp silhouette with a thin dark outline. Lit by a harsh scorched sunlight key light with a burnt orange rim light. --v 8.2 --ar 1:1 --no text, letters, signature, watermark, hands, person, scenery, background objects, cast shadow, frame, border
 ```
 
-#### Lancia ricavata da un tubo
+#### ✓ Lancia ricavata da un tubo
 
 Lancia fatta con un tubo di metallo e un tondino appuntito.  
 File: `assets/arene/wasteland/armi/lancia-ricavata-da-un-tubo.webp`
@@ -1993,7 +1993,7 @@ File: `assets/arene/wasteland/armi/lancia-ricavata-da-un-tubo.webp`
 A spear made from a dented metal pipe with a sharpened length of rebar welded on the tip, wrapped with rags and wire for grip. Single game inventory prop in three-quarter view, laid diagonally from lower left to upper right with a generous empty margin, isolated on a plain flat light grey background. Stylized painterly prop concept art with expressive brushwork, faceted planes and a crisp silhouette with a thin dark outline. Lit by a harsh scorched sunlight key light with a burnt orange rim light. --v 8.2 --ar 1:1 --no text, letters, signature, watermark, hands, person, scenery, background objects, cast shadow, frame, border
 ```
 
-#### Balestra artigianale
+#### ✓ Balestra artigianale
 
 Balestra artigianale fatta con balestre d'auto e rottami.  
 File: `assets/arene/wasteland/armi/balestra-artigianale.webp`
@@ -2004,7 +2004,7 @@ File: `assets/arene/wasteland/armi/balestra-artigianale.webp`
 A homemade crossbow built from a car leaf spring, scrap metal and bolts, with a bicycle chain mechanism and a sharpened rebar bolt loaded. Single game inventory prop in three-quarter view, laid diagonally from lower left to upper right with a generous empty margin, isolated on a plain flat light grey background. Stylized painterly prop concept art with expressive brushwork, faceted planes and a crisp silhouette with a thin dark outline. Lit by a harsh scorched sunlight key light with a burnt orange rim light. --v 8.2 --ar 1:1 --no text, letters, signature, watermark, hands, person, scenery, background objects, cast shadow, frame, border
 ```
 
-#### Molotov
+#### ✓ Molotov
 
 Bottiglia molotov con lo straccio in fiamme.  
 File: `assets/arene/wasteland/armi/molotov.webp`
@@ -2015,7 +2015,7 @@ File: `assets/arene/wasteland/armi/molotov.webp`
 A molotov cocktail made from a glass bottle half full of amber fuel, a rag stuffed in the neck and burning with a small flame. Single game inventory prop in three-quarter view, laid diagonally from lower left to upper right with a generous empty margin, isolated on a plain flat light grey background. Stylized painterly prop concept art with expressive brushwork, faceted planes and a crisp silhouette with a thin dark outline. Lit by a harsh scorched sunlight key light with a burnt orange rim light. --v 8.2 --ar 1:1 --no text, letters, signature, watermark, hands, person, scenery, background objects, cast shadow, frame, border
 ```
 
-#### Catena
+#### ✓ Catena
 
 Catena pesante arrotolata con un lucchetto.  
 File: `assets/arene/wasteland/armi/catena.webp`
@@ -2026,7 +2026,7 @@ File: `assets/arene/wasteland/armi/catena.webp`
 A heavy coiled steel chain with thick rusted links and a big brass padlock hanging from one end. Single game inventory prop in three-quarter view, laid diagonally from lower left to upper right with a generous empty margin, isolated on a plain flat light grey background. Stylized painterly prop concept art with expressive brushwork, faceted planes and a crisp silhouette with a thin dark outline. Lit by a harsh scorched sunlight key light with a burnt orange rim light. --v 8.2 --ar 1:1 --no text, letters, signature, watermark, hands, person, scenery, background objects, cast shadow, frame, border
 ```
 
-#### Mannaia
+#### ✓ Mannaia
 
 Mannaia grande con manico fasciato.  
 File: `assets/arene/wasteland/armi/mannaia.webp`
@@ -2037,7 +2037,7 @@ File: `assets/arene/wasteland/armi/mannaia.webp`
 A large meat cleaver with a broad scratched blade, a hole near the spine and a handle wrapped in dirty cloth. Single game inventory prop in three-quarter view, laid diagonally from lower left to upper right with a generous empty margin, isolated on a plain flat light grey background. Stylized painterly prop concept art with expressive brushwork, faceted planes and a crisp silhouette with a thin dark outline. Lit by a harsh scorched sunlight key light with a burnt orange rim light. --v 8.2 --ar 1:1 --no text, letters, signature, watermark, hands, person, scenery, background objects, cast shadow, frame, border
 ```
 
-#### Lanciachiodi
+#### ✓ Lanciachiodi
 
 Sparachiodi modificato come arma, con caricatore a tamburo.  
 File: `assets/arene/wasteland/armi/lanciachiodi.webp`
@@ -2250,7 +2250,7 @@ Static camera and a seamless ambient loop: the subject keeps the same pose and p
 
 ### Armi · Liceo Spietato
 
-#### Gossip esplosivo
+#### ✓ Gossip esplosivo
 
 Smartphone con un fumetto di chat che esplode come un fuoco d'artificio.  
 File: `assets/arene/liceo/armi/gossip-esplosivo.webp`
@@ -2261,7 +2261,7 @@ File: `assets/arene/liceo/armi/gossip-esplosivo.webp`
 A smartphone with a glowing pink screen and a chat bubble bursting out of it like a firework, sparkles and tiny hearts flying around. Single game inventory prop in three-quarter view, laid diagonally from lower left to upper right with a generous empty margin, isolated on a plain flat light grey background. Stylized painterly prop concept art with expressive brushwork, faceted planes and a crisp silhouette with a thin dark outline. Lit by a soft pastel pink key light with a warm golden rim light, playful comedy mood. --v 8.2 --ar 1:1 --no text, letters, signature, watermark, hands, person, scenery, background objects, cast shadow, frame, border
 ```
 
-#### Foto imbarazzante
+#### ✓ Foto imbarazzante
 
 Polaroid con un'immagine imbarazzante sfocata e un bagliore rosa.  
 File: `assets/arene/liceo/armi/foto-imbarazzante.webp`
@@ -2272,7 +2272,7 @@ File: `assets/arene/liceo/armi/foto-imbarazzante.webp`
 A polaroid photo with a blurred embarrassing picture, slightly bent at one corner, with a soft pink glow and a doodled heart on the border. Single game inventory prop in three-quarter view, laid diagonally from lower left to upper right with a generous empty margin, isolated on a plain flat light grey background. Stylized painterly prop concept art with expressive brushwork, faceted planes and a crisp silhouette with a thin dark outline. Lit by a soft pastel pink key light with a warm golden rim light, playful comedy mood. --v 8.2 --ar 1:1 --no text, letters, signature, watermark, hands, person, scenery, background objects, cast shadow, frame, border
 ```
 
-#### Compito copiato
+#### ✓ Compito copiato
 
 Compito in classe con un bigliettino nascosto che spunta.  
 File: `assets/arene/liceo/armi/compito-copiato.webp`
@@ -2283,7 +2283,7 @@ File: `assets/arene/liceo/armi/compito-copiato.webp`
 A folded test paper with a tiny rolled cheat sheet sticking out of it, scribbled lines instead of writing and a red pen mark on top. Single game inventory prop in three-quarter view, laid diagonally from lower left to upper right with a generous empty margin, isolated on a plain flat light grey background. Stylized painterly prop concept art with expressive brushwork, faceted planes and a crisp silhouette with a thin dark outline. Lit by a soft pastel pink key light with a warm golden rim light, playful comedy mood. --v 8.2 --ar 1:1 --no text, letters, signature, watermark, hands, person, scenery, background objects, cast shadow, frame, border
 ```
 
-#### Pallone da dodgeball
+#### ✓ Pallone da dodgeball
 
 Pallone rosso da dodgeball con scie di movimento.  
 File: `assets/arene/liceo/armi/pallone-da-dodgeball.webp`
@@ -2294,7 +2294,7 @@ File: `assets/arene/liceo/armi/pallone-da-dodgeball.webp`
 A bright red rubber dodgeball with a textured surface and a few motion streaks, as if just thrown. Single game inventory prop in three-quarter view, laid diagonally from lower left to upper right with a generous empty margin, isolated on a plain flat light grey background. Stylized painterly prop concept art with expressive brushwork, faceted planes and a crisp silhouette with a thin dark outline. Lit by a soft pastel pink key light with a warm golden rim light, playful comedy mood. --v 8.2 --ar 1:1 --no text, letters, signature, watermark, hands, person, scenery, background objects, cast shadow, frame, border
 ```
 
-#### Registro rubato
+#### ✓ Registro rubato
 
 Registro di classe spesso con il segnalibro a nastro.  
 File: `assets/arene/liceo/armi/registro-rubato.webp`
@@ -2305,7 +2305,7 @@ File: `assets/arene/liceo/armi/registro-rubato.webp`
 A thick hardcover class register with a plain dark blue cover, a red ribbon bookmark and loose sheets sticking out of the pages. Single game inventory prop in three-quarter view, laid diagonally from lower left to upper right with a generous empty margin, isolated on a plain flat light grey background. Stylized painterly prop concept art with expressive brushwork, faceted planes and a crisp silhouette with a thin dark outline. Lit by a soft pastel pink key light with a warm golden rim light, playful comedy mood. --v 8.2 --ar 1:1 --no text, letters, signature, watermark, hands, person, scenery, background objects, cast shadow, frame, border
 ```
 
-#### Profilo falso
+#### ✓ Profilo falso
 
 Smartphone con un profilo social finto e l'icona di una maschera.  
 File: `assets/arene/liceo/armi/profilo-falso.webp`
@@ -2501,7 +2501,7 @@ Static camera and a seamless ambient loop: the subject keeps the same pose and p
 
 ### Armi · Ufficio Open Space
 
-#### Mail in copia a tutti
+#### ✓ Mail in copia a tutti
 
 Busta di una mail che si moltiplica in tante copie luminose.  
 File: `assets/arene/ufficio/armi/mail-in-copia-a-tutti.webp`
@@ -2512,7 +2512,7 @@ File: `assets/arene/ufficio/armi/mail-in-copia-a-tutti.webp`
 A white email envelope multiplying into many glowing copies that fan out behind it, each with a small red notification dot. Single game inventory prop in three-quarter view, laid diagonally from lower left to upper right with a generous empty margin, isolated on a plain flat light grey background. Stylized painterly prop concept art with expressive brushwork, faceted planes and a crisp silhouette with a thin dark outline. Lit by a cold teal fluorescent key light with a monitor glow rim light, comedy mood. --v 8.2 --ar 1:1 --no text, letters, signature, watermark, hands, person, scenery, background objects, cast shadow, frame, border
 ```
 
-#### Report pieno di errori altrui
+#### ✓ Report pieno di errori altrui
 
 Report stampato coperto di segni rossi e post-it.  
 File: `assets/arene/ufficio/armi/report-pieno-di-errori-altrui.webp`
@@ -2523,7 +2523,7 @@ File: `assets/arene/ufficio/armi/report-pieno-di-errori-altrui.webp`
 A thick printed report covered in red correction marks and colourful sticky notes, abstract scribbled lines instead of text and a paperclip on top. Single game inventory prop in three-quarter view, laid diagonally from lower left to upper right with a generous empty margin, isolated on a plain flat light grey background. Stylized painterly prop concept art with expressive brushwork, faceted planes and a crisp silhouette with a thin dark outline. Lit by a cold teal fluorescent key light with a monitor glow rim light, comedy mood. --v 8.2 --ar 1:1 --no text, letters, signature, watermark, hands, person, scenery, background objects, cast shadow, frame, border
 ```
 
-#### Presentazione rubata
+#### ✓ Presentazione rubata
 
 Chiavetta USB con una slide proiettata e una mascherina da ladro.  
 File: `assets/arene/ufficio/armi/presentazione-rubata.webp`
@@ -2534,7 +2534,7 @@ File: `assets/arene/ufficio/armi/presentazione-rubata.webp`
 A USB stick wearing a tiny black burglar mask, projecting a small glowing slide with an abstract chart above it. Single game inventory prop in three-quarter view, laid diagonally from lower left to upper right with a generous empty margin, isolated on a plain flat light grey background. Stylized painterly prop concept art with expressive brushwork, faceted planes and a crisp silhouette with a thin dark outline. Lit by a cold teal fluorescent key light with a monitor glow rim light, comedy mood. --v 8.2 --ar 1:1 --no text, letters, signature, watermark, hands, person, scenery, background objects, cast shadow, frame, border
 ```
 
-#### Badge clonato del capo
+#### ✓ Badge clonato del capo
 
 Badge col cordino e una sua copia identica luminosa.  
 File: `assets/arene/ufficio/armi/badge-clonato-del-capo.webp`
@@ -2545,7 +2545,7 @@ File: `assets/arene/ufficio/armi/badge-clonato-del-capo.webp`
 An ID badge on a blue lanyard with a blank photo area, and a glowing translucent duplicate copy floating beside it. Single game inventory prop in three-quarter view, laid diagonally from lower left to upper right with a generous empty margin, isolated on a plain flat light grey background. Stylized painterly prop concept art with expressive brushwork, faceted planes and a crisp silhouette with a thin dark outline. Lit by a cold teal fluorescent key light with a monitor glow rim light, comedy mood. --v 8.2 --ar 1:1 --no text, letters, signature, watermark, hands, person, scenery, background objects, cast shadow, frame, border
 ```
 
-#### Foglio Excel con le prove
+#### ✓ Foglio Excel con le prove
 
 Stampa di un foglio di calcolo con celle evidenziate e una lente.  
 File: `assets/arene/ufficio/armi/foglio-excel-con-le-prove.webp`
@@ -2556,7 +2556,7 @@ File: `assets/arene/ufficio/armi/foglio-excel-con-le-prove.webp`
 A spreadsheet printout with bright yellow highlighted cells, abstract grid marks and a magnifying glass resting on top of it. Single game inventory prop in three-quarter view, laid diagonally from lower left to upper right with a generous empty margin, isolated on a plain flat light grey background. Stylized painterly prop concept art with expressive brushwork, faceted planes and a crisp silhouette with a thin dark outline. Lit by a cold teal fluorescent key light with a monitor glow rim light, comedy mood. --v 8.2 --ar 1:1 --no text, letters, signature, watermark, hands, person, scenery, background objects, cast shadow, frame, border
 ```
 
-#### Nota spese gonfiata
+#### ✓ Nota spese gonfiata
 
 Uno scontrino che si gonfia come un palloncino.  
 File: `assets/arene/ufficio/armi/nota-spese-gonfiata.webp`
@@ -2769,7 +2769,7 @@ Static camera and a seamless ambient loop: the subject keeps the same pose and p
 
 ### Armi · Night City — Zona Rossa
 
-#### Pistola smart
+#### ✓ Pistola smart
 
 Pistola smart compatta con canna sagomata e linee luminose ciano.  
 File: `assets/arene/cyberpunk/armi/pistola-smart.webp`
@@ -2780,7 +2780,7 @@ File: `assets/arene/cyberpunk/armi/pistola-smart.webp`
 A compact smart pistol with a sculpted angular barrel, a small targeting module on top and thin glowing cyan lines along the slide. Single game inventory prop in three-quarter view, laid diagonally from lower left to upper right with a generous empty margin, isolated on a plain flat light grey background. Stylized painterly prop concept art with expressive brushwork, faceted planes and a crisp silhouette with a thin dark outline. Lit by an electric cyan neon key light with a magenta rim light and a faint acid yellow glint. --v 8.2 --ar 1:1 --no text, letters, signature, watermark, hands, person, scenery, background objects, cast shadow, frame, border
 ```
 
-#### Katana termica
+#### ✓ Katana termica
 
 Katana con lama rovente arancione e impugnatura avvolta in cavi.  
 File: `assets/arene/cyberpunk/armi/katana-termica.webp`
@@ -2791,7 +2791,7 @@ File: `assets/arene/cyberpunk/armi/katana-termica.webp`
 A katana with a glowing orange heated blade, a tech hilt wrapped in braided cable and a small battery pack at the pommel. Single game inventory prop in three-quarter view, laid diagonally from lower left to upper right with a generous empty margin, isolated on a plain flat light grey background. Stylized painterly prop concept art with expressive brushwork, faceted planes and a crisp silhouette with a thin dark outline. Lit by an electric cyan neon key light with a magenta rim light and a faint acid yellow glint. --v 8.2 --ar 1:1 --no text, letters, signature, watermark, hands, person, scenery, background objects, cast shadow, frame, border
 ```
 
-#### Fucile a pompa da strada
+#### ✓ Fucile a pompa da strada
 
 Fucile a pompa a canne segate coperto di adesivi delle gang.  
 File: `assets/arene/cyberpunk/armi/fucile-a-pompa-da-strada.webp`
@@ -2802,7 +2802,7 @@ File: `assets/arene/cyberpunk/armi/fucile-a-pompa-da-strada.webp`
 A sawed-off pump shotgun with a scratched black body covered in faded gang stickers and a strip of tape around the grip. Single game inventory prop in three-quarter view, laid diagonally from lower left to upper right with a generous empty margin, isolated on a plain flat light grey background. Stylized painterly prop concept art with expressive brushwork, faceted planes and a crisp silhouette with a thin dark outline. Lit by an electric cyan neon key light with a magenta rim light and a faint acid yellow glint. --v 8.2 --ar 1:1 --no text, letters, signature, watermark, hands, person, scenery, background objects, cast shadow, frame, border
 ```
 
-#### Mazza da baseball chiodata
+#### ✓ Mazza da baseball chiodata
 
 Mazza da baseball di legno con chiodi conficcati e nastro all'impugnatura.  
 File: `assets/arene/cyberpunk/armi/mazza-da-baseball-chiodata.webp`
@@ -2813,7 +2813,7 @@ File: `assets/arene/cyberpunk/armi/mazza-da-baseball-chiodata.webp`
 A wooden baseball bat studded with long nails near the tip, the handle wrapped in worn neon pink grip tape. Single game inventory prop in three-quarter view, laid diagonally from lower left to upper right with a generous empty margin, isolated on a plain flat light grey background. Stylized painterly prop concept art with expressive brushwork, faceted planes and a crisp silhouette with a thin dark outline. Lit by an electric cyan neon key light with a magenta rim light and a faint acid yellow glint. --v 8.2 --ar 1:1 --no text, letters, signature, watermark, hands, person, scenery, background objects, cast shadow, frame, border
 ```
 
-#### Pistola a rotaia artigianale
+#### ✓ Pistola a rotaia artigianale
 
 Pistola a rotaia assemblata a mano con bobine scoperte e cavi.  
 File: `assets/arene/cyberpunk/armi/pistola-a-rotaia-artigianale.webp`
@@ -2824,7 +2824,7 @@ File: `assets/arene/cyberpunk/armi/pistola-a-rotaia-artigianale.webp`
 A handmade rail pistol assembled from mismatched parts, with exposed copper coils along the barrel, loose cables and a glowing capacitor. Single game inventory prop in three-quarter view, laid diagonally from lower left to upper right with a generous empty margin, isolated on a plain flat light grey background. Stylized painterly prop concept art with expressive brushwork, faceted planes and a crisp silhouette with a thin dark outline. Lit by an electric cyan neon key light with a magenta rim light and a faint acid yellow glint. --v 8.2 --ar 1:1 --no text, letters, signature, watermark, hands, person, scenery, background objects, cast shadow, frame, border
 ```
 
-#### Taser da buttafuori
+#### ✓ Taser da buttafuori
 
 Taser da buttafuori con due elettrodi e una scarica azzurra.  
 File: `assets/arene/cyberpunk/armi/taser-da-buttafuori.webp`
@@ -2835,7 +2835,7 @@ File: `assets/arene/cyberpunk/armi/taser-da-buttafuori.webp`
 A bulky bouncer stun gun with two metal prongs crackling with a small arc of blue electricity and a rubber grip. Single game inventory prop in three-quarter view, laid diagonally from lower left to upper right with a generous empty margin, isolated on a plain flat light grey background. Stylized painterly prop concept art with expressive brushwork, faceted planes and a crisp silhouette with a thin dark outline. Lit by an electric cyan neon key light with a magenta rim light and a faint acid yellow glint. --v 8.2 --ar 1:1 --no text, letters, signature, watermark, hands, person, scenery, background objects, cast shadow, frame, border
 ```
 
-#### Mitra compatto
+#### ✓ Mitra compatto
 
 Mitra compatto con caricatore lungo e mirino olografico.  
 File: `assets/arene/cyberpunk/armi/mitra-compatto.webp`
@@ -2846,7 +2846,7 @@ File: `assets/arene/cyberpunk/armi/mitra-compatto.webp`
 A compact submachine gun with a long curved magazine, a folding stock and a small holographic sight glowing magenta. Single game inventory prop in three-quarter view, laid diagonally from lower left to upper right with a generous empty margin, isolated on a plain flat light grey background. Stylized painterly prop concept art with expressive brushwork, faceted planes and a crisp silhouette with a thin dark outline. Lit by an electric cyan neon key light with a magenta rim light and a faint acid yellow glint. --v 8.2 --ar 1:1 --no text, letters, signature, watermark, hands, person, scenery, background objects, cast shadow, frame, border
 ```
 
-#### Ventaglio da combattimento in titanio
+#### ✓ Ventaglio da combattimento in titanio
 
 Ventaglio da combattimento in titanio aperto, con i bordi affilati.  
 File: `assets/arene/cyberpunk/armi/ventaglio-da-combattimento-in-titanio.webp`
@@ -2857,7 +2857,7 @@ File: `assets/arene/cyberpunk/armi/ventaglio-da-combattimento-in-titanio.webp`
 An open combat fan made of brushed titanium blades with razor-sharp edges, a small cyan light on the pivot and a black silk tassel. Single game inventory prop in three-quarter view, laid diagonally from lower left to upper right with a generous empty margin, isolated on a plain flat light grey background. Stylized painterly prop concept art with expressive brushwork, faceted planes and a crisp silhouette with a thin dark outline. Lit by an electric cyan neon key light with a magenta rim light and a faint acid yellow glint. --v 8.2 --ar 1:1 --no text, letters, signature, watermark, hands, person, scenery, background objects, cast shadow, frame, border
 ```
 
-#### Sparachiodi riprogrammato
+#### ✓ Sparachiodi riprogrammato
 
 Sparachiodi da cantiere modificato con cavi scoperti e un caricatore di chiodi.  
 File: `assets/arene/cyberpunk/armi/sparachiodi-riprogrammato.webp`
@@ -2868,7 +2868,7 @@ File: `assets/arene/cyberpunk/armi/sparachiodi-riprogrammato.webp`
 A modified construction nail gun with its safety removed, exposed wires taped along the body, a long strip of nails loaded and a hazard yellow stripe. Single game inventory prop in three-quarter view, laid diagonally from lower left to upper right with a generous empty margin, isolated on a plain flat light grey background. Stylized painterly prop concept art with expressive brushwork, faceted planes and a crisp silhouette with a thin dark outline. Lit by an electric cyan neon key light with a magenta rim light and a faint acid yellow glint. --v 8.2 --ar 1:1 --no text, letters, signature, watermark, hands, person, scenery, background objects, cast shadow, frame, border
 ```
 
-#### Tirapugni elettrificato
+#### ✓ Tirapugni elettrificato
 
 Tirapugni di metallo con una piccola batteria e una scintilla azzurra.  
 File: `assets/arene/cyberpunk/armi/tirapugni-elettrificato.webp`
