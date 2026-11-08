@@ -65,19 +65,29 @@
   const nmOf = (id) => (BY[id] ? BY[id].name : 'qualcuno');
   const fill = (tpl, ids) => tpl.replace(/\{(\d)\}/g, (_, k) => esc(nmOf(ids[+k])));
   function goalLabel(m) { const g = (MND.goals || {})[m.g]; return g ? g.label.replace('{1}', m.tg ? nmOf(m.tg) : '') : ''; }
-  function bagHTML(items, theme) {
-    if (!items.length) return '<p class="help">Zaino vuoto.</p>';
+  // lo zaino: per ogni oggetto la descrizione della variante, cosa fa davvero (dagli stessi numeri del motore) e il peso
+  function bagHTML(items, theme, t) {
+    const DL = window.LOS_DATA || {}, meter = arenaOf(theme.id).meter, soft = !!theme.soft;
+    const info = (it) => (DL.itemInfo ? DL.itemInfo(theme.id, it.t, it.n, soft) : { p: {}, d: '', td: '' });
+    const capN = t && t.attr ? 8 + Math.floor(((t.attr.for != null ? t.attr.for : 5) - 5) / 2) : 0;
+    const load = items.reduce((s2, it) => s2 + (info(it).p.posti || 0), 0);
+    const head = capN ? '<div class="bagload' + (load >= capN ? ' full' : '') + '"><span>Peso <b>' + load + '</b> su ' + capN + ' posti · ' + items.length + ' oggetti su 8</span><i><b style="width:' + Math.min(100, Math.round((load / capN) * 100)) + '%"></b></i><small>La capienza dipende dalla Forza. Se non c’è posto, l’oggetto meno utile resta a terra.</small></div>' : '';
+    if (!items.length) return head + '<p class="help">Zaino vuoto.</p>';
     const order = ITM.order || [];
-    return '<div class="bag">' + items.slice().sort((a, b) => order.indexOf(a.t) - order.indexOf(b.t)).map((it) => {
+    return head + '<div class="bag">' + items.slice().sort((a, b) => order.indexOf(a.t) - order.indexOf(b.t)).map((it) => {
       const ty = (theme.soft && (ITM.typesSoft || {})[it.t]) || (ITM.types || {})[it.t] || { label: it.t, desc: '' };
+      const inf = info(it), uses = DL.itemUses ? DL.itemUses(inf, meter ? meter.name : '') : [];
       const how = ((ITM.how || {})[it.h] || 'Trovato').replace('{1}', esc(nmOf(it.f))) + (it.d ? ' · ' + (SIM ? whenLabel(resultTheme(SIM), null, it.d) : 'giorno ' + it.d).toLowerCase() : '');
       const stars = it.q ? '<span class="stars" title="Qualità">' + '★'.repeat(it.q) + '<i>' + '★'.repeat(3 - it.q) + '</i></span>' : '';
-      const uses = it.u != null && it.m ? '<span class="uses" title="Usura: ' + it.u + ' su ' + it.m + '"><b style="width:' + Math.round((it.u / it.m) * 100) + '%"></b></span>' : '';
+      const usesBar = it.u != null && it.m ? '<span class="uses" title="Usura: ' + it.u + ' su ' + it.m + '"><b style="width:' + Math.round((it.u / it.m) * 100) + '%"></b></span>' : '';
       const tag = it.x === 'veleno' ? '<span class="itag bad">Avvelenata</span>' : it.x === 'bomba' ? '<span class="itag bad">Esplosiva</span>' : '';
+      const desc = inf.d ? esc(inf.d) + (inf.td ? ' ' + esc(inf.td) : '') : esc(ty.desc);
       return '<div class="bitem t-' + esc(it.t) + '"><span class="bic">' + (ITIC[it.t] || ITIC.valore) + '</span><div class="bbody"><div class="btop"><b>' + esc(capFirst(stripArt(it.n))) + '</b>' + stars + tag + '</div>' +
-        '<div class="bmeta"><span class="btype">' + esc(ty.label) + '</span><span>' + how + '</span>' + uses + '</div><p>' + esc(ty.desc) + '</p></div></div>';
+        '<div class="bmeta"><span class="btype">' + esc(ty.label) + '</span><span>' + how + '</span>' + usesBar + '</div><p>' + desc + '</p>' +
+        (uses.length ? '<ul class="buses">' + uses.map((u) => '<li>' + esc(u) + '</li>').join('') + '</ul>' : '') + '</div></div>';
     }).join('') + '</div>';
   }
+
   const BDS = D.bonds || { labels: {}, dims: {}, mem: {}, promises: { kinds: {} } };
   const NET_CLS = [['love', 'Amore'], ['friend', 'Amicizia'], ['ally', 'Alleanza'], ['hate', 'Odio'], ['fear', 'Paura'], ['rival', 'Rivalità'], ['plot', 'Segreti']];
   let netOff = new Set();
@@ -1994,7 +2004,7 @@
         ((t.killerIds || []).length ? '<div class="pf-killers"><span>Per mano di</span>' + t.killerIds.filter((k) => BY[k]).map((k) => '<button type="button" class="pf-person" data-prof="' + esc(k) + '">' + avHTML(BY[k]) + '<b>' + esc(BY[k].name) + '</b></button>').join('') + '</div>' : '') + '</div>'
       : nowHTML(t, snap, i, theme) +
         (snap.vit && snap.vit[id] ? sec('Condizione fisica', vitalsHTML(snap.vit[id], theme) + '<div class="chips pf-st">' + (st.length ? st.map((x) => '<span class="chip st">' + esc(statusLabel(x, t, theme)) + '</span>').join('') : '<span class="chip ok">Nessun malanno</span>') + '</div>') : '') +
-        sec('Zaino', bagHTML(inv, theme), plural(inv.length, 'oggetto', 'oggetti'));
+        sec('Zaino', bagHTML(inv, theme, t), plural(inv.length, 'oggetto', 'oggetti'));
     const allyHTML = dead ? '' : sec('Alleanza', ally.length ? '<div class="pf-people">' + ally.map((x) => '<button type="button" class="pf-person" data-prof="' + esc(x) + '">' + avHTML(BY[x]) + '<b>' + esc(BY[x].name) + '</b></button>').join('') + '</div>' : '<p class="help">Gioca da sol' + G3(t.gender, 'o', 'a', 'ə') + ', per ora.</p>', ally.length ? plural(ally.length, 'alleato', 'alleati') + ' in gara' : '');
     const bondsPanel = (allyHTML + rel + people + proms) || '<p class="help">Nessun legame da raccontare.</p>';
     const storyPanel = '<div id="profHistory"></div>' + sec('Cronaca', chronHTML(hist, theme), plural(hist.length, 'evento', 'eventi')) + diaryHTML(t, dead ? t.deathPhase : i);

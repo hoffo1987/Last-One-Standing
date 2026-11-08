@@ -50,6 +50,9 @@ Le scelte degli eventi tengono conto di tutto questo: chi è ferito evita gli sc
 ## Oggetti
 Tredici tipi di oggetto, con nomi diversi in ogni arena: armi, protezioni, cure, cibo, attrezzi, mappe, trappole, esplosivi, veleni, portafortuna, alcol, merce di scambio e ricordi di casa. Nell'Arena c'è la guida completa (sezione "Gli oggetti e a cosa servono").
 L'espansione aggiunge **300 oggetti per arena**, distribuiti in dieci delle famiglie esistenti. Sono combinazioni di modelli, materiali e formati: usano gli effetti, la qualità, l'usura e la provenienza già registrati dal motore, senza attribuire poteri impliciti ai nomi.
+- **Ogni oggetto ha una scheda scritta a mano** (`src/content/_oggetti*.js`): le 540 varianti del mondo (6 per tipo in ognuna delle 9 arene) e tutti gli oggetti dei lessici («una katana», «un gossip esplosivo», «la foto del gatto») hanno una descrizione e i propri effetti. Anche le finiture contano: «con laccio da polso» dà +1 alle prove di Agilità, «in una scatola sigillata» guarisce le febbri, «con fodera trapuntata» assorbe di più.
+- **Effetti veri, usati dal motore**: forza negli scontri e durata delle armi, danno assorbito dalle protezioni, bonus (e malus) alle prove di una caratteristica, difesa dalle aggressioni notturne, protezione dall'indicatore dell'arena (freddo, corruzione, ossigeno, infezione, terrore, radiazioni, ansia, stress), quanto cura e cosa guarisce una cura, quanto sfama un cibo (e se dà energia o morale), conforto di amuleti e ricordi nelle notti peggiori, aiuto a trovare cibo, valore negli scambi (l'avido si accontenta di una merce preziosa), danno delle trappole. La scheda mostra queste utilità con gli stessi numeri del motore.
+- **Zaino con peso**: al massimo 8 oggetti e 8 posti di peso (±1 ogni 2 punti di Forza oltre o sotto 5). Una scure ne occupa 3, un pugnale 1, un ricordo o un amuleto nessuno. Se non c'è posto, l'oggetto meno utile in quel momento resta a terra nella zona, dove altri possono trovarlo; il diario lo racconta.
 - **Ogni oggetto ha una storia**: lo zaino nella scheda mostra cosa fa, la qualità (★), l'usura, e da dove viene ("Portato da casa", "Rubato a Marco · G3", "Preso a Lapo", "Dono degli sponsor", "Scambiato con Irene"…).
 - **Usura**: le armi si consumano a ogni colpo e si rompono; le protezioni riducono i danni e a volte parano un colpo mortale, poi si spaccano.
 - **Costruire**: chi è ingegnoso intinge l'arma nel veleno (poi avvelena a ogni colpo), unisce trappola ed esplosivo, ripara le armi con un attrezzo, si costruisce trappole.
@@ -226,6 +229,7 @@ node tools/test-persistence-ui.js # ripresa senza risimulazione, migrazione lega
 node tools/test-reading.js       # timeline senza spoiler, tempi adattivi e gestione della pausa
 node tools/test-variety-history.js # varietà, memoria storica e contesto degli eventi
 node tools/test-relations.js       # coerenza di alleanze, tono degli eventi, contesti e finale
+node tools/test-items-catalog.js   # schede degli oggetti, finiture, zaino con peso e capienza
 node tools/audit-relations.js 12   # misure di coerenza dei rapporti su molte partite (--esempi per i casi)
 node tools/audit-narrative.js 6    # testi: segnaposto, ripetizioni, morti che agiscono, «ieri» sbagliati
 node tools/test-worker.js        # stesso risultato nel worker e nel motore principale

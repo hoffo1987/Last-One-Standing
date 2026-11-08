@@ -660,7 +660,15 @@
     const statusCount = (t) => Object.keys(t.st).filter((s) => s !== 'lutto' && s !== 'grave').length;
     const traitSum = (t, key) => t.traits.reduce((s, id) => s + ((traitMap[id] && traitMap[id][key]) || 0), 0);
     const hasTrait = (t, id) => t.traits.includes(id);
-    const weaponPow = (t) => { const w = itemOf(t, 'arma'); return w ? (2.2 + (w.q || 2) * 0.9) * MOD.weapon : 0; };
+    /* effetti degli oggetti dal catalogo (vedi content/_oggetti.js): ogni variante ha i suoi numeri */
+    const PROPS = new WeakMap();
+    const itemProps = (it) => { if (!it) return {}; let p = PROPS.get(it); if (!p) { const info = D.itemInfo ? D.itemInfo(theme.id, it.type, it.name, !!theme.soft) : null; p = info ? Object.assign({ known: info.known }, info.p) : {}; PROPS.set(it, p); } return p; };
+    const itemSlots = (it) => { const p = itemProps(it); return p.posti != null ? p.posti : 0; };
+    const carryCap = (t) => 8 + Math.floor(((t.attr.for != null ? t.attr.for : 5) - 5) / 2);
+    // la somma di un effetto su tutto lo zaino
+    const gear = (t, k) => t.inv.reduce((s2, it) => s2 + (itemProps(it)[k] || 0), 0);
+    const gearBest = (t, k, types) => t.inv.filter((it) => !types || types.includes(it.type)).reduce((b, it) => { const v = itemProps(it)[k] || 0; return v > (b ? itemProps(b)[k] || 0 : 0) ? it : b; }, null);
+    const weaponPow = (t) => { const w = itemOf(t, 'arma'); return w ? Math.max(0.5, (2.2 + (w.q || 2) * 0.9 + (itemProps(w).forza || 0))) * MOD.weapon : 0; };
     const meterBad = (t) => !!(M && t.st[M.st] != null);
     // combattimento: caratteristiche, arma (e sua qualità), condizione fisica, umore, tratti, arena
     const combat = (t) => t.attr.for + t.attr.agi + 0.5 * t.attr.int + 0.3 * t.attr.res + 0.2 * t.attr.fort +
@@ -678,13 +686,18 @@
       if (t.hp < 55) bonus -= 1; if (t.hp < 30) bonus -= 1; if (t.st.ubriaco != null) bonus -= 2; if (t.st.affamato != null) bonus -= 1;
       if (t.st.sconvolto != null) bonus -= 1; if (t.st.malato != null || t.st.avvelenato != null) bonus -= 1; if (t.st.lutto != null && attr === 'for') bonus += 1;
       if (t.st.esausto != null) bonus -= 1; if (t.st.disperato != null) bonus -= 1; if (t.mo >= 80) bonus += 1; if (meterBad(t)) bonus -= 1;
-      if ((attr === 'int' || attr === 'sop') && hasItem(t, 'mappa')) bonus += 2;
+      const plainMap = hasItem(t, 'mappa') && !itemProps(itemOf(t, 'mappa')).known;
+      if ((attr === 'int' || attr === 'sop') && plainMap) bonus += 2;
       if (attr === 'for' && hasItem(t, 'arma')) bonus += 1;
       const tb = wx('tb', null); if (tb && tb[attr]) bonus += tb[attr];
       if (t.planPh >= phases.length - 3) bonus += 1;
+      // gli oggetti adatti a quella prova: ogni variante ha i suoi bonus (e qualche malus), al massimo +3 in tutto
+      const inv = t.inv || [], ipr = typeof itemProps === 'function' ? itemProps : () => ({});
+      const gearBonus = Math.max(-2, Math.min(3, inv.reduce((s2, it) => s2 + ((ipr(it).prova || {})[attr] || 0), 0)));
+      if (gearBonus) { bonus += gearBonus; const src = inv.find((it) => (ipr(it).prova || {})[attr]); if (src) itemLedger.record('bonus', t, t, src, null, (gearBonus > 0 ? '+' : '') + gearBonus + ' alla prova di ' + attr + ' dagli oggetti'); }
       const die = 2 + rng.int(6) + rng.int(6);
       const roll = base + die + bonus;
-      if ((attr === 'int' || attr === 'sop') && hasItem(t, 'mappa')) itemLedger.record('bonus', t, t, itemOf(t, 'mappa'), null, '+2 alla prova di ' + attr);
+      if ((attr === 'int' || attr === 'sop') && plainMap) itemLedger.record('bonus', t, t, itemOf(t, 'mappa'), null, '+2 alla prova di ' + attr);
       if (attr === 'for' && hasItem(t, 'arma')) itemLedger.record('bonus', t, t, itemOf(t, 'arma'), null, '+1 alla prova di forza');
       return { roll, dc, pass: roll >= dc, bonus };
     }
@@ -1035,9 +1048,9 @@
     // ogni ricordo cambia il legame di chi ricorda verso l'altra persona
     const { remember, remember1 } = Systems.createMemory({ phases, BD, tweak, getDay: () => day });
 
-    const { syncSt, hurt } = Systems.createVitals({ phases, clamp, M, hasTrait, DR, rng, stats, sys, possessive, itemOf, itemLedger, takeItem: (t, it) => takeItem(t, it) });
+    const { syncSt, hurt } = Systems.createVitals({ phases, clamp, M, hasTrait, DR, rng, stats, sys, possessive, itemOf, itemLedger, takeItem: (t, it) => takeItem(t, it), props: itemProps });
 
-    const { capInv, itemName, maxUses, mkItem, itemScore, canReceiveItem, addItem, takeItem } = Systems.createInventory({ IT, theme, ITEM_NAME, LEX, rng, MOD, itemOf, clamp, getDay: () => day, getOrigin: () => ORIGIN });
+    const { capInv, itemName, maxUses, mkItem, itemScore, canReceiveItem, addItem, takeItem } = Systems.createInventory({ IT, theme, ITEM_NAME, LEX, rng, MOD, itemOf, clamp, getDay: () => day, getOrigin: () => ORIGIN, props: itemProps, slots: itemSlots, cap: carryCap, onDrop: (t, it) => dropItem(t, it) });
 
     // l'arma si consuma a ogni colpo e alla fine si rompe
     function wear(k, out) {
@@ -1049,10 +1062,26 @@
         if (e) { if (out && out.length < 3) out.push(Object.assign(e, { cls: '' })); else remember1(k, e.html, 'fatto'); }
       }
     }
+    // lo zaino è pieno: l'oggetto meno utile resta a terra nella zona (e qualcun altro potrà trovarlo)
+    function dropItem(t, it) {
+      if (!t || it.type === 'ricordo') return;
+      (zoneLoot[t.zone] = zoneLoot[t.zone] || []).push({ it, from: t.id });
+      stats.dropped = (stats.dropped || 0) + 1;
+      if (t.alive && remember1) remember1(t, '<b>' + esc(cap1(it.name)) + '</b> resta a ' + esc(zoneName(t.zone)) + ': nello zaino non c\'era più posto.', 'fatto');
+    }
+    const cap1 = (x) => x.charAt(0).toUpperCase() + x.slice(1);
+    // una cura: salute minima secondo la variante, stati guariti, energia e morale se previsti
+    function applyMed(t, it, floor, add) {
+      const P = itemProps(it);
+      if (add) t.hp += add + (P.cura || 0) / 2; else t.hp = Math.max(t.hp, floor + (P.cura || 0));
+      (P.guarisce || []).forEach((st) => { if (st === 'ferito') t.hp = Math.max(t.hp, 60); else delete t.st[st]; });
+      t.en += P.energia || 0; t.mo += P.morale || 0;
+    }
     function eat(t) {
       const i = t.inv.findIndex((x) => x.type === 'cibo'); if (i < 0) return false;
       const it = t.inv[i], before = itemLedger.state(t);
-      t.inv.splice(i, 1); t.food += 50; t.mo += 3;
+      const P = itemProps(it);
+      t.inv.splice(i, 1); t.food += 50 + (P.cibo || 0); t.mo += 3 + (P.morale || 0); t.en += P.energia || 0;
       if (M && M.coffee) t.pr -= 12;
       syncSt(t); itemLedger.record('consume', t, t, it, before, 'Pasto consumato'); return true;
     }
@@ -1356,8 +1385,8 @@
           case 'consume': {
             const it = itemOf(t, f.item); if (!it) break;
             const before = itemLedger.state(t); takeItem(t, it);
-            if (f.item === 'cibo') t.food += 40;
-            if (f.item === 'med') { t.hp = Math.max(t.hp, 70); if (t.cause && t.cause.k === 'wound' && t.st.malato == null) t.cause = null; }
+            if (f.item === 'cibo') { const P = itemProps(it); t.food += 40 + (P.cibo || 0); t.en += P.energia || 0; t.mo += P.morale || 0; }
+            if (f.item === 'med') { applyMed(t, it, 70); if (t.cause && t.cause.k === 'wound' && t.st.malato == null) t.cause = null; }
             itemLedger.record('consume', t, t, it, before, 'Consumo esplicito');
             break;
           }
@@ -1524,6 +1553,7 @@
           g *= Math.max(0.35, 1.3 - r * 0.07);
           if (buddies(t).length) g *= M.ally;
           if (M.amulet && hasItem(t, 'amuleto')) g *= M.amulet;
+          const shield = Math.min(60, gear(t, 'indicatore')); if (shield) g *= 1 - shield / 100;
           if (hasTrait(t, 'superstizioso') && theme.id === 'horror') g *= 1.2;
         } else g *= Math.max(0.6, 1.25 - t.attr.res * 0.05);
       }
@@ -1565,6 +1595,8 @@
       const A = alive();
       A.forEach((t) => {
         while (t.food < 60 && hasItem(t, 'cibo')) eat(t);
+        // nelle notti peggiori un amuleto o un ricordo tiene in piedi: conforto secondo la variante
+        if (t.mo < 35) { const c = gearBest(t, 'morale', ['amuleto', 'ricordo', 'valore']); if (c) { t.mo += itemProps(c).morale; if (rng.chance(0.35)) remember1(t, 'Stringe <b>' + esc(c.name) + '</b> finché la paura non passa.', 'pensiero'); } }
         // esplorazione: cibo dalla zona o bottino dei caduti
         if (!hasItem(t, 'cibo') && t.food < 65) {
           const loot = zoneLoot[t.zone];
@@ -1575,7 +1607,7 @@
             sys('scavenge', [t, byId[from]], { i: it.name, z: zoneName(t.zone) }, { cat: 'item', why: 'bottino', ids: [t.id] }, 2);
             if (it.type === 'cibo' && t.food < 45) eat(t);
           } else {
-            const p = (0.08 + t.attr.sop * 0.045 + (hasTrait(t, 'cacciatore') ? 0.15 : 0) + (hasItem(t, 'mappa') ? 0.12 * MOD.map : 0) + (hasItem(t, 'attrezzo') ? 0.12 : 0)) * ZP[t.zone][0] * MOD.forage * wx('forage', 1) * (t.en < 25 ? 0.6 : 1);
+            const p = (0.08 + t.attr.sop * 0.045 + (hasTrait(t, 'cacciatore') ? 0.15 : 0) + (hasItem(t, 'mappa') ? 0.12 * MOD.map : 0) + (hasItem(t, 'attrezzo') ? 0.12 : 0) + gear(t, 'raccolta') / 100) * ZP[t.zone][0] * MOD.forage * wx('forage', 1) * (t.en < 25 ? 0.6 : 1);
             if (hasItem(t, 'mappa')) itemLedger.record('bonus', t, t, itemOf(t, 'mappa'), null, 'Ricerca di cibo: termine +0,12 × modificatore mappa prima dei moltiplicatori e del limite');
             if (hasItem(t, 'attrezzo')) itemLedger.record('bonus', t, t, itemOf(t, 'attrezzo'), null, 'Ricerca di cibo: termine +0,12 prima dei moltiplicatori e del limite');
             if (rng.chance(Math.min(0.92, p))) {
@@ -1621,14 +1653,14 @@
         const doc = mates.find((x) => hasItem(x, 'med')) || mates.find((x) => hasTrait(x, 'guaritore') || (x.attr.int >= 7 && x.attr.emp >= 6) || x.partner === t.id);
         if (doc && (hasItem(doc, 'med') || rng.chance(0.55 + doc.attr.emp * 0.03))) {
           const it = itemOf(doc, 'med'), before = it ? itemLedger.state(t) : null;
-          if (it) { doc.inv.splice(doc.inv.indexOf(it), 1); t.hp += 45 * MOD.heal; delete t.st.avvelenato; }
+          if (it) { doc.inv.splice(doc.inv.indexOf(it), 1); applyMed(t, it, 0, 45 * MOD.heal); delete t.st.avvelenato; }
           else t.hp += (16 + doc.attr.int * 1.5 + (hasTrait(doc, 'guaritore') ? 12 : 0)) * MOD.heal * wx('heal', 1);
           t.owes[doc.id] = t.owes[doc.id] || 'cura'; addAff(t, doc, 16); doc.saves++; doc.nursed++; stats.nursed++; t.mo += 6;
           if (M && M.cure && !M.infect && it) t.pr -= M.cure * 0.6;
           if (it) itemLedger.record('heal', doc, t, it, before, 'Cura con un kit di un alleato');
           sys(it ? 'nurseMed' : 'nurse', [doc, t], { i: it ? it.name : '' }, { cat: 'heal', why: 'cure' }, 3);
         } else if (hasItem(t, 'med') && t.hp < 45) {
-          const it2 = itemOf(t, 'med'); itemLedger.use('heal', t, t, it2, () => { t.inv.splice(t.inv.indexOf(it2), 1); t.hp += 40 * MOD.heal; delete t.st.avvelenato; }, 'Automedicazione');
+          const it2 = itemOf(t, 'med'); itemLedger.use('heal', t, t, it2, () => { t.inv.splice(t.inv.indexOf(it2), 1); applyMed(t, it2, 0, 40 * MOD.heal); delete t.st.avvelenato; }, 'Automedicazione');
           sys('selfMed', [t], { i: it2.name }, { cat: 'heal', why: 'cure' }, 2);
         }
         syncSt(t);
@@ -1703,7 +1735,7 @@
         const tr = itemOf(t, 'trap');
         if (!tr || !t.alive) return;
         if ((t.attr.int >= 6 || hasTrait(t, 'ingegnoso') || hasTrait(t, 'cacciatore') || rng.chance(0.3)) && rng.chance(0.55)) {
-          itemLedger.record('deploy', t, t, tr, null, 'Trappola piazzata nella zona ' + zoneName(t.zone)); t.inv.splice(t.inv.indexOf(tr), 1); traps.push({ owner: t.id, zone: t.zone, ph: phases.length, name: tr.name, boom: tr.x === 'bomba' }); t.trapsSet++; stats.trapsSet++;
+          itemLedger.record('deploy', t, t, tr, null, 'Trappola piazzata nella zona ' + zoneName(t.zone)); t.inv.splice(t.inv.indexOf(tr), 1); traps.push({ owner: t.id, zone: t.zone, ph: phases.length, name: tr.name, boom: tr.x === 'bomba', dmg: itemProps(tr).trappola || 0 }); t.trapsSet++; stats.trapsSet++;
           if (rng.chance(0.45)) sys('trapSet', [t], { i: tr.name, z: zoneName(t.zone) }, { cat: 'item', why: 'trappola' }, 1);
         }
       });
@@ -1716,7 +1748,7 @@
         if (!rng.chance(p)) return;
         attacks++; stats.beasts++;
         const guarded = alive().some((x) => x.guard === t.id && x.zone === t.zone);
-        const def = Math.max(t.attr.furt, t.attr.agi, t.attr.cor) + d6() + (hasItem(t, 'arma') ? 2 : 0) + (hasItem(t, 'attrezzo') ? 1 : 0) + (alone ? 0 : 3) + (t.st.esausto != null ? -2 : 0) + (t.vigilPh >= phases.length - 1 ? 2 : 0) + (guarded ? 3 : 0);
+        const def = Math.max(t.attr.furt, t.attr.agi, t.attr.cor) + d6() + (hasItem(t, 'arma') ? 2 : 0) + (hasItem(t, 'attrezzo') ? 1 : 0) + (alone ? 0 : 3) + (t.st.esausto != null ? -2 : 0) + (t.vigilPh >= phases.length - 1 ? 2 : 0) + (guarded ? 3 : 0) + Math.min(5, gear(t, 'belve'));
         if (hasItem(t, 'arma')) itemLedger.record('bonus', t, t, itemOf(t, 'arma'), null, '+2 alla difesa dai predatori; totale ' + def + '/14');
         if (hasItem(t, 'attrezzo')) itemLedger.record('bonus', t, t, itemOf(t, 'attrezzo'), null, '+1 alla difesa dai predatori; totale ' + def + '/14');
         if (def >= 14) { t.survivedBeasts++; if (!alone) { allyMates(t).forEach((x) => addAff(t, x, 6)); sys('beastFend', [t], {}, { cat: 'ally', why: 'predatori' }, 2); } return; }
@@ -1798,7 +1830,7 @@
           if (dodge >= 15) { addAff(v, owner, -15); sys('trapDodge', [owner, v], { z }, { cat: 'none', why: 'trappola' }, 2); break; }
           stats.trapHits++;
           const friendly = owner.allyId != null && owner.allyId === v.allyId;
-          itemLedger.use('attack', owner, v, { type: 'trap', name: tp.name }, () => hurt(v, (32 + rng.int(22)) * (tp.boom ? 1.5 : 1), !friendly ? owner : null, friendly ? 'wound' : 'trap', true), 'Trappola scattata' + (tp.boom ? ' con esplosivo' : ''));
+          itemLedger.use('attack', owner, v, { type: 'trap', name: tp.name }, () => hurt(v, (32 + rng.int(22) + (tp.dmg || 0) * 2) * (tp.boom ? 1.5 : 1), !friendly ? owner : null, friendly ? 'wound' : 'trap', true), 'Trappola scattata' + (tp.boom ? ' con esplosivo' : ''));
           remember(v, owner, 'trap');
           v.trapZ = z;
           if (friendly) { addAff(v, owner, -30); if (v.hp > 0) sys('trapAlly', [owner, v], { z }, { cat: 'hurt', why: 'trappola' }, 3); }
@@ -2277,8 +2309,11 @@
         }
         if (!pay.length) return;
         const greedy = hasTrait(s2, 'avido');
-        if (greedy && pay.length < 2) return;
-        const give = pay.slice(0, greedy ? 2 : 1);
+        // ogni oggetto vale 1, la merce di più secondo la variante; l'avido vuole almeno 3
+        const worth = (it) => 1 + (it.type === 'valore' ? itemProps(it).scambio || 0 : 0), need = greedy ? 3 : 1;
+        const sorted = pay.slice().sort((a, b) => worth(b) - worth(a)), give = [];
+        for (const it of sorted) { if (give.reduce((s3, x) => s3 + worth(x), 0) >= need) break; give.push(it); }
+        if (give.reduce((s3, x) => s3 + worth(x), 0) < need || give.length > 2) return;
         give.forEach((it) => { takeItem(b, it); addItem(s2, Object.assign({}, it, { how: 'scambio', from: b.id, d: day })); });
         takeItem(s2, food); addItem(b, Object.assign({}, food, { how: 'scambio', from: s2.id, d: day })); if (want === 'cibo') eat(b);
         b.trades++; s2.trades++; stats.trades++;

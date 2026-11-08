@@ -5,7 +5,7 @@
       "cfg": {
         "cast": [
           {
-            "id": "cmw741s73075nc",
+            "id": "cmw75sgxc075nc",
             "name": "Giada",
             "gender": "F",
             "team": 1,
@@ -28,7 +28,7 @@
             }
           },
           {
-            "id": "cmw741s731h4y9",
+            "id": "cmw75sgxc1h4y9",
             "name": "Ivo",
             "gender": "M",
             "team": 2,
@@ -60,13 +60,13 @@
         "teamWin": false,
         "custom": []
       },
-      "digest": "c921e179120f684bf2cdc98990fd3c3ca999dc60d6bf4b2cc83ffd5ccd97affb"
+      "digest": "54f792622d7bbf15490303cd13108ee30a57d24f2635e4260822c3b6a81627dd"
     },
     {
       "cfg": {
         "cast": [
           {
-            "id": "cmw741s8l07mm",
+            "id": "cmw75sgyv07mm",
             "name": "Alex",
             "gender": "N",
             "team": 1,
@@ -89,7 +89,7 @@
             }
           },
           {
-            "id": "cmw741s8l1jm8z",
+            "id": "cmw75sgyv1jm8z",
             "name": "Nico",
             "gender": "M",
             "team": 1,
@@ -112,7 +112,7 @@
             }
           },
           {
-            "id": "cmw741s8l2ftzj",
+            "id": "cmw75sgyv2ftzj",
             "name": "Irene",
             "gender": "F",
             "team": 1,
@@ -136,7 +136,7 @@
             }
           },
           {
-            "id": "cmw741s8l3gn6i",
+            "id": "cmw75sgyv3gn6i",
             "name": "Furio",
             "gender": "M",
             "team": 2,
@@ -160,7 +160,7 @@
             }
           },
           {
-            "id": "cmw741s8l4ikv3",
+            "id": "cmw75sgyw4ikv3",
             "name": "Lara",
             "gender": "F",
             "team": 2,
@@ -181,7 +181,7 @@
             }
           },
           {
-            "id": "cmw741s8l514y3",
+            "id": "cmw75sgyw514y3",
             "name": "Lapo",
             "gender": "M",
             "team": 2,
@@ -204,7 +204,7 @@
             }
           },
           {
-            "id": "cmw741s8l67ku5",
+            "id": "cmw75sgyw67ku5",
             "name": "Livia",
             "gender": "F",
             "team": 3,
@@ -225,7 +225,7 @@
             }
           },
           {
-            "id": "cmw741s8l7kfq4",
+            "id": "cmw75sgyw7kfq4",
             "name": "Enea",
             "gender": "M",
             "team": 3,
@@ -246,7 +246,7 @@
             }
           },
           {
-            "id": "cmw741s8l88ub5",
+            "id": "cmw75sgyw88ub5",
             "name": "Rebecca",
             "gender": "F",
             "team": 3,
@@ -269,7 +269,7 @@
             }
           },
           {
-            "id": "cmw741s8l93d0n",
+            "id": "cmw75sgyw93d0n",
             "name": "Matteo",
             "gender": "M",
             "team": 4,
@@ -290,7 +290,7 @@
             }
           },
           {
-            "id": "cmw741s8l1063zu",
+            "id": "cmw75sgyw1063zu",
             "name": "Zoe",
             "gender": "F",
             "team": 4,
@@ -314,7 +314,7 @@
             }
           },
           {
-            "id": "cmw741s8l11hy9t",
+            "id": "cmw75sgyw11hy9t",
             "name": "Gianni",
             "gender": "M",
             "team": 4,
@@ -351,13 +351,13 @@
           }
         ]
       },
-      "digest": "f364d81607004a6e46041d8f3c8b84447e4f8f3923af8bdcde4dc440b1a9d3e2"
+      "digest": "2bbf4f663f798098d1b39e2cd9d051acb840181f0ad4147e3445fb5f1a8d6b4b"
     },
     {
       "cfg": {
         "cast": [
           {
-            "id": "cmw741sf20f4gc",
+            "id": "cmw75sh660f4gc",
             "name": "Viola",
             "gender": "F",
             "team": 1,
@@ -381,7 +381,7 @@
             }
           },
           {
-            "id": "cmw741sf212eda",
+            "id": "cmw75sh6612eda",
             "name": "Ivan",
             "gender": "M",
             "team": 2,
@@ -402,7 +402,7 @@
             }
           },
           {
-            "id": "cmw741sf22aeb0",
+            "id": "cmw75sh662aeb0",
             "name": "Eden",
             "gender": "N",
             "team": 3,
@@ -426,7 +426,7 @@
             }
           },
           {
-            "id": "cmw741sf237785",
+            "id": "cmw75sh6637785",
             "name": "Ettore",
             "gender": "M",
             "team": 4,
@@ -447,7 +447,7 @@
             }
           },
           {
-            "id": "cmw741sf24j0li",
+            "id": "cmw75sh664j0li",
             "name": "Ilaria",
             "gender": "F",
             "team": 5,
@@ -470,7 +470,7 @@
             }
           },
           {
-            "id": "cmw741sf35gm9r",
+            "id": "cmw75sh665gm9r",
             "name": "Nico",
             "gender": "M",
             "team": 6,
@@ -494,7 +494,7 @@
             }
           },
           {
-            "id": "cmw741sf366w4i",
+            "id": "cmw75sh6666w4i",
             "name": "Noa",
             "gender": "N",
             "team": 7,
@@ -517,7 +517,7 @@
             }
           },
           {
-            "id": "cmw741sf379y81",
+            "id": "cmw75sh6679y81",
             "name": "Lapo",
             "gender": "M",
             "team": 8,
@@ -540,7 +540,7 @@
             }
           },
           {
-            "id": "cmw741sf382bkv",
+            "id": "cmw75sh6682bkv",
             "name": "Rebecca",
             "gender": "F",
             "team": 9,
@@ -563,7 +563,7 @@
             }
           },
           {
-            "id": "cmw741sf39dhno",
+            "id": "cmw75sh669dhno",
             "name": "Gianni",
             "gender": "M",
             "team": 10,
@@ -586,7 +586,7 @@
             }
           },
           {
-            "id": "cmw741sf3101idd",
+            "id": "cmw75sh66101idd",
             "name": "Bianca",
             "gender": "F",
             "team": 11,
@@ -610,7 +610,7 @@
             }
           },
           {
-            "id": "cmw741sf311a48g",
+            "id": "cmw75sh6611a48g",
             "name": "Saverio",
             "gender": "M",
             "team": 12,
@@ -634,7 +634,7 @@
             }
           },
           {
-            "id": "cmw741sf312jwmy",
+            "id": "cmw75sh6612jwmy",
             "name": "Livia",
             "gender": "F",
             "team": 13,
@@ -655,7 +655,7 @@
             }
           },
           {
-            "id": "cmw741sf313gmzu",
+            "id": "cmw75sh6613gmzu",
             "name": "Oscar",
             "gender": "M",
             "team": 14,
@@ -679,7 +679,7 @@
             }
           },
           {
-            "id": "cmw741sf314f6ii",
+            "id": "cmw75sh6614f6ii",
             "name": "Tea",
             "gender": "F",
             "team": 15,
@@ -700,7 +700,7 @@
             }
           },
           {
-            "id": "cmw741sf315200t",
+            "id": "cmw75sh6615200t",
             "name": "Leone",
             "gender": "M",
             "team": 16,
@@ -721,7 +721,7 @@
             }
           },
           {
-            "id": "cmw741sf316iwry",
+            "id": "cmw75sh6616iwry",
             "name": "Andrea",
             "gender": "N",
             "team": 17,
@@ -744,7 +744,7 @@
             }
           },
           {
-            "id": "cmw741sf317hivf",
+            "id": "cmw75sh6617hivf",
             "name": "Cesare",
             "gender": "M",
             "team": 18,
@@ -765,7 +765,7 @@
             }
           },
           {
-            "id": "cmw741sf318b007",
+            "id": "cmw75sh6618b007",
             "name": "Aurora",
             "gender": "F",
             "team": 19,
@@ -786,7 +786,7 @@
             }
           },
           {
-            "id": "cmw741sf3198vgt",
+            "id": "cmw75sh66198vgt",
             "name": "Brando",
             "gender": "M",
             "team": 20,
@@ -807,7 +807,7 @@
             }
           },
           {
-            "id": "cmw741sf320kxrt",
+            "id": "cmw75sh6620kxrt",
             "name": "Dafne",
             "gender": "F",
             "team": 21,
@@ -828,7 +828,7 @@
             }
           },
           {
-            "id": "cmw741sf321ff71",
+            "id": "cmw75sh6621ff71",
             "name": "Matteo",
             "gender": "M",
             "team": 22,
@@ -852,7 +852,7 @@
             }
           },
           {
-            "id": "cmw741sf322153k",
+            "id": "cmw75sh6622153k",
             "name": "Noemi",
             "gender": "F",
             "team": 23,
@@ -876,7 +876,7 @@
             }
           },
           {
-            "id": "cmw741sf323hwc3",
+            "id": "cmw75sh6623hwc3",
             "name": "Fabio",
             "gender": "M",
             "team": 24,
@@ -909,13 +909,13 @@
         "teamWin": true,
         "custom": []
       },
-      "digest": "cc8d78b6b6f136fa0781aeeafaaaae3401d3a842805bcdf313701c767ba21169"
+      "digest": "bfb798659258a4c61f19ba838a9a4883b456f0aae47cc87a29067d10d9f76f7e"
     },
     {
       "cfg": {
         "cast": [
           {
-            "id": "cmw741so606wv0",
+            "id": "cmw75shdi06wv0",
             "name": "Nora",
             "gender": "F",
             "team": 1,
@@ -939,7 +939,7 @@
             }
           },
           {
-            "id": "cmw741so617ump",
+            "id": "cmw75shdi17ump",
             "name": "Brando",
             "gender": "M",
             "team": 1,
@@ -963,7 +963,7 @@
             }
           },
           {
-            "id": "cmw741so62dfqo",
+            "id": "cmw75shdi2dfqo",
             "name": "Vera",
             "gender": "F",
             "team": 1,
@@ -984,7 +984,7 @@
             }
           },
           {
-            "id": "cmw741so6334pk",
+            "id": "cmw75shdi334pk",
             "name": "Oscar",
             "gender": "M",
             "team": 2,
@@ -1008,7 +1008,7 @@
             }
           },
           {
-            "id": "cmw741so64efhf",
+            "id": "cmw75shdi4efhf",
             "name": "Giada",
             "gender": "F",
             "team": 2,
@@ -1032,7 +1032,7 @@
             }
           },
           {
-            "id": "cmw741so65fjyw",
+            "id": "cmw75shdi5fjyw",
             "name": "Tommaso",
             "gender": "M",
             "team": 2,
@@ -1056,7 +1056,7 @@
             }
           },
           {
-            "id": "cmw741so66i0qd",
+            "id": "cmw75shdi6i0qd",
             "name": "Paola",
             "gender": "F",
             "team": 3,
@@ -1077,7 +1077,7 @@
             }
           },
           {
-            "id": "cmw741so672qlt",
+            "id": "cmw75shdi72qlt",
             "name": "Enea",
             "gender": "M",
             "team": 3,
@@ -1101,7 +1101,7 @@
             }
           },
           {
-            "id": "cmw741so68anvb",
+            "id": "cmw75shdi8anvb",
             "name": "Agata",
             "gender": "F",
             "team": 3,
@@ -1124,7 +1124,7 @@
             }
           },
           {
-            "id": "cmw741so69dbas",
+            "id": "cmw75shdi9dbas",
             "name": "Bruno",
             "gender": "M",
             "team": 4,
@@ -1148,7 +1148,7 @@
             }
           },
           {
-            "id": "cmw741so6104znl",
+            "id": "cmw75shdi104znl",
             "name": "Chiara",
             "gender": "F",
             "team": 4,
@@ -1169,7 +1169,7 @@
             }
           },
           {
-            "id": "cmw741so6116qbo",
+            "id": "cmw75shdi116qbo",
             "name": "Elia",
             "gender": "M",
             "team": 4,
@@ -1193,7 +1193,7 @@
             }
           },
           {
-            "id": "cmw741so6122ls1",
+            "id": "cmw75shdi122ls1",
             "name": "Sara",
             "gender": "F",
             "team": 5,
@@ -1214,7 +1214,7 @@
             }
           },
           {
-            "id": "cmw741so6137px2",
+            "id": "cmw75shdi137px2",
             "name": "Walter",
             "gender": "M",
             "team": 5,
@@ -1237,7 +1237,7 @@
             }
           },
           {
-            "id": "cmw741so614eftu",
+            "id": "cmw75shdi14eftu",
             "name": "Marta",
             "gender": "F",
             "team": 5,
@@ -1258,7 +1258,7 @@
             }
           },
           {
-            "id": "cmw741so61552tw",
+            "id": "cmw75shdi1552tw",
             "name": "Fabio",
             "gender": "M",
             "team": 6,
@@ -1282,7 +1282,7 @@
             }
           },
           {
-            "id": "cmw741so616cnzd",
+            "id": "cmw75shdi16cnzd",
             "name": "Carla",
             "gender": "F",
             "team": 6,
@@ -1303,7 +1303,7 @@
             }
           },
           {
-            "id": "cmw741so617g198",
+            "id": "cmw75shdi17g198",
             "name": "Ivo",
             "gender": "M",
             "team": 6,
@@ -1324,7 +1324,7 @@
             }
           },
           {
-            "id": "cmw741so61851f2",
+            "id": "cmw75shdi1851f2",
             "name": "Lara",
             "gender": "F",
             "team": 7,
@@ -1348,7 +1348,7 @@
             }
           },
           {
-            "id": "cmw741so619ilrz",
+            "id": "cmw75shdi19ilrz",
             "name": "Ariel",
             "gender": "N",
             "team": 7,
@@ -1371,7 +1371,7 @@
             }
           },
           {
-            "id": "cmw741so620jz7i",
+            "id": "cmw75shdi20jz7i",
             "name": "Emma",
             "gender": "F",
             "team": 7,
@@ -1395,7 +1395,7 @@
             }
           },
           {
-            "id": "cmw741so6212r8z",
+            "id": "cmw75shdi212r8z",
             "name": "Teo",
             "gender": "M",
             "team": 8,
@@ -1418,7 +1418,7 @@
             }
           },
           {
-            "id": "cmw741so6227s1g",
+            "id": "cmw75shdi227s1g",
             "name": "Bianca",
             "gender": "F",
             "team": 8,
@@ -1439,7 +1439,7 @@
             }
           },
           {
-            "id": "cmw741so623fbc6",
+            "id": "cmw75shdi23fbc6",
             "name": "Saverio",
             "gender": "M",
             "team": 8,
@@ -1462,7 +1462,7 @@
             }
           },
           {
-            "id": "cmw741so624d7be",
+            "id": "cmw75shdi24d7be",
             "name": "Gemma",
             "gender": "F",
             "team": 9,
@@ -1485,7 +1485,7 @@
             }
           },
           {
-            "id": "cmw741so625eqxt",
+            "id": "cmw75shdi25eqxt",
             "name": "Nico",
             "gender": "M",
             "team": 9,
@@ -1509,7 +1509,7 @@
             }
           },
           {
-            "id": "cmw741so6269fra",
+            "id": "cmw75shdi269fra",
             "name": "Ottavia",
             "gender": "F",
             "team": 9,
@@ -1530,7 +1530,7 @@
             }
           },
           {
-            "id": "cmw741so6279aw",
+            "id": "cmw75shdi279aw",
             "name": "Marco",
             "gender": "M",
             "team": 10,
@@ -1554,7 +1554,7 @@
             }
           },
           {
-            "id": "cmw741so628fwge",
+            "id": "cmw75shdi28fwge",
             "name": "Priscilla",
             "gender": "F",
             "team": 10,
@@ -1577,7 +1577,7 @@
             }
           },
           {
-            "id": "cmw741so6296ec8",
+            "id": "cmw75shdi296ec8",
             "name": "Luca",
             "gender": "M",
             "team": 10,
@@ -1598,7 +1598,7 @@
             }
           },
           {
-            "id": "cmw741so630606k",
+            "id": "cmw75shdi30606k",
             "name": "Viola",
             "gender": "F",
             "team": 11,
@@ -1619,7 +1619,7 @@
             }
           },
           {
-            "id": "cmw741so631360y",
+            "id": "cmw75shdi31360y",
             "name": "Cesare",
             "gender": "M",
             "team": 11,
@@ -1642,7 +1642,7 @@
             }
           },
           {
-            "id": "cmw741so632gm5x",
+            "id": "cmw75shdi32gm5x",
             "name": "Alba",
             "gender": "F",
             "team": 11,
@@ -1665,7 +1665,7 @@
             }
           },
           {
-            "id": "cmw741so633cah6",
+            "id": "cmw75shdi33cah6",
             "name": "Furio",
             "gender": "M",
             "team": 12,
@@ -1689,7 +1689,7 @@
             }
           },
           {
-            "id": "cmw741so6344r0q",
+            "id": "cmw75shdi344r0q",
             "name": "Livia",
             "gender": "F",
             "team": 12,
@@ -1710,7 +1710,7 @@
             }
           },
           {
-            "id": "cmw741so635ec0z",
+            "id": "cmw75shdi35ec0z",
             "name": "Ugo",
             "gender": "M",
             "team": 12,
@@ -1733,7 +1733,7 @@
             }
           },
           {
-            "id": "cmw741so6361zht",
+            "id": "cmw75shdi361zht",
             "name": "Ilaria",
             "gender": "F",
             "team": 13,
@@ -1757,7 +1757,7 @@
             }
           },
           {
-            "id": "cmw741so637e3g2",
+            "id": "cmw75shdi37e3g2",
             "name": "Lapo",
             "gender": "M",
             "team": 13,
@@ -1781,7 +1781,7 @@
             }
           },
           {
-            "id": "cmw741so638bitj",
+            "id": "cmw75shdi38bitj",
             "name": "Aurora",
             "gender": "F",
             "team": 13,
@@ -1805,7 +1805,7 @@
             }
           },
           {
-            "id": "cmw741so639b966",
+            "id": "cmw75shdi39b966",
             "name": "Orlando",
             "gender": "M",
             "team": 14,
@@ -1829,7 +1829,7 @@
             }
           },
           {
-            "id": "cmw741so640rkl",
+            "id": "cmw75shdi40rkl",
             "name": "Sveva",
             "gender": "F",
             "team": 14,
@@ -1850,7 +1850,7 @@
             }
           },
           {
-            "id": "cmw741so641fbt7",
+            "id": "cmw75shdi41fbt7",
             "name": "Aldo",
             "gender": "M",
             "team": 14,
@@ -1871,7 +1871,7 @@
             }
           },
           {
-            "id": "cmw741so642fchb",
+            "id": "cmw75shdi42fchb",
             "name": "Irene",
             "gender": "F",
             "team": 15,
@@ -1895,7 +1895,7 @@
             }
           },
           {
-            "id": "cmw741so643d55n",
+            "id": "cmw75shdi43d55n",
             "name": "Vito",
             "gender": "M",
             "team": 15,
@@ -1918,7 +1918,7 @@
             }
           },
           {
-            "id": "cmw741so6446hnx",
+            "id": "cmw75shdi446hnx",
             "name": "Matilde",
             "gender": "F",
             "team": 15,
@@ -1941,7 +1941,7 @@
             }
           },
           {
-            "id": "cmw741so645it0p",
+            "id": "cmw75shdi45it0p",
             "name": "Riccardo",
             "gender": "M",
             "team": 16,
@@ -1964,7 +1964,7 @@
             }
           },
           {
-            "id": "cmw741so646gz54",
+            "id": "cmw75shdi46gz54",
             "name": "Elena",
             "gender": "F",
             "team": 16,
@@ -1985,7 +1985,7 @@
             }
           },
           {
-            "id": "cmw741so647gxem",
+            "id": "cmw75shdi47gxem",
             "name": "Pietro",
             "gender": "M",
             "team": 16,
@@ -2018,19 +2018,19 @@
         "custom": [],
         "initialRelations": [
           {
-            "from": "cmw741so606wv0",
-            "to": "cmw741so617ump",
+            "from": "cmw75shdi06wv0",
+            "to": "cmw75shdi17ump",
             "type": "coppia"
           }
         ]
       },
-      "digest": "f32a53a356f333a3b3d6b3bc4a9bc58e48c21a9f1066b4a4f23dc99c05159f2d"
+      "digest": "ca6b191a6d956618aa51f66acc3ce04890529cbf2aa87c41364ae07f37f36705"
     },
     {
       "cfg": {
         "cast": [
           {
-            "id": "cmw741sy7075nc",
+            "id": "cmw75shll075nc",
             "name": "Giada",
             "gender": "F",
             "team": 1,
@@ -2053,7 +2053,7 @@
             }
           },
           {
-            "id": "cmw741sy71h4y9",
+            "id": "cmw75shll1h4y9",
             "name": "Ivo",
             "gender": "M",
             "team": 2,
@@ -2085,13 +2085,13 @@
         "teamWin": false,
         "custom": []
       },
-      "digest": "8c84ed9dfeb33f34264e5e5120c6f3237dbd08210d87ebc203081d41d9675bb7"
+      "digest": "997d968d00321d829643fb85adccaa5a4a2894dd0df40201f31a463aee26cde5"
     },
     {
       "cfg": {
         "cast": [
           {
-            "id": "cmw741syy07mm",
+            "id": "cmw75shm007mm",
             "name": "Alex",
             "gender": "N",
             "team": 1,
@@ -2114,7 +2114,7 @@
             }
           },
           {
-            "id": "cmw741syy1jm8z",
+            "id": "cmw75shm01jm8z",
             "name": "Nico",
             "gender": "M",
             "team": 1,
@@ -2137,7 +2137,7 @@
             }
           },
           {
-            "id": "cmw741syy2ftzj",
+            "id": "cmw75shm02ftzj",
             "name": "Irene",
             "gender": "F",
             "team": 1,
@@ -2161,7 +2161,7 @@
             }
           },
           {
-            "id": "cmw741syy3gn6i",
+            "id": "cmw75shm03gn6i",
             "name": "Furio",
             "gender": "M",
             "team": 2,
@@ -2185,7 +2185,7 @@
             }
           },
           {
-            "id": "cmw741syy4ikv3",
+            "id": "cmw75shm04ikv3",
             "name": "Lara",
             "gender": "F",
             "team": 2,
@@ -2206,7 +2206,7 @@
             }
           },
           {
-            "id": "cmw741syy514y3",
+            "id": "cmw75shm0514y3",
             "name": "Lapo",
             "gender": "M",
             "team": 2,
@@ -2229,7 +2229,7 @@
             }
           },
           {
-            "id": "cmw741syy67ku5",
+            "id": "cmw75shm067ku5",
             "name": "Livia",
             "gender": "F",
             "team": 3,
@@ -2250,7 +2250,7 @@
             }
           },
           {
-            "id": "cmw741syy7kfq4",
+            "id": "cmw75shm07kfq4",
             "name": "Enea",
             "gender": "M",
             "team": 3,
@@ -2271,7 +2271,7 @@
             }
           },
           {
-            "id": "cmw741syy88ub5",
+            "id": "cmw75shm088ub5",
             "name": "Rebecca",
             "gender": "F",
             "team": 3,
@@ -2294,7 +2294,7 @@
             }
           },
           {
-            "id": "cmw741syy93d0n",
+            "id": "cmw75shm093d0n",
             "name": "Matteo",
             "gender": "M",
             "team": 4,
@@ -2315,7 +2315,7 @@
             }
           },
           {
-            "id": "cmw741syy1063zu",
+            "id": "cmw75shm01063zu",
             "name": "Zoe",
             "gender": "F",
             "team": 4,
@@ -2339,7 +2339,7 @@
             }
           },
           {
-            "id": "cmw741syy11hy9t",
+            "id": "cmw75shm011hy9t",
             "name": "Gianni",
             "gender": "M",
             "team": 4,
@@ -2376,13 +2376,13 @@
           }
         ]
       },
-      "digest": "5075322fb5fcfa05bfd4efbed1f5199ee16de2bf051bbba3ccb46fab9fd0fea6"
+      "digest": "60ae18ee65e646756a470a1aaa9f39a8cc91a5e377c95c60938dbcab4a39536a"
     },
     {
       "cfg": {
         "cast": [
           {
-            "id": "cmw741t400f4gc",
+            "id": "cmw75shr50f4gc",
             "name": "Viola",
             "gender": "F",
             "team": 1,
@@ -2406,7 +2406,7 @@
             }
           },
           {
-            "id": "cmw741t4012eda",
+            "id": "cmw75shr512eda",
             "name": "Ivan",
             "gender": "M",
             "team": 2,
@@ -2427,7 +2427,7 @@
             }
           },
           {
-            "id": "cmw741t402aeb0",
+            "id": "cmw75shr52aeb0",
             "name": "Eden",
             "gender": "N",
             "team": 3,
@@ -2451,7 +2451,7 @@
             }
           },
           {
-            "id": "cmw741t4037785",
+            "id": "cmw75shr537785",
             "name": "Ettore",
             "gender": "M",
             "team": 4,
@@ -2472,7 +2472,7 @@
             }
           },
           {
-            "id": "cmw741t404j0li",
+            "id": "cmw75shr54j0li",
             "name": "Ilaria",
             "gender": "F",
             "team": 5,
@@ -2495,7 +2495,7 @@
             }
           },
           {
-            "id": "cmw741t405gm9r",
+            "id": "cmw75shr55gm9r",
             "name": "Nico",
             "gender": "M",
             "team": 6,
@@ -2519,7 +2519,7 @@
             }
           },
           {
-            "id": "cmw741t4066w4i",
+            "id": "cmw75shr566w4i",
             "name": "Noa",
             "gender": "N",
             "team": 7,
@@ -2542,7 +2542,7 @@
             }
           },
           {
-            "id": "cmw741t4079y81",
+            "id": "cmw75shr579y81",
             "name": "Lapo",
             "gender": "M",
             "team": 8,
@@ -2565,7 +2565,7 @@
             }
           },
           {
-            "id": "cmw741t4082bkv",
+            "id": "cmw75shr582bkv",
             "name": "Rebecca",
             "gender": "F",
             "team": 9,
@@ -2588,7 +2588,7 @@
             }
           },
           {
-            "id": "cmw741t409dhno",
+            "id": "cmw75shr59dhno",
             "name": "Gianni",
             "gender": "M",
             "team": 10,
@@ -2611,7 +2611,7 @@
             }
           },
           {
-            "id": "cmw741t40101idd",
+            "id": "cmw75shr5101idd",
             "name": "Bianca",
             "gender": "F",
             "team": 11,
@@ -2635,7 +2635,7 @@
             }
           },
           {
-            "id": "cmw741t4011a48g",
+            "id": "cmw75shr511a48g",
             "name": "Saverio",
             "gender": "M",
             "team": 12,
@@ -2659,7 +2659,7 @@
             }
           },
           {
-            "id": "cmw741t4012jwmy",
+            "id": "cmw75shr512jwmy",
             "name": "Livia",
             "gender": "F",
             "team": 13,
@@ -2680,7 +2680,7 @@
             }
           },
           {
-            "id": "cmw741t4013gmzu",
+            "id": "cmw75shr513gmzu",
             "name": "Oscar",
             "gender": "M",
             "team": 14,
@@ -2704,7 +2704,7 @@
             }
           },
           {
-            "id": "cmw741t4014f6ii",
+            "id": "cmw75shr514f6ii",
             "name": "Tea",
             "gender": "F",
             "team": 15,
@@ -2725,7 +2725,7 @@
             }
           },
           {
-            "id": "cmw741t4015200t",
+            "id": "cmw75shr515200t",
             "name": "Leone",
             "gender": "M",
             "team": 16,
@@ -2746,7 +2746,7 @@
             }
           },
           {
-            "id": "cmw741t4016iwry",
+            "id": "cmw75shr516iwry",
             "name": "Andrea",
             "gender": "N",
             "team": 17,
@@ -2769,7 +2769,7 @@
             }
           },
           {
-            "id": "cmw741t4017hivf",
+            "id": "cmw75shr517hivf",
             "name": "Cesare",
             "gender": "M",
             "team": 18,
@@ -2790,7 +2790,7 @@
             }
           },
           {
-            "id": "cmw741t4018b007",
+            "id": "cmw75shr518b007",
             "name": "Aurora",
             "gender": "F",
             "team": 19,
@@ -2811,7 +2811,7 @@
             }
           },
           {
-            "id": "cmw741t40198vgt",
+            "id": "cmw75shr5198vgt",
             "name": "Brando",
             "gender": "M",
             "team": 20,
@@ -2832,7 +2832,7 @@
             }
           },
           {
-            "id": "cmw741t4020kxrt",
+            "id": "cmw75shr520kxrt",
             "name": "Dafne",
             "gender": "F",
             "team": 21,
@@ -2853,7 +2853,7 @@
             }
           },
           {
-            "id": "cmw741t4021ff71",
+            "id": "cmw75shr521ff71",
             "name": "Matteo",
             "gender": "M",
             "team": 22,
@@ -2877,7 +2877,7 @@
             }
           },
           {
-            "id": "cmw741t4022153k",
+            "id": "cmw75shr522153k",
             "name": "Noemi",
             "gender": "F",
             "team": 23,
@@ -2901,7 +2901,7 @@
             }
           },
           {
-            "id": "cmw741t4023hwc3",
+            "id": "cmw75shr523hwc3",
             "name": "Fabio",
             "gender": "M",
             "team": 24,
@@ -2934,13 +2934,13 @@
         "teamWin": true,
         "custom": []
       },
-      "digest": "edd1b1e1e60b0fc581195f7ade8ccac9bf2596f76353474a3de684dbd80ba51e"
+      "digest": "f1efe79d716e867920dd817920923e0670897571067f6a09992a4ff9389c41fa"
     },
     {
       "cfg": {
         "cast": [
           {
-            "id": "cmw741tbk06wv0",
+            "id": "cmw75shxx06wv0",
             "name": "Nora",
             "gender": "F",
             "team": 1,
@@ -2964,7 +2964,7 @@
             }
           },
           {
-            "id": "cmw741tbk17ump",
+            "id": "cmw75shxy17ump",
             "name": "Brando",
             "gender": "M",
             "team": 1,
@@ -2988,7 +2988,7 @@
             }
           },
           {
-            "id": "cmw741tbk2dfqo",
+            "id": "cmw75shxy2dfqo",
             "name": "Vera",
             "gender": "F",
             "team": 1,
@@ -3009,7 +3009,7 @@
             }
           },
           {
-            "id": "cmw741tbk334pk",
+            "id": "cmw75shxy334pk",
             "name": "Oscar",
             "gender": "M",
             "team": 2,
@@ -3033,7 +3033,7 @@
             }
           },
           {
-            "id": "cmw741tbk4efhf",
+            "id": "cmw75shxy4efhf",
             "name": "Giada",
             "gender": "F",
             "team": 2,
@@ -3057,7 +3057,7 @@
             }
           },
           {
-            "id": "cmw741tbk5fjyw",
+            "id": "cmw75shxy5fjyw",
             "name": "Tommaso",
             "gender": "M",
             "team": 2,
@@ -3081,7 +3081,7 @@
             }
           },
           {
-            "id": "cmw741tbk6i0qd",
+            "id": "cmw75shxy6i0qd",
             "name": "Paola",
             "gender": "F",
             "team": 3,
@@ -3102,7 +3102,7 @@
             }
           },
           {
-            "id": "cmw741tbk72qlt",
+            "id": "cmw75shxy72qlt",
             "name": "Enea",
             "gender": "M",
             "team": 3,
@@ -3126,7 +3126,7 @@
             }
           },
           {
-            "id": "cmw741tbl8anvb",
+            "id": "cmw75shxy8anvb",
             "name": "Agata",
             "gender": "F",
             "team": 3,
@@ -3149,7 +3149,7 @@
             }
           },
           {
-            "id": "cmw741tbl9dbas",
+            "id": "cmw75shxy9dbas",
             "name": "Bruno",
             "gender": "M",
             "team": 4,
@@ -3173,7 +3173,7 @@
             }
           },
           {
-            "id": "cmw741tbl104znl",
+            "id": "cmw75shxy104znl",
             "name": "Chiara",
             "gender": "F",
             "team": 4,
@@ -3194,7 +3194,7 @@
             }
           },
           {
-            "id": "cmw741tbl116qbo",
+            "id": "cmw75shxy116qbo",
             "name": "Elia",
             "gender": "M",
             "team": 4,
@@ -3218,7 +3218,7 @@
             }
           },
           {
-            "id": "cmw741tbl122ls1",
+            "id": "cmw75shxy122ls1",
             "name": "Sara",
             "gender": "F",
             "team": 5,
@@ -3239,7 +3239,7 @@
             }
           },
           {
-            "id": "cmw741tbl137px2",
+            "id": "cmw75shxy137px2",
             "name": "Walter",
             "gender": "M",
             "team": 5,
@@ -3262,7 +3262,7 @@
             }
           },
           {
-            "id": "cmw741tbl14eftu",
+            "id": "cmw75shxy14eftu",
             "name": "Marta",
             "gender": "F",
             "team": 5,
@@ -3283,7 +3283,7 @@
             }
           },
           {
-            "id": "cmw741tbl1552tw",
+            "id": "cmw75shxy1552tw",
             "name": "Fabio",
             "gender": "M",
             "team": 6,
@@ -3307,7 +3307,7 @@
             }
           },
           {
-            "id": "cmw741tbl16cnzd",
+            "id": "cmw75shxy16cnzd",
             "name": "Carla",
             "gender": "F",
             "team": 6,
@@ -3328,7 +3328,7 @@
             }
           },
           {
-            "id": "cmw741tbl17g198",
+            "id": "cmw75shxy17g198",
             "name": "Ivo",
             "gender": "M",
             "team": 6,
@@ -3349,7 +3349,7 @@
             }
           },
           {
-            "id": "cmw741tbl1851f2",
+            "id": "cmw75shxy1851f2",
             "name": "Lara",
             "gender": "F",
             "team": 7,
@@ -3373,7 +3373,7 @@
             }
           },
           {
-            "id": "cmw741tbl19ilrz",
+            "id": "cmw75shxy19ilrz",
             "name": "Ariel",
             "gender": "N",
             "team": 7,
@@ -3396,7 +3396,7 @@
             }
           },
           {
-            "id": "cmw741tbl20jz7i",
+            "id": "cmw75shxy20jz7i",
             "name": "Emma",
             "gender": "F",
             "team": 7,
@@ -3420,7 +3420,7 @@
             }
           },
           {
-            "id": "cmw741tbl212r8z",
+            "id": "cmw75shxy212r8z",
             "name": "Teo",
             "gender": "M",
             "team": 8,
@@ -3443,7 +3443,7 @@
             }
           },
           {
-            "id": "cmw741tbl227s1g",
+            "id": "cmw75shxy227s1g",
             "name": "Bianca",
             "gender": "F",
             "team": 8,
@@ -3464,7 +3464,7 @@
             }
           },
           {
-            "id": "cmw741tbl23fbc6",
+            "id": "cmw75shxy23fbc6",
             "name": "Saverio",
             "gender": "M",
             "team": 8,
@@ -3487,7 +3487,7 @@
             }
           },
           {
-            "id": "cmw741tbl24d7be",
+            "id": "cmw75shxy24d7be",
             "name": "Gemma",
             "gender": "F",
             "team": 9,
@@ -3510,7 +3510,7 @@
             }
           },
           {
-            "id": "cmw741tbl25eqxt",
+            "id": "cmw75shxy25eqxt",
             "name": "Nico",
             "gender": "M",
             "team": 9,
@@ -3534,7 +3534,7 @@
             }
           },
           {
-            "id": "cmw741tbl269fra",
+            "id": "cmw75shxy269fra",
             "name": "Ottavia",
             "gender": "F",
             "team": 9,
@@ -3555,7 +3555,7 @@
             }
           },
           {
-            "id": "cmw741tbl279aw",
+            "id": "cmw75shxy279aw",
             "name": "Marco",
             "gender": "M",
             "team": 10,
@@ -3579,7 +3579,7 @@
             }
           },
           {
-            "id": "cmw741tbl28fwge",
+            "id": "cmw75shxy28fwge",
             "name": "Priscilla",
             "gender": "F",
             "team": 10,
@@ -3602,7 +3602,7 @@
             }
           },
           {
-            "id": "cmw741tbl296ec8",
+            "id": "cmw75shxy296ec8",
             "name": "Luca",
             "gender": "M",
             "team": 10,
@@ -3623,7 +3623,7 @@
             }
           },
           {
-            "id": "cmw741tbl30606k",
+            "id": "cmw75shxy30606k",
             "name": "Viola",
             "gender": "F",
             "team": 11,
@@ -3644,7 +3644,7 @@
             }
           },
           {
-            "id": "cmw741tbl31360y",
+            "id": "cmw75shxy31360y",
             "name": "Cesare",
             "gender": "M",
             "team": 11,
@@ -3667,7 +3667,7 @@
             }
           },
           {
-            "id": "cmw741tbl32gm5x",
+            "id": "cmw75shxy32gm5x",
             "name": "Alba",
             "gender": "F",
             "team": 11,
@@ -3690,7 +3690,7 @@
             }
           },
           {
-            "id": "cmw741tbl33cah6",
+            "id": "cmw75shxy33cah6",
             "name": "Furio",
             "gender": "M",
             "team": 12,
@@ -3714,7 +3714,7 @@
             }
           },
           {
-            "id": "cmw741tbl344r0q",
+            "id": "cmw75shxy344r0q",
             "name": "Livia",
             "gender": "F",
             "team": 12,
@@ -3735,7 +3735,7 @@
             }
           },
           {
-            "id": "cmw741tbl35ec0z",
+            "id": "cmw75shxy35ec0z",
             "name": "Ugo",
             "gender": "M",
             "team": 12,
@@ -3758,7 +3758,7 @@
             }
           },
           {
-            "id": "cmw741tbl361zht",
+            "id": "cmw75shxy361zht",
             "name": "Ilaria",
             "gender": "F",
             "team": 13,
@@ -3782,7 +3782,7 @@
             }
           },
           {
-            "id": "cmw741tbl37e3g2",
+            "id": "cmw75shxy37e3g2",
             "name": "Lapo",
             "gender": "M",
             "team": 13,
@@ -3806,7 +3806,7 @@
             }
           },
           {
-            "id": "cmw741tbl38bitj",
+            "id": "cmw75shxy38bitj",
             "name": "Aurora",
             "gender": "F",
             "team": 13,
@@ -3830,7 +3830,7 @@
             }
           },
           {
-            "id": "cmw741tbl39b966",
+            "id": "cmw75shxy39b966",
             "name": "Orlando",
             "gender": "M",
             "team": 14,
@@ -3854,7 +3854,7 @@
             }
           },
           {
-            "id": "cmw741tbl40rkl",
+            "id": "cmw75shxy40rkl",
             "name": "Sveva",
             "gender": "F",
             "team": 14,
@@ -3875,7 +3875,7 @@
             }
           },
           {
-            "id": "cmw741tbl41fbt7",
+            "id": "cmw75shxy41fbt7",
             "name": "Aldo",
             "gender": "M",
             "team": 14,
@@ -3896,7 +3896,7 @@
             }
           },
           {
-            "id": "cmw741tbl42fchb",
+            "id": "cmw75shxy42fchb",
             "name": "Irene",
             "gender": "F",
             "team": 15,
@@ -3920,7 +3920,7 @@
             }
           },
           {
-            "id": "cmw741tbl43d55n",
+            "id": "cmw75shxy43d55n",
             "name": "Vito",
             "gender": "M",
             "team": 15,
@@ -3943,7 +3943,7 @@
             }
           },
           {
-            "id": "cmw741tbl446hnx",
+            "id": "cmw75shxy446hnx",
             "name": "Matilde",
             "gender": "F",
             "team": 15,
@@ -3966,7 +3966,7 @@
             }
           },
           {
-            "id": "cmw741tbl45it0p",
+            "id": "cmw75shxy45it0p",
             "name": "Riccardo",
             "gender": "M",
             "team": 16,
@@ -3989,7 +3989,7 @@
             }
           },
           {
-            "id": "cmw741tbl46gz54",
+            "id": "cmw75shxy46gz54",
             "name": "Elena",
             "gender": "F",
             "team": 16,
@@ -4010,7 +4010,7 @@
             }
           },
           {
-            "id": "cmw741tbl47gxem",
+            "id": "cmw75shxy47gxem",
             "name": "Pietro",
             "gender": "M",
             "team": 16,
@@ -4043,19 +4043,19 @@
         "custom": [],
         "initialRelations": [
           {
-            "from": "cmw741tbk06wv0",
-            "to": "cmw741tbk17ump",
+            "from": "cmw75shxx06wv0",
+            "to": "cmw75shxy17ump",
             "type": "coppia"
           }
         ]
       },
-      "digest": "0600816b43699253c4fdb7bed3a4cc50b56a02663d3594fe9de6ba5b8445d4c6"
+      "digest": "c75f558e17ba2ba554e8900463e64d9acedbc55ae271cc312610ec0133634b2b"
     },
     {
       "cfg": {
         "cast": [
           {
-            "id": "cmw741tim075nc",
+            "id": "cmw75si4c075nc",
             "name": "Giada",
             "gender": "F",
             "team": 1,
@@ -4078,7 +4078,7 @@
             }
           },
           {
-            "id": "cmw741tim1h4y9",
+            "id": "cmw75si4c1h4y9",
             "name": "Ivo",
             "gender": "M",
             "team": 2,
@@ -4110,13 +4110,13 @@
         "teamWin": false,
         "custom": []
       },
-      "digest": "87af0145f74bb7d2075345d5f3e187430d2e5432bc00aebd2aad591fcfac5c28"
+      "digest": "3eecc939e29eff95429c2de017c577d638f0db6b16045c28235b8c15e31592b9"
     },
     {
       "cfg": {
         "cast": [
           {
-            "id": "cmw741tj607mm",
+            "id": "cmw75si4x07mm",
             "name": "Alex",
             "gender": "N",
             "team": 1,
@@ -4139,7 +4139,7 @@
             }
           },
           {
-            "id": "cmw741tj61jm8z",
+            "id": "cmw75si4x1jm8z",
             "name": "Nico",
             "gender": "M",
             "team": 1,
@@ -4162,7 +4162,7 @@
             }
           },
           {
-            "id": "cmw741tj62ftzj",
+            "id": "cmw75si4x2ftzj",
             "name": "Irene",
             "gender": "F",
             "team": 1,
@@ -4186,7 +4186,7 @@
             }
           },
           {
-            "id": "cmw741tj63gn6i",
+            "id": "cmw75si4x3gn6i",
             "name": "Furio",
             "gender": "M",
             "team": 2,
@@ -4210,7 +4210,7 @@
             }
           },
           {
-            "id": "cmw741tj64ikv3",
+            "id": "cmw75si4x4ikv3",
             "name": "Lara",
             "gender": "F",
             "team": 2,
@@ -4231,7 +4231,7 @@
             }
           },
           {
-            "id": "cmw741tj6514y3",
+            "id": "cmw75si4x514y3",
             "name": "Lapo",
             "gender": "M",
             "team": 2,
@@ -4254,7 +4254,7 @@
             }
           },
           {
-            "id": "cmw741tj667ku5",
+            "id": "cmw75si4x67ku5",
             "name": "Livia",
             "gender": "F",
             "team": 3,
@@ -4275,7 +4275,7 @@
             }
           },
           {
-            "id": "cmw741tj67kfq4",
+            "id": "cmw75si4x7kfq4",
             "name": "Enea",
             "gender": "M",
             "team": 3,
@@ -4296,7 +4296,7 @@
             }
           },
           {
-            "id": "cmw741tj688ub5",
+            "id": "cmw75si4x88ub5",
             "name": "Rebecca",
             "gender": "F",
             "team": 3,
@@ -4319,7 +4319,7 @@
             }
           },
           {
-            "id": "cmw741tj693d0n",
+            "id": "cmw75si4x93d0n",
             "name": "Matteo",
             "gender": "M",
             "team": 4,
@@ -4340,7 +4340,7 @@
             }
           },
           {
-            "id": "cmw741tj61063zu",
+            "id": "cmw75si4x1063zu",
             "name": "Zoe",
             "gender": "F",
             "team": 4,
@@ -4364,7 +4364,7 @@
             }
           },
           {
-            "id": "cmw741tj611hy9t",
+            "id": "cmw75si4x11hy9t",
             "name": "Gianni",
             "gender": "M",
             "team": 4,
@@ -4401,13 +4401,13 @@
           }
         ]
       },
-      "digest": "7d17d82c4a70c3f5c6117ba3848dc2a312ea4e2b94561313caa99a9ad6ea3adb"
+      "digest": "cfe60acebb078c9aaba4d49c61b59fa2798eadea3d3b19dc53f267962234fdae"
     },
     {
       "cfg": {
         "cast": [
           {
-            "id": "cmw741tnu0f4gc",
+            "id": "cmw75si870f4gc",
             "name": "Viola",
             "gender": "F",
             "team": 1,
@@ -4431,7 +4431,7 @@
             }
           },
           {
-            "id": "cmw741tnu12eda",
+            "id": "cmw75si8712eda",
             "name": "Ivan",
             "gender": "M",
             "team": 2,
@@ -4452,7 +4452,7 @@
             }
           },
           {
-            "id": "cmw741tnv2aeb0",
+            "id": "cmw75si872aeb0",
             "name": "Eden",
             "gender": "N",
             "team": 3,
@@ -4476,7 +4476,7 @@
             }
           },
           {
-            "id": "cmw741tnv37785",
+            "id": "cmw75si8737785",
             "name": "Ettore",
             "gender": "M",
             "team": 4,
@@ -4497,7 +4497,7 @@
             }
           },
           {
-            "id": "cmw741tnv4j0li",
+            "id": "cmw75si874j0li",
             "name": "Ilaria",
             "gender": "F",
             "team": 5,
@@ -4520,7 +4520,7 @@
             }
           },
           {
-            "id": "cmw741tnv5gm9r",
+            "id": "cmw75si875gm9r",
             "name": "Nico",
             "gender": "M",
             "team": 6,
@@ -4544,7 +4544,7 @@
             }
           },
           {
-            "id": "cmw741tnv66w4i",
+            "id": "cmw75si8766w4i",
             "name": "Noa",
             "gender": "N",
             "team": 7,
@@ -4567,7 +4567,7 @@
             }
           },
           {
-            "id": "cmw741tnv79y81",
+            "id": "cmw75si8779y81",
             "name": "Lapo",
             "gender": "M",
             "team": 8,
@@ -4590,7 +4590,7 @@
             }
           },
           {
-            "id": "cmw741tnv82bkv",
+            "id": "cmw75si8782bkv",
             "name": "Rebecca",
             "gender": "F",
             "team": 9,
@@ -4613,7 +4613,7 @@
             }
           },
           {
-            "id": "cmw741tnv9dhno",
+            "id": "cmw75si879dhno",
             "name": "Gianni",
             "gender": "M",
             "team": 10,
@@ -4636,7 +4636,7 @@
             }
           },
           {
-            "id": "cmw741tnv101idd",
+            "id": "cmw75si87101idd",
             "name": "Bianca",
             "gender": "F",
             "team": 11,
@@ -4660,7 +4660,7 @@
             }
           },
           {
-            "id": "cmw741tnv11a48g",
+            "id": "cmw75si8711a48g",
             "name": "Saverio",
             "gender": "M",
             "team": 12,
@@ -4684,7 +4684,7 @@
             }
           },
           {
-            "id": "cmw741tnv12jwmy",
+            "id": "cmw75si8712jwmy",
             "name": "Livia",
             "gender": "F",
             "team": 13,
@@ -4705,7 +4705,7 @@
             }
           },
           {
-            "id": "cmw741tnv13gmzu",
+            "id": "cmw75si8713gmzu",
             "name": "Oscar",
             "gender": "M",
             "team": 14,
@@ -4729,7 +4729,7 @@
             }
           },
           {
-            "id": "cmw741tnv14f6ii",
+            "id": "cmw75si8714f6ii",
             "name": "Tea",
             "gender": "F",
             "team": 15,
@@ -4750,7 +4750,7 @@
             }
           },
           {
-            "id": "cmw741tnv15200t",
+            "id": "cmw75si8715200t",
             "name": "Leone",
             "gender": "M",
             "team": 16,
@@ -4771,7 +4771,7 @@
             }
           },
           {
-            "id": "cmw741tnv16iwry",
+            "id": "cmw75si8716iwry",
             "name": "Andrea",
             "gender": "N",
             "team": 17,
@@ -4794,7 +4794,7 @@
             }
           },
           {
-            "id": "cmw741tnv17hivf",
+            "id": "cmw75si8717hivf",
             "name": "Cesare",
             "gender": "M",
             "team": 18,
@@ -4815,7 +4815,7 @@
             }
           },
           {
-            "id": "cmw741tnv18b007",
+            "id": "cmw75si8718b007",
             "name": "Aurora",
             "gender": "F",
             "team": 19,
@@ -4836,7 +4836,7 @@
             }
           },
           {
-            "id": "cmw741tnv198vgt",
+            "id": "cmw75si87198vgt",
             "name": "Brando",
             "gender": "M",
             "team": 20,
@@ -4857,7 +4857,7 @@
             }
           },
           {
-            "id": "cmw741tnv20kxrt",
+            "id": "cmw75si8720kxrt",
             "name": "Dafne",
             "gender": "F",
             "team": 21,
@@ -4878,7 +4878,7 @@
             }
           },
           {
-            "id": "cmw741tnv21ff71",
+            "id": "cmw75si8721ff71",
             "name": "Matteo",
             "gender": "M",
             "team": 22,
@@ -4902,7 +4902,7 @@
             }
           },
           {
-            "id": "cmw741tnv22153k",
+            "id": "cmw75si8722153k",
             "name": "Noemi",
             "gender": "F",
             "team": 23,
@@ -4926,7 +4926,7 @@
             }
           },
           {
-            "id": "cmw741tnv23hwc3",
+            "id": "cmw75si8723hwc3",
             "name": "Fabio",
             "gender": "M",
             "team": 24,
@@ -4959,13 +4959,13 @@
         "teamWin": true,
         "custom": []
       },
-      "digest": "2785218778f6cd98fa791d8ffa1a9d7010c681a10276e6477cd2ed342a68371f"
+      "digest": "45c0b766b3d01b5008ae48aa4ee7f1b4acdee450ff81581164effeb874b74ca1"
     },
     {
       "cfg": {
         "cast": [
           {
-            "id": "cmw741ts406wv0",
+            "id": "cmw75siaz06wv0",
             "name": "Nora",
             "gender": "F",
             "team": 1,
@@ -4989,7 +4989,7 @@
             }
           },
           {
-            "id": "cmw741ts417ump",
+            "id": "cmw75siaz17ump",
             "name": "Brando",
             "gender": "M",
             "team": 1,
@@ -5013,7 +5013,7 @@
             }
           },
           {
-            "id": "cmw741ts42dfqo",
+            "id": "cmw75siaz2dfqo",
             "name": "Vera",
             "gender": "F",
             "team": 1,
@@ -5034,7 +5034,7 @@
             }
           },
           {
-            "id": "cmw741ts4334pk",
+            "id": "cmw75siaz334pk",
             "name": "Oscar",
             "gender": "M",
             "team": 2,
@@ -5058,7 +5058,7 @@
             }
           },
           {
-            "id": "cmw741ts44efhf",
+            "id": "cmw75siaz4efhf",
             "name": "Giada",
             "gender": "F",
             "team": 2,
@@ -5082,7 +5082,7 @@
             }
           },
           {
-            "id": "cmw741ts45fjyw",
+            "id": "cmw75siaz5fjyw",
             "name": "Tommaso",
             "gender": "M",
             "team": 2,
@@ -5106,7 +5106,7 @@
             }
           },
           {
-            "id": "cmw741ts46i0qd",
+            "id": "cmw75siaz6i0qd",
             "name": "Paola",
             "gender": "F",
             "team": 3,
@@ -5127,7 +5127,7 @@
             }
           },
           {
-            "id": "cmw741ts472qlt",
+            "id": "cmw75siaz72qlt",
             "name": "Enea",
             "gender": "M",
             "team": 3,
@@ -5151,7 +5151,7 @@
             }
           },
           {
-            "id": "cmw741ts48anvb",
+            "id": "cmw75siaz8anvb",
             "name": "Agata",
             "gender": "F",
             "team": 3,
@@ -5174,7 +5174,7 @@
             }
           },
           {
-            "id": "cmw741ts49dbas",
+            "id": "cmw75siaz9dbas",
             "name": "Bruno",
             "gender": "M",
             "team": 4,
@@ -5198,7 +5198,7 @@
             }
           },
           {
-            "id": "cmw741ts4104znl",
+            "id": "cmw75siaz104znl",
             "name": "Chiara",
             "gender": "F",
             "team": 4,
@@ -5219,7 +5219,7 @@
             }
           },
           {
-            "id": "cmw741ts4116qbo",
+            "id": "cmw75siaz116qbo",
             "name": "Elia",
             "gender": "M",
             "team": 4,
@@ -5243,7 +5243,7 @@
             }
           },
           {
-            "id": "cmw741ts4122ls1",
+            "id": "cmw75siaz122ls1",
             "name": "Sara",
             "gender": "F",
             "team": 5,
@@ -5264,7 +5264,7 @@
             }
           },
           {
-            "id": "cmw741ts4137px2",
+            "id": "cmw75siaz137px2",
             "name": "Walter",
             "gender": "M",
             "team": 5,
@@ -5287,7 +5287,7 @@
             }
           },
           {
-            "id": "cmw741ts414eftu",
+            "id": "cmw75siaz14eftu",
             "name": "Marta",
             "gender": "F",
             "team": 5,
@@ -5308,7 +5308,7 @@
             }
           },
           {
-            "id": "cmw741ts41552tw",
+            "id": "cmw75siaz1552tw",
             "name": "Fabio",
             "gender": "M",
             "team": 6,
@@ -5332,7 +5332,7 @@
             }
           },
           {
-            "id": "cmw741ts416cnzd",
+            "id": "cmw75siaz16cnzd",
             "name": "Carla",
             "gender": "F",
             "team": 6,
@@ -5353,7 +5353,7 @@
             }
           },
           {
-            "id": "cmw741ts417g198",
+            "id": "cmw75siaz17g198",
             "name": "Ivo",
             "gender": "M",
             "team": 6,
@@ -5374,7 +5374,7 @@
             }
           },
           {
-            "id": "cmw741ts41851f2",
+            "id": "cmw75siaz1851f2",
             "name": "Lara",
             "gender": "F",
             "team": 7,
@@ -5398,7 +5398,7 @@
             }
           },
           {
-            "id": "cmw741ts419ilrz",
+            "id": "cmw75siaz19ilrz",
             "name": "Ariel",
             "gender": "N",
             "team": 7,
@@ -5421,7 +5421,7 @@
             }
           },
           {
-            "id": "cmw741ts420jz7i",
+            "id": "cmw75siaz20jz7i",
             "name": "Emma",
             "gender": "F",
             "team": 7,
@@ -5445,7 +5445,7 @@
             }
           },
           {
-            "id": "cmw741ts4212r8z",
+            "id": "cmw75siaz212r8z",
             "name": "Teo",
             "gender": "M",
             "team": 8,
@@ -5468,7 +5468,7 @@
             }
           },
           {
-            "id": "cmw741ts4227s1g",
+            "id": "cmw75siaz227s1g",
             "name": "Bianca",
             "gender": "F",
             "team": 8,
@@ -5489,7 +5489,7 @@
             }
           },
           {
-            "id": "cmw741ts423fbc6",
+            "id": "cmw75siaz23fbc6",
             "name": "Saverio",
             "gender": "M",
             "team": 8,
@@ -5512,7 +5512,7 @@
             }
           },
           {
-            "id": "cmw741ts424d7be",
+            "id": "cmw75siaz24d7be",
             "name": "Gemma",
             "gender": "F",
             "team": 9,
@@ -5535,7 +5535,7 @@
             }
           },
           {
-            "id": "cmw741ts425eqxt",
+            "id": "cmw75siaz25eqxt",
             "name": "Nico",
             "gender": "M",
             "team": 9,
@@ -5559,7 +5559,7 @@
             }
           },
           {
-            "id": "cmw741ts4269fra",
+            "id": "cmw75siaz269fra",
             "name": "Ottavia",
             "gender": "F",
             "team": 9,
@@ -5580,7 +5580,7 @@
             }
           },
           {
-            "id": "cmw741ts4279aw",
+            "id": "cmw75siaz279aw",
             "name": "Marco",
             "gender": "M",
             "team": 10,
@@ -5604,7 +5604,7 @@
             }
           },
           {
-            "id": "cmw741ts428fwge",
+            "id": "cmw75siaz28fwge",
             "name": "Priscilla",
             "gender": "F",
             "team": 10,
@@ -5627,7 +5627,7 @@
             }
           },
           {
-            "id": "cmw741ts4296ec8",
+            "id": "cmw75siaz296ec8",
             "name": "Luca",
             "gender": "M",
             "team": 10,
@@ -5648,7 +5648,7 @@
             }
           },
           {
-            "id": "cmw741ts430606k",
+            "id": "cmw75siaz30606k",
             "name": "Viola",
             "gender": "F",
             "team": 11,
@@ -5669,7 +5669,7 @@
             }
           },
           {
-            "id": "cmw741ts431360y",
+            "id": "cmw75siaz31360y",
             "name": "Cesare",
             "gender": "M",
             "team": 11,
@@ -5692,7 +5692,7 @@
             }
           },
           {
-            "id": "cmw741ts432gm5x",
+            "id": "cmw75siaz32gm5x",
             "name": "Alba",
             "gender": "F",
             "team": 11,
@@ -5715,7 +5715,7 @@
             }
           },
           {
-            "id": "cmw741ts433cah6",
+            "id": "cmw75siaz33cah6",
             "name": "Furio",
             "gender": "M",
             "team": 12,
@@ -5739,7 +5739,7 @@
             }
           },
           {
-            "id": "cmw741ts4344r0q",
+            "id": "cmw75siaz344r0q",
             "name": "Livia",
             "gender": "F",
             "team": 12,
@@ -5760,7 +5760,7 @@
             }
           },
           {
-            "id": "cmw741ts435ec0z",
+            "id": "cmw75siaz35ec0z",
             "name": "Ugo",
             "gender": "M",
             "team": 12,
@@ -5783,7 +5783,7 @@
             }
           },
           {
-            "id": "cmw741ts4361zht",
+            "id": "cmw75siaz361zht",
             "name": "Ilaria",
             "gender": "F",
             "team": 13,
@@ -5807,7 +5807,7 @@
             }
           },
           {
-            "id": "cmw741ts437e3g2",
+            "id": "cmw75sib037e3g2",
             "name": "Lapo",
             "gender": "M",
             "team": 13,
@@ -5831,7 +5831,7 @@
             }
           },
           {
-            "id": "cmw741ts438bitj",
+            "id": "cmw75sib038bitj",
             "name": "Aurora",
             "gender": "F",
             "team": 13,
@@ -5855,7 +5855,7 @@
             }
           },
           {
-            "id": "cmw741ts439b966",
+            "id": "cmw75sib039b966",
             "name": "Orlando",
             "gender": "M",
             "team": 14,
@@ -5879,7 +5879,7 @@
             }
           },
           {
-            "id": "cmw741ts440rkl",
+            "id": "cmw75sib040rkl",
             "name": "Sveva",
             "gender": "F",
             "team": 14,
@@ -5900,7 +5900,7 @@
             }
           },
           {
-            "id": "cmw741ts441fbt7",
+            "id": "cmw75sib041fbt7",
             "name": "Aldo",
             "gender": "M",
             "team": 14,
@@ -5921,7 +5921,7 @@
             }
           },
           {
-            "id": "cmw741ts442fchb",
+            "id": "cmw75sib042fchb",
             "name": "Irene",
             "gender": "F",
             "team": 15,
@@ -5945,7 +5945,7 @@
             }
           },
           {
-            "id": "cmw741ts443d55n",
+            "id": "cmw75sib043d55n",
             "name": "Vito",
             "gender": "M",
             "team": 15,
@@ -5968,7 +5968,7 @@
             }
           },
           {
-            "id": "cmw741ts4446hnx",
+            "id": "cmw75sib0446hnx",
             "name": "Matilde",
             "gender": "F",
             "team": 15,
@@ -5991,7 +5991,7 @@
             }
           },
           {
-            "id": "cmw741ts445it0p",
+            "id": "cmw75sib045it0p",
             "name": "Riccardo",
             "gender": "M",
             "team": 16,
@@ -6014,7 +6014,7 @@
             }
           },
           {
-            "id": "cmw741ts446gz54",
+            "id": "cmw75sib046gz54",
             "name": "Elena",
             "gender": "F",
             "team": 16,
@@ -6035,7 +6035,7 @@
             }
           },
           {
-            "id": "cmw741ts447gxem",
+            "id": "cmw75sib047gxem",
             "name": "Pietro",
             "gender": "M",
             "team": 16,
@@ -6068,19 +6068,19 @@
         "custom": [],
         "initialRelations": [
           {
-            "from": "cmw741ts406wv0",
-            "to": "cmw741ts417ump",
+            "from": "cmw75siaz06wv0",
+            "to": "cmw75siaz17ump",
             "type": "coppia"
           }
         ]
       },
-      "digest": "67bd5f86aee6e43e3924e57737c93065ce38a14fedc7594c8882b58cb36356ea"
+      "digest": "c0058bca770d236501a6f9da1d1666db613d0fa3636387942cb8d2eea905f5ec"
     },
     {
       "cfg": {
         "cast": [
           {
-            "id": "cmw741tzr075nc",
+            "id": "cmw75siib075nc",
             "name": "Giada",
             "gender": "F",
             "team": 1,
@@ -6103,7 +6103,7 @@
             }
           },
           {
-            "id": "cmw741tzr1h4y9",
+            "id": "cmw75siib1h4y9",
             "name": "Ivo",
             "gender": "M",
             "team": 2,
@@ -6135,13 +6135,13 @@
         "teamWin": false,
         "custom": []
       },
-      "digest": "a87538d4358cf43dbcbdf3416a3ddecf7b551998124dff99743db27952b17b21"
+      "digest": "873f5ed54266c084424f7bd4e4681c6efa1281fc0419d2e36b3673405d33c50f"
     },
     {
       "cfg": {
         "cast": [
           {
-            "id": "cmw741u0n07mm",
+            "id": "cmw75sij407mm",
             "name": "Alex",
             "gender": "N",
             "team": 1,
@@ -6164,7 +6164,7 @@
             }
           },
           {
-            "id": "cmw741u0n1jm8z",
+            "id": "cmw75sij41jm8z",
             "name": "Nico",
             "gender": "M",
             "team": 1,
@@ -6187,7 +6187,7 @@
             }
           },
           {
-            "id": "cmw741u0n2ftzj",
+            "id": "cmw75sij42ftzj",
             "name": "Irene",
             "gender": "F",
             "team": 1,
@@ -6211,7 +6211,7 @@
             }
           },
           {
-            "id": "cmw741u0n3gn6i",
+            "id": "cmw75sij43gn6i",
             "name": "Furio",
             "gender": "M",
             "team": 2,
@@ -6235,7 +6235,7 @@
             }
           },
           {
-            "id": "cmw741u0n4ikv3",
+            "id": "cmw75sij44ikv3",
             "name": "Lara",
             "gender": "F",
             "team": 2,
@@ -6256,7 +6256,7 @@
             }
           },
           {
-            "id": "cmw741u0n514y3",
+            "id": "cmw75sij4514y3",
             "name": "Lapo",
             "gender": "M",
             "team": 2,
@@ -6279,7 +6279,7 @@
             }
           },
           {
-            "id": "cmw741u0n67ku5",
+            "id": "cmw75sij467ku5",
             "name": "Livia",
             "gender": "F",
             "team": 3,
@@ -6300,7 +6300,7 @@
             }
           },
           {
-            "id": "cmw741u0n7kfq4",
+            "id": "cmw75sij47kfq4",
             "name": "Enea",
             "gender": "M",
             "team": 3,
@@ -6321,7 +6321,7 @@
             }
           },
           {
-            "id": "cmw741u0n88ub5",
+            "id": "cmw75sij488ub5",
             "name": "Rebecca",
             "gender": "F",
             "team": 3,
@@ -6344,7 +6344,7 @@
             }
           },
           {
-            "id": "cmw741u0n93d0n",
+            "id": "cmw75sij493d0n",
             "name": "Matteo",
             "gender": "M",
             "team": 4,
@@ -6365,7 +6365,7 @@
             }
           },
           {
-            "id": "cmw741u0n1063zu",
+            "id": "cmw75sij41063zu",
             "name": "Zoe",
             "gender": "F",
             "team": 4,
@@ -6389,7 +6389,7 @@
             }
           },
           {
-            "id": "cmw741u0n11hy9t",
+            "id": "cmw75sij411hy9t",
             "name": "Gianni",
             "gender": "M",
             "team": 4,
@@ -6426,13 +6426,13 @@
           }
         ]
       },
-      "digest": "81e57819510a2de2c3d64a74c2195a53ae9b24ae90938aaf8f0697278726a301"
+      "digest": "ddf2c29dc249922a475cf7f7e3f18b6d04cc666a7117992a209d4a482efd80fa"
     },
     {
       "cfg": {
         "cast": [
           {
-            "id": "cmw741u4s0f4gc",
+            "id": "cmw75simg0f4gc",
             "name": "Viola",
             "gender": "F",
             "team": 1,
@@ -6456,7 +6456,7 @@
             }
           },
           {
-            "id": "cmw741u4s12eda",
+            "id": "cmw75simg12eda",
             "name": "Ivan",
             "gender": "M",
             "team": 2,
@@ -6477,7 +6477,7 @@
             }
           },
           {
-            "id": "cmw741u4s2aeb0",
+            "id": "cmw75simg2aeb0",
             "name": "Eden",
             "gender": "N",
             "team": 3,
@@ -6501,7 +6501,7 @@
             }
           },
           {
-            "id": "cmw741u4s37785",
+            "id": "cmw75simg37785",
             "name": "Ettore",
             "gender": "M",
             "team": 4,
@@ -6522,7 +6522,7 @@
             }
           },
           {
-            "id": "cmw741u4s4j0li",
+            "id": "cmw75simg4j0li",
             "name": "Ilaria",
             "gender": "F",
             "team": 5,
@@ -6545,7 +6545,7 @@
             }
           },
           {
-            "id": "cmw741u4s5gm9r",
+            "id": "cmw75simg5gm9r",
             "name": "Nico",
             "gender": "M",
             "team": 6,
@@ -6569,7 +6569,7 @@
             }
           },
           {
-            "id": "cmw741u4s66w4i",
+            "id": "cmw75simg66w4i",
             "name": "Noa",
             "gender": "N",
             "team": 7,
@@ -6592,7 +6592,7 @@
             }
           },
           {
-            "id": "cmw741u4s79y81",
+            "id": "cmw75simg79y81",
             "name": "Lapo",
             "gender": "M",
             "team": 8,
@@ -6615,7 +6615,7 @@
             }
           },
           {
-            "id": "cmw741u4s82bkv",
+            "id": "cmw75simg82bkv",
             "name": "Rebecca",
             "gender": "F",
             "team": 9,
@@ -6638,7 +6638,7 @@
             }
           },
           {
-            "id": "cmw741u4s9dhno",
+            "id": "cmw75simg9dhno",
             "name": "Gianni",
             "gender": "M",
             "team": 10,
@@ -6661,7 +6661,7 @@
             }
           },
           {
-            "id": "cmw741u4s101idd",
+            "id": "cmw75simg101idd",
             "name": "Bianca",
             "gender": "F",
             "team": 11,
@@ -6685,7 +6685,7 @@
             }
           },
           {
-            "id": "cmw741u4s11a48g",
+            "id": "cmw75simg11a48g",
             "name": "Saverio",
             "gender": "M",
             "team": 12,
@@ -6709,7 +6709,7 @@
             }
           },
           {
-            "id": "cmw741u4s12jwmy",
+            "id": "cmw75simg12jwmy",
             "name": "Livia",
             "gender": "F",
             "team": 13,
@@ -6730,7 +6730,7 @@
             }
           },
           {
-            "id": "cmw741u4s13gmzu",
+            "id": "cmw75simg13gmzu",
             "name": "Oscar",
             "gender": "M",
             "team": 14,
@@ -6754,7 +6754,7 @@
             }
           },
           {
-            "id": "cmw741u4s14f6ii",
+            "id": "cmw75simg14f6ii",
             "name": "Tea",
             "gender": "F",
             "team": 15,
@@ -6775,7 +6775,7 @@
             }
           },
           {
-            "id": "cmw741u4s15200t",
+            "id": "cmw75simg15200t",
             "name": "Leone",
             "gender": "M",
             "team": 16,
@@ -6796,7 +6796,7 @@
             }
           },
           {
-            "id": "cmw741u4s16iwry",
+            "id": "cmw75simg16iwry",
             "name": "Andrea",
             "gender": "N",
             "team": 17,
@@ -6819,7 +6819,7 @@
             }
           },
           {
-            "id": "cmw741u4s17hivf",
+            "id": "cmw75simg17hivf",
             "name": "Cesare",
             "gender": "M",
             "team": 18,
@@ -6840,7 +6840,7 @@
             }
           },
           {
-            "id": "cmw741u4s18b007",
+            "id": "cmw75simg18b007",
             "name": "Aurora",
             "gender": "F",
             "team": 19,
@@ -6861,7 +6861,7 @@
             }
           },
           {
-            "id": "cmw741u4s198vgt",
+            "id": "cmw75simg198vgt",
             "name": "Brando",
             "gender": "M",
             "team": 20,
@@ -6882,7 +6882,7 @@
             }
           },
           {
-            "id": "cmw741u4s20kxrt",
+            "id": "cmw75simg20kxrt",
             "name": "Dafne",
             "gender": "F",
             "team": 21,
@@ -6903,7 +6903,7 @@
             }
           },
           {
-            "id": "cmw741u4s21ff71",
+            "id": "cmw75simg21ff71",
             "name": "Matteo",
             "gender": "M",
             "team": 22,
@@ -6927,7 +6927,7 @@
             }
           },
           {
-            "id": "cmw741u4s22153k",
+            "id": "cmw75simg22153k",
             "name": "Noemi",
             "gender": "F",
             "team": 23,
@@ -6951,7 +6951,7 @@
             }
           },
           {
-            "id": "cmw741u4s23hwc3",
+            "id": "cmw75simg23hwc3",
             "name": "Fabio",
             "gender": "M",
             "team": 24,
@@ -6984,13 +6984,13 @@
         "teamWin": true,
         "custom": []
       },
-      "digest": "55fbf0343348372e8618df71a61f2897848a3b9e8f09951be703796acc4b9e1d"
+      "digest": "af4d4f77736b2cbe2d33351bf793a29d564422d5fd605a94e5ceb3fa87047810"
     },
     {
       "cfg": {
         "cast": [
           {
-            "id": "cmw741u8x06wv0",
+            "id": "cmw75sis606wv0",
             "name": "Nora",
             "gender": "F",
             "team": 1,
@@ -7014,7 +7014,7 @@
             }
           },
           {
-            "id": "cmw741u8x17ump",
+            "id": "cmw75sis617ump",
             "name": "Brando",
             "gender": "M",
             "team": 1,
@@ -7038,7 +7038,7 @@
             }
           },
           {
-            "id": "cmw741u8x2dfqo",
+            "id": "cmw75sis62dfqo",
             "name": "Vera",
             "gender": "F",
             "team": 1,
@@ -7059,7 +7059,7 @@
             }
           },
           {
-            "id": "cmw741u8x334pk",
+            "id": "cmw75sis6334pk",
             "name": "Oscar",
             "gender": "M",
             "team": 2,
@@ -7083,7 +7083,7 @@
             }
           },
           {
-            "id": "cmw741u8x4efhf",
+            "id": "cmw75sis64efhf",
             "name": "Giada",
             "gender": "F",
             "team": 2,
@@ -7107,7 +7107,7 @@
             }
           },
           {
-            "id": "cmw741u8x5fjyw",
+            "id": "cmw75sis65fjyw",
             "name": "Tommaso",
             "gender": "M",
             "team": 2,
@@ -7131,7 +7131,7 @@
             }
           },
           {
-            "id": "cmw741u8x6i0qd",
+            "id": "cmw75sis66i0qd",
             "name": "Paola",
             "gender": "F",
             "team": 3,
@@ -7152,7 +7152,7 @@
             }
           },
           {
-            "id": "cmw741u8x72qlt",
+            "id": "cmw75sis672qlt",
             "name": "Enea",
             "gender": "M",
             "team": 3,
@@ -7176,7 +7176,7 @@
             }
           },
           {
-            "id": "cmw741u8x8anvb",
+            "id": "cmw75sis68anvb",
             "name": "Agata",
             "gender": "F",
             "team": 3,
@@ -7199,7 +7199,7 @@
             }
           },
           {
-            "id": "cmw741u8x9dbas",
+            "id": "cmw75sis69dbas",
             "name": "Bruno",
             "gender": "M",
             "team": 4,
@@ -7223,7 +7223,7 @@
             }
           },
           {
-            "id": "cmw741u8x104znl",
+            "id": "cmw75sis6104znl",
             "name": "Chiara",
             "gender": "F",
             "team": 4,
@@ -7244,7 +7244,7 @@
             }
           },
           {
-            "id": "cmw741u8x116qbo",
+            "id": "cmw75sis6116qbo",
             "name": "Elia",
             "gender": "M",
             "team": 4,
@@ -7268,7 +7268,7 @@
             }
           },
           {
-            "id": "cmw741u8x122ls1",
+            "id": "cmw75sis6122ls1",
             "name": "Sara",
             "gender": "F",
             "team": 5,
@@ -7289,7 +7289,7 @@
             }
           },
           {
-            "id": "cmw741u8x137px2",
+            "id": "cmw75sis6137px2",
             "name": "Walter",
             "gender": "M",
             "team": 5,
@@ -7312,7 +7312,7 @@
             }
           },
           {
-            "id": "cmw741u8x14eftu",
+            "id": "cmw75sis614eftu",
             "name": "Marta",
             "gender": "F",
             "team": 5,
@@ -7333,7 +7333,7 @@
             }
           },
           {
-            "id": "cmw741u8x1552tw",
+            "id": "cmw75sis61552tw",
             "name": "Fabio",
             "gender": "M",
             "team": 6,
@@ -7357,7 +7357,7 @@
             }
           },
           {
-            "id": "cmw741u8x16cnzd",
+            "id": "cmw75sis616cnzd",
             "name": "Carla",
             "gender": "F",
             "team": 6,
@@ -7378,7 +7378,7 @@
             }
           },
           {
-            "id": "cmw741u8x17g198",
+            "id": "cmw75sis617g198",
             "name": "Ivo",
             "gender": "M",
             "team": 6,
@@ -7399,7 +7399,7 @@
             }
           },
           {
-            "id": "cmw741u8x1851f2",
+            "id": "cmw75sis61851f2",
             "name": "Lara",
             "gender": "F",
             "team": 7,
@@ -7423,7 +7423,7 @@
             }
           },
           {
-            "id": "cmw741u8x19ilrz",
+            "id": "cmw75sis619ilrz",
             "name": "Ariel",
             "gender": "N",
             "team": 7,
@@ -7446,7 +7446,7 @@
             }
           },
           {
-            "id": "cmw741u8x20jz7i",
+            "id": "cmw75sis620jz7i",
             "name": "Emma",
             "gender": "F",
             "team": 7,
@@ -7470,7 +7470,7 @@
             }
           },
           {
-            "id": "cmw741u8x212r8z",
+            "id": "cmw75sis6212r8z",
             "name": "Teo",
             "gender": "M",
             "team": 8,
@@ -7493,7 +7493,7 @@
             }
           },
           {
-            "id": "cmw741u8x227s1g",
+            "id": "cmw75sis6227s1g",
             "name": "Bianca",
             "gender": "F",
             "team": 8,
@@ -7514,7 +7514,7 @@
             }
           },
           {
-            "id": "cmw741u8x23fbc6",
+            "id": "cmw75sis623fbc6",
             "name": "Saverio",
             "gender": "M",
             "team": 8,
@@ -7537,7 +7537,7 @@
             }
           },
           {
-            "id": "cmw741u8x24d7be",
+            "id": "cmw75sis624d7be",
             "name": "Gemma",
             "gender": "F",
             "team": 9,
@@ -7560,7 +7560,7 @@
             }
           },
           {
-            "id": "cmw741u8x25eqxt",
+            "id": "cmw75sis625eqxt",
             "name": "Nico",
             "gender": "M",
             "team": 9,
@@ -7584,7 +7584,7 @@
             }
           },
           {
-            "id": "cmw741u8x269fra",
+            "id": "cmw75sis6269fra",
             "name": "Ottavia",
             "gender": "F",
             "team": 9,
@@ -7605,7 +7605,7 @@
             }
           },
           {
-            "id": "cmw741u8x279aw",
+            "id": "cmw75sis6279aw",
             "name": "Marco",
             "gender": "M",
             "team": 10,
@@ -7629,7 +7629,7 @@
             }
           },
           {
-            "id": "cmw741u8x28fwge",
+            "id": "cmw75sis628fwge",
             "name": "Priscilla",
             "gender": "F",
             "team": 10,
@@ -7652,7 +7652,7 @@
             }
           },
           {
-            "id": "cmw741u8x296ec8",
+            "id": "cmw75sis6296ec8",
             "name": "Luca",
             "gender": "M",
             "team": 10,
@@ -7673,7 +7673,7 @@
             }
           },
           {
-            "id": "cmw741u8x30606k",
+            "id": "cmw75sis630606k",
             "name": "Viola",
             "gender": "F",
             "team": 11,
@@ -7694,7 +7694,7 @@
             }
           },
           {
-            "id": "cmw741u8x31360y",
+            "id": "cmw75sis631360y",
             "name": "Cesare",
             "gender": "M",
             "team": 11,
@@ -7717,7 +7717,7 @@
             }
           },
           {
-            "id": "cmw741u8x32gm5x",
+            "id": "cmw75sis632gm5x",
             "name": "Alba",
             "gender": "F",
             "team": 11,
@@ -7740,7 +7740,7 @@
             }
           },
           {
-            "id": "cmw741u8x33cah6",
+            "id": "cmw75sis633cah6",
             "name": "Furio",
             "gender": "M",
             "team": 12,
@@ -7764,7 +7764,7 @@
             }
           },
           {
-            "id": "cmw741u8x344r0q",
+            "id": "cmw75sis6344r0q",
             "name": "Livia",
             "gender": "F",
             "team": 12,
@@ -7785,7 +7785,7 @@
             }
           },
           {
-            "id": "cmw741u8x35ec0z",
+            "id": "cmw75sis635ec0z",
             "name": "Ugo",
             "gender": "M",
             "team": 12,
@@ -7808,7 +7808,7 @@
             }
           },
           {
-            "id": "cmw741u8x361zht",
+            "id": "cmw75sis6361zht",
             "name": "Ilaria",
             "gender": "F",
             "team": 13,
@@ -7832,7 +7832,7 @@
             }
           },
           {
-            "id": "cmw741u8x37e3g2",
+            "id": "cmw75sis637e3g2",
             "name": "Lapo",
             "gender": "M",
             "team": 13,
@@ -7856,7 +7856,7 @@
             }
           },
           {
-            "id": "cmw741u8x38bitj",
+            "id": "cmw75sis638bitj",
             "name": "Aurora",
             "gender": "F",
             "team": 13,
@@ -7880,7 +7880,7 @@
             }
           },
           {
-            "id": "cmw741u8x39b966",
+            "id": "cmw75sis639b966",
             "name": "Orlando",
             "gender": "M",
             "team": 14,
@@ -7904,7 +7904,7 @@
             }
           },
           {
-            "id": "cmw741u8x40rkl",
+            "id": "cmw75sis640rkl",
             "name": "Sveva",
             "gender": "F",
             "team": 14,
@@ -7925,7 +7925,7 @@
             }
           },
           {
-            "id": "cmw741u8x41fbt7",
+            "id": "cmw75sis641fbt7",
             "name": "Aldo",
             "gender": "M",
             "team": 14,
@@ -7946,7 +7946,7 @@
             }
           },
           {
-            "id": "cmw741u8x42fchb",
+            "id": "cmw75sis642fchb",
             "name": "Irene",
             "gender": "F",
             "team": 15,
@@ -7970,7 +7970,7 @@
             }
           },
           {
-            "id": "cmw741u8x43d55n",
+            "id": "cmw75sis643d55n",
             "name": "Vito",
             "gender": "M",
             "team": 15,
@@ -7993,7 +7993,7 @@
             }
           },
           {
-            "id": "cmw741u8x446hnx",
+            "id": "cmw75sis6446hnx",
             "name": "Matilde",
             "gender": "F",
             "team": 15,
@@ -8016,7 +8016,7 @@
             }
           },
           {
-            "id": "cmw741u8x45it0p",
+            "id": "cmw75sis645it0p",
             "name": "Riccardo",
             "gender": "M",
             "team": 16,
@@ -8039,7 +8039,7 @@
             }
           },
           {
-            "id": "cmw741u8x46gz54",
+            "id": "cmw75sis646gz54",
             "name": "Elena",
             "gender": "F",
             "team": 16,
@@ -8060,7 +8060,7 @@
             }
           },
           {
-            "id": "cmw741u8x47gxem",
+            "id": "cmw75sis647gxem",
             "name": "Pietro",
             "gender": "M",
             "team": 16,
@@ -8093,19 +8093,19 @@
         "custom": [],
         "initialRelations": [
           {
-            "from": "cmw741u8x06wv0",
-            "to": "cmw741u8x17ump",
+            "from": "cmw75sis606wv0",
+            "to": "cmw75sis617ump",
             "type": "coppia"
           }
         ]
       },
-      "digest": "71698391986a06c44aad0d92ebdfa820f0fc6d155090b04c89c03230fa1c20ff"
+      "digest": "8d5996406c150eef1f7ec06da865e1c43bbf82867139e1608543794641e1e610"
     },
     {
       "cfg": {
         "cast": [
           {
-            "id": "cmw741ufp075nc",
+            "id": "cmw75siyp075nc",
             "name": "Giada",
             "gender": "F",
             "team": 1,
@@ -8128,7 +8128,7 @@
             }
           },
           {
-            "id": "cmw741ufp1h4y9",
+            "id": "cmw75siyp1h4y9",
             "name": "Ivo",
             "gender": "M",
             "team": 2,
@@ -8160,13 +8160,13 @@
         "teamWin": false,
         "custom": []
       },
-      "digest": "057b4eb4a27624c07f4ef8d3f80c0295cea524cd79eb339e3ea6cd49c6b2f8c0"
+      "digest": "5369b730b8f56e64840b1041bc2f0d1f2f99b15946a8395e91fcb615b99d8133"
     },
     {
       "cfg": {
         "cast": [
           {
-            "id": "cmw741ugf07mm",
+            "id": "cmw75siza07mm",
             "name": "Alex",
             "gender": "N",
             "team": 1,
@@ -8189,7 +8189,7 @@
             }
           },
           {
-            "id": "cmw741ugf1jm8z",
+            "id": "cmw75siza1jm8z",
             "name": "Nico",
             "gender": "M",
             "team": 1,
@@ -8212,7 +8212,7 @@
             }
           },
           {
-            "id": "cmw741ugf2ftzj",
+            "id": "cmw75siza2ftzj",
             "name": "Irene",
             "gender": "F",
             "team": 1,
@@ -8236,7 +8236,7 @@
             }
           },
           {
-            "id": "cmw741ugf3gn6i",
+            "id": "cmw75siza3gn6i",
             "name": "Furio",
             "gender": "M",
             "team": 2,
@@ -8260,7 +8260,7 @@
             }
           },
           {
-            "id": "cmw741ugf4ikv3",
+            "id": "cmw75siza4ikv3",
             "name": "Lara",
             "gender": "F",
             "team": 2,
@@ -8281,7 +8281,7 @@
             }
           },
           {
-            "id": "cmw741ugf514y3",
+            "id": "cmw75siza514y3",
             "name": "Lapo",
             "gender": "M",
             "team": 2,
@@ -8304,7 +8304,7 @@
             }
           },
           {
-            "id": "cmw741ugf67ku5",
+            "id": "cmw75siza67ku5",
             "name": "Livia",
             "gender": "F",
             "team": 3,
@@ -8325,7 +8325,7 @@
             }
           },
           {
-            "id": "cmw741ugf7kfq4",
+            "id": "cmw75siza7kfq4",
             "name": "Enea",
             "gender": "M",
             "team": 3,
@@ -8346,7 +8346,7 @@
             }
           },
           {
-            "id": "cmw741ugf88ub5",
+            "id": "cmw75siza88ub5",
             "name": "Rebecca",
             "gender": "F",
             "team": 3,
@@ -8369,7 +8369,7 @@
             }
           },
           {
-            "id": "cmw741ugf93d0n",
+            "id": "cmw75siza93d0n",
             "name": "Matteo",
             "gender": "M",
             "team": 4,
@@ -8390,7 +8390,7 @@
             }
           },
           {
-            "id": "cmw741ugf1063zu",
+            "id": "cmw75siza1063zu",
             "name": "Zoe",
             "gender": "F",
             "team": 4,
@@ -8414,7 +8414,7 @@
             }
           },
           {
-            "id": "cmw741ugf11hy9t",
+            "id": "cmw75siza11hy9t",
             "name": "Gianni",
             "gender": "M",
             "team": 4,
@@ -8451,13 +8451,13 @@
           }
         ]
       },
-      "digest": "4e57c4f603a9bc2b56471e8408bbcc557af07c1aaa561493d24ae9fcd4d5642b"
+      "digest": "18411ce3139a25c14d765937c8d8af6356351dde6c85d7da6b11a9ce8853d582"
     },
     {
       "cfg": {
         "cast": [
           {
-            "id": "cmw741uju0f4gc",
+            "id": "cmw75sj2q0f4gc",
             "name": "Viola",
             "gender": "F",
             "team": 1,
@@ -8481,7 +8481,7 @@
             }
           },
           {
-            "id": "cmw741uju12eda",
+            "id": "cmw75sj2q12eda",
             "name": "Ivan",
             "gender": "M",
             "team": 2,
@@ -8502,7 +8502,7 @@
             }
           },
           {
-            "id": "cmw741uju2aeb0",
+            "id": "cmw75sj2q2aeb0",
             "name": "Eden",
             "gender": "N",
             "team": 3,
@@ -8526,7 +8526,7 @@
             }
           },
           {
-            "id": "cmw741uju37785",
+            "id": "cmw75sj2q37785",
             "name": "Ettore",
             "gender": "M",
             "team": 4,
@@ -8547,7 +8547,7 @@
             }
           },
           {
-            "id": "cmw741uju4j0li",
+            "id": "cmw75sj2q4j0li",
             "name": "Ilaria",
             "gender": "F",
             "team": 5,
@@ -8570,7 +8570,7 @@
             }
           },
           {
-            "id": "cmw741uju5gm9r",
+            "id": "cmw75sj2q5gm9r",
             "name": "Nico",
             "gender": "M",
             "team": 6,
@@ -8594,7 +8594,7 @@
             }
           },
           {
-            "id": "cmw741uju66w4i",
+            "id": "cmw75sj2q66w4i",
             "name": "Noa",
             "gender": "N",
             "team": 7,
@@ -8617,7 +8617,7 @@
             }
           },
           {
-            "id": "cmw741uju79y81",
+            "id": "cmw75sj2q79y81",
             "name": "Lapo",
             "gender": "M",
             "team": 8,
@@ -8640,7 +8640,7 @@
             }
           },
           {
-            "id": "cmw741uju82bkv",
+            "id": "cmw75sj2q82bkv",
             "name": "Rebecca",
             "gender": "F",
             "team": 9,
@@ -8663,7 +8663,7 @@
             }
           },
           {
-            "id": "cmw741uju9dhno",
+            "id": "cmw75sj2q9dhno",
             "name": "Gianni",
             "gender": "M",
             "team": 10,
@@ -8686,7 +8686,7 @@
             }
           },
           {
-            "id": "cmw741uju101idd",
+            "id": "cmw75sj2q101idd",
             "name": "Bianca",
             "gender": "F",
             "team": 11,
@@ -8710,7 +8710,7 @@
             }
           },
           {
-            "id": "cmw741uju11a48g",
+            "id": "cmw75sj2q11a48g",
             "name": "Saverio",
             "gender": "M",
             "team": 12,
@@ -8734,7 +8734,7 @@
             }
           },
           {
-            "id": "cmw741uju12jwmy",
+            "id": "cmw75sj2q12jwmy",
             "name": "Livia",
             "gender": "F",
             "team": 13,
@@ -8755,7 +8755,7 @@
             }
           },
           {
-            "id": "cmw741uju13gmzu",
+            "id": "cmw75sj2q13gmzu",
             "name": "Oscar",
             "gender": "M",
             "team": 14,
@@ -8779,7 +8779,7 @@
             }
           },
           {
-            "id": "cmw741uju14f6ii",
+            "id": "cmw75sj2q14f6ii",
             "name": "Tea",
             "gender": "F",
             "team": 15,
@@ -8800,7 +8800,7 @@
             }
           },
           {
-            "id": "cmw741uju15200t",
+            "id": "cmw75sj2q15200t",
             "name": "Leone",
             "gender": "M",
             "team": 16,
@@ -8821,7 +8821,7 @@
             }
           },
           {
-            "id": "cmw741uju16iwry",
+            "id": "cmw75sj2q16iwry",
             "name": "Andrea",
             "gender": "N",
             "team": 17,
@@ -8844,7 +8844,7 @@
             }
           },
           {
-            "id": "cmw741uju17hivf",
+            "id": "cmw75sj2q17hivf",
             "name": "Cesare",
             "gender": "M",
             "team": 18,
@@ -8865,7 +8865,7 @@
             }
           },
           {
-            "id": "cmw741uju18b007",
+            "id": "cmw75sj2q18b007",
             "name": "Aurora",
             "gender": "F",
             "team": 19,
@@ -8886,7 +8886,7 @@
             }
           },
           {
-            "id": "cmw741uju198vgt",
+            "id": "cmw75sj2q198vgt",
             "name": "Brando",
             "gender": "M",
             "team": 20,
@@ -8907,7 +8907,7 @@
             }
           },
           {
-            "id": "cmw741uju20kxrt",
+            "id": "cmw75sj2q20kxrt",
             "name": "Dafne",
             "gender": "F",
             "team": 21,
@@ -8928,7 +8928,7 @@
             }
           },
           {
-            "id": "cmw741uju21ff71",
+            "id": "cmw75sj2q21ff71",
             "name": "Matteo",
             "gender": "M",
             "team": 22,
@@ -8952,7 +8952,7 @@
             }
           },
           {
-            "id": "cmw741uju22153k",
+            "id": "cmw75sj2q22153k",
             "name": "Noemi",
             "gender": "F",
             "team": 23,
@@ -8976,7 +8976,7 @@
             }
           },
           {
-            "id": "cmw741uju23hwc3",
+            "id": "cmw75sj2q23hwc3",
             "name": "Fabio",
             "gender": "M",
             "team": 24,
@@ -9009,13 +9009,13 @@
         "teamWin": true,
         "custom": []
       },
-      "digest": "bdebc85bd9036e9977c6486bfc591412be0fb168d7d6975957c858fa5faae477"
+      "digest": "a699c8f5b69a4499a715f10b7b9f450f21b55664d033ca806ea46cd66f7762e4"
     },
     {
       "cfg": {
         "cast": [
           {
-            "id": "cmw741uqn06wv0",
+            "id": "cmw75sjbe06wv0",
             "name": "Nora",
             "gender": "F",
             "team": 1,
@@ -9039,7 +9039,7 @@
             }
           },
           {
-            "id": "cmw741uqn17ump",
+            "id": "cmw75sjbe17ump",
             "name": "Brando",
             "gender": "M",
             "team": 1,
@@ -9063,7 +9063,7 @@
             }
           },
           {
-            "id": "cmw741uqn2dfqo",
+            "id": "cmw75sjbe2dfqo",
             "name": "Vera",
             "gender": "F",
             "team": 1,
@@ -9084,7 +9084,7 @@
             }
           },
           {
-            "id": "cmw741uqn334pk",
+            "id": "cmw75sjbe334pk",
             "name": "Oscar",
             "gender": "M",
             "team": 2,
@@ -9108,7 +9108,7 @@
             }
           },
           {
-            "id": "cmw741uqn4efhf",
+            "id": "cmw75sjbe4efhf",
             "name": "Giada",
             "gender": "F",
             "team": 2,
@@ -9132,7 +9132,7 @@
             }
           },
           {
-            "id": "cmw741uqn5fjyw",
+            "id": "cmw75sjbe5fjyw",
             "name": "Tommaso",
             "gender": "M",
             "team": 2,
@@ -9156,7 +9156,7 @@
             }
           },
           {
-            "id": "cmw741uqn6i0qd",
+            "id": "cmw75sjbe6i0qd",
             "name": "Paola",
             "gender": "F",
             "team": 3,
@@ -9177,7 +9177,7 @@
             }
           },
           {
-            "id": "cmw741uqn72qlt",
+            "id": "cmw75sjbe72qlt",
             "name": "Enea",
             "gender": "M",
             "team": 3,
@@ -9201,7 +9201,7 @@
             }
           },
           {
-            "id": "cmw741uqn8anvb",
+            "id": "cmw75sjbe8anvb",
             "name": "Agata",
             "gender": "F",
             "team": 3,
@@ -9224,7 +9224,7 @@
             }
           },
           {
-            "id": "cmw741uqn9dbas",
+            "id": "cmw75sjbe9dbas",
             "name": "Bruno",
             "gender": "M",
             "team": 4,
@@ -9248,7 +9248,7 @@
             }
           },
           {
-            "id": "cmw741uqn104znl",
+            "id": "cmw75sjbe104znl",
             "name": "Chiara",
             "gender": "F",
             "team": 4,
@@ -9269,7 +9269,7 @@
             }
           },
           {
-            "id": "cmw741uqn116qbo",
+            "id": "cmw75sjbe116qbo",
             "name": "Elia",
             "gender": "M",
             "team": 4,
@@ -9293,7 +9293,7 @@
             }
           },
           {
-            "id": "cmw741uqn122ls1",
+            "id": "cmw75sjbe122ls1",
             "name": "Sara",
             "gender": "F",
             "team": 5,
@@ -9314,7 +9314,7 @@
             }
           },
           {
-            "id": "cmw741uqn137px2",
+            "id": "cmw75sjbe137px2",
             "name": "Walter",
             "gender": "M",
             "team": 5,
@@ -9337,7 +9337,7 @@
             }
           },
           {
-            "id": "cmw741uqn14eftu",
+            "id": "cmw75sjbe14eftu",
             "name": "Marta",
             "gender": "F",
             "team": 5,
@@ -9358,7 +9358,7 @@
             }
           },
           {
-            "id": "cmw741uqn1552tw",
+            "id": "cmw75sjbe1552tw",
             "name": "Fabio",
             "gender": "M",
             "team": 6,
@@ -9382,7 +9382,7 @@
             }
           },
           {
-            "id": "cmw741uqn16cnzd",
+            "id": "cmw75sjbe16cnzd",
             "name": "Carla",
             "gender": "F",
             "team": 6,
@@ -9403,7 +9403,7 @@
             }
           },
           {
-            "id": "cmw741uqn17g198",
+            "id": "cmw75sjbe17g198",
             "name": "Ivo",
             "gender": "M",
             "team": 6,
@@ -9424,7 +9424,7 @@
             }
           },
           {
-            "id": "cmw741uqn1851f2",
+            "id": "cmw75sjbe1851f2",
             "name": "Lara",
             "gender": "F",
             "team": 7,
@@ -9448,7 +9448,7 @@
             }
           },
           {
-            "id": "cmw741uqn19ilrz",
+            "id": "cmw75sjbe19ilrz",
             "name": "Ariel",
             "gender": "N",
             "team": 7,
@@ -9471,7 +9471,7 @@
             }
           },
           {
-            "id": "cmw741uqn20jz7i",
+            "id": "cmw75sjbe20jz7i",
             "name": "Emma",
             "gender": "F",
             "team": 7,
@@ -9495,7 +9495,7 @@
             }
           },
           {
-            "id": "cmw741uqn212r8z",
+            "id": "cmw75sjbe212r8z",
             "name": "Teo",
             "gender": "M",
             "team": 8,
@@ -9518,7 +9518,7 @@
             }
           },
           {
-            "id": "cmw741uqn227s1g",
+            "id": "cmw75sjbe227s1g",
             "name": "Bianca",
             "gender": "F",
             "team": 8,
@@ -9539,7 +9539,7 @@
             }
           },
           {
-            "id": "cmw741uqn23fbc6",
+            "id": "cmw75sjbe23fbc6",
             "name": "Saverio",
             "gender": "M",
             "team": 8,
@@ -9562,7 +9562,7 @@
             }
           },
           {
-            "id": "cmw741uqn24d7be",
+            "id": "cmw75sjbe24d7be",
             "name": "Gemma",
             "gender": "F",
             "team": 9,
@@ -9585,7 +9585,7 @@
             }
           },
           {
-            "id": "cmw741uqn25eqxt",
+            "id": "cmw75sjbe25eqxt",
             "name": "Nico",
             "gender": "M",
             "team": 9,
@@ -9609,7 +9609,7 @@
             }
           },
           {
-            "id": "cmw741uqn269fra",
+            "id": "cmw75sjbe269fra",
             "name": "Ottavia",
             "gender": "F",
             "team": 9,
@@ -9630,7 +9630,7 @@
             }
           },
           {
-            "id": "cmw741uqn279aw",
+            "id": "cmw75sjbe279aw",
             "name": "Marco",
             "gender": "M",
             "team": 10,
@@ -9654,7 +9654,7 @@
             }
           },
           {
-            "id": "cmw741uqn28fwge",
+            "id": "cmw75sjbe28fwge",
             "name": "Priscilla",
             "gender": "F",
             "team": 10,
@@ -9677,7 +9677,7 @@
             }
           },
           {
-            "id": "cmw741uqn296ec8",
+            "id": "cmw75sjbe296ec8",
             "name": "Luca",
             "gender": "M",
             "team": 10,
@@ -9698,7 +9698,7 @@
             }
           },
           {
-            "id": "cmw741uqn30606k",
+            "id": "cmw75sjbe30606k",
             "name": "Viola",
             "gender": "F",
             "team": 11,
@@ -9719,7 +9719,7 @@
             }
           },
           {
-            "id": "cmw741uqn31360y",
+            "id": "cmw75sjbe31360y",
             "name": "Cesare",
             "gender": "M",
             "team": 11,
@@ -9742,7 +9742,7 @@
             }
           },
           {
-            "id": "cmw741uqn32gm5x",
+            "id": "cmw75sjbe32gm5x",
             "name": "Alba",
             "gender": "F",
             "team": 11,
@@ -9765,7 +9765,7 @@
             }
           },
           {
-            "id": "cmw741uqn33cah6",
+            "id": "cmw75sjbe33cah6",
             "name": "Furio",
             "gender": "M",
             "team": 12,
@@ -9789,7 +9789,7 @@
             }
           },
           {
-            "id": "cmw741uqn344r0q",
+            "id": "cmw75sjbe344r0q",
             "name": "Livia",
             "gender": "F",
             "team": 12,
@@ -9810,7 +9810,7 @@
             }
           },
           {
-            "id": "cmw741uqn35ec0z",
+            "id": "cmw75sjbe35ec0z",
             "name": "Ugo",
             "gender": "M",
             "team": 12,
@@ -9833,7 +9833,7 @@
             }
           },
           {
-            "id": "cmw741uqn361zht",
+            "id": "cmw75sjbe361zht",
             "name": "Ilaria",
             "gender": "F",
             "team": 13,
@@ -9857,7 +9857,7 @@
             }
           },
           {
-            "id": "cmw741uqn37e3g2",
+            "id": "cmw75sjbe37e3g2",
             "name": "Lapo",
             "gender": "M",
             "team": 13,
@@ -9881,7 +9881,7 @@
             }
           },
           {
-            "id": "cmw741uqn38bitj",
+            "id": "cmw75sjbe38bitj",
             "name": "Aurora",
             "gender": "F",
             "team": 13,
@@ -9905,7 +9905,7 @@
             }
           },
           {
-            "id": "cmw741uqn39b966",
+            "id": "cmw75sjbe39b966",
             "name": "Orlando",
             "gender": "M",
             "team": 14,
@@ -9929,7 +9929,7 @@
             }
           },
           {
-            "id": "cmw741uqn40rkl",
+            "id": "cmw75sjbe40rkl",
             "name": "Sveva",
             "gender": "F",
             "team": 14,
@@ -9950,7 +9950,7 @@
             }
           },
           {
-            "id": "cmw741uqn41fbt7",
+            "id": "cmw75sjbe41fbt7",
             "name": "Aldo",
             "gender": "M",
             "team": 14,
@@ -9971,7 +9971,7 @@
             }
           },
           {
-            "id": "cmw741uqn42fchb",
+            "id": "cmw75sjbe42fchb",
             "name": "Irene",
             "gender": "F",
             "team": 15,
@@ -9995,7 +9995,7 @@
             }
           },
           {
-            "id": "cmw741uqn43d55n",
+            "id": "cmw75sjbe43d55n",
             "name": "Vito",
             "gender": "M",
             "team": 15,
@@ -10018,7 +10018,7 @@
             }
           },
           {
-            "id": "cmw741uqn446hnx",
+            "id": "cmw75sjbe446hnx",
             "name": "Matilde",
             "gender": "F",
             "team": 15,
@@ -10041,7 +10041,7 @@
             }
           },
           {
-            "id": "cmw741uqn45it0p",
+            "id": "cmw75sjbe45it0p",
             "name": "Riccardo",
             "gender": "M",
             "team": 16,
@@ -10064,7 +10064,7 @@
             }
           },
           {
-            "id": "cmw741uqn46gz54",
+            "id": "cmw75sjbe46gz54",
             "name": "Elena",
             "gender": "F",
             "team": 16,
@@ -10085,7 +10085,7 @@
             }
           },
           {
-            "id": "cmw741uqn47gxem",
+            "id": "cmw75sjbe47gxem",
             "name": "Pietro",
             "gender": "M",
             "team": 16,
@@ -10118,19 +10118,19 @@
         "custom": [],
         "initialRelations": [
           {
-            "from": "cmw741uqn06wv0",
-            "to": "cmw741uqn17ump",
+            "from": "cmw75sjbe06wv0",
+            "to": "cmw75sjbe17ump",
             "type": "coppia"
           }
         ]
       },
-      "digest": "cd8ee8fd84199e6931e4dd06d4cca9df21fd0fd75b6e24700aa55b314fc57209"
+      "digest": "27afb5c93b566f0c3183a2350afcd3bfb249ee05cd422f0a2a45a66ad7b0e630"
     },
     {
       "cfg": {
         "cast": [
           {
-            "id": "cmw741ux8075nc",
+            "id": "cmw75sjh2075nc",
             "name": "Giada",
             "gender": "F",
             "team": 1,
@@ -10153,7 +10153,7 @@
             }
           },
           {
-            "id": "cmw741ux81h4y9",
+            "id": "cmw75sjh21h4y9",
             "name": "Ivo",
             "gender": "M",
             "team": 2,
@@ -10185,13 +10185,13 @@
         "teamWin": false,
         "custom": []
       },
-      "digest": "f3f28e083e7d242612359f7865ed53cbd6d20a1283b32dfe8e7cb7b42ee0bc37"
+      "digest": "b000eb094bdc486e63117a13b78bd693021918dce9071e02e97500e697033142"
     },
     {
       "cfg": {
         "cast": [
           {
-            "id": "cmw741uxv07mm",
+            "id": "cmw75sjhk07mm",
             "name": "Alex",
             "gender": "N",
             "team": 1,
@@ -10214,7 +10214,7 @@
             }
           },
           {
-            "id": "cmw741uxv1jm8z",
+            "id": "cmw75sjhk1jm8z",
             "name": "Nico",
             "gender": "M",
             "team": 1,
@@ -10237,7 +10237,7 @@
             }
           },
           {
-            "id": "cmw741uxv2ftzj",
+            "id": "cmw75sjhk2ftzj",
             "name": "Irene",
             "gender": "F",
             "team": 1,
@@ -10261,7 +10261,7 @@
             }
           },
           {
-            "id": "cmw741uxv3gn6i",
+            "id": "cmw75sjhk3gn6i",
             "name": "Furio",
             "gender": "M",
             "team": 2,
@@ -10285,7 +10285,7 @@
             }
           },
           {
-            "id": "cmw741uxv4ikv3",
+            "id": "cmw75sjhk4ikv3",
             "name": "Lara",
             "gender": "F",
             "team": 2,
@@ -10306,7 +10306,7 @@
             }
           },
           {
-            "id": "cmw741uxv514y3",
+            "id": "cmw75sjhk514y3",
             "name": "Lapo",
             "gender": "M",
             "team": 2,
@@ -10329,7 +10329,7 @@
             }
           },
           {
-            "id": "cmw741uxv67ku5",
+            "id": "cmw75sjhk67ku5",
             "name": "Livia",
             "gender": "F",
             "team": 3,
@@ -10350,7 +10350,7 @@
             }
           },
           {
-            "id": "cmw741uxv7kfq4",
+            "id": "cmw75sjhk7kfq4",
             "name": "Enea",
             "gender": "M",
             "team": 3,
@@ -10371,7 +10371,7 @@
             }
           },
           {
-            "id": "cmw741uxv88ub5",
+            "id": "cmw75sjhk88ub5",
             "name": "Rebecca",
             "gender": "F",
             "team": 3,
@@ -10394,7 +10394,7 @@
             }
           },
           {
-            "id": "cmw741uxv93d0n",
+            "id": "cmw75sjhk93d0n",
             "name": "Matteo",
             "gender": "M",
             "team": 4,
@@ -10415,7 +10415,7 @@
             }
           },
           {
-            "id": "cmw741uxv1063zu",
+            "id": "cmw75sjhk1063zu",
             "name": "Zoe",
             "gender": "F",
             "team": 4,
@@ -10439,7 +10439,7 @@
             }
           },
           {
-            "id": "cmw741uxv11hy9t",
+            "id": "cmw75sjhk11hy9t",
             "name": "Gianni",
             "gender": "M",
             "team": 4,
@@ -10476,13 +10476,13 @@
           }
         ]
       },
-      "digest": "1aa914d3af1f10eb59fe62c9b135526f1d673f9ca14c7b6d930046bdbaf83a1f"
+      "digest": "961b4210492cd9ee29bf9bb5587732de0bd9baaa939b14c371654040731384e3"
     },
     {
       "cfg": {
         "cast": [
           {
-            "id": "cmw741v350f4gc",
+            "id": "cmw75sjk80f4gc",
             "name": "Viola",
             "gender": "F",
             "team": 1,
@@ -10506,7 +10506,7 @@
             }
           },
           {
-            "id": "cmw741v3512eda",
+            "id": "cmw75sjk812eda",
             "name": "Ivan",
             "gender": "M",
             "team": 2,
@@ -10527,7 +10527,7 @@
             }
           },
           {
-            "id": "cmw741v352aeb0",
+            "id": "cmw75sjk82aeb0",
             "name": "Eden",
             "gender": "N",
             "team": 3,
@@ -10551,7 +10551,7 @@
             }
           },
           {
-            "id": "cmw741v3537785",
+            "id": "cmw75sjk837785",
             "name": "Ettore",
             "gender": "M",
             "team": 4,
@@ -10572,7 +10572,7 @@
             }
           },
           {
-            "id": "cmw741v354j0li",
+            "id": "cmw75sjk84j0li",
             "name": "Ilaria",
             "gender": "F",
             "team": 5,
@@ -10595,7 +10595,7 @@
             }
           },
           {
-            "id": "cmw741v355gm9r",
+            "id": "cmw75sjk85gm9r",
             "name": "Nico",
             "gender": "M",
             "team": 6,
@@ -10619,7 +10619,7 @@
             }
           },
           {
-            "id": "cmw741v3566w4i",
+            "id": "cmw75sjk866w4i",
             "name": "Noa",
             "gender": "N",
             "team": 7,
@@ -10642,7 +10642,7 @@
             }
           },
           {
-            "id": "cmw741v3579y81",
+            "id": "cmw75sjk879y81",
             "name": "Lapo",
             "gender": "M",
             "team": 8,
@@ -10665,7 +10665,7 @@
             }
           },
           {
-            "id": "cmw741v3582bkv",
+            "id": "cmw75sjk882bkv",
             "name": "Rebecca",
             "gender": "F",
             "team": 9,
@@ -10688,7 +10688,7 @@
             }
           },
           {
-            "id": "cmw741v359dhno",
+            "id": "cmw75sjk89dhno",
             "name": "Gianni",
             "gender": "M",
             "team": 10,
@@ -10711,7 +10711,7 @@
             }
           },
           {
-            "id": "cmw741v35101idd",
+            "id": "cmw75sjk8101idd",
             "name": "Bianca",
             "gender": "F",
             "team": 11,
@@ -10735,7 +10735,7 @@
             }
           },
           {
-            "id": "cmw741v3511a48g",
+            "id": "cmw75sjk811a48g",
             "name": "Saverio",
             "gender": "M",
             "team": 12,
@@ -10759,7 +10759,7 @@
             }
           },
           {
-            "id": "cmw741v3512jwmy",
+            "id": "cmw75sjk812jwmy",
             "name": "Livia",
             "gender": "F",
             "team": 13,
@@ -10780,7 +10780,7 @@
             }
           },
           {
-            "id": "cmw741v3513gmzu",
+            "id": "cmw75sjk813gmzu",
             "name": "Oscar",
             "gender": "M",
             "team": 14,
@@ -10804,7 +10804,7 @@
             }
           },
           {
-            "id": "cmw741v3514f6ii",
+            "id": "cmw75sjk814f6ii",
             "name": "Tea",
             "gender": "F",
             "team": 15,
@@ -10825,7 +10825,7 @@
             }
           },
           {
-            "id": "cmw741v3515200t",
+            "id": "cmw75sjk815200t",
             "name": "Leone",
             "gender": "M",
             "team": 16,
@@ -10846,7 +10846,7 @@
             }
           },
           {
-            "id": "cmw741v3516iwry",
+            "id": "cmw75sjk816iwry",
             "name": "Andrea",
             "gender": "N",
             "team": 17,
@@ -10869,7 +10869,7 @@
             }
           },
           {
-            "id": "cmw741v3517hivf",
+            "id": "cmw75sjk817hivf",
             "name": "Cesare",
             "gender": "M",
             "team": 18,
@@ -10890,7 +10890,7 @@
             }
           },
           {
-            "id": "cmw741v3518b007",
+            "id": "cmw75sjk818b007",
             "name": "Aurora",
             "gender": "F",
             "team": 19,
@@ -10911,7 +10911,7 @@
             }
           },
           {
-            "id": "cmw741v35198vgt",
+            "id": "cmw75sjk8198vgt",
             "name": "Brando",
             "gender": "M",
             "team": 20,
@@ -10932,7 +10932,7 @@
             }
           },
           {
-            "id": "cmw741v3520kxrt",
+            "id": "cmw75sjk820kxrt",
             "name": "Dafne",
             "gender": "F",
             "team": 21,
@@ -10953,7 +10953,7 @@
             }
           },
           {
-            "id": "cmw741v3521ff71",
+            "id": "cmw75sjk821ff71",
             "name": "Matteo",
             "gender": "M",
             "team": 22,
@@ -10977,7 +10977,7 @@
             }
           },
           {
-            "id": "cmw741v3522153k",
+            "id": "cmw75sjk822153k",
             "name": "Noemi",
             "gender": "F",
             "team": 23,
@@ -11001,7 +11001,7 @@
             }
           },
           {
-            "id": "cmw741v3523hwc3",
+            "id": "cmw75sjk823hwc3",
             "name": "Fabio",
             "gender": "M",
             "team": 24,
@@ -11034,13 +11034,13 @@
         "teamWin": true,
         "custom": []
       },
-      "digest": "335743bd78e38e26be9590bae8c7b838f7d43581adc43388a407b5236eed22e1"
+      "digest": "f7a28940d8bce640754a979acf18a25ebea3560ebc71469befc78e64173a57fa"
     },
     {
       "cfg": {
         "cast": [
           {
-            "id": "cmw741v8u06wv0",
+            "id": "cmw75sjor06wv0",
             "name": "Nora",
             "gender": "F",
             "team": 1,
@@ -11064,7 +11064,7 @@
             }
           },
           {
-            "id": "cmw741v8u17ump",
+            "id": "cmw75sjor17ump",
             "name": "Brando",
             "gender": "M",
             "team": 1,
@@ -11088,7 +11088,7 @@
             }
           },
           {
-            "id": "cmw741v8u2dfqo",
+            "id": "cmw75sjor2dfqo",
             "name": "Vera",
             "gender": "F",
             "team": 1,
@@ -11109,7 +11109,7 @@
             }
           },
           {
-            "id": "cmw741v8u334pk",
+            "id": "cmw75sjor334pk",
             "name": "Oscar",
             "gender": "M",
             "team": 2,
@@ -11133,7 +11133,7 @@
             }
           },
           {
-            "id": "cmw741v8u4efhf",
+            "id": "cmw75sjor4efhf",
             "name": "Giada",
             "gender": "F",
             "team": 2,
@@ -11157,7 +11157,7 @@
             }
           },
           {
-            "id": "cmw741v8u5fjyw",
+            "id": "cmw75sjor5fjyw",
             "name": "Tommaso",
             "gender": "M",
             "team": 2,
@@ -11181,7 +11181,7 @@
             }
           },
           {
-            "id": "cmw741v8u6i0qd",
+            "id": "cmw75sjor6i0qd",
             "name": "Paola",
             "gender": "F",
             "team": 3,
@@ -11202,7 +11202,7 @@
             }
           },
           {
-            "id": "cmw741v8u72qlt",
+            "id": "cmw75sjor72qlt",
             "name": "Enea",
             "gender": "M",
             "team": 3,
@@ -11226,7 +11226,7 @@
             }
           },
           {
-            "id": "cmw741v8u8anvb",
+            "id": "cmw75sjor8anvb",
             "name": "Agata",
             "gender": "F",
             "team": 3,
@@ -11249,7 +11249,7 @@
             }
           },
           {
-            "id": "cmw741v8u9dbas",
+            "id": "cmw75sjor9dbas",
             "name": "Bruno",
             "gender": "M",
             "team": 4,
@@ -11273,7 +11273,7 @@
             }
           },
           {
-            "id": "cmw741v8u104znl",
+            "id": "cmw75sjor104znl",
             "name": "Chiara",
             "gender": "F",
             "team": 4,
@@ -11294,7 +11294,7 @@
             }
           },
           {
-            "id": "cmw741v8u116qbo",
+            "id": "cmw75sjor116qbo",
             "name": "Elia",
             "gender": "M",
             "team": 4,
@@ -11318,7 +11318,7 @@
             }
           },
           {
-            "id": "cmw741v8u122ls1",
+            "id": "cmw75sjor122ls1",
             "name": "Sara",
             "gender": "F",
             "team": 5,
@@ -11339,7 +11339,7 @@
             }
           },
           {
-            "id": "cmw741v8u137px2",
+            "id": "cmw75sjor137px2",
             "name": "Walter",
             "gender": "M",
             "team": 5,
@@ -11362,7 +11362,7 @@
             }
           },
           {
-            "id": "cmw741v8u14eftu",
+            "id": "cmw75sjor14eftu",
             "name": "Marta",
             "gender": "F",
             "team": 5,
@@ -11383,7 +11383,7 @@
             }
           },
           {
-            "id": "cmw741v8u1552tw",
+            "id": "cmw75sjor1552tw",
             "name": "Fabio",
             "gender": "M",
             "team": 6,
@@ -11407,7 +11407,7 @@
             }
           },
           {
-            "id": "cmw741v8u16cnzd",
+            "id": "cmw75sjor16cnzd",
             "name": "Carla",
             "gender": "F",
             "team": 6,
@@ -11428,7 +11428,7 @@
             }
           },
           {
-            "id": "cmw741v8u17g198",
+            "id": "cmw75sjor17g198",
             "name": "Ivo",
             "gender": "M",
             "team": 6,
@@ -11449,7 +11449,7 @@
             }
           },
           {
-            "id": "cmw741v8u1851f2",
+            "id": "cmw75sjor1851f2",
             "name": "Lara",
             "gender": "F",
             "team": 7,
@@ -11473,7 +11473,7 @@
             }
           },
           {
-            "id": "cmw741v8u19ilrz",
+            "id": "cmw75sjor19ilrz",
             "name": "Ariel",
             "gender": "N",
             "team": 7,
@@ -11496,7 +11496,7 @@
             }
           },
           {
-            "id": "cmw741v8u20jz7i",
+            "id": "cmw75sjor20jz7i",
             "name": "Emma",
             "gender": "F",
             "team": 7,
@@ -11520,7 +11520,7 @@
             }
           },
           {
-            "id": "cmw741v8u212r8z",
+            "id": "cmw75sjor212r8z",
             "name": "Teo",
             "gender": "M",
             "team": 8,
@@ -11543,7 +11543,7 @@
             }
           },
           {
-            "id": "cmw741v8u227s1g",
+            "id": "cmw75sjor227s1g",
             "name": "Bianca",
             "gender": "F",
             "team": 8,
@@ -11564,7 +11564,7 @@
             }
           },
           {
-            "id": "cmw741v8u23fbc6",
+            "id": "cmw75sjor23fbc6",
             "name": "Saverio",
             "gender": "M",
             "team": 8,
@@ -11587,7 +11587,7 @@
             }
           },
           {
-            "id": "cmw741v8u24d7be",
+            "id": "cmw75sjor24d7be",
             "name": "Gemma",
             "gender": "F",
             "team": 9,
@@ -11610,7 +11610,7 @@
             }
           },
           {
-            "id": "cmw741v8u25eqxt",
+            "id": "cmw75sjor25eqxt",
             "name": "Nico",
             "gender": "M",
             "team": 9,
@@ -11634,7 +11634,7 @@
             }
           },
           {
-            "id": "cmw741v8u269fra",
+            "id": "cmw75sjos269fra",
             "name": "Ottavia",
             "gender": "F",
             "team": 9,
@@ -11655,7 +11655,7 @@
             }
           },
           {
-            "id": "cmw741v8u279aw",
+            "id": "cmw75sjos279aw",
             "name": "Marco",
             "gender": "M",
             "team": 10,
@@ -11679,7 +11679,7 @@
             }
           },
           {
-            "id": "cmw741v8u28fwge",
+            "id": "cmw75sjos28fwge",
             "name": "Priscilla",
             "gender": "F",
             "team": 10,
@@ -11702,7 +11702,7 @@
             }
           },
           {
-            "id": "cmw741v8u296ec8",
+            "id": "cmw75sjos296ec8",
             "name": "Luca",
             "gender": "M",
             "team": 10,
@@ -11723,7 +11723,7 @@
             }
           },
           {
-            "id": "cmw741v8u30606k",
+            "id": "cmw75sjos30606k",
             "name": "Viola",
             "gender": "F",
             "team": 11,
@@ -11744,7 +11744,7 @@
             }
           },
           {
-            "id": "cmw741v8u31360y",
+            "id": "cmw75sjos31360y",
             "name": "Cesare",
             "gender": "M",
             "team": 11,
@@ -11767,7 +11767,7 @@
             }
           },
           {
-            "id": "cmw741v8u32gm5x",
+            "id": "cmw75sjos32gm5x",
             "name": "Alba",
             "gender": "F",
             "team": 11,
@@ -11790,7 +11790,7 @@
             }
           },
           {
-            "id": "cmw741v8u33cah6",
+            "id": "cmw75sjos33cah6",
             "name": "Furio",
             "gender": "M",
             "team": 12,
@@ -11814,7 +11814,7 @@
             }
           },
           {
-            "id": "cmw741v8u344r0q",
+            "id": "cmw75sjos344r0q",
             "name": "Livia",
             "gender": "F",
             "team": 12,
@@ -11835,7 +11835,7 @@
             }
           },
           {
-            "id": "cmw741v8u35ec0z",
+            "id": "cmw75sjos35ec0z",
             "name": "Ugo",
             "gender": "M",
             "team": 12,
@@ -11858,7 +11858,7 @@
             }
           },
           {
-            "id": "cmw741v8u361zht",
+            "id": "cmw75sjos361zht",
             "name": "Ilaria",
             "gender": "F",
             "team": 13,
@@ -11882,7 +11882,7 @@
             }
           },
           {
-            "id": "cmw741v8u37e3g2",
+            "id": "cmw75sjos37e3g2",
             "name": "Lapo",
             "gender": "M",
             "team": 13,
@@ -11906,7 +11906,7 @@
             }
           },
           {
-            "id": "cmw741v8u38bitj",
+            "id": "cmw75sjos38bitj",
             "name": "Aurora",
             "gender": "F",
             "team": 13,
@@ -11930,7 +11930,7 @@
             }
           },
           {
-            "id": "cmw741v8u39b966",
+            "id": "cmw75sjos39b966",
             "name": "Orlando",
             "gender": "M",
             "team": 14,
@@ -11954,7 +11954,7 @@
             }
           },
           {
-            "id": "cmw741v8u40rkl",
+            "id": "cmw75sjos40rkl",
             "name": "Sveva",
             "gender": "F",
             "team": 14,
@@ -11975,7 +11975,7 @@
             }
           },
           {
-            "id": "cmw741v8u41fbt7",
+            "id": "cmw75sjos41fbt7",
             "name": "Aldo",
             "gender": "M",
             "team": 14,
@@ -11996,7 +11996,7 @@
             }
           },
           {
-            "id": "cmw741v8u42fchb",
+            "id": "cmw75sjos42fchb",
             "name": "Irene",
             "gender": "F",
             "team": 15,
@@ -12020,7 +12020,7 @@
             }
           },
           {
-            "id": "cmw741v8u43d55n",
+            "id": "cmw75sjos43d55n",
             "name": "Vito",
             "gender": "M",
             "team": 15,
@@ -12043,7 +12043,7 @@
             }
           },
           {
-            "id": "cmw741v8u446hnx",
+            "id": "cmw75sjos446hnx",
             "name": "Matilde",
             "gender": "F",
             "team": 15,
@@ -12066,7 +12066,7 @@
             }
           },
           {
-            "id": "cmw741v8u45it0p",
+            "id": "cmw75sjos45it0p",
             "name": "Riccardo",
             "gender": "M",
             "team": 16,
@@ -12089,7 +12089,7 @@
             }
           },
           {
-            "id": "cmw741v8u46gz54",
+            "id": "cmw75sjos46gz54",
             "name": "Elena",
             "gender": "F",
             "team": 16,
@@ -12110,7 +12110,7 @@
             }
           },
           {
-            "id": "cmw741v8u47gxem",
+            "id": "cmw75sjos47gxem",
             "name": "Pietro",
             "gender": "M",
             "team": 16,
@@ -12143,19 +12143,19 @@
         "custom": [],
         "initialRelations": [
           {
-            "from": "cmw741v8u06wv0",
-            "to": "cmw741v8u17ump",
+            "from": "cmw75sjor06wv0",
+            "to": "cmw75sjor17ump",
             "type": "coppia"
           }
         ]
       },
-      "digest": "afe1e580fee101e1c9f88ec6225abcf64d88951cbac4bd9fcde426507b9ea47d"
+      "digest": "9fb1253cdcb59121474590b1165468524a59b24463abd50b318d8425c650e5fa"
     },
     {
       "cfg": {
         "cast": [
           {
-            "id": "cmw741vi0075nc",
+            "id": "cmw75sjvk075nc",
             "name": "Giada",
             "gender": "F",
             "team": 1,
@@ -12178,7 +12178,7 @@
             }
           },
           {
-            "id": "cmw741vi01h4y9",
+            "id": "cmw75sjvk1h4y9",
             "name": "Ivo",
             "gender": "M",
             "team": 2,
@@ -12210,13 +12210,13 @@
         "teamWin": false,
         "custom": []
       },
-      "digest": "13e925763ade9fb61fddbbd66aa00cc746b6c85861d203b51041a6b4885055db"
+      "digest": "4b7ee53a570d2b65850f9a42b6d4fd9bbf21ea6ea7ac50328315cf18d76a9143"
     },
     {
       "cfg": {
         "cast": [
           {
-            "id": "cmw741vj407mm",
+            "id": "cmw75sjw207mm",
             "name": "Alex",
             "gender": "N",
             "team": 1,
@@ -12239,7 +12239,7 @@
             }
           },
           {
-            "id": "cmw741vj41jm8z",
+            "id": "cmw75sjw21jm8z",
             "name": "Nico",
             "gender": "M",
             "team": 1,
@@ -12262,7 +12262,7 @@
             }
           },
           {
-            "id": "cmw741vj42ftzj",
+            "id": "cmw75sjw22ftzj",
             "name": "Irene",
             "gender": "F",
             "team": 1,
@@ -12286,7 +12286,7 @@
             }
           },
           {
-            "id": "cmw741vj43gn6i",
+            "id": "cmw75sjw23gn6i",
             "name": "Furio",
             "gender": "M",
             "team": 2,
@@ -12310,7 +12310,7 @@
             }
           },
           {
-            "id": "cmw741vj44ikv3",
+            "id": "cmw75sjw24ikv3",
             "name": "Lara",
             "gender": "F",
             "team": 2,
@@ -12331,7 +12331,7 @@
             }
           },
           {
-            "id": "cmw741vj4514y3",
+            "id": "cmw75sjw2514y3",
             "name": "Lapo",
             "gender": "M",
             "team": 2,
@@ -12354,7 +12354,7 @@
             }
           },
           {
-            "id": "cmw741vj467ku5",
+            "id": "cmw75sjw267ku5",
             "name": "Livia",
             "gender": "F",
             "team": 3,
@@ -12375,7 +12375,7 @@
             }
           },
           {
-            "id": "cmw741vj47kfq4",
+            "id": "cmw75sjw27kfq4",
             "name": "Enea",
             "gender": "M",
             "team": 3,
@@ -12396,7 +12396,7 @@
             }
           },
           {
-            "id": "cmw741vj488ub5",
+            "id": "cmw75sjw288ub5",
             "name": "Rebecca",
             "gender": "F",
             "team": 3,
@@ -12419,7 +12419,7 @@
             }
           },
           {
-            "id": "cmw741vj493d0n",
+            "id": "cmw75sjw293d0n",
             "name": "Matteo",
             "gender": "M",
             "team": 4,
@@ -12440,7 +12440,7 @@
             }
           },
           {
-            "id": "cmw741vj41063zu",
+            "id": "cmw75sjw21063zu",
             "name": "Zoe",
             "gender": "F",
             "team": 4,
@@ -12464,7 +12464,7 @@
             }
           },
           {
-            "id": "cmw741vj411hy9t",
+            "id": "cmw75sjw211hy9t",
             "name": "Gianni",
             "gender": "M",
             "team": 4,
@@ -12501,13 +12501,13 @@
           }
         ]
       },
-      "digest": "b2e4cc594b468da34449f5b28612929012f945e9e985f9817972c821f71bb081"
+      "digest": "6e7ccd0f833483f6873c9350177f101d9f1222f96ea3685923ca7ae84a6187d6"
     },
     {
       "cfg": {
         "cast": [
           {
-            "id": "cmw741vnc0f4gc",
+            "id": "cmw75sjyp0f4gc",
             "name": "Viola",
             "gender": "F",
             "team": 1,
@@ -12531,7 +12531,7 @@
             }
           },
           {
-            "id": "cmw741vnc12eda",
+            "id": "cmw75sjyp12eda",
             "name": "Ivan",
             "gender": "M",
             "team": 2,
@@ -12552,7 +12552,7 @@
             }
           },
           {
-            "id": "cmw741vnc2aeb0",
+            "id": "cmw75sjyp2aeb0",
             "name": "Eden",
             "gender": "N",
             "team": 3,
@@ -12576,7 +12576,7 @@
             }
           },
           {
-            "id": "cmw741vnc37785",
+            "id": "cmw75sjyp37785",
             "name": "Ettore",
             "gender": "M",
             "team": 4,
@@ -12597,7 +12597,7 @@
             }
           },
           {
-            "id": "cmw741vnc4j0li",
+            "id": "cmw75sjyp4j0li",
             "name": "Ilaria",
             "gender": "F",
             "team": 5,
@@ -12620,7 +12620,7 @@
             }
           },
           {
-            "id": "cmw741vnc5gm9r",
+            "id": "cmw75sjyp5gm9r",
             "name": "Nico",
             "gender": "M",
             "team": 6,
@@ -12644,7 +12644,7 @@
             }
           },
           {
-            "id": "cmw741vnc66w4i",
+            "id": "cmw75sjyp66w4i",
             "name": "Noa",
             "gender": "N",
             "team": 7,
@@ -12667,7 +12667,7 @@
             }
           },
           {
-            "id": "cmw741vnc79y81",
+            "id": "cmw75sjyp79y81",
             "name": "Lapo",
             "gender": "M",
             "team": 8,
@@ -12690,7 +12690,7 @@
             }
           },
           {
-            "id": "cmw741vnc82bkv",
+            "id": "cmw75sjyp82bkv",
             "name": "Rebecca",
             "gender": "F",
             "team": 9,
@@ -12713,7 +12713,7 @@
             }
           },
           {
-            "id": "cmw741vnc9dhno",
+            "id": "cmw75sjyp9dhno",
             "name": "Gianni",
             "gender": "M",
             "team": 10,
@@ -12736,7 +12736,7 @@
             }
           },
           {
-            "id": "cmw741vnc101idd",
+            "id": "cmw75sjyp101idd",
             "name": "Bianca",
             "gender": "F",
             "team": 11,
@@ -12760,7 +12760,7 @@
             }
           },
           {
-            "id": "cmw741vnc11a48g",
+            "id": "cmw75sjyp11a48g",
             "name": "Saverio",
             "gender": "M",
             "team": 12,
@@ -12784,7 +12784,7 @@
             }
           },
           {
-            "id": "cmw741vnc12jwmy",
+            "id": "cmw75sjyp12jwmy",
             "name": "Livia",
             "gender": "F",
             "team": 13,
@@ -12805,7 +12805,7 @@
             }
           },
           {
-            "id": "cmw741vnc13gmzu",
+            "id": "cmw75sjyp13gmzu",
             "name": "Oscar",
             "gender": "M",
             "team": 14,
@@ -12829,7 +12829,7 @@
             }
           },
           {
-            "id": "cmw741vnc14f6ii",
+            "id": "cmw75sjyp14f6ii",
             "name": "Tea",
             "gender": "F",
             "team": 15,
@@ -12850,7 +12850,7 @@
             }
           },
           {
-            "id": "cmw741vnc15200t",
+            "id": "cmw75sjyp15200t",
             "name": "Leone",
             "gender": "M",
             "team": 16,
@@ -12871,7 +12871,7 @@
             }
           },
           {
-            "id": "cmw741vnc16iwry",
+            "id": "cmw75sjyp16iwry",
             "name": "Andrea",
             "gender": "N",
             "team": 17,
@@ -12894,7 +12894,7 @@
             }
           },
           {
-            "id": "cmw741vnc17hivf",
+            "id": "cmw75sjyp17hivf",
             "name": "Cesare",
             "gender": "M",
             "team": 18,
@@ -12915,7 +12915,7 @@
             }
           },
           {
-            "id": "cmw741vnc18b007",
+            "id": "cmw75sjyp18b007",
             "name": "Aurora",
             "gender": "F",
             "team": 19,
@@ -12936,7 +12936,7 @@
             }
           },
           {
-            "id": "cmw741vnc198vgt",
+            "id": "cmw75sjyp198vgt",
             "name": "Brando",
             "gender": "M",
             "team": 20,
@@ -12957,7 +12957,7 @@
             }
           },
           {
-            "id": "cmw741vnc20kxrt",
+            "id": "cmw75sjyp20kxrt",
             "name": "Dafne",
             "gender": "F",
             "team": 21,
@@ -12978,7 +12978,7 @@
             }
           },
           {
-            "id": "cmw741vnc21ff71",
+            "id": "cmw75sjyp21ff71",
             "name": "Matteo",
             "gender": "M",
             "team": 22,
@@ -13002,7 +13002,7 @@
             }
           },
           {
-            "id": "cmw741vnc22153k",
+            "id": "cmw75sjyp22153k",
             "name": "Noemi",
             "gender": "F",
             "team": 23,
@@ -13026,7 +13026,7 @@
             }
           },
           {
-            "id": "cmw741vnc23hwc3",
+            "id": "cmw75sjyp23hwc3",
             "name": "Fabio",
             "gender": "M",
             "team": 24,
@@ -13059,13 +13059,13 @@
         "teamWin": true,
         "custom": []
       },
-      "digest": "ec23f9d494d75d3c7b04b3d080f400e9bc84fddbab5bfbe6de78a8d5c486b7d2"
+      "digest": "27808dfa9a6474ea280196b18343d1726767cbe8214b152d3c1b07f7d94add86"
     },
     {
       "cfg": {
         "cast": [
           {
-            "id": "cmw741vqf06wv0",
+            "id": "cmw75sk2606wv0",
             "name": "Nora",
             "gender": "F",
             "team": 1,
@@ -13089,7 +13089,7 @@
             }
           },
           {
-            "id": "cmw741vqf17ump",
+            "id": "cmw75sk2617ump",
             "name": "Brando",
             "gender": "M",
             "team": 1,
@@ -13113,7 +13113,7 @@
             }
           },
           {
-            "id": "cmw741vqf2dfqo",
+            "id": "cmw75sk262dfqo",
             "name": "Vera",
             "gender": "F",
             "team": 1,
@@ -13134,7 +13134,7 @@
             }
           },
           {
-            "id": "cmw741vqf334pk",
+            "id": "cmw75sk26334pk",
             "name": "Oscar",
             "gender": "M",
             "team": 2,
@@ -13158,7 +13158,7 @@
             }
           },
           {
-            "id": "cmw741vqf4efhf",
+            "id": "cmw75sk264efhf",
             "name": "Giada",
             "gender": "F",
             "team": 2,
@@ -13182,7 +13182,7 @@
             }
           },
           {
-            "id": "cmw741vqf5fjyw",
+            "id": "cmw75sk265fjyw",
             "name": "Tommaso",
             "gender": "M",
             "team": 2,
@@ -13206,7 +13206,7 @@
             }
           },
           {
-            "id": "cmw741vqf6i0qd",
+            "id": "cmw75sk266i0qd",
             "name": "Paola",
             "gender": "F",
             "team": 3,
@@ -13227,7 +13227,7 @@
             }
           },
           {
-            "id": "cmw741vqf72qlt",
+            "id": "cmw75sk2672qlt",
             "name": "Enea",
             "gender": "M",
             "team": 3,
@@ -13251,7 +13251,7 @@
             }
           },
           {
-            "id": "cmw741vqf8anvb",
+            "id": "cmw75sk268anvb",
             "name": "Agata",
             "gender": "F",
             "team": 3,
@@ -13274,7 +13274,7 @@
             }
           },
           {
-            "id": "cmw741vqf9dbas",
+            "id": "cmw75sk269dbas",
             "name": "Bruno",
             "gender": "M",
             "team": 4,
@@ -13298,7 +13298,7 @@
             }
           },
           {
-            "id": "cmw741vqf104znl",
+            "id": "cmw75sk26104znl",
             "name": "Chiara",
             "gender": "F",
             "team": 4,
@@ -13319,7 +13319,7 @@
             }
           },
           {
-            "id": "cmw741vqf116qbo",
+            "id": "cmw75sk26116qbo",
             "name": "Elia",
             "gender": "M",
             "team": 4,
@@ -13343,7 +13343,7 @@
             }
           },
           {
-            "id": "cmw741vqf122ls1",
+            "id": "cmw75sk26122ls1",
             "name": "Sara",
             "gender": "F",
             "team": 5,
@@ -13364,7 +13364,7 @@
             }
           },
           {
-            "id": "cmw741vqf137px2",
+            "id": "cmw75sk26137px2",
             "name": "Walter",
             "gender": "M",
             "team": 5,
@@ -13387,7 +13387,7 @@
             }
           },
           {
-            "id": "cmw741vqf14eftu",
+            "id": "cmw75sk2614eftu",
             "name": "Marta",
             "gender": "F",
             "team": 5,
@@ -13408,7 +13408,7 @@
             }
           },
           {
-            "id": "cmw741vqf1552tw",
+            "id": "cmw75sk261552tw",
             "name": "Fabio",
             "gender": "M",
             "team": 6,
@@ -13432,7 +13432,7 @@
             }
           },
           {
-            "id": "cmw741vqf16cnzd",
+            "id": "cmw75sk2616cnzd",
             "name": "Carla",
             "gender": "F",
             "team": 6,
@@ -13453,7 +13453,7 @@
             }
           },
           {
-            "id": "cmw741vqf17g198",
+            "id": "cmw75sk2617g198",
             "name": "Ivo",
             "gender": "M",
             "team": 6,
@@ -13474,7 +13474,7 @@
             }
           },
           {
-            "id": "cmw741vqf1851f2",
+            "id": "cmw75sk261851f2",
             "name": "Lara",
             "gender": "F",
             "team": 7,
@@ -13498,7 +13498,7 @@
             }
           },
           {
-            "id": "cmw741vqf19ilrz",
+            "id": "cmw75sk2619ilrz",
             "name": "Ariel",
             "gender": "N",
             "team": 7,
@@ -13521,7 +13521,7 @@
             }
           },
           {
-            "id": "cmw741vqf20jz7i",
+            "id": "cmw75sk2620jz7i",
             "name": "Emma",
             "gender": "F",
             "team": 7,
@@ -13545,7 +13545,7 @@
             }
           },
           {
-            "id": "cmw741vqf212r8z",
+            "id": "cmw75sk26212r8z",
             "name": "Teo",
             "gender": "M",
             "team": 8,
@@ -13568,7 +13568,7 @@
             }
           },
           {
-            "id": "cmw741vqf227s1g",
+            "id": "cmw75sk26227s1g",
             "name": "Bianca",
             "gender": "F",
             "team": 8,
@@ -13589,7 +13589,7 @@
             }
           },
           {
-            "id": "cmw741vqf23fbc6",
+            "id": "cmw75sk2623fbc6",
             "name": "Saverio",
             "gender": "M",
             "team": 8,
@@ -13612,7 +13612,7 @@
             }
           },
           {
-            "id": "cmw741vqf24d7be",
+            "id": "cmw75sk2624d7be",
             "name": "Gemma",
             "gender": "F",
             "team": 9,
@@ -13635,7 +13635,7 @@
             }
           },
           {
-            "id": "cmw741vqf25eqxt",
+            "id": "cmw75sk2625eqxt",
             "name": "Nico",
             "gender": "M",
             "team": 9,
@@ -13659,7 +13659,7 @@
             }
           },
           {
-            "id": "cmw741vqf269fra",
+            "id": "cmw75sk26269fra",
             "name": "Ottavia",
             "gender": "F",
             "team": 9,
@@ -13680,7 +13680,7 @@
             }
           },
           {
-            "id": "cmw741vqf279aw",
+            "id": "cmw75sk26279aw",
             "name": "Marco",
             "gender": "M",
             "team": 10,
@@ -13704,7 +13704,7 @@
             }
           },
           {
-            "id": "cmw741vqf28fwge",
+            "id": "cmw75sk2628fwge",
             "name": "Priscilla",
             "gender": "F",
             "team": 10,
@@ -13727,7 +13727,7 @@
             }
           },
           {
-            "id": "cmw741vqf296ec8",
+            "id": "cmw75sk26296ec8",
             "name": "Luca",
             "gender": "M",
             "team": 10,
@@ -13748,7 +13748,7 @@
             }
           },
           {
-            "id": "cmw741vqf30606k",
+            "id": "cmw75sk2630606k",
             "name": "Viola",
             "gender": "F",
             "team": 11,
@@ -13769,7 +13769,7 @@
             }
           },
           {
-            "id": "cmw741vqf31360y",
+            "id": "cmw75sk2631360y",
             "name": "Cesare",
             "gender": "M",
             "team": 11,
@@ -13792,7 +13792,7 @@
             }
           },
           {
-            "id": "cmw741vqf32gm5x",
+            "id": "cmw75sk2632gm5x",
             "name": "Alba",
             "gender": "F",
             "team": 11,
@@ -13815,7 +13815,7 @@
             }
           },
           {
-            "id": "cmw741vqf33cah6",
+            "id": "cmw75sk2633cah6",
             "name": "Furio",
             "gender": "M",
             "team": 12,
@@ -13839,7 +13839,7 @@
             }
           },
           {
-            "id": "cmw741vqf344r0q",
+            "id": "cmw75sk26344r0q",
             "name": "Livia",
             "gender": "F",
             "team": 12,
@@ -13860,7 +13860,7 @@
             }
           },
           {
-            "id": "cmw741vqf35ec0z",
+            "id": "cmw75sk2635ec0z",
             "name": "Ugo",
             "gender": "M",
             "team": 12,
@@ -13883,7 +13883,7 @@
             }
           },
           {
-            "id": "cmw741vqf361zht",
+            "id": "cmw75sk26361zht",
             "name": "Ilaria",
             "gender": "F",
             "team": 13,
@@ -13907,7 +13907,7 @@
             }
           },
           {
-            "id": "cmw741vqf37e3g2",
+            "id": "cmw75sk2637e3g2",
             "name": "Lapo",
             "gender": "M",
             "team": 13,
@@ -13931,7 +13931,7 @@
             }
           },
           {
-            "id": "cmw741vqf38bitj",
+            "id": "cmw75sk2638bitj",
             "name": "Aurora",
             "gender": "F",
             "team": 13,
@@ -13955,7 +13955,7 @@
             }
           },
           {
-            "id": "cmw741vqf39b966",
+            "id": "cmw75sk2639b966",
             "name": "Orlando",
             "gender": "M",
             "team": 14,
@@ -13979,7 +13979,7 @@
             }
           },
           {
-            "id": "cmw741vqf40rkl",
+            "id": "cmw75sk2640rkl",
             "name": "Sveva",
             "gender": "F",
             "team": 14,
@@ -14000,7 +14000,7 @@
             }
           },
           {
-            "id": "cmw741vqf41fbt7",
+            "id": "cmw75sk2641fbt7",
             "name": "Aldo",
             "gender": "M",
             "team": 14,
@@ -14021,7 +14021,7 @@
             }
           },
           {
-            "id": "cmw741vqf42fchb",
+            "id": "cmw75sk2642fchb",
             "name": "Irene",
             "gender": "F",
             "team": 15,
@@ -14045,7 +14045,7 @@
             }
           },
           {
-            "id": "cmw741vqf43d55n",
+            "id": "cmw75sk2643d55n",
             "name": "Vito",
             "gender": "M",
             "team": 15,
@@ -14068,7 +14068,7 @@
             }
           },
           {
-            "id": "cmw741vqf446hnx",
+            "id": "cmw75sk26446hnx",
             "name": "Matilde",
             "gender": "F",
             "team": 15,
@@ -14091,7 +14091,7 @@
             }
           },
           {
-            "id": "cmw741vqf45it0p",
+            "id": "cmw75sk2645it0p",
             "name": "Riccardo",
             "gender": "M",
             "team": 16,
@@ -14114,7 +14114,7 @@
             }
           },
           {
-            "id": "cmw741vqf46gz54",
+            "id": "cmw75sk2646gz54",
             "name": "Elena",
             "gender": "F",
             "team": 16,
@@ -14135,7 +14135,7 @@
             }
           },
           {
-            "id": "cmw741vqf47gxem",
+            "id": "cmw75sk2647gxem",
             "name": "Pietro",
             "gender": "M",
             "team": 16,
@@ -14168,19 +14168,19 @@
         "custom": [],
         "initialRelations": [
           {
-            "from": "cmw741vqf06wv0",
-            "to": "cmw741vqf17ump",
+            "from": "cmw75sk2606wv0",
+            "to": "cmw75sk2617ump",
             "type": "coppia"
           }
         ]
       },
-      "digest": "90beddaa671a05b821fea2aaa7c577fc2af3c3d9ee5fce2de18efc93c732a46e"
+      "digest": "07624024ec7d18baea373757cc4cbbc8fe5a84ba60cb01a74851520a5c36f805"
     },
     {
       "cfg": {
         "cast": [
           {
-            "id": "cmw741vyc075nc",
+            "id": "cmw75sk9s075nc",
             "name": "Giada",
             "gender": "F",
             "team": 1,
@@ -14203,7 +14203,7 @@
             }
           },
           {
-            "id": "cmw741vyc1h4y9",
+            "id": "cmw75sk9s1h4y9",
             "name": "Ivo",
             "gender": "M",
             "team": 2,
@@ -14235,13 +14235,13 @@
         "teamWin": false,
         "custom": []
       },
-      "digest": "1247b31019c95245ac21fc3ccc61b604eab753f2ab9e9279d40dff9164d59192"
+      "digest": "c339a3402d70dcf4dfb177e7b3c3b569daa58764187382594488c8fb3c495930"
     },
     {
       "cfg": {
         "cast": [
           {
-            "id": "cmw741vyv07mm",
+            "id": "cmw75ska807mm",
             "name": "Alex",
             "gender": "N",
             "team": 1,
@@ -14264,7 +14264,7 @@
             }
           },
           {
-            "id": "cmw741vyv1jm8z",
+            "id": "cmw75ska81jm8z",
             "name": "Nico",
             "gender": "M",
             "team": 1,
@@ -14287,7 +14287,7 @@
             }
           },
           {
-            "id": "cmw741vyv2ftzj",
+            "id": "cmw75ska82ftzj",
             "name": "Irene",
             "gender": "F",
             "team": 1,
@@ -14311,7 +14311,7 @@
             }
           },
           {
-            "id": "cmw741vyv3gn6i",
+            "id": "cmw75ska83gn6i",
             "name": "Furio",
             "gender": "M",
             "team": 2,
@@ -14335,7 +14335,7 @@
             }
           },
           {
-            "id": "cmw741vyv4ikv3",
+            "id": "cmw75ska84ikv3",
             "name": "Lara",
             "gender": "F",
             "team": 2,
@@ -14356,7 +14356,7 @@
             }
           },
           {
-            "id": "cmw741vyv514y3",
+            "id": "cmw75ska8514y3",
             "name": "Lapo",
             "gender": "M",
             "team": 2,
@@ -14379,7 +14379,7 @@
             }
           },
           {
-            "id": "cmw741vyv67ku5",
+            "id": "cmw75ska867ku5",
             "name": "Livia",
             "gender": "F",
             "team": 3,
@@ -14400,7 +14400,7 @@
             }
           },
           {
-            "id": "cmw741vyv7kfq4",
+            "id": "cmw75ska87kfq4",
             "name": "Enea",
             "gender": "M",
             "team": 3,
@@ -14421,7 +14421,7 @@
             }
           },
           {
-            "id": "cmw741vyv88ub5",
+            "id": "cmw75ska888ub5",
             "name": "Rebecca",
             "gender": "F",
             "team": 3,
@@ -14444,7 +14444,7 @@
             }
           },
           {
-            "id": "cmw741vyv93d0n",
+            "id": "cmw75ska893d0n",
             "name": "Matteo",
             "gender": "M",
             "team": 4,
@@ -14465,7 +14465,7 @@
             }
           },
           {
-            "id": "cmw741vyv1063zu",
+            "id": "cmw75ska81063zu",
             "name": "Zoe",
             "gender": "F",
             "team": 4,
@@ -14489,7 +14489,7 @@
             }
           },
           {
-            "id": "cmw741vyv11hy9t",
+            "id": "cmw75ska811hy9t",
             "name": "Gianni",
             "gender": "M",
             "team": 4,
@@ -14526,13 +14526,13 @@
           }
         ]
       },
-      "digest": "52a7ca18bc8ea477a400320b485d68ca320075205faceff92474c7e1b3faf87e"
+      "digest": "f4a6920f54d1c23eefbf3b2232417340152bef48b93f4cf730a8aff544b5c6dd"
     },
     {
       "cfg": {
         "cast": [
           {
-            "id": "cmw741w1f0f4gc",
+            "id": "cmw75skcy0f4gc",
             "name": "Viola",
             "gender": "F",
             "team": 1,
@@ -14556,7 +14556,7 @@
             }
           },
           {
-            "id": "cmw741w1f12eda",
+            "id": "cmw75skcy12eda",
             "name": "Ivan",
             "gender": "M",
             "team": 2,
@@ -14577,7 +14577,7 @@
             }
           },
           {
-            "id": "cmw741w1f2aeb0",
+            "id": "cmw75skcy2aeb0",
             "name": "Eden",
             "gender": "N",
             "team": 3,
@@ -14601,7 +14601,7 @@
             }
           },
           {
-            "id": "cmw741w1f37785",
+            "id": "cmw75skcy37785",
             "name": "Ettore",
             "gender": "M",
             "team": 4,
@@ -14622,7 +14622,7 @@
             }
           },
           {
-            "id": "cmw741w1f4j0li",
+            "id": "cmw75skcy4j0li",
             "name": "Ilaria",
             "gender": "F",
             "team": 5,
@@ -14645,7 +14645,7 @@
             }
           },
           {
-            "id": "cmw741w1f5gm9r",
+            "id": "cmw75skcy5gm9r",
             "name": "Nico",
             "gender": "M",
             "team": 6,
@@ -14669,7 +14669,7 @@
             }
           },
           {
-            "id": "cmw741w1f66w4i",
+            "id": "cmw75skcy66w4i",
             "name": "Noa",
             "gender": "N",
             "team": 7,
@@ -14692,7 +14692,7 @@
             }
           },
           {
-            "id": "cmw741w1f79y81",
+            "id": "cmw75skcy79y81",
             "name": "Lapo",
             "gender": "M",
             "team": 8,
@@ -14715,7 +14715,7 @@
             }
           },
           {
-            "id": "cmw741w1f82bkv",
+            "id": "cmw75skcy82bkv",
             "name": "Rebecca",
             "gender": "F",
             "team": 9,
@@ -14738,7 +14738,7 @@
             }
           },
           {
-            "id": "cmw741w1f9dhno",
+            "id": "cmw75skcy9dhno",
             "name": "Gianni",
             "gender": "M",
             "team": 10,
@@ -14761,7 +14761,7 @@
             }
           },
           {
-            "id": "cmw741w1f101idd",
+            "id": "cmw75skcy101idd",
             "name": "Bianca",
             "gender": "F",
             "team": 11,
@@ -14785,7 +14785,7 @@
             }
           },
           {
-            "id": "cmw741w1g11a48g",
+            "id": "cmw75skcy11a48g",
             "name": "Saverio",
             "gender": "M",
             "team": 12,
@@ -14809,7 +14809,7 @@
             }
           },
           {
-            "id": "cmw741w1g12jwmy",
+            "id": "cmw75skcy12jwmy",
             "name": "Livia",
             "gender": "F",
             "team": 13,
@@ -14830,7 +14830,7 @@
             }
           },
           {
-            "id": "cmw741w1g13gmzu",
+            "id": "cmw75skcy13gmzu",
             "name": "Oscar",
             "gender": "M",
             "team": 14,
@@ -14854,7 +14854,7 @@
             }
           },
           {
-            "id": "cmw741w1g14f6ii",
+            "id": "cmw75skcy14f6ii",
             "name": "Tea",
             "gender": "F",
             "team": 15,
@@ -14875,7 +14875,7 @@
             }
           },
           {
-            "id": "cmw741w1g15200t",
+            "id": "cmw75skcy15200t",
             "name": "Leone",
             "gender": "M",
             "team": 16,
@@ -14896,7 +14896,7 @@
             }
           },
           {
-            "id": "cmw741w1g16iwry",
+            "id": "cmw75skcy16iwry",
             "name": "Andrea",
             "gender": "N",
             "team": 17,
@@ -14919,7 +14919,7 @@
             }
           },
           {
-            "id": "cmw741w1g17hivf",
+            "id": "cmw75skcy17hivf",
             "name": "Cesare",
             "gender": "M",
             "team": 18,
@@ -14940,7 +14940,7 @@
             }
           },
           {
-            "id": "cmw741w1g18b007",
+            "id": "cmw75skcy18b007",
             "name": "Aurora",
             "gender": "F",
             "team": 19,
@@ -14961,7 +14961,7 @@
             }
           },
           {
-            "id": "cmw741w1g198vgt",
+            "id": "cmw75skcy198vgt",
             "name": "Brando",
             "gender": "M",
             "team": 20,
@@ -14982,7 +14982,7 @@
             }
           },
           {
-            "id": "cmw741w1g20kxrt",
+            "id": "cmw75skcy20kxrt",
             "name": "Dafne",
             "gender": "F",
             "team": 21,
@@ -15003,7 +15003,7 @@
             }
           },
           {
-            "id": "cmw741w1g21ff71",
+            "id": "cmw75skcy21ff71",
             "name": "Matteo",
             "gender": "M",
             "team": 22,
@@ -15027,7 +15027,7 @@
             }
           },
           {
-            "id": "cmw741w1g22153k",
+            "id": "cmw75skcy22153k",
             "name": "Noemi",
             "gender": "F",
             "team": 23,
@@ -15051,7 +15051,7 @@
             }
           },
           {
-            "id": "cmw741w1g23hwc3",
+            "id": "cmw75skcy23hwc3",
             "name": "Fabio",
             "gender": "M",
             "team": 24,
@@ -15084,13 +15084,13 @@
         "teamWin": true,
         "custom": []
       },
-      "digest": "14fe3e77643cc20f237ec505326a0d5aafeb452bd8260c0e8c8f76f07a55608a"
+      "digest": "fbc6f7ae30bb01c570da9706a3da30f14c91a6c7b53b433f6566d422fd87d2fd"
     },
     {
       "cfg": {
         "cast": [
           {
-            "id": "cmw741w5106wv0",
+            "id": "cmw75skgo06wv0",
             "name": "Nora",
             "gender": "F",
             "team": 1,
@@ -15114,7 +15114,7 @@
             }
           },
           {
-            "id": "cmw741w5117ump",
+            "id": "cmw75skgo17ump",
             "name": "Brando",
             "gender": "M",
             "team": 1,
@@ -15138,7 +15138,7 @@
             }
           },
           {
-            "id": "cmw741w512dfqo",
+            "id": "cmw75skgo2dfqo",
             "name": "Vera",
             "gender": "F",
             "team": 1,
@@ -15159,7 +15159,7 @@
             }
           },
           {
-            "id": "cmw741w51334pk",
+            "id": "cmw75skgo334pk",
             "name": "Oscar",
             "gender": "M",
             "team": 2,
@@ -15183,7 +15183,7 @@
             }
           },
           {
-            "id": "cmw741w514efhf",
+            "id": "cmw75skgo4efhf",
             "name": "Giada",
             "gender": "F",
             "team": 2,
@@ -15207,7 +15207,7 @@
             }
           },
           {
-            "id": "cmw741w515fjyw",
+            "id": "cmw75skgo5fjyw",
             "name": "Tommaso",
             "gender": "M",
             "team": 2,
@@ -15231,7 +15231,7 @@
             }
           },
           {
-            "id": "cmw741w516i0qd",
+            "id": "cmw75skgo6i0qd",
             "name": "Paola",
             "gender": "F",
             "team": 3,
@@ -15252,7 +15252,7 @@
             }
           },
           {
-            "id": "cmw741w5172qlt",
+            "id": "cmw75skgo72qlt",
             "name": "Enea",
             "gender": "M",
             "team": 3,
@@ -15276,7 +15276,7 @@
             }
           },
           {
-            "id": "cmw741w518anvb",
+            "id": "cmw75skgo8anvb",
             "name": "Agata",
             "gender": "F",
             "team": 3,
@@ -15299,7 +15299,7 @@
             }
           },
           {
-            "id": "cmw741w519dbas",
+            "id": "cmw75skgo9dbas",
             "name": "Bruno",
             "gender": "M",
             "team": 4,
@@ -15323,7 +15323,7 @@
             }
           },
           {
-            "id": "cmw741w51104znl",
+            "id": "cmw75skgo104znl",
             "name": "Chiara",
             "gender": "F",
             "team": 4,
@@ -15344,7 +15344,7 @@
             }
           },
           {
-            "id": "cmw741w51116qbo",
+            "id": "cmw75skgo116qbo",
             "name": "Elia",
             "gender": "M",
             "team": 4,
@@ -15368,7 +15368,7 @@
             }
           },
           {
-            "id": "cmw741w51122ls1",
+            "id": "cmw75skgo122ls1",
             "name": "Sara",
             "gender": "F",
             "team": 5,
@@ -15389,7 +15389,7 @@
             }
           },
           {
-            "id": "cmw741w51137px2",
+            "id": "cmw75skgo137px2",
             "name": "Walter",
             "gender": "M",
             "team": 5,
@@ -15412,7 +15412,7 @@
             }
           },
           {
-            "id": "cmw741w5114eftu",
+            "id": "cmw75skgo14eftu",
             "name": "Marta",
             "gender": "F",
             "team": 5,
@@ -15433,7 +15433,7 @@
             }
           },
           {
-            "id": "cmw741w511552tw",
+            "id": "cmw75skgo1552tw",
             "name": "Fabio",
             "gender": "M",
             "team": 6,
@@ -15457,7 +15457,7 @@
             }
           },
           {
-            "id": "cmw741w5116cnzd",
+            "id": "cmw75skgo16cnzd",
             "name": "Carla",
             "gender": "F",
             "team": 6,
@@ -15478,7 +15478,7 @@
             }
           },
           {
-            "id": "cmw741w5117g198",
+            "id": "cmw75skgo17g198",
             "name": "Ivo",
             "gender": "M",
             "team": 6,
@@ -15499,7 +15499,7 @@
             }
           },
           {
-            "id": "cmw741w511851f2",
+            "id": "cmw75skgo1851f2",
             "name": "Lara",
             "gender": "F",
             "team": 7,
@@ -15523,7 +15523,7 @@
             }
           },
           {
-            "id": "cmw741w5119ilrz",
+            "id": "cmw75skgo19ilrz",
             "name": "Ariel",
             "gender": "N",
             "team": 7,
@@ -15546,7 +15546,7 @@
             }
           },
           {
-            "id": "cmw741w5120jz7i",
+            "id": "cmw75skgo20jz7i",
             "name": "Emma",
             "gender": "F",
             "team": 7,
@@ -15570,7 +15570,7 @@
             }
           },
           {
-            "id": "cmw741w51212r8z",
+            "id": "cmw75skgo212r8z",
             "name": "Teo",
             "gender": "M",
             "team": 8,
@@ -15593,7 +15593,7 @@
             }
           },
           {
-            "id": "cmw741w51227s1g",
+            "id": "cmw75skgo227s1g",
             "name": "Bianca",
             "gender": "F",
             "team": 8,
@@ -15614,7 +15614,7 @@
             }
           },
           {
-            "id": "cmw741w5123fbc6",
+            "id": "cmw75skgo23fbc6",
             "name": "Saverio",
             "gender": "M",
             "team": 8,
@@ -15637,7 +15637,7 @@
             }
           },
           {
-            "id": "cmw741w5124d7be",
+            "id": "cmw75skgo24d7be",
             "name": "Gemma",
             "gender": "F",
             "team": 9,
@@ -15660,7 +15660,7 @@
             }
           },
           {
-            "id": "cmw741w5125eqxt",
+            "id": "cmw75skgo25eqxt",
             "name": "Nico",
             "gender": "M",
             "team": 9,
@@ -15684,7 +15684,7 @@
             }
           },
           {
-            "id": "cmw741w51269fra",
+            "id": "cmw75skgo269fra",
             "name": "Ottavia",
             "gender": "F",
             "team": 9,
@@ -15705,7 +15705,7 @@
             }
           },
           {
-            "id": "cmw741w51279aw",
+            "id": "cmw75skgo279aw",
             "name": "Marco",
             "gender": "M",
             "team": 10,
@@ -15729,7 +15729,7 @@
             }
           },
           {
-            "id": "cmw741w5128fwge",
+            "id": "cmw75skgo28fwge",
             "name": "Priscilla",
             "gender": "F",
             "team": 10,
@@ -15752,7 +15752,7 @@
             }
           },
           {
-            "id": "cmw741w51296ec8",
+            "id": "cmw75skgo296ec8",
             "name": "Luca",
             "gender": "M",
             "team": 10,
@@ -15773,7 +15773,7 @@
             }
           },
           {
-            "id": "cmw741w5130606k",
+            "id": "cmw75skgo30606k",
             "name": "Viola",
             "gender": "F",
             "team": 11,
@@ -15794,7 +15794,7 @@
             }
           },
           {
-            "id": "cmw741w5131360y",
+            "id": "cmw75skgo31360y",
             "name": "Cesare",
             "gender": "M",
             "team": 11,
@@ -15817,7 +15817,7 @@
             }
           },
           {
-            "id": "cmw741w5132gm5x",
+            "id": "cmw75skgo32gm5x",
             "name": "Alba",
             "gender": "F",
             "team": 11,
@@ -15840,7 +15840,7 @@
             }
           },
           {
-            "id": "cmw741w5133cah6",
+            "id": "cmw75skgo33cah6",
             "name": "Furio",
             "gender": "M",
             "team": 12,
@@ -15864,7 +15864,7 @@
             }
           },
           {
-            "id": "cmw741w51344r0q",
+            "id": "cmw75skgo344r0q",
             "name": "Livia",
             "gender": "F",
             "team": 12,
@@ -15885,7 +15885,7 @@
             }
           },
           {
-            "id": "cmw741w5135ec0z",
+            "id": "cmw75skgo35ec0z",
             "name": "Ugo",
             "gender": "M",
             "team": 12,
@@ -15908,7 +15908,7 @@
             }
           },
           {
-            "id": "cmw741w51361zht",
+            "id": "cmw75skgo361zht",
             "name": "Ilaria",
             "gender": "F",
             "team": 13,
@@ -15932,7 +15932,7 @@
             }
           },
           {
-            "id": "cmw741w5137e3g2",
+            "id": "cmw75skgo37e3g2",
             "name": "Lapo",
             "gender": "M",
             "team": 13,
@@ -15956,7 +15956,7 @@
             }
           },
           {
-            "id": "cmw741w5138bitj",
+            "id": "cmw75skgo38bitj",
             "name": "Aurora",
             "gender": "F",
             "team": 13,
@@ -15980,7 +15980,7 @@
             }
           },
           {
-            "id": "cmw741w5139b966",
+            "id": "cmw75skgo39b966",
             "name": "Orlando",
             "gender": "M",
             "team": 14,
@@ -16004,7 +16004,7 @@
             }
           },
           {
-            "id": "cmw741w5140rkl",
+            "id": "cmw75skgo40rkl",
             "name": "Sveva",
             "gender": "F",
             "team": 14,
@@ -16025,7 +16025,7 @@
             }
           },
           {
-            "id": "cmw741w5141fbt7",
+            "id": "cmw75skgo41fbt7",
             "name": "Aldo",
             "gender": "M",
             "team": 14,
@@ -16046,7 +16046,7 @@
             }
           },
           {
-            "id": "cmw741w5142fchb",
+            "id": "cmw75skgo42fchb",
             "name": "Irene",
             "gender": "F",
             "team": 15,
@@ -16070,7 +16070,7 @@
             }
           },
           {
-            "id": "cmw741w5143d55n",
+            "id": "cmw75skgo43d55n",
             "name": "Vito",
             "gender": "M",
             "team": 15,
@@ -16093,7 +16093,7 @@
             }
           },
           {
-            "id": "cmw741w51446hnx",
+            "id": "cmw75skgo446hnx",
             "name": "Matilde",
             "gender": "F",
             "team": 15,
@@ -16116,7 +16116,7 @@
             }
           },
           {
-            "id": "cmw741w5145it0p",
+            "id": "cmw75skgo45it0p",
             "name": "Riccardo",
             "gender": "M",
             "team": 16,
@@ -16139,7 +16139,7 @@
             }
           },
           {
-            "id": "cmw741w5146gz54",
+            "id": "cmw75skgo46gz54",
             "name": "Elena",
             "gender": "F",
             "team": 16,
@@ -16160,7 +16160,7 @@
             }
           },
           {
-            "id": "cmw741w5147gxem",
+            "id": "cmw75skgo47gxem",
             "name": "Pietro",
             "gender": "M",
             "team": 16,
@@ -16193,19 +16193,19 @@
         "custom": [],
         "initialRelations": [
           {
-            "from": "cmw741w5106wv0",
-            "to": "cmw741w5117ump",
+            "from": "cmw75skgo06wv0",
+            "to": "cmw75skgo17ump",
             "type": "coppia"
           }
         ]
       },
-      "digest": "e737ff1709726603f5208cac19fc71d23789e6d8bc79db2e8632244e677dff73"
+      "digest": "294f6739c46a1e0efddd238c46847590f58845e8304ec23729aac85cc8da531d"
     },
     {
       "cfg": {
         "cast": [
           {
-            "id": "cmw741w9s075nc",
+            "id": "cmw75skkq075nc",
             "name": "Giada",
             "gender": "F",
             "team": 1,
@@ -16228,7 +16228,7 @@
             }
           },
           {
-            "id": "cmw741w9s1h4y9",
+            "id": "cmw75skkq1h4y9",
             "name": "Ivo",
             "gender": "M",
             "team": 2,
@@ -16260,13 +16260,13 @@
         "teamWin": false,
         "custom": []
       },
-      "digest": "a0ef69dff782e69092a12f7feb0ce0e48517206321852c48aeee35b554249a1d"
+      "digest": "bb9db119bcfc37a983fb66360b8e012d6b1fbdedde9e9f1f58c6ff81b6d5693e"
     },
     {
       "cfg": {
         "cast": [
           {
-            "id": "cmw741wa207mm",
+            "id": "cmw75skl607mm",
             "name": "Alex",
             "gender": "N",
             "team": 1,
@@ -16289,7 +16289,7 @@
             }
           },
           {
-            "id": "cmw741wa21jm8z",
+            "id": "cmw75skl61jm8z",
             "name": "Nico",
             "gender": "M",
             "team": 1,
@@ -16312,7 +16312,7 @@
             }
           },
           {
-            "id": "cmw741wa22ftzj",
+            "id": "cmw75skl62ftzj",
             "name": "Irene",
             "gender": "F",
             "team": 1,
@@ -16336,7 +16336,7 @@
             }
           },
           {
-            "id": "cmw741wa23gn6i",
+            "id": "cmw75skl63gn6i",
             "name": "Furio",
             "gender": "M",
             "team": 2,
@@ -16360,7 +16360,7 @@
             }
           },
           {
-            "id": "cmw741wa24ikv3",
+            "id": "cmw75skl64ikv3",
             "name": "Lara",
             "gender": "F",
             "team": 2,
@@ -16381,7 +16381,7 @@
             }
           },
           {
-            "id": "cmw741wa2514y3",
+            "id": "cmw75skl6514y3",
             "name": "Lapo",
             "gender": "M",
             "team": 2,
@@ -16404,7 +16404,7 @@
             }
           },
           {
-            "id": "cmw741wa267ku5",
+            "id": "cmw75skl667ku5",
             "name": "Livia",
             "gender": "F",
             "team": 3,
@@ -16425,7 +16425,7 @@
             }
           },
           {
-            "id": "cmw741wa27kfq4",
+            "id": "cmw75skl67kfq4",
             "name": "Enea",
             "gender": "M",
             "team": 3,
@@ -16446,7 +16446,7 @@
             }
           },
           {
-            "id": "cmw741wa288ub5",
+            "id": "cmw75skl688ub5",
             "name": "Rebecca",
             "gender": "F",
             "team": 3,
@@ -16469,7 +16469,7 @@
             }
           },
           {
-            "id": "cmw741wa293d0n",
+            "id": "cmw75skl693d0n",
             "name": "Matteo",
             "gender": "M",
             "team": 4,
@@ -16490,7 +16490,7 @@
             }
           },
           {
-            "id": "cmw741wa21063zu",
+            "id": "cmw75skl61063zu",
             "name": "Zoe",
             "gender": "F",
             "team": 4,
@@ -16514,7 +16514,7 @@
             }
           },
           {
-            "id": "cmw741wa211hy9t",
+            "id": "cmw75skl611hy9t",
             "name": "Gianni",
             "gender": "M",
             "team": 4,
@@ -16551,13 +16551,13 @@
           }
         ]
       },
-      "digest": "7d62e717fdf9c3a7eb9f3014f872a8eee5a015f21f0ddc8c76460fa4b9f30ad3"
+      "digest": "241b66ecd2c756bbfee7873b8bf0507ac529c86d3e8c2ab260ba5bd427da71d2"
     },
     {
       "cfg": {
         "cast": [
           {
-            "id": "cmw741wbi0f4gc",
+            "id": "cmw75skmr0f4gc",
             "name": "Viola",
             "gender": "F",
             "team": 1,
@@ -16581,7 +16581,7 @@
             }
           },
           {
-            "id": "cmw741wbi12eda",
+            "id": "cmw75skmr12eda",
             "name": "Ivan",
             "gender": "M",
             "team": 2,
@@ -16602,7 +16602,7 @@
             }
           },
           {
-            "id": "cmw741wbi2aeb0",
+            "id": "cmw75skmr2aeb0",
             "name": "Eden",
             "gender": "N",
             "team": 3,
@@ -16626,7 +16626,7 @@
             }
           },
           {
-            "id": "cmw741wbi37785",
+            "id": "cmw75skmr37785",
             "name": "Ettore",
             "gender": "M",
             "team": 4,
@@ -16647,7 +16647,7 @@
             }
           },
           {
-            "id": "cmw741wbi4j0li",
+            "id": "cmw75skmr4j0li",
             "name": "Ilaria",
             "gender": "F",
             "team": 5,
@@ -16670,7 +16670,7 @@
             }
           },
           {
-            "id": "cmw741wbi5gm9r",
+            "id": "cmw75skmr5gm9r",
             "name": "Nico",
             "gender": "M",
             "team": 6,
@@ -16694,7 +16694,7 @@
             }
           },
           {
-            "id": "cmw741wbi66w4i",
+            "id": "cmw75skmr66w4i",
             "name": "Noa",
             "gender": "N",
             "team": 7,
@@ -16717,7 +16717,7 @@
             }
           },
           {
-            "id": "cmw741wbi79y81",
+            "id": "cmw75skmr79y81",
             "name": "Lapo",
             "gender": "M",
             "team": 8,
@@ -16740,7 +16740,7 @@
             }
           },
           {
-            "id": "cmw741wbi82bkv",
+            "id": "cmw75skmr82bkv",
             "name": "Rebecca",
             "gender": "F",
             "team": 9,
@@ -16763,7 +16763,7 @@
             }
           },
           {
-            "id": "cmw741wbi9dhno",
+            "id": "cmw75skmr9dhno",
             "name": "Gianni",
             "gender": "M",
             "team": 10,
@@ -16786,7 +16786,7 @@
             }
           },
           {
-            "id": "cmw741wbi101idd",
+            "id": "cmw75skmr101idd",
             "name": "Bianca",
             "gender": "F",
             "team": 11,
@@ -16810,7 +16810,7 @@
             }
           },
           {
-            "id": "cmw741wbi11a48g",
+            "id": "cmw75skmr11a48g",
             "name": "Saverio",
             "gender": "M",
             "team": 12,
@@ -16834,7 +16834,7 @@
             }
           },
           {
-            "id": "cmw741wbi12jwmy",
+            "id": "cmw75skmr12jwmy",
             "name": "Livia",
             "gender": "F",
             "team": 13,
@@ -16855,7 +16855,7 @@
             }
           },
           {
-            "id": "cmw741wbi13gmzu",
+            "id": "cmw75skmr13gmzu",
             "name": "Oscar",
             "gender": "M",
             "team": 14,
@@ -16879,7 +16879,7 @@
             }
           },
           {
-            "id": "cmw741wbi14f6ii",
+            "id": "cmw75skmr14f6ii",
             "name": "Tea",
             "gender": "F",
             "team": 15,
@@ -16900,7 +16900,7 @@
             }
           },
           {
-            "id": "cmw741wbi15200t",
+            "id": "cmw75skmr15200t",
             "name": "Leone",
             "gender": "M",
             "team": 16,
@@ -16921,7 +16921,7 @@
             }
           },
           {
-            "id": "cmw741wbi16iwry",
+            "id": "cmw75skmr16iwry",
             "name": "Andrea",
             "gender": "N",
             "team": 17,
@@ -16944,7 +16944,7 @@
             }
           },
           {
-            "id": "cmw741wbi17hivf",
+            "id": "cmw75skmr17hivf",
             "name": "Cesare",
             "gender": "M",
             "team": 18,
@@ -16965,7 +16965,7 @@
             }
           },
           {
-            "id": "cmw741wbi18b007",
+            "id": "cmw75skmr18b007",
             "name": "Aurora",
             "gender": "F",
             "team": 19,
@@ -16986,7 +16986,7 @@
             }
           },
           {
-            "id": "cmw741wbi198vgt",
+            "id": "cmw75skmr198vgt",
             "name": "Brando",
             "gender": "M",
             "team": 20,
@@ -17007,7 +17007,7 @@
             }
           },
           {
-            "id": "cmw741wbi20kxrt",
+            "id": "cmw75skmr20kxrt",
             "name": "Dafne",
             "gender": "F",
             "team": 21,
@@ -17028,7 +17028,7 @@
             }
           },
           {
-            "id": "cmw741wbi21ff71",
+            "id": "cmw75skmr21ff71",
             "name": "Matteo",
             "gender": "M",
             "team": 22,
@@ -17052,7 +17052,7 @@
             }
           },
           {
-            "id": "cmw741wbi22153k",
+            "id": "cmw75skmr22153k",
             "name": "Noemi",
             "gender": "F",
             "team": 23,
@@ -17076,7 +17076,7 @@
             }
           },
           {
-            "id": "cmw741wbi23hwc3",
+            "id": "cmw75skmr23hwc3",
             "name": "Fabio",
             "gender": "M",
             "team": 24,
@@ -17109,13 +17109,13 @@
         "teamWin": true,
         "custom": []
       },
-      "digest": "69558595527390461baa92f481433e519ec7c4610ff3da8e09a9fc218834733f"
+      "digest": "e3f9d6cb46e01f10068723178468b938e176dd3ebf665ac156dd97d9fc4cf6b4"
     },
     {
       "cfg": {
         "cast": [
           {
-            "id": "cmw741wel06wv0",
+            "id": "cmw75skpa06wv0",
             "name": "Nora",
             "gender": "F",
             "team": 1,
@@ -17139,7 +17139,7 @@
             }
           },
           {
-            "id": "cmw741wel17ump",
+            "id": "cmw75skpa17ump",
             "name": "Brando",
             "gender": "M",
             "team": 1,
@@ -17163,7 +17163,7 @@
             }
           },
           {
-            "id": "cmw741wel2dfqo",
+            "id": "cmw75skpa2dfqo",
             "name": "Vera",
             "gender": "F",
             "team": 1,
@@ -17184,7 +17184,7 @@
             }
           },
           {
-            "id": "cmw741wel334pk",
+            "id": "cmw75skpa334pk",
             "name": "Oscar",
             "gender": "M",
             "team": 2,
@@ -17208,7 +17208,7 @@
             }
           },
           {
-            "id": "cmw741wel4efhf",
+            "id": "cmw75skpa4efhf",
             "name": "Giada",
             "gender": "F",
             "team": 2,
@@ -17232,7 +17232,7 @@
             }
           },
           {
-            "id": "cmw741wel5fjyw",
+            "id": "cmw75skpa5fjyw",
             "name": "Tommaso",
             "gender": "M",
             "team": 2,
@@ -17256,7 +17256,7 @@
             }
           },
           {
-            "id": "cmw741wel6i0qd",
+            "id": "cmw75skpa6i0qd",
             "name": "Paola",
             "gender": "F",
             "team": 3,
@@ -17277,7 +17277,7 @@
             }
           },
           {
-            "id": "cmw741wel72qlt",
+            "id": "cmw75skpa72qlt",
             "name": "Enea",
             "gender": "M",
             "team": 3,
@@ -17301,7 +17301,7 @@
             }
           },
           {
-            "id": "cmw741wel8anvb",
+            "id": "cmw75skpa8anvb",
             "name": "Agata",
             "gender": "F",
             "team": 3,
@@ -17324,7 +17324,7 @@
             }
           },
           {
-            "id": "cmw741wel9dbas",
+            "id": "cmw75skpa9dbas",
             "name": "Bruno",
             "gender": "M",
             "team": 4,
@@ -17348,7 +17348,7 @@
             }
           },
           {
-            "id": "cmw741wel104znl",
+            "id": "cmw75skpa104znl",
             "name": "Chiara",
             "gender": "F",
             "team": 4,
@@ -17369,7 +17369,7 @@
             }
           },
           {
-            "id": "cmw741wel116qbo",
+            "id": "cmw75skpa116qbo",
             "name": "Elia",
             "gender": "M",
             "team": 4,
@@ -17393,7 +17393,7 @@
             }
           },
           {
-            "id": "cmw741wel122ls1",
+            "id": "cmw75skpa122ls1",
             "name": "Sara",
             "gender": "F",
             "team": 5,
@@ -17414,7 +17414,7 @@
             }
           },
           {
-            "id": "cmw741wel137px2",
+            "id": "cmw75skpa137px2",
             "name": "Walter",
             "gender": "M",
             "team": 5,
@@ -17437,7 +17437,7 @@
             }
           },
           {
-            "id": "cmw741wel14eftu",
+            "id": "cmw75skpa14eftu",
             "name": "Marta",
             "gender": "F",
             "team": 5,
@@ -17458,7 +17458,7 @@
             }
           },
           {
-            "id": "cmw741wel1552tw",
+            "id": "cmw75skpa1552tw",
             "name": "Fabio",
             "gender": "M",
             "team": 6,
@@ -17482,7 +17482,7 @@
             }
           },
           {
-            "id": "cmw741wel16cnzd",
+            "id": "cmw75skpa16cnzd",
             "name": "Carla",
             "gender": "F",
             "team": 6,
@@ -17503,7 +17503,7 @@
             }
           },
           {
-            "id": "cmw741wel17g198",
+            "id": "cmw75skpa17g198",
             "name": "Ivo",
             "gender": "M",
             "team": 6,
@@ -17524,7 +17524,7 @@
             }
           },
           {
-            "id": "cmw741wel1851f2",
+            "id": "cmw75skpa1851f2",
             "name": "Lara",
             "gender": "F",
             "team": 7,
@@ -17548,7 +17548,7 @@
             }
           },
           {
-            "id": "cmw741wel19ilrz",
+            "id": "cmw75skpa19ilrz",
             "name": "Ariel",
             "gender": "N",
             "team": 7,
@@ -17571,7 +17571,7 @@
             }
           },
           {
-            "id": "cmw741wel20jz7i",
+            "id": "cmw75skpa20jz7i",
             "name": "Emma",
             "gender": "F",
             "team": 7,
@@ -17595,7 +17595,7 @@
             }
           },
           {
-            "id": "cmw741wel212r8z",
+            "id": "cmw75skpa212r8z",
             "name": "Teo",
             "gender": "M",
             "team": 8,
@@ -17618,7 +17618,7 @@
             }
           },
           {
-            "id": "cmw741wel227s1g",
+            "id": "cmw75skpa227s1g",
             "name": "Bianca",
             "gender": "F",
             "team": 8,
@@ -17639,7 +17639,7 @@
             }
           },
           {
-            "id": "cmw741wel23fbc6",
+            "id": "cmw75skpa23fbc6",
             "name": "Saverio",
             "gender": "M",
             "team": 8,
@@ -17662,7 +17662,7 @@
             }
           },
           {
-            "id": "cmw741wel24d7be",
+            "id": "cmw75skpa24d7be",
             "name": "Gemma",
             "gender": "F",
             "team": 9,
@@ -17685,7 +17685,7 @@
             }
           },
           {
-            "id": "cmw741wel25eqxt",
+            "id": "cmw75skpa25eqxt",
             "name": "Nico",
             "gender": "M",
             "team": 9,
@@ -17709,7 +17709,7 @@
             }
           },
           {
-            "id": "cmw741wel269fra",
+            "id": "cmw75skpa269fra",
             "name": "Ottavia",
             "gender": "F",
             "team": 9,
@@ -17730,7 +17730,7 @@
             }
           },
           {
-            "id": "cmw741wel279aw",
+            "id": "cmw75skpa279aw",
             "name": "Marco",
             "gender": "M",
             "team": 10,
@@ -17754,7 +17754,7 @@
             }
           },
           {
-            "id": "cmw741wel28fwge",
+            "id": "cmw75skpa28fwge",
             "name": "Priscilla",
             "gender": "F",
             "team": 10,
@@ -17777,7 +17777,7 @@
             }
           },
           {
-            "id": "cmw741wel296ec8",
+            "id": "cmw75skpa296ec8",
             "name": "Luca",
             "gender": "M",
             "team": 10,
@@ -17798,7 +17798,7 @@
             }
           },
           {
-            "id": "cmw741wel30606k",
+            "id": "cmw75skpa30606k",
             "name": "Viola",
             "gender": "F",
             "team": 11,
@@ -17819,7 +17819,7 @@
             }
           },
           {
-            "id": "cmw741wel31360y",
+            "id": "cmw75skpa31360y",
             "name": "Cesare",
             "gender": "M",
             "team": 11,
@@ -17842,7 +17842,7 @@
             }
           },
           {
-            "id": "cmw741wel32gm5x",
+            "id": "cmw75skpa32gm5x",
             "name": "Alba",
             "gender": "F",
             "team": 11,
@@ -17865,7 +17865,7 @@
             }
           },
           {
-            "id": "cmw741wel33cah6",
+            "id": "cmw75skpa33cah6",
             "name": "Furio",
             "gender": "M",
             "team": 12,
@@ -17889,7 +17889,7 @@
             }
           },
           {
-            "id": "cmw741wel344r0q",
+            "id": "cmw75skpa344r0q",
             "name": "Livia",
             "gender": "F",
             "team": 12,
@@ -17910,7 +17910,7 @@
             }
           },
           {
-            "id": "cmw741wel35ec0z",
+            "id": "cmw75skpa35ec0z",
             "name": "Ugo",
             "gender": "M",
             "team": 12,
@@ -17933,7 +17933,7 @@
             }
           },
           {
-            "id": "cmw741wel361zht",
+            "id": "cmw75skpa361zht",
             "name": "Ilaria",
             "gender": "F",
             "team": 13,
@@ -17957,7 +17957,7 @@
             }
           },
           {
-            "id": "cmw741wel37e3g2",
+            "id": "cmw75skpa37e3g2",
             "name": "Lapo",
             "gender": "M",
             "team": 13,
@@ -17981,7 +17981,7 @@
             }
           },
           {
-            "id": "cmw741wel38bitj",
+            "id": "cmw75skpa38bitj",
             "name": "Aurora",
             "gender": "F",
             "team": 13,
@@ -18005,7 +18005,7 @@
             }
           },
           {
-            "id": "cmw741wel39b966",
+            "id": "cmw75skpa39b966",
             "name": "Orlando",
             "gender": "M",
             "team": 14,
@@ -18029,7 +18029,7 @@
             }
           },
           {
-            "id": "cmw741wel40rkl",
+            "id": "cmw75skpa40rkl",
             "name": "Sveva",
             "gender": "F",
             "team": 14,
@@ -18050,7 +18050,7 @@
             }
           },
           {
-            "id": "cmw741wel41fbt7",
+            "id": "cmw75skpa41fbt7",
             "name": "Aldo",
             "gender": "M",
             "team": 14,
@@ -18071,7 +18071,7 @@
             }
           },
           {
-            "id": "cmw741wel42fchb",
+            "id": "cmw75skpa42fchb",
             "name": "Irene",
             "gender": "F",
             "team": 15,
@@ -18095,7 +18095,7 @@
             }
           },
           {
-            "id": "cmw741wel43d55n",
+            "id": "cmw75skpa43d55n",
             "name": "Vito",
             "gender": "M",
             "team": 15,
@@ -18118,7 +18118,7 @@
             }
           },
           {
-            "id": "cmw741wel446hnx",
+            "id": "cmw75skpa446hnx",
             "name": "Matilde",
             "gender": "F",
             "team": 15,
@@ -18141,7 +18141,7 @@
             }
           },
           {
-            "id": "cmw741wel45it0p",
+            "id": "cmw75skpa45it0p",
             "name": "Riccardo",
             "gender": "M",
             "team": 16,
@@ -18164,7 +18164,7 @@
             }
           },
           {
-            "id": "cmw741wel46gz54",
+            "id": "cmw75skpa46gz54",
             "name": "Elena",
             "gender": "F",
             "team": 16,
@@ -18185,7 +18185,7 @@
             }
           },
           {
-            "id": "cmw741wel47gxem",
+            "id": "cmw75skpa47gxem",
             "name": "Pietro",
             "gender": "M",
             "team": 16,
@@ -18218,13 +18218,13 @@
         "custom": [],
         "initialRelations": [
           {
-            "from": "cmw741wel06wv0",
-            "to": "cmw741wel17ump",
+            "from": "cmw75skpa06wv0",
+            "to": "cmw75skpa17ump",
             "type": "coppia"
           }
         ]
       },
-      "digest": "d7878fbee66f8673d49034d92e73a80c6ebe0f40ff0f488f406532bdf3d3f688"
+      "digest": "0d61b3093eeab85a0bbc0f7edc1ab1cf2bbbabd79d194520f220cd343874c212"
     }
   ]
 }

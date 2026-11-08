@@ -53,6 +53,7 @@
 
   function createVitals(env) {
     const { phases, clamp, M, hasTrait, DR, rng, stats, sys, possessive, itemOf, takeItem, itemLedger } = env;
+    const props = env.props || (() => ({}));
     function syncSt(t) {
       const ph = phases.length;
       const set = (k, on) => { if (on) { if (t.st[k] == null) t.st[k] = ph; } else delete t.st[k]; };
@@ -67,7 +68,7 @@
       const ar = itemOf(t, 'armatura');
       if (ar && dmg >= 8) {
         const before = itemLedger.state(t), unprotected = dmg;
-        dmg *= 0.62;
+        dmg *= Math.max(0.3, 0.62 - (props(ar).assorbe || 0) / 100);
         itemLedger.record('absorb', t, t, ar, before, 'Danno calcolato ridotto da ' + unprotected.toFixed(2) + ' a ' + dmg.toFixed(2) + '; prima di limiti alla salute'); ar.u = (ar.u || 1) - 1;
         if (ar.u <= 0) { takeItem(t, ar); sys('armorBreak', [t], { i: ar.name, ip: possessive(ar) }, { cat: 'hurt', why: 'oggetto' }, 1); }
       }
@@ -88,7 +89,25 @@
 
   function createInventory(env) {
     const { IT, theme, ITEM_NAME, LEX, rng, MOD, itemOf, clamp, getDay, getOrigin } = env;
-    const capInv = (t) => { while (t.inv.length > 8) { const k = t.inv.findIndex((x) => x.type !== 'ricordo'); t.inv.splice(k >= 0 ? k : 0, 1); } };
+    // peso, capienza ed effetti degli oggetti (dal catalogo); senza catalogo valgono le regole di prima
+    const props = env.props || (() => ({})), slots = env.slots || (() => 0), cap = env.cap || (() => Infinity), onDrop = env.onDrop || null;
+    const MAX_ITEMS = 8;
+    const sum = (o) => (o ? Object.values(o).reduce((s, v) => s + v, 0) : 0);
+    // quanto conviene tenere un oggetto adesso: le cure valgono di più a chi è ferito, il cibo a chi ha fame
+    function keepScore(t, it) {
+      const P = props(it);
+      const base = { arma: 30 + (it.q || 2) * 8, armatura: 28, med: t.hp < 60 ? 46 : 30, cibo: t.food < 50 ? 38 : 22, attrezzo: 18, mappa: 16, trap: 14, amuleto: 12, valore: 8, ricordo: 60, alcol: 6, veleno: 10, esplosivo: 14 }[it.type] || 10;
+      return base + sum(P.prova) * 3 + (P.belve || 0) * 2 + (P.indicatore || 0) / 5 + (P.forza || 0) * 6 + (P.assorbe || 0) / 3 + (P.scambio || 0) * 3 + (P.morale || 0) + (P.raccolta || 0) / 3 + (it.u || 0) - Math.max(0, slots(it) - 1) * 2;
+    }
+    // l'oggetto da lasciare quando lo zaino supera gli otto oggetti o il peso sopportabile (mai prima un ricordo)
+    function victim(t, list) {
+      const n = list.length, w = list.reduce((s2, x) => s2 + slots(x), 0);
+      if (n <= MAX_ITEMS && w <= cap(t)) return null;
+      const pool = list.filter((x) => x.type !== 'ricordo' && (n > MAX_ITEMS || slots(x) > 0));
+      if (!pool.length) return list[0];
+      return pool.reduce((a, b) => (keepScore(t, b) < keepScore(t, a) ? b : a));
+    }
+    const capInv = (t) => { for (let guard = 0; guard < 30; guard++) { const v = victim(t, t.inv); if (!v) break; t.inv.splice(t.inv.indexOf(v), 1); if (onDrop) onDrop(t, v); } };
     const itemName = (type) => {
       const n = ((IT.names || {})[theme.id] || {})[type] || ((IT.names || {})._ || {})[type];
       if (n && n.length) return rng.pick(n);
@@ -98,16 +117,16 @@
     function mkItem(type, name, how, from, q) {
       const it = { type, name: name || itemName(type), how: how || getOrigin() || 'trovato', from: from ? from.id : null, d: getDay() };
       if (type === 'arma') it.q = q || clamp(Math.round(0.7 + rng.f() * 2.2 * MOD.weapon), 1, 3);
-      const mu = maxUses(type, it.q); if (mu) { it.u = mu; it.um = mu; }
+      const mu = maxUses(type, it.q); if (mu) { it.u = Math.max(1, mu + (props(it).usi || 0)); it.um = it.u; }
       return it;
     }
-    const itemScore = (it) => (it.q || 2) * 10 + (it.u || 0) + (it.x ? 5 : 0);
+    const itemScore = (it) => { const P = props(it); return (it.q || 2) * 10 + (it.u || 0) + (it.x ? 5 : 0) + (P.forza || 0) * 8 + (P.assorbe || 0) / 2; };
     function canReceiveItem(t, it) {
       if (!t || !t.alive) return false;
       const old = itemOf(t, it.type);
       if ((it.type === 'arma' || it.type === 'armatura') && old && itemScore(old) >= itemScore(it)) return false;
-      // capInv eliminerebbe proprio l'oggetto ricevuto da uno zaino pieno di ricordi.
-      return !(t.inv.length >= 8 && it.type !== 'ricordo' && t.inv.every((x) => x.type === 'ricordo'));
+      // si accetta solo se, a zaino pieno, non sarebbe proprio questo l'oggetto da lasciare
+      return victim(t, t.inv.filter((x) => !((it.type === 'arma' || it.type === 'armatura') && x === old)).concat([it])) !== it;
     }
     function addItem(t, it) {
       if (it.type === 'arma' || it.type === 'armatura') {
@@ -117,7 +136,8 @@
       t.inv.push(it); capInv(t); return true;
     }
     function takeItem(t, it) { const k = t.inv.indexOf(it); if (k >= 0) t.inv.splice(k, 1); return it; }
-    return { capInv, itemName, maxUses, mkItem, itemScore, canReceiveItem, addItem, takeItem };
+    const load = (t) => t.inv.reduce((s2, x) => s2 + slots(x), 0);
+    return { capInv, itemName, maxUses, mkItem, itemScore, canReceiveItem, addItem, takeItem, load, keepScore };
   }
 
   function createSnapshots(env) {
