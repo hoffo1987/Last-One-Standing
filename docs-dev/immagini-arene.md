@@ -2,7 +2,7 @@
 
 _Generato da `node tools/atlas-slots.js` a partire da `tools/atlas-brief.js`: per cambiare un testo o un prompt modifica il brief e rigenera, non questo file._
 
-**Immagini presenti: 99 su 182** (luoghi 60/66, pericoli 39/39, armi 0/77). **Video presenti: 0 su 105** (luoghi e pericoli). Meteo, disastri e oggetti arriveranno dopo.
+**Immagini presenti: 105 su 182** (luoghi 66/66, pericoli 39/39, armi 0/77). **Video presenti: 0 su 105** (luoghi e pericoli). Meteo, disastri e oggetti arriveranno dopo.
 
 ## 1. Lo stile
 
@@ -505,7 +505,7 @@ A jagged mountain peak crowned by a dragon lair, with a wide cave mouth glowing 
 Static camera and a seamless ambient loop: the place itself stays perfectly still and only small elements move, slowly and gently. Smoke rises slowly from the lair, the gold glints softly, embers float upward, clouds drift across the stars. --motion low --loop
 ```
 
-#### Altare delle armi
+#### ✓ Altare delle armi
 
 Altare di pietra nella radura centrale, rastrelliere e tre sentieri verso Torre, Foresta e Lago.  
 File: `assets/arene/fantasy/luoghi/altare-delle-armi.webp` · video: `assets/arene/fantasy/luoghi/altare-delle-armi.mp4`
@@ -1057,7 +1057,7 @@ A suburban street with a crashed car against a lamp post and an abandoned yellow
 Static camera and a seamless ambient loop: the place itself stays perfectly still and only small elements move, slowly and gently. Smoke rises slowly on the horizon, tall grass sways, a swing creaks gently back and forth, clouds drift. --motion low --loop
 ```
 
-#### Piazza
+#### ✓ Piazza
 
 Piazza del convoglio abbandonato, casse aperte e vie verso ospedale, negozi e metropolitana.  
 File: `assets/arene/zombie/luoghi/piazza.webp` · video: `assets/arene/zombie/luoghi/piazza.mp4`
@@ -1603,7 +1603,7 @@ A derelict Victorian greenhouse with a cracked stone fountain in the central thi
 Static camera and a seamless ambient loop: the place itself stays perfectly still and only small elements move, slowly and gently. Carnivorous plants open and close very slowly, vines sway, fog drifts through the broken panes. --motion low --loop
 ```
 
-#### Salone
+#### ✓ Salone
 
 Salone del ballo della villa, tavoli con doni e porte verso le diverse ali dell'edificio.  
 File: `assets/arene/horror/luoghi/salone.webp` · video: `assets/arene/horror/luoghi/salone.mp4`
@@ -1882,7 +1882,7 @@ A giant cracked concrete dam with a makeshift settlement of shacks, flags and wa
 Static camera and a seamless ambient loop: the place itself stays perfectly still and only small elements move, slowly and gently. Water trickles through the crack, flags flutter on the shacks, dust drifts, smoke rises from a chimney. --motion low --loop
 ```
 
-#### Deposito
+#### ✓ Deposito
 
 Deposito di rifornimenti con cancello aperto, taniche e casse vicino all'autostrada spezzata.  
 File: `assets/arene/wasteland/luoghi/deposito.webp` · video: `assets/arene/wasteland/luoghi/deposito.mp4`
@@ -2161,7 +2161,7 @@ An assembly hall with a wooden stage and a single microphone under a spotlight i
 Static camera and a seamless ambient loop: the place itself stays perfectly still and only small elements move, slowly and gently. The spotlight beam shimmers with floating dust, the curtains sway gently, the microphone cable swings slightly. --motion low --loop
 ```
 
-#### Aule
+#### ✓ Aule
 
 Aula scolastica con file di banchi, cattedra e porta aperta sul corridoio delle lezioni.  
 File: `assets/arene/liceo/luoghi/aule.webp` · video: `assets/arene/liceo/luoghi/aule.mp4`
@@ -2327,7 +2327,7 @@ Riunioni infinite, fogli Excel e licenziamenti. Nessuno muore: si viene licenzia
 
 ### Luoghi · Ufficio Open Space
 
-#### Sala riunioni
+#### ✓ Sala riunioni
 
 Sala riunioni con tavolo di vetro lungo, sedie vuote, schermo del proiettore e lavagna.  
 File: `assets/arene/ufficio/luoghi/sala-riunioni.webp` · video: `assets/arene/ufficio/luoghi/sala-riunioni.mp4`

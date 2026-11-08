@@ -5,7 +5,7 @@ descrive la provenienza documentata, senza attribuire una licenza alle immagini.
 
 | Risorse | Provenienza documentata |
 | --- | --- |
-| `assets/arene/*.webp` | Nove banner forniti per il progetto nel flusso di creazione delle immagini tematiche; successivamente ottimizzati in WebP. |
+| `assets/arene/*.webp` | Dieci banner (3:1) generati con Midjourney dai prompt di [docs-dev/banner-arene.md](docs-dev/banner-arene.md), forniti per il progetto e ottimizzati in WebP a 1500 × 500. Sostituiscono i nove banner precedenti, che restano nello storico del repository. |
 | `assets/arene/cyberpunk.webp` e `assets/arene/cyberpunk/` | Banner, 7 luoghi e 4 pericoli di Night City — Zona Rossa generati con Midjourney dai prompt di [docs-dev/immagini-arene.md](docs-dev/immagini-arene.md), forniti per il progetto e ottimizzati in WebP. I prompt dei banner di tutte le arene sono in [docs-dev/banner-arene.md](docs-dev/banner-arene.md). Nessun personaggio, marchio o logo di opere esistenti. |
 | `assets/logo.webp` | Logo creato con imagegen per Last One Standing, reinterpretando il riferimento del progetto nello stile illustrato dei banner. |
 | `assets/icona.webp`, `favicon.png`, `icona-180.png` | Icona dedicata generata per il progetto; favicon e icona per dispositivi derivate dall'immagine. |
