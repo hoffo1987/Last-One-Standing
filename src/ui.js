@@ -2179,15 +2179,19 @@
     const theme = resultTheme(SIM), soft = !!theme.soft, st = SIM.stats;
     const W = SIM.winners.map((id) => BY[id]);
     const kN = (n) => n + ' ' + (soft ? (n === 1 ? 'eliminazione' : 'eliminazioni') : (n === 1 ? 'uccisione' : 'uccisioni'));
+    // la rivelazione: il dipinto dell'arena a tutta scena, un alone che gira dietro chi ha vinto
+    const crown = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 18 4.5 7l5 4.5L12 5l2.5 6.5 5-4.5L21 18z"/><path d="M3.5 21h17"/></svg>';
+    const eyeb = '<div class="eyebrow">' + ART.icon(theme.id, 13) + ' ' + esc(theme.name) + ' · ' + durTxt(theme) + ' · ' + SIM.tributes.length + ' concorrenti</div>';
+    const scene = '<div class="wscene" aria-hidden="true">' + ART.scene(theme.id) + '</div><div class="fn-halo" aria-hidden="true"></div>';
     let hero;
     if (W.length === 1) {
       const w = W[0];
-      hero = '<div class="winhero"><div class="wscene" aria-hidden="true">' + ART.scene(theme.id) + '</div>' + avHTML(w, { btn: true }) + '<div style="min-width:0"><div class="eyebrow">' + ART.icon(theme.id, 13) + ' ' + esc(theme.name) + ' · ' + durTxt(theme) + ' · ' + SIM.tributes.length + ' concorrenti</div>' +
-        '<h1>' + esc(w.name) + '</h1><p><b style="color:var(--screen-ink)">' + G3(w.gender, 'Ultimo', 'Ultima', 'Ultimə') + ' in piedi.</b> Squadra ' + w.team + (w.traits.length ? ' · ' + w.traits.map((x) => TRAITS[x].name).join(', ') : '') + '.</p>' +
+      hero = '<div class="winhero finale">' + scene + '<div class="fn-portrait">' + avHTML(w, { btn: true }) + '<span class="fn-crown">' + crown + '</span></div><div class="fn-text">' + eyeb +
+        '<div class="fn-title">' + G3(w.gender, 'Ultimo', 'Ultima', 'Ultimə') + ' in piedi</div><h1>' + esc(w.name) + '</h1><p>Squadra ' + w.team + (w.traits.length ? ' · ' + w.traits.map((x) => TRAITS[x].name).join(', ') : '') + '</p>' +
         '<div class="wstats"><div><b>' + w.kills + '</b><span>' + (soft ? 'eliminazioni' : 'uccisioni') + '</span></div><div><b>' + w.events + '</b><span>eventi vissuti</span></div><div><b>' + w.alliancesFormed + '</b><span>alleanze</span></div><div><b>' + w.items + '</b><span>oggetti trovati</span></div></div></div></div>';
     } else if (W.length > 1) {
-      hero = '<div class="winhero" style="grid-template-columns:minmax(0,1fr)"><div class="wscene" aria-hidden="true">' + ART.scene(theme.id) + '</div><div><div class="eyebrow">' + ART.icon(theme.id, 13) + ' ' + esc(theme.name) + ' · ' + durTxt(theme) + '</div><h1>Vince la squadra ' + W[0].team + '</h1><div class="teamavs">' + W.map((w) => avHTML(w, { btn: true })).join('') + '</div><p style="margin-top:12px">' + W.map((w) => esc(w.name) + ' (' + kN(w.kills) + ')').join(' · ') + '</p></div></div>';
-    } else hero = '<div class="winhero" style="grid-template-columns:minmax(0,1fr)"><div><h1>Nessun superstite</h1><p>L\'arena non ha risparmiato nessuno.</p></div></div>';
+      hero = '<div class="winhero finale team">' + scene + '<div class="fn-text">' + eyeb + '<div class="fn-title">Squadra vincitrice</div><h1>Vince la squadra ' + W[0].team + '</h1><div class="teamavs">' + W.map((w) => avHTML(w, { btn: true })).join('') + '</div><p>' + W.map((w) => esc(w.name) + ' (' + kN(w.kills) + ')').join(' · ') + '</p></div></div>';
+    } else hero = '<div class="winhero finale none">' + scene + '<div class="fn-text">' + eyeb + '<div class="fn-title">Nessun superstite</div><h1>L\'arena ha vinto</h1><p>Non è rimasto in piedi nessuno.</p></div></div>';
 
     const ranked = SIM.tributes.slice().sort((a, b) => a.rank - b.rank || b.kills - a.kills);
     const podiumT = ranked.slice(0, 3);

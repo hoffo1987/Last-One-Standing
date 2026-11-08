@@ -57,6 +57,232 @@
   };
 
   /* Un campo animato su un canvas sopra (o sotto) un contenitore */
+  /* ================= SCENE DIPINTE =================
+   * Sopra ogni banner non girano più particelle generiche: ogni arena descrive la propria scena,
+   * ancorata al dipinto (u, v = frazioni dell'immagine, seguite anche quando l'immagine è ritagliata
+   * o in lento movimento). Luci che respirano e tremolano dove il quadro ha le sue fonti di luce,
+   * raggi che girano piano, fasce di nebbia a quote diverse, particelle con profondità (lontane e
+   * nitide, vicine e sfocate) e un evento raro proprio dell'arena. Tutto in fusione «screen»:
+   * la luce si somma al dipinto senza coprirlo. */
+  const hexRgb = (h) => { const n = parseInt(h.slice(1), 16); return [(n >> 16) & 255, (n >> 8) & 255, n & 255]; };
+  const rgba = (h, a) => { const [r, g, b] = hexRgb(h); return 'rgba(' + r + ',' + g + ',' + b + ',' + a + ')'; };
+  const sprites = new Map();
+  function glowSprite(c) {
+    let s = sprites.get(c); if (s) return s;
+    s = document.createElement('canvas'); s.width = s.height = 128; const g = s.getContext('2d');
+    const gr = g.createRadialGradient(64, 64, 0, 64, 64, 64);
+    gr.addColorStop(0, rgba(c, 1)); gr.addColorStop(0.18, rgba(c, 0.55)); gr.addColorStop(0.5, rgba(c, 0.14)); gr.addColorStop(1, rgba(c, 0));
+    g.fillStyle = gr; g.fillRect(0, 0, 128, 128); sprites.set(c, s); return s;
+  }
+  const rr = (a) => (Array.isArray(a) ? R(a[0], a[1]) : a);
+  // rumore morbido per tremolii credibili (somma di sinusoidi sfasate)
+  const wob = (t, s) => (Math.sin(t * 1.7 + s) * 0.5 + Math.sin(t * 3.1 + s * 2.3) * 0.3 + Math.sin(t * 7.3 + s * 4.1) * 0.2);
+  const SC = {
+    classico: {
+      lights: [{ u: 0.5, v: 0.2, r: 0.42, c: '#ffb14a', a: 0.32, pulse: 0.08, rays: { n: 9, len: 1.6, w: 0.045, a: 0.07, sp: 0.018 } }, { u: 0.53, v: 0.74, r: 0.12, c: '#ff7a2a', a: 0.45, flick: 0.4 }],
+      fog: [{ v: 0.62, c: '#ffb070', a: 0.1, h: 0.16, sp: 7 }, { v: 0.9, c: '#7a3b6a', a: 0.12, h: 0.2, sp: -5 }],
+      motes: [{ k: 'rise', n: 22, c: ['#ffd27a', '#ff8a3d', '#ffb14a'], u: [0.44, 0.62], v: [0.62, 0.84], vy: [-34, -14], vx: [-10, 10], sz: [0.8, 2.2], life: [2.5, 6] }, { k: 'drift', n: 20, c: ['#ffe2a8'], sz: [0.5, 1.3], a: 0.55 }, { k: 'bokeh', n: 5, c: ['#ffb14a', '#ff8a3d'], sz: [14, 30], a: 0.07 }],
+    },
+    fantasy: {
+      lights: [{ u: 0.53, v: 0.15, r: 0.34, c: '#cfe0ff', a: 0.26, pulse: 0.1, rays: { n: 7, len: 1.4, w: 0.035, a: 0.05, sp: -0.012 } }, { u: 0.08, v: 0.3, r: 0.16, c: '#ff8a2a', a: 0.32, pulse: 0.3, sp: 0.8 }, { u: 0.65, v: 0.4, r: 0.2, c: '#48c8ff', a: 0.28, pulse: 0.25, sp: 0.6 }, { u: 0.25, v: 0.82, r: 0.1, c: '#3ff0d0', a: 0.35, pulse: 0.35, sp: 1.1 }],
+      fog: [{ v: 0.7, c: '#4a5cff', a: 0.1, h: 0.2, sp: 5 }, { v: 0.92, c: '#7a3ac8', a: 0.1, h: 0.16, sp: -4 }],
+      motes: [{ k: 'rise', n: 26, c: ['#7af0ff', '#c79bff', '#ffd98a'], u: [0.05, 0.95], v: [0.55, 1], vy: [-22, -8], vx: [-6, 6], sz: [0.8, 2], life: [4, 8], wander: 14 }, { k: 'twinkle', n: 26, c: ['#ffffff', '#cfe0ff'], v: [0, 0.35], sz: [0.5, 1.2] }, { k: 'bokeh', n: 6, c: ['#48c8ff', '#c79bff'], sz: [12, 26], a: 0.08 }],
+      event: 'shootingStar',
+    },
+    scifi: {
+      lights: [{ u: 0.5, v: 0.58, r: 0.45, c: '#5aa8ff', a: 0.18, pulse: 0.12, sp: 0.4 }, { u: 0.62, v: 0.6, r: 0.18, c: '#ff8a5c', a: 0.22, pulse: 0.2, sp: 0.5 }, { u: 0.05, v: 0.35, r: 0.05, c: '#ff3b2f', a: 0.7, blink: 1.6 }, { u: 0.12, v: 0.68, r: 0.04, c: '#ff5a2f', a: 0.7, blink: 2.3 }, { u: 0.96, v: 0.55, r: 0.04, c: '#ff5a2f', a: 0.6, blink: 1.9 }],
+      motes: [{ k: 'twinkle', n: 46, c: ['#ffffff', '#bfe8ff', '#9fc0ff'], v: [0, 0.6], sz: [0.4, 1.3] }, { k: 'drift', n: 10, c: ['#9fc0ff'], sz: [0.8, 2], a: 0.45, vx: [-10, -3] }, { k: 'bokeh', n: 4, c: ['#5aa8ff'], sz: [16, 30], a: 0.06 }],
+      event: 'shootingStar',
+    },
+    zombie: {
+      lights: [{ u: 0.3, v: 0.35, r: 0.3, c: '#38e08a', a: 0.16, pulse: 0.15, sp: 0.3 }, { u: 0.85, v: 0.22, r: 0.1, c: '#ffb04a', a: 0.5, flick: 0.6 }, { u: 0.72, v: 0.58, r: 0.06, c: '#ff8a3d', a: 0.45, flick: 0.5 }],
+      fog: [{ v: 0.55, c: '#4fd88a', a: 0.08, h: 0.22, sp: 4 }, { v: 0.85, c: '#7a9a8a', a: 0.1, h: 0.18, sp: -6 }],
+      motes: [{ k: 'fall', n: 50, c: ['#b8d8c8'], sz: [0.6, 1.1], a: 0.28, vy: [380, 520], vx: [-60, -40], len: [10, 20] }, { k: 'drift', n: 14, c: ['#c8f0a0'], sz: [0.6, 1.4], a: 0.4 }],
+      event: 'searchlight', src: { u: 0.48, v: 0.08 },
+    },
+    royale: {
+      lights: [{ u: 0.66, v: 0.72, r: 0.36, c: '#ffb36a', a: 0.3, pulse: 0.08, rays: { n: 8, len: 1.2, w: 0.04, a: 0.06, sp: 0.015 } }, { u: 0.55, v: 0.45, r: 0.3, c: '#5ac8ff', a: 0.12, pulse: 0.2, sp: 0.5 }],
+      fog: [{ v: 0.88, c: '#8ad8ff', a: 0.07, h: 0.12, sp: 10 }],
+      motes: [{ k: 'sparkle', n: 30, c: ['#ffffff', '#ffe0b0'], u: [0.2, 0.8], v: [0.82, 0.96], sz: [0.6, 1.6] }, { k: 'chute', n: 4, c: ['#ffe3c4', '#ff9a6a', '#ffffff'], u: [0.4, 0.75], v: [0.05, 0.3], sz: [3, 5] }, { k: 'drift', n: 10, c: ['#fff0d0'], sz: [0.6, 1.2], a: 0.4 }],
+      event: 'domeShimmer', src: { u: 0.55, v: 0.42 },
+    },
+    horror: {
+      lights: [{ u: 0.5, v: 0.3, r: 0.46, c: '#ff3b2a', a: 0.26, pulse: 0.12, sp: 0.35 }, { u: 0.92, v: 0.78, r: 0.07, c: '#ff8a3d', a: 0.5, flick: 0.5 }, { u: 0.39, v: 0.45, r: 0.04, c: '#ffb04a', a: 0.6, flick: 0.6 }],
+      fog: [{ v: 0.72, c: '#6a8cff', a: 0.12, h: 0.2, sp: 6 }, { v: 0.9, c: '#a0b4ff', a: 0.1, h: 0.16, sp: -8 }],
+      motes: [{ k: 'bat', n: 5, c: ['#08040a'], u: [0.3, 0.7], v: [0.1, 0.4], sz: [3, 6] }, { k: 'rise', n: 14, c: ['#ff4a2a', '#ff8a3d'], u: [0.2, 0.9], v: [0.75, 0.95], vy: [-18, -6], vx: [-6, 6], sz: [0.7, 1.6], life: [3, 6] }, { k: 'drift', n: 10, c: ['#ffd0d0'], sz: [0.5, 1.1], a: 0.35 }],
+      event: 'lightning',
+    },
+    wasteland: {
+      lights: [{ u: 0.27, v: 0.24, r: 0.48, c: '#ff9a3a', a: 0.3, pulse: 0.1, sp: 0.35, rays: { n: 10, len: 1.5, w: 0.04, a: 0.06, sp: 0.01 } }, { u: 0.77, v: 0.42, r: 0.07, c: '#ffb04a', a: 0.55, flick: 0.55 }],
+      fog: [{ v: 0.6, c: '#ffb070', a: 0.08, h: 0.14, sp: 18 }, { v: 0.85, c: '#ff8a4a', a: 0.08, h: 0.16, sp: 24 }],
+      motes: [{ k: 'streak', n: 34, c: ['#ffd9a0', '#f4b26a'], sz: [0.6, 1.3], a: 0.35, vx: [140, 240], vy: [-8, 6], len: [8, 18] }, { k: 'rise', n: 10, c: ['#ff8a3d', '#ffd27a'], u: [0.72, 0.82], v: [0.38, 0.5], vy: [-30, -14], vx: [-4, 10], sz: [0.8, 1.8], life: [1.5, 3.5] }, { k: 'bokeh', n: 4, c: ['#ff9a3a'], sz: [14, 28], a: 0.07 }],
+      event: 'heatHaze', src: { u: 0.27, v: 0.42 },
+    },
+    liceo: {
+      lights: [{ u: 0.5, v: 0.5, r: 0.36, c: '#ffcf8a', a: 0.18, pulse: 0.08, sp: 0.4 }, { u: 0.86, v: 0.4, r: 0.18, c: '#ff8a3d', a: 0.2, pulse: 0.2, sp: 0.6 }, { u: 0.06, v: 0.62, r: 0.06, c: '#5ab8ff', a: 0.4, flick: 0.3 }],
+      motes: [{ k: 'flutter', n: 10, c: ['#ffd1e0', '#ffffff', '#ffb0c8'], sz: [2.5, 4.5], vy: [10, 24], vx: [6, 18] }, { k: 'drift', n: 18, c: ['#ffe8c0'], sz: [0.6, 1.4], a: 0.5 }, { k: 'bokeh', n: 5, c: ['#ffb0c8', '#ffcf8a'], sz: [14, 28], a: 0.08 }],
+      event: 'paperPlane',
+    },
+    ufficio: {
+      lights: [{ u: 0.48, v: 0.38, r: 0.2, c: '#ffc070', a: 0.22, pulse: 0.1, sp: 0.4 }, { u: 0.5, v: 0.86, r: 0.42, c: '#4ab8ff', a: 0.14, pulse: 0.18, sp: 0.8 }],
+      motes: [{ k: 'screen', n: 26, c: ['#6ad0ff', '#4ab8ff', '#9fe8ff'], u: [0.08, 0.92], v: [0.72, 0.9], sz: [1.5, 3.5] }, { k: 'drift', n: 22, c: ['#cfe8ff'], sz: [0.5, 1.2], a: 0.45 }, { k: 'flutter', n: 3, c: ['#ffffff'], sz: [3.5, 5], vy: [8, 16], vx: [10, 20] }],
+    },
+    cyberpunk: {
+      lights: [{ u: 0.5, v: 0.04, r: 0.16, c: '#ffd23a', a: 0.6, pulse: 0.3, sp: 1.2, beam: true }, { u: 0.21, v: 0.2, r: 0.16, c: '#ff4fd8', a: 0.35, flick: 0.35 }, { u: 0.88, v: 0.24, r: 0.15, c: '#3ff0ff', a: 0.32, flick: 0.3 }, { u: 0.5, v: 0.62, r: 0.3, c: '#5a6aff', a: 0.16, pulse: 0.15, sp: 0.5 }],
+      fog: [{ v: 0.75, c: '#7a5aff', a: 0.08, h: 0.2, sp: 5 }],
+      motes: [{ k: 'fall', n: 70, c: ['#9ff6ff', '#cfefff'], sz: [0.5, 1], a: 0.3, vy: [420, 600], vx: [-50, -30], len: [12, 24] }, { k: 'puddle', n: 14, c: ['#3ff0ff', '#ff4fd8'], u: [0.25, 0.75], v: [0.86, 0.98], sz: [6, 16] }, { k: 'bokeh', n: 5, c: ['#ff4fd8', '#3ff0ff'], sz: [12, 26], a: 0.08 }],
+      event: 'glitch',
+    },
+  };
+  // posizione e misura dell'immagine dentro il riquadro (object-fit: cover, anche durante il movimento lento)
+  function imgBox(f) {
+    const im = f.host.querySelector('img.scene');
+    if (!im || !im.naturalWidth) return { x: 0, y: 0, w: f.w, h: f.h };
+    const r = im.getBoundingClientRect(), hr = f.host.getBoundingClientRect();
+    const s = Math.max(r.width / im.naturalWidth, r.height / im.naturalHeight), dw = im.naturalWidth * s, dh = im.naturalHeight * s;
+    const op = getComputedStyle(im).objectPosition.split(' '), pct = (v) => (/%$/.test(v || '') ? parseFloat(v) / 100 : 0.5);
+    return { x: r.left - hr.left + (r.width - dw) * pct(op[0]), y: r.top - hr.top + (r.height - dh) * pct(op[1]), w: dw, h: dh };
+  }
+  function seedScene(f) {
+    const S = SC[f.theme], B = f.box || (f.box = imgBox(f)), k = Math.min(2, f.k), area = Math.min(1.4, Math.max(0.5, f.w / 900));
+    f.sc = { motes: [], ev: { next: R(5, 10) } };
+    for (const m of S.motes || []) {
+      const n = Math.round(m.n * (m.k === 'bokeh' || m.k === 'chute' || m.k === 'bat' ? 1 : area * (0.7 + k * 0.3)));
+      for (let i = 0; i < n; i++) f.sc.motes.push(spawnMote(m, B, f, true));
+    }
+  }
+  function spawnMote(m, B, f, initial) {
+    const u = m.u ? rr(m.u) : R(0, 1), v = m.v ? rr(m.v) : R(0, 1);
+    const p = { m, c: pick(m.c), x: B.x + u * B.w, y: B.y + v * B.h, sz: rr(m.sz), t: R(0, 20), s: R(0, 9), a: m.a != null ? m.a : 0.8 };
+    if (m.k === 'rise') { p.vx = rr(m.vx); p.vy = rr(m.vy); p.life = rr(m.life); p.age = initial ? R(0, p.life) : 0; }
+    else if (m.k === 'fall' || m.k === 'streak') { p.vx = rr(m.vx); p.vy = rr(m.vy); p.len = rr(m.len); if (!initial) { if (m.k === 'fall') p.y = -20; else p.x = -20; } }
+    else if (m.k === 'drift') { p.vx = m.vx ? rr(m.vx) : R(-6, 6); p.vy = R(-5, 3); }
+    else if (m.k === 'bokeh') { p.vx = R(-5, 5); p.vy = R(-3, 3); p.x = R(0, f.w); p.y = R(0, f.h); }
+    else if (m.k === 'flutter') { p.vx = rr(m.vx); p.vy = rr(m.vy); p.rot = R(0, 6); if (!initial) { p.x = R(-40, f.w * 0.6); p.y = -12; } }
+    else if (m.k === 'bat') { p.vx = R(30, 60) * (Math.random() < 0.5 ? -1 : 1); p.vy = 0; }
+    else if (m.k === 'chute') { p.vx = R(3, 8); p.vy = R(6, 12); if (!initial) p.y = B.y + R(-0.05, 0.05) * B.h; }
+    return p;
+  }
+  function paintScene(f, dt) {
+    const S = SC[f.theme], g = f.g, t = f.t, k = Math.min(2, f.k);
+    if (!f.box || (f.boxT = (f.boxT || 0) + dt) > 0.25) { f.box = imgBox(f); f.boxT = 0; }
+    const B = f.box, P = (u, v) => [B.x + u * B.w, B.y + v * B.h];
+    g.globalCompositeOperation = 'lighter';
+    // nebbie: grandi fasce morbide che scorrono a velocità diverse (parallasse)
+    for (const fg of S.fog || []) {
+      const y = B.y + fg.v * B.h, h = fg.h * B.h, step = h * 2.4, off = ((t * fg.sp) % step + step) % step;
+      for (let x = -step + off; x < f.w + step; x += step) {
+        const cx = x + Math.sin(t * 0.15 + x * 0.01) * h * 0.4, cy = y + Math.sin(t * 0.2 + x * 0.02) * h * 0.15;
+        g.globalAlpha = fg.a * (0.75 + 0.25 * Math.sin(t * 0.3 + x * 0.013)); g.drawImage(glowSprite(fg.c), cx - step * 0.75, cy - h, step * 1.5, h * 2);
+      }
+    }
+    // luci: respiro, tremolio delle fiamme, lampeggio delle spie, raggi rotanti, fascio verticale
+    for (const L of S.lights || []) {
+      const [x, y] = P(L.u, L.v); let a = L.a;
+      if (L.pulse) a *= 1 - L.pulse + L.pulse * (0.5 + 0.5 * Math.sin(t * (L.sp || 0.5) * 2 * Math.PI * 0.3 + L.u * 9));
+      if (L.flick) a *= Math.max(0.15, 1 - L.flick * (0.5 + 0.5 * wob(t * 2.2, L.u * 13)) - (Math.random() < 0.012 ? 0.6 : 0));
+      if (L.blink) a *= (Math.sin(t * Math.PI * 2 / L.blink + L.v * 7) > 0.6 ? 1 : 0.12);
+      a *= 0.85 + k * 0.15;
+      const rad = L.r * B.h * 2;
+      if (L.rays) {
+        const RY = L.rays, len = RY.len * B.h;
+        for (let i = 0; i < RY.n; i++) {
+          const ang = t * RY.sp + (i / RY.n) * Math.PI * 2, w = RY.w * B.h * (0.7 + 0.3 * Math.sin(t * 0.4 + i));
+          const gr = g.createLinearGradient(x, y, x + Math.cos(ang) * len, y + Math.sin(ang) * len);
+          gr.addColorStop(0, rgba(L.c, RY.a * (0.6 + 0.4 * Math.sin(t * 0.5 + i * 1.7)) * (0.85 + k * 0.15))); gr.addColorStop(1, rgba(L.c, 0));
+          g.globalAlpha = 1; g.fillStyle = gr; g.beginPath(); g.moveTo(x, y);
+          g.lineTo(x + Math.cos(ang - 0.5 * w / len) * len, y + Math.sin(ang - 0.5 * w / len) * len); g.lineTo(x + Math.cos(ang + 0.5 * w / len) * len, y + Math.sin(ang + 0.5 * w / len) * len); g.closePath(); g.fill();
+        }
+      }
+      if (L.beam) { const gr = g.createLinearGradient(x, y, x, 0); gr.addColorStop(0, rgba(L.c, a * 0.5)); gr.addColorStop(1, rgba(L.c, 0)); g.globalAlpha = 1; g.fillStyle = gr; g.fillRect(x - B.h * 0.012, 0, B.h * 0.024, Math.max(0, y)); }
+      g.globalAlpha = Math.min(1, a); g.drawImage(glowSprite(L.c), x - rad, y - rad, rad * 2, rad * 2);
+    }
+    // particelle
+    for (let i = 0; i < f.sc.motes.length; i++) {
+      const p = f.sc.motes[i], m = p.m; p.t += dt;
+      switch (m.k) {
+        case 'rise': {
+          p.age += dt; p.x += (p.vx + Math.sin(p.t * 1.3 + p.s) * (m.wander || 6)) * dt; p.y += p.vy * dt;
+          const life = Math.min(1, p.age / p.life), fade = Math.sin(life * Math.PI);
+          g.globalAlpha = p.a * fade * (0.6 + 0.4 * Math.sin(p.t * 9 + p.s)); const r = p.sz * 4; g.drawImage(glowSprite(p.c), p.x - r, p.y - r, r * 2, r * 2);
+          if (p.age > p.life) f.sc.motes[i] = spawnMote(m, B, f, false); break;
+        }
+        case 'fall': case 'streak': {
+          p.x += p.vx * dt; p.y += p.vy * dt; g.globalAlpha = p.a; g.strokeStyle = p.c; g.lineWidth = p.sz;
+          const n = Math.hypot(p.vx, p.vy) || 1; g.beginPath(); g.moveTo(p.x, p.y); g.lineTo(p.x - p.vx / n * p.len, p.y - p.vy / n * p.len); g.stroke();
+          if (p.y > f.h + 30 || p.x > f.w + 30 || p.x < -40) f.sc.motes[i] = spawnMote(m, B, f, false); break;
+        }
+        case 'drift': {
+          p.x += (p.vx + Math.sin(p.t * 0.7 + p.s) * 4) * dt; p.y += (p.vy + Math.cos(p.t * 0.5 + p.s) * 3) * dt; wrap(p, f.w, f.h, 10);
+          g.globalAlpha = p.a * (0.5 + 0.5 * Math.sin(p.t * 1.3 + p.s)); const r = p.sz * 3; g.drawImage(glowSprite(p.c), p.x - r, p.y - r, r * 2, r * 2); break;
+        }
+        case 'bokeh': {
+          p.x += p.vx * dt; p.y += p.vy * dt; wrap(p, f.w, f.h, 40); g.globalAlpha = p.a * (0.6 + 0.4 * Math.sin(p.t * 0.4 + p.s)); const r = p.sz * 2; g.drawImage(glowSprite(p.c), p.x - r, p.y - r, r * 2, r * 2); break;
+        }
+        case 'twinkle': case 'sparkle': case 'screen': {
+          const sp = m.k === 'sparkle' ? 3.2 : m.k === 'screen' ? 0.8 : 1.4;
+          let a = 0.5 + 0.5 * Math.sin(p.t * sp + p.s); if (m.k === 'sparkle') a = Math.pow(a, 6); if (m.k === 'screen') a = 0.45 + 0.35 * a - (Math.random() < 0.004 ? 0.4 : 0);
+          g.globalAlpha = Math.max(0, a) * (m.a || 0.9); const r = p.sz * (m.k === 'screen' ? 3 : 2.5); g.drawImage(glowSprite(p.c), p.x - r, p.y - r, r * 2, r * 2); break;
+        }
+        case 'puddle': {
+          const a = 0.18 + 0.14 * Math.sin(p.t * 1.1 + p.s); g.globalAlpha = a; const w = p.sz * (1.6 + 0.4 * Math.sin(p.t * 0.7 + p.s)); g.drawImage(glowSprite(p.c), p.x - w * 2, p.y - w * 0.3, w * 4, w * 0.6); break;
+        }
+        case 'flutter': {
+          p.x += (p.vx + Math.sin(p.t * 1.6 + p.s) * 18) * dt; p.y += (p.vy + Math.cos(p.t * 2.1 + p.s) * 6) * dt; p.rot += dt * 1.4;
+          g.save(); g.translate(p.x, p.y); g.rotate(Math.sin(p.rot) * 0.8); g.scale(Math.cos(p.t * 2.6 + p.s), 1); g.globalCompositeOperation = 'source-over'; g.globalAlpha = 0.75; g.fillStyle = p.c; g.fillRect(-p.sz, -p.sz * 1.3, p.sz * 2, p.sz * 2.6); g.restore(); g.globalCompositeOperation = 'lighter';
+          if (p.y > f.h + 20 || p.x > f.w + 30) f.sc.motes[i] = spawnMote(m, B, f, false); break;
+        }
+        case 'bat': {
+          p.x += p.vx * dt; p.y += Math.sin(p.t * 2.4 + p.s) * 14 * dt; if (p.x < -40) p.x = f.w + 30; if (p.x > f.w + 40) p.x = -30;
+          g.save(); g.globalCompositeOperation = 'source-over'; shapes.bat(g, { x: p.x, y: p.y, r: p.sz, c: p.c, o: 0.85, t: p.t }); g.restore(); break;
+        }
+        case 'chute': {
+          p.x += (p.vx + Math.sin(p.t * 0.9 + p.s) * 4) * dt; p.y += p.vy * dt;
+          g.save(); g.globalCompositeOperation = 'source-over'; shapes.chute(g, { x: p.x, y: p.y, r: p.sz, c: p.c, o: 0.75 }); g.restore();
+          if (p.y > B.y + B.h * 0.7) f.sc.motes[i] = spawnMote(m, B, f, false); break;
+        }
+      }
+    }
+    sceneEvent(f, S, B, P, dt);
+    g.globalAlpha = 1; g.globalCompositeOperation = 'source-over';
+  }
+  // eventi rari: arrivano ogni tanto, senza ritmo fisso, e durano poco
+  function sceneEvent(f, S, B, P, dt) {
+    const g = f.g, e = f.sc.ev, t = f.t;
+    if (S.event === 'searchlight') {
+      // il faro di un elicottero che spazza la città: tre spicchi sovrapposti, così il bordo resta morbido
+      const [x, y] = P(S.src.u, S.src.v), ang = Math.PI / 2 + Math.sin(t * 0.22) * 0.75, len = B.h * 1.3;
+      for (const [w, a] of [[0.16, 0.035], [0.1, 0.045], [0.05, 0.06]]) {
+        const gr = g.createLinearGradient(x, y, x + Math.cos(ang) * len, y + Math.sin(ang) * len); gr.addColorStop(0, 'rgba(220,255,230,' + a + ')'); gr.addColorStop(0.7, 'rgba(220,255,230,' + a * 0.4 + ')'); gr.addColorStop(1, 'rgba(220,255,230,0)');
+        g.globalAlpha = 1; g.fillStyle = gr; g.beginPath(); g.moveTo(x, y); g.lineTo(x + Math.cos(ang - w) * len, y + Math.sin(ang - w) * len); g.lineTo(x + Math.cos(ang + w) * len, y + Math.sin(ang + w) * len); g.closePath(); g.fill();
+      }
+      g.globalAlpha = 0.5; const r0 = B.h * 0.05; g.drawImage(glowSprite('#e8fff0'), x - r0, y - r0, r0 * 2, r0 * 2); return;
+    }
+    if (S.event === 'domeShimmer') {
+      const [x, y] = P(S.src.u, S.src.v), rx = B.w * 0.26, ry = B.h * 0.32, ph = (t * 0.18) % 1;
+      g.globalAlpha = 0.35; g.strokeStyle = 'rgba(160,230,255,.6)'; g.lineWidth = 2; g.beginPath(); g.ellipse(x, y + ry * 0.4, rx, ry, 0, Math.PI * (1.05 + ph * 0.7), Math.PI * (1.12 + ph * 0.7)); g.stroke(); return;
+    }
+    if (S.event === 'heatHaze') {
+      const [, y] = P(0, S.src.v);
+      for (let i = 0; i < 4; i++) { const yy = y + i * B.h * 0.05 + Math.sin(t * 1.4 + i) * 3; g.globalAlpha = 0.05; g.drawImage(glowSprite('#ffd9a0'), -20 + Math.sin(t * 0.6 + i) * 30, yy - 6, f.w + 40, 12); }
+      return;
+    }
+    e.next -= dt;
+    if (e.next <= 0 && !e.on) { e.on = { t: 0, x: R(0.15, 0.85) * f.w, y: R(0.05, 0.35) * f.h, d: S.event === 'lightning' ? 0.7 : S.event === 'glitch' ? 0.45 : S.event === 'paperPlane' ? 4.5 : 1.1 }; e.next = R(7, 16) / Math.min(2, f.k); }
+    if (!e.on) return;
+    const o = e.on; o.t += dt; const q = o.t / o.d; if (q >= 1) { e.on = null; return; }
+    if (S.event === 'lightning') {
+      const fl = q < 0.12 || (q > 0.22 && q < 0.3) ? 1 : 0; if (fl) { g.globalAlpha = 0.22; g.fillStyle = '#d8d0ff'; g.fillRect(0, 0, f.w, f.h); }
+      if (q < 0.35) { g.globalAlpha = 0.8 * (1 - q * 2); g.strokeStyle = '#f0e8ff'; g.lineWidth = 1.6; g.beginPath(); let x = o.x, y = 0; g.moveTo(x, y); while (y < f.h * 0.55) { x += R(-18, 18); y += R(10, 24); g.lineTo(x, y); } g.stroke(); }
+    } else if (S.event === 'glitch') {
+      for (let i = 0; i < 3; i++) { const yy = (o.y + i * 23 + q * 40) % f.h; g.globalAlpha = 0.18 * (1 - q); g.fillStyle = i % 2 ? '#ff4fd8' : '#3ff0ff'; g.fillRect(R(-20, f.w * 0.3), yy, R(f.w * 0.3, f.w * 0.8), R(2, 6)); }
+    } else if (S.event === 'shootingStar') {
+      const x = o.x - q * f.w * 0.3, y = o.y + q * f.h * 0.18; g.globalAlpha = Math.sin(q * Math.PI) * 0.9; g.strokeStyle = '#ffffff'; g.lineWidth = 1.4; g.beginPath(); g.moveTo(x, y); g.lineTo(x + 46, y - 28); g.stroke();
+    } else if (S.event === 'paperPlane') {
+      const x = -30 + q * (f.w + 60), y = o.y + 40 + Math.sin(q * 6) * 14; g.save(); g.globalCompositeOperation = 'source-over'; shapes.plane(g, { x, y, r: 5, c: '#ffffff', o: 0.85 * Math.sin(q * Math.PI) + 0.1, vx: 1, vy: Math.cos(q * 6) * 0.3 }); g.restore();
+    }
+  }
+
   const fields = new Set();
   class Field {
     constructor(host, theme, opts) {
@@ -69,7 +295,7 @@
       fields.add(this); loop();
     }
     resize() { const r = this.host.getBoundingClientRect(), d = Math.min(1.5, G.devicePixelRatio || 1); this.w = Math.max(10, r.width); this.h = Math.max(10, r.height); this.cv.width = this.w * d; this.cv.height = this.h * d; this.g.setTransform(d, 0, 0, d, 0, 0); }
-    seed() { const A = AMB[this.theme]; this.ps = []; const n = Math.round(A.n * Math.min(2.5, this.k) * Math.min(1.4, Math.max(0.5, this.w / 900))); for (let i = 0; i < n; i++) { const p = A.spawn(this.w, this.h); p.t = p.t || R(0, 9); this.ps.push(p); } }
+    seed() { if (SC[this.theme]) { this.box = null; seedScene(this); return; } const A = AMB[this.theme]; this.ps = []; const n = Math.round(A.n * Math.min(2.5, this.k) * Math.min(1.4, Math.max(0.5, this.w / 900))); for (let i = 0; i < n; i++) { const p = A.spawn(this.w, this.h); p.t = p.t || R(0, 9); this.ps.push(p); } }
     setTheme(theme, intensity) { theme = AMB[theme] ? theme : 'brand'; const ch = theme !== this.theme || (intensity && Math.abs(intensity - this.k) > 0.3); this.theme = theme; if (intensity) this.k = intensity; if (ch) this.seed(); }
     burst(kind, x, y, n) { for (let i = 0; i < (n || 16); i++) this.extraP.push(burstParticle(kind, x != null ? x : this.w / 2, y != null ? y : this.h / 2)); }
     frame(dt) {
@@ -77,9 +303,12 @@
       if (!this.visible || this.host.offsetParent === null) return;
       const r = this.host.getBoundingClientRect(); if (Math.abs(r.width - this.w) > 2 || Math.abs(r.height - this.h) > 2) { this.resize(); this.seed(); }
       const A = AMB[this.theme], g = this.g; this.t += dt; g.clearRect(0, 0, this.w, this.h);
-      const sp = 0.6 + this.k * 0.4;
-      for (const p of this.ps) { p.t += dt; A.step(p, dt * sp, this.w, this.h); shapes[p.s] && shapes[p.s](g, p); }
-      if (A.extra) A.extra(g, this.w, this.h, this.t, this);
+      if (SC[this.theme] && this.sc) paintScene(this, dt * (0.75 + Math.min(2, this.k) * 0.25));
+      else {
+        const sp = 0.6 + this.k * 0.4;
+        for (const p of this.ps) { p.t += dt; A.step(p, dt * sp, this.w, this.h); shapes[p.s] && shapes[p.s](g, p); }
+        if (A.extra) A.extra(g, this.w, this.h, this.t, this);
+      }
       this.extraP = this.extraP.filter((p) => { p.life -= dt; p.t += dt; p.vy += (p.grav || 0) * dt; p.x += p.vx * dt; p.y += p.vy * dt; p.a = (p.a || 0) + (p.va || 0) * dt; p.o = Math.max(0, Math.min(1, p.life / p.life0)); shapes[p.s](g, p); return p.life > 0; });
     }
     destroy() { fields.delete(this); if (this.io) this.io.disconnect(); this.cv.remove(); }

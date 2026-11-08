@@ -2462,3 +2462,119 @@ html, body { margin: 0; }
    la «catturerebbe» (un elemento con backdrop-filter diventa il riferimento dei figli fissi) */
 @media (max-width: 760px) { .top { -webkit-backdrop-filter: none; backdrop-filter: none; background: color-mix(in srgb, var(--panel-solid) 94%, transparent); } }
 @media (max-width: 760px) { .steps { background: color-mix(in srgb, var(--panel-solid) 92%, transparent); box-shadow: 0 -18px 40px -24px rgba(0,0,0,.6); } }
+
+/* =====================================================================
+ * ESITO: un finale da film
+ * La rivelazione occupa tutta la scena, dentro il dipinto dell'arena; un alone di luce gira dietro
+ * chi ha vinto; i pulsanti sono una barra di vetro che galleggia sul bordo del dipinto; il podio è
+ * un palco con un occhio di bue; i premi sono trofei; la classifica ha le sue medaglie.
+ * ===================================================================== */
+.winhero.finale { --fh: clamp(440px, 64vh, 660px); min-height: var(--fh); margin-top: 18px; padding: clamp(24px, 4vw, 56px); border-radius: 28px; display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: end; gap: clamp(20px, 4vw, 54px);
+  background: var(--screen); isolation: isolate; box-shadow: inset 0 0 0 1px hsl(var(--h) 80% 80% / .12), 0 40px 90px -40px rgba(0,0,0,.85), 0 0 120px -60px hsl(var(--h) 90% 55% / .7); }
+.winhero.finale::before { z-index: 1; background: linear-gradient(90deg, hsl(var(--h) 40% 4% / .82) 0%, hsl(var(--h) 40% 4% / .45) 45%, transparent 75%), linear-gradient(0deg, hsl(var(--h) 40% 4% / .92) 0%, transparent 55%), radial-gradient(ellipse 80% 60% at 70% 30%, transparent, hsl(var(--h) 40% 4% / .35)); }
+.winhero.finale .wscene { inset: 0; opacity: 1; -webkit-mask-image: none; mask-image: none; z-index: 0; }
+.winhero.finale .wscene img.scene, .winhero.finale .wscene svg { width: 100%; height: 100%; object-position: center 40%; animation: kenburns 40s ease-in-out infinite alternate; }
+.winhero.finale .fx-field { z-index: 1; }
+.winhero.finale > .fn-portrait, .winhero.finale > .fn-text { position: relative; z-index: 2; }
+/* l'alone: raggi lenti dietro il ritratto */
+.fn-halo { position: absolute; z-index: 1; left: clamp(24px, 4vw, 56px); bottom: clamp(24px, 4vw, 56px); width: 230px; height: 230px; transform: translate(-25%, 25%); pointer-events: none; border-radius: 50%;
+  background: radial-gradient(circle, hsl(var(--h) 95% 65% / .55) 0%, hsl(var(--h) 95% 55% / .18) 32%, transparent 62%), repeating-conic-gradient(from 0deg, hsl(var(--h) 95% 70% / .22) 0 7deg, transparent 7deg 22deg);
+  -webkit-mask: radial-gradient(circle, #000 25%, transparent 70%); mask: radial-gradient(circle, #000 25%, transparent 70%); animation: haloSpin 60s linear infinite; mix-blend-mode: screen; }
+@keyframes haloSpin { to { transform: translate(-25%, 25%) rotate(360deg); } }
+.winhero.finale.team .fn-halo, .winhero.finale.none .fn-halo { display: none; }
+.fn-portrait { position: relative; }
+.winhero.finale .fn-portrait .av { --s: clamp(150px, 16vw, 210px); font-size: 64px; box-shadow: 0 0 0 4px hsl(var(--h) 40% 6%), 0 0 0 8px var(--screen-accent), 0 0 60px 6px hsl(var(--h) 95% 55% / .55), 0 30px 60px -20px rgba(0,0,0,.8); }
+.fn-crown { position: absolute; left: 50%; top: -6px; transform: translate(-50%, -60%) rotate(-6deg); width: 54px; height: 54px; filter: drop-shadow(0 6px 14px rgba(0,0,0,.6)) drop-shadow(0 0 16px hsl(45 100% 60% / .7)); }
+.fn-crown svg { width: 100%; height: 100%; fill: #f5c542; stroke: #fff2b8; stroke-width: 1; stroke-linejoin: round; }
+.fn-text { min-width: 0; padding-bottom: 6px; }
+.winhero.finale .eyebrow { color: var(--screen-accent); }
+.fn-title { margin-top: 14px; font-family: var(--f-display); font-weight: 800; font-size: clamp(15px, 1.6vw, 19px); letter-spacing: .22em; text-transform: uppercase; color: #f5c542; text-shadow: 0 0 18px hsl(45 100% 55% / .6); display: inline-flex; align-items: center; gap: 12px; }
+.fn-title::before, .fn-title::after { content: ""; width: 34px; height: 1px; background: currentColor; opacity: .7; }
+.winhero.finale h1 { margin: 6px 0 8px; font-size: clamp(54px, 9vw, 128px); line-height: .95; letter-spacing: -.035em;
+  background: linear-gradient(180deg, #fff 30%, color-mix(in srgb, var(--screen-accent) 55%, #fff) 100%); -webkit-background-clip: text; background-clip: text; color: transparent; filter: drop-shadow(0 6px 30px hsl(var(--h) 90% 40% / .55)); }
+.winhero.finale p { color: hsl(var(--h) 25% 88% / .85); font-size: 17px; }
+.winhero.finale .wstats { margin-top: 22px; gap: 10px; }
+.winhero.finale .wstats > div { padding: 12px 16px 10px; min-width: 104px; border-radius: 14px; background: hsl(var(--h) 40% 8% / .45); -webkit-backdrop-filter: blur(10px) saturate(1.3); backdrop-filter: blur(10px) saturate(1.3); box-shadow: inset 0 0 0 1px hsl(var(--h) 80% 80% / .14), inset 0 1px 0 hsl(0 0% 100% / .08); }
+.winhero.finale .wstats b { font-size: clamp(28px, 3vw, 38px); }
+.winhero.finale.team, .winhero.finale.none { grid-template-columns: minmax(0, 1fr); }
+.winhero.finale .teamavs { margin: 14px 0 6px; }
+/* i pulsanti: una barra di vetro che galleggia sul bordo inferiore del dipinto */
+#resBody .resactions { position: relative; z-index: 3; width: fit-content; max-width: calc(100% - 32px); margin: -30px auto 30px; padding: 10px; border-radius: 18px; justify-content: center;
+  background: color-mix(in srgb, var(--panel-solid) 72%, transparent); -webkit-backdrop-filter: blur(18px) saturate(1.4); backdrop-filter: blur(18px) saturate(1.4); box-shadow: var(--sheen), var(--depth); border: 1px solid var(--line); }
+#resBody .resactions .help.mono { padding: 0 8px; }
+/* capitoli numerati */
+#resBody .resgrid { counter-reset: cap; }
+#resBody .resgrid .block > h2 { counter-increment: cap; display: flex; align-items: baseline; gap: 12px; font-size: 24px; letter-spacing: -.01em; }
+#resBody .resgrid .block > h2::before { content: counter(cap, decimal-leading-zero); font-family: var(--f-body); font-variant-numeric: tabular-nums; font-size: 13px; font-weight: 700; letter-spacing: .12em; color: var(--accent); padding: 3px 8px; border-radius: 999px; background: color-mix(in srgb, var(--accent) 14%, transparent); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--accent) 35%, transparent); transform: translateY(-3px); }
+#resBody .block { padding: 22px; }
+/* il podio: un palco con un occhio di bue sul primo posto */
+.podium { position: relative; padding-top: 34px; }
+.podium::before { content: ""; position: absolute; left: 50%; top: -22px; width: 46%; height: calc(100% + 22px); transform: translateX(-50%); pointer-events: none;
+  background: linear-gradient(180deg, hsl(45 100% 80% / .22), hsl(45 100% 70% / .05) 70%, transparent); clip-path: polygon(38% 0, 62% 0, 100% 100%, 0 100%); filter: blur(2px); }
+.pod .av { --s: 76px; box-shadow: 0 0 0 3px var(--panel-solid), 0 0 0 6px var(--medal, var(--line)), 0 14px 30px -14px var(--medal, transparent); }
+.pod.p1 { --medal: #f5c542; } .pod.p2 { --medal: #c9d3dd; } .pod.p3 { --medal: #d08a4e; }
+.pod.p1 .av { --s: 104px; }
+.pod b { font-size: 21px; }
+.pod .step { position: relative; overflow: hidden; border-radius: 14px 14px 4px 4px; color: color-mix(in srgb, var(--medal) 70%, var(--ink));
+  background: linear-gradient(180deg, color-mix(in srgb, var(--medal) 34%, var(--panel-solid)) 0, color-mix(in srgb, var(--medal) 12%, var(--panel-solid)) 26%, var(--panel-solid) 100%);
+  box-shadow: inset 0 1px 0 color-mix(in srgb, var(--medal) 70%, #fff), inset 0 0 0 1px color-mix(in srgb, var(--medal) 30%, transparent), 0 20px 40px -24px var(--medal); text-shadow: 0 0 22px color-mix(in srgb, var(--medal) 70%, transparent); }
+.pod.p1 .step { height: 150px; color: #3a2a00; background: linear-gradient(180deg, #ffe78a 0, #f5c542 28%, #b8860b 100%); text-shadow: 0 1px 0 rgba(255,255,255,.5); }
+.pod.p2 .step { height: 104px; } .pod.p3 .step { height: 76px; }
+.pod .step::after { content: ""; position: absolute; inset: 0; background: linear-gradient(115deg, transparent 35%, hsl(0 0% 100% / .28) 50%, transparent 65%); transform: translateX(-120%); animation: podShine 6s ease-in-out infinite; }
+.pod.p2 .step::after { animation-delay: 1.2s; } .pod.p3 .step::after { animation-delay: 2.4s; }
+@keyframes podShine { 0%, 60% { transform: translateX(-120%); } 85%, 100% { transform: translateX(120%); } }
+/* i premi: trofei con il loro bagliore */
+.award { position: relative; overflow: hidden; border: 1px solid transparent; background: radial-gradient(120% 90% at 100% 0%, color-mix(in srgb, var(--accent) 16%, transparent), transparent 55%) padding-box, linear-gradient(var(--panel), var(--panel)) padding-box, var(--edge) border-box; box-shadow: var(--sheen), var(--shadow-sm); }
+.award::after { content: ""; position: absolute; right: 10px; top: 10px; width: 22px; height: 22px; opacity: .55; background: var(--accent);
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M7 3h10v3h3v2a4 4 0 0 1-4 4h-.3A5 5 0 0 1 13 14.9V17h3v4H8v-4h3v-2.1A5 5 0 0 1 8.3 12H8a4 4 0 0 1-4-4V6h3zm0 5V6H6v2a2 2 0 0 0 1 1.7zm10 0a2 2 0 0 0 1-1.7V6h-1z'/%3E%3C/svg%3E") center / contain no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M7 3h10v3h3v2a4 4 0 0 1-4 4h-.3A5 5 0 0 1 13 14.9V17h3v4H8v-4h3v-2.1A5 5 0 0 1 8.3 12H8a4 4 0 0 1-4-4V6h3zm0 5V6H6v2a2 2 0 0 0 1 1.7zm10 0a2 2 0 0 0 1-1.7V6h-1z'/%3E%3C/svg%3E") center / contain no-repeat; }
+.award:hover { box-shadow: var(--sheen), 0 16px 34px -16px color-mix(in srgb, var(--accent) 70%, transparent); }
+.award .at { text-transform: uppercase; letter-spacing: .1em; font-size: 11px; font-weight: 700; }
+.award b { font-family: var(--f-display); font-size: 19px; }
+/* andamento: area con sfumatura e punto finale che pulsa */
+#resBody .chart svg path[fill="var(--accent)"] { fill-opacity: .22; }
+#resBody .chart circle { filter: drop-shadow(0 0 8px var(--accent)); animation: dotPulse 2.4s ease-in-out infinite; transform-box: fill-box; transform-origin: center; }
+@keyframes dotPulse { 50% { transform: scale(1.35); } }
+/* chi ha ucciso di più: barre con luce */
+#resBody .bar .tr { height: 12px; border-radius: 999px; background: color-mix(in srgb, var(--panel-2) 80%, transparent); box-shadow: inset 0 1px 2px rgba(0,0,0,.25); }
+#resBody .bar .tr i { border-radius: 999px; box-shadow: 0 0 14px -2px currentColor; background-image: linear-gradient(180deg, hsl(0 0% 100% / .35), transparent 60%) !important; }
+/* la classifica: righe come lastre, medaglie per i primi tre */
+#resBody table { border-collapse: separate; border-spacing: 0 6px; }
+#resBody tbody tr { background: color-mix(in srgb, var(--panel-solid) 55%, transparent); transition: background .2s; }
+#resBody tbody tr:hover { background: color-mix(in srgb, var(--accent) 10%, var(--panel-solid)); }
+#resBody tbody td:first-child { border-radius: 10px 0 0 10px; } #resBody tbody td:last-child { border-radius: 0 10px 10px 0; }
+#resBody tbody tr:nth-child(-n+3) td.n:first-child { font-family: var(--f-display); font-weight: 900; font-size: 17px; }
+#resBody tbody tr:nth-child(1) td.n:first-child { color: #d9a514; } #resBody tbody tr:nth-child(2) td.n:first-child { color: #9aa7b4; } #resBody tbody tr:nth-child(3) td.n:first-child { color: #c0763a; }
+#resBody tbody tr.win { background: linear-gradient(90deg, hsl(45 100% 55% / .18), color-mix(in srgb, var(--panel-solid) 55%, transparent) 60%); }
+/* la locandina come un manifesto appeso */
+#resBody .posterbox img { border-radius: 14px; transform: rotate(-1.2deg); box-shadow: 0 30px 60px -28px rgba(0,0,0,.8), 0 0 0 1px hsl(0 0% 100% / .08); transition: transform .4s cubic-bezier(.2,.8,.2,1); }
+#resBody .posterbox img:hover { transform: rotate(0) scale(1.02); }
+@media (max-width: 760px) {
+  .winhero.finale { grid-template-columns: minmax(0, 1fr); justify-items: center; text-align: center; align-items: end; --fh: auto; min-height: 560px; padding: 28px 18px 46px; }
+  .winhero.finale::before { background: linear-gradient(0deg, hsl(var(--h) 40% 4% / .95) 0%, hsl(var(--h) 40% 4% / .55) 55%, hsl(var(--h) 40% 4% / .2) 100%); }
+  .fn-halo { left: 50%; bottom: auto; top: 60px; transform: translate(-50%, 0); animation-name: haloSpinM; }
+  @keyframes haloSpinM { to { transform: translate(-50%, 0) rotate(360deg); } }
+  .winhero.finale .wstats { justify-content: center; }
+  .winhero.finale .wstats > div { min-width: 0; flex: 1 1 40%; }
+  .fn-title::before, .fn-title::after { width: 18px; }
+  #resBody .resactions { margin-top: -26px; }
+  .pod.p1 .av { --s: 80px; } .pod .av { --s: 60px; } .pod.p1 .step { height: 120px; }
+}
+@media (prefers-reduced-motion: reduce) { .fn-halo, .pod .step::after, #resBody .chart circle, .winhero.finale .wscene img.scene { animation: none; } }
+[data-reduced-motion] .fn-halo, [data-reduced-motion] .pod .step::after, [data-reduced-motion] #resBody .chart circle, [data-reduced-motion] .winhero.finale .wscene img.scene { animation: none; }
+/* il nome si anima lettera per lettera: niente testo «ritagliato» sul gradiente, che le lettere animate perderebbero */
+.winhero.finale h1 { background: none; -webkit-background-clip: border-box; background-clip: border-box; color: #fff; filter: none;
+  text-shadow: 0 2px 0 hsl(var(--h) 60% 30% / .5), 0 0 40px hsl(var(--h) 95% 55% / .55), 0 10px 50px rgba(0,0,0,.6); }
+.winhero.finale h1 * { color: inherit; }
+.winhero.finale .eyebrow { display: flex; }
+.fn-title { display: flex; width: fit-content; }
+@media (max-width: 760px) { .winhero.finale .eyebrow, .fn-title { justify-content: center; margin-inline: auto; } }
+@media (max-width: 760px) {
+  .winhero.finale .wstats { gap: 6px; flex-wrap: nowrap; width: 100%; }
+  .winhero.finale .wstats > div { flex: 1 1 0; min-width: 0; padding: 9px 6px 7px; border-radius: 12px; }
+  .winhero.finale .wstats b { font-size: 22px; }
+  .winhero.finale .wstats span { font-size: 10.5px; line-height: 1.2; display: block; }
+  .winhero.finale .fn-portrait .av { --s: 132px; font-size: 48px; }
+  .fn-halo { top: 6px; width: 260px; height: 260px; }
+  .winhero.finale h1 { font-size: clamp(44px, 13vw, 64px); }
+}

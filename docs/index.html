@@ -2485,6 +2485,122 @@ html, body { margin: 0; }
    la «catturerebbe» (un elemento con backdrop-filter diventa il riferimento dei figli fissi) */
 @media (max-width: 760px) { .top { -webkit-backdrop-filter: none; backdrop-filter: none; background: color-mix(in srgb, var(--panel-solid) 94%, transparent); } }
 @media (max-width: 760px) { .steps { background: color-mix(in srgb, var(--panel-solid) 92%, transparent); box-shadow: 0 -18px 40px -24px rgba(0,0,0,.6); } }
+
+/* =====================================================================
+ * ESITO: un finale da film
+ * La rivelazione occupa tutta la scena, dentro il dipinto dell'arena; un alone di luce gira dietro
+ * chi ha vinto; i pulsanti sono una barra di vetro che galleggia sul bordo del dipinto; il podio è
+ * un palco con un occhio di bue; i premi sono trofei; la classifica ha le sue medaglie.
+ * ===================================================================== */
+.winhero.finale { --fh: clamp(440px, 64vh, 660px); min-height: var(--fh); margin-top: 18px; padding: clamp(24px, 4vw, 56px); border-radius: 28px; display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: end; gap: clamp(20px, 4vw, 54px);
+  background: var(--screen); isolation: isolate; box-shadow: inset 0 0 0 1px hsl(var(--h) 80% 80% / .12), 0 40px 90px -40px rgba(0,0,0,.85), 0 0 120px -60px hsl(var(--h) 90% 55% / .7); }
+.winhero.finale::before { z-index: 1; background: linear-gradient(90deg, hsl(var(--h) 40% 4% / .82) 0%, hsl(var(--h) 40% 4% / .45) 45%, transparent 75%), linear-gradient(0deg, hsl(var(--h) 40% 4% / .92) 0%, transparent 55%), radial-gradient(ellipse 80% 60% at 70% 30%, transparent, hsl(var(--h) 40% 4% / .35)); }
+.winhero.finale .wscene { inset: 0; opacity: 1; -webkit-mask-image: none; mask-image: none; z-index: 0; }
+.winhero.finale .wscene img.scene, .winhero.finale .wscene svg { width: 100%; height: 100%; object-position: center 40%; animation: kenburns 40s ease-in-out infinite alternate; }
+.winhero.finale .fx-field { z-index: 1; }
+.winhero.finale > .fn-portrait, .winhero.finale > .fn-text { position: relative; z-index: 2; }
+/* l'alone: raggi lenti dietro il ritratto */
+.fn-halo { position: absolute; z-index: 1; left: clamp(24px, 4vw, 56px); bottom: clamp(24px, 4vw, 56px); width: 230px; height: 230px; transform: translate(-25%, 25%); pointer-events: none; border-radius: 50%;
+  background: radial-gradient(circle, hsl(var(--h) 95% 65% / .55) 0%, hsl(var(--h) 95% 55% / .18) 32%, transparent 62%), repeating-conic-gradient(from 0deg, hsl(var(--h) 95% 70% / .22) 0 7deg, transparent 7deg 22deg);
+  -webkit-mask: radial-gradient(circle, #000 25%, transparent 70%); mask: radial-gradient(circle, #000 25%, transparent 70%); animation: haloSpin 60s linear infinite; mix-blend-mode: screen; }
+@keyframes haloSpin { to { transform: translate(-25%, 25%) rotate(360deg); } }
+.winhero.finale.team .fn-halo, .winhero.finale.none .fn-halo { display: none; }
+.fn-portrait { position: relative; }
+.winhero.finale .fn-portrait .av { --s: clamp(150px, 16vw, 210px); font-size: 64px; box-shadow: 0 0 0 4px hsl(var(--h) 40% 6%), 0 0 0 8px var(--screen-accent), 0 0 60px 6px hsl(var(--h) 95% 55% / .55), 0 30px 60px -20px rgba(0,0,0,.8); }
+.fn-crown { position: absolute; left: 50%; top: -6px; transform: translate(-50%, -60%) rotate(-6deg); width: 54px; height: 54px; filter: drop-shadow(0 6px 14px rgba(0,0,0,.6)) drop-shadow(0 0 16px hsl(45 100% 60% / .7)); }
+.fn-crown svg { width: 100%; height: 100%; fill: #f5c542; stroke: #fff2b8; stroke-width: 1; stroke-linejoin: round; }
+.fn-text { min-width: 0; padding-bottom: 6px; }
+.winhero.finale .eyebrow { color: var(--screen-accent); }
+.fn-title { margin-top: 14px; font-family: var(--f-display); font-weight: 800; font-size: clamp(15px, 1.6vw, 19px); letter-spacing: .22em; text-transform: uppercase; color: #f5c542; text-shadow: 0 0 18px hsl(45 100% 55% / .6); display: inline-flex; align-items: center; gap: 12px; }
+.fn-title::before, .fn-title::after { content: ""; width: 34px; height: 1px; background: currentColor; opacity: .7; }
+.winhero.finale h1 { margin: 6px 0 8px; font-size: clamp(54px, 9vw, 128px); line-height: .95; letter-spacing: -.035em;
+  background: linear-gradient(180deg, #fff 30%, color-mix(in srgb, var(--screen-accent) 55%, #fff) 100%); -webkit-background-clip: text; background-clip: text; color: transparent; filter: drop-shadow(0 6px 30px hsl(var(--h) 90% 40% / .55)); }
+.winhero.finale p { color: hsl(var(--h) 25% 88% / .85); font-size: 17px; }
+.winhero.finale .wstats { margin-top: 22px; gap: 10px; }
+.winhero.finale .wstats > div { padding: 12px 16px 10px; min-width: 104px; border-radius: 14px; background: hsl(var(--h) 40% 8% / .45); -webkit-backdrop-filter: blur(10px) saturate(1.3); backdrop-filter: blur(10px) saturate(1.3); box-shadow: inset 0 0 0 1px hsl(var(--h) 80% 80% / .14), inset 0 1px 0 hsl(0 0% 100% / .08); }
+.winhero.finale .wstats b { font-size: clamp(28px, 3vw, 38px); }
+.winhero.finale.team, .winhero.finale.none { grid-template-columns: minmax(0, 1fr); }
+.winhero.finale .teamavs { margin: 14px 0 6px; }
+/* i pulsanti: una barra di vetro che galleggia sul bordo inferiore del dipinto */
+#resBody .resactions { position: relative; z-index: 3; width: fit-content; max-width: calc(100% - 32px); margin: -30px auto 30px; padding: 10px; border-radius: 18px; justify-content: center;
+  background: color-mix(in srgb, var(--panel-solid) 72%, transparent); -webkit-backdrop-filter: blur(18px) saturate(1.4); backdrop-filter: blur(18px) saturate(1.4); box-shadow: var(--sheen), var(--depth); border: 1px solid var(--line); }
+#resBody .resactions .help.mono { padding: 0 8px; }
+/* capitoli numerati */
+#resBody .resgrid { counter-reset: cap; }
+#resBody .resgrid .block > h2 { counter-increment: cap; display: flex; align-items: baseline; gap: 12px; font-size: 24px; letter-spacing: -.01em; }
+#resBody .resgrid .block > h2::before { content: counter(cap, decimal-leading-zero); font-family: var(--f-body); font-variant-numeric: tabular-nums; font-size: 13px; font-weight: 700; letter-spacing: .12em; color: var(--accent); padding: 3px 8px; border-radius: 999px; background: color-mix(in srgb, var(--accent) 14%, transparent); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--accent) 35%, transparent); transform: translateY(-3px); }
+#resBody .block { padding: 22px; }
+/* il podio: un palco con un occhio di bue sul primo posto */
+.podium { position: relative; padding-top: 34px; }
+.podium::before { content: ""; position: absolute; left: 50%; top: -22px; width: 46%; height: calc(100% + 22px); transform: translateX(-50%); pointer-events: none;
+  background: linear-gradient(180deg, hsl(45 100% 80% / .22), hsl(45 100% 70% / .05) 70%, transparent); clip-path: polygon(38% 0, 62% 0, 100% 100%, 0 100%); filter: blur(2px); }
+.pod .av { --s: 76px; box-shadow: 0 0 0 3px var(--panel-solid), 0 0 0 6px var(--medal, var(--line)), 0 14px 30px -14px var(--medal, transparent); }
+.pod.p1 { --medal: #f5c542; } .pod.p2 { --medal: #c9d3dd; } .pod.p3 { --medal: #d08a4e; }
+.pod.p1 .av { --s: 104px; }
+.pod b { font-size: 21px; }
+.pod .step { position: relative; overflow: hidden; border-radius: 14px 14px 4px 4px; color: color-mix(in srgb, var(--medal) 70%, var(--ink));
+  background: linear-gradient(180deg, color-mix(in srgb, var(--medal) 34%, var(--panel-solid)) 0, color-mix(in srgb, var(--medal) 12%, var(--panel-solid)) 26%, var(--panel-solid) 100%);
+  box-shadow: inset 0 1px 0 color-mix(in srgb, var(--medal) 70%, #fff), inset 0 0 0 1px color-mix(in srgb, var(--medal) 30%, transparent), 0 20px 40px -24px var(--medal); text-shadow: 0 0 22px color-mix(in srgb, var(--medal) 70%, transparent); }
+.pod.p1 .step { height: 150px; color: #3a2a00; background: linear-gradient(180deg, #ffe78a 0, #f5c542 28%, #b8860b 100%); text-shadow: 0 1px 0 rgba(255,255,255,.5); }
+.pod.p2 .step { height: 104px; } .pod.p3 .step { height: 76px; }
+.pod .step::after { content: ""; position: absolute; inset: 0; background: linear-gradient(115deg, transparent 35%, hsl(0 0% 100% / .28) 50%, transparent 65%); transform: translateX(-120%); animation: podShine 6s ease-in-out infinite; }
+.pod.p2 .step::after { animation-delay: 1.2s; } .pod.p3 .step::after { animation-delay: 2.4s; }
+@keyframes podShine { 0%, 60% { transform: translateX(-120%); } 85%, 100% { transform: translateX(120%); } }
+/* i premi: trofei con il loro bagliore */
+.award { position: relative; overflow: hidden; border: 1px solid transparent; background: radial-gradient(120% 90% at 100% 0%, color-mix(in srgb, var(--accent) 16%, transparent), transparent 55%) padding-box, linear-gradient(var(--panel), var(--panel)) padding-box, var(--edge) border-box; box-shadow: var(--sheen), var(--shadow-sm); }
+.award::after { content: ""; position: absolute; right: 10px; top: 10px; width: 22px; height: 22px; opacity: .55; background: var(--accent);
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M7 3h10v3h3v2a4 4 0 0 1-4 4h-.3A5 5 0 0 1 13 14.9V17h3v4H8v-4h3v-2.1A5 5 0 0 1 8.3 12H8a4 4 0 0 1-4-4V6h3zm0 5V6H6v2a2 2 0 0 0 1 1.7zm10 0a2 2 0 0 0 1-1.7V6h-1z'/%3E%3C/svg%3E") center / contain no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M7 3h10v3h3v2a4 4 0 0 1-4 4h-.3A5 5 0 0 1 13 14.9V17h3v4H8v-4h3v-2.1A5 5 0 0 1 8.3 12H8a4 4 0 0 1-4-4V6h3zm0 5V6H6v2a2 2 0 0 0 1 1.7zm10 0a2 2 0 0 0 1-1.7V6h-1z'/%3E%3C/svg%3E") center / contain no-repeat; }
+.award:hover { box-shadow: var(--sheen), 0 16px 34px -16px color-mix(in srgb, var(--accent) 70%, transparent); }
+.award .at { text-transform: uppercase; letter-spacing: .1em; font-size: 11px; font-weight: 700; }
+.award b { font-family: var(--f-display); font-size: 19px; }
+/* andamento: area con sfumatura e punto finale che pulsa */
+#resBody .chart svg path[fill="var(--accent)"] { fill-opacity: .22; }
+#resBody .chart circle { filter: drop-shadow(0 0 8px var(--accent)); animation: dotPulse 2.4s ease-in-out infinite; transform-box: fill-box; transform-origin: center; }
+@keyframes dotPulse { 50% { transform: scale(1.35); } }
+/* chi ha ucciso di più: barre con luce */
+#resBody .bar .tr { height: 12px; border-radius: 999px; background: color-mix(in srgb, var(--panel-2) 80%, transparent); box-shadow: inset 0 1px 2px rgba(0,0,0,.25); }
+#resBody .bar .tr i { border-radius: 999px; box-shadow: 0 0 14px -2px currentColor; background-image: linear-gradient(180deg, hsl(0 0% 100% / .35), transparent 60%) !important; }
+/* la classifica: righe come lastre, medaglie per i primi tre */
+#resBody table { border-collapse: separate; border-spacing: 0 6px; }
+#resBody tbody tr { background: color-mix(in srgb, var(--panel-solid) 55%, transparent); transition: background .2s; }
+#resBody tbody tr:hover { background: color-mix(in srgb, var(--accent) 10%, var(--panel-solid)); }
+#resBody tbody td:first-child { border-radius: 10px 0 0 10px; } #resBody tbody td:last-child { border-radius: 0 10px 10px 0; }
+#resBody tbody tr:nth-child(-n+3) td.n:first-child { font-family: var(--f-display); font-weight: 900; font-size: 17px; }
+#resBody tbody tr:nth-child(1) td.n:first-child { color: #d9a514; } #resBody tbody tr:nth-child(2) td.n:first-child { color: #9aa7b4; } #resBody tbody tr:nth-child(3) td.n:first-child { color: #c0763a; }
+#resBody tbody tr.win { background: linear-gradient(90deg, hsl(45 100% 55% / .18), color-mix(in srgb, var(--panel-solid) 55%, transparent) 60%); }
+/* la locandina come un manifesto appeso */
+#resBody .posterbox img { border-radius: 14px; transform: rotate(-1.2deg); box-shadow: 0 30px 60px -28px rgba(0,0,0,.8), 0 0 0 1px hsl(0 0% 100% / .08); transition: transform .4s cubic-bezier(.2,.8,.2,1); }
+#resBody .posterbox img:hover { transform: rotate(0) scale(1.02); }
+@media (max-width: 760px) {
+  .winhero.finale { grid-template-columns: minmax(0, 1fr); justify-items: center; text-align: center; align-items: end; --fh: auto; min-height: 560px; padding: 28px 18px 46px; }
+  .winhero.finale::before { background: linear-gradient(0deg, hsl(var(--h) 40% 4% / .95) 0%, hsl(var(--h) 40% 4% / .55) 55%, hsl(var(--h) 40% 4% / .2) 100%); }
+  .fn-halo { left: 50%; bottom: auto; top: 60px; transform: translate(-50%, 0); animation-name: haloSpinM; }
+  @keyframes haloSpinM { to { transform: translate(-50%, 0) rotate(360deg); } }
+  .winhero.finale .wstats { justify-content: center; }
+  .winhero.finale .wstats > div { min-width: 0; flex: 1 1 40%; }
+  .fn-title::before, .fn-title::after { width: 18px; }
+  #resBody .resactions { margin-top: -26px; }
+  .pod.p1 .av { --s: 80px; } .pod .av { --s: 60px; } .pod.p1 .step { height: 120px; }
+}
+@media (prefers-reduced-motion: reduce) { .fn-halo, .pod .step::after, #resBody .chart circle, .winhero.finale .wscene img.scene { animation: none; } }
+[data-reduced-motion] .fn-halo, [data-reduced-motion] .pod .step::after, [data-reduced-motion] #resBody .chart circle, [data-reduced-motion] .winhero.finale .wscene img.scene { animation: none; }
+/* il nome si anima lettera per lettera: niente testo «ritagliato» sul gradiente, che le lettere animate perderebbero */
+.winhero.finale h1 { background: none; -webkit-background-clip: border-box; background-clip: border-box; color: #fff; filter: none;
+  text-shadow: 0 2px 0 hsl(var(--h) 60% 30% / .5), 0 0 40px hsl(var(--h) 95% 55% / .55), 0 10px 50px rgba(0,0,0,.6); }
+.winhero.finale h1 * { color: inherit; }
+.winhero.finale .eyebrow { display: flex; }
+.fn-title { display: flex; width: fit-content; }
+@media (max-width: 760px) { .winhero.finale .eyebrow, .fn-title { justify-content: center; margin-inline: auto; } }
+@media (max-width: 760px) {
+  .winhero.finale .wstats { gap: 6px; flex-wrap: nowrap; width: 100%; }
+  .winhero.finale .wstats > div { flex: 1 1 0; min-width: 0; padding: 9px 6px 7px; border-radius: 12px; }
+  .winhero.finale .wstats b { font-size: 22px; }
+  .winhero.finale .wstats span { font-size: 10.5px; line-height: 1.2; display: block; }
+  .winhero.finale .fn-portrait .av { --s: 132px; font-size: 48px; }
+  .fn-halo { top: 6px; width: 260px; height: 260px; }
+  .winhero.finale h1 { font-size: clamp(44px, 13vw, 64px); }
+}
 </style>
 
 <!-- l'atmosfera dipinta: il banner dell'arena attiva, sfocato, dietro tutto il sito -->
@@ -16029,7 +16145,7 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
 </script>
 <script>window.LOS_ASSETS = {"logo":"img/logo.f2d5175789.webp","icona":"img/icona.8b02ddeb49.webp","favicon":"img/favicon.86774dc7cf.png","panoramica":"img/panoramica.66c4c27255.webp","sagome":["img/sagome-cappuccio.e8876ba986.webp","img/sagome-esploratore.9a99fd13f8.webp","img/sagome-viaggiatore.5e36435604.webp"],"arene":{"classico":"img/arene-classico.c2887324d1.webp","cyberpunk":"img/arene-cyberpunk.713b4c77ea.webp","fantasy":"img/arene-fantasy.ee494a9322.webp","horror":"img/arene-horror.76225517ca.webp","liceo":"img/arene-liceo.c591ac5f32.webp","royale":"img/arene-royale.46515caf90.webp","scifi":"img/arene-scifi.bc9d8e04eb.webp","ufficio":"img/arene-ufficio.a2e36d4f7f.webp","wasteland":"img/arene-wasteland.734ed966b2.webp","zombie":"img/arene-zombie.11476cf1ca.webp"},"atlas":{"classico":{"armi":{"arco":"img/arene-classico-armi-arco.57fa716aa9.webp","ascia":"img/arene-classico-armi-ascia.f48629747b.webp","coltello-da-campo":"img/arene-classico-armi-coltello-da-campo.3393de240f.webp","coltello":"img/arene-classico-armi-coltello.a0134af05c.webp","falce-corta":"img/arene-classico-armi-falce-corta.3131158a9f.webp","fionda":"img/arene-classico-armi-fionda.48c8c32c43.webp","lancia-da-caccia":"img/arene-classico-armi-lancia-da-caccia.6f2be560ec.webp","lancia":"img/arene-classico-armi-lancia.115909650b.webp","machete":"img/arene-classico-armi-machete.e1c9ef25d7.webp","mazza-corta":"img/arene-classico-armi-mazza-corta.e1092f0628.webp","mazza":"img/arene-classico-armi-mazza.1fddf37b46.webp","pugnale-da-cintura":"img/arene-classico-armi-pugnale-da-cintura.0bedc8a501.webp","pugnale":"img/arene-classico-armi-pugnale.fda9dbf38a.webp","scure-da-legna":"img/arene-classico-armi-scure-da-legna.837c5d1f78.webp","spada-corta":"img/arene-classico-armi-spada-corta.952e6b7f6a.webp","tridente":"img/arene-classico-armi-tridente.2fcb3547d9.webp"},"luoghi":{"altopiano":"img/arene-classico-luoghi-altopiano.36a37512d3.webp","bosco":"img/arene-classico-luoghi-bosco.2e9163544b.webp","cornucopia":"img/arene-classico-luoghi-cornucopia.393b2dabe1.webp","fiume":"img/arene-classico-luoghi-fiume.22b335a914.webp","paludi":"img/arene-classico-luoghi-paludi.77cf115eb4.webp","rovine":"img/arene-classico-luoghi-rovine.9ea4f70ca9.webp"},"pericoli":{"branco-di-lupi-mutanti":"img/arene-classico-pericoli-branco-di-lupi-mutanti.d786a62875.webp","orso-affamato":"img/arene-classico-pericoli-orso-affamato.e4f38a9892.webp","sciame-di-vespe-velenose":"img/arene-classico-pericoli-sciame-di-vespe-velenose.5adb2c7b8d.webp","serpente-gigante":"img/arene-classico-pericoli-serpente-gigante.b17e7f3d91.webp"}},"cyberpunk":{"armi":{"coltello-vibrante-in-ceramica":"img/arene-cyberpunk-armi-coltello-vibrante-in-ceramica.6bbcd0e9e4.webp","fucile-a-pompa-da-strada":"img/arene-cyberpunk-armi-fucile-a-pompa-da-strada.dbd0de34e1.webp","fucile-a-pompa-elettromagnetico":"img/arene-cyberpunk-armi-fucile-a-pompa-elettromagnetico.0555418cd0.webp","katana-termica":"img/arene-cyberpunk-armi-katana-termica.f1ff597173.webp","mazza-a-impulsi":"img/arene-cyberpunk-armi-mazza-a-impulsi.22d841ed1d.webp","mazza-da-baseball-chiodata":"img/arene-cyberpunk-armi-mazza-da-baseball-chiodata.db2996f744.webp","mitra-compatto":"img/arene-cyberpunk-armi-mitra-compatto.eaa3815798.webp","pistola-a-rotaia-artigianale":"img/arene-cyberpunk-armi-pistola-a-rotaia-artigianale.f9e83bda89.webp","pistola-smart":"img/arene-cyberpunk-armi-pistola-smart.2aa922ba8c.webp","sparachiodi-riprogrammato":"img/arene-cyberpunk-armi-sparachiodi-riprogrammato.70f6190cb0.webp","taser-da-buttafuori":"img/arene-cyberpunk-armi-taser-da-buttafuori.60b58b451d.webp","tirapugni-elettrificato":"img/arene-cyberpunk-armi-tirapugni-elettrificato.1ce19bab37.webp","ventaglio-da-combattimento-in-titanio":"img/arene-cyberpunk-armi-ventaglio-da-combattimento-in-titanio.f3b7bb5a10.webp"},"luoghi":{"clinica-del-ripperdoc":"img/arene-cyberpunk-luoghi-clinica-del-ripperdoc.8ef0cb941b.webp","club-della-braindance":"img/arene-cyberpunk-luoghi-club-della-braindance.7765542e70.webp","megablocco":"img/arene-cyberpunk-luoghi-megablocco.28b72e6ecf.webp","mercato-di-kabuki":"img/arene-cyberpunk-luoghi-mercato-di-kabuki.d5c8ab7b96.webp","nodo-dati-corporativo":"img/arene-cyberpunk-luoghi-nodo-dati-corporativo.56ca3e1335.webp","officina-dei-maelstrom":"img/arene-cyberpunk-luoghi-officina-dei-maelstrom.d69285cf21.webp","piazza-della-torre":"img/arene-cyberpunk-luoghi-piazza-della-torre.1e400212c8.webp"},"pericoli":{"banda-di-scav":"img/arene-cyberpunk-pericoli-banda-di-scav.f1a2b2ccc4.webp","gang-di-cromati":"img/arene-cyberpunk-pericoli-gang-di-cromati.74e5576e23.webp","sciame-di-droni-di-pattuglia":"img/arene-cyberpunk-pericoli-sciame-di-droni-di-pattuglia.6fb4b17ad9.webp","squadra-di-sicurezza-corporativa":"img/arene-cyberpunk-pericoli-squadra-di-sicurezza-corporativa.6195a3b15d.webp"}},"fantasy":{"armi":{"arco-elfico":"img/arene-fantasy-armi-arco-elfico.8012f9136d.webp","ascia-nanica":"img/arene-fantasy-armi-ascia-nanica.6913fdf008.webp","balestra":"img/arene-fantasy-armi-balestra.7767becc83.webp","bastone-magico":"img/arene-fantasy-armi-bastone-magico.0781aee860.webp","daga-dei-giuramenti":"img/arene-fantasy-armi-daga-dei-giuramenti.3b6d4b398c.webp","falcetto-dargento":"img/arene-fantasy-armi-falcetto-dargento.1ce0e4e163.webp","lancia-incantata":"img/arene-fantasy-armi-lancia-incantata.7371199824.webp","lancia-silvana":"img/arene-fantasy-armi-lancia-silvana.08fbc01ede.webp","martello-da-guerra":"img/arene-fantasy-armi-martello-da-guerra.4eb03f4db7.webp","martello-nanico":"img/arene-fantasy-armi-martello-nanico.82ad6b9b14.webp","mazza-di-quercia":"img/arene-fantasy-armi-mazza-di-quercia.0f6a8345a9.webp","pugnale-avvelenato":"img/arene-fantasy-armi-pugnale-avvelenato.aba554d177.webp","spada-da-viaggio":"img/arene-fantasy-armi-spada-da-viaggio.a7bdcab5f4.webp","spada-runica":"img/arene-fantasy-armi-spada-runica.ec4012c6cf.webp"},"luoghi":{"altare-delle-armi":"img/arene-fantasy-luoghi-altare-delle-armi.db06de44c1.webp","foresta-elfica":"img/arene-fantasy-luoghi-foresta-elfica.0448fcfbd3.webp","lago-nebbioso":"img/arene-fantasy-luoghi-lago-nebbioso.f19abc7c81.webp","miniere":"img/arene-fantasy-luoghi-miniere.5baa916ec9.webp","palude-stregata":"img/arene-fantasy-luoghi-palude-stregata.6a0b2af4a7.webp","picco-del-drago":"img/arene-fantasy-luoghi-picco-del-drago.06bdfd84b1.webp","torre-in-rovina":"img/arene-fantasy-luoghi-torre-in-rovina.ac716863c7.webp"},"pericoli":{"branco-di-lupi-mannari":"img/arene-fantasy-pericoli-branco-di-lupi-mannari.1c9124ceee.webp","spettro-errante":"img/arene-fantasy-pericoli-spettro-errante.056074bc23.webp","troll-di-caverna":"img/arene-fantasy-pericoli-troll-di-caverna.31aa2444f0.webp","viverna":"img/arene-fantasy-pericoli-viverna.577b91a819.webp"}},"horror":{"armi":{"ascia":"img/arene-horror-armi-ascia.f6793c220e.webp","attizzatoio":"img/arene-horror-armi-attizzatoio.12b9bf75af.webp","bastone-da-passeggio":"img/arene-horror-armi-bastone-da-passeggio.1a636ce4ab.webp","candelabro-dargento":"img/arene-horror-armi-candelabro-dargento.7d962054de.webp","coltello-dargento":"img/arene-horror-armi-coltello-dargento.73a6bb81ea.webp","crocifisso-appuntito":"img/arene-horror-armi-crocifisso-appuntito.203b41a170.webp","daga-da-cerimonia":"img/arene-horror-armi-daga-da-cerimonia.a597e15c53.webp","falce":"img/arene-horror-armi-falce.6513df8fa2.webp","fucile-da-caccia":"img/arene-horror-armi-fucile-da-caccia.169dc367e1.webp","pugnale-depoca":"img/arene-horror-armi-pugnale-depoca.f148afd005.webp","pugnale-rituale":"img/arene-horror-armi-pugnale-rituale.944cb9056c.webp","scure-da-legna":"img/arene-horror-armi-scure-da-legna.a11379a412.webp"},"luoghi":{"biblioteca":"img/arene-horror-luoghi-biblioteca.00d6ab97f4.webp","cantina":"img/arene-horror-luoghi-cantina.a196828c1d.webp","cappella":"img/arene-horror-luoghi-cappella.a51e505028.webp","cimitero":"img/arene-horror-luoghi-cimitero.7a441de089.webp","salone":"img/arene-horror-luoghi-salone.37f10c88c7.webp","serra":"img/arene-horror-luoghi-serra.b3d91121d4.webp","soffitta":"img/arene-horror-luoghi-soffitta.466d40cea3.webp"},"pericoli":{"bambola-posseduta":"img/arene-horror-pericoli-bambola-posseduta.7064eef1d7.webp","entita-senza-volto":"img/arene-horror-pericoli-entita-senza-volto.2c28467bdd.webp","spettro-urlante":"img/arene-horror-pericoli-spettro-urlante.25fa554e05.webp","stormo-di-corvi":"img/arene-horror-pericoli-stormo-di-corvi.fe5c85d7ae.webp"}},"liceo":{"armi":{"compito-copiato":"img/arene-liceo-armi-compito-copiato.c9ade27d61.webp","dossier-delle-revisioni":"img/arene-liceo-armi-dossier-delle-revisioni.77676a0f5f.webp","elenco-delle-correzioni":"img/arene-liceo-armi-elenco-delle-correzioni.04be1154c8.webp","fascicolo-di-risposte-motivate":"img/arene-liceo-armi-fascicolo-di-risposte-motivate.c29995b581.webp","foto-imbarazzante":"img/arene-liceo-armi-foto-imbarazzante.ff7d3ef284.webp","gossip-esplosivo":"img/arene-liceo-armi-gossip-esplosivo.552b1e6236.webp","pallone-da-dodgeball":"img/arene-liceo-armi-pallone-da-dodgeball.60a2576785.webp","profilo-falso":"img/arene-liceo-armi-profilo-falso.d1dac05a2b.webp","prospetto-dei-contributi":"img/arene-liceo-armi-prospetto-dei-contributi.0c121fd79a.webp","quaderno-delle-verifiche":"img/arene-liceo-armi-quaderno-delle-verifiche.7d8b07341a.webp","registro-rubato":"img/arene-liceo-armi-registro-rubato.67eb4b9eff.webp","riepilogo-delle-fonti":"img/arene-liceo-armi-riepilogo-delle-fonti.3c889a0ed5.webp"},"luoghi":{"aula-magna":"img/arene-liceo-luoghi-aula-magna.0478e35c5c.webp","aule":"img/arene-liceo-luoghi-aule.b3142d07cc.webp","biblioteca":"img/arene-liceo-luoghi-biblioteca.1ae806ae58.webp","cortile":"img/arene-liceo-luoghi-cortile.51bf433337.webp","laboratorio-di-chimica":"img/arene-liceo-luoghi-laboratorio-di-chimica.eba1434683.webp","mensa":"img/arene-liceo-luoghi-mensa.67bcbc7e37.webp","palestra":"img/arene-liceo-luoghi-palestra.8ecb872849.webp"},"pericoli":{"bidello-di-turno":"img/arene-liceo-pericoli-bidello-di-turno.191c43a8bd.webp","ispezione-a-sorpresa":"img/arene-liceo-pericoli-ispezione-a-sorpresa.bef087d9b9.webp","preside":"img/arene-liceo-pericoli-preside.033f6c9aae.webp","professoressa-di-matematica":"img/arene-liceo-pericoli-professoressa-di-matematica.6cb65c6a3f.webp"}},"royale":{"armi":{"balestra":"img/arene-royale-armi-balestra.64563b6cea.webp","carabina-compatta":"img/arene-royale-armi-carabina-compatta.a0fa150fbe.webp","coltello-da-combattimento":"img/arene-royale-armi-coltello-da-combattimento.74a64bca77.webp","coltello-tattico":"img/arene-royale-armi-coltello-tattico.8e9cb56197.webp","fucile-a-pompa":"img/arene-royale-armi-fucile-a-pompa.3d7fc7d83c.webp","fucile-da-cecchino":"img/arene-royale-armi-fucile-da-cecchino.fc3c4f19f1.webp","fucile-dassalto":"img/arene-royale-armi-fucile-dassalto.b91ccb0ec8.webp","granata":"img/arene-royale-armi-granata.fd9c359b27.webp","lancia-da-sopravvivenza":"img/arene-royale-armi-lancia-da-sopravvivenza.8a39c1a5e5.webp","manganello":"img/arene-royale-armi-manganello.dc6284893b.webp","mitraglietta":"img/arene-royale-armi-mitraglietta.6dcc3246e6.webp","pistola-da-segnalazione-modificata":"img/arene-royale-armi-pistola-da-segnalazione-modificata.1c7f899ca7.webp","pistola":"img/arene-royale-armi-pistola.acae268814.webp","scure-da-campo":"img/arene-royale-armi-scure-da-campo.6a5b0becd5.webp"},"luoghi":{"aeroporto":"img/arene-royale-luoghi-aeroporto.81e8ce98d4.webp","base-militare":"img/arene-royale-luoghi-base-militare.67f3a7de9d.webp","centrale-elettrica":"img/arene-royale-luoghi-centrale-elettrica.05ee57458a.webp","fattoria":"img/arene-royale-luoghi-fattoria.7c780dda87.webp","foresta":"img/arene-royale-luoghi-foresta.03b47644d0.webp","villaggio-costiero":"img/arene-royale-luoghi-villaggio-costiero.568519eb7c.webp"},"pericoli":{"cane-da-guardia-addestrato":"img/arene-royale-pericoli-cane-da-guardia-addestrato.c7853a67a0.webp","drone-armato":"img/arene-royale-pericoli-drone-armato.30d0b73e01.webp","elicottero-da-caccia":"img/arene-royale-pericoli-elicottero-da-caccia.8c68e62346.webp"}},"scifi":{"armi":{"bastone-a-impulsi":"img/arene-scifi-armi-bastone-a-impulsi.4e17e074e7.webp","cannone-a-rotaia-portatile":"img/arene-scifi-armi-cannone-a-rotaia-portatile.9a59b97d98.webp","frusta-monofilamento":"img/arene-scifi-armi-frusta-monofilamento.5ee8081aa9.webp","fucile-al-plasma":"img/arene-scifi-armi-fucile-al-plasma.ea2384a239.webp","granata-emp":"img/arene-scifi-armi-granata-emp.04cfd31203.webp","lama-di-servizio":"img/arene-scifi-armi-lama-di-servizio.a47d434464.webp","lama-vibrante":"img/arene-scifi-armi-lama-vibrante.02b0f47ff8.webp","lancia-da-abbordaggio":"img/arene-scifi-armi-lancia-da-abbordaggio.cf167e52ff.webp","perforatore-portatile":"img/arene-scifi-armi-perforatore-portatile.aa7e92ecab.webp","pistola-a-scarica":"img/arene-scifi-armi-pistola-a-scarica.33b3e5929e.webp","pistola-laser":"img/arene-scifi-armi-pistola-laser.aed4bbf3ed.webp","taglierino-ceramico":"img/arene-scifi-armi-taglierino-ceramico.b45d524836.webp","taser-a-impulsi":"img/arene-scifi-armi-taser-a-impulsi.360e29e1d5.webp"},"luoghi":{"condotti-di-servizio":"img/arene-scifi-luoghi-condotti-di-servizio.6817134b5e.webp","hangar":"img/arene-scifi-luoghi-hangar.6de551833b.webp","moduli-abitativi":"img/arene-scifi-luoghi-moduli-abitativi.9f5bb96d39.webp","ponte-di-comando":"img/arene-scifi-luoghi-ponte-di-comando.3e9ffd005a.webp","reattore":"img/arene-scifi-luoghi-reattore.d10a335006.webp","serra-idroponica":"img/arene-scifi-luoghi-serra-idroponica.b6f4407853.webp"},"pericoli":{"androide-da-combattimento":"img/arene-scifi-pericoli-androide-da-combattimento.1a3d3eb38e.webp","creatura-aliena-dai-tentacoli":"img/arene-scifi-pericoli-creatura-aliena-dai-tentacoli.b6b314ddd9.webp","drone-di-sicurezza-impazzito":"img/arene-scifi-pericoli-drone-di-sicurezza-impazzito.c8a9c6f9e3.webp","sciame-di-nanobot":"img/arene-scifi-pericoli-sciame-di-nanobot.d43296f047.webp"}},"ufficio":{"armi":{"badge-clonato-del-capo":"img/arene-ufficio-armi-badge-clonato-del-capo.be9f7381fe.webp","dossier-dei-risultati":"img/arene-ufficio-armi-dossier-dei-risultati.1888e2f671.webp","elenco-dei-contributi":"img/arene-ufficio-armi-elenco-dei-contributi.3de4fbe5bf.webp","fascicolo-delle-fonti":"img/arene-ufficio-armi-fascicolo-delle-fonti.02df27dfbf.webp","foglio-excel-con-le-prove":"img/arene-ufficio-armi-foglio-excel-con-le-prove.944f6ec708.webp","mail-in-copia-a-tutti":"img/arene-ufficio-armi-mail-in-copia-a-tutti.1d4304df14.webp","nota-spese-gonfiata":"img/arene-ufficio-armi-nota-spese-gonfiata.d2683cca4c.webp","presentazione-rubata":"img/arene-ufficio-armi-presentazione-rubata.815dc5c8b4.webp","prospetto-delle-metriche":"img/arene-ufficio-armi-prospetto-delle-metriche.356da1d2d9.webp","registro-delle-revisioni":"img/arene-ufficio-armi-registro-delle-revisioni.509eab44df.webp","report-pieno-di-errori-altrui":"img/arene-ufficio-armi-report-pieno-di-errori-altrui.c01c0ef897.webp","riepilogo-delle-approvazioni":"img/arene-ufficio-armi-riepilogo-delle-approvazioni.9394dadd6b.webp"},"luoghi":{"cucina":"img/arene-ufficio-luoghi-cucina.d968f8861d.webp","open-space":"img/arene-ufficio-luoghi-open-space.b6b7990c99.webp","parcheggio":"img/arene-ufficio-luoghi-parcheggio.d593f2ed83.webp","sala-riunioni":"img/arene-ufficio-luoghi-sala-riunioni.f92c4030a9.webp","sala-stampanti":"img/arene-ufficio-luoghi-sala-stampanti.1727f50082.webp","ufficio-del-direttore":"img/arene-ufficio-luoghi-ufficio-del-direttore.bb3b6cabab.webp"},"pericoli":{"consulente-esterno":"img/arene-ufficio-pericoli-consulente-esterno.ce6e200c3f.webp","direttore-generale":"img/arene-ufficio-pericoli-direttore-generale.da2eb1f708.webp","riorganizzazione-aziendale":"img/arene-ufficio-pericoli-riorganizzazione-aziendale.1fd57b76b3.webp","ufficio-risorse-umane":"img/arene-ufficio-pericoli-ufficio-risorse-umane.8392df7518.webp"}},"wasteland":{"armi":{"balestra-artigianale":"img/arene-wasteland-armi-balestra-artigianale.e09826852f.webp","catena":"img/arene-wasteland-armi-catena.866183d584.webp","coltello-da-strada":"img/arene-wasteland-armi-coltello-da-strada.1083c4429d.webp","fucile-arrugginito":"img/arene-wasteland-armi-fucile-arrugginito.797601f16e.webp","lama-di-recupero":"img/arene-wasteland-armi-lama-di-recupero.1ad13cfc78.webp","lancia-di-ferraglia":"img/arene-wasteland-armi-lancia-di-ferraglia.99d9f41307.webp","lancia-ricavata-da-un-tubo":"img/arene-wasteland-armi-lancia-ricavata-da-un-tubo.53b934e449.webp","lanciachiodi":"img/arene-wasteland-armi-lanciachiodi.e4f51e42e2.webp","mannaia":"img/arene-wasteland-armi-mannaia.518ae9c11c.webp","martello-da-officina":"img/arene-wasteland-armi-martello-da-officina.851055795e.webp","mazza-di-tubi":"img/arene-wasteland-armi-mazza-di-tubi.91babe82ac.webp","molotov":"img/arene-wasteland-armi-molotov.303d6fa315.webp","scure-da-demolizione":"img/arene-wasteland-armi-scure-da-demolizione.066ea5e066.webp"},"luoghi":{"autostrada-spezzata":"img/arene-wasteland-luoghi-autostrada-spezzata.19a72a0b97.webp","citta-fantasma":"img/arene-wasteland-luoghi-citta-fantasma.fe22bb72b2.webp","cratere":"img/arene-wasteland-luoghi-cratere.04de7ca40a.webp","deposito":"img/arene-wasteland-luoghi-deposito.f98aa31220.webp","diga":"img/arene-wasteland-luoghi-diga.3be9abe15a.webp","discarica":"img/arene-wasteland-luoghi-discarica.b8783ad9c6.webp","raffineria":"img/arene-wasteland-luoghi-raffineria.081e2d2ad6.webp"},"pericoli":{"banda-di-predoni":"img/arene-wasteland-pericoli-banda-di-predoni.1dfcfd1628.webp","branco-di-cani-mutati":"img/arene-wasteland-pericoli-branco-di-cani-mutati.442fabfc39.webp","scorpione-gigante":"img/arene-wasteland-pericoli-scorpione-gigante.2dd8911367.webp","verme-delle-sabbie":"img/arene-wasteland-pericoli-verme-delle-sabbie.a0d445beeb.webp"}},"zombie":{"armi":{"accetta-da-soccorso":"img/arene-zombie-armi-accetta-da-soccorso.6d36eb13ac.webp","accetta":"img/arene-zombie-armi-accetta.0eed163720.webp","balestra":"img/arene-zombie-armi-balestra.d705131d17.webp","coltello-da-campeggio":"img/arene-zombie-armi-coltello-da-campeggio.2abab58e78.webp","fucile-a-pompa":"img/arene-zombie-armi-fucile-a-pompa.b00b1d6a70.webp","katana":"img/arene-zombie-armi-katana.f631ad392f.webp","machete-da-potatura":"img/arene-zombie-armi-machete-da-potatura.94a93108a1.webp","martello-da-carpentiere":"img/arene-zombie-armi-martello-da-carpentiere.021e8a80f2.webp","mazza-chiodata":"img/arene-zombie-armi-mazza-chiodata.b4e11dcadb.webp","mazza-da-lavoro":"img/arene-zombie-armi-mazza-da-lavoro.c36a90108f.webp","motosega":"img/arene-zombie-armi-motosega.f74e603615.webp","piede-di-porco":"img/arene-zombie-armi-piede-di-porco.c185a97e0d.webp","pistola":"img/arene-zombie-armi-pistola.6d30022ca6.webp"},"luoghi":{"centro-commerciale":"img/arene-zombie-luoghi-centro-commerciale.333f4699d5.webp","metropolitana":"img/arene-zombie-luoghi-metropolitana.878a263605.webp","ospedale":"img/arene-zombie-luoghi-ospedale.f25de413a4.webp","periferia":"img/arene-zombie-luoghi-periferia.e28a7d70c7.webp","piazza":"img/arene-zombie-luoghi-piazza.b6ed86b3ad.webp","scuola":"img/arene-zombie-luoghi-scuola.153ddbaa75.webp","stazione-di-polizia":"img/arene-zombie-luoghi-stazione-di-polizia.157f7a17f5.webp"},"pericoli":{"cane-infetto":"img/arene-zombie-pericoli-cane-infetto.fdff913d6f.webp","gigante-mutato":"img/arene-zombie-pericoli-gigante-mutato.91fad36b70.webp","infetto-corridore":"img/arene-zombie-pericoli-infetto-corridore.61f48faafd.webp","orda-di-zombi":"img/arene-zombie-pericoli-orda-di-zombi.e0fc6d1b56.webp"}}}};
 ;
-window.LOS_BUILD = "9b281823a28a86b41c28f8f0c3e39fcd506e82ce62a144e15cdc504d89e55539";
+window.LOS_BUILD = "15d054577f1aa06f9b49a83a63a02b7f47433a09a124ca9b7f4e5e2c7436526c";
 ;
 /* Last One Standing — grafica vettoriale: logo, icone delle arene, illustrazioni.
  * Tutto è SVG generato in codice: nessuna immagine esterna. */
@@ -16556,6 +16672,232 @@ window.LOS_BUILD = "9b281823a28a86b41c28f8f0c3e39fcd506e82ce62a144e15cdc504d89e5
   };
 
   /* Un campo animato su un canvas sopra (o sotto) un contenitore */
+  /* ================= SCENE DIPINTE =================
+   * Sopra ogni banner non girano più particelle generiche: ogni arena descrive la propria scena,
+   * ancorata al dipinto (u, v = frazioni dell'immagine, seguite anche quando l'immagine è ritagliata
+   * o in lento movimento). Luci che respirano e tremolano dove il quadro ha le sue fonti di luce,
+   * raggi che girano piano, fasce di nebbia a quote diverse, particelle con profondità (lontane e
+   * nitide, vicine e sfocate) e un evento raro proprio dell'arena. Tutto in fusione «screen»:
+   * la luce si somma al dipinto senza coprirlo. */
+  const hexRgb = (h) => { const n = parseInt(h.slice(1), 16); return [(n >> 16) & 255, (n >> 8) & 255, n & 255]; };
+  const rgba = (h, a) => { const [r, g, b] = hexRgb(h); return 'rgba(' + r + ',' + g + ',' + b + ',' + a + ')'; };
+  const sprites = new Map();
+  function glowSprite(c) {
+    let s = sprites.get(c); if (s) return s;
+    s = document.createElement('canvas'); s.width = s.height = 128; const g = s.getContext('2d');
+    const gr = g.createRadialGradient(64, 64, 0, 64, 64, 64);
+    gr.addColorStop(0, rgba(c, 1)); gr.addColorStop(0.18, rgba(c, 0.55)); gr.addColorStop(0.5, rgba(c, 0.14)); gr.addColorStop(1, rgba(c, 0));
+    g.fillStyle = gr; g.fillRect(0, 0, 128, 128); sprites.set(c, s); return s;
+  }
+  const rr = (a) => (Array.isArray(a) ? R(a[0], a[1]) : a);
+  // rumore morbido per tremolii credibili (somma di sinusoidi sfasate)
+  const wob = (t, s) => (Math.sin(t * 1.7 + s) * 0.5 + Math.sin(t * 3.1 + s * 2.3) * 0.3 + Math.sin(t * 7.3 + s * 4.1) * 0.2);
+  const SC = {
+    classico: {
+      lights: [{ u: 0.5, v: 0.2, r: 0.42, c: '#ffb14a', a: 0.32, pulse: 0.08, rays: { n: 9, len: 1.6, w: 0.045, a: 0.07, sp: 0.018 } }, { u: 0.53, v: 0.74, r: 0.12, c: '#ff7a2a', a: 0.45, flick: 0.4 }],
+      fog: [{ v: 0.62, c: '#ffb070', a: 0.1, h: 0.16, sp: 7 }, { v: 0.9, c: '#7a3b6a', a: 0.12, h: 0.2, sp: -5 }],
+      motes: [{ k: 'rise', n: 22, c: ['#ffd27a', '#ff8a3d', '#ffb14a'], u: [0.44, 0.62], v: [0.62, 0.84], vy: [-34, -14], vx: [-10, 10], sz: [0.8, 2.2], life: [2.5, 6] }, { k: 'drift', n: 20, c: ['#ffe2a8'], sz: [0.5, 1.3], a: 0.55 }, { k: 'bokeh', n: 5, c: ['#ffb14a', '#ff8a3d'], sz: [14, 30], a: 0.07 }],
+    },
+    fantasy: {
+      lights: [{ u: 0.53, v: 0.15, r: 0.34, c: '#cfe0ff', a: 0.26, pulse: 0.1, rays: { n: 7, len: 1.4, w: 0.035, a: 0.05, sp: -0.012 } }, { u: 0.08, v: 0.3, r: 0.16, c: '#ff8a2a', a: 0.32, pulse: 0.3, sp: 0.8 }, { u: 0.65, v: 0.4, r: 0.2, c: '#48c8ff', a: 0.28, pulse: 0.25, sp: 0.6 }, { u: 0.25, v: 0.82, r: 0.1, c: '#3ff0d0', a: 0.35, pulse: 0.35, sp: 1.1 }],
+      fog: [{ v: 0.7, c: '#4a5cff', a: 0.1, h: 0.2, sp: 5 }, { v: 0.92, c: '#7a3ac8', a: 0.1, h: 0.16, sp: -4 }],
+      motes: [{ k: 'rise', n: 26, c: ['#7af0ff', '#c79bff', '#ffd98a'], u: [0.05, 0.95], v: [0.55, 1], vy: [-22, -8], vx: [-6, 6], sz: [0.8, 2], life: [4, 8], wander: 14 }, { k: 'twinkle', n: 26, c: ['#ffffff', '#cfe0ff'], v: [0, 0.35], sz: [0.5, 1.2] }, { k: 'bokeh', n: 6, c: ['#48c8ff', '#c79bff'], sz: [12, 26], a: 0.08 }],
+      event: 'shootingStar',
+    },
+    scifi: {
+      lights: [{ u: 0.5, v: 0.58, r: 0.45, c: '#5aa8ff', a: 0.18, pulse: 0.12, sp: 0.4 }, { u: 0.62, v: 0.6, r: 0.18, c: '#ff8a5c', a: 0.22, pulse: 0.2, sp: 0.5 }, { u: 0.05, v: 0.35, r: 0.05, c: '#ff3b2f', a: 0.7, blink: 1.6 }, { u: 0.12, v: 0.68, r: 0.04, c: '#ff5a2f', a: 0.7, blink: 2.3 }, { u: 0.96, v: 0.55, r: 0.04, c: '#ff5a2f', a: 0.6, blink: 1.9 }],
+      motes: [{ k: 'twinkle', n: 46, c: ['#ffffff', '#bfe8ff', '#9fc0ff'], v: [0, 0.6], sz: [0.4, 1.3] }, { k: 'drift', n: 10, c: ['#9fc0ff'], sz: [0.8, 2], a: 0.45, vx: [-10, -3] }, { k: 'bokeh', n: 4, c: ['#5aa8ff'], sz: [16, 30], a: 0.06 }],
+      event: 'shootingStar',
+    },
+    zombie: {
+      lights: [{ u: 0.3, v: 0.35, r: 0.3, c: '#38e08a', a: 0.16, pulse: 0.15, sp: 0.3 }, { u: 0.85, v: 0.22, r: 0.1, c: '#ffb04a', a: 0.5, flick: 0.6 }, { u: 0.72, v: 0.58, r: 0.06, c: '#ff8a3d', a: 0.45, flick: 0.5 }],
+      fog: [{ v: 0.55, c: '#4fd88a', a: 0.08, h: 0.22, sp: 4 }, { v: 0.85, c: '#7a9a8a', a: 0.1, h: 0.18, sp: -6 }],
+      motes: [{ k: 'fall', n: 50, c: ['#b8d8c8'], sz: [0.6, 1.1], a: 0.28, vy: [380, 520], vx: [-60, -40], len: [10, 20] }, { k: 'drift', n: 14, c: ['#c8f0a0'], sz: [0.6, 1.4], a: 0.4 }],
+      event: 'searchlight', src: { u: 0.48, v: 0.08 },
+    },
+    royale: {
+      lights: [{ u: 0.66, v: 0.72, r: 0.36, c: '#ffb36a', a: 0.3, pulse: 0.08, rays: { n: 8, len: 1.2, w: 0.04, a: 0.06, sp: 0.015 } }, { u: 0.55, v: 0.45, r: 0.3, c: '#5ac8ff', a: 0.12, pulse: 0.2, sp: 0.5 }],
+      fog: [{ v: 0.88, c: '#8ad8ff', a: 0.07, h: 0.12, sp: 10 }],
+      motes: [{ k: 'sparkle', n: 30, c: ['#ffffff', '#ffe0b0'], u: [0.2, 0.8], v: [0.82, 0.96], sz: [0.6, 1.6] }, { k: 'chute', n: 4, c: ['#ffe3c4', '#ff9a6a', '#ffffff'], u: [0.4, 0.75], v: [0.05, 0.3], sz: [3, 5] }, { k: 'drift', n: 10, c: ['#fff0d0'], sz: [0.6, 1.2], a: 0.4 }],
+      event: 'domeShimmer', src: { u: 0.55, v: 0.42 },
+    },
+    horror: {
+      lights: [{ u: 0.5, v: 0.3, r: 0.46, c: '#ff3b2a', a: 0.26, pulse: 0.12, sp: 0.35 }, { u: 0.92, v: 0.78, r: 0.07, c: '#ff8a3d', a: 0.5, flick: 0.5 }, { u: 0.39, v: 0.45, r: 0.04, c: '#ffb04a', a: 0.6, flick: 0.6 }],
+      fog: [{ v: 0.72, c: '#6a8cff', a: 0.12, h: 0.2, sp: 6 }, { v: 0.9, c: '#a0b4ff', a: 0.1, h: 0.16, sp: -8 }],
+      motes: [{ k: 'bat', n: 5, c: ['#08040a'], u: [0.3, 0.7], v: [0.1, 0.4], sz: [3, 6] }, { k: 'rise', n: 14, c: ['#ff4a2a', '#ff8a3d'], u: [0.2, 0.9], v: [0.75, 0.95], vy: [-18, -6], vx: [-6, 6], sz: [0.7, 1.6], life: [3, 6] }, { k: 'drift', n: 10, c: ['#ffd0d0'], sz: [0.5, 1.1], a: 0.35 }],
+      event: 'lightning',
+    },
+    wasteland: {
+      lights: [{ u: 0.27, v: 0.24, r: 0.48, c: '#ff9a3a', a: 0.3, pulse: 0.1, sp: 0.35, rays: { n: 10, len: 1.5, w: 0.04, a: 0.06, sp: 0.01 } }, { u: 0.77, v: 0.42, r: 0.07, c: '#ffb04a', a: 0.55, flick: 0.55 }],
+      fog: [{ v: 0.6, c: '#ffb070', a: 0.08, h: 0.14, sp: 18 }, { v: 0.85, c: '#ff8a4a', a: 0.08, h: 0.16, sp: 24 }],
+      motes: [{ k: 'streak', n: 34, c: ['#ffd9a0', '#f4b26a'], sz: [0.6, 1.3], a: 0.35, vx: [140, 240], vy: [-8, 6], len: [8, 18] }, { k: 'rise', n: 10, c: ['#ff8a3d', '#ffd27a'], u: [0.72, 0.82], v: [0.38, 0.5], vy: [-30, -14], vx: [-4, 10], sz: [0.8, 1.8], life: [1.5, 3.5] }, { k: 'bokeh', n: 4, c: ['#ff9a3a'], sz: [14, 28], a: 0.07 }],
+      event: 'heatHaze', src: { u: 0.27, v: 0.42 },
+    },
+    liceo: {
+      lights: [{ u: 0.5, v: 0.5, r: 0.36, c: '#ffcf8a', a: 0.18, pulse: 0.08, sp: 0.4 }, { u: 0.86, v: 0.4, r: 0.18, c: '#ff8a3d', a: 0.2, pulse: 0.2, sp: 0.6 }, { u: 0.06, v: 0.62, r: 0.06, c: '#5ab8ff', a: 0.4, flick: 0.3 }],
+      motes: [{ k: 'flutter', n: 10, c: ['#ffd1e0', '#ffffff', '#ffb0c8'], sz: [2.5, 4.5], vy: [10, 24], vx: [6, 18] }, { k: 'drift', n: 18, c: ['#ffe8c0'], sz: [0.6, 1.4], a: 0.5 }, { k: 'bokeh', n: 5, c: ['#ffb0c8', '#ffcf8a'], sz: [14, 28], a: 0.08 }],
+      event: 'paperPlane',
+    },
+    ufficio: {
+      lights: [{ u: 0.48, v: 0.38, r: 0.2, c: '#ffc070', a: 0.22, pulse: 0.1, sp: 0.4 }, { u: 0.5, v: 0.86, r: 0.42, c: '#4ab8ff', a: 0.14, pulse: 0.18, sp: 0.8 }],
+      motes: [{ k: 'screen', n: 26, c: ['#6ad0ff', '#4ab8ff', '#9fe8ff'], u: [0.08, 0.92], v: [0.72, 0.9], sz: [1.5, 3.5] }, { k: 'drift', n: 22, c: ['#cfe8ff'], sz: [0.5, 1.2], a: 0.45 }, { k: 'flutter', n: 3, c: ['#ffffff'], sz: [3.5, 5], vy: [8, 16], vx: [10, 20] }],
+    },
+    cyberpunk: {
+      lights: [{ u: 0.5, v: 0.04, r: 0.16, c: '#ffd23a', a: 0.6, pulse: 0.3, sp: 1.2, beam: true }, { u: 0.21, v: 0.2, r: 0.16, c: '#ff4fd8', a: 0.35, flick: 0.35 }, { u: 0.88, v: 0.24, r: 0.15, c: '#3ff0ff', a: 0.32, flick: 0.3 }, { u: 0.5, v: 0.62, r: 0.3, c: '#5a6aff', a: 0.16, pulse: 0.15, sp: 0.5 }],
+      fog: [{ v: 0.75, c: '#7a5aff', a: 0.08, h: 0.2, sp: 5 }],
+      motes: [{ k: 'fall', n: 70, c: ['#9ff6ff', '#cfefff'], sz: [0.5, 1], a: 0.3, vy: [420, 600], vx: [-50, -30], len: [12, 24] }, { k: 'puddle', n: 14, c: ['#3ff0ff', '#ff4fd8'], u: [0.25, 0.75], v: [0.86, 0.98], sz: [6, 16] }, { k: 'bokeh', n: 5, c: ['#ff4fd8', '#3ff0ff'], sz: [12, 26], a: 0.08 }],
+      event: 'glitch',
+    },
+  };
+  // posizione e misura dell'immagine dentro il riquadro (object-fit: cover, anche durante il movimento lento)
+  function imgBox(f) {
+    const im = f.host.querySelector('img.scene');
+    if (!im || !im.naturalWidth) return { x: 0, y: 0, w: f.w, h: f.h };
+    const r = im.getBoundingClientRect(), hr = f.host.getBoundingClientRect();
+    const s = Math.max(r.width / im.naturalWidth, r.height / im.naturalHeight), dw = im.naturalWidth * s, dh = im.naturalHeight * s;
+    const op = getComputedStyle(im).objectPosition.split(' '), pct = (v) => (/%$/.test(v || '') ? parseFloat(v) / 100 : 0.5);
+    return { x: r.left - hr.left + (r.width - dw) * pct(op[0]), y: r.top - hr.top + (r.height - dh) * pct(op[1]), w: dw, h: dh };
+  }
+  function seedScene(f) {
+    const S = SC[f.theme], B = f.box || (f.box = imgBox(f)), k = Math.min(2, f.k), area = Math.min(1.4, Math.max(0.5, f.w / 900));
+    f.sc = { motes: [], ev: { next: R(5, 10) } };
+    for (const m of S.motes || []) {
+      const n = Math.round(m.n * (m.k === 'bokeh' || m.k === 'chute' || m.k === 'bat' ? 1 : area * (0.7 + k * 0.3)));
+      for (let i = 0; i < n; i++) f.sc.motes.push(spawnMote(m, B, f, true));
+    }
+  }
+  function spawnMote(m, B, f, initial) {
+    const u = m.u ? rr(m.u) : R(0, 1), v = m.v ? rr(m.v) : R(0, 1);
+    const p = { m, c: pick(m.c), x: B.x + u * B.w, y: B.y + v * B.h, sz: rr(m.sz), t: R(0, 20), s: R(0, 9), a: m.a != null ? m.a : 0.8 };
+    if (m.k === 'rise') { p.vx = rr(m.vx); p.vy = rr(m.vy); p.life = rr(m.life); p.age = initial ? R(0, p.life) : 0; }
+    else if (m.k === 'fall' || m.k === 'streak') { p.vx = rr(m.vx); p.vy = rr(m.vy); p.len = rr(m.len); if (!initial) { if (m.k === 'fall') p.y = -20; else p.x = -20; } }
+    else if (m.k === 'drift') { p.vx = m.vx ? rr(m.vx) : R(-6, 6); p.vy = R(-5, 3); }
+    else if (m.k === 'bokeh') { p.vx = R(-5, 5); p.vy = R(-3, 3); p.x = R(0, f.w); p.y = R(0, f.h); }
+    else if (m.k === 'flutter') { p.vx = rr(m.vx); p.vy = rr(m.vy); p.rot = R(0, 6); if (!initial) { p.x = R(-40, f.w * 0.6); p.y = -12; } }
+    else if (m.k === 'bat') { p.vx = R(30, 60) * (Math.random() < 0.5 ? -1 : 1); p.vy = 0; }
+    else if (m.k === 'chute') { p.vx = R(3, 8); p.vy = R(6, 12); if (!initial) p.y = B.y + R(-0.05, 0.05) * B.h; }
+    return p;
+  }
+  function paintScene(f, dt) {
+    const S = SC[f.theme], g = f.g, t = f.t, k = Math.min(2, f.k);
+    if (!f.box || (f.boxT = (f.boxT || 0) + dt) > 0.25) { f.box = imgBox(f); f.boxT = 0; }
+    const B = f.box, P = (u, v) => [B.x + u * B.w, B.y + v * B.h];
+    g.globalCompositeOperation = 'lighter';
+    // nebbie: grandi fasce morbide che scorrono a velocità diverse (parallasse)
+    for (const fg of S.fog || []) {
+      const y = B.y + fg.v * B.h, h = fg.h * B.h, step = h * 2.4, off = ((t * fg.sp) % step + step) % step;
+      for (let x = -step + off; x < f.w + step; x += step) {
+        const cx = x + Math.sin(t * 0.15 + x * 0.01) * h * 0.4, cy = y + Math.sin(t * 0.2 + x * 0.02) * h * 0.15;
+        g.globalAlpha = fg.a * (0.75 + 0.25 * Math.sin(t * 0.3 + x * 0.013)); g.drawImage(glowSprite(fg.c), cx - step * 0.75, cy - h, step * 1.5, h * 2);
+      }
+    }
+    // luci: respiro, tremolio delle fiamme, lampeggio delle spie, raggi rotanti, fascio verticale
+    for (const L of S.lights || []) {
+      const [x, y] = P(L.u, L.v); let a = L.a;
+      if (L.pulse) a *= 1 - L.pulse + L.pulse * (0.5 + 0.5 * Math.sin(t * (L.sp || 0.5) * 2 * Math.PI * 0.3 + L.u * 9));
+      if (L.flick) a *= Math.max(0.15, 1 - L.flick * (0.5 + 0.5 * wob(t * 2.2, L.u * 13)) - (Math.random() < 0.012 ? 0.6 : 0));
+      if (L.blink) a *= (Math.sin(t * Math.PI * 2 / L.blink + L.v * 7) > 0.6 ? 1 : 0.12);
+      a *= 0.85 + k * 0.15;
+      const rad = L.r * B.h * 2;
+      if (L.rays) {
+        const RY = L.rays, len = RY.len * B.h;
+        for (let i = 0; i < RY.n; i++) {
+          const ang = t * RY.sp + (i / RY.n) * Math.PI * 2, w = RY.w * B.h * (0.7 + 0.3 * Math.sin(t * 0.4 + i));
+          const gr = g.createLinearGradient(x, y, x + Math.cos(ang) * len, y + Math.sin(ang) * len);
+          gr.addColorStop(0, rgba(L.c, RY.a * (0.6 + 0.4 * Math.sin(t * 0.5 + i * 1.7)) * (0.85 + k * 0.15))); gr.addColorStop(1, rgba(L.c, 0));
+          g.globalAlpha = 1; g.fillStyle = gr; g.beginPath(); g.moveTo(x, y);
+          g.lineTo(x + Math.cos(ang - 0.5 * w / len) * len, y + Math.sin(ang - 0.5 * w / len) * len); g.lineTo(x + Math.cos(ang + 0.5 * w / len) * len, y + Math.sin(ang + 0.5 * w / len) * len); g.closePath(); g.fill();
+        }
+      }
+      if (L.beam) { const gr = g.createLinearGradient(x, y, x, 0); gr.addColorStop(0, rgba(L.c, a * 0.5)); gr.addColorStop(1, rgba(L.c, 0)); g.globalAlpha = 1; g.fillStyle = gr; g.fillRect(x - B.h * 0.012, 0, B.h * 0.024, Math.max(0, y)); }
+      g.globalAlpha = Math.min(1, a); g.drawImage(glowSprite(L.c), x - rad, y - rad, rad * 2, rad * 2);
+    }
+    // particelle
+    for (let i = 0; i < f.sc.motes.length; i++) {
+      const p = f.sc.motes[i], m = p.m; p.t += dt;
+      switch (m.k) {
+        case 'rise': {
+          p.age += dt; p.x += (p.vx + Math.sin(p.t * 1.3 + p.s) * (m.wander || 6)) * dt; p.y += p.vy * dt;
+          const life = Math.min(1, p.age / p.life), fade = Math.sin(life * Math.PI);
+          g.globalAlpha = p.a * fade * (0.6 + 0.4 * Math.sin(p.t * 9 + p.s)); const r = p.sz * 4; g.drawImage(glowSprite(p.c), p.x - r, p.y - r, r * 2, r * 2);
+          if (p.age > p.life) f.sc.motes[i] = spawnMote(m, B, f, false); break;
+        }
+        case 'fall': case 'streak': {
+          p.x += p.vx * dt; p.y += p.vy * dt; g.globalAlpha = p.a; g.strokeStyle = p.c; g.lineWidth = p.sz;
+          const n = Math.hypot(p.vx, p.vy) || 1; g.beginPath(); g.moveTo(p.x, p.y); g.lineTo(p.x - p.vx / n * p.len, p.y - p.vy / n * p.len); g.stroke();
+          if (p.y > f.h + 30 || p.x > f.w + 30 || p.x < -40) f.sc.motes[i] = spawnMote(m, B, f, false); break;
+        }
+        case 'drift': {
+          p.x += (p.vx + Math.sin(p.t * 0.7 + p.s) * 4) * dt; p.y += (p.vy + Math.cos(p.t * 0.5 + p.s) * 3) * dt; wrap(p, f.w, f.h, 10);
+          g.globalAlpha = p.a * (0.5 + 0.5 * Math.sin(p.t * 1.3 + p.s)); const r = p.sz * 3; g.drawImage(glowSprite(p.c), p.x - r, p.y - r, r * 2, r * 2); break;
+        }
+        case 'bokeh': {
+          p.x += p.vx * dt; p.y += p.vy * dt; wrap(p, f.w, f.h, 40); g.globalAlpha = p.a * (0.6 + 0.4 * Math.sin(p.t * 0.4 + p.s)); const r = p.sz * 2; g.drawImage(glowSprite(p.c), p.x - r, p.y - r, r * 2, r * 2); break;
+        }
+        case 'twinkle': case 'sparkle': case 'screen': {
+          const sp = m.k === 'sparkle' ? 3.2 : m.k === 'screen' ? 0.8 : 1.4;
+          let a = 0.5 + 0.5 * Math.sin(p.t * sp + p.s); if (m.k === 'sparkle') a = Math.pow(a, 6); if (m.k === 'screen') a = 0.45 + 0.35 * a - (Math.random() < 0.004 ? 0.4 : 0);
+          g.globalAlpha = Math.max(0, a) * (m.a || 0.9); const r = p.sz * (m.k === 'screen' ? 3 : 2.5); g.drawImage(glowSprite(p.c), p.x - r, p.y - r, r * 2, r * 2); break;
+        }
+        case 'puddle': {
+          const a = 0.18 + 0.14 * Math.sin(p.t * 1.1 + p.s); g.globalAlpha = a; const w = p.sz * (1.6 + 0.4 * Math.sin(p.t * 0.7 + p.s)); g.drawImage(glowSprite(p.c), p.x - w * 2, p.y - w * 0.3, w * 4, w * 0.6); break;
+        }
+        case 'flutter': {
+          p.x += (p.vx + Math.sin(p.t * 1.6 + p.s) * 18) * dt; p.y += (p.vy + Math.cos(p.t * 2.1 + p.s) * 6) * dt; p.rot += dt * 1.4;
+          g.save(); g.translate(p.x, p.y); g.rotate(Math.sin(p.rot) * 0.8); g.scale(Math.cos(p.t * 2.6 + p.s), 1); g.globalCompositeOperation = 'source-over'; g.globalAlpha = 0.75; g.fillStyle = p.c; g.fillRect(-p.sz, -p.sz * 1.3, p.sz * 2, p.sz * 2.6); g.restore(); g.globalCompositeOperation = 'lighter';
+          if (p.y > f.h + 20 || p.x > f.w + 30) f.sc.motes[i] = spawnMote(m, B, f, false); break;
+        }
+        case 'bat': {
+          p.x += p.vx * dt; p.y += Math.sin(p.t * 2.4 + p.s) * 14 * dt; if (p.x < -40) p.x = f.w + 30; if (p.x > f.w + 40) p.x = -30;
+          g.save(); g.globalCompositeOperation = 'source-over'; shapes.bat(g, { x: p.x, y: p.y, r: p.sz, c: p.c, o: 0.85, t: p.t }); g.restore(); break;
+        }
+        case 'chute': {
+          p.x += (p.vx + Math.sin(p.t * 0.9 + p.s) * 4) * dt; p.y += p.vy * dt;
+          g.save(); g.globalCompositeOperation = 'source-over'; shapes.chute(g, { x: p.x, y: p.y, r: p.sz, c: p.c, o: 0.75 }); g.restore();
+          if (p.y > B.y + B.h * 0.7) f.sc.motes[i] = spawnMote(m, B, f, false); break;
+        }
+      }
+    }
+    sceneEvent(f, S, B, P, dt);
+    g.globalAlpha = 1; g.globalCompositeOperation = 'source-over';
+  }
+  // eventi rari: arrivano ogni tanto, senza ritmo fisso, e durano poco
+  function sceneEvent(f, S, B, P, dt) {
+    const g = f.g, e = f.sc.ev, t = f.t;
+    if (S.event === 'searchlight') {
+      // il faro di un elicottero che spazza la città: tre spicchi sovrapposti, così il bordo resta morbido
+      const [x, y] = P(S.src.u, S.src.v), ang = Math.PI / 2 + Math.sin(t * 0.22) * 0.75, len = B.h * 1.3;
+      for (const [w, a] of [[0.16, 0.035], [0.1, 0.045], [0.05, 0.06]]) {
+        const gr = g.createLinearGradient(x, y, x + Math.cos(ang) * len, y + Math.sin(ang) * len); gr.addColorStop(0, 'rgba(220,255,230,' + a + ')'); gr.addColorStop(0.7, 'rgba(220,255,230,' + a * 0.4 + ')'); gr.addColorStop(1, 'rgba(220,255,230,0)');
+        g.globalAlpha = 1; g.fillStyle = gr; g.beginPath(); g.moveTo(x, y); g.lineTo(x + Math.cos(ang - w) * len, y + Math.sin(ang - w) * len); g.lineTo(x + Math.cos(ang + w) * len, y + Math.sin(ang + w) * len); g.closePath(); g.fill();
+      }
+      g.globalAlpha = 0.5; const r0 = B.h * 0.05; g.drawImage(glowSprite('#e8fff0'), x - r0, y - r0, r0 * 2, r0 * 2); return;
+    }
+    if (S.event === 'domeShimmer') {
+      const [x, y] = P(S.src.u, S.src.v), rx = B.w * 0.26, ry = B.h * 0.32, ph = (t * 0.18) % 1;
+      g.globalAlpha = 0.35; g.strokeStyle = 'rgba(160,230,255,.6)'; g.lineWidth = 2; g.beginPath(); g.ellipse(x, y + ry * 0.4, rx, ry, 0, Math.PI * (1.05 + ph * 0.7), Math.PI * (1.12 + ph * 0.7)); g.stroke(); return;
+    }
+    if (S.event === 'heatHaze') {
+      const [, y] = P(0, S.src.v);
+      for (let i = 0; i < 4; i++) { const yy = y + i * B.h * 0.05 + Math.sin(t * 1.4 + i) * 3; g.globalAlpha = 0.05; g.drawImage(glowSprite('#ffd9a0'), -20 + Math.sin(t * 0.6 + i) * 30, yy - 6, f.w + 40, 12); }
+      return;
+    }
+    e.next -= dt;
+    if (e.next <= 0 && !e.on) { e.on = { t: 0, x: R(0.15, 0.85) * f.w, y: R(0.05, 0.35) * f.h, d: S.event === 'lightning' ? 0.7 : S.event === 'glitch' ? 0.45 : S.event === 'paperPlane' ? 4.5 : 1.1 }; e.next = R(7, 16) / Math.min(2, f.k); }
+    if (!e.on) return;
+    const o = e.on; o.t += dt; const q = o.t / o.d; if (q >= 1) { e.on = null; return; }
+    if (S.event === 'lightning') {
+      const fl = q < 0.12 || (q > 0.22 && q < 0.3) ? 1 : 0; if (fl) { g.globalAlpha = 0.22; g.fillStyle = '#d8d0ff'; g.fillRect(0, 0, f.w, f.h); }
+      if (q < 0.35) { g.globalAlpha = 0.8 * (1 - q * 2); g.strokeStyle = '#f0e8ff'; g.lineWidth = 1.6; g.beginPath(); let x = o.x, y = 0; g.moveTo(x, y); while (y < f.h * 0.55) { x += R(-18, 18); y += R(10, 24); g.lineTo(x, y); } g.stroke(); }
+    } else if (S.event === 'glitch') {
+      for (let i = 0; i < 3; i++) { const yy = (o.y + i * 23 + q * 40) % f.h; g.globalAlpha = 0.18 * (1 - q); g.fillStyle = i % 2 ? '#ff4fd8' : '#3ff0ff'; g.fillRect(R(-20, f.w * 0.3), yy, R(f.w * 0.3, f.w * 0.8), R(2, 6)); }
+    } else if (S.event === 'shootingStar') {
+      const x = o.x - q * f.w * 0.3, y = o.y + q * f.h * 0.18; g.globalAlpha = Math.sin(q * Math.PI) * 0.9; g.strokeStyle = '#ffffff'; g.lineWidth = 1.4; g.beginPath(); g.moveTo(x, y); g.lineTo(x + 46, y - 28); g.stroke();
+    } else if (S.event === 'paperPlane') {
+      const x = -30 + q * (f.w + 60), y = o.y + 40 + Math.sin(q * 6) * 14; g.save(); g.globalCompositeOperation = 'source-over'; shapes.plane(g, { x, y, r: 5, c: '#ffffff', o: 0.85 * Math.sin(q * Math.PI) + 0.1, vx: 1, vy: Math.cos(q * 6) * 0.3 }); g.restore();
+    }
+  }
+
   const fields = new Set();
   class Field {
     constructor(host, theme, opts) {
@@ -16568,7 +16910,7 @@ window.LOS_BUILD = "9b281823a28a86b41c28f8f0c3e39fcd506e82ce62a144e15cdc504d89e5
       fields.add(this); loop();
     }
     resize() { const r = this.host.getBoundingClientRect(), d = Math.min(1.5, G.devicePixelRatio || 1); this.w = Math.max(10, r.width); this.h = Math.max(10, r.height); this.cv.width = this.w * d; this.cv.height = this.h * d; this.g.setTransform(d, 0, 0, d, 0, 0); }
-    seed() { const A = AMB[this.theme]; this.ps = []; const n = Math.round(A.n * Math.min(2.5, this.k) * Math.min(1.4, Math.max(0.5, this.w / 900))); for (let i = 0; i < n; i++) { const p = A.spawn(this.w, this.h); p.t = p.t || R(0, 9); this.ps.push(p); } }
+    seed() { if (SC[this.theme]) { this.box = null; seedScene(this); return; } const A = AMB[this.theme]; this.ps = []; const n = Math.round(A.n * Math.min(2.5, this.k) * Math.min(1.4, Math.max(0.5, this.w / 900))); for (let i = 0; i < n; i++) { const p = A.spawn(this.w, this.h); p.t = p.t || R(0, 9); this.ps.push(p); } }
     setTheme(theme, intensity) { theme = AMB[theme] ? theme : 'brand'; const ch = theme !== this.theme || (intensity && Math.abs(intensity - this.k) > 0.3); this.theme = theme; if (intensity) this.k = intensity; if (ch) this.seed(); }
     burst(kind, x, y, n) { for (let i = 0; i < (n || 16); i++) this.extraP.push(burstParticle(kind, x != null ? x : this.w / 2, y != null ? y : this.h / 2)); }
     frame(dt) {
@@ -16576,9 +16918,12 @@ window.LOS_BUILD = "9b281823a28a86b41c28f8f0c3e39fcd506e82ce62a144e15cdc504d89e5
       if (!this.visible || this.host.offsetParent === null) return;
       const r = this.host.getBoundingClientRect(); if (Math.abs(r.width - this.w) > 2 || Math.abs(r.height - this.h) > 2) { this.resize(); this.seed(); }
       const A = AMB[this.theme], g = this.g; this.t += dt; g.clearRect(0, 0, this.w, this.h);
-      const sp = 0.6 + this.k * 0.4;
-      for (const p of this.ps) { p.t += dt; A.step(p, dt * sp, this.w, this.h); shapes[p.s] && shapes[p.s](g, p); }
-      if (A.extra) A.extra(g, this.w, this.h, this.t, this);
+      if (SC[this.theme] && this.sc) paintScene(this, dt * (0.75 + Math.min(2, this.k) * 0.25));
+      else {
+        const sp = 0.6 + this.k * 0.4;
+        for (const p of this.ps) { p.t += dt; A.step(p, dt * sp, this.w, this.h); shapes[p.s] && shapes[p.s](g, p); }
+        if (A.extra) A.extra(g, this.w, this.h, this.t, this);
+      }
       this.extraP = this.extraP.filter((p) => { p.life -= dt; p.t += dt; p.vy += (p.grav || 0) * dt; p.x += p.vx * dt; p.y += p.vy * dt; p.a = (p.a || 0) + (p.va || 0) * dt; p.o = Math.max(0, Math.min(1, p.life / p.life0)); shapes[p.s](g, p); return p.life > 0; });
     }
     destroy() { fields.delete(this); if (this.io) this.io.disconnect(); this.cv.remove(); }
@@ -20163,15 +20508,19 @@ window.LOS_BUILD = "9b281823a28a86b41c28f8f0c3e39fcd506e82ce62a144e15cdc504d89e5
     const theme = resultTheme(SIM), soft = !!theme.soft, st = SIM.stats;
     const W = SIM.winners.map((id) => BY[id]);
     const kN = (n) => n + ' ' + (soft ? (n === 1 ? 'eliminazione' : 'eliminazioni') : (n === 1 ? 'uccisione' : 'uccisioni'));
+    // la rivelazione: il dipinto dell'arena a tutta scena, un alone che gira dietro chi ha vinto
+    const crown = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 18 4.5 7l5 4.5L12 5l2.5 6.5 5-4.5L21 18z"/><path d="M3.5 21h17"/></svg>';
+    const eyeb = '<div class="eyebrow">' + ART.icon(theme.id, 13) + ' ' + esc(theme.name) + ' · ' + durTxt(theme) + ' · ' + SIM.tributes.length + ' concorrenti</div>';
+    const scene = '<div class="wscene" aria-hidden="true">' + ART.scene(theme.id) + '</div><div class="fn-halo" aria-hidden="true"></div>';
     let hero;
     if (W.length === 1) {
       const w = W[0];
-      hero = '<div class="winhero"><div class="wscene" aria-hidden="true">' + ART.scene(theme.id) + '</div>' + avHTML(w, { btn: true }) + '<div style="min-width:0"><div class="eyebrow">' + ART.icon(theme.id, 13) + ' ' + esc(theme.name) + ' · ' + durTxt(theme) + ' · ' + SIM.tributes.length + ' concorrenti</div>' +
-        '<h1>' + esc(w.name) + '</h1><p><b style="color:var(--screen-ink)">' + G3(w.gender, 'Ultimo', 'Ultima', 'Ultimə') + ' in piedi.</b> Squadra ' + w.team + (w.traits.length ? ' · ' + w.traits.map((x) => TRAITS[x].name).join(', ') : '') + '.</p>' +
+      hero = '<div class="winhero finale">' + scene + '<div class="fn-portrait">' + avHTML(w, { btn: true }) + '<span class="fn-crown">' + crown + '</span></div><div class="fn-text">' + eyeb +
+        '<div class="fn-title">' + G3(w.gender, 'Ultimo', 'Ultima', 'Ultimə') + ' in piedi</div><h1>' + esc(w.name) + '</h1><p>Squadra ' + w.team + (w.traits.length ? ' · ' + w.traits.map((x) => TRAITS[x].name).join(', ') : '') + '</p>' +
         '<div class="wstats"><div><b>' + w.kills + '</b><span>' + (soft ? 'eliminazioni' : 'uccisioni') + '</span></div><div><b>' + w.events + '</b><span>eventi vissuti</span></div><div><b>' + w.alliancesFormed + '</b><span>alleanze</span></div><div><b>' + w.items + '</b><span>oggetti trovati</span></div></div></div></div>';
     } else if (W.length > 1) {
-      hero = '<div class="winhero" style="grid-template-columns:minmax(0,1fr)"><div class="wscene" aria-hidden="true">' + ART.scene(theme.id) + '</div><div><div class="eyebrow">' + ART.icon(theme.id, 13) + ' ' + esc(theme.name) + ' · ' + durTxt(theme) + '</div><h1>Vince la squadra ' + W[0].team + '</h1><div class="teamavs">' + W.map((w) => avHTML(w, { btn: true })).join('') + '</div><p style="margin-top:12px">' + W.map((w) => esc(w.name) + ' (' + kN(w.kills) + ')').join(' · ') + '</p></div></div>';
-    } else hero = '<div class="winhero" style="grid-template-columns:minmax(0,1fr)"><div><h1>Nessun superstite</h1><p>L\'arena non ha risparmiato nessuno.</p></div></div>';
+      hero = '<div class="winhero finale team">' + scene + '<div class="fn-text">' + eyeb + '<div class="fn-title">Squadra vincitrice</div><h1>Vince la squadra ' + W[0].team + '</h1><div class="teamavs">' + W.map((w) => avHTML(w, { btn: true })).join('') + '</div><p>' + W.map((w) => esc(w.name) + ' (' + kN(w.kills) + ')').join(' · ') + '</p></div></div>';
+    } else hero = '<div class="winhero finale none">' + scene + '<div class="fn-text">' + eyeb + '<div class="fn-title">Nessun superstite</div><h1>L\'arena ha vinto</h1><p>Non è rimasto in piedi nessuno.</p></div></div>';
 
     const ranked = SIM.tributes.slice().sort((a, b) => a.rank - b.rank || b.kills - a.kills);
     const podiumT = ranked.slice(0, 3);
