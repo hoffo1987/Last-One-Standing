@@ -2288,3 +2288,37 @@ details.card > summary { font-size: 16px; }
 .buses { list-style: none; margin: 4px 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: 4px; }
 .buses li { font-size: 12px; font-weight: 600; padding: 2px 8px; border-radius: 999px; background: color-mix(in srgb, var(--accent) 12%, var(--panel-2)); color: var(--ink); }
 .buses { align-items: flex-start; }
+
+/* ===== Locandine: dieci arene ===== */
+/* con tre colonne, una locandina rimasta da sola nell'ultima riga occupa tutta la riga (vale per qualunque numero di arene) */
+@media (min-width: 761px) {
+  .themes .poster-card:last-child:nth-child(3n+1) { grid-column: 1 / -1; min-height: 190px; }
+  .themes .poster-card:last-child:nth-child(3n+1) small { max-width: 60ch; }
+}
+.hh-scenes:not(.pano) { grid-template-columns: repeat(5, 1fr); grid-template-rows: repeat(2, 1fr); }
+@media (max-width: 760px) { .hh-scenes:not(.pano) { grid-template-columns: 1fr; grid-template-rows: repeat(3, 1fr); } }
+
+/* ===== Night City — Zona Rossa =====
+ * Le regole proprie di un'arena usano l'attributo data-arena sulla radice (data-theme resta
+ * riservato a chiaro/scuro). L'attributo segue l'arena della partita aperta, anche in un replay. */
+:root[data-arena="cyberpunk"] { --arena-acid: #e8ff3a; --arena-cyan: #3ff0ff; --arena-magenta: #ff4fd8; --arena-petrol: #06222b; }
+.poster-card[data-theme="cyberpunk"] { box-shadow: inset 0 0 0 1px rgba(63, 240, 255, .35); }
+.poster-card[data-theme="cyberpunk"] b { text-shadow: 0 0 12px rgba(255, 79, 216, .55), 0 2px 10px rgba(0, 0, 0, .6); }
+.poster-card[data-theme="cyberpunk"] .picon { color: #e8ff3a; border-color: rgba(232, 255, 58, .45); }
+:root[data-arena="cyberpunk"] .broadcast { background-image: linear-gradient(135deg, rgba(6, 34, 43, .35), rgba(255, 79, 216, .08)); }
+:root[data-arena="cyberpunk"] .broadcast::after { content: ""; position: absolute; inset: 0; pointer-events: none; z-index: 1; opacity: .35;
+  background: repeating-linear-gradient(0deg, rgba(63, 240, 255, .06) 0 1px, transparent 1px 4px); }
+:root[data-arena="cyberpunk"] .bc-title h1 { text-shadow: 0 0 18px rgba(63, 240, 255, .35), 2px 0 0 rgba(255, 79, 216, .35), -2px 0 0 rgba(63, 240, 255, .25); }
+:root[data-arena="cyberpunk"] .broadcast[data-kind="dis"] .bc-title h1 { animation: cpGlitch 1.8s steps(1, end) 1; }
+:root[data-arena="cyberpunk"] .broadcast[data-kind="n"] .bc-scene { filter: brightness(.7) saturate(1.3) hue-rotate(10deg); }
+:root[data-arena="cyberpunk"] .dx-hero .apv-banner::after { content: ""; position: absolute; inset: 0; pointer-events: none;
+  background: repeating-linear-gradient(0deg, rgba(63, 240, 255, .07) 0 1px, transparent 1px 3px); }
+:root[data-arena="cyberpunk"] .dx-kicker { color: var(--arena-cyan); }
+@media (prefers-color-scheme: light) { :root[data-arena="cyberpunk"]:not([data-theme="dark"]) .dx-kicker { color: #007a85; } }
+:root[data-arena="cyberpunk"][data-theme="light"] .dx-kicker { color: #007a85; }
+@keyframes cpGlitch {
+  0% { transform: none; } 8% { transform: translateX(-3px) skewX(-6deg); } 12% { transform: translateX(2px); clip-path: inset(10% 0 55% 0); }
+  16% { transform: none; clip-path: none; } 52% { transform: translateX(1px) skewX(4deg); } 56%, 100% { transform: none; }
+}
+@media (prefers-reduced-motion: reduce) { :root[data-arena="cyberpunk"] .broadcast[data-kind="dis"] .bc-title h1 { animation: none; } }
+[data-reduced-motion][data-arena="cyberpunk"] .broadcast[data-kind="dis"] .bc-title h1 { animation: none; }

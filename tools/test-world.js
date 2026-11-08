@@ -85,7 +85,8 @@ for(const theme of D.themes){
   for(const type of Object.keys(names))assert.ok(names[type].every(n=>pools.lex[type].includes(n)),theme.id+' oggetti '+type);
   console.log('OK: '+theme.id+' — 300 per ciascuno degli otto repertori, 30 situazioni, tutte le zone/tratti/caratteristiche.');
 }
-assert.equal(ids.size,21600);
+// otto repertori da 300 voci per ogni arena: il totale segue il numero delle arene (nove arene = 21600)
+assert.equal(ids.size,D.themes.length*8*300);
 console.log('OK: '+templates+' modelli e '+renderings+' accordi grammaticali; nessun ripiego geografico o contenuto irraggiungibile.');
 // Il catalogo non deve mutare per effetto di una partita; gli esiti sono salvati.
 const before=JSON.stringify(D.world.compile(D.themes[0])),localData=new Map();
@@ -113,5 +114,5 @@ globalThis.localStorage={getItem:k=>localData.get(k)||null,setItem:(k,v)=>localD
   const imported=await LOS_REPLAY.importReplay(encoded);assert.deepEqual(await LOS_REPLAY.load(imported),result);
 }
 assert.equal(JSON.stringify(D.world.compile(D.themes[0])),before);
-console.log('OK: nuove scene estratte nelle nove arene, determinismo completo, incidenti locali, esportazione/importazione e cataloghi immutati.');
+console.log('OK: nuove scene estratte in tutte le '+D.themes.length+' arene, determinismo completo, incidenti locali, esportazione/importazione e cataloghi immutati.');
 })().catch(error=>{console.error(error);process.exitCode=1;});

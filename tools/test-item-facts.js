@@ -18,4 +18,4 @@ for (const theme of LOS_DATA.themes) {
     const bad = structuredClone(result); edit(bad.itemFacts[0]); assert.equal(LOS_REPLAY.validate(bad), false);
   }
 }
-console.log('OK: effetti saturati, proprietario e destinatario distinti, osservazione senza mutazioni, schema e compatibilità legacy nelle nove arene.');
+console.log('OK: effetti saturati, proprietario e destinatario distinti, osservazione senza mutazioni, schema e compatibilità legacy in tutte le arene.');

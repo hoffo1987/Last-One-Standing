@@ -45,10 +45,24 @@
   ];
   // ogni parola chiave deve cominciare una parola: «capi» non è «api», «evento» non è «vento»
   const FAMW = FAM.map(([f, re]) => [f, new RegExp('\\b(?:' + re.source.replace(/^\^/, '') + ')')]);
-  const FALLBACK = { classico: 'luce', fantasy: 'magia', scifi: 'tech', zombie: 'bestie', royale: 'spettacolo', horror: 'buio', wasteland: 'sabbia', liceo: 'burocrazia', ufficio: 'burocrazia' };
+  const FALLBACK = { classico: 'luce', fantasy: 'magia', scifi: 'tech', zombie: 'bestie', royale: 'spettacolo', horror: 'buio', wasteland: 'sabbia', liceo: 'burocrazia', ufficio: 'burocrazia', cyberpunk: 'tech' };
+  // famiglie proprie di un'arena, controllate prima di quelle comuni (le altre arene non cambiano)
+  const FAMA = {
+    cyberpunk: [
+      ['esplosione', /maxtac|rastrellament|blocco totale|raid|ronda|scav|cyberpsic|allerta pattuglia|torrett/],
+      ['tech', /\bice\b|interferenz|rete|virus delle ottiche|ottic|braindance|nodo dati|impiant|cyberdeck|disturbi/],
+      ['buio', /blackout|notte di neon/],
+      ['tossico', /pioggia acida|smog|gas/],
+      ['cassa', /consegna|scorte/],
+      ['caldo', /condizionator/],
+      ['festa', /tregua/],
+    ],
+  };
   const family = (name, extra, theme) => {
     const s = norm(name + ' ' + (extra || ''));
     const n = norm(name);
+    for (const [f, re] of FAMA[theme] || []) if (re.test(n)) return f;
+    for (const [f, re] of FAMA[theme] || []) if (re.test(s)) return f;
     for (const [f, re] of FAMW) if (re.test(n)) return f;
     for (const [f, re] of FAMW) if (re.test(s)) return f;
     return FALLBACK[theme] || 'luce';

@@ -285,4 +285,21 @@ ricordo|la foto del gatto|Il gatto di casa, che dorme sul divano. Ti aspetta.|mo
 ricordo|una tazza con scritto «Il capo migliore del mondo»|Un regalo ironico. O forse no.|morale:4 prova:car+1 posti:1
 ricordo|il badge del primo giorno|La foto del primo giorno: più giovane, più ottimista.|morale:5 prova:cor+1
 `;
+  D.itemLexCatalog.cyberpunk = `
+arma|un fucile a pompa da strada|Canne segate e calcio coperto di adesivi delle gang: fa paura anche scarico.|forza:1.5 posti:3 belve:2
+arma|una mazza da baseball chiodata|Legno vero e chiodi veri: un pezzo d'antiquariato con un brutto carattere.|forza:0.5 prova:for+1
+arma|un taser da buttafuori|Due elettrodi e una scarica che manda a terra chiunque, impianti compresi.|forza:0 posti:1 belve:2
+arma|un mitra compatto|Tanti colpi, poca precisione. Si svuota in fretta.|forza:1 usi:-1 posti:2
+cibo|una barretta di proteine sintetiche|Sa di cartone alla fragola, ma sfama.|cibo:0 posti:0
+cibo|una scatola di noodle istantanei|Acqua calda, tre minuti, e la giornata migliora.|cibo:5
+cibo|una lattina di bevanda energetica|Zucchero, caffeina e qualcosa che non è scritto sull'etichetta.|cibo:-25 energia:20 posti:0
+cibo|un panino di soia in busta|Pane di soia e salsa di soia. Sfama.|cibo:0
+amuleto|un defibrillatore sottocutaneo|Un impianto sotto lo sterno: se il cuore si ferma, una scarica lo riavvia. Come ogni portafortuna salva una volta sola, poi si brucia.|posti:0 impianto:1
+alcol|una bottiglia di sakè sintetico|Sakè di laboratorio: scalda, consola e fa dire cose di cui ci si pente.|morale:6 posti:1
+alcol|una lattina di birra di riso|Tiepida, amara e sociale.|morale:5 posti:0
+veleno|una fiala di neurotossina|Basta un graffio per mandare in tilt il sistema nervoso, impianti compresi.|posti:0
+veleno|una cartuccia di veleno per lame|Una cartuccia da avvitare all'impugnatura: ogni colpo inietta la tossina.|posti:0
+esplosivo|una granata a frammentazione|Militare, rubata a un posto di blocco. Il piano B di molti.|posti:1
+esplosivo|una carica di plastico|Plastico con un detonatore a tempo: apre porte, e non solo porte.|posti:1
+`;
 })(typeof window === 'object' ? window : globalThis);

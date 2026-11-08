@@ -259,6 +259,7 @@
     wasteland: { recap: 'Il fumo all’orizzonte' },
     liceo: { day: (d) => capW(ordinal(d)) + ' giorno di scuola', night: (d) => 'Dopo scuola del ' + ordinal(d) + ' giorno', recap: 'L’appello del mattino' },
     ufficio: { day: (d) => capW(ordinal(d)) + ' giorno di lavoro', night: (d) => 'Straordinari del ' + ordinal(d) + ' giorno', recap: 'Le scrivanie vuote' },
+    cyberpunk: { day: (d) => capW(ordinal(d)) + ' giorno nella zona sigillata', night: (d) => capW(ordinal(d, true)) + ' notte di neon', recap: 'I segnali spenti' },
   };
   const calOf = (theme) => Object.assign({}, CAL._, CAL[theme.id] || {});
   // il limite di giorni scelto prima della partita (null se non si conosce, per esempio in un replay vecchio)
@@ -539,7 +540,8 @@
   }
   const nTeams = () => new Set(S.cast.map((t) => t.team)).size;
   const plural = (n, s, p) => n + ' ' + (n === 1 ? s : p);
-  function setHue(id) { const t = THEMES[id]; if (t) document.documentElement.style.setProperty('--h', t.hue); }
+  // tinta e attributo dell'arena (data-arena; data-theme resta per chiaro/scuro). Segue l'arena della partita aperta, anche nei replay.
+  function setHue(id) { const t = THEMES[id]; if (t) { document.documentElement.style.setProperty('--h', t.hue); document.documentElement.dataset.arena = t.id; } }
 
   /* ---------------- tema chiaro/scuro ---------------- */
   function applyUi() { if (S.ui) document.documentElement.dataset.theme = S.ui; else delete document.documentElement.dataset.theme; }
@@ -579,7 +581,7 @@
     $('#liveDot').hidden = !SIM;
     if (v !== 'diretta') stopPlay();
     if (v !== 'home') stopHomeLoop();
-    if (v === 'home' && ART.assets.logo) document.documentElement.style.setProperty('--h', 162);
+    if (v === 'home' && ART.assets.logo) { document.documentElement.style.setProperty('--h', 162); delete document.documentElement.dataset.arena; }
     else setHue((v === 'diretta' || v === 'esito') && SIM ? SIM.theme : S.settings.theme);
     if (v === 'home') renderHome();
     if (v === 'cast') { renderCast(); if (changed) playEntrance('castenter'); }
@@ -1445,7 +1447,7 @@
     const beasts = t.lex.mostro.map((x, i) => '<article class="wanted" style="--r:' + ((i % 2 ? 1 : -1) * (1 + i % 3)) + 'deg">' + ATL.pic(t.id, 'pericoli', x, t.hue) + '<div class="wd-body"><span class="wd-tag">' + (t.soft ? 'Attenzione' : 'Pericolo') + '</span><h4>' + esc(capFirst(stripArt(x))) + '</h4></div></article>').join('');
     return chHead('Il campo di gioco', plural(Z.length, 'zona', 'zone') + ' collegate da passaggi. Gli spostamenti consumano energia e gli incontri richiedono la presenza nello stesso luogo. Le zone ricche aiutano a trovare cibo; di notte il riparo e i compagni presenti favoriscono il recupero. Gli imprevisti locali coinvolgono chi è sul posto e possono riemergere nei dialoghi delle fasi successive.') +
       '<div class="zboard">' + zones + '</div>' + plaque +
-      '<div class="dx-split"><section class="arsenal"><div class="ch-sub"><h4>' + (t.soft ? 'Armi improprie' : 'Armeria') + '</h4><p>' + (t.soft ? 'Con queste si fanno fuori i rivali, senza versare sangue.' : 'Si raccolgono in giro, si rubano agli altri o arrivano dagli sponsor.') + '</p></div><ul class="rack">' + arms + '</ul></section>' +
+      '<div class="dx-split"><section class="arsenal"><div class="ch-sub"><h4>' + (t.soft ? 'Armi improprie' : 'Armeria') + '</h4><p>' + (t.soft ? 'Con queste si fanno fuori i rivali, senza versare sangue.' : (t.id === 'cyberpunk' ? 'Si raccolgono in giro, si rubano agli altri o arrivano dai fixer. Gli impianti, una volta installati, non passano di mano.' : 'Si raccolgono in giro, si rubano agli altri o arrivano dagli sponsor.')) + '</p></div><ul class="rack">' + arms + '</ul></section>' +
       '<section class="bestiary"><div class="ch-sub"><h4>' + (t.soft ? 'Da evitare' : 'Pericoli') + '</h4><p>' + (t.soft ? 'Girano per i corridoi: chi resta da solo rischia di finire nei guai.' : 'Di notte attaccano chi dorme da solo, soprattutto nelle zone pericolose.') + '</p></div><div class="wanted-grid">' + beasts + '</div></section></div>';
   }
 
@@ -1463,7 +1465,8 @@
     if (f.trap) add('Trappole più efficaci', 'neutral');
     if (f.fame) f.fame > 1 ? add('Più attenzione del pubblico', 'good') : add('Il pubblico guarda altrove', 'neutral');
     if (f.storm) add('Tempesta nelle zone aperte', 'bad');
-    if (f.pr && m) f.pr > 0 ? add(m.name + ' in salita', 'bad') : add(m.name + ' in calo', 'good');
+    // un indicatore che non cala da solo, con il meteo favorevole sale solo più piano
+    if (f.pr && m) f.pr > 0 ? add(m.name + ' in salita', 'bad') : add(m.noDecay ? m.name + ' sale più piano' : m.name + ' in calo', 'good');
     if (f.tb) Object.entries(f.tb).forEach(([a, v]) => add('Prove di ' + (ECO.attrNames[a] || a) + (v > 0 ? ' più facili' : ' più difficili'), v > 0 ? 'good' : 'bad'));
     return out.length ? '<ul class="fxs">' + out.join('') + '</ul>' : '<ul class="fxs"><li class="fx neutral">• Nessun effetto particolare</li></ul>';
   }
@@ -2379,7 +2382,7 @@
       $('#heroLogo').innerHTML = ART.logo(76, { bg: 'var(--screen-2)', ink: 'var(--screen-ink)', accent: 'var(--screen-accent)' });
     }
     if (ART.assets.panoramica) { $('#heroScenes').innerHTML = '<img class="hero-pano" src="' + ART.assets.panoramica + '" alt="" draggable="false">'; $('#heroScenes').classList.add('pano'); }
-    else $('#heroScenes').innerHTML = ['classico', 'fantasy', 'scifi', 'zombie', 'royale', 'horror', 'wasteland', 'liceo', 'ufficio'].map((t) => ART.scene(t)).join('');
+    else $('#heroScenes').innerHTML = D.themes.map((t) => ART.scene(t.id)).join('');
     if (ART.assets.sagome && ART.assets.sagome.length) { const st = document.createElement('style'); st.textContent = ART.assets.sagome.map((u, k) => '.sil-' + k + '{-webkit-mask-image:url(' + u + ');mask-image:url(' + u + ')}').join(''); document.head.appendChild(st); }
     AN.ripple(document.body);
     try { const ic = document.createElement('link'); ic.rel = 'icon'; ic.href = ART.logoDataUri('#e3b04b'); document.head.appendChild(ic); } catch (e) { /* niente */ }

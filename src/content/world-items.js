@@ -124,7 +124,34 @@
       ricordo:'una foto del team|un biglietto di benvenuto|una cartolina delle ferie|un foglio di dediche|un disegno della scrivania|un invito della vecchia squadra',
       cibo:'dei cracker integrali|delle mandorle|dei biscotti al cacao|delle gallette|dei grissini|delle fette di frutta secca',
     },
+    cyberpunk:{
+      arma:'una pistola smart|una katana termica|un fucile a pompa elettromagnetico|una mazza a impulsi|un coltello vibrante in ceramica|una pistola a rotaia artigianale',
+      armatura:'una giacca balistica|un giubbotto in fibra di carbonio|uno scudo antisommossa recuperato|un casco con visiera schermata|una placcatura subdermale|un rivestimento dermico ignifugo',
+      attrezzo:'un cyberdeck portatile|un kit da scasso elettronico|un multiattrezzo da tecnico|un rilevatore di segnali|una fascia di raffreddamento neurale|un’interfaccia neurale da polso',
+      mappa:'uno schema dei condotti di servizio|una mappa dei punti ciechi delle telecamere|un elenco dei distributori ancora pieni|una pianta del Nodo dati|un registro delle ronde corporative|un’ottica cartografica',
+      trap:'una mina a prossimità|un filo monomolecolare|una torretta automatica riprogrammata|una granata a impulso collegata a un sensore|una rete elettrificata|un detonatore a pressione',
+      med:'un iniettore medico|un kit da ripperdoc|una dose di stabilizzante neurale|una bomboletta di colla chirurgica|una scatola di antibiotici del Mercato|un antidoto universale',
+      amuleto:'un portachiavi a forma di gatto fortunato|un biochip di backup|una medaglietta della scuola di quartiere|un dado di metallo inciso|un nastro dei santi di strada|un santino olografico',
+      valore:'una chiavetta di eddie|uno shard di dati rubati|una scheda di accesso corporativa|una bobina di cavo in fibra|un pacchetto di chip di memoria|un orologio meccanico vero',
+      ricordo:'una foto stampata su carta|un vecchio disco musicale|un braccialetto dell’ospedale|un biglietto della metropolitana sopraelevata|un vecchio telefono a conchiglia|un peluche bruciacchiato',
+      cibo:'delle barrette di proteine sintetiche|delle scatole di noodle istantanei|delle pastiglie di caffeina|dei panini di soia in busta|degli spiedini di carne coltivata|delle gallette di alghe',
+    },
   };
   const paper=split('con riferimenti datati|con annotazioni verificabili|con una copia firmata|con indice analitico|con allegati numerati');
-  D.worldItemData={roots,tails,paper,split};
+  // finiture proprie di un'arena (Night City: tutte tecnologiche, adatte anche agli impianti)
+  const themeTails={
+    cyberpunk:{
+      arma:split('con firmware aggiornato|con modulo di puntamento|con batteria potenziata|con circuiti schermati|con modalità silenziosa'),
+      armatura:split('con fibre di kevlar intrecciate|con gel antiurto|con sensori di impatto|con schermatura termica|con piastre rinforzate'),
+      attrezzo:split('con firmware aggiornato|con batteria di riserva|con schermatura antintrusione|con dissipatore di calore|con guscio ultraleggero'),
+      mappa:split('con aggiornamento in tempo reale|con percorsi colorati|con note di un fixer|con codici di emergenza|con livelli dei piani'),
+      trap:split('con sensore di movimento|con innesco a infrarossi|con carica raddoppiata|con mimetica olografica|con allarme di prossimità'),
+      med:split('in una custodia sterile|in una cartuccia compatta|con antibiotici aggiunti|con dosatore automatico|con istruzioni vocali'),
+      amuleto:split('con un led che lampeggia piano|con una dedica incisa al laser|con una catenella di rame|con un ologramma di famiglia|con un adesivo di una band'),
+      valore:split('in una custodia antiurto|con certificato di provenienza|in una busta schermata|con sigillo intatto|con un codice di riscatto'),
+      ricordo:split('con una dedica scritta a mano|con una data incisa|con un adesivo a forma di stella|con le iniziali incise|con una nota ripiegata'),
+      cibo:split('in una busta sottovuoto|in una vaschetta da asporto|in una confezione da distributore|in un sacchetto di carta oleata|in una scatola richiudibile'),
+    },
+  };
+  D.worldItemData={roots,tails,paper,split,themeTails};
 })(typeof window!=='undefined'?window:globalThis);

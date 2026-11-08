@@ -103,7 +103,8 @@
     function victim(t, list) {
       const n = list.length, w = list.reduce((s2, x) => s2 + slots(x), 0);
       if (n <= MAX_ITEMS && w <= cap(t)) return null;
-      const pool = list.filter((x) => x.type !== 'ricordo' && (n > MAX_ITEMS || slots(x) > 0));
+      // gli impianti non si lasciano a terra: sono installati
+      const pool = list.filter((x) => x.type !== 'ricordo' && !props(x).impianto && (n > MAX_ITEMS || slots(x) > 0));
       if (!pool.length) return list[0];
       return pool.reduce((a, b) => (keepScore(t, b) < keepScore(t, a) ? b : a));
     }

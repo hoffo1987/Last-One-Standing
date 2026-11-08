@@ -474,9 +474,11 @@
     const MIND = D.mind || { goals: {}, acts: {}, actsSoft: {}, diary: { trait: {} }, diarySoft: { trait: {} }, mem: {} };
     let ORIGIN = null, CURKIND = '';
     const VO = D.voice || {}, VS = D.voiceSoft || {}, CH = D.chats || {};
-    const ACT = (k) => mapEnabled&&theme.soft&&k==='sleepwalk'?['{0} si allontana nel dormiveglia fino a {z}. Si sveglia lì, senza ricordare il percorso.']:(theme.soft && MIND.actsSoft && MIND.actsSoft[k]) || (MIND.acts || {})[k] || [];
-    const DIA = (k) => (theme.soft && MIND.diarySoft && MIND.diarySoft[k]) || (MIND.diary || {})[k] || [];
-    const DIAT = (tr) => (theme.soft && MIND.diarySoft && MIND.diarySoft.trait && MIND.diarySoft.trait[tr]) || ((MIND.diary || {}).trait || {})[tr] || [];
+    // azioni e diario: prima i testi propri dell'arena (se ci sono), poi quelli delle arene senza violenza, poi i comuni
+    const ARENA_ACT = (MIND.actsArena || {})[theme.id] || {}, ARENA_DIA = (MIND.diaryArena || {})[theme.id] || {};
+    const ACT = (k) => ARENA_ACT[k] || (mapEnabled&&theme.soft&&k==='sleepwalk'?['{0} si allontana nel dormiveglia fino a {z}. Si sveglia lì, senza ricordare il percorso.']:(theme.soft && MIND.actsSoft && MIND.actsSoft[k]) || (MIND.acts || {})[k] || []);
+    const DIA = (k) => ARENA_DIA[k] || (theme.soft && MIND.diarySoft && MIND.diarySoft[k]) || (MIND.diary || {})[k] || [];
+    const DIAT = (tr) => (ARENA_DIA.trait || {})[tr] || (theme.soft && MIND.diarySoft && MIND.diarySoft.trait && MIND.diarySoft.trait[tr]) || ((MIND.diary || {}).trait || {})[tr] || [];
 
     const T = (cfg.cast || []).map((c, i) => ({
       id: c.id || 't' + i, name: (c.name || 'Concorrente ' + (i + 1)).trim(), gender: c.gender || 'M',
@@ -658,7 +660,12 @@
       causes: {}, shared: 0, nursed: 0, foraged: 0, trapsSet: 0, trapHits: 0, beasts: 0, infected: 0, cured: 0, broken: 0, looted: 0, meteo: [], expelled: 0, trades: 0 };
 
     const hasItem = (t, it) => t.inv.some((x) => x.type === it);
-    const itemOf = (t, it) => t.inv.find((x) => x.type === it);
+    // gli impianti (solo nelle arene che li prevedono) si usano ma non passano di mano:
+    // per gli scambi si sceglie sempre prima un oggetto trasferibile dello stesso tipo
+    const implantArena = !!(D.itemHasImplants && D.itemHasImplants(theme.id));
+    const isImplant = (x) => implantArena && !!itemProps(x).impianto;
+    const movable = (x) => !isImplant(x);
+    const itemOf = implantArena ? (t, it) => t.inv.find((x) => x.type === it && movable(x)) || t.inv.find((x) => x.type === it) : (t, it) => t.inv.find((x) => x.type === it);
     const statusCount = (t) => Object.keys(t.st).filter((s) => s !== 'lutto' && s !== 'grave').length;
     const traitSum = (t, key) => t.traits.reduce((s, id) => s + ((traitMap[id] && traitMap[id][key]) || 0), 0);
     const hasTrait = (t, id) => t.traits.includes(id);
@@ -742,7 +749,7 @@
           }
           case 'hasAlly': if (A.allyId == null) return false; break;
           case 'has': if (!hasItem(A, r.item)) return false; break;
-          case 'canReceive': { const it = itemOf(A, r.item); if (!it || !canReceiveItem(B, it)) return false; break; }
+          case 'canReceive': { const it = itemOf(A, r.item); if (!it || !movable(it) || !canReceiveItem(B, it)) return false; break; }
           case 'need': if (r.s === '*' ? statusCount(A) === 0 : A.st[r.s] == null) return false; break;
           case 'foe':
             for (const a of r.a) for (const b of r.b) {
@@ -1066,7 +1073,7 @@
     }
     // lo zaino è pieno: l'oggetto meno utile resta a terra nella zona (e qualcun altro potrà trovarlo)
     function dropItem(t, it) {
-      if (!t || it.type === 'ricordo') return;
+      if (!t || it.type === 'ricordo' || isImplant(it)) return;
       (zoneLoot[t.zone] = zoneLoot[t.zone] || []).push({ it, from: t.id });
       stats.dropped = (stats.dropped || 0) + 1;
       if (t.alive && remember1) remember1(t, '<b>' + esc(cap1(it.name)) + '</b> resta a ' + esc(zoneName(t.zone)) + ': nello zaino non c\'era più posto.', 'fatto');
@@ -1137,7 +1144,7 @@
         const K = killers.find((k) => k.alive);
         if (K && v.inv.length) {
           let took = 0; const left = [];
-          v.inv.slice().forEach((it) => {
+          v.inv.filter(movable).forEach((it) => {
             const mine = itemOf(K, it.type);
             const want = it.type !== 'ricordo' && (it.type === 'arma' || it.type === 'armatura' ? !mine || itemScore(it) > itemScore(mine) : !mine || it.type === 'cibo' || it.type === 'valore');
             if (took < 2 && want) {
@@ -1147,11 +1154,11 @@
           });
           // il resto dello zaino resta sul posto, per chi passerà di lì
           if (left.length) (zoneLoot[v.zone] = zoneLoot[v.zone] || []).push(...left);
-        } else if (!K && v.inv.length) (zoneLoot[v.zone] = zoneLoot[v.zone] || []).push(...v.inv.map((it) => ({ it, from: v.id })));
+        } else if (!K && v.inv.length) (zoneLoot[v.zone] = zoneLoot[v.zone] || []).push(...v.inv.filter(movable).map((it) => ({ it, from: v.id })));
       } else {
         stats.envDeaths++;
         if (!stats.firstBlood) stats.firstBlood = { killers: [], victim: v.id, day };
-        if (v.inv.length) (zoneLoot[v.zone] = zoneLoot[v.zone] || []).push(...v.inv.map((it) => ({ it, from: v.id })));
+        if (v.inv.length) (zoneLoot[v.zone] = zoneLoot[v.zone] || []).push(...v.inv.filter(movable).map((it) => ({ it, from: v.id })));
       }
       T.forEach((X) => { if (X.alive && X.zone === v.zone) X.sawDeath = phases.length; });
       // chi amava o stimava la vittima reagisce
@@ -1217,7 +1224,7 @@
     }
     function transferItem(from, to, type, how, ctx, lexPick) {
       const it = itemOf(from, type);
-      if (!it || from === to || !canReceiveItem(to, it)) return false;
+      if (!it || from === to || !movable(it) || !canReceiveItem(to, it)) return false;
       if (!giveItem(to, type, ctx, lexPick, it.name, it.q, how, from, it)) return false;
       takeItem(from, it);
       return true;
@@ -1732,6 +1739,15 @@
           syncSt(t);
         }
       });
+      // riposo assistito (solo nelle arene che lo prevedono): con un alleato accanto, in un posto
+      // abbastanza riparato, l'indicatore cala di una quantità fissa; da solo non scende mai
+      if (M && M.rest && !M.infect) A.forEach((t) => {
+        if (!t.alive || t.pr <= 0 || ZP[t.zone][2] < M.rest.shelter) return;
+        const m = buddies(t)[0]; if (!m) return;
+        const was = t.pr; t.pr = Math.max(0, t.pr - M.rest.amount); stats.meterRest = (stats.meterRest || 0) + 1;
+        if (was >= M.thr || rng.chance(0.25)) sys('meterRest', [t, m], { m: M.name.toLowerCase() }, { cat: 'heal', why: 'riposo assistito' }, 1);
+        syncSt(t);
+      });
       // trappole: chi le ha e sa usarle le piazza
       A.forEach((t) => {
         const tr = itemOf(t, 'trap');
@@ -2149,9 +2165,9 @@
         }
         // prepotenza
         if ((tr('bruto') || tr('avido') || tr('spietato')) && t.attr.for >= 6) {
-          const u = mates.find((x) => canFight(t, x) && combat(x) < combat(t) - 3 && x.inv.some((it) => /cibo|valore|med|amuleto|armatura/.test(it.type)));
+          const u = mates.find((x) => canFight(t, x) && combat(x) < combat(t) - 3 && x.inv.some((it) => /cibo|valore|med|amuleto|armatura/.test(it.type) && movable(it)));
           if (u) add(1.3 + (tr('bruto') ? 0.6 : 0), () => {
-            const it = u.inv.find((x) => /cibo|valore|med|amuleto|armatura/.test(x.type)); takeItem(u, it);
+            const it = u.inv.find((x) => /cibo|valore|med|amuleto|armatura/.test(x.type) && movable(x)); takeItem(u, it);
             addItem(t, Object.assign({}, it, { how: 'rubato', from: u.id, d: day })); addGrudge(u, t, 'steal'); remember(u, t, 'bullied'); u.mo -= 10;
             return say('bully', [t, u], { i: it.name, z: zoneName(t.zone) }, 'betray', traitName(tr('bruto') ? 'bruto' : tr('avido') ? 'avido' : 'spietato'), 3);
           });
@@ -2175,7 +2191,7 @@
         // regalare
         if (tr('generoso') || t.attr.emp >= 8) {
           const u = mates.concat(allyMates(t)).find((x) => (x.mo < 35 || x.food < 30) && hostility(t, x) < 2);
-          const it = t.inv.find((x) => (u && u.food < 30 ? x.type === 'cibo' : /cibo|valore|alcol|amuleto/.test(x.type)));
+          const it = t.inv.find((x) => movable(x) && (u && u.food < 30 ? x.type === 'cibo' : /cibo|valore|alcol|amuleto/.test(x.type)));
           if (u && it) add(1.3 + (tr('generoso') ? 1 : 0), () => {
             takeItem(t, it); addItem(u, Object.assign({}, it, { how: 'dono', from: t.id, d: day })); if (it.type === 'cibo' && u.food < 45) eat(u);
             u.owes[t.id] = u.owes[t.id] || 'dono'; addAff(t, u, 20); u.mo += 8; remember(u, t, 'gift'); syncSt(u);
@@ -2232,9 +2248,9 @@
         }
         // furto notturno
         if (tr('furtivo') || (tr('avido') && t.attr.furt >= 6)) {
-          const u = mates.find((x) => !isAlly(t, x) && x.partner !== t.id && x.inv.some((it) => it.type !== 'ricordo'));
+          const u = mates.find((x) => !isAlly(t, x) && x.partner !== t.id && x.inv.some((it) => it.type !== 'ricordo' && movable(it)));
           if (u) add(1.2, () => {
-            const it = rng.pick(u.inv.filter((x) => x.type !== 'ricordo')); takeItem(u, it); addItem(t, Object.assign({}, it, { how: 'rubato', from: u.id, d: day }));
+            const it = rng.pick(u.inv.filter((x) => x.type !== 'ricordo' && movable(x))); takeItem(u, it); addItem(t, Object.assign({}, it, { how: 'rubato', from: u.id, d: day }));
             if (hasTrait(u, 'paranoico') || rng.chance(Math.max(0.1, 0.4 - (t.attr.furt - 5) * 0.05))) { addGrudge(u, t, 'steal'); remember(u, t, 'nightTheft'); }
             u.mo -= 6;
             return say('nightTheft', [t, u], { i: it.name }, 'betray', traitName(tr('furtivo') ? 'furtivo' : 'avido'), 2);
@@ -2300,7 +2316,7 @@
       alive().forEach((b) => {
         const want = b.food < 40 && !hasItem(b, 'cibo') ? 'cibo' : b.hp < 50 && !hasItem(b, 'med') ? 'med' : null;
         if (!want) return;
-        const pay = b.inv.filter((x) => x.type === 'valore' || x.type === 'alcol' || (x.type === 'arma' && b.attr.for <= 4) || x.type === 'esplosivo' || x.type === 'veleno');
+        const pay = b.inv.filter((x) => movable(x)).filter((x) => x.type === 'valore' || x.type === 'alcol' || (x.type === 'arma' && b.attr.for <= 4) || x.type === 'esplosivo' || x.type === 'veleno');
         const sellers = zoneMates(b).concat(allyMates(b)).filter((x) => x !== b && hostility(b, x) < 2 && (want === 'cibo' ? x.inv.filter((it) => it.type === 'cibo').length >= (x.food >= 55 ? 1 : 2) : hasItem(x, 'med') && x.hp >= 70));
         const s2 = sellers[0]; if (!s2) return;
         const food = itemOf(s2, want);
@@ -2570,7 +2586,7 @@
         if (!a.alive || a.allyId != null || hasTrait(a, 'solitario')) return;
         const S = A.find((x) => x !== a && fearOf(a, x) >= 60 && x.zone === a.zone && hostility(a, x) < 3 && !recentWound(a, x, 3) && !(cfg.teamWin && x.team !== a.team) && (x.allyId == null || (alliances.get(x.allyId) || new Set()).size < 5) && canTeam([x, a]));
         if (!S || !rng.chance(0.3)) return;
-        const it = a.inv.filter((x) => x.type !== 'ricordo').sort((x, y) => itemScore(y) - itemScore(x))[0];
+        const it = a.inv.filter((x) => x.type !== 'ricordo' && movable(x)).sort((x, y) => itemScore(y) - itemScore(x))[0];
         if (it && !hasTrait(S, 'pacifista')) { takeItem(a, it); addItem(S, Object.assign({}, it, { how: 'dono', from: a.id, d: day })); }
         joinAlliance([S, a]); remember(a, S, 'submitted'); remember(S, a, 'protector'); tweak(a, S, { p: -15 });
         stats.submissions = (stats.submissions || 0) + 1;
@@ -2740,11 +2756,14 @@
     // titoli e introduzioni degli atti finali: dicono quanti restano e cosa cambia, senza ripetersi
     const FINAL_ONLY = /ultimo scontro|ultima sfida|vince la partita|fine della partita|ultimo cerchio|il liceo sceglie|all'ultima (interrogazione|riunione)/i;
     function climaxTitle(round, n) {
+      // le arene possono dare un nome proprio ai primi atti dello scontro finale
+      if (theme.climax && theme.climax.titles && n > 2 && round < theme.climax.titles.length) return theme.climax.titles[round];
       if (n === 2) return round === 0 ? 'Faccia a faccia' : theme.soft ? 'La sfida finale' : 'Il duello finale';
       return ['Gli ultimi equilibri', 'Le carte sul tavolo', 'Il punto di rottura'][round] || (theme.soft ? ['Fino all’ultima mossa', 'Nessun passo indietro', 'L’ultimo rilancio'] : ['L’ultimo rilancio', 'Nessun passo indietro', 'Fino all’ultimo respiro'])[(round - 3) % 3];
     }
     function climaxIntro(round, n, meeting) {
       const where = atZone(zoneName(meeting));
+      if (round === 0 && theme.climax && theme.climax.intro) return (n === 2 ? 'Restano in due. ' : 'Restano in ' + n + '. ') + theme.climax.intro.replace('{z}', zoneName(meeting));
       if (round === 0) return (n === 2 ? 'Restano in due' : 'Restano in ' + n) + '. Tutti si dirigono verso ' + zoneName(meeting) + ': da qui si esce solo vincendo.';
       if (n === 2) return theme.soft ? 'Restano in due. Ne resterà uno solo.' : 'Restano in due. Solo uno uscirà dall\'arena.';
       if (round === 1) return 'Restano in ' + n + '. Prima di colpire davvero, ci si studia e si saggiano le forze.';

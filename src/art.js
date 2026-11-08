@@ -42,6 +42,7 @@
     wasteland: '<path d="M3 18c3-2 6-2 9 0s6 2 9 0"/><path d="M3 21h18"/><circle cx="12" cy="10" r="4"/><path d="M12 3v1.5M5.5 6 6.6 7.1M18.5 6l-1.1 1.1"/>',
     liceo: '<path d="M3 9l9-5 9 5-9 5z"/><path d="M7 11v5c0 1.5 2.5 3 5 3s5-1.5 5-3v-5"/><path d="M21 9v6"/>',
     ufficio: '<rect x="3" y="8" width="18" height="12" rx="2"/><path d="M9 8V6a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2M3 13h18M11 13v2h2v-2"/>',
+    cyberpunk: '<path d="M4 21V9h4v12M10 21V4h5v17M17 21v-9h3v9"/><path d="M2 21h20"/><path d="M12.5 7v2M12.5 12v2"/><path d="M6 12h.01M18.5 15h.01"/>',
   };
   function icon(themeId, size) {
     const s = size || 20;
@@ -134,6 +135,28 @@
       skyline(200, 10, 41, '#0f3f3a', '#c9fff1', 60, 140) + skyline(200, 12, 47, '#082624', '#7ff5d8', 30, 80) +
       '<g transform="translate(300 60)"><circle r="22" fill="#e8fff8"/><path d="M0 -14 v14 h10" stroke="#0b2b2a" stroke-width="3" fill="none" stroke-linecap="round"/></g>' +
       '<g fill="#fff" opacity=".85"><rect x="70" y="40" width="16" height="20" transform="rotate(-15 78 50)"/><rect x="200" y="28" width="14" height="18" transform="rotate(12 207 37)"/><rect x="140" y="70" width="12" height="16" transform="rotate(-30 146 78)"/></g>'; },
+    // Night City: cielo petrolio, torre con il faro giallo acido, insegne olografiche, cavi, vapore e asfalto bagnato
+    cyberpunk: () => { const g = id('s'), w = id('w'), h = id('h'); const r = rnd(77);
+      let rain = ''; for (let i = 0; i < 70; i++) { const x = r() * 420, y = r() * 200, l = 6 + r() * 10; rain += '<path d="M' + x.toFixed(1) + ' ' + y.toFixed(1) + 'l-2 ' + l.toFixed(1) + '" stroke="#9ff6ff" stroke-width=".7" opacity="' + (0.15 + r() * 0.35).toFixed(2) + '"/>'; }
+      return sky(g, '#041219', '#123c4a') +
+      '<defs><linearGradient id="' + w + '" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#0a2630"/><stop offset="1" stop-color="#03090d"/></linearGradient>' +
+      '<radialGradient id="' + h + '" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#ff2bd6" stop-opacity=".55"/><stop offset="1" stop-color="#ff2bd6" stop-opacity="0"/></radialGradient></defs>' +
+      '<ellipse cx="120" cy="120" rx="170" ry="70" fill="url(#' + h + ')"/>' +
+      skyline(158, 18, 61, '#0b2a36', '#3ff0ff', 40, 95) +
+      '<g><rect x="186" y="18" width="34" height="150" fill="#061a22"/><path d="M186 18 l17 -14 17 14z" fill="#061a22"/><rect x="201" y="0" width="4" height="10" fill="#061a22"/>' +
+      '<circle cx="203" cy="4" r="3.2" fill="#e8ff3a"/><circle cx="203" cy="4" r="11" fill="#e8ff3a" opacity=".18"/>' +
+      [0, 1, 2, 3, 4, 5, 6, 7, 8, 9].map((i) => '<rect x="191" y="' + (30 + i * 13) + '" width="24" height="2" fill="#3ff0ff" opacity="' + (0.25 + (i % 3) * 0.2).toFixed(2) + '"/>').join('') + '</g>' +
+      skyline(170, 14, 83, '#061820', '#ff4fd8', 25, 70) +
+      '<g transform="translate(58 74)"><rect width="46" height="22" rx="3" fill="#ff2bd6" opacity=".18"/><rect width="46" height="22" rx="3" fill="none" stroke="#ff4fd8" stroke-width="1.6"/><path d="M8 7h10M8 11h14M8 15h8M28 6v10M33 6l5 10M38 6l-5 10" stroke="#ffd1f5" stroke-width="1.4" stroke-linecap="round"/></g>' +
+      '<g transform="translate(300 62)"><rect width="34" height="54" rx="3" fill="#e8ff3a" opacity=".12"/><rect width="34" height="54" rx="3" fill="none" stroke="#e8ff3a" stroke-width="1.6"/><path d="M9 10h16M9 18h16M9 26h10M9 34h16M9 42h8" stroke="#f6ffb0" stroke-width="1.6" stroke-linecap="round"/></g>' +
+      '<g transform="translate(250 104)"><rect width="40" height="14" rx="2" fill="none" stroke="#3ff0ff" stroke-width="1.4" opacity=".9"/><path d="M6 7h28" stroke="#b8fbff" stroke-width="1.4" stroke-dasharray="3 2"/></g>' +
+      '<g fill="none" stroke="#020a0e" stroke-width="1.6"><path d="M0 60 Q90 88 186 70"/><path d="M220 80 Q300 104 400 76"/><path d="M0 96 Q120 120 250 104"/><path d="M290 112 Q350 126 400 118"/></g>' +
+      '<g fill="none" stroke="#cfe8ee" stroke-linecap="round" opacity=".14"><path d="M96 168 q-10 -18 2 -32 q12 -14 -2 -34" stroke-width="9"/><path d="M106 168 q8 -16 -2 -30 q-10 -14 4 -28" stroke-width="5"/><path d="M342 168 q-8 -14 2 -26 q10 -12 -2 -26" stroke-width="8"/></g>' +
+      '<rect y="168" width="400" height="32" fill="url(#' + w + ')"/>' +
+      '<g opacity=".5"><rect x="194" y="170" width="18" height="30" fill="#3ff0ff" opacity=".18"/><rect x="62" y="170" width="40" height="22" fill="#ff4fd8" opacity=".2"/><rect x="302" y="170" width="30" height="26" fill="#e8ff3a" opacity=".16"/></g>' +
+      '<path d="M0 168 h400" stroke="#3ff0ff" stroke-width="1" opacity=".5"/><path d="M0 186 h400" stroke="#ff4fd8" stroke-width=".8" opacity=".25" stroke-dasharray="14 10"/>' +
+      '<g fill="#010508"><path d="M150 168 v-14 l3 -8 h6 l3 8 v14z"/><circle cx="156" cy="141" r="5"/><path d="M162 150 l12 -4" stroke="#010508" stroke-width="3"/><path d="M262 168 v-12 l2 -9 h5 l3 9 v12z"/><circle cx="266" cy="142" r="4.5"/></g>' +
+      '<path d="M174 146 l40 -10" stroke="#e8ff3a" stroke-width=".8" opacity=".7"/>' + rain; },
   };
   const ASSETS = G.LOS_ASSETS || { arene: {} };
   function scene(themeId, cls) {

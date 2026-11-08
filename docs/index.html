@@ -2311,6 +2311,40 @@ details.card > summary { font-size: 16px; }
 .buses { list-style: none; margin: 4px 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: 4px; }
 .buses li { font-size: 12px; font-weight: 600; padding: 2px 8px; border-radius: 999px; background: color-mix(in srgb, var(--accent) 12%, var(--panel-2)); color: var(--ink); }
 .buses { align-items: flex-start; }
+
+/* ===== Locandine: dieci arene ===== */
+/* con tre colonne, una locandina rimasta da sola nell'ultima riga occupa tutta la riga (vale per qualunque numero di arene) */
+@media (min-width: 761px) {
+  .themes .poster-card:last-child:nth-child(3n+1) { grid-column: 1 / -1; min-height: 190px; }
+  .themes .poster-card:last-child:nth-child(3n+1) small { max-width: 60ch; }
+}
+.hh-scenes:not(.pano) { grid-template-columns: repeat(5, 1fr); grid-template-rows: repeat(2, 1fr); }
+@media (max-width: 760px) { .hh-scenes:not(.pano) { grid-template-columns: 1fr; grid-template-rows: repeat(3, 1fr); } }
+
+/* ===== Night City — Zona Rossa =====
+ * Le regole proprie di un'arena usano l'attributo data-arena sulla radice (data-theme resta
+ * riservato a chiaro/scuro). L'attributo segue l'arena della partita aperta, anche in un replay. */
+:root[data-arena="cyberpunk"] { --arena-acid: #e8ff3a; --arena-cyan: #3ff0ff; --arena-magenta: #ff4fd8; --arena-petrol: #06222b; }
+.poster-card[data-theme="cyberpunk"] { box-shadow: inset 0 0 0 1px rgba(63, 240, 255, .35); }
+.poster-card[data-theme="cyberpunk"] b { text-shadow: 0 0 12px rgba(255, 79, 216, .55), 0 2px 10px rgba(0, 0, 0, .6); }
+.poster-card[data-theme="cyberpunk"] .picon { color: #e8ff3a; border-color: rgba(232, 255, 58, .45); }
+:root[data-arena="cyberpunk"] .broadcast { background-image: linear-gradient(135deg, rgba(6, 34, 43, .35), rgba(255, 79, 216, .08)); }
+:root[data-arena="cyberpunk"] .broadcast::after { content: ""; position: absolute; inset: 0; pointer-events: none; z-index: 1; opacity: .35;
+  background: repeating-linear-gradient(0deg, rgba(63, 240, 255, .06) 0 1px, transparent 1px 4px); }
+:root[data-arena="cyberpunk"] .bc-title h1 { text-shadow: 0 0 18px rgba(63, 240, 255, .35), 2px 0 0 rgba(255, 79, 216, .35), -2px 0 0 rgba(63, 240, 255, .25); }
+:root[data-arena="cyberpunk"] .broadcast[data-kind="dis"] .bc-title h1 { animation: cpGlitch 1.8s steps(1, end) 1; }
+:root[data-arena="cyberpunk"] .broadcast[data-kind="n"] .bc-scene { filter: brightness(.7) saturate(1.3) hue-rotate(10deg); }
+:root[data-arena="cyberpunk"] .dx-hero .apv-banner::after { content: ""; position: absolute; inset: 0; pointer-events: none;
+  background: repeating-linear-gradient(0deg, rgba(63, 240, 255, .07) 0 1px, transparent 1px 3px); }
+:root[data-arena="cyberpunk"] .dx-kicker { color: var(--arena-cyan); }
+@media (prefers-color-scheme: light) { :root[data-arena="cyberpunk"]:not([data-theme="dark"]) .dx-kicker { color: #007a85; } }
+:root[data-arena="cyberpunk"][data-theme="light"] .dx-kicker { color: #007a85; }
+@keyframes cpGlitch {
+  0% { transform: none; } 8% { transform: translateX(-3px) skewX(-6deg); } 12% { transform: translateX(2px); clip-path: inset(10% 0 55% 0); }
+  16% { transform: none; clip-path: none; } 52% { transform: translateX(1px) skewX(4deg); } 56%, 100% { transform: none; }
+}
+@media (prefers-reduced-motion: reduce) { :root[data-arena="cyberpunk"] .broadcast[data-kind="dis"] .bc-title h1 { animation: none; } }
+[data-reduced-motion][data-arena="cyberpunk"] .broadcast[data-kind="dis"] .bc-title h1 { animation: none; }
 </style>
 
 <header class="top">
@@ -3623,6 +3657,78 @@ details.card > summary { font-size: 16px; }
 ` },
       ],
     },
+    /* ------------------------------------------------------------
+     * Decima arena, aggiunta in coda: l'ordine delle nove precedenti e i loro
+     * risultati restano quelli di sempre. Un distretto immaginario di Watson,
+     * sigillato dopo un colpo ai dati andato male. Nessun personaggio canonico. */
+    {
+      id: 'cyberpunk', name: 'Night City — Zona Rossa', tag: 'Neon, impianti e contratti saltati: un distretto sigillato dove nessuno è indispensabile.',
+      hue: 305, glyph: '⌁',
+      phase: { b: 'Il contratto saltato', d: 'Giorno', n: 'Notte', f: 'La consegna del fixer' },
+      climax: { titles: ['La stretta corporativa', 'Le ultime linee aperte', 'Il blocco totale'], intro: 'La stretta corporativa chiude un isolato dopo l’altro: resta aperta solo la strada verso {z}. Da qui si esce soltanto vincendo.' },
+      intro: {
+        b: 'Il colpo ai dati è saltato: le serrande del distretto si abbassano e i droni di sicurezza bloccano gli svincoli. Tutti scappano con quello che riescono ad afferrare.',
+        d: 'Le insegne olografiche tremolano nello smog: comincia un altro giorno nella zona sigillata.',
+        n: 'Il cielo sopra Watson diventa viola di neon. Nei vicoli si spengono i segnali, uno alla volta.',
+        f: 'Un fixer manda lo stesso messaggio a tutti: c’è una consegna, e la roba va a chi arriva per primo.',
+        finale: 'La stretta corporativa chiude un isolato dopo l’altro: restano aperte solo le vie verso la Piazza della torre.',
+      },
+      fallen: ['Sulla rete del quartiere nessun biochip si spegne.', 'Sulla rete del quartiere si spegne un biochip.', 'Sulla rete del quartiere si spengono {n} biochip.'],
+      lex: {
+        arma: ['una pistola smart', 'una katana termica', 'un fucile a pompa da strada', 'una mazza da baseball chiodata', 'una pistola a rotaia artigianale', 'un taser da buttafuori', 'un mitra compatto'],
+        cibo: ['una barretta di proteine sintetiche', 'una scatola di noodle istantanei', 'una lattina di bevanda energetica', 'un panino di soia in busta'],
+        luogo: ['il Mercato di Kabuki', 'il Megablocco', 'la Clinica del ripperdoc', 'il Club della braindance', 'l\'Officina dei Maelstrom', 'il Nodo dati corporativo'],
+        mostro: ['una squadra di sicurezza corporativa', 'uno sciame di droni di pattuglia', 'una banda di Scav', 'una gang di cromati'],
+        trappola: ['una mina a prossimità', 'un filo monomolecolare teso in un corridoio', 'una torretta automatica riprogrammata'],
+        rifugio: ['una capsula-letto del Megablocco', 'il retro di un distributore di noodle', 'un vano tecnico dietro le insegne'],
+        dono: ['un pacco lasciato da un drone del fixer'],
+      },
+      extra: {
+        b: `
+1 +arma:A | {A} strappa {arma} dalle mani di una guardia svenuta e si butta nel primo vicolo.
+1 +cibo:A | {A} sfonda un distributore automatico e riempie le tasche di {cibo}.
+1 @stl | {A} si spegne il biochip e si confonde tra la folla che scappa dalla Piazza.
+2 al:AB @soc | {A} e {B} si ritrovano nello stesso ascensore di servizio e decidono di uscirne insieme.
+2 k:A>B @agg | Nel caos dello sgombero, {A} spinge {B} contro le serrande che si chiudono.
+`,
+        d: `
+1 +attrezzo:A @int | {A} contratta con un banco del Mercato e si porta via {attrezzo} per un favore da restituire.
+1 s:A=affamato | {A} passa la giornata a fuggire dai droni e non trova un solo distributore funzionante.
+2 al:AB @soc | {A} e {B} si dividono un contratto del fixer: metà dei rischi, metà della paga.
+2 k:A>B @agg | {A} vende a una gang la posizione di {B}. La gang passa a riscuotere.
+`,
+        n: `
+1 | {A} guarda le insegne pubblicitarie ripetere lo stesso slogan per tutta la notte.
+2 k:A>B @stl | {A} raggiunge {B} nel buio di un blackout e chiude il conto senza fare rumore.
+`,
+      },
+      disasters: [
+        { n: 'L’intervento della MaxTac', intro: 'Qualcuno è andato in cyberpsicosi: la squadra speciale della polizia arriva e non fa domande a chi si trova in mezzo.', out: `
+1 d:A | {A} si trova sulla linea di tiro della MaxTac nel momento sbagliato.
+1 s:A=ferito | {A} viene travolt[A:o/a] dallo sgombero della MaxTac e se la cava con una brutta ferita.
+1 @stl | {A} si appiattisce sotto una scala antincendio finché la MaxTac non se ne va.
+1 pr:A+18 | {A} assiste da vicino all’intervento della MaxTac. Il sovraccarico neurale sale: le immagini non se ne vanno.
+` },
+        { n: 'Il rastrellamento corporativo', intro: 'Una squadra corporativa setaccia il distretto alla ricerca dei dati rubati: chi non ha un documento valido viene trattato come un sospetto.', out: `
+1 d:A | {A} non convince la squadra corporativa e non torna dal controllo.
+1 s:A=ferito | {A} viene fermat[A:o/a] e interrogat[A:o/a] con metodi poco gentili.
+2 k:A>B | {A} indica {B} alla squadra corporativa come complice del furto. Per {B} il controllo finisce male.
+1 test:A=furt12 ko:s:A=ferito | {A} passa tra i controlli corporativi senza farsi notare. || {A} prova a passare tra i controlli corporativi, ma viene riconosciut[A:o/a] e colpit[A:o/a].
+` },
+        { n: 'Il cortocircuito della rete', intro: 'Un virus attraversa la rete del quartiere: impianti, insegne e serrature impazziscono tutti insieme.', out: `
+1 pr:A+20 | Gli impianti di {A} ricevono il virus in pieno: il sovraccarico neurale schizza in alto.
+1 s:A=sconvolto | Le ottiche di {A} mostrano per un’ora immagini che non esistono.
+1 test:A=int12 ok:pr:A-10 ko:pr:A+15 | {A} isola i propri impianti dalla rete prima che il virus arrivi e ne esce più lucid[A:o/a]. || {A} prova a isolare i propri impianti dalla rete, ma il virus arriva prima.
+1 d:A | Il virus manda in blocco l’impianto cardiaco di {A}.
+` },
+        { n: 'La pioggia acida sul distretto', intro: 'Dalle nuvole gialle cade una pioggia che corrode vernice, plastica e pelle.', out: `
+1 s:A=ferito | {A} resta sotto la pioggia acida troppo a lungo e si riempie di ustioni.
+1 en:A-15 | {A} corre da una tettoia all’altra per tutta la giornata e arriva al riparo senza fiato.
+1 @luck | {A} trova riparo in una capsula-letto libera proprio quando il cielo si apre.
+1 d:A | {A} scivola sul cemento bagnato da una passerella e non si rialza più.
+` },
+      ],
+    },
   ];
 })(typeof window !== 'undefined' ? window : globalThis);
 
@@ -3647,7 +3753,7 @@ details.card > summary { font-size: 16px; }
   E.statusLabel = {
     grave: 'Grave', esausto: 'Esausto', disperato: 'Disperato',
     assiderato: 'Assiderato', maledetto: 'Maledetto', ipossia: 'In ipossia', infetto: 'Infetto',
-    terrorizzato: 'Terrorizzato', irradiato: 'Irradiato', ansia: 'In ansia', stressato: 'Sotto stress', tempesta: 'Nella tempesta',
+    terrorizzato: 'Terrorizzato', irradiato: 'Irradiato', ansia: 'In ansia', stressato: 'Sotto stress', tempesta: 'Nella tempesta', sovraccarico: 'In sovraccarico',
   };
   E.labels = { hp: 'Salute', en: 'Energia', mo: 'Morale', food: 'Sazietà' };
   E.labelsSoft = { hp: 'Reputazione', en: 'Energie', mo: 'Morale', food: 'Sazietà' };
@@ -3868,6 +3974,76 @@ details.card > summary { font-size: 16px; }
         meterDeath: ['{0} manda le dimissioni alle tre di notte, con un PowerPoint di trenta slide sul perché.', '{0} va in burnout durante una call e chiude il portatile per sempre. Direzione: una baita in montagna.'],
         forage: ['{0} intercetta il carrello degli avanzi del catering: {cibo}.', '{0} scopre che nel frigo comune c\'è {cibo} senza nome. Ora ce l\'ha.', '{0} si autoinvita a una riunione solo per {cibo}.'],
         refill: ['{0} si concede una pausa caffè di quaranta minuti. Lo stress scende, la produttività pure.'],
+      },
+    },
+    /* Night City — Zona Rossa. L'indicatore è il Sovraccarico neurale: gli impianti
+     * scaldano, la rete del quartiere disturba, la paura fa il resto. Non cala da solo. */
+    cyberpunk: {
+      rule: 'Sovraccarico neurale e contratti',
+      desc: 'Il distretto è sigillato e ogni ora in strada carica gli impianti di Sovraccarico neurale, soprattutto all’Officina dei Maelstrom, al Nodo dati e in Piazza. Non scende da solo: servono cure, il riposo assistito in un posto riparato o una diagnosi riuscita. Intelligenza, Furtività ed Empatia contano più della Forza; i fixer pagano chi fa notizia.',
+      key: ['int', 'furt', 'emp'],
+      drain: { food: 1, en: 1.15, mo: 1.05 },
+      mods: { forage: 0.85, heal: 1.1, weapon: 1.15, stealth: 1.15, fame: 1.2, sponsor: 1.25, night: 1.1, beast: 1.15, trap: 1.2, greed: 1.3 },
+      zones: [[1.5, 1.2, 0.3], [1, 0.9, 0.8], [0.9, 0.7, 0.9], [1, 1.1, 0.6], [1.3, 1.7, 0.3], [0.8, 1.5, 0.5]],
+      meter: {
+        id: 'sovraccarico', name: 'Sovraccarico neurale', st: 'sovraccarico',
+        desc: 'Sale a ogni fase: +8 all’apertura, +10 di giorno, +5 di notte, +6 alla consegna del fixer, +14 nei disastri, e +5 in più nella fase in cui si viene feriti. Il totale si moltiplica per il pericolo della zona (×0,7 alla Clinica, fino a ×1,7 all’Officina dei Maelstrom). Resistenza ed Empatia lo frenano (con la loro media a 10 sale del 40% più piano, a 1 del 23% più in fretta); un alleato o il partner accanto toglie il 15%, gli oggetti schermati fino al 60%; il meteo lo spinge su o lo rallenta. Non cala mai da solo: lo abbassano le cure (−40), un kit medico usato da un alleato (−24), il riposo assistito nel Megablocco o alla Clinica con un alleato accanto (−14 a notte) e le diagnosi riuscite (da −12 a −25). Da 65 si è in sovraccarico: −1,5 negli scontri, −1 alle prove e si dorme peggio. A 100 gli impianti tolgono 12 punti di salute a ogni fase, fino alla morte.',
+        gain: { b: 8, d: 10, n: 5, dis: 14, f: 6 }, resist: ['res', 'emp'], ally: 0.85, thr: 65, dmg: 12, cure: 40, wound: 5, death: true, zoneMult: true, noDecay: true,
+        rest: { shelter: 0.8, amount: 14 },
+      },
+      meteo: [
+        { n: 'Pioggia acida', d: 'Dalle nuvole gialle cade una pioggia che mangia vernice e pelle: tutti cercano una tettoia.', fx: { pr: 4, en: 1.15, heal: 0.85 } },
+        { n: 'Smog denso', d: 'Lo smog copre le insegne fino al terzo piano. Ci si vede a dieci metri.', fx: { stl: 1.35, en: 1.1 } },
+        { n: 'Blackout di quartiere', d: 'La rete elettrica salta isolato per isolato. Al buio contano gli occhi e il silenzio.', fx: { stl: 1.5, pr: 3, lethal: 1.05 } },
+        { n: 'Interferenze di rete', d: 'Un’onda di rumore digitale attraversa il distretto: gli impianti friggono e i calcoli si sbagliano.', fx: { pr: 6, tb: { int: -1 } } },
+        { n: 'Allerta pattuglia', d: 'I droni della sicurezza corporativa volano bassi e le squadre controllano i vicoli.', fx: { beast: 1.6, lethal: 1.1 } },
+        { n: 'Consegna di scorte', d: 'Un convoglio umanitario lascia casse di razioni ai bordi del Mercato: chi corre mangia.', fx: { forage: 1.5, food: 0.85 } },
+        { n: 'Caldo dei condizionatori', d: 'Migliaia di condizionatori soffiano aria bollente nei vicoli. Si suda anche da fermi.', fx: { en: 1.25, food: 1.15 } },
+        { n: 'Tregua del quartiere', d: 'Le gang si accordano per un giorno senza sparare. Nessuno ci crede, ma tutti respirano.', fx: { lethal: 0.85, pr: -4, heal: 1.15 } },
+        { n: 'Disturbi ottici', d: 'Le ottiche di tutti mostrano sfarfallii e immagini doppie: mirare è difficile, sparire è più facile.', fx: { stl: 1.2, tb: { agi: -1, furt: 1 } } },
+        { n: 'Notte di neon', d: 'Le insegne si accendono tutte insieme e le dirette dei fixer cercano facce nuove.', fx: { fame: 1.5, pr: 2 } },
+      ],
+      txt: {
+        meterUp: ['Le ottiche di {0} cominciano a mostrare righe di codice che nessuno ha scritto. Il sovraccarico neurale è oltre la soglia.', '{0} sente gli impianti scaldarsi sotto la pelle e deve fermarsi a respirare: il sovraccarico neurale è alto.', 'A {0} trema la mano cromata e la voce dei pensieri arriva in ritardo. Il sovraccarico neurale non scende.', 'Il diagnostico interno di {0} lampeggia in rosso: troppo carico, troppo a lungo.'],
+        meterDeath: ['Gli impianti di {0} vanno in blocco tutti insieme: il cuore artificiale si ferma tra due battiti.', '{0} brucia l’ultimo margine di sovraccarico neurale. Le ottiche restano accese su un vicolo vuoto.'],
+        meterCure: ['{1} ricalibra gli impianti di {0}: {m} cala.'],
+        meterRest: ['{0} dorme al riparo mentre {1} tiene d’occhio il diagnostico: al mattino il sovraccarico neurale è più basso.', '{1} resta svegli[1:o/a] accanto a {0}, in un posto riparato, e gli impianti di {0} hanno il tempo di raffreddarsi.'],
+        forage: ['{0} contratta con un banco del Mercato rimasto aperto e torna con {cibo}.', '{0} forza un distributore automatico rimasto senza corrente e recupera {cibo}.', '{0} segue l’odore di una cucina di strada ancora accesa e rimedia {cibo}.'],
+        beastHit: ['{mostro} sorprende {0} da sol[0:o/a] in un vicolo: {0} scappa, ma con una ferita brutta.', '{0} si addormenta troppo vicino a una strada battuta da {mostro}. Si sveglia appena in tempo per fuggire, ferit[0:o/a].', '{mostro} perquisisce il riparo di {0} nel buio. {0} riesce a sgusciare via, lasciando sangue sul cemento.'],
+        beastDeath: ['{mostro} trova {0} da sol[0:o/a] nella notte. Il biochip di {0} si spegne poco dopo.', '{0} non sente arrivare {mostro}. Il vicolo torna silenzioso.'],
+        beastFend: ['{mostro} punta il riparo del gruppo di {0}, ma i turni di guardia funzionano: si ritirano tutti nel retro di un negozio e la minaccia passa oltre.'],
+        nurse: ['{0} passa la notte a ricucire {1} con quello che ha.', '{0} chiude le ferite di {1} con una colla chirurgica scaduta. Tiene.', '{0} veglia su {1} e controlla il battito ogni ora.'],
+        nurseMed: ['{0} usa {i} per rimettere in piedi {1}.', '{0} spende {i} per {1}, senza chiedere niente in cambio.'],
+        selfMed: ['{0} si medica da sol[0:o/a] con {i}, davanti a uno specchio rotto.', '{0} si inietta {i} e aspetta che la stanza smetta di girare.'],
+        trapSet: ['{0} nasconde {i} lungo un passaggio di {z} e se ne va senza voltarsi.', '{0} piazza {i} in un corridoio di {z}. Adesso basta aspettare.'],
+        trapHit: ['{1} finisce nella trappola che {0} aveva nascosto in {z}.', 'La trappola di {0} scatta su {1}, in {z}. Il rumore rimbalza tra i palazzi.'],
+        trapKill: ['{1} finisce nella trappola che {0} aveva nascosto in {z}, e non ne esce viv[1:o/a].', 'La trappola di {0} in {z} fa il suo lavoro: il biochip di {1} si spegne.'],
+        trapDodge: ['Le ottiche di {1} segnalano la trappola di {0} in {z} appena in tempo: {1} la disinnesca e capisce chi cercare.', '{1} scavalca la trappola di {0} in {z} senza nemmeno accorgersene. Fortuna sfacciata.'],
+        trapAlly: ['{1} finisce nella trappola piazzata da {0}, su[0:o/a] alleat[0:o/a]. La discussione si sente per tre piani.'],
+        watch: ['{0} e {1} fanno i turni di guardia davanti a una porta blindata: dormono poco, ma dormono.', '{0} resta di guardia perché {1} possa dormire.'],
+        exhausted: ['{0} si addormenta in piedi, appoggiat[0:o/a] a un’insegna che ronza.', '{0} è così stanc[0:o/a] che cammina in tondo per un isolato intero.', 'Gli occhi di {0} si chiudono da soli: niente sonno da due giorni, solo stimolanti.'],
+        starveDeath: ['{0} non mangia da giorni: si addormenta in una capsula-letto e non si sveglia più.', 'La fame consuma {0} un poco alla volta, mentre le insegne promettono noodle a ogni angolo.'],
+        woundDeathAny: ['{0} perde troppo sangue e si spegne in silenzio, sotto un’insegna che lampeggia.', 'Le ferite di {0} si infettano: senza un ripperdoc, non c’è niente da fare.', '{0} si appoggia a una saracinesca per riposare. Non si rialzerà.'],
+        exhaustDeath: ['{0} crolla per lo sfinimento in mezzo al marciapiede. Nessuno si ferma.'],
+        sickDeath: ['La febbre si porta via {0} durante la notte, in una stanza senza finestre.', '{0} è troppo debole per combattere l’infezione: gli antibiotici del Mercato erano falsi.'],
+        poisonDeath: ['{0} non riesce a smaltire la tossina: muore tra i crampi, sotto le luci al neon.'],
+        grave: ['{0} è ridott[0:o/a] male: senza un ripperdoc non arriverà lontano.', '{0} perde sangue a ogni passo e lascia una scia sul cemento bagnato.'],
+        healed: ['Le ferite di {0} si stanno chiudendo: la colla chirurgica e il riposo hanno fatto il loro lavoro.'],
+        loot: ['{0} fruga nelle tasche di {1}: trova {i}.', '{0} non perde tempo: prende {i} dalle cose di {1}.'],
+        scavenge: ['{0} trova lo zaino di {1} abbandonato in {z} e ci recupera {i}.', '{0} recupera {i} in {z}: roba di {1}, che ormai non ne ha più bisogno.'],
+        share: ['{0} divide {i} con {1}, che non mangiava da giorni.', '{0} vede {1} allo stremo e [1:gli/le] lascia metà delle proprie razioni.'],
+        greed: ['{0} mangia {i} da sol[0:o/a] mentre {1}, affamat[1:o/a], guarda. {1} se lo segna.', '{0} nasconde {i} nella giacca. {1} se ne accorge.'],
+        comfort: ['{0} resta accanto a {1} tutta la notte e [1:gli/le] racconta di quando la città aveva ancora le stelle.', '{0} mette in comune con {1} le cuffie e una vecchia playlist finché {1} non torna a sorridere.'],
+        moraleLeave: ['{0} non ce la fa più: lascia l’alleanza senza dire una parola.', '{0} se ne va all’alba. Lascia solo un messaggio: «Meglio sol[0:o/a] che con voi».'],
+        remorse: ['{0} non riesce a togliersi dalla testa la faccia di {1}.', '{0} riguarda per tre volte la registrazione delle proprie ottiche. Non cambia niente.'],
+        bloodlust: ['{0} ha preso gusto alla caccia. I fixer prendono nota, gli altri tremano.'],
+        accident: ['{0}, ubriac[0:o/a], gioca con {i} in un vicolo. Il resto è prevedibile.'],
+        accidentDeath: ['{0}, ubriac[0:o/a], gioca con {i} sotto un’insegna. Il biochip si spegne poco dopo.'],
+        weaponBreak: ['{0} colpisce ancora, e {ip} si spezza. Era roba da Mercato, del resto.', 'Proprio sul più bello, {ip} si inceppa per sempre tra le mani di {0}.'],
+        armorBreak: ['{0} incassa il colpo: {ip} si spacca, ma ha fatto il suo dovere.'],
+        tough: ['Ma {0} non è mort[0:o/a]: si trascina via con una ferita orribile. Senza un ripperdoc non durerà, e {1} lo sa.', 'Colpo di scena: il biochip di {0} lampeggia ancora. A fatica, ma respira, e ha visto bene la faccia di {1}.'],
+        toughEnv: ['Ma {0} non è mort[0:o/a]: tossisce, si rialza e si trascina via. Ridott[0:o/a] malissimo.'],
+        woundSick: ['La ferita di {0} si è infettata: febbre alta e brividi.', 'Senza bende pulite, la ferita di {0} peggiora. Pessimo segno.'],
       },
     },
   };
@@ -4161,6 +4337,7 @@ details.card > summary { font-size: 16px; }
       wasteland: { armatura: ['un\'armatura di copertoni', 'uno scudo ricavato da un cartello stradale', 'una maschera antigas'], attrezzo: ['un contatore Geiger', 'una chiave inglese', 'una borraccia filtrante'], valore: ['una manciata di tappi di bottiglia', 'una tanica di benzina'], alcol: ['una bottiglia di distillato di cactus'] },
       liceo: { armatura: ['un alibi di ferro', 'una felpa col cappuccio'], attrezzo: ['gli appunti di tutto l\'anno', 'una calcolatrice scientifica', 'un caricabatterie di riserva'], valore: ['dei buoni pasto', 'le risposte del compito di domani'], alcol: ['una lattina di energy drink'], ricordo: ['un portachiavi dell\'amicizia', 'il quaderno delle confidenze', 'il biglietto del primo concerto', 'una foto di classe delle medie'] },
       ufficio: { armatura: ['una scrivania d\'angolo strategica', 'delle cuffie antirumore'], attrezzo: ['una chiavetta USB con tutte le password', 'una macro di Excel miracolosa'], valore: ['dei buoni pasto', 'delle ferie arretrate'], alcol: ['un amaro della cena aziendale'], ricordo: ['la foto del gatto', 'una tazza con scritto «Il capo migliore del mondo»', 'il badge del primo giorno'] },
+      cyberpunk: { armatura: ['una giacca balistica', 'una placcatura subdermale', 'un casco con visiera schermata'], attrezzo: ['un cyberdeck portatile', 'un kit da scasso elettronico', 'un rilevatore di segnali'], valore: ['una chiavetta di eddie', 'uno shard di dati rubati'], alcol: ['una bottiglia di sakè sintetico'], ricordo: ['una foto stampata su carta', 'un vecchio telefono a conchiglia', 'un peluche bruciacchiato'] },
     },
     how: { casa: 'Portato da casa', trovato: 'Trovato', sponsor: 'Dono degli sponsor', festino: 'Preso al festino', rubato: 'Rubato a {1}', bottino: 'Preso a {1}', eredita: 'Ereditato da {1}', dono: 'Regalo di {1}', scambio: 'Scambiato con {1}', costruito: 'Costruito', zaino: 'Trovato tra le cose di {1}', lettera: 'Scritto da {1}' },
   };
@@ -4901,6 +5078,132 @@ cibo|delle fette di frutta secca|Dalla macchinetta del secondo piano, l'unica ch
 })(typeof window === 'object' ? window : globalThis);
 
 ;
+/* Catalogo degli oggetti: Night City — Zona Rossa. Formato in _oggetti-1.js.
+ * Gli impianti (impianto:1) funzionano come gli altri oggetti del loro tipo, ma restano
+ * addosso a chi li ha installati: nessuno può rubarli, riceverli, prenderli come bottino
+ * o trovarli a terra. Le finiture di quest'arena sono tutte tecnologiche, così valgono
+ * anche per un impianto («una placcatura subdermale con gel antiurto»). */
+(function (G) {
+  const D = (G.LOS_DATA = G.LOS_DATA || {}); D.itemCatalog = D.itemCatalog || {};
+  D.itemCatalog.cyberpunk = `
+arma|una pistola smart|Una pistola con proiettili a guida intelligente collegati alle ottiche: il colpo curva verso il bersaglio.|forza:1 prova:int+1
+arma|una katana termica|La lama si arroventa con un pulsante sull'elsa. Taglia, e cauterizza mentre taglia.|forza:1.5 posti:3 prova:agi-1
+arma|un fucile a pompa elettromagnetico|Due bobine al posto delle canne: un colpo solo, che sposta anche i muri sottili.|forza:1.5 posti:3 belve:3
+arma|una mazza a impulsi|Un manganello da buttafuori con una scarica che piega le ginocchia.|forza:0.5 prova:for+1
+arma|un coltello vibrante in ceramica|La lama vibra e taglia il kevlar, e non suona ai metal detector.|forza:-0.5 posti:1 prova:furt+2
+arma|una pistola a rotaia artigianale|Assemblata in un garage con pezzi di tre marche diverse. Spara lontano, quando non si surriscalda.|forza:1 usi:-1 prova:agi+1
+armatura|una giacca balistica|Kevlar sotto il tessuto lucido: protegge, e al Club fa anche la sua figura.|assorbe:6
+armatura|un giubbotto in fibra di carbonio|Leggero e rigido: ferma le lame, un po' meno i proiettili.|assorbe:4 prova:agi+1
+armatura|uno scudo antisommossa recuperato|Policarbonato graffiato, con il logo di una corporazione coperto di vernice.|assorbe:14 posti:4 usi:1
+armatura|un casco con visiera schermata|La visiera filtra i lampi e il rumore della rete: gli impianti si scaldano meno.|assorbe:2 indicatore:15
+armatura|una placcatura subdermale|Placche sottili installate sotto la pelle del torace. Non si toglie, e non si può rubare.|assorbe:8 posti:0 impianto:1
+armatura|un rivestimento dermico ignifugo|Una pellicola installata sulla pelle delle braccia: regge calore e scintille, e disperde il calore degli impianti.|assorbe:3 indicatore:10 posti:0 impianto:1
+attrezzo|un cyberdeck portatile|Il computer dei netrunner: con il cavo giusto apre porte, telecamere e terminali a portata di presa.|prova:int+2
+attrezzo|un kit da scasso elettronico|Grimaldelli digitali e pinze isolate per le serrature a codice.|prova:furt+2
+attrezzo|un multiattrezzo da tecnico|Cacciaviti, pinze e un tester in un solo pezzo.|prova:int+1 prova:for+1
+attrezzo|un rilevatore di segnali|Ascolta le frequenze dei droni e vibra quando passano vicino.|belve:3 prova:sop+1
+attrezzo|una fascia di raffreddamento neurale|Si stringe alla nuca e assorbe il calore degli impianti.|indicatore:25
+attrezzo|un’interfaccia neurale da polso|Una presa installata nel polso: collega mente e macchine senza cavi volanti.|prova:int+1 indicatore:10 posti:0 impianto:1
+mappa|uno schema dei condotti di servizio|Ogni condotto tra i palazzi, con le grate che si aprono a mano: si gira senza farsi vedere dai droni.|prova:furt+1 belve:2
+mappa|una mappa dei punti ciechi delle telecamere|Gli angoli che le telecamere non vedono, segnati in rosso.|prova:furt+2
+mappa|un elenco dei distributori ancora pieni|Ogni distributore automatico non ancora svuotato, con l'orario del rifornimento.|raccolta:14
+mappa|una pianta del Nodo dati|Corridoi, sale server e porte stagne del nodo, con le procedure di emergenza.|prova:int+2
+mappa|un registro delle ronde corporative|Orari e percorsi delle squadre di sicurezza: dove non trovarsi di notte.|belve:4
+mappa|un’ottica cartografica|Un impianto oculare che proietta la mappa del quartiere sopra quello che si vede.|prova:agi+1 prova:sop+1 posti:0 impianto:1
+trap|una mina a prossimità|Si attacca a un muro e scatta quando qualcuno passa troppo vicino.|trappola:8
+trap|un filo monomolecolare|Un filo così sottile che non si vede: teso in un corridoio, taglia tutto quello che ci passa.|trappola:7 posti:1
+trap|una torretta automatica riprogrammata|Una torretta di sicurezza con il bersaglio cambiato. Tiene lontano anche le visite notturne.|trappola:6 posti:4 belve:3
+trap|una granata a impulso collegata a un sensore|Quando scatta, spegne luci e impianti di chi è nel raggio.|trappola:4
+trap|una rete elettrificata|Una rete da cantiere collegata a una batteria: ferma e scuote.|trappola:5 belve:2
+trap|un detonatore a pressione|Nascosto sotto una piastrella, aspetta il primo passo distratto.|trappola:6 posti:1 prova:furt+1
+med|un iniettore medico|Una siringa a pressione con antidolorifici e coagulanti: rimette in piedi in pochi secondi.|cura:10
+med|un kit da ripperdoc|Bisturi, colla chirurgica e garze, per chi sa cosa sta facendo.|cura:15 guarisce:ferito posti:2 prova:emp+1
+med|una dose di stabilizzante neurale|Una dose sempre pronta in tasca: chi la porta con sé dosa meglio gli impianti e accumula meno sovraccarico.|cura:-5 indicatore:15 posti:0
+med|una bomboletta di colla chirurgica|Chiude un taglio in tre secondi. Brucia come il fuoco.|cura:5 guarisce:ferito posti:0
+med|una scatola di antibiotici del Mercato|Antibiotici veri, forse. L'etichetta dice di sì.|cura:0 guarisce:malato
+med|un antidoto universale|Un neutralizzatore di tossine da bar: funziona quasi sempre.|cura:0 guarisce:avvelenato
+amuleto|un portachiavi a forma di gatto fortunato|Un gatto di plastica che saluta con la zampa. Lo ha toccato mezzo Mercato.|prova:fort+2
+amuleto|un biochip di backup|Una copia dei ricordi più importanti, salvata su un chip da collo. Se va male, almeno resta qualcosa.|morale:5
+amuleto|una medaglietta della scuola di quartiere|Una medaglia di latta per una corsa vinta a dieci anni.|prova:cor+1 morale:3
+amuleto|un dado di metallo inciso|Un dado pesante con un sei su ogni faccia: almeno lui vince sempre.|prova:fort+1 prova:cor+1
+amuleto|un nastro dei santi di strada|Un nastro con le facce dei santi del quartiere stampate sopra. Calma i pensieri.|morale:4 indicatore:5
+amuleto|un santino olografico|Un ologramma tascabile che recita una preghiera in tre lingue.|morale:3 prova:res+1
+valore|una chiavetta di eddie|Una chiavetta con un saldo di eurodollari non tracciabili. Al Mercato apre ogni porta.|scambio:3 posti:0
+valore|uno shard di dati rubati|Un frammento dei dati del colpo andato male: qualcuno pagherebbe molto, qualcun altro ucciderebbe.|scambio:3 posti:0
+valore|una scheda di accesso corporativa|Il badge di un impiegato che non tornerà a reclamarlo. Apre qualche porta di servizio.|scambio:2 prova:furt+1 posti:0
+valore|una bobina di cavo in fibra|Fibra ottica nuova: i tecnici del Megablocco la pagano bene.|scambio:2
+valore|un pacchetto di chip di memoria|Chip vergini, ancora sigillati.|scambio:2 posti:0
+valore|un orologio meccanico vero|Un orologio con le lancette e senza schermo. Un pezzo da collezione.|scambio:3 morale:2
+ricordo|una foto stampata su carta|Una foto vera, su carta, di una famiglia in un parco che non esiste più.|morale:6
+ricordo|un vecchio disco musicale|Un disco rock del secolo scorso, autografato da nessuno sa chi.|morale:5 prova:cor+1
+ricordo|un braccialetto dell’ospedale|Il braccialetto di una nascita, conservato in un portafoglio.|morale:6
+ricordo|un biglietto della metropolitana sopraelevata|Un biglietto mai obliterato: doveva servire per andarsene dal distretto.|morale:5 prova:res+1
+ricordo|un vecchio telefono a conchiglia|Dentro c'è solo un messaggio vocale: trenta secondi di una voce che dice «torna a casa per cena».|morale:7
+ricordo|un peluche bruciacchiato|Un orsetto con un occhio di bottone e la pelliccia annerita dal fumo.|morale:6
+cibo|delle barrette di proteine sintetiche|Sanno di cartone alla fragola, ma sfamano.|cibo:5
+cibo|delle scatole di noodle istantanei|Basta acqua calda, e c'è sempre un distributore che la dà.|cibo:10
+cibo|delle pastiglie di caffeina|Non sfamano quasi per niente, ma tengono svegli per un'altra notte.|cibo:-30 energia:20 posti:0
+cibo|dei panini di soia in busta|Pane di soia e salsa di soia: un pasto completo, dicono.|cibo:5 energia:5
+cibo|degli spiedini di carne coltivata|Carne di laboratorio cotta sulla griglia di un banco del Mercato.|cibo:15 morale:3
+cibo|delle gallette di alghe|Croccanti, salate, leggere: si portano ovunque.|cibo:-10 energia:5 posti:0
+`;
+  // finiture di Night City, con il loro effetto (i nomi stanno in world-items.js)
+  D.itemTailsArena = D.itemTailsArena || {};
+  D.itemTailsArena.cyberpunk = {
+    arma: `con firmware aggiornato|Il firmware nuovo corregge rinculo e inceppamenti: regge un colpo in più prima di cedere.|usi:1
+con modulo di puntamento|Un piccolo modulo collegato alle ottiche guida la mano.|prova:agi+1
+con batteria potenziata|Più energia a ogni colpo.|forza:0.5
+con circuiti schermati|Le interferenze di rete non la bloccano: si combatte senza esitare.|prova:cor+1
+con modalità silenziosa|Spegne luci, suoni e firme elettroniche finché non serve.|prova:furt+1`,
+    armatura: `con fibre di kevlar intrecciate|Uno strato in più dove serve di più.|assorbe:5
+con gel antiurto|Il gel si indurisce all'impatto: regge un colpo in più prima di cedere.|usi:1
+con sensori di impatto|Avverte un istante prima del colpo: ci si sposta d'istinto.|prova:agi+1
+con schermatura termica|Il calore degli impianti si disperde meglio.|indicatore:5
+con piastre rinforzate|Protegge meglio, ma pesa di più.|assorbe:8 posti:1`,
+    attrezzo: `con firmware aggiornato|Programmi nuovi, meno errori.|prova:int+1
+con batteria di riserva|Funziona anche durante i blackout: ci si orienta al buio.|prova:sop+1
+con schermatura antintrusione|Nessun segnale la tradisce: si lavora senza farsi notare.|prova:furt+1
+con dissipatore di calore|Scalda meno, e scalda meno chi la usa.|indicatore:5
+con guscio ultraleggero|Pesa quasi niente.|posti:-1`,
+    mappa: `con aggiornamento in tempo reale|I dati si aggiornano da soli quando passa una rete libera.|prova:int+1
+con percorsi colorati|Un colore per il cibo, uno per le cure: le scorte si trovano prima.|raccolta:8
+con note di un fixer|Qualcuno ha segnato dove dormire senza ricevere visite.|belve:2
+con codici di emergenza|I codici aprono le porte di servizio: si scappa più in fretta.|prova:agi+1
+con livelli dei piani|I piani dei palazzi uno sopra l'altro: si trovano scale che nessuno usa.|prova:furt+1`,
+    trap: `con sensore di movimento|Scatta al primo movimento, anche lento.|trappola:4
+con innesco a infrarossi|Un raggio invisibile attraversa il passaggio.|prova:furt+1
+con carica raddoppiata|Doppia potenza, doppio rumore.|trappola:6
+con mimetica olografica|Un ologramma la fa sembrare un pezzo di muro qualunque.|prova:furt+1 trappola:2
+con allarme di prossimità|Piazzata vicino al riparo, avverte chi dorme se qualcuno si avvicina.|belve:2`,
+    med: `in una custodia sterile|Sigillato e pulito: le dosi restano intatte.|cura:5
+in una cartuccia compatta|Leggero: entra in qualunque tasca.|posti:-1
+con antibiotici aggiunti|Ferma anche le infezioni.|guarisce:malato
+con dosatore automatico|Il dosatore calcola la dose giusta.|cura:5
+con istruzioni vocali|Una voce spiega cosa fare passo per passo: anche chi non sa medicare ci riesce.|prova:emp+1`,
+    amuleto: `con un led che lampeggia piano|Il lampeggio lento calma il respiro e i pensieri.|indicatore:5
+con una dedica incisa al laser|Le parole incise si toccano prima delle decisioni azzardate.|prova:fort+1
+con una catenella di rame|Il rame scalda le dita fredde, e il coraggio.|prova:cor+1
+con un ologramma di famiglia|Un volto sorride ogni volta che lo si apre.|morale:4
+con un adesivo di una band|L'adesivo ricorda un concerto in cui andava tutto bene.|morale:3`,
+    valore: `in una custodia antiurto|Arriva intatto a chi lo compra.|scambio:1
+con certificato di provenienza|Il certificato, vero o falso, alza il prezzo.|scambio:1
+in una busta schermata|Piatta e sottile: non occupa spazio.|posti:-1
+con sigillo intatto|Mai aperto: vale più della parola di chi lo vende.|scambio:1
+con un codice di riscatto|Il codice di riscatto mette di buon umore.|morale:2`,
+    ricordo: `con una dedica scritta a mano|La dedica, riletta cento volte, dà forza nei momenti brutti.|morale:3
+con una data incisa|La data ricorda per cosa si sta resistendo.|prova:cor+1
+con un adesivo a forma di stella|La stellina sembra fatta apposta per le notti peggiori.|morale:2
+con le iniziali incise|Le iniziali, toccate di nascosto, sono una promessa da mantenere.|prova:res+1
+con una nota ripiegata|La nota ripiegata dice una cosa sola: torna.|morale:4`,
+    cibo: `in una busta sottovuoto|Conservato bene: sfama di più.|cibo:5
+in una vaschetta da asporto|Ancora tiepido, quasi come al banco.|cibo:5 morale:2
+in una confezione da distributore|Porzione da distributore: piccola.|cibo:-5
+in un sacchetto di carta oleata|Unto e sostanzioso: dà energia.|energia:5
+in una scatola richiudibile|Si richiude e si incastra nello zaino.|posti:-1`,
+  };
+})(typeof window === 'object' ? window : globalThis);
+
+;
 /* Catalogo degli oggetti che nascono dai lessici delle arene (gli eventi scritti a mano: «trova {arma}»).
  * Formato come _oggetti-1.js. «_» vale in tutte le arene. Promemoria degli effetti di tipo, sempre attivi:
  * le armi danno forza negli scontri, gli esplosivi +2 di potenza, i veleni si applicano alle armi,
@@ -5188,6 +5491,23 @@ ricordo|la foto del gatto|Il gatto di casa, che dorme sul divano. Ti aspetta.|mo
 ricordo|una tazza con scritto «Il capo migliore del mondo»|Un regalo ironico. O forse no.|morale:4 prova:car+1 posti:1
 ricordo|il badge del primo giorno|La foto del primo giorno: più giovane, più ottimista.|morale:5 prova:cor+1
 `;
+  D.itemLexCatalog.cyberpunk = `
+arma|un fucile a pompa da strada|Canne segate e calcio coperto di adesivi delle gang: fa paura anche scarico.|forza:1.5 posti:3 belve:2
+arma|una mazza da baseball chiodata|Legno vero e chiodi veri: un pezzo d'antiquariato con un brutto carattere.|forza:0.5 prova:for+1
+arma|un taser da buttafuori|Due elettrodi e una scarica che manda a terra chiunque, impianti compresi.|forza:0 posti:1 belve:2
+arma|un mitra compatto|Tanti colpi, poca precisione. Si svuota in fretta.|forza:1 usi:-1 posti:2
+cibo|una barretta di proteine sintetiche|Sa di cartone alla fragola, ma sfama.|cibo:0 posti:0
+cibo|una scatola di noodle istantanei|Acqua calda, tre minuti, e la giornata migliora.|cibo:5
+cibo|una lattina di bevanda energetica|Zucchero, caffeina e qualcosa che non è scritto sull'etichetta.|cibo:-25 energia:20 posti:0
+cibo|un panino di soia in busta|Pane di soia e salsa di soia. Sfama.|cibo:0
+amuleto|un defibrillatore sottocutaneo|Un impianto sotto lo sterno: se il cuore si ferma, una scarica lo riavvia. Come ogni portafortuna salva una volta sola, poi si brucia.|posti:0 impianto:1
+alcol|una bottiglia di sakè sintetico|Sakè di laboratorio: scalda, consola e fa dire cose di cui ci si pente.|morale:6 posti:1
+alcol|una lattina di birra di riso|Tiepida, amara e sociale.|morale:5 posti:0
+veleno|una fiala di neurotossina|Basta un graffio per mandare in tilt il sistema nervoso, impianti compresi.|posti:0
+veleno|una cartuccia di veleno per lame|Una cartuccia da avvitare all'impugnatura: ogni colpo inietta la tossina.|posti:0
+esplosivo|una granata a frammentazione|Militare, rubata a un posto di blocco. Il piano B di molti.|posti:1
+esplosivo|una carica di plastico|Plastico con un detonatore a tempo: apre porte, e non solo porte.|posti:1
+`;
 })(typeof window === 'object' ? window : globalThis);
 
 ;
@@ -5213,7 +5533,9 @@ ricordo|il badge del primo giorno|La foto del primo giorno: più giovane, più o
  *                  quando il morale crolla, una volta per notte
  *   raccolta:N     probabilità in più (punti percentuali) di trovare cibo di notte
  *   scambio:N      valore negli scambi (merce)
- *   trappola:N     danno in più di una trappola piazzata */
+ *   trappola:N     danno in più di una trappola piazzata
+ *   impianto:1     impianto installato (Night City): si usa come gli altri oggetti del tipo, ma nessuno
+ *                  può rubarlo, riceverlo in dono o in scambio, prenderlo come bottino o trovarlo a terra */
 (function (G) {
   const D = (G.LOS_DATA = G.LOS_DATA || {});
   D.itemCatalog = D.itemCatalog || {};
@@ -5286,7 +5608,7 @@ con allegati numerati|Gli allegati in ordine fanno durare l'effetto più a lungo
       const [, k, v] = m;
       if (k === 'prova') { const x = v.match(/^(for|agi|int|car|fort|res|furt|cor|emp|sop)([+-]\d+)$/); if (!x) throw new Error('Prova non valida: ' + tok); (p.prova = p.prova || {})[x[1]] = (p.prova[x[1]] || 0) + +x[2]; }
       else if (k === 'guarisce') p.guarisce = (p.guarisce || []).concat(v.split(',').filter((x) => STATI[x] || (() => { throw new Error('Stato non valido: ' + x); })()));
-      else if (['posti', 'forza', 'usi', 'assorbe', 'belve', 'indicatore', 'cura', 'cibo', 'energia', 'morale', 'raccolta', 'scambio', 'trappola'].includes(k)) { if (!Number.isFinite(+v)) throw new Error('Valore non valido: ' + tok); p[k] = (p[k] || 0) + +v; }
+      else if (['posti', 'forza', 'usi', 'assorbe', 'belve', 'indicatore', 'cura', 'cibo', 'energia', 'morale', 'raccolta', 'scambio', 'trappola', 'impianto'].includes(k)) { if (!Number.isFinite(+v)) throw new Error('Valore non valido: ' + tok); p[k] = (p[k] || 0) + +v; }
       else throw new Error('Proprietà sconosciuta: ' + tok);
     });
     return p;
@@ -5309,12 +5631,20 @@ con allegati numerati|Gli allegati in ordine fanno durare l'effetto più a lungo
     if (cache.has(themeId)) return cache.get(themeId);
     const rows = parseRows(D.itemCatalog[themeId]);
     const roots = {}; rows.forEach((r) => { (roots[r.type] = roots[r.type] || []).push(r); });
-    const tails = {}; for (const t in D.itemTails) tails[t] = parseRows(D.itemTails[t]);
+    // finiture: quelle proprie dell'arena, se ci sono, altrimenti le comuni
+    const own = (D.itemTailsArena || {})[themeId] || {};
+    const tails = {}; for (const t in D.itemTails) tails[t] = parseRows(own[t] || D.itemTails[t]);
     // oggetti dei lessici: quelli dell'arena e quelli comuni a tutte
     const lex = parseRows(D.itemLexCatalog && D.itemLexCatalog[themeId]).concat(parseRows(D.itemLexCatalog && D.itemLexCatalog._));
     const out = { roots, tails, paper: parseRows(D.itemPaper), lex };
     cache.set(themeId, out); return out;
   }
+  // le arene con impianti installati (oggetti che non si possono rubare, cedere né perdere a terra)
+  const implantCache = new Map();
+  D.itemHasImplants = (themeId) => {
+    if (!implantCache.has(themeId)) { const c = catalog(themeId); implantCache.set(themeId, Object.values(c.roots).some((rs) => rs.some((r) => r.p.impianto)) || c.lex.some((r) => r.p.impianto)); }
+    return implantCache.get(themeId);
+  };
   // radici per arena e tipo, nello stesso formato di worldItemData (usato da zz-world.js)
   D.itemRoots = (themeId) => { const c = catalog(themeId), out = {}; for (const t in c.roots) out[t] = c.roots[t].map((r) => r.name).join('|'); return out; };
   /* Descrizione ed effetti di un oggetto dal suo nome. Restituisce sempre qualcosa:
@@ -5352,6 +5682,7 @@ con allegati numerati|Gli allegati in ordine fanno durare l'effetto più a lungo
     if (p.raccolta) out.push('+' + p.raccolta + '% di trovare cibo di notte');
     if (p.scambio) out.push('Vale di più negli scambi (+' + p.scambio + ')');
     if (p.trappola) out.push('Trappola più dannosa (+' + p.trappola + ')');
+    if (p.impianto) out.push('Impianto installato: non si può rubare, cedere né lasciare a terra');
     out.push(p.posti ? 'Occupa ' + p.posti + (p.posti === 1 ? ' posto' : ' posti') + ' nello zaino' : 'Non occupa spazio nello zaino');
     return out;
   };
@@ -5631,6 +5962,7 @@ con allegati numerati|Gli allegati in ordine fanno durare l'effetto più a lungo
     wasteland: { amuleto: ['una piastra di metallo cucita nella giacca', 'un tappo di bottiglia fortunato'], alcol: ['una bottiglia di liquore distillato in un radiatore', 'una tanica di birra di cactus'], veleno: ['una fiala di veleno di scorpione', 'una bottiglia d\'acqua radioattiva'], mappa: ['una mappa delle sorgenti nascoste'], esplosivo: ['una molotov', 'un barile di carburante'] },
     liceo: { amuleto: ['una raccomandazione del preside', 'un certificato medico in bianco'], alcol: ['una lattina di energy drink'], veleno: ['un pettegolezzo avvelenato', 'uno screenshot compromettente'], mappa: ['l\'orario segreto delle verifiche'], esplosivo: ['un video virale', 'una petizione con trecento firme'] },
     ufficio: { amuleto: ['uno zio nel consiglio di amministrazione', 'un contratto blindato'], alcol: ['una bottiglia di prosecco aziendale', 'una bottiglia di limoncello del capo'], veleno: ['una mail anonima all\'ufficio del personale', 'una segnalazione anonima'], mappa: ['l\'organigramma segreto della riorganizzazione'], esplosivo: ['un report che fa saltare tutto', 'la registrazione di una riunione riservata'] },
+    cyberpunk: { amuleto: ['un defibrillatore sottocutaneo', 'un santino olografico'], alcol: ['una bottiglia di sakè sintetico', 'una lattina di birra di riso'], veleno: ['una fiala di neurotossina', 'una cartuccia di veleno per lame'], mappa: ['una mappa dei punti ciechi delle telecamere'], esplosivo: ['una granata a frammentazione', 'una carica di plastico'] },
   };
   Object.keys(LEX).forEach((id) => D.packs.push({ theme: id, lex: LEX[id] }));
 
@@ -6103,6 +6435,71 @@ Vortice nel Fiume | Il Fiume comincia a girare su se stesso in un vortice enorme
 2 al:AB @soc | {A} e {B} si incontrano al festino e decidono di proteggersi a vicenda.
 2 k:A>B w:A | {A} usa {arma:A} per difendere il bottino da {B}.
 `,
+  };
+})(typeof window !== 'undefined' ? window : globalThis);
+
+;
+/* Night City — Zona Rossa: voci, conversazioni, azioni e diario propri dell'arena.
+ * Sostituiscono i testi comuni che parlano di fuochi, boschi, stelle o sponsor;
+ * le altre arene continuano a usare i testi di sempre. */
+(function (G) {
+  const D = G.LOS_DATA; if (!D) return;
+  const ID = 'cyberpunk';
+  const put = (kind, list) => { const v = D.voice && D.voice[kind]; if (!v) return; (v.arena = v.arena || {})[ID] = list; };
+  put('kill', ['Biochip spento.', 'Contratto chiuso.', 'Niente di personale: solo eddie.', 'Il cromo non ti ha salvato.', 'Night City non si ricorda di nessuno.']);
+  put('last', ['Dite al fixer che il lavoro non l’ho finito.', 'Almeno questa volta non mi hanno fregato gli impianti.', 'Speravo in un’uscita di scena più al neon.', 'Il mio backup... qualcuno ha fatto il backup?']);
+  put('ally', ['Metà dei rischi, metà della paga.', 'Io controllo i droni, tu le porte.', 'Se ti friggono gli impianti, ti porto alla Clinica. Promesso.']);
+  put('love', ['In tutta Night City, proprio tu.', 'Quando usciamo dal distretto, ti porto a vedere il mare vero.', 'Le insegne mentono. Tu no.']);
+  put('taunt', ['Torna quando avrai il cromo giusto.', 'Gonk.', 'Hai l’ICE di un tostapane.']);
+  put('disaster', ['Odio questa città.', 'Qualcuno spenga la rete, vi prego.', 'Ancora vivo, ancora senza eddie.']);
+  if (D.chats) {
+    const A = D.chats.arena || (D.chats.arena = {});
+    A[ID] = (A[ID] || []).concat([
+      ['Quanto sovraccarico hai?', 'Abbastanza da vedere le pubblicità anche a occhi chiusi.'],
+      ['Ti fidi del fixer?', 'Mi fido degli eddie del fixer. Del fixer, no.'],
+      ['Domani passiamo dal Mercato?', 'Domani passiamo dove non ci sono droni. Se esiste.'],
+      ['Hai mai visto il cielo senza smog?', 'Una volta, in una braindance. Era finto anche quello.'],
+      ['Senti anche tu quel ronzio?', 'Sono le insegne. O i miei impianti. Spero le insegne.'],
+      ['Cosa farai con la tua parte?', 'Un biglietto per fuori città. Solo andata.'],
+    ]);
+  }
+  const M = D.mind; if (!M) return;
+  (M.actsArena = M.actsArena || {})[ID] = {
+    recruit: ['{0} convince {1} a unirsi al gruppo: «A Night City da soli si dura una notte».', '{0} offre a {1} un posto nella capsula-letto e un’alleanza. {1} accetta.', '{0} parla con {1} per mezz’ora, sotto una tettoia. Alla fine si stringono la mano: ora fanno parte della stessa alleanza.'],
+    show: ['{0} improvvisa una diretta per le telecamere dei fixer. Le visualizzazioni salgono.', '{0} fa un discorso commovente al drone più vicino. Chi guarda la diretta applaude.', '{0} si mette in posa sotto un’insegna al neon, per nessun motivo pratico. I fixer prendono nota.'],
+    speech: ['{0} raduna l’alleanza e divide i compiti: chi controlla i droni, chi le porte, chi gli impianti. Il gruppo respira.', '{0} fa un discorso da film sulla fine delle corporazioni. Funziona: tutti dormono meglio.'],
+    ritual: ['{0} tocca {i} tre volte prima di dormire. Non si sa mai.', '{0} recita a bassa voce la preghiera stampata su un santino del quartiere. Si sente subito meglio.', '{0} riavvia gli impianti nello stesso ordine di ogni sera. Il rito calma più del diagnostico.'],
+    sleepwalk: ['{0} si alza nel sonno e cammina fino a {z}. Si sveglia lì, con le ottiche accese e nessun ricordo del percorso.', 'Gli altri vedono {0} passare nel buio, a occhi chiusi, in direzione di {z}. Nessuno ha il coraggio di fermarl[0:o/a].'],
+    madness: ['{0} passa la notte a discutere con un distributore automatico. Il distributore, a quanto pare, ha torto.', '{0} dipinge una faccia sul proprio zaino e lo presenta a tutti come un nuovo socio.', '{0} ride da sol[0:o/a] per un’ora davanti a una pubblicità di impianti. Nessuno chiede perché.'],
+    mishap: ['{0} inciampa nel buio e perde {i} in un tombino. Addio.', '{0} si siede su una presa di corrente scoperta. Non è una metafora.', '{0} usa {i} come cuscino. Al mattino {i} non c’è più.'],
+    hunt: ['{0} torna da un giro tra i distributori con {cibo} per tutta l’alleanza.', '{0} esce all’alba e rientra con {cibo}. Nessuno chiede da dove venga.'],
+    plan: ['{0} proietta la mappa del quartiere su un muro e ripassa il piano tre volte.', '{0} studia gli spostamenti degli altri dalle telecamere di un negozio e prende appunti. Domani sarà pront[0:o/a].', '{0} ripassa a mente le vie di fuga, una per una, finché non le sa a memoria.'],
+    letter: ['{0} registra un messaggio per {1} e lo lascia sul suo zaino, in uno shard.', '{0} scrive a {1} un messaggio pieno di cancellature e lo infila nel suo zaino.'],
+    paranoid: ['{0} dorme con le ottiche accese. Letteralmente.', '{0} cambia nascondiglio tre volte durante la notte.'],
+    loner: ['{0} lascia l’alleanza: troppa gente, troppi biochip vicini. Meglio sol[0:o/a].', '{0} se ne va prima dell’alba. Non è niente di personale: a Night City funziona così.'],
+    sponsorBonus: ['Nella consegna, per {0}, c’è anche {i}.', 'Il fixer aggiunge {i}: ha capito di cosa ha bisogno {0}.'],
+    luckyFind: ['{0} inciampa su {i}. A volte la fortuna è solo guardare per terra.', '{0} trova {i} in un cassonetto dove nessuno aveva guardato.'],
+  };
+  (M.diaryArena = M.diaryArena || {})[ID] = {
+    lonely: ['{0} non parla con nessuno da giorni. Ha iniziato a rispondere alle pubblicità.', '{0} guarda le luci di un’altra alleanza dalla finestra di un palazzo e non sa se sia invidia o sollievo.'],
+    calm: ['{0} pensa a cosa farà fuori dal distretto e fa una lista. È una lista lunga.', '{0} guarda le insegne lampeggiare e prova a contarle per addormentarsi.', '{0} si chiede chi stia guardando la sua diretta, là fuori.'],
+    crush: ['{0} guarda {1} dormire e si chiede se sia il momento giusto per dirglielo.', 'Ogni volta che {1} ride, {0} dimentica per un attimo dove si trova.', '{0} ha salvato una foto di {1} in un angolo della memoria delle ottiche. Imbarazzante.'],
+    keepsakeDead: ['{0} stringe {i} tra le mani. È tutto quello che resta di {1}.', '{0} guarda {i} alla luce di un’insegna. {1} non c’è più, ma in quel ricordo sì.'],
+    star: ['{0} ripassa le pose migliori per i droni dei fixer. Il pubblico, dopotutto, è un alleato.', '{0} ha capito come funziona: più fai notizia, più i fixer ti mandano roba.'],
+    hungry: ['{0} sogna {cibo} e si sveglia masticando l’aria.', '{0} conta le razioni che non ha. Il conto è veloce.', 'Lo stomaco di {0} brontola così forte che teme di farsi sentire dai droni.'],
+    trait: {
+      superstizioso: ['{0} ha contato le insegne rotte sulla strada: sette. Sette è un buon numero. Forse.'],
+      fortunato: ['{0} trova sempre un distributore funzionante. Sempre.'],
+      romantico: ['{0} scrive poesie sul vetro appannato di una capsula-letto e le cancella prima dell’alba.'],
+      sonnambulo: ['{0} si sveglia con le scarpe bagnate di pioggia acida e nessun ricordo della notte.'],
+      ubriacone: ['{0} sogna un bancone del Club e un bicchiere pieno. Si sveglia con la bocca secca.'],
+      folle: ['{0} ha dato un nome a tutti i droni della zona. Il preferito si chiama Gianfranco.'],
+      traditore: ['{0} si esercita a sembrare sincer[0:o/a] davanti al riflesso di una vetrina.'],
+      bruto: ['{0} fa flessioni nel buio per tenersi svegli[0:o/a] e per farsi sentire.'],
+      guaritore: ['{0} controlla le scorte di colla chirurgica. Prima o poi serviranno.'],
+      ingegnoso: ['{0} smonta e rimonta un vecchio cyberdeck per tutta la notte. Non si sa per fare cosa.'],
+      cacciatore: ['{0} legge le tracce dei droni sul cemento bagnato come un libro aperto.'],
+    },
   };
 })(typeof window !== 'undefined' ? window : globalThis);
 
@@ -6748,6 +7145,183 @@ L'orgia dei lupi | La luna piena manda in calore tutti i lupi mutanti. Sono dist
 `,
   });
 })(typeof window !== 'undefined' ? window : globalThis);
+
+;
+/* Night City — Zona Rossa: eventi d'autore, consegne del fixer, finale e disastri.
+ * Zone: 0 Mercato di Kabuki · 1 Megablocco · 2 Clinica del ripperdoc · 3 Club della braindance
+ *       4 Officina dei Maelstrom · 5 Nodo dati corporativo · 6 Piazza della torre.
+ * Regole: ogni fatto raccontato ha l'effetto corrispondente; le azioni dei netrunner
+ * avvengono sempre sul posto, con un cavo, una presa o un terminale (niente attacchi a distanza);
+ * il Sovraccarico neurale (pr) cala solo con cure, diagnosi riuscite o riposo assistito. */
+(function (G) {
+  const D = (G.LOS_DATA = G.LOS_DATA || {}); D.packs = D.packs || [];
+  D.packs.push({
+    theme: 'cyberpunk',
+    ev: {
+      b: `
+1 at:6 +med:A @int | {A} sfonda la vetrina di una farmacia automatica in Piazza e si porta via {med} prima che scattino le serrande.
+1 at:6 +valore:A @luck | Nella calca della Piazza, {A} raccoglie da terra quello che un corriere in fuga ha perso: {valore}.
+1 at:6 @stl en:A+5 | {A} spegne il proprio biochip, si mescola a un gruppo di turisti terrorizzati e supera il primo posto di blocco senza un controllo.
+1 at:6 test:A=agi12 ok:+cibo:A ko:s:A=ferito | {A} si lancia sotto una serranda che scende e la supera con le braccia piene di {cibo}. || {A} prova a passare sotto una serranda che scende, ma la serranda arriva prima e [A:gli/le] schiaccia una gamba.
+1 at:6 pr:A+10 | Le ottiche di {A} registrano tutta la sparatoria del colpo andato male, fotogramma per fotogramma. Il sovraccarico neurale parte già alto.
+1 at:6 +attrezzo:A @int | {A} stacca da un'auto della sicurezza in fiamme {attrezzo} ancora funzionante.
+2 at:6 al:AB @soc | {A} e {B} si nascondono nello stesso vano di un ascensore della torre e decidono di uscirne insieme.
+2 at:6 k:A>B @agg | Nella calca della Piazza, {A} usa {B} come scudo contro una raffica dei droni.
+2 at:6 test:A=car12 ok:al:AB ko:mo:A-8 | {A} convince {B} che in due si passano i controlli meglio che da soli. Funziona: nasce un'alleanza. || {A} propone a {B} di passare i controlli insieme. {B} sparisce tra la folla senza rispondere.
+2 at:6 steal:A<B=cibo @stl | Mentre {B} guarda le serrande scendere, {A} [B:gli/le] sfila dallo zaino {cibo:B}.
+3 at:6 al:ABC @soc | {A}, {B} e {C} si ritrovano dietro lo stesso furgone blindato in mezzo alla Piazza. Un'occhiata, e decidono di coprirsi le spalle a vicenda.
+`,
+      d: `
+1 at:0 +cibo:A @food | Al Mercato di Kabuki, {A} racconta una storia inventata a una signora dei noodle. Lei ride così tanto che [A:gli/le] regala {cibo}.
+1 at:0 test:A=car12 ok:+attrezzo:A ko:mo:A-6 | {A} contratta per mezz'ora con un venditore di ricambi del Mercato e se ne va con {attrezzo} a un prezzo ridicolo. || {A} contratta con un venditore di ricambi del Mercato, ma il venditore ride e chiude la tenda.
+1 at:0 con:A=valore -valore:A +med:A | Al Mercato, {A} paga un banco di medicinali con {valore:A} e riceve in cambio {med}.
+1 at:0 test:A=furt12 ok:+valore:A ko:s:A=ferito | Mentre due venditori del Mercato litigano, {A} si infila dietro i banchi e recupera {valore} da una cassa lasciata aperta. || {A} prova a infilarsi dietro i banchi del Mercato, ma un venditore se ne accorge e [A:gli/le] spacca una bottiglia sul braccio.
+1 at:0 test:A=int11 ok:+mappa:A ko:mo:A-5 | Al Mercato, {A} riconosce un falso tra le mappe in vendita e il venditore, pur di farl[A:o/a] stare zitt[A:o/a], [A:gli/le] regala quella vera: {mappa}. || Al Mercato, {A} compra la mappa di un distretto sigillato. A metà strada scopre che è la mappa di un altro distretto.
+2 at:0 al:AB @soc | {A} offre a {B} metà di uno spiedino comprato al Mercato. Tra un boccone e l'altro, nasce un'alleanza.
+2 at:0 k:A>B @agg | Al Mercato di Kabuki, {A} segue {B} tra le bancarelle e chiude il conto in un vicolo senza testimoni.
+1 at:1 en:A+15 | {A} trova una capsula-letto del Megablocco con la serratura rotta e ci dorme sei ore di fila, per la prima volta da giorni.
+1 at:1 test:A=emp12 ok:+cibo:A ok:mo:A+6 ko:mo:A-6 | Al Megablocco, {A} aiuta un'anziana a riparare la porta di casa. Lei ricambia con {cibo} e un sorriso. || Al Megablocco, {A} bussa a dieci porte per chiedere aiuto. Non se ne apre nessuna.
+1 at:1 test:A=agi12 ok:mo:A+6 ko:s:A=ferito | {A} scende quaranta piani del Megablocco lungo la scala antincendio esterna, più in fretta della pattuglia che l[A:o/a] cerca. || {A} scende la scala antincendio del Megablocco, ma un gradino cede e [A:gli/le] apre un taglio sulla gamba.
+2 at:1 test:A=emp12 ok:al:AB ko:rel:AB-8 | Nel corridoio del Megablocco, {A} riconosce in {B} la stessa paura che ha l[A:ui/ei]. Lo dice ad alta voce, e {B} accetta di restare insieme. || Nel corridoio del Megablocco, {A} prova a parlare con {B}, ma sceglie la frase sbagliata e {B} [A:gli/le] chiude la porta in faccia.
+2 at:1 steal:A<B=valore @stl @secret | Mentre {B} dorme in una capsula del Megablocco, {A} forza lo sportello e si porta via {valore:B}.
+1 at:2 stat:A>pr45 test:A=int12 ok:pr:A-25 ko:pr:A+6 | Alla Clinica del ripperdoc, {A} collega i propri impianti al diagnostico e trova il modulo che scalda. Lo spegne: il sovraccarico neurale scende. || Alla Clinica, {A} prova a fare da sol[A:o/a] la diagnosi degli impianti, ma sbaglia sequenza e il diagnostico manda una scarica.
+1 at:2 stat:A<hp70 test:A=emp11 ok:cure:A ko:hp:A-8 | {A} convince il ripperdoc a curarl[A:o/a] in cambio di una promessa: un'ora sul lettino, ferite chiuse e impianti ricalibrati. || {A} chiede al ripperdoc di curarl[A:o/a], ma il ripperdoc vuole eddie veri. {A} ci prova da sol[A:o/a] e peggiora la ferita.
+1 at:2 +med:A @heal | Nel retro della Clinica, {A} trova un armadietto con il lucchetto rotto: dentro c'è {med}.
+1 at:2 stat:A<hp60 con:A=valore -valore:A cure:A | {A} paga il ripperdoc con {valore:A}. In mezz'ora le ferite sono chiuse e gli impianti ricalibrati.
+2 at:2 stat:B>pr50 test:A=emp12 ok:pr:B-20 ok:fid:B>A+8 ko:pr:B+5 | Alla Clinica, {A} legge i valori di {B} sul monitor e capisce prima di {B} cosa non va. Un riavvio guidato, e il sovraccarico di {B} scende. || Alla Clinica, {A} prova a leggere i valori degli impianti di {B}, ma li interpreta al contrario e il riavvio peggiora le cose.
+2 at:2 need:B=ferito con:A=med -med:A cure:B debt:B>A @heal | Sul lettino della Clinica, {A} usa {med:A} per rimettere in piedi {B}. {B} ringrazia a denti stretti: adesso è in debito.
+1 at:3 test:A=car12 ok:star:A ok:mo:A+10 ko:mo:A-8 | Al Club della braindance, {A} sale sul palco e improvvisa un discorso contro le corporazioni. Le registrazioni girano in tutto il distretto. || Al Club, {A} sale sul palco per farsi notare, ma il microfono è spento e nessuno se ne accorge.
+1 at:3 pr:A+12 mo:A+12 | {A} si concede una braindance di dieci minuti al Club: una spiaggia, il sole, nessuna paura. Esce sorridendo, ma con gli impianti bollenti.
+1 at:3 test:A=furt12 ok:+valore:A ko:s:A=ferito | Al Club, {A} si mescola ai ballerini e sfila {valore} dalla giacca di un dirigente ubriaco. || Al Club, {A} prova a sfilare il portafoglio a un dirigente ubriaco, ma la guardia del corpo se ne accorge e [A:gli/le] torce il braccio.
+2 at:3 crush:A>B test:A=car12 ok:love:AB ko:mo:A-10 | Sotto le luci del Club, {A} invita {B} a ballare. Al terzo pezzo, si baciano. || Sotto le luci del Club, {A} invita {B} a ballare. {B} guarda l'ora e dice che deve andare.
+2 at:3 al:AB @soc | Al bancone del Club, {A} e {B} scoprono di essere stat[AB:i/e] fregat[AB:i/e] dallo stesso fixer. Brindano e decidono di fregarlo insieme.
+2 at:3 k:A>B @agg | Al Club della braindance, {A} manomette il visore di {B} durante una sessione. {B} non si sveglia più.
+1 at:4 test:A=furt13 ok:+arma:A ko:s:A=ferito | {A} si infila nell'Officina dei Maelstrom durante il cambio della guardia ed esce con {arma}. || {A} prova a infilarsi nell'Officina dei Maelstrom, ma i Maelstrom l[A:o/a] vedono e [A:gli/le] lasciano un ricordo con una chiave inglese.
+1 at:4 test:A=int12 ok:+armatura:A ko:en:A-10 | All'Officina, {A} assembla {armatura} con le lamiere di una moto smontata. || All'Officina, {A} prova ad assemblare una protezione con le lamiere di una moto, ma i pezzi non combaciano e la giornata se ne va in tentativi.
+1 at:4 pr:A+12 | Per pagare il passaggio, {A} accetta di provare per un'ora un impianto dei Maelstrom. L'impianto se ne va, il sovraccarico neurale resta.
+2 at:4 enemy:AB test:A=int12 ok:hit:A>B ko:hit:B>A | All'Officina, {A} sabota la moto di {B}: i freni cedono alla prima curva e {B} finisce contro un muro. || All'Officina, {A} prova a sabotare la moto di {B}, ma {B} l[A:o/a] sorprende con le mani nel motore e [A:gli/le] chiude il cofano sulle dita.
+2 at:4 k:A>B @agg | {A} attira {B} nell'Officina dei Maelstrom e l[B:o/a] spinge nel campo di tiro della torretta.
+2 at:4 al:AB @soc | All'Officina, {A} e {B} rimettono in moto insieme una vecchia moto. Il motore parte al terzo tentativo, e anche l'alleanza.
+1 at:5 test:A=int13 ok:+valore:A ok:pr:A+6 ko:pr:A+16 ko:s:A=ferito | Al Nodo dati corporativo, {A} si collega a un terminale, aggira l'ICE e scarica {valore}. Gli impianti scaldano, ma ne vale la pena. || Al Nodo dati, {A} prova a forzare l'ICE di un terminale. L'ICE risponde con una scarica di ritorno: naso che sanguina e impianti in fiamme.
+1 at:5 con:A=attrezzo test:A=int12 ok:+mappa:A ko:pr:A+12 | Con {attrezzo:A}, {A} entra nella rete di servizio del Nodo dati e si stampa {mappa}. || Con {attrezzo:A}, {A} prova a entrare nella rete di servizio del Nodo dati, ma l'ICE l[A:o/a] respinge e la scarica arriva dritta agli impianti.
+1 at:5 test:A=furt12 ok:+armatura:A ko:s:A=ferito | {A} passa strisciando sotto le torrette del Nodo dati e recupera {armatura} da un armadietto della sicurezza. || {A} prova a passare sotto le torrette del Nodo dati, ma una torretta l[A:o/a] vede e spara.
+2 at:5 test:A=int12 ok:al:AB ko:pr:A+10 | Al Nodo dati, {A} mostra a {B} come entrare in un terminale senza farsi friggere. {B} decide che conviene restare con chi sa queste cose. || Al Nodo dati, {A} prova a mostrare a {B} come entrare in un terminale, ma è {A} a prendersi la scarica dell'ICE.
+2 at:5 enemy:AB test:A=int13 ok:hit:A>B ok:pr:B+15 ko:pr:A+15 | Al Nodo dati, {A} manda un picco di corrente nella presa a cui è collegat[B:o/a] {B}. Lo schermo di {B} diventa bianco, e per un attimo anche le sue ottiche. || Al Nodo dati, {A} prova a mandare un picco nella presa di {B}, ma sbaglia cavo e il picco torna indietro.
+1 at:6 test:A=furt12 ok:star:A ko:s:A=ferito | {A} attraversa la Piazza della torre sotto il naso delle volanti corporative e lo fa sembrare facile. Il video gira tra i fixer. || {A} prova ad attraversare di corsa la Piazza della torre, ma una volante l[A:o/a] inquadra e i colpi di avvertimento non sono solo di avvertimento.
+1 at:6 pr:A+8 | In Piazza, il megaschermo della torre manda in loop le facce dei ricercati per il colpo. Tra queste c'è anche quella di {A}.
+2 at:6 k:A>B @agg | Sotto il megaschermo della Piazza, {A} sfida {B} davanti a tutti. Dura poco.
+1 stat:A>pr60 test:A=res12 ok:mo:A+8 ko:s:A=sconvolto | Per colpa del sovraccarico neurale, {A} vede insegne che non esistono. Si concentra sul respiro finché le visioni passano. || Per colpa del sovraccarico neurale, {A} vede insegne che non esistono. Prova a ignorarle, ma un'insegna [A:gli/le] parla con la voce di sua madre.
+1 stat:A>pr70 trait:A=paranoico pr:A+6 | Con gli impianti al limite, {A} si convince che le telecamere trasmettano i suoi pensieri. Copre tutte le lenti del quartiere con il nastro adesivo, una per una.
+1 stat:A>pr55 trait:A=sopravvissuto test:A=res11 ok:pr:A-12 ko:en:A-8 | {A} ha già visto impianti andare in sovraccarico: fa partire il diagnostico di emergenza e spegne i moduli che scaldano, uno alla volta. Funziona. || {A} prova a lanciare il diagnostico di emergenza, ma il sistema chiede una password che non ricorda. La giornata se ne va così.
+1 trait:A=ingegnoso con:A=attrezzo test:A=int12 ok:+trap:A ko:pr:A+8 | {A} usa {attrezzo:A} per riprogrammare un congegno di sicurezza abbandonato e ne ricava {trap}. || {A} prova a riprogrammare un congegno di sicurezza con {attrezzo:A}, ma il congegno risponde con un impulso che fa friggere gli impianti.
+1 trait:A=esibizionista star:A pr:A+5 | {A} fa una diretta dalla zona sigillata e racconta il colpo andato male come se fosse un film. I fixer prendono nota del nome.
+1 trait:A=avido test:A=furt12 ok:+valore:A ko:s:A=ferito | {A} svuota una banca automatica mezza rotta e se ne va con {valore}. || {A} prova a forzare una banca automatica, ma il sistema di difesa risponde con una scarica che [A:gli/le] brucia le dita.
+1 wx:buio test:A=furt11 ok:+cibo:A ok:+med:A ko:en:A-10 | Approfittando del buio, {A} entra in un supermercato automatico con le porte bloccate e riempie lo zaino: {cibo} e {med}. || Approfittando del buio, {A} prova a entrare in un supermercato automatico, ma le porte si richiudono e deve girare intorno all'isolato per ore.
+1 wx:pericolo stat:A<hp50 @cow en:A+10 | Con il quartiere così pericoloso e le ferite che bruciano, {A} decide che oggi non si muove dal proprio nascondiglio. Riposa, e nessuno l[A:o/a] trova.
+1 wx:abbondanza test:A=agi11 ok:+cibo:A ok:+cibo:A ko:en:A-8 | {A} arriva in tempo allo scarico delle razioni e ne afferra due prima della ressa. || {A} corre verso lo scarico delle razioni, ma arriva quando le casse sono già vuote.
+1 trait:A=goloso stat:A<food40 test:A=furt11 ok:+cibo:A ko:mo:A-6 | {A} segue l'odore di una cucina di strada fino al retro di un ristorante e si porta via {cibo}. || {A} segue l'odore di una cucina di strada, ma il cuoco l[A:o/a] caccia via con un mestolo.
+1 trait:A=solitario @stl en:A+8 | {A} passa la giornata sui tetti, da un'antenna all'altra, senza incontrare nessuno. Le gambe ringraziano.
+1 trait:A=sfortunato pr:A+8 | Un'insegna olografica difettosa si accende in faccia a {A} con un lampo bianco. Le ottiche ci mettono un'ora a riprendersi, gli impianti molto di più.
+1 trait:A=fortunato +valore:A @luck | {A} infila la mano in un tombino per recuperare una moneta e tira fuori {valore}.
+1 trait:A=cacciatore test:A=sop12 ok:+cibo:A ko:en:A-8 | {A} segue le tracce dei corrieri del Mercato fino a un deposito di razioni dimenticato: {cibo}. || {A} segue le tracce dei corrieri, ma porta solo a un deposito già svuotato.
+1 trait:A=codardo @cow mo:A-6 | Al primo drone che passa, {A} si chiude in un cassonetto e ci resta fino a sera.
+2 couple:AB stat:B>pr60 test:A=emp11 ok:pr:B-18 ok:amo:B>A+6 ko:mo:A-6 | {A} resta accanto a {B} e [B:gli/le] guida il respiro mentre il diagnostico riavvia gli impianti uno alla volta. Il sovraccarico di {B} scende. || {A} prova ad aiutare {B} a riavviare gli impianti, ma {B} è troppo agitat[B:o/a] e l[A:o/a] manda via.
+2 ally:AB trait:A=traditore test:A=furt12 ok:steal:A<B=valore ko:rel:AB-15 | {A} fa una copia della chiave di cifratura di {B} e si prende {valore:B}. || {A} prova a copiare la chiave di cifratura di {B}, ma {B} se ne accorge.
+2 grudge:A>B test:A=furt12 ok:hit:A>B ko:mo:A-8 | {A} si avvicina a {B} nella folla e infila uno shard infetto nella sua presa. Gli impianti di {B} vanno in tilt e {B} crolla a terra. || {A} prova a infilare uno shard infetto nella presa di {B}, ma {B} si gira all'ultimo momento.
+2 owe:A>B con:A=valore give:A>B=valore repay:A>B | {A} salda il debito con {B} come si fa a Night City: [B:gli/le] consegna {valore:A} senza dire una parola.
+2 trait:A=guaritore need:B=ferito cure:B debt:B>A @heal | {A} improvvisa una sala operatoria sul tavolo di una cucina di strada, ricuce {B} e già che c'è [B:gli/le] ricalibra gli impianti. {B} resta in debito.
+2 trait:A=carismatico test:A=car11 ok:al:AB ko:mo:A-5 | {A} propone a {B} un contratto in due: metà dei rischi, metà della paga. {B} stringe la mano. || {A} propone a {B} un contratto in due, ma {B} ha già sentito parlare di l[A:ui/ei].
+2 fear:A>B test:A=cor12 ok:pau:A>B-15 ok:mo:A+8 ko:mo:A-8 | {A} ha paura di {B} da giorni. Oggi l[B:o/a] guarda negli occhi in mezzo alla strada e scopre che anche {B} trema. || {A} ha paura di {B} da giorni. Oggi prova a guardarl[B:o/a] negli occhi, ma abbassa lo sguardo per prim[A:o/a].
+2 rival:AB test:A=int12 ok:ris:B>A+12 ok:mo:A+8 ko:mo:A-6 | {A} e {B} si sfidano a chi apre per prim[A:o/a] una serratura a codice. Vince {A}, e {B} se lo ricorda. || {A} e {B} si sfidano a chi apre per prim[A:o/a] una serratura a codice. {B} la apre mentre {A} sta ancora leggendo il codice.
+2 ally:AB stat:B<mo30 trait:A=leader test:A=car12 ok:mo:B+15 ko:mo:B-5 | {A} vede {B} crollare e [B:gli/le] affida un compito preciso: tenere d'occhio i droni per un'ora. {B} si rimette in moto. || {A} prova a tirare su {B} con un discorso, ma {B} lo trova motivante come una pubblicità di impianti.
+2 trust:A>B trait:A=generoso con:A=med give:A>B=med @give | {A} passa a {B} {med:A}, la cosa più preziosa che ha. Non chiede niente in cambio.
+2 enemy:AB trait:A=pacifista test:A=car13 ok:rel:AB+15 ko:hit:B>A | {A} offre a {B} una lattina e propone di lasciar perdere: il nemico vero sono le corporazioni. {B} accetta. || {A} offre a {B} una lattina e una tregua. {B} prende la lattina e [A:gli/le] dà un pugno.
+3 trait:A=leader test:A=car12 ok:al:ABC ko:mo:A-8 | {A} raduna {B} e {C} sotto una tettoia e propone un piano per uscire dal distretto. Accettano tutti. || {A} raduna {B} e {C} e propone un piano per uscire dal distretto. Nessuno ci crede.
+3 k:AB>C @agg *0.6 | {A} e {B} vendono {C} a una squadra corporativa in cambio di un lasciapassare. La squadra porta via {C}; il lasciapassare non arriverà mai.
+`,
+      n: `
+1 at:1 en:A+10 | Nel Megablocco, {A} dorme in una capsula-letto con la porta chiusa dall'interno. Fuori, i droni passano senza fermarsi.
+1 stat:A>pr60 test:A=int12 ok:pr:A-15 ko:pr:A+5 | Di notte, {A} lancia il diagnostico degli impianti modulo per modulo e spegne quelli che scaldano. Al mattino il sovraccarico è più basso. || Di notte, {A} prova a lanciare il diagnostico, ma si addormenta a metà: un modulo resta acceso fino all'alba e il sovraccarico sale ancora.
+1 trait:A=solitario en:A+10 mo:A-4 | {A} passa la notte da sol[A:o/a] su un tetto, a guardare le volanti che attraversano lo smog.
+1 test:A=furt12 ok:+cibo:A ko:s:A=ferito | Di notte, {A} scavalca la grata di un distributore automatico e si serve: {cibo}. || Di notte, {A} prova a scavalcare la grata di un distributore, ma l'allarme spara una scarica e [A:gli/le] brucia la mano.
+1 trait:A=romantico mo:A+10 | {A} ascolta per tutta la notte una vecchia canzone d'amore nelle cuffie. Le insegne fanno il resto.
+1 trait:A=paranoico test:A=int11 ok:+trap:A ko:en:A-8 | {A} passa la notte a cablare la porta del proprio nascondiglio. Al mattino ha {trap}. || {A} passa la notte a cablare la porta del proprio nascondiglio, ma il circuito salta a ogni prova.
+1 @mad pr:A+5 | {A} passa la notte a parlare con la pubblicità di un'insegna olografica. L'insegna, per fortuna, risponde solo con offerte.
+1 trait:A=sonnambulo pr:A+6 | Nel dormiveglia, {A} si collega a una presa pubblica e sogna i ricordi di qualcun altro. Si sveglia con gli impianti caldi e il nome di uno sconosciuto in bocca.
+1 stat:A<en30 en:A+15 | Sfinit[A:o/a], {A} si addormenta su un sedile della metropolitana ferma. Nessuno l[A:o/a] sveglia fino all'alba.
+2 couple:AB mo:A+10 mo:B+10 | {A} e {B} si chiudono in una capsula-letto e guardano le insegne dalla finestrella, come due turisti in vacanza.
+2 ally:AB trait:A=leale en:A-8 en:B+12 | {A} resta svegli[A:o/a] tutta la notte con il rilevatore in mano, perché {B} possa dormire.
+2 k:A>B @stl | Durante un blackout, {A} trova {B} addormentat[B:o/a] e chiude il conto senza fare rumore.
+2 enemy:AB test:A=furt12 ok:steal:A<B=arma ko:hit:B>A | Di notte, {A} striscia fino al nascondiglio di {B} e [B:gli/le] porta via {arma:B}. || Di notte, {A} striscia fino al nascondiglio di {B}, ma {B} dorme con un occhio aperto e colpisce per prim[B:o/a].
+2 grudge:A>B forgive:A>B | Sotto la pioggia acida, {A} e {B} si ritrovano sotto la stessa tettoia. Due ore di silenzio, poi {A} decide che il rancore pesa troppo.
+2 trait:A=furtivo test:A=furt12 ok:steal:A<B=valore ko:rel:AB-10 | Di notte, {A} si avvicina a {B} che dorme e [B:gli/le] sfila {valore:B} dalla giacca. || Di notte, {A} si avvicina a {B} che dorme, ma {B} si sveglia proprio mentre {A} allunga la mano.
+2 ally:AB stat:B>pr55 test:A=int12 ok:pr:B-15 ko:en:A-8 | {A} passa la notte a collegare gli impianti di {B} a un dissipatore improvvisato con una ventola da computer. Al mattino il sovraccarico di {B} è più basso. || {A} prova a raffreddare gli impianti di {B} con una ventola da computer, ma la ventola si brucia prima dell'alba.
+3 ally:ABC mo:A+6 mo:B+6 mo:C+6 | {A}, {B} e {C} dividono una scatola di noodle su un tetto e si raccontano cosa faranno con gli eddie, se usciranno vivi.
+`,
+      f: `
+1 +arma:A | Alla consegna del fixer, {A} arriva per prim[A:o/a] e afferra {arma}.
+1 +med:A +cibo:A | {A} riempie lo zaino alla consegna: {med} e {cibo}.
+1 test:A=agi12 ok:+armatura:A ko:s:A=ferito | {A} si lancia sulla cassa più grande della consegna e ne esce con {armatura}. || {A} si lancia sulla cassa più grande della consegna, ma qualcuno [A:gli/le] chiude il coperchio sulle mani.
+1 pr:A+8 star:A | {A} apre una cassa della consegna e dentro trova un drone con la telecamera accesa: il fixer vuole vedere le facce. {A} saluta. Il sovraccarico sale, la fama pure.
+1 @luck +valore:A | In fondo a una cassa, {A} trova {valore} con un biglietto: «Per il prossimo lavoro».
+1 @stl +attrezzo:A | Mentre gli altri si contendono le casse grandi, {A} apre quella piccola che nessuno guarda: dentro c'è {attrezzo}.
+2 k:A>B @agg | Alla consegna, {A} e {B} afferrano la stessa cassa. Solo {A} se ne va.
+2 al:AB @soc | Alla consegna, {A} e {B} si coprono a vicenda: uno prende le casse, l'altro tiene d'occhio i droni. Funziona così bene che decidono di continuare.
+2 steal:A<B=arma @stl | Mentre {B} apre una cassa della consegna, {A} [B:gli/le] sfila {arma:B} dalla cintura.
+3 k:A>BC *0.5 @agg | Alla consegna, {A} lascia che {B} e {C} si contendano la cassa giusta, poi chiude il conto con entrambi.
+`,
+      finale: `
+2 k:A>B | Sotto la torre, tra le volanti che girano, {A} e {B} si affrontano con quello che resta. Resta in piedi {A}.
+2 k:A>B stat:B>pr60 | Gli impianti di {B} sono al limite: {B} attacca per prim[B:o/a], ma il braccio cromato non risponde. {A} non sbaglia.
+2 k:A>B w:A | {A} punta {arma:A} contro {B} sotto il megaschermo della Piazza. Il colpo parte prima che {B} possa parlare.
+2 k:A>B | Le barriere della Piazza salgono e lasciano a {A} e {B} un quadrato di cemento. Ne esce solo {A}.
+2 k:A>B con:A=attrezzo | {A} collega {attrezzo:A} a una torretta della Piazza e la gira contro {B}.
+2 k:A>B trait:A=spietato | {A} non dice niente: aspetta che {B} esca dal riparo e chiude il conto.
+2 k:A>B grudge:A>B | {A} ricorda a {B} ogni torto subito nella zona sigillata, poi chiude il conto.
+2 k:A>B stat:A<hp40 | Ferit[A:o/a] e senza fiato, {A} gioca l'ultima carta contro {B}, e la gioca bene.
+`,
+      sponsor: `
+1 +armatura:A @gift | Un drone del fixer lascia per {A} {armatura} e un messaggio: «Ti tengo d'occhio. Non deludermi».
+1 +med:A @gift | Il fixer manda a {A} {med}, con un biglietto: «Il prossimo lavoro te lo pago in eddie».
+1 +attrezzo:A @gift | Un corriere in moto lancia a {A} {attrezzo} senza fermarsi. Il fixer non spiega mai niente.
+1 +arma:A @gift | Il fixer fa arrivare a {A} {arma}: «Hai fatto notizia. Adesso fai il resto».
+1 +mappa:A @gift | Il fixer manda a {A} {mappa}: «Così almeno non ti perdi».
+1 +cibo:A mo:A+8 @gift | Un drone del fixer lascia a {A} {cibo} e una lattina fredda. Per una volta, qualcuno si ricorda di l[A:ui/ei].
+`,
+      fallback: `
+1 | {A} passa la giornata a cambiare vicolo ogni volta che passa un drone.
+1 | {A} guarda per un'ora la stessa pubblicità di impianti in offerta. Non se li può permettere.
+1 | {A} resta sotto una tettoia ad aspettare che smetta di piovere acido. Non smette.
+1 | {A} conta i colpi rimasti e le ore di batteria. Il conto non è incoraggiante.
+1 | {A} cammina tra la folla con il cappuccio alzato e non parla con nessuno.
+1 | {A} prova a chiamare qualcuno fuori dal distretto. La linea è sigillata come le strade.
+`,
+      ds: `
+1 | {A} si chiude in un vano tecnico e aspetta che passi.
+1 @luck | {A} si trovava dall'altra parte del distretto.
+1 s:A=ferito | {A} se la cava, ma con una ferita da ricucire.
+1 pr:A+10 | {A} ne esce senza un graffio, ma gli impianti non smettono di scaldare.
+2 ally:AB | {A} e {B} si coprono le spalle a vicenda finché il peggio non passa.
+2 k:A>B | Nel caos, {A} spinge {B} nella direzione sbagliata. {B} non torna.
+`,
+    },
+    dis: `
+Il blackout del Megablocco | La corrente salta in tutto il Megablocco: ascensori fermi, porte bloccate, scale al buio. | {A} cade nella tromba di un ascensore senza porte. | {A} ruzzola giù per tre rampe di scale al buio. | {A} accende la torcia del multiattrezzo e scende un gradino alla volta.
+L'incendio al Mercato di Kabuki | Una cucina di strada prende fuoco e le fiamme corrono da un tendone all'altro. | {A} resta intrappolat[A:o/a] tra i tendoni in fiamme. | {A} attraversa le fiamme con la giacca sopra la testa e ne esce ustionat[A:o/a]. | {A} si infila in un vicolo che il fuoco non raggiunge.
+Il raid dei Maelstrom | I Maelstrom escono dall'Officina sulle moto e attraversano il distretto in cerca di cromo da strappare. | {A} viene raggiunt[A:o/a] dai Maelstrom e non se ne sa più niente. | {A} sfugge ai Maelstrom, ma una catena [A:gli/le] lascia il segno sulla schiena. | {A} si sdraia sotto un'auto finché i motori non si allontanano.
+La braindance contaminata del Club | Al Club della braindance circola una registrazione contaminata: chi la prova non distingue più i ricordi veri. | {A} prova la registrazione e il cuore non regge. | {A} strappa il visore troppo tardi e resta stordit[A:o/a] per ore. | {A} si rifiuta di indossare il visore e se ne va. | sconvolto
+L'allarme del Nodo dati corporativo | Al Nodo dati scatta l'allarme totale: le torrette si accendono e le porte stagne si chiudono. | {A} resta chius[A:o/a] tra due porte stagne con una torretta accesa. | {A} supera le torrette, ma non senza un colpo nella spalla. | {A} resta immobile nell'angolo cieco di una telecamera finché l'allarme non rientra.
+Lo sciame di droni | Uno sciame di droni corporativi scende sul distretto e scansiona ogni volto. | {A} viene scansionat[A:o/a], riconosciut[A:o/a] e colpit[A:o/a] senza preavviso. | {A} scappa dai droni, ma un colpo [A:gli/le] prende di striscio la gamba. | {A} si copre il volto con la sciarpa e cammina piano, come tutti gli altri.
+La ronda degli Scav | Una banda di Scav gira per il distretto in cerca di impianti da rivendere. | {A} finisce nelle mani degli Scav e non torna. | {A} sfugge agli Scav, ma con un taglio profondo sul braccio. | {A} si finge mort[A:o/a] in mezzo ai rifiuti e gli Scav passano oltre.
+Il cyberpsicotico in libertà | Qualcuno è andato in cyberpsicosi e cammina per le strade con le lame da avambraccio aperte. | {A} incrocia il cyberpsicotico in un vicolo senza uscita. | {A} scappa dal cyberpsicotico con un taglio sulla schiena. | {A} si chiude in un negozio e abbassa la serranda.
+Il crollo della passerella sopraelevata | Una passerella pedonale tra due palazzi cede sotto il peso della folla in fuga. | {A} precipita con la passerella. | {A} si aggrappa a un cavo e cade solo per l'ultimo piano. | {A} era già sull'altro lato quando la passerella ha ceduto.
+La fuga di gas dalla Clinica del ripperdoc | Un serbatoio di anestetico si rompe e il gas riempie la Clinica. | {A} si addormenta nel gas e non si risveglia. | {A} esce dalla Clinica barcollando e batte la testa sullo stipite. | {A} trattiene il respiro e raggiunge l'uscita di servizio.
+Il virus delle ottiche | Un virus attraversa la rete del quartiere e manda in tilt le ottiche di chi è collegato. | {A} attraversa la strada con le ottiche spente e viene investit[A:o/a] da una volante. | {A} perde la vista per ore e va a sbattere ovunque. | {A} aveva già scollegato le ottiche dalla rete. | sconvolto
+Lo smog tossico | Una nube di smog tossico scende dai camini delle fabbriche fino all'altezza della strada. | {A} respira lo smog per troppe ore e non si rialza. | {A} tossisce per tutta la notte e si sveglia con la febbre. | {A} si chiude in una capsula-letto e sigilla le fessure con il nastro. | malato
+Il blocco totale della Piazza della torre | La sicurezza corporativa chiude la Piazza della torre e spara a chiunque provi a uscire. | {A} prova a uscire dalla Piazza e i cecchini non sbagliano. | {A} esce dalla Piazza con un proiettile nella gamba. | {A} resta nascost[A:o/a] sotto la pensilina della metro finché il blocco non si allenta.
+`,
+  });
+})(typeof window === 'object' ? window : globalThis);
 
 ;
 /* Reame Incantato — pacchetto esteso. */
@@ -10332,9 +10906,36 @@ La miniera | Una vecchia miniera crolla sotto i piedi di chi ci cammina sopra. |
       ricordo:'una foto del team|un biglietto di benvenuto|una cartolina delle ferie|un foglio di dediche|un disegno della scrivania|un invito della vecchia squadra',
       cibo:'dei cracker integrali|delle mandorle|dei biscotti al cacao|delle gallette|dei grissini|delle fette di frutta secca',
     },
+    cyberpunk:{
+      arma:'una pistola smart|una katana termica|un fucile a pompa elettromagnetico|una mazza a impulsi|un coltello vibrante in ceramica|una pistola a rotaia artigianale',
+      armatura:'una giacca balistica|un giubbotto in fibra di carbonio|uno scudo antisommossa recuperato|un casco con visiera schermata|una placcatura subdermale|un rivestimento dermico ignifugo',
+      attrezzo:'un cyberdeck portatile|un kit da scasso elettronico|un multiattrezzo da tecnico|un rilevatore di segnali|una fascia di raffreddamento neurale|un’interfaccia neurale da polso',
+      mappa:'uno schema dei condotti di servizio|una mappa dei punti ciechi delle telecamere|un elenco dei distributori ancora pieni|una pianta del Nodo dati|un registro delle ronde corporative|un’ottica cartografica',
+      trap:'una mina a prossimità|un filo monomolecolare|una torretta automatica riprogrammata|una granata a impulso collegata a un sensore|una rete elettrificata|un detonatore a pressione',
+      med:'un iniettore medico|un kit da ripperdoc|una dose di stabilizzante neurale|una bomboletta di colla chirurgica|una scatola di antibiotici del Mercato|un antidoto universale',
+      amuleto:'un portachiavi a forma di gatto fortunato|un biochip di backup|una medaglietta della scuola di quartiere|un dado di metallo inciso|un nastro dei santi di strada|un santino olografico',
+      valore:'una chiavetta di eddie|uno shard di dati rubati|una scheda di accesso corporativa|una bobina di cavo in fibra|un pacchetto di chip di memoria|un orologio meccanico vero',
+      ricordo:'una foto stampata su carta|un vecchio disco musicale|un braccialetto dell’ospedale|un biglietto della metropolitana sopraelevata|un vecchio telefono a conchiglia|un peluche bruciacchiato',
+      cibo:'delle barrette di proteine sintetiche|delle scatole di noodle istantanei|delle pastiglie di caffeina|dei panini di soia in busta|degli spiedini di carne coltivata|delle gallette di alghe',
+    },
   };
   const paper=split('con riferimenti datati|con annotazioni verificabili|con una copia firmata|con indice analitico|con allegati numerati');
-  D.worldItemData={roots,tails,paper,split};
+  // finiture proprie di un'arena (Night City: tutte tecnologiche, adatte anche agli impianti)
+  const themeTails={
+    cyberpunk:{
+      arma:split('con firmware aggiornato|con modulo di puntamento|con batteria potenziata|con circuiti schermati|con modalità silenziosa'),
+      armatura:split('con fibre di kevlar intrecciate|con gel antiurto|con sensori di impatto|con schermatura termica|con piastre rinforzate'),
+      attrezzo:split('con firmware aggiornato|con batteria di riserva|con schermatura antintrusione|con dissipatore di calore|con guscio ultraleggero'),
+      mappa:split('con aggiornamento in tempo reale|con percorsi colorati|con note di un fixer|con codici di emergenza|con livelli dei piani'),
+      trap:split('con sensore di movimento|con innesco a infrarossi|con carica raddoppiata|con mimetica olografica|con allarme di prossimità'),
+      med:split('in una custodia sterile|in una cartuccia compatta|con antibiotici aggiunti|con dosatore automatico|con istruzioni vocali'),
+      amuleto:split('con un led che lampeggia piano|con una dedica incisa al laser|con una catenella di rame|con un ologramma di famiglia|con un adesivo di una band'),
+      valore:split('in una custodia antiurto|con certificato di provenienza|in una busta schermata|con sigillo intatto|con un codice di riscatto'),
+      ricordo:split('con una dedica scritta a mano|con una data incisa|con un adesivo a forma di stella|con le iniziali incise|con una nota ripiegata'),
+      cibo:split('in una busta sottovuoto|in una vaschetta da asporto|in una confezione da distributore|in un sacchetto di carta oleata|in una scatola richiudibile'),
+    },
+  };
+  D.worldItemData={roots,tails,paper,split,themeTails};
 })(typeof window!=='undefined'?window:globalThis);
 
 ;
@@ -10632,6 +11233,38 @@ La miniera | Una vecchia miniera crolla sotto i piedi di chi ci cammina sopra. |
 5|Passaggio promesso|il calendario dei passaggi|Un passaggio proposto risulta segnato come confermato.|falsifica la conferma e viene licenziat[A:o/a]|perde credibilità sull'organizzazione|distingue proposte e conferme
 5|Inventario del furgone|l'inventario del furgone|L'inventario riporta materiale non caricato.|certifica materiale assente e viene licenziat[A:o/a]|perde credibilità sull'inventario|conta soltanto il materiale presente
 `,
+    cyberpunk:`
+0|Bancarella in corto|il banco delle ottiche usate|Un cavo scoperto del banco comincia a sfrigolare sotto la pioggia.|tocca il cavo scoperto e viene fulminat[A:o/a]|si ustiona la mano sul cavo scoperto|toglie l'alimentazione al banco con un bastone isolato
+0|Friggitrice abbandonata|la cucina di strada dei noodle|L'olio della friggitrice abbandonata comincia a fumare.|viene investit[A:o/a] dall'olio in fiamme e non sopravvive|si scotta un braccio con uno schizzo d'olio|soffoca la friggitrice con il coperchio di metallo
+0|Insegna pericolante|l'insegna olografica del mercato|Il supporto dell'insegna olografica cede con uno schiocco.|resta sotto l'insegna che precipita e perde la vita|viene colpit[A:o/a] di striscio dal telaio dell'insegna|si sposta sotto il portico prima che l'insegna cada
+0|Drone del contrabbando|il drone delle consegne illegali|Il drone delle consegne perde quota e gira su sé stesso.|viene colpit[A:o/a] in pieno dalle eliche e non si rialza|si taglia un braccio contro un'elica|si butta a terra finché il drone non si schianta
+0|Folla in fuga|il passaggio tra le bancarelle|Qualcuno grida «pattuglia!» e la folla si mette a correre nella stessa direzione.|viene travolt[A:o/a] dalla folla e non si rialza più|viene spint[A:o/a] contro una bancarella e si ferisce|si infila dietro un banco e lascia passare la folla
+1|Ascensore senza freni|l'ascensore di servizio del Megablocco|I freni dell'ascensore di servizio stridono tra un piano e l'altro.|precipita con la cabina e non sopravvive|si ferisce quando la cabina si blocca di colpo|forza le porte e scende al piano più vicino
+1|Ballatoio corroso|il ballatoio del quarantesimo piano|La ringhiera del ballatoio è mangiata dalla ruggine e dalla pioggia acida.|cade dal ballatoio e perde la vita|si ferisce aggrappandosi alla ringhiera che cede|resta attaccat[A:o/a] al muro e procede un passo alla volta
+1|Condotto del gas|il corridoio delle capsule-letto|Un odore dolciastro esce da un condotto del gas nel corridoio.|respira il gas fino a perdere i sensi e non si sveglia più|si ferisce cadendo dopo aver respirato il gas|chiude la valvola e apre la finestra di servizio
+1|Porta blindata impazzita|la porta blindata di un appartamento|La porta blindata si apre e si chiude da sola, con il motore che stride.|resta schiacciat[A:o/a] tra la porta e lo stipite|si schiaccia una mano nella porta|blocca la porta con una sbarra di metallo prima di passare
+2|Fiale scambiate|il carrello delle fiale|Le fiale sul carrello della clinica hanno le etichette scambiate.|si inietta la fiala sbagliata e non si risveglia|si inietta una dose sbagliata e crolla a terra ferendosi|confronta i codici delle fiale con il registro del ripperdoc
+2|Braccio chirurgico|il braccio chirurgico automatico|Il braccio chirurgico si riaccende da solo e cerca un paziente.|viene colpit[A:o/a] dal bisturi automatico e perde la vita|si ferisce di striscio contro il bisturi|toglie l'alimentazione al braccio chirurgico
+2|Impianti di scarto|il bidone degli impianti di scarto|Nel bidone degli impianti di scarto qualcosa scintilla e scalda.|viene investit[A:o/a] dall'esplosione di una batteria e non sopravvive|si ustiona le mani su una batteria gonfia|allontana il bidone con un piede e aspetta
+2|Generatore d'emergenza|il generatore della clinica|Il generatore d'emergenza va in sovraccarico e il cofano si arroventa.|resta accanto al generatore quando esplode e non sopravvive|si ustiona contro il cofano del generatore|abbassa il carico e spegne le macchine non necessarie
+3|Sessione che non si chiude|la poltrona della braindance|La sessione di braindance non si chiude e il visore continua a trasmettere.|resta intrappolat[A:o/a] nella registrazione finché il cuore si ferma|cade dalla poltrona e si ferisce strappando il visore|stacca il visore seguendo la sequenza di sicurezza
+3|Pista allagata|la pista da ballo|La pista è allagata e un cavo delle luci pende sopra l'acqua.|mette il piede nell'acqua quando il cavo la tocca e non sopravvive alla scossa|prende una scossa dal pavimento bagnato|resta sui gradini asciutti lungo il muro
+3|Buttafuori fuori controllo|l'ingresso del club|Il buttafuori cromato ha le ottiche rosse e non riconosce più nessuno.|viene colpit[A:o/a] dal buttafuori e non si rialza|incassa un pugno del buttafuori|resta fuori dalla sua visuale e aspetta che si calmi
+3|Bombola sotto il bancone|il bancone dei cocktail|Una bombola di gas per le bevande perde sotto il bancone.|si trova accanto alla bombola quando esplode e perde la vita|viene colpit[A:o/a] dalle schegge di vetro|chiude la valvola della bombola e si allontana
+4|Pressa idraulica|la pressa dell'officina|La pressa idraulica scende a scatti senza che nessuno la comandi.|resta sotto la pressa e non sopravvive|si schiaccia un piede sotto la pressa|si tiene lontan[A:o/a] dal piano della pressa
+4|Torretta di guardia|la torretta dei Maelstrom|La torretta automatica dei Maelstrom gira lentamente e cerca un bersaglio.|finisce nel campo di tiro della torretta e perde la vita|viene ferit[A:o/a] da una raffica della torretta|resta dietro una lamiera finché la torretta non si gira
+4|Fusti di carburante|i fusti di carburante|Un fusto di carburante perde vicino a una saldatrice ancora accesa.|si trova tra i fusti quando prendono fuoco e non sopravvive|si ustiona allontanandosi dalle fiamme|spegne la saldatrice prima che il carburante la raggiunga
+4|Ponte sollevatore|il ponte sollevatore delle moto|Il ponte sollevatore scivola e una moto blindata oscilla sopra il passaggio.|resta sotto la moto che cade e perde la vita|viene colpit[A:o/a] di striscio dalla moto in caduta|aspetta che il ponte si fermi prima di passare
+4|Saldatrice al plasma|la saldatrice al plasma|La saldatrice al plasma resta accesa su un banco senza nessuno.|viene raggiunt[A:o/a] dalla fiamma al plasma e non sopravvive|si ustiona un braccio con la fiamma|spegne la saldatrice dal pannello a muro
+5|ICE attivo|il terminale di accesso|Il terminale di accesso mostra un muro di ICE che pulsa in rosso.|si collega senza protezioni e l'ICE [A:gli/le] brucia il sistema nervoso|esce dalla connessione con il naso che sanguina e le mani che tremano|stacca il cavo prima che l'ICE completi la scansione
+5|Torrette del corridoio|le torrette del corridoio dati|Le torrette del corridoio dati si attivano a ogni passo non autorizzato.|viene colpit[A:o/a] dalle torrette e perde la vita|viene ferit[A:o/a] da un colpo di torretta|avanza strisciando sotto il raggio delle torrette
+5|Raffreddamento dei server|la sala dei server|Il sistema di raffreddamento della sala server libera gas inerte.|resta nella sala mentre il gas toglie l'aria e non sopravvive|esce dalla sala senza fiato e sbatte contro un armadio di server|trattiene il respiro e raggiunge la porta d'emergenza
+5|Porta a tempo|la porta stagna del nodo|La porta stagna del nodo dati si chiude con un conto alla rovescia.|resta chius[A:o/a] nel vano e non ne esce viv[A:o/a]|si ferisce passando sotto la porta che scende|aspetta il ciclo successivo invece di correre
+6|Barriere a scomparsa|le barriere della piazza|Le barriere a scomparsa della piazza salgono dal selciato senza preavviso.|viene sbalzat[A:o/a] da una barriera e non si rialza|si ferisce una gamba contro una barriera|resta sulle strisce dove le barriere non salgono
+6|Megaschermo|il megaschermo della torre|Il megaschermo della torre si stacca da un angolo e penzola sulla piazza.|resta sotto il megaschermo che crolla e perde la vita|viene colpit[A:o/a] dai frammenti dello schermo|si sposta sotto la pensilina della metro
+6|Volante corporativa|la piattaforma delle volanti|Una volante corporativa atterra di traverso sulla piattaforma.|viene travolt[A:o/a] dalla volante in atterraggio|viene sbalzat[A:o/a] dallo spostamento d'aria e si ferisce|si butta dietro i vasi di cemento della piazza
+6|Gas antisommossa|le bocchette antisommossa|Le bocchette antisommossa della piazza cominciano a sibilare.|respira il gas antisommossa fino a crollare e non si rialza|cade a terra tossendo e si ferisce|si copre il viso e si allontana controvento
+`,
   };
 })(typeof window!=='undefined'?window:globalThis);
 
@@ -10908,7 +11541,7 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
     });
     const data=D.worldItemData,own=data.roots[theme.id],soft=!!theme.soft;
     Object.entries(own).forEach(([type,roots])=>data.split(roots).forEach((name,i)=>{
-      const endings=soft&&['arma','armatura','trap','med'].includes(type)?data.paper:data.tails[type];
+      const endings=soft&&['arma','armatura','trap','med'].includes(type)?data.paper:data.themeTails?.[theme.id]?.[type]||data.tails[type];
       endings.forEach((tail,j)=>out.items.push({id:'mondo-'+theme.id+'-item-'+type+'-'+i+'-'+j,type,name:name+' '+tail}));
     }));
     out.counts=Object.fromEntries(['events','traits','trials','deaths','disasters','dialogues','quotes','items'].map(k=>[k,out[k].length]));
@@ -11030,7 +11663,8 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
     function victim(t, list) {
       const n = list.length, w = list.reduce((s2, x) => s2 + slots(x), 0);
       if (n <= MAX_ITEMS && w <= cap(t)) return null;
-      const pool = list.filter((x) => x.type !== 'ricordo' && (n > MAX_ITEMS || slots(x) > 0));
+      // gli impianti non si lasciano a terra: sono installati
+      const pool = list.filter((x) => x.type !== 'ricordo' && !props(x).impianto && (n > MAX_ITEMS || slots(x) > 0));
       if (!pool.length) return list[0];
       return pool.reduce((a, b) => (keepScore(t, b) < keepScore(t, a) ? b : a));
     }
@@ -11196,6 +11830,7 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
     wasteland: { start: 6, feast: 1, finale: 5, extra: ['il Deposito', [1.5,1.4,0.4], 'Il cancello iniziale e le scorte, lungo l’autostrada.'], links: [[6,0],[6,1],[6,3],[0,2],[0,3],[1,2],[1,5],[2,4],[3,4],[3,5],[4,5]], descriptions: ['Rottami utili e ripari di fortuna.', 'Asfalto aperto, convogli e poche coperture.', 'Impianti contaminati e strutture instabili.', 'Case vuote in cui trovare riparo.', 'Pochissime risorse e radiazioni elevate.', 'Acqua e passaggi verso il bacino.'] },
     liceo: { start: 5, feast: 0, finale: 5, extra:['le Aule',[1.1,1.3,0.5],'Le classi delle lezioni, delle verifiche e delle interrogazioni.'],links: [[5,0],[5,2],[5,4],[0,1],[0,4],[1,2],[1,4],[2,3],[3,4],[6,2],[6,3],[6,4],[6,5]], descriptions: ['Gare e festa di istituto.', 'Merende e tavoli in cui nascono alleanze.', 'Silenzio e un posto per riprendersi.', 'Esperimenti e occasioni per fare figuracce.', 'Incontri, gossip e cambi d’ora.', 'Banchi, assemblee e convocazioni della Preside.'] },
     ufficio: { start: 1, feast: 2, finale: 0, links: [[0,1],[0,3],[1,2],[1,4],[1,5],[2,4],[2,5],[3,4]], descriptions: ['Presentazioni e verdetti della direzione.', 'Scrivanie, colleghi e sguardi indiscreti.', 'Caffè, scorte e cena aziendale.', 'Colloqui ad alto rischio.', 'Una pausa appartata, finché la stampante collabora.', 'Fuori dagli uffici, con accesso alla cucina e all’open space.'] },
+    cyberpunk: { start: 6, feast: 0, finale: 6, extra: ['la Piazza della torre', [1.4,1.3,0.2], 'Il cuore del distretto, sotto la torre del colpo andato male: tutte le strade passano di qui.'], links: [[6,0],[6,1],[6,3],[6,5],[0,1],[0,4],[1,2],[2,3],[2,5],[3,4],[4,5]], descriptions: ['Bancarelle, cibo e roba di contrabbando, ma nessun posto dove nascondersi.', 'Corridoi infiniti e capsule-letto: si dorme al riparo, se si conosce qualcuno.', 'Cure, impianti e diagnosi, in una delle poche stanze ancora sicure.', 'Luci, musica e gente distratta: si incontrano alleati e coltelli.', 'Pezzi di ricambio e armi in quantità, ma i Maelstrom non perdonano gli ospiti.', 'Terminali e linee dati protetti da torrette e ICE: lavoro per chi sa entrare.'] },
   };
   const strip = s => s.replace(/^(?:il |lo |la |l['’]|i |gli |le )/i, '');
   const habitats={
@@ -11203,6 +11838,7 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
     scifi:{water:[],trees:[],inside:[0,1,2,3,4,5]},zombie:{water:[2,5],trees:[3,5],inside:[0,1,2,3,4]},
     royale:{water:[2],trees:[4,5],inside:[0,1,2,3,4]},horror:{water:[0,5],trees:[3,5],inside:[0,1,2,4,6]},
     wasteland:{water:[5],trees:[],inside:[2,3,6]},liceo:{water:[1,4],trees:[4],inside:[0,1,2,3,5,6]},ufficio:{water:[2],trees:[5],inside:[0,1,2,3,4]},
+    cyberpunk:{water:[],trees:[],inside:[1,2,3,4,5]},
   };
   const escapeRE = s => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
   function describe(theme, eco) {
@@ -11247,6 +11883,8 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
     wasteland: /\b(?:cornucopia|gong|foresta elfica|bosco|boschi|sottobosco|liana|liane|prato verde|erba fresca|alber[oi] rigoglios\w*|bacche fresche)\b/iu,
     liceo: /\b(?:sangue|sanguina\w*|cadaver\w*|ammazz\w*|uccid\w*|sbran\w*|decapit\w*|sgozz\w*|fucile|pistola|proiettil\w*|cornucopia)\b/iu,
     ufficio: /\b(?:sangue|sanguina\w*|cadaver\w*|ammazz\w*|uccid\w*|sbran\w*|decapit\w*|sgozz\w*|fucile|pistola|proiettil\w*|cornucopia)\b/iu,
+    // Night City: niente boschi né natura selvaggia, niente magia, alieni, astronavi o decompressione.
+    cyberpunk: /\b(?:cornucopia|gong|bosco|boschi|foresta|forest\w*|sottobosco|radura|liana|liane|cespugli\w*|alber[oi]|ram[oi]|foglie|quadrifoglio|tana|uccell\w*|tronco|pigna|ghiand\w*|nido di vespe|fiume|fiumi|ruscello|lago|palud\w*|grotta|grotte|dirupo|precipizio|lup[oi]|orso|cinghiale|conigli\w*|cervo|falò|fuoco da campo|incantesim\w*|magi[ac][oaie]?|magich\w*|stregon\w*|strega|elfic\w*|elfo|elfi|drago|draghi|fata|fate|runic\w*|pozione|alien\w*|astronave|navetta|decompression\w*|ossigeno|zombie|zombi|cannone|deserto|dune|duna)\b/iu,
   };
   const offTheme = (text, theme) => !!incompatible[theme.id]?.test(theme.id==='scifi'?text.replace(/pioggia di micrometeoriti/giu,'sciame di micrometeoriti'):text);
   // Varianti editoriali: si sostituiscono locuzioni intere, con i rispettivi
@@ -11259,6 +11897,7 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
       ['la Cornucopia',"l'Hangar"],['nello stesso cespuglio','dietro lo stesso armadietto'],['ogni albero che incontra','ogni pannello che incontra'],['riposa al sole','riposa sotto una lampada di manutenzione'],['cade da un dirupo','precipita da una passerella'],['rivolto al cielo','rivolto a una telecamera sul soffitto'],['verso il cielo','verso il soffitto'],['contro un albero','contro un montante'],["sull'albero più alto della zona",'su una passerella sopraelevata'],['la corteccia di un albero','il rivestimento isolante di un cavo'],['a duello un albero', 'a duello un montante'],["Vince l'albero",'Vince il montante'],['attraversare il fiume a nuoto','attraversare un modulo in decompressione senza fune di sicurezza'],['Di notte. Vestit[A:o/a].','In pieno ciclo notturno. Senza tuta.'],['a pescare e a raccontarsi','a recuperare razioni da un distributore e a raccontarsi'],['dei funghi trovati in una radura','una coltura sperimentale della Serra idroponica'],['un bagno insieme nel fiume','una pausa insieme nelle docce dei Moduli abitativi'],['la testa nel fiume','la testa in un condotto di scarico'],["bevendo acqua del fiume",'bevendo acqua del ricircolatore'],['inquadra il cielo','inquadra il soffitto'],['dietro un cespuglio','dietro un armadietto'],['sfida un albero a braccio di ferro e lo sradica','strappa un montante dal suo alloggiamento a mani nude'],['sfida un albero a braccio di ferro','prova a piegare un montante a mani nude'],['corde e rami piegati','cavi e molle recuperate'],["filtra l'acqua con sabbia e carbone",'ripristina il filtro del ricircolatore'],['una pioggia di sassi','una raffica di bulloni'],['in un cespuglio','dietro un carrello di manutenzione'],['Il cespuglio era occupato','Il carrello era già occupato'],['sotto il sole senza acqua','tra i moduli senza una bombola di riserva'],['pesta un ramo secco','pesta una fascetta metallica'],['spezza un albero giovane','spezza un tubo dismesso'],["un masso che bloccava l'unica uscita della grotta",'un portello deformato che bloccava il passaggio'],["da un albero all'altro, senza mai toccare terra",'da una passerella all’altra, senza toccare il pavimento'],['su un sasso, poi su un ramo, poi sullo stesso sasso','su un bullone, poi su un cavo, poi sullo stesso bullone'],['Un uccello','Un drone delle pulizie'],['un secondo uccello','un secondo drone'],['un ramo cade','un cavo si stacca'],['al centro della radura','al centro del modulo'],['accende un fuoco con due sassi, caccia un coniglio con un laccio e cucina uno stufato','ripristina un fornello di emergenza e prepara uno stufato con le razioni'],['prova a cacciare un coniglio. Il coniglio','prova a catturare un drone delle consegne. Il drone'],["se il sole giri intorno all'arena o il contrario",'se la stazione giri intorno al pianeta o il contrario'],['su tutti gli alberi della zona','su tutti i pannelli della zona'],['da un albero su cui','da una passerella su cui'],['Morde un ramo','Morde un cavo'],['a un ramo a quattro metri', 'a un cavo a quattro metri'],['un cespuglio con la forma di','un carrello coperto da un telo con la forma di'],['gli alberi l[A:o/a] stiano spiando. Gli alberi hanno le telecamere','i pannelli l[A:o/a] stiano spiando. I pannelli hanno le telecamere'],['prende a pugni un albero per sfogarsi. L’albero cade','prende a pugni un pannello per sfogarsi. Il pannello cede'],["prende a pugni un albero per sfogarsi. L'albero cade",'prende a pugni un pannello per sfogarsi. Il pannello cede'],['a ogni sasso della zona. Al tramonto','a ogni bullone della zona. A fine ciclo'],['il sasso più grosso','il bullone più grosso'],['nascoste negli alberi','incassate nei pannelli'],['una pigna','un bullone'],['da un albero dritt[A:o/a]','da una scala dritt[A:o/a]'],["da una parte all'altra del fiume",'dalle due parti di un portello bloccato'],['Nessuno dei due sa nuotare','Nessuno dei due sa sbloccarlo'],['un cespuglio pieno di bacche','un distributore pieno di snack'],['Le bacche erano lassative','Gli snack erano lassativi'],['fino al tramonto','fino a fine ciclo'],['dietro un albero','dietro un montante'],['a un ramo','a una sbarra'],["all'alba",'al cambio di ciclo'],["prima dell'alba",'prima del cambio di ciclo'],['alla luce fioca delle stelle','alla luce di un terminale'],['guarda le stelle e ne sceglie una','osserva una carta stellare e sceglie una stella'],['contro il gelo','contro le correnti dei condotti'],['un letto di foglie, un tetto di rami e un fuoco che non fa fumo','un giaciglio di teli isolanti e un riparo dalle ventole'],['alla luna. Poi alla seconda luna. Nell’arena c’è una luna sola','al pianeta. Poi al suo riflesso nell’oblò. I brindisi sono due, il pianeta uno'],["alla luna. Poi alla seconda luna. Nell'arena c'è una luna sola",'al pianeta. Poi al suo riflesso nell’oblò. I brindisi sono due, il pianeta uno'],['a guardare le stelle passare','a guardare un planetario sul terminale'],['Ogni volta che ne passa una','Ogni volta che compare una stella'],["le stelle dell'arena",'la carta stellare del terminale'],['travestiti da cespugli','nascosti sotto teli di manutenzione'],['Un ramo si spezza','Un cavo si stacca'],['Il cannone suonerà','Il computer registrerà la perdita del segnale vitale'],['suona il cannone','si spegne il segnale vitale'],
     ],
     zombie:[['la Cornucopia','la Piazza']],royale:[['la Cornucopia',"l'Aeroporto"]],horror:[['la Cornucopia','il Salone']],
+    cyberpunk:[['la Cornucopia','la Piazza della torre'],['gli sponsor','i fixer'],['Uno sponsor anonimo','Un fixer anonimo'],['Uno sponsor dal gusto discutibile','Un fixer dal gusto discutibile'],['Due sponsor svengono','Due fixer smettono di ridere'],['tre paracadute di cibo','tre droni con il cibo'],['un unico paracadute','un unico drone'],['Lo share sale','Le visualizzazioni salgono'],['La regia stacca','La diretta del fixer stacca'],['cerca di capire le stelle dell\'arena e scopre che sono disposte a forma di logo dello sponsor principale','cerca di leggere le insegne del quartiere e scopre che compongono il logo di una corporazione'],['alla luce fioca delle stelle','alla luce fioca delle insegne'],['guarda le stelle e ne sceglie una','guarda le insegne e ne sceglie una'],['da una pozza di fango','da una pozza di liquame'],['corpo a corpo nel fango','corpo a corpo in una pozza d\'acqua sporca'],['a rotolarsi nel fango','a rotolarsi in una pozzanghera'],['torna dalla caccia con abbastanza carne per tre giorni e una pelliccia nuova','torna da un deposito abbandonato con abbastanza carne in scatola per tre giorni']],
     wasteland:[['la Cornucopia','il Deposito'],['nel Bosco','tra i ruderi della Città fantasma'],['in un bosco','tra i ruderi della Città fantasma'],['nel sottobosco','tra i rottami della Discarica']],
   };
   const sharedCorrections=[
@@ -11345,6 +11984,7 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
       const scenes = {
         scifi: ['{A} controlla le giunture del modulo. Il rumore di fondo non promette nulla di buono.', '{A} si ferma ad ascoltare i condotti. Per una volta, sente solo le ventole.', '{A} cerca un angolo lontano dalle luci di emergenza e riprende fiato.'],
         fantasy: ['{A} osserva i segni lasciati dalla magia e decide di non toccarli.', '{A} sussurra una vecchia formula per farsi coraggio. Almeno la voce non trema.', '{A} si concede una pausa e controlla i sentieri del reame.'],
+        cyberpunk: ['{A} controlla il diagnostico degli impianti e aspetta che le ottiche smettano di sfarfallare.', '{A} si ferma sotto una tettoia e ascolta il ronzio delle insegne. Per ora, nessun drone.', '{A} cambia vicolo due volte prima di fermarsi a riprendere fiato.'],
         _: ['{A} studia i passaggi della zona prima di fare la prossima mossa.', '{A} cerca un posto tranquillo e riprende fiato.', '{A} ascolta i rumori intorno e decide di aspettare.'],
       };
       let h = 0; for (const c of ev.text) h = (h*31+c.charCodeAt(0)) >>> 0;
@@ -11362,7 +12002,7 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
     if(aliasCache.has(zones))return aliasCache.get(zones);
     const list=zones.map(z => {
       const bare = strip(z.name), variants = [bare];
-      const short = { 'Torre in rovina':['Torre'], 'Picco del drago':['Picco'], 'Lago nebbioso':['Lago nebbioso'], 'Altare delle armi':['Altare'], 'Ponte di comando':['Ponte di comando'], 'Centro commerciale':['Centro commerciale'], 'Città fantasma':['Città fantasma'] }[bare];
+      const short = { 'Torre in rovina':['Torre'], 'Picco del drago':['Picco'], 'Lago nebbioso':['Lago nebbioso'], 'Altare delle armi':['Altare'], 'Ponte di comando':['Ponte di comando'], 'Centro commerciale':['Centro commerciale'], 'Città fantasma':['Città fantasma'], 'Mercato di Kabuki':['Mercato'], 'Clinica del ripperdoc':['Clinica'], 'Club della braindance':['Club'], 'Officina dei Maelstrom':['Officina'], 'Nodo dati corporativo':['Nodo dati'], 'Piazza della torre':['Piazza'] }[bare];
       if (short) variants.push(...short);
       variants.push(...genericPlaces[bare]||[]);
       return { zone:z.id, re:new RegExp('(?<![\\p{L}])(?:'+variants.map(escapeRE).join('|')+')(?![\\p{L}])','giu') };
@@ -11418,7 +12058,7 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
   function preparePools(pools, theme, zones) {
     const key=JSON.stringify(zones.map(z=>[z.name,z.features]));
     const cached=poolCache.get(pools);if(cached?.key===key)return cached.out;
-    const out = { ...pools, lex:{...pools.lex,luogo:zones.map(z=>z.name),med:pools.world?pools.lex.med:[theme.soft?'un aiuto per riprendersi':theme.id==='fantasy'?'una pozione curativa':'un kit medico'],trap:pools.world?pools.lex.trap:theme.lex.trappola} };
+    const out = { ...pools, lex:{...pools.lex,luogo:zones.map(z=>z.name),med:pools.world?pools.lex.med:[theme.soft?'un aiuto per riprendersi':theme.id==='fantasy'?'una pozione curativa':theme.id==='cyberpunk'?'un iniettore medico':'un kit medico'],trap:pools.world?pools.lex.trap:theme.lex.trappola} };
     for (const [k,v] of Object.entries(pools)) if (Array.isArray(v) && k !== 'disasters') out[k]=v.map(e=>prepare(e,theme,zones));
     out.disasters=pools.disasters.map(d=>({...d,n:adaptText(d.n,theme),intro:adaptText(d.intro,theme),out:d.out.map(e=>prepare(e,theme,zones))}));
     poolCache.set(pools,{key,out});return out;
@@ -11949,9 +12589,11 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
     const MIND = D.mind || { goals: {}, acts: {}, actsSoft: {}, diary: { trait: {} }, diarySoft: { trait: {} }, mem: {} };
     let ORIGIN = null, CURKIND = '';
     const VO = D.voice || {}, VS = D.voiceSoft || {}, CH = D.chats || {};
-    const ACT = (k) => mapEnabled&&theme.soft&&k==='sleepwalk'?['{0} si allontana nel dormiveglia fino a {z}. Si sveglia lì, senza ricordare il percorso.']:(theme.soft && MIND.actsSoft && MIND.actsSoft[k]) || (MIND.acts || {})[k] || [];
-    const DIA = (k) => (theme.soft && MIND.diarySoft && MIND.diarySoft[k]) || (MIND.diary || {})[k] || [];
-    const DIAT = (tr) => (theme.soft && MIND.diarySoft && MIND.diarySoft.trait && MIND.diarySoft.trait[tr]) || ((MIND.diary || {}).trait || {})[tr] || [];
+    // azioni e diario: prima i testi propri dell'arena (se ci sono), poi quelli delle arene senza violenza, poi i comuni
+    const ARENA_ACT = (MIND.actsArena || {})[theme.id] || {}, ARENA_DIA = (MIND.diaryArena || {})[theme.id] || {};
+    const ACT = (k) => ARENA_ACT[k] || (mapEnabled&&theme.soft&&k==='sleepwalk'?['{0} si allontana nel dormiveglia fino a {z}. Si sveglia lì, senza ricordare il percorso.']:(theme.soft && MIND.actsSoft && MIND.actsSoft[k]) || (MIND.acts || {})[k] || []);
+    const DIA = (k) => ARENA_DIA[k] || (theme.soft && MIND.diarySoft && MIND.diarySoft[k]) || (MIND.diary || {})[k] || [];
+    const DIAT = (tr) => (ARENA_DIA.trait || {})[tr] || (theme.soft && MIND.diarySoft && MIND.diarySoft.trait && MIND.diarySoft.trait[tr]) || ((MIND.diary || {}).trait || {})[tr] || [];
 
     const T = (cfg.cast || []).map((c, i) => ({
       id: c.id || 't' + i, name: (c.name || 'Concorrente ' + (i + 1)).trim(), gender: c.gender || 'M',
@@ -12133,7 +12775,12 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
       causes: {}, shared: 0, nursed: 0, foraged: 0, trapsSet: 0, trapHits: 0, beasts: 0, infected: 0, cured: 0, broken: 0, looted: 0, meteo: [], expelled: 0, trades: 0 };
 
     const hasItem = (t, it) => t.inv.some((x) => x.type === it);
-    const itemOf = (t, it) => t.inv.find((x) => x.type === it);
+    // gli impianti (solo nelle arene che li prevedono) si usano ma non passano di mano:
+    // per gli scambi si sceglie sempre prima un oggetto trasferibile dello stesso tipo
+    const implantArena = !!(D.itemHasImplants && D.itemHasImplants(theme.id));
+    const isImplant = (x) => implantArena && !!itemProps(x).impianto;
+    const movable = (x) => !isImplant(x);
+    const itemOf = implantArena ? (t, it) => t.inv.find((x) => x.type === it && movable(x)) || t.inv.find((x) => x.type === it) : (t, it) => t.inv.find((x) => x.type === it);
     const statusCount = (t) => Object.keys(t.st).filter((s) => s !== 'lutto' && s !== 'grave').length;
     const traitSum = (t, key) => t.traits.reduce((s, id) => s + ((traitMap[id] && traitMap[id][key]) || 0), 0);
     const hasTrait = (t, id) => t.traits.includes(id);
@@ -12217,7 +12864,7 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
           }
           case 'hasAlly': if (A.allyId == null) return false; break;
           case 'has': if (!hasItem(A, r.item)) return false; break;
-          case 'canReceive': { const it = itemOf(A, r.item); if (!it || !canReceiveItem(B, it)) return false; break; }
+          case 'canReceive': { const it = itemOf(A, r.item); if (!it || !movable(it) || !canReceiveItem(B, it)) return false; break; }
           case 'need': if (r.s === '*' ? statusCount(A) === 0 : A.st[r.s] == null) return false; break;
           case 'foe':
             for (const a of r.a) for (const b of r.b) {
@@ -12541,7 +13188,7 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
     }
     // lo zaino è pieno: l'oggetto meno utile resta a terra nella zona (e qualcun altro potrà trovarlo)
     function dropItem(t, it) {
-      if (!t || it.type === 'ricordo') return;
+      if (!t || it.type === 'ricordo' || isImplant(it)) return;
       (zoneLoot[t.zone] = zoneLoot[t.zone] || []).push({ it, from: t.id });
       stats.dropped = (stats.dropped || 0) + 1;
       if (t.alive && remember1) remember1(t, '<b>' + esc(cap1(it.name)) + '</b> resta a ' + esc(zoneName(t.zone)) + ': nello zaino non c\'era più posto.', 'fatto');
@@ -12612,7 +13259,7 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
         const K = killers.find((k) => k.alive);
         if (K && v.inv.length) {
           let took = 0; const left = [];
-          v.inv.slice().forEach((it) => {
+          v.inv.filter(movable).forEach((it) => {
             const mine = itemOf(K, it.type);
             const want = it.type !== 'ricordo' && (it.type === 'arma' || it.type === 'armatura' ? !mine || itemScore(it) > itemScore(mine) : !mine || it.type === 'cibo' || it.type === 'valore');
             if (took < 2 && want) {
@@ -12622,11 +13269,11 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
           });
           // il resto dello zaino resta sul posto, per chi passerà di lì
           if (left.length) (zoneLoot[v.zone] = zoneLoot[v.zone] || []).push(...left);
-        } else if (!K && v.inv.length) (zoneLoot[v.zone] = zoneLoot[v.zone] || []).push(...v.inv.map((it) => ({ it, from: v.id })));
+        } else if (!K && v.inv.length) (zoneLoot[v.zone] = zoneLoot[v.zone] || []).push(...v.inv.filter(movable).map((it) => ({ it, from: v.id })));
       } else {
         stats.envDeaths++;
         if (!stats.firstBlood) stats.firstBlood = { killers: [], victim: v.id, day };
-        if (v.inv.length) (zoneLoot[v.zone] = zoneLoot[v.zone] || []).push(...v.inv.map((it) => ({ it, from: v.id })));
+        if (v.inv.length) (zoneLoot[v.zone] = zoneLoot[v.zone] || []).push(...v.inv.filter(movable).map((it) => ({ it, from: v.id })));
       }
       T.forEach((X) => { if (X.alive && X.zone === v.zone) X.sawDeath = phases.length; });
       // chi amava o stimava la vittima reagisce
@@ -12692,7 +13339,7 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
     }
     function transferItem(from, to, type, how, ctx, lexPick) {
       const it = itemOf(from, type);
-      if (!it || from === to || !canReceiveItem(to, it)) return false;
+      if (!it || from === to || !movable(it) || !canReceiveItem(to, it)) return false;
       if (!giveItem(to, type, ctx, lexPick, it.name, it.q, how, from, it)) return false;
       takeItem(from, it);
       return true;
@@ -13207,6 +13854,15 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
           syncSt(t);
         }
       });
+      // riposo assistito (solo nelle arene che lo prevedono): con un alleato accanto, in un posto
+      // abbastanza riparato, l'indicatore cala di una quantità fissa; da solo non scende mai
+      if (M && M.rest && !M.infect) A.forEach((t) => {
+        if (!t.alive || t.pr <= 0 || ZP[t.zone][2] < M.rest.shelter) return;
+        const m = buddies(t)[0]; if (!m) return;
+        const was = t.pr; t.pr = Math.max(0, t.pr - M.rest.amount); stats.meterRest = (stats.meterRest || 0) + 1;
+        if (was >= M.thr || rng.chance(0.25)) sys('meterRest', [t, m], { m: M.name.toLowerCase() }, { cat: 'heal', why: 'riposo assistito' }, 1);
+        syncSt(t);
+      });
       // trappole: chi le ha e sa usarle le piazza
       A.forEach((t) => {
         const tr = itemOf(t, 'trap');
@@ -13624,9 +14280,9 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
         }
         // prepotenza
         if ((tr('bruto') || tr('avido') || tr('spietato')) && t.attr.for >= 6) {
-          const u = mates.find((x) => canFight(t, x) && combat(x) < combat(t) - 3 && x.inv.some((it) => /cibo|valore|med|amuleto|armatura/.test(it.type)));
+          const u = mates.find((x) => canFight(t, x) && combat(x) < combat(t) - 3 && x.inv.some((it) => /cibo|valore|med|amuleto|armatura/.test(it.type) && movable(it)));
           if (u) add(1.3 + (tr('bruto') ? 0.6 : 0), () => {
-            const it = u.inv.find((x) => /cibo|valore|med|amuleto|armatura/.test(x.type)); takeItem(u, it);
+            const it = u.inv.find((x) => /cibo|valore|med|amuleto|armatura/.test(x.type) && movable(x)); takeItem(u, it);
             addItem(t, Object.assign({}, it, { how: 'rubato', from: u.id, d: day })); addGrudge(u, t, 'steal'); remember(u, t, 'bullied'); u.mo -= 10;
             return say('bully', [t, u], { i: it.name, z: zoneName(t.zone) }, 'betray', traitName(tr('bruto') ? 'bruto' : tr('avido') ? 'avido' : 'spietato'), 3);
           });
@@ -13650,7 +14306,7 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
         // regalare
         if (tr('generoso') || t.attr.emp >= 8) {
           const u = mates.concat(allyMates(t)).find((x) => (x.mo < 35 || x.food < 30) && hostility(t, x) < 2);
-          const it = t.inv.find((x) => (u && u.food < 30 ? x.type === 'cibo' : /cibo|valore|alcol|amuleto/.test(x.type)));
+          const it = t.inv.find((x) => movable(x) && (u && u.food < 30 ? x.type === 'cibo' : /cibo|valore|alcol|amuleto/.test(x.type)));
           if (u && it) add(1.3 + (tr('generoso') ? 1 : 0), () => {
             takeItem(t, it); addItem(u, Object.assign({}, it, { how: 'dono', from: t.id, d: day })); if (it.type === 'cibo' && u.food < 45) eat(u);
             u.owes[t.id] = u.owes[t.id] || 'dono'; addAff(t, u, 20); u.mo += 8; remember(u, t, 'gift'); syncSt(u);
@@ -13707,9 +14363,9 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
         }
         // furto notturno
         if (tr('furtivo') || (tr('avido') && t.attr.furt >= 6)) {
-          const u = mates.find((x) => !isAlly(t, x) && x.partner !== t.id && x.inv.some((it) => it.type !== 'ricordo'));
+          const u = mates.find((x) => !isAlly(t, x) && x.partner !== t.id && x.inv.some((it) => it.type !== 'ricordo' && movable(it)));
           if (u) add(1.2, () => {
-            const it = rng.pick(u.inv.filter((x) => x.type !== 'ricordo')); takeItem(u, it); addItem(t, Object.assign({}, it, { how: 'rubato', from: u.id, d: day }));
+            const it = rng.pick(u.inv.filter((x) => x.type !== 'ricordo' && movable(x))); takeItem(u, it); addItem(t, Object.assign({}, it, { how: 'rubato', from: u.id, d: day }));
             if (hasTrait(u, 'paranoico') || rng.chance(Math.max(0.1, 0.4 - (t.attr.furt - 5) * 0.05))) { addGrudge(u, t, 'steal'); remember(u, t, 'nightTheft'); }
             u.mo -= 6;
             return say('nightTheft', [t, u], { i: it.name }, 'betray', traitName(tr('furtivo') ? 'furtivo' : 'avido'), 2);
@@ -13775,7 +14431,7 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
       alive().forEach((b) => {
         const want = b.food < 40 && !hasItem(b, 'cibo') ? 'cibo' : b.hp < 50 && !hasItem(b, 'med') ? 'med' : null;
         if (!want) return;
-        const pay = b.inv.filter((x) => x.type === 'valore' || x.type === 'alcol' || (x.type === 'arma' && b.attr.for <= 4) || x.type === 'esplosivo' || x.type === 'veleno');
+        const pay = b.inv.filter((x) => movable(x)).filter((x) => x.type === 'valore' || x.type === 'alcol' || (x.type === 'arma' && b.attr.for <= 4) || x.type === 'esplosivo' || x.type === 'veleno');
         const sellers = zoneMates(b).concat(allyMates(b)).filter((x) => x !== b && hostility(b, x) < 2 && (want === 'cibo' ? x.inv.filter((it) => it.type === 'cibo').length >= (x.food >= 55 ? 1 : 2) : hasItem(x, 'med') && x.hp >= 70));
         const s2 = sellers[0]; if (!s2) return;
         const food = itemOf(s2, want);
@@ -14045,7 +14701,7 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
         if (!a.alive || a.allyId != null || hasTrait(a, 'solitario')) return;
         const S = A.find((x) => x !== a && fearOf(a, x) >= 60 && x.zone === a.zone && hostility(a, x) < 3 && !recentWound(a, x, 3) && !(cfg.teamWin && x.team !== a.team) && (x.allyId == null || (alliances.get(x.allyId) || new Set()).size < 5) && canTeam([x, a]));
         if (!S || !rng.chance(0.3)) return;
-        const it = a.inv.filter((x) => x.type !== 'ricordo').sort((x, y) => itemScore(y) - itemScore(x))[0];
+        const it = a.inv.filter((x) => x.type !== 'ricordo' && movable(x)).sort((x, y) => itemScore(y) - itemScore(x))[0];
         if (it && !hasTrait(S, 'pacifista')) { takeItem(a, it); addItem(S, Object.assign({}, it, { how: 'dono', from: a.id, d: day })); }
         joinAlliance([S, a]); remember(a, S, 'submitted'); remember(S, a, 'protector'); tweak(a, S, { p: -15 });
         stats.submissions = (stats.submissions || 0) + 1;
@@ -14215,11 +14871,14 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
     // titoli e introduzioni degli atti finali: dicono quanti restano e cosa cambia, senza ripetersi
     const FINAL_ONLY = /ultimo scontro|ultima sfida|vince la partita|fine della partita|ultimo cerchio|il liceo sceglie|all'ultima (interrogazione|riunione)/i;
     function climaxTitle(round, n) {
+      // le arene possono dare un nome proprio ai primi atti dello scontro finale
+      if (theme.climax && theme.climax.titles && n > 2 && round < theme.climax.titles.length) return theme.climax.titles[round];
       if (n === 2) return round === 0 ? 'Faccia a faccia' : theme.soft ? 'La sfida finale' : 'Il duello finale';
       return ['Gli ultimi equilibri', 'Le carte sul tavolo', 'Il punto di rottura'][round] || (theme.soft ? ['Fino all’ultima mossa', 'Nessun passo indietro', 'L’ultimo rilancio'] : ['L’ultimo rilancio', 'Nessun passo indietro', 'Fino all’ultimo respiro'])[(round - 3) % 3];
     }
     function climaxIntro(round, n, meeting) {
       const where = atZone(zoneName(meeting));
+      if (round === 0 && theme.climax && theme.climax.intro) return (n === 2 ? 'Restano in due. ' : 'Restano in ' + n + '. ') + theme.climax.intro.replace('{z}', zoneName(meeting));
       if (round === 0) return (n === 2 ? 'Restano in due' : 'Restano in ' + n) + '. Tutti si dirigono verso ' + zoneName(meeting) + ': da qui si esce solo vincendo.';
       if (n === 2) return theme.soft ? 'Restano in due. Ne resterà uno solo.' : 'Restano in due. Solo uno uscirà dall\'arena.';
       if (round === 1) return 'Restano in ' + n + '. Prima di colpire davvero, ci si studia e si saggiano le forze.';
@@ -14529,7 +15188,7 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
 </script>
 <script>window.LOS_ASSETS = {"logo":"img/logo.f2d5175789.webp","icona":"img/icona.8b02ddeb49.webp","favicon":"img/favicon.86774dc7cf.png","panoramica":"img/panoramica.66c4c27255.webp","sagome":["img/sagome-cappuccio.e8876ba986.webp","img/sagome-esploratore.9a99fd13f8.webp","img/sagome-viaggiatore.5e36435604.webp"],"arene":{"classico":"img/arene-classico.42c6ba42ee.webp","fantasy":"img/arene-fantasy.75b7fb0d32.webp","horror":"img/arene-horror.48052d80b4.webp","liceo":"img/arene-liceo.05ed578a90.webp","royale":"img/arene-royale.36c9952cd7.webp","scifi":"img/arene-scifi.403694f00f.webp","ufficio":"img/arene-ufficio.67b271bea3.webp","wasteland":"img/arene-wasteland.889002ace8.webp","zombie":"img/arene-zombie.36c9135a12.webp"},"atlas":{"classico":{"luoghi":{"altopiano":"img/arene-classico-luoghi-altopiano.36a37512d3.webp","bosco":"img/arene-classico-luoghi-bosco.2e9163544b.webp","cornucopia":"img/arene-classico-luoghi-cornucopia.393b2dabe1.webp","fiume":"img/arene-classico-luoghi-fiume.22b335a914.webp","paludi":"img/arene-classico-luoghi-paludi.77cf115eb4.webp","rovine":"img/arene-classico-luoghi-rovine.9ea4f70ca9.webp"},"pericoli":{"branco-di-lupi-mutanti":"img/arene-classico-pericoli-branco-di-lupi-mutanti.d786a62875.webp","orso-affamato":"img/arene-classico-pericoli-orso-affamato.e4f38a9892.webp","sciame-di-vespe-velenose":"img/arene-classico-pericoli-sciame-di-vespe-velenose.5adb2c7b8d.webp","serpente-gigante":"img/arene-classico-pericoli-serpente-gigante.b17e7f3d91.webp"}},"fantasy":{"luoghi":{"foresta-elfica":"img/arene-fantasy-luoghi-foresta-elfica.0448fcfbd3.webp","lago-nebbioso":"img/arene-fantasy-luoghi-lago-nebbioso.f19abc7c81.webp","miniere":"img/arene-fantasy-luoghi-miniere.5baa916ec9.webp","palude-stregata":"img/arene-fantasy-luoghi-palude-stregata.6a0b2af4a7.webp","picco-del-drago":"img/arene-fantasy-luoghi-picco-del-drago.06bdfd84b1.webp","torre-in-rovina":"img/arene-fantasy-luoghi-torre-in-rovina.ac716863c7.webp"},"pericoli":{"branco-di-lupi-mannari":"img/arene-fantasy-pericoli-branco-di-lupi-mannari.1c9124ceee.webp","spettro-errante":"img/arene-fantasy-pericoli-spettro-errante.056074bc23.webp","troll-di-caverna":"img/arene-fantasy-pericoli-troll-di-caverna.31aa2444f0.webp","viverna":"img/arene-fantasy-pericoli-viverna.577b91a819.webp"}},"horror":{"luoghi":{"biblioteca":"img/arene-horror-luoghi-biblioteca.00d6ab97f4.webp","cappella":"img/arene-horror-luoghi-cappella.a51e505028.webp","cimitero":"img/arene-horror-luoghi-cimitero.7a441de089.webp","serra":"img/arene-horror-luoghi-serra.b3d91121d4.webp","soffitta":"img/arene-horror-luoghi-soffitta.466d40cea3.webp"},"pericoli":{"bambola-posseduta":"img/arene-horror-pericoli-bambola-posseduta.7064eef1d7.webp","entita-senza-volto":"img/arene-horror-pericoli-entita-senza-volto.2c28467bdd.webp","spettro-urlante":"img/arene-horror-pericoli-spettro-urlante.25fa554e05.webp","stormo-di-corvi":"img/arene-horror-pericoli-stormo-di-corvi.fe5c85d7ae.webp"}},"liceo":{"luoghi":{"aula-magna":"img/arene-liceo-luoghi-aula-magna.0478e35c5c.webp","biblioteca":"img/arene-liceo-luoghi-biblioteca.1ae806ae58.webp","cortile":"img/arene-liceo-luoghi-cortile.51bf433337.webp","laboratorio-di-chimica":"img/arene-liceo-luoghi-laboratorio-di-chimica.eba1434683.webp","mensa":"img/arene-liceo-luoghi-mensa.67bcbc7e37.webp","palestra":"img/arene-liceo-luoghi-palestra.8ecb872849.webp"},"pericoli":{"bidello-di-turno":"img/arene-liceo-pericoli-bidello-di-turno.191c43a8bd.webp","ispezione-a-sorpresa":"img/arene-liceo-pericoli-ispezione-a-sorpresa.bef087d9b9.webp","preside":"img/arene-liceo-pericoli-preside.033f6c9aae.webp","professoressa-di-matematica":"img/arene-liceo-pericoli-professoressa-di-matematica.6cb65c6a3f.webp"}},"royale":{"luoghi":{"aeroporto":"img/arene-royale-luoghi-aeroporto.81e8ce98d4.webp","base-militare":"img/arene-royale-luoghi-base-militare.67f3a7de9d.webp","centrale-elettrica":"img/arene-royale-luoghi-centrale-elettrica.05ee57458a.webp","fattoria":"img/arene-royale-luoghi-fattoria.7c780dda87.webp","foresta":"img/arene-royale-luoghi-foresta.03b47644d0.webp","villaggio-costiero":"img/arene-royale-luoghi-villaggio-costiero.568519eb7c.webp"},"pericoli":{"cane-da-guardia-addestrato":"img/arene-royale-pericoli-cane-da-guardia-addestrato.c7853a67a0.webp","drone-armato":"img/arene-royale-pericoli-drone-armato.30d0b73e01.webp","elicottero-da-caccia":"img/arene-royale-pericoli-elicottero-da-caccia.8c68e62346.webp"}},"scifi":{"luoghi":{"hangar":"img/arene-scifi-luoghi-hangar.6de551833b.webp","moduli-abitativi":"img/arene-scifi-luoghi-moduli-abitativi.9f5bb96d39.webp","ponte-di-comando":"img/arene-scifi-luoghi-ponte-di-comando.3e9ffd005a.webp","reattore":"img/arene-scifi-luoghi-reattore.d10a335006.webp","serra-idroponica":"img/arene-scifi-luoghi-serra-idroponica.b6f4407853.webp"},"pericoli":{"androide-da-combattimento":"img/arene-scifi-pericoli-androide-da-combattimento.1a3d3eb38e.webp","creatura-aliena-dai-tentacoli":"img/arene-scifi-pericoli-creatura-aliena-dai-tentacoli.b6b314ddd9.webp","drone-di-sicurezza-impazzito":"img/arene-scifi-pericoli-drone-di-sicurezza-impazzito.c8a9c6f9e3.webp","sciame-di-nanobot":"img/arene-scifi-pericoli-sciame-di-nanobot.d43296f047.webp"}},"ufficio":{"luoghi":{"cucina":"img/arene-ufficio-luoghi-cucina.d968f8861d.webp","open-space":"img/arene-ufficio-luoghi-open-space.b6b7990c99.webp","parcheggio":"img/arene-ufficio-luoghi-parcheggio.d593f2ed83.webp","sala-stampanti":"img/arene-ufficio-luoghi-sala-stampanti.1727f50082.webp","ufficio-del-direttore":"img/arene-ufficio-luoghi-ufficio-del-direttore.bb3b6cabab.webp"},"pericoli":{"consulente-esterno":"img/arene-ufficio-pericoli-consulente-esterno.ce6e200c3f.webp","direttore-generale":"img/arene-ufficio-pericoli-direttore-generale.da2eb1f708.webp","riorganizzazione-aziendale":"img/arene-ufficio-pericoli-riorganizzazione-aziendale.1fd57b76b3.webp","ufficio-risorse-umane":"img/arene-ufficio-pericoli-ufficio-risorse-umane.8392df7518.webp"}},"wasteland":{"luoghi":{"autostrada-spezzata":"img/arene-wasteland-luoghi-autostrada-spezzata.19a72a0b97.webp","citta-fantasma":"img/arene-wasteland-luoghi-citta-fantasma.fe22bb72b2.webp","cratere":"img/arene-wasteland-luoghi-cratere.04de7ca40a.webp","diga":"img/arene-wasteland-luoghi-diga.3be9abe15a.webp","discarica":"img/arene-wasteland-luoghi-discarica.b8783ad9c6.webp","raffineria":"img/arene-wasteland-luoghi-raffineria.081e2d2ad6.webp"},"pericoli":{"banda-di-predoni":"img/arene-wasteland-pericoli-banda-di-predoni.1dfcfd1628.webp","branco-di-cani-mutati":"img/arene-wasteland-pericoli-branco-di-cani-mutati.442fabfc39.webp","scorpione-gigante":"img/arene-wasteland-pericoli-scorpione-gigante.2dd8911367.webp","verme-delle-sabbie":"img/arene-wasteland-pericoli-verme-delle-sabbie.a0d445beeb.webp"}},"zombie":{"luoghi":{"centro-commerciale":"img/arene-zombie-luoghi-centro-commerciale.333f4699d5.webp","metropolitana":"img/arene-zombie-luoghi-metropolitana.878a263605.webp","periferia":"img/arene-zombie-luoghi-periferia.e28a7d70c7.webp","scuola":"img/arene-zombie-luoghi-scuola.153ddbaa75.webp","stazione-di-polizia":"img/arene-zombie-luoghi-stazione-di-polizia.157f7a17f5.webp"},"pericoli":{"cane-infetto":"img/arene-zombie-pericoli-cane-infetto.fdff913d6f.webp","gigante-mutato":"img/arene-zombie-pericoli-gigante-mutato.91fad36b70.webp","infetto-corridore":"img/arene-zombie-pericoli-infetto-corridore.61f48faafd.webp","orda-di-zombi":"img/arene-zombie-pericoli-orda-di-zombi.e0fc6d1b56.webp"}}}};
 ;
-window.LOS_BUILD = "fd33339b71391c68b531613040e481c41875c0f32204245623a01795c0cfe50e";
+window.LOS_BUILD = "9d09a132ee16c1c17052677d11a1f8e6e624f44757c7d89426bbac641e22d97a";
 ;
 /* Last One Standing — grafica vettoriale: logo, icone delle arene, illustrazioni.
  * Tutto è SVG generato in codice: nessuna immagine esterna. */
@@ -14575,6 +15234,7 @@ window.LOS_BUILD = "fd33339b71391c68b531613040e481c41875c0f32204245623a01795c0cf
     wasteland: '<path d="M3 18c3-2 6-2 9 0s6 2 9 0"/><path d="M3 21h18"/><circle cx="12" cy="10" r="4"/><path d="M12 3v1.5M5.5 6 6.6 7.1M18.5 6l-1.1 1.1"/>',
     liceo: '<path d="M3 9l9-5 9 5-9 5z"/><path d="M7 11v5c0 1.5 2.5 3 5 3s5-1.5 5-3v-5"/><path d="M21 9v6"/>',
     ufficio: '<rect x="3" y="8" width="18" height="12" rx="2"/><path d="M9 8V6a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2M3 13h18M11 13v2h2v-2"/>',
+    cyberpunk: '<path d="M4 21V9h4v12M10 21V4h5v17M17 21v-9h3v9"/><path d="M2 21h20"/><path d="M12.5 7v2M12.5 12v2"/><path d="M6 12h.01M18.5 15h.01"/>',
   };
   function icon(themeId, size) {
     const s = size || 20;
@@ -14667,6 +15327,28 @@ window.LOS_BUILD = "fd33339b71391c68b531613040e481c41875c0f32204245623a01795c0cf
       skyline(200, 10, 41, '#0f3f3a', '#c9fff1', 60, 140) + skyline(200, 12, 47, '#082624', '#7ff5d8', 30, 80) +
       '<g transform="translate(300 60)"><circle r="22" fill="#e8fff8"/><path d="M0 -14 v14 h10" stroke="#0b2b2a" stroke-width="3" fill="none" stroke-linecap="round"/></g>' +
       '<g fill="#fff" opacity=".85"><rect x="70" y="40" width="16" height="20" transform="rotate(-15 78 50)"/><rect x="200" y="28" width="14" height="18" transform="rotate(12 207 37)"/><rect x="140" y="70" width="12" height="16" transform="rotate(-30 146 78)"/></g>'; },
+    // Night City: cielo petrolio, torre con il faro giallo acido, insegne olografiche, cavi, vapore e asfalto bagnato
+    cyberpunk: () => { const g = id('s'), w = id('w'), h = id('h'); const r = rnd(77);
+      let rain = ''; for (let i = 0; i < 70; i++) { const x = r() * 420, y = r() * 200, l = 6 + r() * 10; rain += '<path d="M' + x.toFixed(1) + ' ' + y.toFixed(1) + 'l-2 ' + l.toFixed(1) + '" stroke="#9ff6ff" stroke-width=".7" opacity="' + (0.15 + r() * 0.35).toFixed(2) + '"/>'; }
+      return sky(g, '#041219', '#123c4a') +
+      '<defs><linearGradient id="' + w + '" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#0a2630"/><stop offset="1" stop-color="#03090d"/></linearGradient>' +
+      '<radialGradient id="' + h + '" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#ff2bd6" stop-opacity=".55"/><stop offset="1" stop-color="#ff2bd6" stop-opacity="0"/></radialGradient></defs>' +
+      '<ellipse cx="120" cy="120" rx="170" ry="70" fill="url(#' + h + ')"/>' +
+      skyline(158, 18, 61, '#0b2a36', '#3ff0ff', 40, 95) +
+      '<g><rect x="186" y="18" width="34" height="150" fill="#061a22"/><path d="M186 18 l17 -14 17 14z" fill="#061a22"/><rect x="201" y="0" width="4" height="10" fill="#061a22"/>' +
+      '<circle cx="203" cy="4" r="3.2" fill="#e8ff3a"/><circle cx="203" cy="4" r="11" fill="#e8ff3a" opacity=".18"/>' +
+      [0, 1, 2, 3, 4, 5, 6, 7, 8, 9].map((i) => '<rect x="191" y="' + (30 + i * 13) + '" width="24" height="2" fill="#3ff0ff" opacity="' + (0.25 + (i % 3) * 0.2).toFixed(2) + '"/>').join('') + '</g>' +
+      skyline(170, 14, 83, '#061820', '#ff4fd8', 25, 70) +
+      '<g transform="translate(58 74)"><rect width="46" height="22" rx="3" fill="#ff2bd6" opacity=".18"/><rect width="46" height="22" rx="3" fill="none" stroke="#ff4fd8" stroke-width="1.6"/><path d="M8 7h10M8 11h14M8 15h8M28 6v10M33 6l5 10M38 6l-5 10" stroke="#ffd1f5" stroke-width="1.4" stroke-linecap="round"/></g>' +
+      '<g transform="translate(300 62)"><rect width="34" height="54" rx="3" fill="#e8ff3a" opacity=".12"/><rect width="34" height="54" rx="3" fill="none" stroke="#e8ff3a" stroke-width="1.6"/><path d="M9 10h16M9 18h16M9 26h10M9 34h16M9 42h8" stroke="#f6ffb0" stroke-width="1.6" stroke-linecap="round"/></g>' +
+      '<g transform="translate(250 104)"><rect width="40" height="14" rx="2" fill="none" stroke="#3ff0ff" stroke-width="1.4" opacity=".9"/><path d="M6 7h28" stroke="#b8fbff" stroke-width="1.4" stroke-dasharray="3 2"/></g>' +
+      '<g fill="none" stroke="#020a0e" stroke-width="1.6"><path d="M0 60 Q90 88 186 70"/><path d="M220 80 Q300 104 400 76"/><path d="M0 96 Q120 120 250 104"/><path d="M290 112 Q350 126 400 118"/></g>' +
+      '<g fill="none" stroke="#cfe8ee" stroke-linecap="round" opacity=".14"><path d="M96 168 q-10 -18 2 -32 q12 -14 -2 -34" stroke-width="9"/><path d="M106 168 q8 -16 -2 -30 q-10 -14 4 -28" stroke-width="5"/><path d="M342 168 q-8 -14 2 -26 q10 -12 -2 -26" stroke-width="8"/></g>' +
+      '<rect y="168" width="400" height="32" fill="url(#' + w + ')"/>' +
+      '<g opacity=".5"><rect x="194" y="170" width="18" height="30" fill="#3ff0ff" opacity=".18"/><rect x="62" y="170" width="40" height="22" fill="#ff4fd8" opacity=".2"/><rect x="302" y="170" width="30" height="26" fill="#e8ff3a" opacity=".16"/></g>' +
+      '<path d="M0 168 h400" stroke="#3ff0ff" stroke-width="1" opacity=".5"/><path d="M0 186 h400" stroke="#ff4fd8" stroke-width=".8" opacity=".25" stroke-dasharray="14 10"/>' +
+      '<g fill="#010508"><path d="M150 168 v-14 l3 -8 h6 l3 8 v14z"/><circle cx="156" cy="141" r="5"/><path d="M162 150 l12 -4" stroke="#010508" stroke-width="3"/><path d="M262 168 v-12 l2 -9 h5 l3 9 v12z"/><circle cx="266" cy="142" r="4.5"/></g>' +
+      '<path d="M174 146 l40 -10" stroke="#e8ff3a" stroke-width=".8" opacity=".7"/>' + rain; },
   };
   const ASSETS = G.LOS_ASSETS || { arene: {} };
   function scene(themeId, cls) {
@@ -14748,10 +15430,24 @@ window.LOS_BUILD = "fd33339b71391c68b531613040e481c41875c0f32204245623a01795c0cf
   ];
   // ogni parola chiave deve cominciare una parola: «capi» non è «api», «evento» non è «vento»
   const FAMW = FAM.map(([f, re]) => [f, new RegExp('\\b(?:' + re.source.replace(/^\^/, '') + ')')]);
-  const FALLBACK = { classico: 'luce', fantasy: 'magia', scifi: 'tech', zombie: 'bestie', royale: 'spettacolo', horror: 'buio', wasteland: 'sabbia', liceo: 'burocrazia', ufficio: 'burocrazia' };
+  const FALLBACK = { classico: 'luce', fantasy: 'magia', scifi: 'tech', zombie: 'bestie', royale: 'spettacolo', horror: 'buio', wasteland: 'sabbia', liceo: 'burocrazia', ufficio: 'burocrazia', cyberpunk: 'tech' };
+  // famiglie proprie di un'arena, controllate prima di quelle comuni (le altre arene non cambiano)
+  const FAMA = {
+    cyberpunk: [
+      ['esplosione', /maxtac|rastrellament|blocco totale|raid|ronda|scav|cyberpsic|allerta pattuglia|torrett/],
+      ['tech', /\bice\b|interferenz|rete|virus delle ottiche|ottic|braindance|nodo dati|impiant|cyberdeck|disturbi/],
+      ['buio', /blackout|notte di neon/],
+      ['tossico', /pioggia acida|smog|gas/],
+      ['cassa', /consegna|scorte/],
+      ['caldo', /condizionator/],
+      ['festa', /tregua/],
+    ],
+  };
   const family = (name, extra, theme) => {
     const s = norm(name + ' ' + (extra || ''));
     const n = norm(name);
+    for (const [f, re] of FAMA[theme] || []) if (re.test(n)) return f;
+    for (const [f, re] of FAMA[theme] || []) if (re.test(s)) return f;
     for (const [f, re] of FAMW) if (re.test(n)) return f;
     for (const [f, re] of FAMW) if (re.test(s)) return f;
     return FALLBACK[theme] || 'luce';
@@ -15006,6 +15702,10 @@ window.LOS_BUILD = "fd33339b71391c68b531613040e481c41875c0f32204245623a01795c0cf
       step: (p, dt, w, h) => { p.x += p.vx * dt; p.y += (p.vy + (p.s === 'plane' ? Math.sin(p.t * 2) * 14 : 0)) * dt; wrap(p, w, h, 40); } },
     ufficio: { n: 20, spawn: (w, h) => ({ s: Math.random() < 0.7 ? 'sheet' : 'dot', x: R(0, w), y: R(-h, h), vx: R(6, 22), vy: R(10, 26), r: R(3, 6), c: pick(['#ffffff', '#fff6a8', '#c9fff1']), a: R(-0.6, 0.6), o: R(0.5, 0.9), t: R(0, 9) }),
       step: (p, dt, w, h) => { if (p.s === 'dot') { p.vy = -6; p.o = 0.4 + 0.4 * Math.sin(p.t * 3); p.c = '#7ff5d8'; p.r = 1.6; } p.x += (p.vx + Math.sin(p.t * 1.2) * 14) * dt; p.y += p.vy * dt; p.a += Math.sin(p.t) * 0.01; wrap(p, w, h, 30); } },
+    // Night City: pioggia leggera (strisce ciano), scintille gialle e magenta dalle insegne, e ogni tanto un glitch orizzontale
+    cyberpunk: { n: 64, spawn: (w, h) => Math.random() < 0.78 ? { s: 'streak', x: R(0, w), y: R(-h, h), vx: R(-30, -14), vy: R(260, 380), r: R(0.6, 1.2), c: pick(['#9ff6ff', '#3ff0ff', '#cfefff']), o: R(0.12, 0.35), t: 0 } : { s: 'spark', x: R(0, w), y: R(0, h * 0.6), vx: R(-6, 6), vy: R(10, 40), r: R(1.5, 3), c: pick(['#e8ff3a', '#ff4fd8', '#3ff0ff']), o: R(0.4, 0.9), t: R(0, 9), f: R(4, 9) },
+      step: (p, dt, w, h) => { p.x += p.vx * dt; p.y += p.vy * dt; wrap(p, w, h, 40); },
+      extra(g, w, h, t, f) { if (!f.glitch && Math.random() < 0.004 * f.k) f.glitch = 8; if (f.glitch > 0) { f.glitch--; const y = (f.glitch * 37 % 10) / 10 * h; g.fillStyle = f.glitch % 2 ? 'rgba(255,79,216,.18)' : 'rgba(63,240,255,.16)'; g.fillRect(0, y, w, 3 + (f.glitch % 3) * 4); g.fillStyle = 'rgba(232,255,58,.08)'; g.fillRect(w * 0.1, y + 8, w * 0.5, 2); } } },
     celebrate: { n: 0, spawn: () => ({}), step: () => {} },
   };
 
@@ -15126,7 +15826,7 @@ window.LOS_BUILD = "fd33339b71391c68b531613040e481c41875c0f32204245623a01795c0cf
 
   /* ================= TRANSIZIONI DI FASE ================= */
   // colore e stile del disastro per arena
-  const DIS = { classico: 'fire', fantasy: 'shock', scifi: 'alarm', zombie: 'toxic', royale: 'bomb', horror: 'lightning', wasteland: 'sand', liceo: 'bell', ufficio: 'glitch' };
+  const DIS = { classico: 'fire', fantasy: 'shock', scifi: 'alarm', zombie: 'toxic', royale: 'bomb', horror: 'lightning', wasteland: 'sand', liceo: 'bell', ufficio: 'glitch', cyberpunk: 'glitch' };
   function phaseFx(bc, kind, theme, forward, opt) {
     if (!bc) return;
     bc.dataset.kind = kind; bc.dataset.dis = DIS[theme] || 'fire';
@@ -15134,7 +15834,7 @@ window.LOS_BUILD = "fd33339b71391c68b531613040e481c41875c0f32204245623a01795c0cf
     bc.classList.remove('fx-phase'); void bc.offsetWidth; bc.classList.add('fx-phase');
     const f = bc.querySelector('.bc-scene') && bc.querySelector('.bc-scene').__field;
     if (f) {
-      if (kind === 'dis') f.burst(theme === 'classico' || theme === 'wasteland' ? 'embers' : 'sparks', null, null, 40);
+      if (kind === 'dis') f.burst(theme === 'classico' || theme === 'wasteland' ? 'embers' : 'sparks', null, null, theme === 'cyberpunk' ? 56 : 40);
       if (kind === 'f') f.burst('sparks', null, null, 30);
       if (kind === 'fallen' && opt && opt.deaths) f.burst('embers', null, null, 12 + opt.deaths * 4);
     }
@@ -15151,6 +15851,7 @@ window.LOS_BUILD = "fd33339b71391c68b531613040e481c41875c0f32204245623a01795c0cf
     royale: { colors: ['#ffd36b', '#ffffff', '#ff8a5c', '#5fb7ff'], shape: 'coin' }, horror: { colors: ['#c0392b', '#f6e7d0', '#1a0710', '#8e1b12'], shape: 'bat' },
     wasteland: { colors: ['#f08a24', '#ffd36b', '#9c3d14', '#f4c27a'], shape: 'rect' }, liceo: { colors: ['#ff7aa8', '#fff3c4', '#ffb3c7', '#ffffff'], shape: 'heart' },
     ufficio: { colors: ['#ffffff', '#fff6a8', '#c9fff1', '#7ff5d8'], shape: 'paper' },
+    cyberpunk: { colors: ['#e8ff3a', '#3ff0ff', '#ff4fd8', '#ffffff'], shape: 'rect' },
   };
   function confetti(theme, hue) {
     if (reduced) return;
@@ -16696,6 +17397,7 @@ window.LOS_BUILD = "fd33339b71391c68b531613040e481c41875c0f32204245623a01795c0cf
     wasteland: { recap: 'Il fumo all’orizzonte' },
     liceo: { day: (d) => capW(ordinal(d)) + ' giorno di scuola', night: (d) => 'Dopo scuola del ' + ordinal(d) + ' giorno', recap: 'L’appello del mattino' },
     ufficio: { day: (d) => capW(ordinal(d)) + ' giorno di lavoro', night: (d) => 'Straordinari del ' + ordinal(d) + ' giorno', recap: 'Le scrivanie vuote' },
+    cyberpunk: { day: (d) => capW(ordinal(d)) + ' giorno nella zona sigillata', night: (d) => capW(ordinal(d, true)) + ' notte di neon', recap: 'I segnali spenti' },
   };
   const calOf = (theme) => Object.assign({}, CAL._, CAL[theme.id] || {});
   // il limite di giorni scelto prima della partita (null se non si conosce, per esempio in un replay vecchio)
@@ -16976,7 +17678,8 @@ window.LOS_BUILD = "fd33339b71391c68b531613040e481c41875c0f32204245623a01795c0cf
   }
   const nTeams = () => new Set(S.cast.map((t) => t.team)).size;
   const plural = (n, s, p) => n + ' ' + (n === 1 ? s : p);
-  function setHue(id) { const t = THEMES[id]; if (t) document.documentElement.style.setProperty('--h', t.hue); }
+  // tinta e attributo dell'arena (data-arena; data-theme resta per chiaro/scuro). Segue l'arena della partita aperta, anche nei replay.
+  function setHue(id) { const t = THEMES[id]; if (t) { document.documentElement.style.setProperty('--h', t.hue); document.documentElement.dataset.arena = t.id; } }
 
   /* ---------------- tema chiaro/scuro ---------------- */
   function applyUi() { if (S.ui) document.documentElement.dataset.theme = S.ui; else delete document.documentElement.dataset.theme; }
@@ -17016,7 +17719,7 @@ window.LOS_BUILD = "fd33339b71391c68b531613040e481c41875c0f32204245623a01795c0cf
     $('#liveDot').hidden = !SIM;
     if (v !== 'diretta') stopPlay();
     if (v !== 'home') stopHomeLoop();
-    if (v === 'home' && ART.assets.logo) document.documentElement.style.setProperty('--h', 162);
+    if (v === 'home' && ART.assets.logo) { document.documentElement.style.setProperty('--h', 162); delete document.documentElement.dataset.arena; }
     else setHue((v === 'diretta' || v === 'esito') && SIM ? SIM.theme : S.settings.theme);
     if (v === 'home') renderHome();
     if (v === 'cast') { renderCast(); if (changed) playEntrance('castenter'); }
@@ -17882,7 +18585,7 @@ window.LOS_BUILD = "fd33339b71391c68b531613040e481c41875c0f32204245623a01795c0cf
     const beasts = t.lex.mostro.map((x, i) => '<article class="wanted" style="--r:' + ((i % 2 ? 1 : -1) * (1 + i % 3)) + 'deg">' + ATL.pic(t.id, 'pericoli', x, t.hue) + '<div class="wd-body"><span class="wd-tag">' + (t.soft ? 'Attenzione' : 'Pericolo') + '</span><h4>' + esc(capFirst(stripArt(x))) + '</h4></div></article>').join('');
     return chHead('Il campo di gioco', plural(Z.length, 'zona', 'zone') + ' collegate da passaggi. Gli spostamenti consumano energia e gli incontri richiedono la presenza nello stesso luogo. Le zone ricche aiutano a trovare cibo; di notte il riparo e i compagni presenti favoriscono il recupero. Gli imprevisti locali coinvolgono chi è sul posto e possono riemergere nei dialoghi delle fasi successive.') +
       '<div class="zboard">' + zones + '</div>' + plaque +
-      '<div class="dx-split"><section class="arsenal"><div class="ch-sub"><h4>' + (t.soft ? 'Armi improprie' : 'Armeria') + '</h4><p>' + (t.soft ? 'Con queste si fanno fuori i rivali, senza versare sangue.' : 'Si raccolgono in giro, si rubano agli altri o arrivano dagli sponsor.') + '</p></div><ul class="rack">' + arms + '</ul></section>' +
+      '<div class="dx-split"><section class="arsenal"><div class="ch-sub"><h4>' + (t.soft ? 'Armi improprie' : 'Armeria') + '</h4><p>' + (t.soft ? 'Con queste si fanno fuori i rivali, senza versare sangue.' : (t.id === 'cyberpunk' ? 'Si raccolgono in giro, si rubano agli altri o arrivano dai fixer. Gli impianti, una volta installati, non passano di mano.' : 'Si raccolgono in giro, si rubano agli altri o arrivano dagli sponsor.')) + '</p></div><ul class="rack">' + arms + '</ul></section>' +
       '<section class="bestiary"><div class="ch-sub"><h4>' + (t.soft ? 'Da evitare' : 'Pericoli') + '</h4><p>' + (t.soft ? 'Girano per i corridoi: chi resta da solo rischia di finire nei guai.' : 'Di notte attaccano chi dorme da solo, soprattutto nelle zone pericolose.') + '</p></div><div class="wanted-grid">' + beasts + '</div></section></div>';
   }
 
@@ -17900,7 +18603,8 @@ window.LOS_BUILD = "fd33339b71391c68b531613040e481c41875c0f32204245623a01795c0cf
     if (f.trap) add('Trappole più efficaci', 'neutral');
     if (f.fame) f.fame > 1 ? add('Più attenzione del pubblico', 'good') : add('Il pubblico guarda altrove', 'neutral');
     if (f.storm) add('Tempesta nelle zone aperte', 'bad');
-    if (f.pr && m) f.pr > 0 ? add(m.name + ' in salita', 'bad') : add(m.name + ' in calo', 'good');
+    // un indicatore che non cala da solo, con il meteo favorevole sale solo più piano
+    if (f.pr && m) f.pr > 0 ? add(m.name + ' in salita', 'bad') : add(m.noDecay ? m.name + ' sale più piano' : m.name + ' in calo', 'good');
     if (f.tb) Object.entries(f.tb).forEach(([a, v]) => add('Prove di ' + (ECO.attrNames[a] || a) + (v > 0 ? ' più facili' : ' più difficili'), v > 0 ? 'good' : 'bad'));
     return out.length ? '<ul class="fxs">' + out.join('') + '</ul>' : '<ul class="fxs"><li class="fx neutral">• Nessun effetto particolare</li></ul>';
   }
@@ -18816,7 +19520,7 @@ window.LOS_BUILD = "fd33339b71391c68b531613040e481c41875c0f32204245623a01795c0cf
       $('#heroLogo').innerHTML = ART.logo(76, { bg: 'var(--screen-2)', ink: 'var(--screen-ink)', accent: 'var(--screen-accent)' });
     }
     if (ART.assets.panoramica) { $('#heroScenes').innerHTML = '<img class="hero-pano" src="' + ART.assets.panoramica + '" alt="" draggable="false">'; $('#heroScenes').classList.add('pano'); }
-    else $('#heroScenes').innerHTML = ['classico', 'fantasy', 'scifi', 'zombie', 'royale', 'horror', 'wasteland', 'liceo', 'ufficio'].map((t) => ART.scene(t)).join('');
+    else $('#heroScenes').innerHTML = D.themes.map((t) => ART.scene(t.id)).join('');
     if (ART.assets.sagome && ART.assets.sagome.length) { const st = document.createElement('style'); st.textContent = ART.assets.sagome.map((u, k) => '.sil-' + k + '{-webkit-mask-image:url(' + u + ');mask-image:url(' + u + ')}').join(''); document.head.appendChild(st); }
     AN.ripple(document.body);
     try { const ic = document.createElement('link'); ic.rel = 'icon'; ic.href = ART.logoDataUri('#e3b04b'); document.head.appendChild(ic); } catch (e) { /* niente */ }

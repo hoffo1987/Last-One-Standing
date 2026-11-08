@@ -49,6 +49,10 @@
       step: (p, dt, w, h) => { p.x += p.vx * dt; p.y += (p.vy + (p.s === 'plane' ? Math.sin(p.t * 2) * 14 : 0)) * dt; wrap(p, w, h, 40); } },
     ufficio: { n: 20, spawn: (w, h) => ({ s: Math.random() < 0.7 ? 'sheet' : 'dot', x: R(0, w), y: R(-h, h), vx: R(6, 22), vy: R(10, 26), r: R(3, 6), c: pick(['#ffffff', '#fff6a8', '#c9fff1']), a: R(-0.6, 0.6), o: R(0.5, 0.9), t: R(0, 9) }),
       step: (p, dt, w, h) => { if (p.s === 'dot') { p.vy = -6; p.o = 0.4 + 0.4 * Math.sin(p.t * 3); p.c = '#7ff5d8'; p.r = 1.6; } p.x += (p.vx + Math.sin(p.t * 1.2) * 14) * dt; p.y += p.vy * dt; p.a += Math.sin(p.t) * 0.01; wrap(p, w, h, 30); } },
+    // Night City: pioggia leggera (strisce ciano), scintille gialle e magenta dalle insegne, e ogni tanto un glitch orizzontale
+    cyberpunk: { n: 64, spawn: (w, h) => Math.random() < 0.78 ? { s: 'streak', x: R(0, w), y: R(-h, h), vx: R(-30, -14), vy: R(260, 380), r: R(0.6, 1.2), c: pick(['#9ff6ff', '#3ff0ff', '#cfefff']), o: R(0.12, 0.35), t: 0 } : { s: 'spark', x: R(0, w), y: R(0, h * 0.6), vx: R(-6, 6), vy: R(10, 40), r: R(1.5, 3), c: pick(['#e8ff3a', '#ff4fd8', '#3ff0ff']), o: R(0.4, 0.9), t: R(0, 9), f: R(4, 9) },
+      step: (p, dt, w, h) => { p.x += p.vx * dt; p.y += p.vy * dt; wrap(p, w, h, 40); },
+      extra(g, w, h, t, f) { if (!f.glitch && Math.random() < 0.004 * f.k) f.glitch = 8; if (f.glitch > 0) { f.glitch--; const y = (f.glitch * 37 % 10) / 10 * h; g.fillStyle = f.glitch % 2 ? 'rgba(255,79,216,.18)' : 'rgba(63,240,255,.16)'; g.fillRect(0, y, w, 3 + (f.glitch % 3) * 4); g.fillStyle = 'rgba(232,255,58,.08)'; g.fillRect(w * 0.1, y + 8, w * 0.5, 2); } } },
     celebrate: { n: 0, spawn: () => ({}), step: () => {} },
   };
 
@@ -169,7 +173,7 @@
 
   /* ================= TRANSIZIONI DI FASE ================= */
   // colore e stile del disastro per arena
-  const DIS = { classico: 'fire', fantasy: 'shock', scifi: 'alarm', zombie: 'toxic', royale: 'bomb', horror: 'lightning', wasteland: 'sand', liceo: 'bell', ufficio: 'glitch' };
+  const DIS = { classico: 'fire', fantasy: 'shock', scifi: 'alarm', zombie: 'toxic', royale: 'bomb', horror: 'lightning', wasteland: 'sand', liceo: 'bell', ufficio: 'glitch', cyberpunk: 'glitch' };
   function phaseFx(bc, kind, theme, forward, opt) {
     if (!bc) return;
     bc.dataset.kind = kind; bc.dataset.dis = DIS[theme] || 'fire';
@@ -177,7 +181,7 @@
     bc.classList.remove('fx-phase'); void bc.offsetWidth; bc.classList.add('fx-phase');
     const f = bc.querySelector('.bc-scene') && bc.querySelector('.bc-scene').__field;
     if (f) {
-      if (kind === 'dis') f.burst(theme === 'classico' || theme === 'wasteland' ? 'embers' : 'sparks', null, null, 40);
+      if (kind === 'dis') f.burst(theme === 'classico' || theme === 'wasteland' ? 'embers' : 'sparks', null, null, theme === 'cyberpunk' ? 56 : 40);
       if (kind === 'f') f.burst('sparks', null, null, 30);
       if (kind === 'fallen' && opt && opt.deaths) f.burst('embers', null, null, 12 + opt.deaths * 4);
     }
@@ -194,6 +198,7 @@
     royale: { colors: ['#ffd36b', '#ffffff', '#ff8a5c', '#5fb7ff'], shape: 'coin' }, horror: { colors: ['#c0392b', '#f6e7d0', '#1a0710', '#8e1b12'], shape: 'bat' },
     wasteland: { colors: ['#f08a24', '#ffd36b', '#9c3d14', '#f4c27a'], shape: 'rect' }, liceo: { colors: ['#ff7aa8', '#fff3c4', '#ffb3c7', '#ffffff'], shape: 'heart' },
     ufficio: { colors: ['#ffffff', '#fff6a8', '#c9fff1', '#7ff5d8'], shape: 'paper' },
+    cyberpunk: { colors: ['#e8ff3a', '#3ff0ff', '#ff4fd8', '#ffffff'], shape: 'rect' },
   };
   function confetti(theme, hue) {
     if (reduced) return;

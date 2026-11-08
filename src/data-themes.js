@@ -676,5 +676,77 @@
 ` },
       ],
     },
+    /* ------------------------------------------------------------
+     * Decima arena, aggiunta in coda: l'ordine delle nove precedenti e i loro
+     * risultati restano quelli di sempre. Un distretto immaginario di Watson,
+     * sigillato dopo un colpo ai dati andato male. Nessun personaggio canonico. */
+    {
+      id: 'cyberpunk', name: 'Night City — Zona Rossa', tag: 'Neon, impianti e contratti saltati: un distretto sigillato dove nessuno è indispensabile.',
+      hue: 305, glyph: '⌁',
+      phase: { b: 'Il contratto saltato', d: 'Giorno', n: 'Notte', f: 'La consegna del fixer' },
+      climax: { titles: ['La stretta corporativa', 'Le ultime linee aperte', 'Il blocco totale'], intro: 'La stretta corporativa chiude un isolato dopo l’altro: resta aperta solo la strada verso {z}. Da qui si esce soltanto vincendo.' },
+      intro: {
+        b: 'Il colpo ai dati è saltato: le serrande del distretto si abbassano e i droni di sicurezza bloccano gli svincoli. Tutti scappano con quello che riescono ad afferrare.',
+        d: 'Le insegne olografiche tremolano nello smog: comincia un altro giorno nella zona sigillata.',
+        n: 'Il cielo sopra Watson diventa viola di neon. Nei vicoli si spengono i segnali, uno alla volta.',
+        f: 'Un fixer manda lo stesso messaggio a tutti: c’è una consegna, e la roba va a chi arriva per primo.',
+        finale: 'La stretta corporativa chiude un isolato dopo l’altro: restano aperte solo le vie verso la Piazza della torre.',
+      },
+      fallen: ['Sulla rete del quartiere nessun biochip si spegne.', 'Sulla rete del quartiere si spegne un biochip.', 'Sulla rete del quartiere si spengono {n} biochip.'],
+      lex: {
+        arma: ['una pistola smart', 'una katana termica', 'un fucile a pompa da strada', 'una mazza da baseball chiodata', 'una pistola a rotaia artigianale', 'un taser da buttafuori', 'un mitra compatto'],
+        cibo: ['una barretta di proteine sintetiche', 'una scatola di noodle istantanei', 'una lattina di bevanda energetica', 'un panino di soia in busta'],
+        luogo: ['il Mercato di Kabuki', 'il Megablocco', 'la Clinica del ripperdoc', 'il Club della braindance', 'l\'Officina dei Maelstrom', 'il Nodo dati corporativo'],
+        mostro: ['una squadra di sicurezza corporativa', 'uno sciame di droni di pattuglia', 'una banda di Scav', 'una gang di cromati'],
+        trappola: ['una mina a prossimità', 'un filo monomolecolare teso in un corridoio', 'una torretta automatica riprogrammata'],
+        rifugio: ['una capsula-letto del Megablocco', 'il retro di un distributore di noodle', 'un vano tecnico dietro le insegne'],
+        dono: ['un pacco lasciato da un drone del fixer'],
+      },
+      extra: {
+        b: `
+1 +arma:A | {A} strappa {arma} dalle mani di una guardia svenuta e si butta nel primo vicolo.
+1 +cibo:A | {A} sfonda un distributore automatico e riempie le tasche di {cibo}.
+1 @stl | {A} si spegne il biochip e si confonde tra la folla che scappa dalla Piazza.
+2 al:AB @soc | {A} e {B} si ritrovano nello stesso ascensore di servizio e decidono di uscirne insieme.
+2 k:A>B @agg | Nel caos dello sgombero, {A} spinge {B} contro le serrande che si chiudono.
+`,
+        d: `
+1 +attrezzo:A @int | {A} contratta con un banco del Mercato e si porta via {attrezzo} per un favore da restituire.
+1 s:A=affamato | {A} passa la giornata a fuggire dai droni e non trova un solo distributore funzionante.
+2 al:AB @soc | {A} e {B} si dividono un contratto del fixer: metà dei rischi, metà della paga.
+2 k:A>B @agg | {A} vende a una gang la posizione di {B}. La gang passa a riscuotere.
+`,
+        n: `
+1 | {A} guarda le insegne pubblicitarie ripetere lo stesso slogan per tutta la notte.
+2 k:A>B @stl | {A} raggiunge {B} nel buio di un blackout e chiude il conto senza fare rumore.
+`,
+      },
+      disasters: [
+        { n: 'L’intervento della MaxTac', intro: 'Qualcuno è andato in cyberpsicosi: la squadra speciale della polizia arriva e non fa domande a chi si trova in mezzo.', out: `
+1 d:A | {A} si trova sulla linea di tiro della MaxTac nel momento sbagliato.
+1 s:A=ferito | {A} viene travolt[A:o/a] dallo sgombero della MaxTac e se la cava con una brutta ferita.
+1 @stl | {A} si appiattisce sotto una scala antincendio finché la MaxTac non se ne va.
+1 pr:A+18 | {A} assiste da vicino all’intervento della MaxTac. Il sovraccarico neurale sale: le immagini non se ne vanno.
+` },
+        { n: 'Il rastrellamento corporativo', intro: 'Una squadra corporativa setaccia il distretto alla ricerca dei dati rubati: chi non ha un documento valido viene trattato come un sospetto.', out: `
+1 d:A | {A} non convince la squadra corporativa e non torna dal controllo.
+1 s:A=ferito | {A} viene fermat[A:o/a] e interrogat[A:o/a] con metodi poco gentili.
+2 k:A>B | {A} indica {B} alla squadra corporativa come complice del furto. Per {B} il controllo finisce male.
+1 test:A=furt12 ko:s:A=ferito | {A} passa tra i controlli corporativi senza farsi notare. || {A} prova a passare tra i controlli corporativi, ma viene riconosciut[A:o/a] e colpit[A:o/a].
+` },
+        { n: 'Il cortocircuito della rete', intro: 'Un virus attraversa la rete del quartiere: impianti, insegne e serrature impazziscono tutti insieme.', out: `
+1 pr:A+20 | Gli impianti di {A} ricevono il virus in pieno: il sovraccarico neurale schizza in alto.
+1 s:A=sconvolto | Le ottiche di {A} mostrano per un’ora immagini che non esistono.
+1 test:A=int12 ok:pr:A-10 ko:pr:A+15 | {A} isola i propri impianti dalla rete prima che il virus arrivi e ne esce più lucid[A:o/a]. || {A} prova a isolare i propri impianti dalla rete, ma il virus arriva prima.
+1 d:A | Il virus manda in blocco l’impianto cardiaco di {A}.
+` },
+        { n: 'La pioggia acida sul distretto', intro: 'Dalle nuvole gialle cade una pioggia che corrode vernice, plastica e pelle.', out: `
+1 s:A=ferito | {A} resta sotto la pioggia acida troppo a lungo e si riempie di ustioni.
+1 en:A-15 | {A} corre da una tettoia all’altra per tutta la giornata e arriva al riparo senza fiato.
+1 @luck | {A} trova riparo in una capsula-letto libera proprio quando il cielo si apre.
+1 d:A | {A} scivola sul cemento bagnato da una passerella e non si rialza più.
+` },
+      ],
+    },
   ];
 })(typeof window !== 'undefined' ? window : globalThis);

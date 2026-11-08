@@ -6,6 +6,7 @@ descrive la provenienza documentata, senza attribuire una licenza alle immagini.
 | Risorse | Provenienza documentata |
 | --- | --- |
 | `assets/arene/*.webp` | Nove banner forniti per il progetto nel flusso di creazione delle immagini tematiche; successivamente ottimizzati in WebP. |
+| Locandina di Night City — Zona Rossa (`cyberpunk`) | **Provvisoria.** Non c'è ancora un `assets/arene/cyberpunk.webp`: la locandina, il banner della guida e lo sfondo della diretta usano l'illustrazione vettoriale disegnata in `src/art.js` (skyline, torre con faro giallo acido, insegne olografiche, cavi, vapore, asfalto bagnato e pioggia). Quando arriverà il banner definitivo basterà aggiungere il file: la build lo incorpora al posto dell'SVG. Le immagini della guida di quest'arena (7 luoghi, 4 pericoli, 7 armi) hanno nomi e prompt in [docs-dev/immagini-arene.md](docs-dev/immagini-arene.md). Nessun personaggio, marchio o logo di opere esistenti. |
 | `assets/logo.webp` | Logo creato con imagegen per Last One Standing, reinterpretando il riferimento del progetto nello stile illustrato dei banner. |
 | `assets/icona.webp`, `favicon.png`, `icona-180.png` | Icona dedicata generata per il progetto; favicon e icona per dispositivi derivate dall'immagine. |
 | `assets/panoramica.webp`, `anteprima.jpg` | Illustrazione della home e anteprima per i link generate con imagegen per il progetto. |

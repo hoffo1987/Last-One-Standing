@@ -31,7 +31,7 @@ function context(withWorker) {
       const expected = JSON.parse(JSON.stringify(main.LOS.simulate(cfg)));
       assert.deepEqual(JSON.parse(JSON.stringify(await worker.simulate(cfg))), expected, theme.id);
     }
-    console.log('OK: risultati del worker identici al motore principale in tutte le nove arene');
+    console.log('OK: risultati del worker identici al motore principale in tutte le ' + main.LOS_DATA.themes.length + ' arene');
     await assert.rejects(worker.simulate({ cast: [] }), /almeno 2/);
     const cfg = { cast: main.LOS.randomCast(200, 'cancel', 2), theme: 'classico', seed: 'cancel' };
     const pending = worker.simulate(cfg); worker.cancel(); await assert.rejects(pending, e => e.name === 'AbortError');

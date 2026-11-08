@@ -189,7 +189,7 @@
     });
     const data=D.worldItemData,own=data.roots[theme.id],soft=!!theme.soft;
     Object.entries(own).forEach(([type,roots])=>data.split(roots).forEach((name,i)=>{
-      const endings=soft&&['arma','armatura','trap','med'].includes(type)?data.paper:data.tails[type];
+      const endings=soft&&['arma','armatura','trap','med'].includes(type)?data.paper:data.themeTails?.[theme.id]?.[type]||data.tails[type];
       endings.forEach((tail,j)=>out.items.push({id:'mondo-'+theme.id+'-item-'+type+'-'+i+'-'+j,type,name:name+' '+tail}));
     }));
     out.counts=Object.fromEntries(['events','traits','trials','deaths','disasters','dialogues','quotes','items'].map(k=>[k,out[k].length]));

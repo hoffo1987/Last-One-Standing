@@ -20,7 +20,9 @@
  *                  quando il morale crolla, una volta per notte
  *   raccolta:N     probabilità in più (punti percentuali) di trovare cibo di notte
  *   scambio:N      valore negli scambi (merce)
- *   trappola:N     danno in più di una trappola piazzata */
+ *   trappola:N     danno in più di una trappola piazzata
+ *   impianto:1     impianto installato (Night City): si usa come gli altri oggetti del tipo, ma nessuno
+ *                  può rubarlo, riceverlo in dono o in scambio, prenderlo come bottino o trovarlo a terra */
 (function (G) {
   const D = (G.LOS_DATA = G.LOS_DATA || {});
   D.itemCatalog = D.itemCatalog || {};
@@ -93,7 +95,7 @@ con allegati numerati|Gli allegati in ordine fanno durare l'effetto più a lungo
       const [, k, v] = m;
       if (k === 'prova') { const x = v.match(/^(for|agi|int|car|fort|res|furt|cor|emp|sop)([+-]\d+)$/); if (!x) throw new Error('Prova non valida: ' + tok); (p.prova = p.prova || {})[x[1]] = (p.prova[x[1]] || 0) + +x[2]; }
       else if (k === 'guarisce') p.guarisce = (p.guarisce || []).concat(v.split(',').filter((x) => STATI[x] || (() => { throw new Error('Stato non valido: ' + x); })()));
-      else if (['posti', 'forza', 'usi', 'assorbe', 'belve', 'indicatore', 'cura', 'cibo', 'energia', 'morale', 'raccolta', 'scambio', 'trappola'].includes(k)) { if (!Number.isFinite(+v)) throw new Error('Valore non valido: ' + tok); p[k] = (p[k] || 0) + +v; }
+      else if (['posti', 'forza', 'usi', 'assorbe', 'belve', 'indicatore', 'cura', 'cibo', 'energia', 'morale', 'raccolta', 'scambio', 'trappola', 'impianto'].includes(k)) { if (!Number.isFinite(+v)) throw new Error('Valore non valido: ' + tok); p[k] = (p[k] || 0) + +v; }
       else throw new Error('Proprietà sconosciuta: ' + tok);
     });
     return p;
@@ -116,12 +118,20 @@ con allegati numerati|Gli allegati in ordine fanno durare l'effetto più a lungo
     if (cache.has(themeId)) return cache.get(themeId);
     const rows = parseRows(D.itemCatalog[themeId]);
     const roots = {}; rows.forEach((r) => { (roots[r.type] = roots[r.type] || []).push(r); });
-    const tails = {}; for (const t in D.itemTails) tails[t] = parseRows(D.itemTails[t]);
+    // finiture: quelle proprie dell'arena, se ci sono, altrimenti le comuni
+    const own = (D.itemTailsArena || {})[themeId] || {};
+    const tails = {}; for (const t in D.itemTails) tails[t] = parseRows(own[t] || D.itemTails[t]);
     // oggetti dei lessici: quelli dell'arena e quelli comuni a tutte
     const lex = parseRows(D.itemLexCatalog && D.itemLexCatalog[themeId]).concat(parseRows(D.itemLexCatalog && D.itemLexCatalog._));
     const out = { roots, tails, paper: parseRows(D.itemPaper), lex };
     cache.set(themeId, out); return out;
   }
+  // le arene con impianti installati (oggetti che non si possono rubare, cedere né perdere a terra)
+  const implantCache = new Map();
+  D.itemHasImplants = (themeId) => {
+    if (!implantCache.has(themeId)) { const c = catalog(themeId); implantCache.set(themeId, Object.values(c.roots).some((rs) => rs.some((r) => r.p.impianto)) || c.lex.some((r) => r.p.impianto)); }
+    return implantCache.get(themeId);
+  };
   // radici per arena e tipo, nello stesso formato di worldItemData (usato da zz-world.js)
   D.itemRoots = (themeId) => { const c = catalog(themeId), out = {}; for (const t in c.roots) out[t] = c.roots[t].map((r) => r.name).join('|'); return out; };
   /* Descrizione ed effetti di un oggetto dal suo nome. Restituisce sempre qualcosa:
@@ -159,6 +169,7 @@ con allegati numerati|Gli allegati in ordine fanno durare l'effetto più a lungo
     if (p.raccolta) out.push('+' + p.raccolta + '% di trovare cibo di notte');
     if (p.scambio) out.push('Vale di più negli scambi (+' + p.scambio + ')');
     if (p.trappola) out.push('Trappola più dannosa (+' + p.trappola + ')');
+    if (p.impianto) out.push('Impianto installato: non si può rubare, cedere né lasciare a terra');
     out.push(p.posti ? 'Occupa ' + p.posti + (p.posti === 1 ? ' posto' : ' posti') + ' nello zaino' : 'Non occupa spazio nello zaino');
     return out;
   };

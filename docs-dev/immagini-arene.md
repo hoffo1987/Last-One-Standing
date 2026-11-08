@@ -2,7 +2,7 @@
 
 _Generato da `node tools/atlas-slots.js` a partire da `tools/atlas-brief.js`: per cambiare un testo o un prompt modifica il brief e rigenera, non questo file._
 
-**Immagini presenti: 85 su 161** (luoghi 50/59, pericoli 35/35, armi 0/67). **Video presenti: 0 su 94** (luoghi e pericoli). Meteo, disastri e oggetti arriveranno dopo.
+**Immagini presenti: 85 su 179** (luoghi 50/66, pericoli 35/39, armi 0/74). **Video presenti: 0 su 105** (luoghi e pericoli). Meteo, disastri e oggetti arriveranno dopo.
 
 ## 1. Lo stile
 
@@ -95,6 +95,7 @@ Sul sito i video partiranno da soli, muti e in loop, con l'immagine ferma mentre
 | [Terre Desolate](#terre-desolate) | 7 | 4 | 7 |
 | [Liceo Spietato](#liceo-spietato) | 7 | 4 | 6 |
 | [Ufficio Open Space](#ufficio-open-space) | 6 | 4 | 6 |
+| [Night City — Zona Rossa](#night-city--zona-rossa) | 7 | 4 | 7 |
 
 ---
 
@@ -2564,4 +2565,283 @@ File: `assets/arene/ufficio/armi/nota-spese-gonfiata.webp`
 
 ```text
 A long paper receipt inflating like a balloon, curled at the ends, with a small string tied at the bottom. Single game inventory prop in three-quarter view, laid diagonally from lower left to upper right with a generous empty margin, isolated on a plain flat light grey background. Stylized painterly prop concept art with expressive brushwork, faceted planes and a crisp silhouette with a thin dark outline. Lit by a cold teal fluorescent key light with a monitor glow rim light, comedy mood. --v 8.2 --ar 1:1 --no text, letters, signature, watermark, hands, person, scenery, background objects, cast shadow, frame, border
+```
+
+---
+
+## Night City — Zona Rossa
+
+Neon, impianti e contratti saltati: un distretto sigillato dove nessuno è indispensabile.
+
+- **Atmosfera**: Distretto sigillato di una megalopoli notturna: cemento bagnato e toni petrolio, insegne olografiche magenta e ciano, un faro giallo acido, cavi sospesi, vapore e pioggia sottile. Nessun personaggio o logo riconoscibile.
+- **Frase di luce dell'arena** (è già nei comandi): `Wet petrol-blue night light with glowing magenta and electric cyan neon reflections on rain-soaked concrete, an acid yellow accent glow, drifting steam and thin rain.`
+
+### Luoghi · Night City — Zona Rossa
+
+#### Mercato di Kabuki
+
+Mercato notturno affollato di bancarelle sotto tendoni e insegne olografiche, vapore delle cucine di strada.  
+File: `assets/arene/cyberpunk/luoghi/mercato-di-kabuki.webp` · video: `assets/arene/cyberpunk/luoghi/mercato-di-kabuki.mp4`
+
+**Immagine**
+
+```text
+A dense night market of improvised stalls under plastic awnings fills the central third of the frame, lit by glowing magenta and cyan holographic signs. Noodle stands release clouds of steam, crates of spare optics and tangled cables crowd the wet foreground, and a narrow alley disappears between tall concrete blocks. Stylized painterly environment concept art with visible expressive brushwork and faceted concrete planes. Wet petrol-blue night light with glowing magenta and electric cyan neon reflections on rain-soaked concrete, an acid yellow accent glow, drifting steam and thin rain. --v 8.2 --ar 16:9 --no text, letters, signature, watermark, logo, people, characters, frame, border
+```
+
+**Video (Animate → Manual)**
+
+```text
+Static camera and a seamless ambient loop: the place itself stays perfectly still and only small elements move, slowly and gently. Steam rises slowly from the noodle stands, holographic signs flicker gently, raindrops ripple in the puddles. --motion low --loop
+```
+
+#### Megablocco
+
+Megablocco residenziale gigantesco, ballatoi su decine di piani e finestre accese.  
+File: `assets/arene/cyberpunk/luoghi/megablocco.webp` · video: `assets/arene/cyberpunk/luoghi/megablocco.mp4`
+
+**Immagine**
+
+```text
+A colossal residential megablock rises through the central third of the frame, its stacked open walkways lined with tiny lit windows, air conditioners and laundry lines. A cracked concrete courtyard with a broken elevator shaft and a rusted fire escape fills the foreground under a thin acid rain. Stylized painterly environment concept art with visible expressive brushwork and faceted concrete planes. Wet petrol-blue night light with glowing magenta and electric cyan neon reflections on rain-soaked concrete, an acid yellow accent glow, drifting steam and thin rain. --v 8.2 --ar 16:9 --no text, letters, signature, watermark, logo, people, characters, frame, border
+```
+
+**Video (Animate → Manual)**
+
+```text
+Static camera and a seamless ambient loop: the place itself stays perfectly still and only small elements move, slowly and gently. Window lights blink on and off one by one, laundry sways in the wind, thin rain falls steadily. --motion low --loop
+```
+
+#### Clinica del ripperdoc
+
+Clinica clandestina di un ripperdoc con poltrona chirurgica, bracci robotici e luce fredda.  
+File: `assets/arene/cyberpunk/luoghi/clinica-del-ripperdoc.webp` · video: `assets/arene/cyberpunk/luoghi/clinica-del-ripperdoc.mp4`
+
+**Immagine**
+
+```text
+A cramped back-alley cyber clinic with a worn surgical chair under a cold cyan lamp in the central third of the frame, flanked by articulated robotic surgical arms and shelves of glowing implant canisters. Monitors with heartbeat lines, coiled tubes and a steel tray of tools fill the foreground. Stylized painterly environment concept art with visible expressive brushwork and faceted concrete planes. Wet petrol-blue night light with glowing magenta and electric cyan neon reflections on rain-soaked concrete, an acid yellow accent glow, drifting steam and thin rain. --v 8.2 --ar 16:9 --no text, letters, signature, watermark, logo, people, characters, frame, border
+```
+
+**Video (Animate → Manual)**
+
+```text
+Static camera and a seamless ambient loop: the place itself stays perfectly still and only small elements move, slowly and gently. The heartbeat lines pulse slowly on the monitors, a robotic arm twitches gently, the lamp hums and flickers faintly. --motion low --loop
+```
+
+#### Club della braindance
+
+Club notturno con pista allagata di luci, poltrone per la braindance e visori appesi.  
+File: `assets/arene/cyberpunk/luoghi/club-della-braindance.webp` · video: `assets/arene/cyberpunk/luoghi/club-della-braindance.mp4`
+
+**Immagine**
+
+```text
+A neon nightclub with a reflective dance floor in the central third of the frame, surrounded by reclining braindance chairs with headset visors hanging above them. Laser beams in magenta and cyan cut through haze, and a bar counter of glowing bottles lines the foreground. Stylized painterly environment concept art with visible expressive brushwork and faceted concrete planes. Wet petrol-blue night light with glowing magenta and electric cyan neon reflections on rain-soaked concrete, an acid yellow accent glow, drifting steam and thin rain. --v 8.2 --ar 16:9 --no text, letters, signature, watermark, logo, people, characters, frame, border
+```
+
+**Video (Animate → Manual)**
+
+```text
+Static camera and a seamless ambient loop: the place itself stays perfectly still and only small elements move, slowly and gently. Laser beams sweep slowly through the haze, headset lights blink, the floor reflections ripple softly. --motion low --loop
+```
+
+#### Officina dei Maelstrom
+
+Officina di una gang con moto blindate, pezzi di cromo e una torretta di guardia.  
+File: `assets/arene/cyberpunk/luoghi/officina-dei-maelstrom.webp` · video: `assets/arene/cyberpunk/luoghi/officina-dei-maelstrom.mp4`
+
+**Immagine**
+
+```text
+A grimy gang workshop with an armoured motorbike raised on a hydraulic lift in the central third of the frame, under red emergency lights. Piles of chrome limbs, welding sparks, fuel drums and chains fill the foreground, and an automated sentry turret watches from a steel catwalk. Stylized painterly environment concept art with visible expressive brushwork and faceted concrete planes. Wet petrol-blue night light with glowing magenta and electric cyan neon reflections on rain-soaked concrete, an acid yellow accent glow, drifting steam and thin rain. --v 8.2 --ar 16:9 --no text, letters, signature, watermark, logo, people, characters, frame, border
+```
+
+**Video (Animate → Manual)**
+
+```text
+Static camera and a seamless ambient loop: the place itself stays perfectly still and only small elements move, slowly and gently. Welding sparks shower in short bursts, the sentry turret pans slowly, red lights pulse, smoke drifts. --motion low --loop
+```
+
+#### Nodo dati corporativo
+
+Sala server corporativa con colonne di dati luminosi, torrette e porte stagne.  
+File: `assets/arene/cyberpunk/luoghi/nodo-dati-corporativo.webp` · video: `assets/arene/cyberpunk/luoghi/nodo-dati-corporativo.mp4`
+
+**Immagine**
+
+```text
+A sterile corporate data hub with towering server columns glowing cyan in the central third of the frame, data streams of light running up their surfaces. A sealed blast door, ceiling turrets and a single access terminal fill the foreground on a polished black floor. Stylized painterly environment concept art with visible expressive brushwork and faceted concrete planes. Wet petrol-blue night light with glowing magenta and electric cyan neon reflections on rain-soaked concrete, an acid yellow accent glow, drifting steam and thin rain. --v 8.2 --ar 16:9 --no text, letters, signature, watermark, logo, people, characters, frame, border
+```
+
+**Video (Animate → Manual)**
+
+```text
+Static camera and a seamless ambient loop: the place itself stays perfectly still and only small elements move, slowly and gently. Data light streams flow upward continuously, the terminal screen blinks, the turrets rotate a few degrees and return. --motion low --loop
+```
+
+#### Piazza della torre
+
+Piazza centrale ai piedi di una torre altissima, megaschermo, volanti in volo e barriere di sicurezza.  
+File: `assets/arene/cyberpunk/luoghi/piazza-della-torre.webp` · video: `assets/arene/cyberpunk/luoghi/piazza-della-torre.mp4`
+
+**Immagine**
+
+```text
+A wide plaza at the foot of a colossal corporate tower that dominates the central third of the frame, its top crowned by an acid yellow beacon. A giant video screen glows on its facade, flying police cars hover in the smog, and security barriers, planters and a metro canopy fill the wet foreground. Stylized painterly environment concept art with visible expressive brushwork and faceted concrete planes. Wet petrol-blue night light with glowing magenta and electric cyan neon reflections on rain-soaked concrete, an acid yellow accent glow, drifting steam and thin rain. --v 8.2 --ar 16:9 --no text, letters, signature, watermark, logo, people, characters, frame, border
+```
+
+**Video (Animate → Manual)**
+
+```text
+Static camera and a seamless ambient loop: the place itself stays perfectly still and only small elements move, slowly and gently. The beacon pulses slowly, flying cars drift across the sky, the giant screen flickers, rain shimmers on the plaza. --motion low --loop
+```
+
+### Pericoli · Night City — Zona Rossa
+
+#### Squadra di sicurezza corporativa
+
+Squadra di sicurezza corporativa in armatura tattica senza insegne, visiere luminose.  
+File: `assets/arene/cyberpunk/pericoli/squadra-di-sicurezza-corporativa.webp` · video: `assets/arene/cyberpunk/pericoli/squadra-di-sicurezza-corporativa.mp4`
+
+**Immagine**
+
+```text
+A corporate security squad in sleek unmarked tactical armour, the leader in front with a glowing cyan visor and a smart rifle held low, the others behind as dark silhouettes with matching visor glows. Rain beads on their armour plates. Stylized painterly character concept art with visible expressive brushwork and faceted concrete planes. Centered portrait composition, the subject facing the viewer with its eyes or focal point in the upper half of the frame, the edges dissolving into dark mist. Wet petrol-blue night light with glowing magenta and electric cyan neon reflections on rain-soaked concrete, an acid yellow accent glow, drifting steam and thin rain. --v 8.2 --ar 4:3 --no text, letters, signature, watermark, logo, frame, border
+```
+
+**Video (Animate → Manual)**
+
+```text
+Static camera and a seamless ambient loop: the subject keeps the same pose and position, with only subtle living movement, slow and calm. The visors pulse softly, rain runs down the armour, the squad shifts weight slightly in place. --motion low --loop
+```
+
+#### Sciame di droni di pattuglia
+
+Sciame di piccoli droni di sorveglianza con luci rosse e scanner.  
+File: `assets/arene/cyberpunk/pericoli/sciame-di-droni-di-pattuglia.webp` · video: `assets/arene/cyberpunk/pericoli/sciame-di-droni-di-pattuglia.mp4`
+
+**Immagine**
+
+```text
+A swarm of small surveillance drones hovering toward the viewer, the closest one large in the frame with a single red scanning lens and four spinning rotors, the others scattered behind in the smog with thin scanning beams. Stylized painterly character concept art with visible expressive brushwork and faceted concrete planes. Centered portrait composition, the subject facing the viewer with its eyes or focal point in the upper half of the frame, the edges dissolving into dark mist. Wet petrol-blue night light with glowing magenta and electric cyan neon reflections on rain-soaked concrete, an acid yellow accent glow, drifting steam and thin rain. --v 8.2 --ar 4:3 --no text, letters, signature, watermark, logo, frame, border
+```
+
+**Video (Animate → Manual)**
+
+```text
+Static camera and a seamless ambient loop: the subject keeps the same pose and position, with only subtle living movement, slow and calm. The rotors spin, the drones bob gently in place, scanning beams sweep slowly. --motion low --loop
+```
+
+#### Banda di Scav
+
+Banda di Scav con stracci, maschere improvvisate e strumenti chirurgici rubati.  
+File: `assets/arene/cyberpunk/pericoli/banda-di-scav.webp` · video: `assets/arene/cyberpunk/pericoli/banda-di-scav.mp4`
+
+**Immagine**
+
+```text
+A gang of scavengers in layered rags and makeshift breathing masks, the leader in front holding a stolen bone saw with a cracked optic glowing in one eye, the others behind as hunched silhouettes among trash bags in a dim alley. Stylized painterly character concept art with visible expressive brushwork and faceted concrete planes. Centered portrait composition, the subject facing the viewer with its eyes or focal point in the upper half of the frame, the edges dissolving into dark mist. Wet petrol-blue night light with glowing magenta and electric cyan neon reflections on rain-soaked concrete, an acid yellow accent glow, drifting steam and thin rain. --v 8.2 --ar 4:3 --no text, letters, signature, watermark, logo, frame, border
+```
+
+**Video (Animate → Manual)**
+
+```text
+Static camera and a seamless ambient loop: the subject keeps the same pose and position, with only subtle living movement, slow and calm. The masks breathe with slow puffs of vapour, the cracked optic flickers, the figures sway slightly. --motion low --loop
+```
+
+#### Gang di cromati
+
+Gang di cromati con arti metallici, impianti visibili e luci sotto la pelle.  
+File: `assets/arene/cyberpunk/pericoli/gang-di-cromati.webp` · video: `assets/arene/cyberpunk/pericoli/gang-di-cromati.mp4`
+
+**Immagine**
+
+```text
+A street gang of heavily augmented fighters, the leader in front with polished chrome arms, glowing subdermal lines across the face and a mohawk of fibre optic strands, the others behind with metal jaws and glowing eyes under a magenta sign. Stylized painterly character concept art with visible expressive brushwork and faceted concrete planes. Centered portrait composition, the subject facing the viewer with its eyes or focal point in the upper half of the frame, the edges dissolving into dark mist. Wet petrol-blue night light with glowing magenta and electric cyan neon reflections on rain-soaked concrete, an acid yellow accent glow, drifting steam and thin rain. --v 8.2 --ar 4:3 --no text, letters, signature, watermark, logo, frame, border
+```
+
+**Video (Animate → Manual)**
+
+```text
+Static camera and a seamless ambient loop: the subject keeps the same pose and position, with only subtle living movement, slow and calm. The subdermal lines pulse, the fibre optic hair shimmers, the chrome catches flickering neon reflections. --motion low --loop
+```
+
+### Armi · Night City — Zona Rossa
+
+#### Pistola smart
+
+Pistola smart compatta con canna sagomata e linee luminose ciano.  
+File: `assets/arene/cyberpunk/armi/pistola-smart.webp`
+
+**Immagine**
+
+```text
+A compact smart pistol with a sculpted angular barrel, a small targeting module on top and thin glowing cyan lines along the slide. Single game inventory prop in three-quarter view, laid diagonally from lower left to upper right with a generous empty margin, isolated on a plain flat light grey background. Stylized painterly prop concept art with expressive brushwork, faceted planes and a crisp silhouette with a thin dark outline. Lit by an electric cyan neon key light with a magenta rim light and a faint acid yellow glint. --v 8.2 --ar 1:1 --no text, letters, signature, watermark, hands, person, scenery, background objects, cast shadow, frame, border
+```
+
+#### Katana termica
+
+Katana con lama rovente arancione e impugnatura avvolta in cavi.  
+File: `assets/arene/cyberpunk/armi/katana-termica.webp`
+
+**Immagine**
+
+```text
+A katana with a glowing orange heated blade, a tech hilt wrapped in braided cable and a small battery pack at the pommel. Single game inventory prop in three-quarter view, laid diagonally from lower left to upper right with a generous empty margin, isolated on a plain flat light grey background. Stylized painterly prop concept art with expressive brushwork, faceted planes and a crisp silhouette with a thin dark outline. Lit by an electric cyan neon key light with a magenta rim light and a faint acid yellow glint. --v 8.2 --ar 1:1 --no text, letters, signature, watermark, hands, person, scenery, background objects, cast shadow, frame, border
+```
+
+#### Fucile a pompa da strada
+
+Fucile a pompa a canne segate coperto di adesivi delle gang.  
+File: `assets/arene/cyberpunk/armi/fucile-a-pompa-da-strada.webp`
+
+**Immagine**
+
+```text
+A sawed-off pump shotgun with a scratched black body covered in faded gang stickers and a strip of tape around the grip. Single game inventory prop in three-quarter view, laid diagonally from lower left to upper right with a generous empty margin, isolated on a plain flat light grey background. Stylized painterly prop concept art with expressive brushwork, faceted planes and a crisp silhouette with a thin dark outline. Lit by an electric cyan neon key light with a magenta rim light and a faint acid yellow glint. --v 8.2 --ar 1:1 --no text, letters, signature, watermark, hands, person, scenery, background objects, cast shadow, frame, border
+```
+
+#### Mazza da baseball chiodata
+
+Mazza da baseball di legno con chiodi conficcati e nastro all'impugnatura.  
+File: `assets/arene/cyberpunk/armi/mazza-da-baseball-chiodata.webp`
+
+**Immagine**
+
+```text
+A wooden baseball bat studded with long nails near the tip, the handle wrapped in worn neon pink grip tape. Single game inventory prop in three-quarter view, laid diagonally from lower left to upper right with a generous empty margin, isolated on a plain flat light grey background. Stylized painterly prop concept art with expressive brushwork, faceted planes and a crisp silhouette with a thin dark outline. Lit by an electric cyan neon key light with a magenta rim light and a faint acid yellow glint. --v 8.2 --ar 1:1 --no text, letters, signature, watermark, hands, person, scenery, background objects, cast shadow, frame, border
+```
+
+#### Pistola a rotaia artigianale
+
+Pistola a rotaia assemblata a mano con bobine scoperte e cavi.  
+File: `assets/arene/cyberpunk/armi/pistola-a-rotaia-artigianale.webp`
+
+**Immagine**
+
+```text
+A handmade rail pistol assembled from mismatched parts, with exposed copper coils along the barrel, loose cables and a glowing capacitor. Single game inventory prop in three-quarter view, laid diagonally from lower left to upper right with a generous empty margin, isolated on a plain flat light grey background. Stylized painterly prop concept art with expressive brushwork, faceted planes and a crisp silhouette with a thin dark outline. Lit by an electric cyan neon key light with a magenta rim light and a faint acid yellow glint. --v 8.2 --ar 1:1 --no text, letters, signature, watermark, hands, person, scenery, background objects, cast shadow, frame, border
+```
+
+#### Taser da buttafuori
+
+Taser da buttafuori con due elettrodi e una scarica azzurra.  
+File: `assets/arene/cyberpunk/armi/taser-da-buttafuori.webp`
+
+**Immagine**
+
+```text
+A bulky bouncer stun gun with two metal prongs crackling with a small arc of blue electricity and a rubber grip. Single game inventory prop in three-quarter view, laid diagonally from lower left to upper right with a generous empty margin, isolated on a plain flat light grey background. Stylized painterly prop concept art with expressive brushwork, faceted planes and a crisp silhouette with a thin dark outline. Lit by an electric cyan neon key light with a magenta rim light and a faint acid yellow glint. --v 8.2 --ar 1:1 --no text, letters, signature, watermark, hands, person, scenery, background objects, cast shadow, frame, border
+```
+
+#### Mitra compatto
+
+Mitra compatto con caricatore lungo e mirino olografico.  
+File: `assets/arene/cyberpunk/armi/mitra-compatto.webp`
+
+**Immagine**
+
+```text
+A compact submachine gun with a long curved magazine, a folding stock and a small holographic sight glowing magenta. Single game inventory prop in three-quarter view, laid diagonally from lower left to upper right with a generous empty margin, isolated on a plain flat light grey background. Stylized painterly prop concept art with expressive brushwork, faceted planes and a crisp silhouette with a thin dark outline. Lit by an electric cyan neon key light with a magenta rim light and a faint acid yellow glint. --v 8.2 --ar 1:1 --no text, letters, signature, watermark, hands, person, scenery, background objects, cast shadow, frame, border
 ```
