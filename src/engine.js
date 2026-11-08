@@ -388,7 +388,11 @@
   const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   const cap = (s) => s.charAt(0).toUpperCase() + s.slice(1);
   const edFix = (s) => s.replace(/(^|[ («])([Ee]) ((?:<b[^>]*>)?)(?=[Ee][^\s])/g, (_, pre, p, tag) => pre + p + 'd ' + tag)
-    .replace(/(^|[ («])([Aa]) ((?:<b[^>]*>)?)(?=[AÀaà][^\s'’])/g, (_, pre, p, tag) => pre + p + 'd ' + tag);
+    .replace(/(^|[ («])([Aa]) ((?:<b[^>]*>)?)(?=[AÀaà][^\s'’])/g, (_, pre, p, tag) => pre + p + 'd ' + tag)
+    // «un pezzo di {cibo}» con «delle gallette» diventerebbe «un pezzo di delle gallette»:
+    // dopo «di» l'articolo partitivo dei lessici cade («un pezzo di gallette», «in cambio di pesce secco»)
+    .replace(/(^|[\s(«])([Dd]i) (?:dello|della|degli|delle|del|dei) /g, '$1$2 ')
+    .replace(/(^|[\s(«])([Dd]i) dell(?:['’]|&#39;)/g, '$1$2 ');
   const nameTag = (t) => '<b class="nm" data-id="' + esc(t.id) + '" style="--c:' + esc(t.color || '#888') + '">' + esc(t.name) + '</b>';
 
   /* ---------------- Simulazione ---------------- */
