@@ -599,7 +599,7 @@
   let homeTimer = null, demo = null, demoI = 0, demoPending = false;
   function renderHome() {
     if (typeof studio !== 'undefined' && studio) studio.renderSeasons();
-    $('#facts').innerHTML = [[COUNTS.events, 'modelli di evento, più ' + COUNTS.adultEvents + ' per adulti'], [COUNTS.disasters, 'disastri, più ' + COUNTS.adultDisasters + ' per adulti'], [D.themes.length, 'arene da esplorare'], [D.traits.length + ' · ' + D.attrs.length, 'tratti e caratteristiche che cambiano la storia']]
+    $('#facts').innerHTML = [[COUNTS.written != null ? COUNTS.written : COUNTS.events, 'eventi scritti a mano, più ' + COUNTS.adultEvents + ' per adulti' + (COUNTS.combined ? ' e ' + COUNTS.combined + ' combinati dai luoghi' : '')], [COUNTS.disasters, 'disastri, più ' + COUNTS.adultDisasters + ' per adulti'], [D.themes.length, 'arene da esplorare'], [D.traits.length + ' · ' + D.attrs.length, 'tratti e caratteristiche che cambiano la storia']]
       .map(([n, l]) => '<div class="fact"><b>' + n + '</b><span>' + l + '</span></div>').join('');
     $('#arenaStrip').innerHTML = D.themes.map((t) => posterHTML(t, false, 'a')).join('');
     const r = $('#resume');
@@ -1360,7 +1360,7 @@
 
   /* =============== ARENA =============== */
   function renderArena() {
-    $('#arenaSub').textContent = 'Ogni arena ha luoghi, armi, pericoli e disastri propri. In tutto ' + COUNTS.events + ' modelli di evento e ' + COUNTS.disasters + ' disastri, più quelli che scrivi tu.';
+    $('#arenaSub').textContent = 'Ogni arena ha luoghi, armi, pericoli e disastri propri. In tutto ' + (COUNTS.written != null ? COUNTS.written : COUNTS.events) + ' eventi scritti a mano' + (COUNTS.combined ? ' (più ' + COUNTS.combined + ' combinati dai luoghi del mondo)' : '') + ' e ' + COUNTS.disasters + ' disastri, più quelli che scrivi tu.';
     $('#themeList').innerHTML = D.themes.map((t) => posterHTML(t, S.settings.theme === t.id)).join('');
     radioFocus($('#themeList'));
     AN.tilt($('#themeList'), '.poster-card');
@@ -1395,7 +1395,8 @@
     $('#arenaPreview').innerHTML =
       '<header class="dx-hero"><div class="apv-banner" aria-hidden="true">' + ART.scene(t.id) + '</div>' +
         '<div class="dx-title"><span class="dx-kicker">Guida all\'arena</span><h2>' + esc(t.name) + '</h2><p>' + esc(t.tag) + '</p>' + (t.soft ? '<span class="dx-soft">Nessuno muore: si esce dai giochi</span>' : '') + '</div></header>' +
-      '<div class="dx-stats">' + stat(pt.events + (adult ? pt.adultEvents : 0), 'Eventi') + stat(pt.disasters + (adult ? pt.adultDisasters : 0), 'Disastri') + stat(window.LOS_GEOGRAPHY.describe(t,A).length, 'Zone') + stat((A.meteo || []).length, 'Tipi di meteo') + '</div>' +
+      '<div class="dx-stats">' + stat((pt.written != null ? pt.written : pt.events) + (adult ? pt.adultEvents : 0), 'Eventi scritti') + stat(pt.disasters + (adult ? pt.adultDisasters : 0), 'Disastri') + stat(window.LOS_GEOGRAPHY.describe(t,A).length, 'Zone') + stat((A.meteo || []).length, 'Tipi di meteo') + '</div>' +
+      (pt.written != null ? '<p class="help dx-count">Eventi scritti a mano: ' + pt.own + ' solo per quest’arena, ' + (pt.written - pt.own) + ' condivisi con altre arene' + (adult && pt.adultEvents ? ', più ' + pt.adultEvents + ' per adulti' : '') + '. In più, ' + pt.combined + ' eventi nascono combinando ' + ((pt.world && pt.world.scenes) || 30) + ' luoghi descritti a mano con frasi-tipo comuni a tutte le arene.</p>' : '') +
       '<nav class="dx-nav" role="tablist" aria-label="Capitoli della guida">' + CHAPTERS.map(([k, l]) => '<button type="button" role="tab" id="dxt-' + k + '" data-dx="' + k + '" aria-controls="dxp-' + k + '" aria-selected="' + (dxCh === k) + '" tabindex="' + (dxCh === k ? 0 : -1) + '">' + chIcon(k) + '<span>' + l + '</span></button>').join('') + '</nav>' +
       CHAPTERS.map(([k]) => '<section class="dx-panel" role="tabpanel" id="dxp-' + k + '" aria-labelledby="dxt-' + k + '"' + (dxCh === k ? '' : ' hidden') + '>' + (dxCh === k ? chapter(k, t) : '') + '</section>').join('');
     AN.field($('#arenaPreview .apv-banner'), t.id, { intensity: 1.2 });

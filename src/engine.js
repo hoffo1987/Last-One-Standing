@@ -309,7 +309,7 @@
     const cnt = (s) => (s ? s.split('\n').filter((l) => l.trim() && !l.trim().startsWith('#') && l.includes('|')).length : 0);
     const cntDis = (s) => (s ? s.split('\n').filter((l) => l.trim() && !l.trim().startsWith('#')).length : 0);
     const perTheme = {};
-    let events = 0, disasters = 0, adultEvents = 0, adultDis = 0, outcomes = 0;
+    let events = 0, disasters = 0, adultEvents = 0, adultDis = 0, outcomes = 0, combined = 0;
     const seen = new Set();
     const add = (key, n, isDis, adult) => {
       if (seen.has(key)) return; seen.add(key);
@@ -329,19 +329,21 @@
       add('td' + t.id, (t.disasters || []).length, true);
       add('md' + t.id, cntDis(more.dis), true);
       // conteggio per arena (quello che quella partita può usare)
-      let e = 0, d = (t.disasters || []).length + cntDis(more.dis), ea = 0, da = 0;
-      if (t.soft) PHASES.forEach((k) => (e += cnt(t.pool[k])));
-      else { PHASES.forEach((k) => (e += cnt(D.core[k]) + cnt((D.coreExtra || {})[k]))); if (t.extra) Object.values(t.extra).forEach((s) => (e += cnt(s))); }
-      if (more.extra) Object.values(more.extra).forEach((s) => (e += cnt(s)));
+      // e: tutte le righe scritte a mano usabili nell'arena; own: solo quelle scritte per quest'arena
+      let e = 0, own = 0, d = (t.disasters || []).length + cntDis(more.dis), ea = 0, da = 0;
+      if (t.soft) PHASES.forEach((k) => { const c = cnt(t.pool[k]); e += c; own += c; });
+      else { PHASES.forEach((k) => (e += cnt(D.core[k]) + cnt((D.coreExtra || {})[k]))); if (t.extra) Object.values(t.extra).forEach((s) => { const c = cnt(s); e += c; own += c; }); }
+      if (more.extra) Object.values(more.extra).forEach((s) => { const c = cnt(s); e += c; own += c; });
       packsFor(t, true).forEach((pk) => {
         let pe = 0; PHASES.forEach((k) => (pe += cnt((pk.ev || {})[k])));
-        if (pk.adult) { ea += pe; da += cntDis(pk.dis); } else { e += pe; d += cntDis(pk.dis); }
+        if (pk.adult) { ea += pe; da += cntDis(pk.dis); } else { e += pe; d += cntDis(pk.dis); if (pk.theme === t.id) own += pe; }
       });
       const world=D.world?.compile(t),extra=world?world.counts.events+world.counts.traits+world.counts.trials+world.counts.deaths:0;
-      if(world){events+=extra;disasters+=world.counts.disasters;outcomes+=world.counts.disasters*3;}
-      perTheme[t.id] = { events: e+extra, disasters: d+(world?.counts.disasters||0), adultEvents: ea, adultDisasters: da, ...(world?{world:world.counts}:{}) };
+      if(world){events+=extra;combined+=extra;disasters+=world.counts.disasters;outcomes+=world.counts.disasters*3;}
+      perTheme[t.id] = { events: e+extra, written: e, own, combined: extra, disasters: d+(world?.counts.disasters||0), adultEvents: ea, adultDisasters: da, ...(world?{world:world.counts}:{}) };
     });
-    return { events, disasters, adultEvents, adultDisasters: adultDis, outcomes, themes: D.themes.length, perTheme };
+    // written: righe scritte a mano; combined: eventi nati dai luoghi del mondo per frasi-tipo comuni
+    return { events, written: events - combined, combined, disasters, adultEvents, adultDisasters: adultDis, outcomes, themes: D.themes.length, perTheme };
   }
 
   /* ---------------- Grammatica ---------------- */
