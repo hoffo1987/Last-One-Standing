@@ -542,7 +542,19 @@
   const nTeams = () => new Set(S.cast.map((t) => t.team)).size;
   const plural = (n, s, p) => n + ' ' + (n === 1 ? s : p);
   // tinta e attributo dell'arena (data-arena; data-theme resta per chiaro/scuro). Segue l'arena della partita aperta, anche nei replay.
-  function setHue(id) { const t = THEMES[id]; if (t) { document.documentElement.style.setProperty('--h', t.hue); document.documentElement.dataset.arena = t.id; } }
+  // l'atmosfera dipinta: dietro tutto il sito c'è il banner dell'arena attiva (in home la panoramica),
+  // sfocato e velato; cambia con una dissolvenza tra due livelli
+  let atmoSrc = '', atmoFlip = 0;
+  function setAtmo(src) {
+    if (!src || src === atmoSrc) return;
+    const layers = document.querySelectorAll('#atmo .atmo-l'); if (layers.length < 2) return;
+    atmoSrc = src; atmoFlip = 1 - atmoFlip;
+    const on = layers[atmoFlip], off = layers[1 - atmoFlip];
+    on.style.backgroundImage = 'url("' + src.replace(/"/g, '%22') + '")';
+    on.classList.add('on'); off.classList.remove('on');
+  }
+  const arenaArt = (id) => (ART.assets.arene && ART.assets.arene[id]) || (ART.sceneDataUri ? ART.sceneDataUri(id) : '');
+  function setHue(id) { const t = THEMES[id]; if (t) { document.documentElement.style.setProperty('--h', t.hue); document.documentElement.dataset.arena = t.id; setAtmo(arenaArt(t.id)); } }
 
   /* ---------------- tema chiaro/scuro ---------------- */
   function applyUi() { if (S.ui) document.documentElement.dataset.theme = S.ui; else delete document.documentElement.dataset.theme; }
@@ -582,7 +594,7 @@
     $('#liveDot').hidden = !SIM;
     if (v !== 'diretta') stopPlay();
     if (v !== 'home') stopHomeLoop();
-    if (v === 'home' && ART.assets.logo) { document.documentElement.style.setProperty('--h', 162); delete document.documentElement.dataset.arena; }
+    if (v === 'home' && ART.assets.logo) { document.documentElement.style.setProperty('--h', 162); delete document.documentElement.dataset.arena; setAtmo(ART.assets.panoramica || arenaArt(S.settings.theme)); }
     else setHue((v === 'diretta' || v === 'esito') && SIM ? SIM.theme : S.settings.theme);
     if (v === 'home') renderHome();
     if (v === 'cast') { renderCast(); if (changed) playEntrance('castenter'); }

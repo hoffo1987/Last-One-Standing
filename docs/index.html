@@ -214,7 +214,7 @@ main { padding-bottom: 120px; }
 .poster-card .pmeta { font-family: var(--f-body); font-variant-numeric: tabular-nums; font-size: 12.5px; color: rgba(255,255,255,.7); position: relative; }
 .poster-card .ptag-old { position: absolute; top: 12px; left: 12px; font-family: var(--f-body); font-variant-numeric: tabular-nums; font-size: 12.5px; background: rgba(0,0,0,.35); border-radius: 5px; padding: 2px 6px; }
 .poster-card .pcheck { position: absolute; top: 12px; right: 12px; width: 28px; height: 28px; border-radius: 50%; background: #fff; color: hsl(var(--ph) 60% 25%); display: none; place-items: center; font-weight: 900; }
-.poster-card[aria-checked="true"] { box-shadow: 0 0 0 3px var(--panel), 0 0 0 6px hsl(var(--ph) 85% 55%); }
+.poster-card[aria-checked="true"] { box-shadow: 0 0 0 3px var(--panel-solid), 0 0 0 6px hsl(var(--ph) 85% 55%); }
 .poster-card[aria-checked="true"] .pcheck { display: grid; }
 
 /* ---------- concorrenti ---------- */
@@ -266,14 +266,14 @@ main { padding-bottom: 120px; }
 .dockin > span b { color: var(--ink); font-family: var(--f-display); font-size: 19px; }
 
 /* avatar */
-.av { --s: 44px; width: var(--s); height: var(--s); border-radius: 50%; flex: none; display: grid; place-items: center; background: var(--c, #888); color: #fff; font-family: var(--f-display); font-weight: 800; font-size: calc(var(--s) * .4); overflow: hidden; position: relative; text-shadow: 0 1px 1px rgba(0,0,0,.25); box-shadow: 0 0 0 2px var(--panel); }
+.av { --s: 44px; width: var(--s); height: var(--s); border-radius: 50%; flex: none; display: grid; place-items: center; background: var(--c, #888); color: #fff; font-family: var(--f-display); font-weight: 800; font-size: calc(var(--s) * .4); overflow: hidden; position: relative; text-shadow: 0 1px 1px rgba(0,0,0,.25); box-shadow: 0 0 0 2px var(--panel-solid); }
 .av img { width: 100%; height: 100%; object-fit: cover; }
 .av.dead { background: var(--panel-2); color: var(--muted); text-shadow: none; box-shadow: inset 0 0 0 1.5px var(--line); }
 .av.dead img { filter: grayscale(1); opacity: .45; }
 .av.dead::after { content: ""; position: absolute; inset: 0; background: linear-gradient(135deg, transparent 46.5%, var(--dead) 46.5%, var(--dead) 53.5%, transparent 53.5%); }
 button.av, .avbtn { cursor: pointer; border: 0; padding: 0; }
 .avbtn { background: none; border-radius: 50%; position: relative; }
-.avbtn .cam { position: absolute; right: -3px; bottom: -3px; width: 20px; height: 20px; border-radius: 50%; background: var(--ink); color: var(--bg); display: grid; place-items: center; box-shadow: 0 0 0 2px var(--panel); }
+.avbtn .cam { position: absolute; right: -3px; bottom: -3px; width: 20px; height: 20px; border-radius: 50%; background: var(--ink); color: var(--bg); display: grid; place-items: center; box-shadow: 0 0 0 2px var(--panel-solid); }
 .avbtn .cam svg { width: 11px; height: 11px; }
 .nm { font-weight: 700; color: var(--ink); background: none; border: 0; padding: 0; cursor: pointer; text-decoration: underline; text-decoration-color: color-mix(in srgb, var(--c) 70%, transparent); text-decoration-thickness: 3px; text-underline-offset: 3px; font: inherit; font-weight: 700; }
 .nm:hover { text-decoration-color: var(--c); }
@@ -754,7 +754,7 @@ img.scene { object-fit: cover; object-position: center; user-select: none; }
 .poster-card .pscene::after { content: ""; position: absolute; inset: 0; background: radial-gradient(circle at var(--gx, 50%) var(--gy, 0%), rgba(255,255,255,.28), transparent 45%); opacity: 0; transition: opacity .3s; }
 .poster-card.tilting .pscene::after { opacity: 1; }
 .poster-card[aria-checked="true"] { animation: selGlow 2.4s ease-in-out infinite; }
-@keyframes selGlow { 50% { box-shadow: 0 0 0 3px var(--panel), 0 0 0 6px hsl(var(--ph) 85% 55%), 0 0 30px 4px hsl(var(--ph) 85% 55% / .5); } }
+@keyframes selGlow { 50% { box-shadow: 0 0 0 3px var(--panel-solid), 0 0 0 6px hsl(var(--ph) 85% 55%), 0 0 30px 4px hsl(var(--ph) 85% 55% / .5); } }
 .poster-card .picon { transition: transform .4s cubic-bezier(.2,.9,.3,1.4); }
 .poster-card:hover .picon { transform: rotate(-10deg) scale(1.12); }
 .arenapreview.swap .apv-banner img.scene { animation: bannerIn .8s cubic-bezier(.2,.7,.3,1); }
@@ -1049,7 +1049,7 @@ img.scene { object-fit: cover; object-position: center; user-select: none; }
 .net.focus .edge { opacity: .08; }
 .net.focus .edge.on { opacity: 1; }
 .net .node { cursor: pointer; outline: none; }
-.net .node circle { stroke: var(--panel); stroke-width: 2.5; transition: r .2s; }
+.net .node circle { stroke: var(--panel-solid); stroke-width: 2.5; transition: r .2s; }
 .net .node text { font: 700 8.5px var(--f-mono); fill: #fff; text-anchor: middle; pointer-events: none; text-shadow: 0 1px 2px rgba(0,0,0,.6); }
 .net .node:hover circle, .net .node.on circle, .net .node:focus-visible circle { stroke: var(--ink); }
 .e-love { --ec2: #e0559a; } .e-friend { --ec2: #2f9e6a; } .e-ally { --ec2: #4f7fd6; } .e-hate { --ec2: #d94a3a; } .e-fear { --ec2: #8a5bd6; } .e-rival { --ec2: #e08a2b; } .e-plot { --ec2: #7a6a9a; }
@@ -1155,8 +1155,8 @@ img.scene { object-fit: cover; object-position: center; user-select: none; }
 .tile .tnum::before { content: "#"; opacity: .6; }
 .tile .grip { top: 9px; right: 6px; }
 .tile .thead { gap: 12px; padding-right: 44px; }
-.tile .avbtn .av { --s: 56px; box-shadow: 0 0 0 2px var(--panel), 0 0 0 4px color-mix(in srgb, var(--c) 75%, transparent); transition: transform .3s cubic-bezier(.2,.9,.3,1.4), box-shadow .3s; }
-.tile .avbtn:hover .av, .tile .avbtn:focus-visible .av { transform: scale(1.06) rotate(-2deg); box-shadow: 0 0 0 2px var(--panel), 0 0 0 5px var(--c); }
+.tile .avbtn .av { --s: 56px; box-shadow: 0 0 0 2px var(--panel-solid), 0 0 0 4px color-mix(in srgb, var(--c) 75%, transparent); transition: transform .3s cubic-bezier(.2,.9,.3,1.4), box-shadow .3s; }
+.tile .avbtn:hover .av, .tile .avbtn:focus-visible .av { transform: scale(1.06) rotate(-2deg); box-shadow: 0 0 0 2px var(--panel-solid), 0 0 0 5px var(--c); }
 .tile .avbtn .cam { opacity: .9; transition: transform .25s, opacity .25s; }
 .tile .avbtn:hover .cam { transform: scale(1.15); opacity: 1; }
 .tile .tid { min-width: 0; flex: 1; display: grid; gap: 3px; }
@@ -1238,7 +1238,7 @@ img.scene { object-fit: cover; object-position: center; user-select: none; }
 .toast .tact { border: 0; background: color-mix(in srgb, var(--bg) 18%, transparent); color: inherit; font: inherit; font-weight: 800; font-size: 13px; padding: 6px 12px; border-radius: 999px; cursor: pointer; }
 .toast .tact:hover { background: color-mix(in srgb, var(--bg) 30%, transparent); }
 /* scheda di modifica */
-.edhead .avbtn .av { --s: 76px; box-shadow: 0 0 0 3px var(--panel), 0 0 0 6px color-mix(in srgb, var(--c) 75%, transparent); }
+.edhead .avbtn .av { --s: 76px; box-shadow: 0 0 0 3px var(--panel-solid), 0 0 0 6px color-mix(in srgb, var(--c) 75%, transparent); }
 .edhead .ps { gap: 6px; }
 .edmeta { font-family: var(--f-body); font-variant-numeric: tabular-nums; font-size: 13px; color: var(--muted); }
 .edprof { font-size: 14px; color: var(--muted); } .edprof b { color: var(--ink); }
@@ -1247,7 +1247,7 @@ img.scene { object-fit: cover; object-position: center; user-select: none; }
 .radar .rg polygon, .radar .rg line { fill: none; stroke: var(--line); stroke-width: 1; }
 .radar .rg text { font: 600 8.5px var(--f-mono); fill: var(--muted); text-anchor: middle; }
 .radar .rv { fill: color-mix(in srgb, var(--accent) 24%, transparent); stroke: var(--accent); stroke-width: 2; stroke-linejoin: round; }
-.radar .rp { fill: var(--accent); stroke: var(--panel); stroke-width: 1.5; }
+.radar .rp { fill: var(--accent); stroke: var(--panel-solid); stroke-width: 1.5; }
 .presets { display: flex; flex-wrap: wrap; gap: 6px; align-content: flex-start; }
 .presets .help { width: 100%; }
 .attrgrid input[type="range"] { accent-color: var(--accent); }
@@ -1928,7 +1928,7 @@ details.card > summary { font-size: 16px; }
 .net .edge.on { opacity: 1; }
 .net.focus .edge:not(.on):not(.faded) { opacity: .15; }
 .net .node { cursor: pointer; transition: opacity .25s; }
-.net .node circle { stroke: var(--panel); stroke-width: 2.5; transition: stroke .2s, stroke-width .2s; }
+.net .node circle { stroke: var(--panel-solid); stroke-width: 2.5; transition: stroke .2s, stroke-width .2s; }
 .net .node .ini { font: 800 9px var(--f-body); fill: #fff; text-anchor: middle; pointer-events: none; text-shadow: 0 1px 2px rgba(0,0,0,.6); }
 .net .node .nm { font: 700 10.5px var(--f-body); fill: var(--ink); pointer-events: none; }
 .net .node.sel circle { stroke: var(--accent); stroke-width: 4; }
@@ -2045,7 +2045,7 @@ details.card > summary { font-size: 16px; }
 .ev .event-place svg { width: 12px; height: 12px; fill: currentColor; }
 .ev .why { margin: 0; }
 .ev .avs { padding-top: 2px; position: relative; z-index: 1; }
-.ev .avs .av { --s: 42px; box-shadow: 0 0 0 2px var(--panel); }
+.ev .avs .av { --s: 42px; box-shadow: 0 0 0 2px var(--panel-solid); }
 .ev-mark { position: absolute; right: -12px; bottom: -16px; width: 92px; height: 92px; color: var(--cc); opacity: .08; pointer-events: none; z-index: 0; }
 .ev-mark svg { width: 100%; height: 100%; }
 .ev-mark:empty { display: none; }
@@ -2169,9 +2169,9 @@ details.card > summary { font-size: 16px; }
 /* intestazione */
 .pf-hero { position: relative; display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 16px; align-items: center; padding: 18px; border-radius: 18px; overflow: hidden; isolation: isolate;
   background: radial-gradient(120% 140% at 0% 0%, color-mix(in srgb, var(--tc) 30%, transparent), transparent 60%), linear-gradient(160deg, color-mix(in srgb, var(--tc) 12%, var(--panel)), var(--panel-2)); border: 1px solid color-mix(in srgb, var(--tc) 35%, var(--line)); }
-.pf-hero > .av { --s: 104px; font-size: 38px; box-shadow: 0 0 0 3px var(--panel), 0 0 0 6px var(--tc), 0 14px 30px -14px var(--tc); }
-.pf-hero.s-dead > .av { box-shadow: 0 0 0 3px var(--panel), 0 0 0 6px var(--dead); }
-.pf-hero.s-win > .av { box-shadow: 0 0 0 3px var(--panel), 0 0 0 6px #e3b341, 0 14px 34px -10px #e3b341; }
+.pf-hero > .av { --s: 104px; font-size: 38px; box-shadow: 0 0 0 3px var(--panel-solid), 0 0 0 6px var(--tc), 0 14px 30px -14px var(--tc); }
+.pf-hero.s-dead > .av { box-shadow: 0 0 0 3px var(--panel-solid), 0 0 0 6px var(--dead); }
+.pf-hero.s-win > .av { box-shadow: 0 0 0 3px var(--panel-solid), 0 0 0 6px #e3b341, 0 14px 34px -10px #e3b341; }
 .pf-id { display: grid; gap: 8px; min-width: 0; justify-items: start; }
 .pf-status { display: inline-flex; align-items: center; gap: 6px; font-weight: 800; font-size: 13.5px; padding: 5px 11px; border-radius: 999px; background: color-mix(in srgb, var(--alive) 16%, var(--panel)); color: color-mix(in srgb, var(--alive) 75%, var(--ink)); }
 .pf-status::before { content: ''; width: 8px; height: 8px; border-radius: 50%; background: currentColor; }
@@ -2266,7 +2266,7 @@ details.card > summary { font-size: 16px; }
 .pf-day { position: sticky; top: 112px; z-index: 1; justify-self: start; font-weight: 800; font-size: 13px; padding: 4px 10px; border-radius: 999px; background: var(--panel); border: 1px solid var(--line); box-shadow: 0 2px 8px -4px rgb(0 0 0 / .3); }
 .pf-chron ul { list-style: none; margin: 0 0 0 10px; padding: 0 0 0 14px; border-left: 2px solid var(--line); display: grid; gap: 8px; }
 .pf-ev { position: relative; padding: 9px 12px; border-radius: 12px; background: var(--panel-2); border-left: 3px solid var(--cc); }
-.pf-ev::before { content: ''; position: absolute; left: -21px; top: 14px; width: 10px; height: 10px; border-radius: 50%; background: var(--cc); box-shadow: 0 0 0 3px var(--panel); }
+.pf-ev::before { content: ''; position: absolute; left: -21px; top: 14px; width: 10px; height: 10px; border-radius: 50%; background: var(--cc); box-shadow: 0 0 0 3px var(--panel-solid); }
 .pf-when { display: block; font-size: 12.5px; font-weight: 700; color: var(--muted); margin-bottom: 3px; }
 .pf-ev p { margin: 0; font-size: 14.5px; line-height: 1.45; }
 
@@ -2281,9 +2281,9 @@ details.card > summary { font-size: 16px; }
 
 @media (max-width: 560px) {
   .pf-hero { gap: 14px; padding: 14px; border-radius: 16px; }
-  .pf-hero > .av { --s: 72px; font-size: 26px; box-shadow: 0 0 0 2px var(--panel), 0 0 0 4px var(--tc); }
-  .pf-hero.s-dead > .av { box-shadow: 0 0 0 2px var(--panel), 0 0 0 4px var(--dead); }
-  .pf-hero.s-win > .av { box-shadow: 0 0 0 2px var(--panel), 0 0 0 4px #e3b341; }
+  .pf-hero > .av { --s: 72px; font-size: 26px; box-shadow: 0 0 0 2px var(--panel-solid), 0 0 0 4px var(--tc); }
+  .pf-hero.s-dead > .av { box-shadow: 0 0 0 2px var(--panel-solid), 0 0 0 4px var(--dead); }
+  .pf-hero.s-win > .av { box-shadow: 0 0 0 2px var(--panel-solid), 0 0 0 4px #e3b341; }
   .pf-id { gap: 6px; }
   .pf-status { font-size: 12.5px; padding: 4px 9px; }
   .pf-team { font-size: 14px; }
@@ -2352,7 +2352,143 @@ details.card > summary { font-size: 16px; }
 }
 @media (prefers-reduced-motion: reduce) { :root[data-arena="cyberpunk"] .broadcast[data-kind="dis"] .bc-title h1 { animation: none; } }
 [data-reduced-motion][data-arena="cyberpunk"] .broadcast[data-kind="dis"] .bc-title h1 { animation: none; }
+
+/* =====================================================================
+ * ATMOSFERA DIPINTA
+ * Le immagini delle arene sono dipinti pieni di luce e materia: il sito intorno
+ * non deve sembrare un modulo piatto appoggiato sopra. Quindi:
+ *  1. dietro tutto c'è il banner dell'arena attiva, sfocato e velato (#atmo);
+ *  2. i pannelli diventano lastre traslucide con un filo di luce sul bordo;
+ *  3. una grana pittorica leggerissima unifica foto, interfaccia e illustrazioni;
+ *  4. titoli con una pennellata d'accento, profondità e bagliori nel colore dell'arena.
+ * ===================================================================== */
+:root {
+  --panel-solid: hsl(var(--h) 30% 99%);
+  --panel: hsl(var(--h) 40% 99% / .8);
+  --panel-2: hsl(var(--h) 26% 93% / .74);
+  --line: hsl(var(--h) 30% 25% / .13);
+  --bg: hsl(var(--h) 22% 93%);
+  --sheen: inset 0 1px 0 hsl(0 0% 100% / .7), inset 0 0 0 1px hsl(0 0% 100% / .25);
+  --edge: linear-gradient(160deg, hsl(var(--h) 60% 50% / .35), hsl(var(--h) 30% 40% / .08) 45%, hsl(var(--h) 60% 45% / .22));
+  --depth: 0 1px 1px hsl(var(--h) 40% 15% / .06), 0 10px 26px -12px hsl(var(--h) 45% 18% / .28), 0 30px 60px -30px hsl(var(--h) 50% 15% / .25);
+  --atmo-veil: linear-gradient(180deg, hsl(var(--h) 45% 97% / .72) 0%, hsl(var(--h) 30% 95% / .86) 55%, hsl(var(--h) 25% 93% / .93) 100%);
+  --atmo-filter: blur(26px) saturate(1.15) brightness(1.08);
+  --grain-op: .045;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --panel-solid: hsl(var(--h) 16% 10.5%);
+    --panel: hsl(var(--h) 24% 8.5% / .74);
+    --panel-2: hsl(var(--h) 20% 14% / .66);
+    --line: hsl(var(--h) 45% 75% / .11);
+    --bg: hsl(var(--h) 26% 5%);
+    --sheen: inset 0 1px 0 hsl(var(--h) 60% 85% / .07), inset 0 0 0 1px hsl(var(--h) 50% 70% / .025);
+    --edge: linear-gradient(160deg, hsl(var(--h) 80% 70% / .32), hsl(var(--h) 40% 60% / .05) 42%, hsl(var(--h) 70% 55% / .18));
+    --depth: 0 1px 1px rgba(0,0,0,.35), 0 14px 32px -14px rgba(0,0,0,.65), 0 34px 70px -34px hsl(var(--h) 70% 30% / .35);
+    --atmo-veil: radial-gradient(ellipse 120% 70% at 50% -10%, hsl(var(--h) 40% 8% / .25), hsl(var(--h) 35% 5% / .72) 65%), linear-gradient(180deg, hsl(var(--h) 35% 5% / .25), hsl(var(--h) 35% 4% / .78));
+    --atmo-filter: blur(24px) saturate(1.35) brightness(.62);
+    --grain-op: .07;
+  }
+}
+:root[data-theme="dark"] {
+  --panel-solid: hsl(var(--h) 16% 10.5%);
+  --panel: hsl(var(--h) 24% 8.5% / .74);
+  --panel-2: hsl(var(--h) 20% 14% / .66);
+  --line: hsl(var(--h) 45% 75% / .11);
+  --bg: hsl(var(--h) 26% 5%);
+  --sheen: inset 0 1px 0 hsl(var(--h) 60% 85% / .07), inset 0 0 0 1px hsl(var(--h) 50% 70% / .025);
+  --edge: linear-gradient(160deg, hsl(var(--h) 80% 70% / .32), hsl(var(--h) 40% 60% / .05) 42%, hsl(var(--h) 70% 55% / .18));
+  --depth: 0 1px 1px rgba(0,0,0,.35), 0 14px 32px -14px rgba(0,0,0,.65), 0 34px 70px -34px hsl(var(--h) 70% 30% / .35);
+  --atmo-veil: radial-gradient(ellipse 120% 70% at 50% -10%, hsl(var(--h) 40% 8% / .25), hsl(var(--h) 35% 5% / .72) 65%), linear-gradient(180deg, hsl(var(--h) 35% 5% / .25), hsl(var(--h) 35% 4% / .78));
+  --atmo-filter: blur(24px) saturate(1.35) brightness(.62);
+  --grain-op: .07;
+}
+
+/* 1. lo strato dipinto: due livelli che si danno il cambio con una dissolvenza */
+html { background: var(--bg); }
+body { background: transparent; }
+#atmo { position: fixed; inset: 0; z-index: -1; pointer-events: none; overflow: hidden; background: var(--bg); }
+#atmo .atmo-l { position: absolute; inset: -6%; background-size: cover; background-position: center 38%; filter: var(--atmo-filter); transform: scale(1.08); opacity: 0; transition: opacity 1.4s ease, filter .6s; }
+#atmo .atmo-l.on { opacity: 1; animation: atmoDrift 60s ease-in-out infinite alternate; }
+#atmo::after { content: ""; position: absolute; inset: 0; background: var(--atmo-veil); }
+/* una lama di luce nel colore dell'arena, come una sorgente fuori campo */
+#atmo::before { content: ""; position: absolute; inset: 0; z-index: 1; background: radial-gradient(ellipse 50% 40% at 12% 0%, hsl(var(--h) 90% 60% / .14), transparent 70%), radial-gradient(ellipse 40% 35% at 95% 100%, hsl(var(--h) 80% 50% / .1), transparent 70%); mix-blend-mode: screen; }
+@keyframes atmoDrift { from { transform: scale(1.08) translate3d(-1%, -.6%, 0); } to { transform: scale(1.14) translate3d(1%, .8%, 0); } }
+
+/* 3. grana pittorica su tutto: lega foto, illustrazioni e interfaccia nella stessa materia */
+html::after { content: ""; position: fixed; inset: 0; z-index: 90; pointer-events: none; opacity: var(--grain-op); mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.82' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .5 0 0 0 0 .5 0 0 0 0 .5 0 0 0 1 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); }
+
+/* 2. lastre traslucide: bordo di luce in gradiente, riflesso in alto, profondità */
+.card, .toolbar, .facts, .arenapreview, .ovstats, .rstats, .story2, .nowcard, .rules, .rteam, .pf-day {
+  border: 1px solid transparent;
+  background: linear-gradient(var(--panel), var(--panel)) padding-box, var(--edge) border-box;
+  box-shadow: var(--sheen), var(--depth);
+  -webkit-backdrop-filter: blur(14px) saturate(1.25); backdrop-filter: blur(14px) saturate(1.25);
+}
+.tile { background: radial-gradient(130% 70% at 50% -5%, color-mix(in srgb, var(--c, var(--accent)) 16%, transparent), transparent 62%), var(--panel); box-shadow: var(--sheen), var(--depth); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); }
+.tile:hover { box-shadow: var(--sheen), 0 18px 40px -18px color-mix(in srgb, var(--c, var(--accent)) 75%, transparent), var(--depth); }
+.ev { box-shadow: inset 4px 0 0 var(--cc), var(--sheen), 0 10px 24px -16px rgba(0,0,0,.45); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
+  background: radial-gradient(90% 140% at 0% 0%, color-mix(in srgb, var(--cc) 15%, transparent), transparent 55%), var(--panel); }
+.ev.c-none { box-shadow: inset 4px 0 0 color-mix(in srgb, var(--c-none) 45%, var(--line)), var(--sheen); }
+.zc, .wxc, .dzc, .zcard, .zrow, .mb, .tday, .inv-detail, .ovs, .bitem { box-shadow: var(--sheen), var(--shadow-sm); }
+dialog { background: var(--panel-solid); box-shadow: var(--sheen), 0 40px 90px -30px rgba(0,0,0,.7); }
+.top { background: color-mix(in srgb, var(--panel-solid) 62%, transparent); box-shadow: 0 1px 0 var(--line), 0 18px 40px -30px rgba(0,0,0,.6); -webkit-backdrop-filter: blur(18px) saturate(1.4); backdrop-filter: blur(18px) saturate(1.4); }
+.dock { background: color-mix(in srgb, var(--panel-solid) 70%, transparent); box-shadow: 0 -1px 0 var(--line), 0 -24px 50px -30px rgba(0,0,0,.6); -webkit-backdrop-filter: blur(18px) saturate(1.4); backdrop-filter: blur(18px) saturate(1.4); }
+.btn { background: color-mix(in srgb, var(--panel-solid) 72%, transparent); box-shadow: var(--sheen); }
+.btn:hover { border-color: color-mix(in srgb, var(--accent) 55%, var(--line)); box-shadow: var(--sheen), 0 8px 22px -12px color-mix(in srgb, var(--accent) 70%, transparent); }
+.btn.primary { background: linear-gradient(180deg, color-mix(in srgb, var(--accent) 88%, #fff), var(--accent) 55%, color-mix(in srgb, var(--accent) 85%, #000)); box-shadow: inset 0 1px 0 hsl(0 0% 100% / .35), 0 10px 26px -10px color-mix(in srgb, var(--accent) 80%, transparent); }
+input, select, textarea { background-color: color-mix(in srgb, var(--panel-solid) 80%, transparent); }
+
+/* 4. titoli: più materia, una pennellata d'accento sotto, una luce che li stacca dal fondo */
+.pagehead { position: relative; padding-block: 40px 22px; }
+.pagehead h1 { font-weight: 900; letter-spacing: -.02em; text-shadow: 0 2px 30px hsl(var(--h) 60% 20% / .25); }
+.pagehead h1::after, h2.sec::after { content: ""; display: block; width: min(180px, 40%); height: 12px; margin-top: 10px; background: linear-gradient(90deg, var(--accent), color-mix(in srgb, var(--accent) 40%, transparent));
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 14' preserveAspectRatio='none'%3E%3Cpath d='M2 8C30 3 62 11 98 6s70-4 100 1l-2 5c-34-3-62 2-96 1S24 12 3 12z'/%3E%3C/svg%3E") center / 100% 100% no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 14' preserveAspectRatio='none'%3E%3Cpath d='M2 8C30 3 62 11 98 6s70-4 100 1l-2 5c-34-3-62 2-96 1S24 12 3 12z'/%3E%3C/svg%3E") center / 100% 100% no-repeat; }
+h2.sec::after { width: 110px; height: 9px; margin-top: 8px; }
+.eyebrow { letter-spacing: .08em; text-transform: uppercase; font-size: 12px; font-weight: 700; display: inline-flex; align-items: center; gap: 8px; }
+.eyebrow::before { content: ""; width: 18px; height: 2px; border-radius: 2px; background: currentColor; box-shadow: 0 0 10px currentColor; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .pagehead h1 { text-shadow: 0 2px 34px hsl(var(--h) 80% 50% / .28); } }
+:root[data-theme="dark"] .pagehead h1 { text-shadow: 0 2px 34px hsl(var(--h) 80% 50% / .28); }
+/* i titoli messi a fuoco dal programma (cambio di vista) non mostrano il riquadro blu */
+h1[tabindex="-1"]:focus, h2[tabindex="-1"]:focus { outline: none; }
+
+/* la home: la panoramica continua nell'atmosfera invece di finire contro un bordo netto */
+.homehero { background: linear-gradient(180deg, var(--screen) 0%, color-mix(in srgb, var(--screen) 55%, transparent) 70%, transparent 100%); }
+.homehero::after { background: linear-gradient(90deg, color-mix(in srgb, var(--screen) 92%, transparent) 0%, color-mix(in srgb, var(--screen) 55%, transparent) 45%, transparent 75%), linear-gradient(180deg, transparent 70%, color-mix(in srgb, var(--bg) 70%, transparent) 100%); }
+
+/* le immagini dipinte ricevono una cornice di luce invece di un taglio netto */
+.poster-card { box-shadow: var(--sheen), 0 22px 44px -22px hsl(var(--ph) 70% 20% / .8); }
+.poster-card::before { content: ""; position: absolute; inset: 0; z-index: 1; pointer-events: none; border-radius: inherit; box-shadow: inset 0 0 0 1px hsl(var(--ph) 80% 80% / .18), inset 0 1px 0 hsl(0 0% 100% / .25); }
+.apv-banner { box-shadow: inset 0 0 0 1px hsl(var(--h) 80% 80% / .12), 0 24px 50px -28px rgba(0,0,0,.7); }
+.apv-banner::before { content: ""; position: absolute; inset: 0; z-index: 1; pointer-events: none; background: linear-gradient(180deg, transparent 40%, color-mix(in srgb, var(--panel-solid) 85%, transparent) 100%); }
+.broadcast { box-shadow: inset 0 0 0 1px hsl(var(--h) 80% 80% / .1), 0 30px 70px -30px rgba(0,0,0,.75), 0 0 80px -40px hsl(var(--h) 90% 55% / .5); }
+
+/* stati e scrollbar nel colore dell'arena */
+::selection { background: color-mix(in srgb, var(--accent) 45%, transparent); }
+* { scrollbar-color: color-mix(in srgb, var(--accent) 45%, transparent) transparent; }
+
+/* chi preferisce meno movimento: niente deriva dell'atmosfera, niente dissolvenze lunghe */
+@media (prefers-reduced-motion: reduce) { #atmo .atmo-l, #atmo .atmo-l.on { animation: none; transition: none; } }
+[data-reduced-motion] #atmo .atmo-l, [data-reduced-motion] #atmo .atmo-l.on { animation: none; transition: none; }
+/* telefoni: meno sfocature sovrapposte, che costano batteria */
+@media (max-width: 760px) {
+  .tile, .ev { -webkit-backdrop-filter: none; backdrop-filter: none; }
+  #atmo .atmo-l { filter: blur(18px) saturate(1.3) brightness(.6); }
+  .pagehead { padding-block: 26px 14px; }
+}
+@media (max-width: 760px) and (prefers-color-scheme: light) { :root:not([data-theme="dark"]) #atmo .atmo-l { filter: blur(18px) saturate(1.1) brightness(1.08); } }
+/* niente cornice di 8 px attorno al sito: la barra in alto e l'atmosfera arrivano ai bordi */
+html, body { margin: 0; }
+/* su telefono la barra dei passaggi è fissata in basso dentro l'intestazione: una sfocatura sull'intestazione
+   la «catturerebbe» (un elemento con backdrop-filter diventa il riferimento dei figli fissi) */
+@media (max-width: 760px) { .top { -webkit-backdrop-filter: none; backdrop-filter: none; background: color-mix(in srgb, var(--panel-solid) 94%, transparent); } }
+@media (max-width: 760px) { .steps { background: color-mix(in srgb, var(--panel-solid) 92%, transparent); box-shadow: 0 -18px 40px -24px rgba(0,0,0,.6); } }
 </style>
+
+<!-- l'atmosfera dipinta: il banner dell'arena attiva, sfocato, dietro tutto il sito -->
+<div id="atmo" aria-hidden="true"><div class="atmo-l"></div><div class="atmo-l"></div></div>
 
 <header class="top">
   <div class="wrap topin">
@@ -10507,7 +10643,7 @@ L'esplosione del furgone dei preservativi | Un furgone delle consegne carico di 
       b: `
 1 test:A=agi13 ok:+arma:A ok:+attrezzo:A ko:pr:A+15 | Quando le luci della cena si spengono, {A} afferra al buio {arma} e {attrezzo} dalla credenza. || Quando le luci della cena si spengono, {A} afferra al buio quella che crede un'arma. È una mano. Fredda.
 1 +attrezzo:A @int | Mentre gli altri si contendono i coltelli da tavola, {A} prende un candelabro acceso: {attrezzo}. Nella villa, la luce è tutto.
-1 @cow +cibo:A | {A} si infila sotto il tavolo della cena con un vassoio di {cibo} e resta lì finché le urla non finiscono.
+1 @cow +cibo:A | {A} si infila sotto il tavolo della cena portandosi dietro {cibo} e resta lì finché le urla non finiscono.
 2 al:AB @soc | {A} e {B} si ritrovano chiusi nello stesso armadio a muro durante il blackout. Si stringono le mani al buio. Ne escono alleati.
 2 hit:A>B steal:A<B=arma @agg | {A} strappa dalle mani di {B} il coltello d'argento della cena, con una forchettata sul dorso della mano.
 1 test:A=cor12 ok:+mappa:A ko:pr:A+20 | {A} stacca dal muro del Salone una pianta incorniciata della villa: {mappa}. || {A} stacca dal muro una cornice credendo fosse una pianta della villa. Era un ritratto. Il ritratto apre gli occhi.
@@ -15889,7 +16025,7 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
 </script>
 <script>window.LOS_ASSETS = {"logo":"img/logo.f2d5175789.webp","icona":"img/icona.8b02ddeb49.webp","favicon":"img/favicon.86774dc7cf.png","panoramica":"img/panoramica.66c4c27255.webp","sagome":["img/sagome-cappuccio.e8876ba986.webp","img/sagome-esploratore.9a99fd13f8.webp","img/sagome-viaggiatore.5e36435604.webp"],"arene":{"classico":"img/arene-classico.c2887324d1.webp","cyberpunk":"img/arene-cyberpunk.713b4c77ea.webp","fantasy":"img/arene-fantasy.ee494a9322.webp","horror":"img/arene-horror.76225517ca.webp","liceo":"img/arene-liceo.c591ac5f32.webp","royale":"img/arene-royale.46515caf90.webp","scifi":"img/arene-scifi.bc9d8e04eb.webp","ufficio":"img/arene-ufficio.a2e36d4f7f.webp","wasteland":"img/arene-wasteland.734ed966b2.webp","zombie":"img/arene-zombie.11476cf1ca.webp"},"atlas":{"classico":{"armi":{"arco":"img/arene-classico-armi-arco.57fa716aa9.webp","ascia":"img/arene-classico-armi-ascia.f48629747b.webp","coltello-da-campo":"img/arene-classico-armi-coltello-da-campo.3393de240f.webp","coltello":"img/arene-classico-armi-coltello.a0134af05c.webp","falce-corta":"img/arene-classico-armi-falce-corta.3131158a9f.webp","fionda":"img/arene-classico-armi-fionda.48c8c32c43.webp","lancia-da-caccia":"img/arene-classico-armi-lancia-da-caccia.6f2be560ec.webp","lancia":"img/arene-classico-armi-lancia.115909650b.webp","machete":"img/arene-classico-armi-machete.e1c9ef25d7.webp","mazza-corta":"img/arene-classico-armi-mazza-corta.e1092f0628.webp","mazza":"img/arene-classico-armi-mazza.1fddf37b46.webp","pugnale-da-cintura":"img/arene-classico-armi-pugnale-da-cintura.0bedc8a501.webp","pugnale":"img/arene-classico-armi-pugnale.fda9dbf38a.webp","scure-da-legna":"img/arene-classico-armi-scure-da-legna.837c5d1f78.webp","spada-corta":"img/arene-classico-armi-spada-corta.952e6b7f6a.webp","tridente":"img/arene-classico-armi-tridente.2fcb3547d9.webp"},"luoghi":{"altopiano":"img/arene-classico-luoghi-altopiano.36a37512d3.webp","bosco":"img/arene-classico-luoghi-bosco.2e9163544b.webp","cornucopia":"img/arene-classico-luoghi-cornucopia.393b2dabe1.webp","fiume":"img/arene-classico-luoghi-fiume.22b335a914.webp","paludi":"img/arene-classico-luoghi-paludi.77cf115eb4.webp","rovine":"img/arene-classico-luoghi-rovine.9ea4f70ca9.webp"},"pericoli":{"branco-di-lupi-mutanti":"img/arene-classico-pericoli-branco-di-lupi-mutanti.d786a62875.webp","orso-affamato":"img/arene-classico-pericoli-orso-affamato.e4f38a9892.webp","sciame-di-vespe-velenose":"img/arene-classico-pericoli-sciame-di-vespe-velenose.5adb2c7b8d.webp","serpente-gigante":"img/arene-classico-pericoli-serpente-gigante.b17e7f3d91.webp"}},"cyberpunk":{"armi":{"coltello-vibrante-in-ceramica":"img/arene-cyberpunk-armi-coltello-vibrante-in-ceramica.6bbcd0e9e4.webp","fucile-a-pompa-da-strada":"img/arene-cyberpunk-armi-fucile-a-pompa-da-strada.dbd0de34e1.webp","fucile-a-pompa-elettromagnetico":"img/arene-cyberpunk-armi-fucile-a-pompa-elettromagnetico.0555418cd0.webp","katana-termica":"img/arene-cyberpunk-armi-katana-termica.f1ff597173.webp","mazza-a-impulsi":"img/arene-cyberpunk-armi-mazza-a-impulsi.22d841ed1d.webp","mazza-da-baseball-chiodata":"img/arene-cyberpunk-armi-mazza-da-baseball-chiodata.db2996f744.webp","mitra-compatto":"img/arene-cyberpunk-armi-mitra-compatto.eaa3815798.webp","pistola-a-rotaia-artigianale":"img/arene-cyberpunk-armi-pistola-a-rotaia-artigianale.f9e83bda89.webp","pistola-smart":"img/arene-cyberpunk-armi-pistola-smart.2aa922ba8c.webp","sparachiodi-riprogrammato":"img/arene-cyberpunk-armi-sparachiodi-riprogrammato.70f6190cb0.webp","taser-da-buttafuori":"img/arene-cyberpunk-armi-taser-da-buttafuori.60b58b451d.webp","tirapugni-elettrificato":"img/arene-cyberpunk-armi-tirapugni-elettrificato.1ce19bab37.webp","ventaglio-da-combattimento-in-titanio":"img/arene-cyberpunk-armi-ventaglio-da-combattimento-in-titanio.f3b7bb5a10.webp"},"luoghi":{"clinica-del-ripperdoc":"img/arene-cyberpunk-luoghi-clinica-del-ripperdoc.8ef0cb941b.webp","club-della-braindance":"img/arene-cyberpunk-luoghi-club-della-braindance.7765542e70.webp","megablocco":"img/arene-cyberpunk-luoghi-megablocco.28b72e6ecf.webp","mercato-di-kabuki":"img/arene-cyberpunk-luoghi-mercato-di-kabuki.d5c8ab7b96.webp","nodo-dati-corporativo":"img/arene-cyberpunk-luoghi-nodo-dati-corporativo.56ca3e1335.webp","officina-dei-maelstrom":"img/arene-cyberpunk-luoghi-officina-dei-maelstrom.d69285cf21.webp","piazza-della-torre":"img/arene-cyberpunk-luoghi-piazza-della-torre.1e400212c8.webp"},"pericoli":{"banda-di-scav":"img/arene-cyberpunk-pericoli-banda-di-scav.f1a2b2ccc4.webp","gang-di-cromati":"img/arene-cyberpunk-pericoli-gang-di-cromati.74e5576e23.webp","sciame-di-droni-di-pattuglia":"img/arene-cyberpunk-pericoli-sciame-di-droni-di-pattuglia.6fb4b17ad9.webp","squadra-di-sicurezza-corporativa":"img/arene-cyberpunk-pericoli-squadra-di-sicurezza-corporativa.6195a3b15d.webp"}},"fantasy":{"armi":{"arco-elfico":"img/arene-fantasy-armi-arco-elfico.8012f9136d.webp","ascia-nanica":"img/arene-fantasy-armi-ascia-nanica.6913fdf008.webp","balestra":"img/arene-fantasy-armi-balestra.7767becc83.webp","bastone-magico":"img/arene-fantasy-armi-bastone-magico.0781aee860.webp","daga-dei-giuramenti":"img/arene-fantasy-armi-daga-dei-giuramenti.3b6d4b398c.webp","falcetto-dargento":"img/arene-fantasy-armi-falcetto-dargento.1ce0e4e163.webp","lancia-incantata":"img/arene-fantasy-armi-lancia-incantata.7371199824.webp","lancia-silvana":"img/arene-fantasy-armi-lancia-silvana.08fbc01ede.webp","martello-da-guerra":"img/arene-fantasy-armi-martello-da-guerra.4eb03f4db7.webp","martello-nanico":"img/arene-fantasy-armi-martello-nanico.82ad6b9b14.webp","mazza-di-quercia":"img/arene-fantasy-armi-mazza-di-quercia.0f6a8345a9.webp","pugnale-avvelenato":"img/arene-fantasy-armi-pugnale-avvelenato.aba554d177.webp","spada-da-viaggio":"img/arene-fantasy-armi-spada-da-viaggio.a7bdcab5f4.webp","spada-runica":"img/arene-fantasy-armi-spada-runica.ec4012c6cf.webp"},"luoghi":{"altare-delle-armi":"img/arene-fantasy-luoghi-altare-delle-armi.db06de44c1.webp","foresta-elfica":"img/arene-fantasy-luoghi-foresta-elfica.0448fcfbd3.webp","lago-nebbioso":"img/arene-fantasy-luoghi-lago-nebbioso.f19abc7c81.webp","miniere":"img/arene-fantasy-luoghi-miniere.5baa916ec9.webp","palude-stregata":"img/arene-fantasy-luoghi-palude-stregata.6a0b2af4a7.webp","picco-del-drago":"img/arene-fantasy-luoghi-picco-del-drago.06bdfd84b1.webp","torre-in-rovina":"img/arene-fantasy-luoghi-torre-in-rovina.ac716863c7.webp"},"pericoli":{"branco-di-lupi-mannari":"img/arene-fantasy-pericoli-branco-di-lupi-mannari.1c9124ceee.webp","spettro-errante":"img/arene-fantasy-pericoli-spettro-errante.056074bc23.webp","troll-di-caverna":"img/arene-fantasy-pericoli-troll-di-caverna.31aa2444f0.webp","viverna":"img/arene-fantasy-pericoli-viverna.577b91a819.webp"}},"horror":{"armi":{"ascia":"img/arene-horror-armi-ascia.f6793c220e.webp","attizzatoio":"img/arene-horror-armi-attizzatoio.12b9bf75af.webp","bastone-da-passeggio":"img/arene-horror-armi-bastone-da-passeggio.1a636ce4ab.webp","candelabro-dargento":"img/arene-horror-armi-candelabro-dargento.7d962054de.webp","coltello-dargento":"img/arene-horror-armi-coltello-dargento.73a6bb81ea.webp","crocifisso-appuntito":"img/arene-horror-armi-crocifisso-appuntito.203b41a170.webp","daga-da-cerimonia":"img/arene-horror-armi-daga-da-cerimonia.a597e15c53.webp","falce":"img/arene-horror-armi-falce.6513df8fa2.webp","fucile-da-caccia":"img/arene-horror-armi-fucile-da-caccia.169dc367e1.webp","pugnale-depoca":"img/arene-horror-armi-pugnale-depoca.f148afd005.webp","pugnale-rituale":"img/arene-horror-armi-pugnale-rituale.944cb9056c.webp","scure-da-legna":"img/arene-horror-armi-scure-da-legna.a11379a412.webp"},"luoghi":{"biblioteca":"img/arene-horror-luoghi-biblioteca.00d6ab97f4.webp","cantina":"img/arene-horror-luoghi-cantina.a196828c1d.webp","cappella":"img/arene-horror-luoghi-cappella.a51e505028.webp","cimitero":"img/arene-horror-luoghi-cimitero.7a441de089.webp","salone":"img/arene-horror-luoghi-salone.37f10c88c7.webp","serra":"img/arene-horror-luoghi-serra.b3d91121d4.webp","soffitta":"img/arene-horror-luoghi-soffitta.466d40cea3.webp"},"pericoli":{"bambola-posseduta":"img/arene-horror-pericoli-bambola-posseduta.7064eef1d7.webp","entita-senza-volto":"img/arene-horror-pericoli-entita-senza-volto.2c28467bdd.webp","spettro-urlante":"img/arene-horror-pericoli-spettro-urlante.25fa554e05.webp","stormo-di-corvi":"img/arene-horror-pericoli-stormo-di-corvi.fe5c85d7ae.webp"}},"liceo":{"armi":{"compito-copiato":"img/arene-liceo-armi-compito-copiato.c9ade27d61.webp","dossier-delle-revisioni":"img/arene-liceo-armi-dossier-delle-revisioni.77676a0f5f.webp","elenco-delle-correzioni":"img/arene-liceo-armi-elenco-delle-correzioni.04be1154c8.webp","fascicolo-di-risposte-motivate":"img/arene-liceo-armi-fascicolo-di-risposte-motivate.c29995b581.webp","foto-imbarazzante":"img/arene-liceo-armi-foto-imbarazzante.ff7d3ef284.webp","gossip-esplosivo":"img/arene-liceo-armi-gossip-esplosivo.552b1e6236.webp","pallone-da-dodgeball":"img/arene-liceo-armi-pallone-da-dodgeball.60a2576785.webp","profilo-falso":"img/arene-liceo-armi-profilo-falso.d1dac05a2b.webp","prospetto-dei-contributi":"img/arene-liceo-armi-prospetto-dei-contributi.0c121fd79a.webp","quaderno-delle-verifiche":"img/arene-liceo-armi-quaderno-delle-verifiche.7d8b07341a.webp","registro-rubato":"img/arene-liceo-armi-registro-rubato.67eb4b9eff.webp","riepilogo-delle-fonti":"img/arene-liceo-armi-riepilogo-delle-fonti.3c889a0ed5.webp"},"luoghi":{"aula-magna":"img/arene-liceo-luoghi-aula-magna.0478e35c5c.webp","aule":"img/arene-liceo-luoghi-aule.b3142d07cc.webp","biblioteca":"img/arene-liceo-luoghi-biblioteca.1ae806ae58.webp","cortile":"img/arene-liceo-luoghi-cortile.51bf433337.webp","laboratorio-di-chimica":"img/arene-liceo-luoghi-laboratorio-di-chimica.eba1434683.webp","mensa":"img/arene-liceo-luoghi-mensa.67bcbc7e37.webp","palestra":"img/arene-liceo-luoghi-palestra.8ecb872849.webp"},"pericoli":{"bidello-di-turno":"img/arene-liceo-pericoli-bidello-di-turno.191c43a8bd.webp","ispezione-a-sorpresa":"img/arene-liceo-pericoli-ispezione-a-sorpresa.bef087d9b9.webp","preside":"img/arene-liceo-pericoli-preside.033f6c9aae.webp","professoressa-di-matematica":"img/arene-liceo-pericoli-professoressa-di-matematica.6cb65c6a3f.webp"}},"royale":{"armi":{"balestra":"img/arene-royale-armi-balestra.64563b6cea.webp","carabina-compatta":"img/arene-royale-armi-carabina-compatta.a0fa150fbe.webp","coltello-da-combattimento":"img/arene-royale-armi-coltello-da-combattimento.74a64bca77.webp","coltello-tattico":"img/arene-royale-armi-coltello-tattico.8e9cb56197.webp","fucile-a-pompa":"img/arene-royale-armi-fucile-a-pompa.3d7fc7d83c.webp","fucile-da-cecchino":"img/arene-royale-armi-fucile-da-cecchino.fc3c4f19f1.webp","fucile-dassalto":"img/arene-royale-armi-fucile-dassalto.b91ccb0ec8.webp","granata":"img/arene-royale-armi-granata.fd9c359b27.webp","lancia-da-sopravvivenza":"img/arene-royale-armi-lancia-da-sopravvivenza.8a39c1a5e5.webp","manganello":"img/arene-royale-armi-manganello.dc6284893b.webp","mitraglietta":"img/arene-royale-armi-mitraglietta.6dcc3246e6.webp","pistola-da-segnalazione-modificata":"img/arene-royale-armi-pistola-da-segnalazione-modificata.1c7f899ca7.webp","pistola":"img/arene-royale-armi-pistola.acae268814.webp","scure-da-campo":"img/arene-royale-armi-scure-da-campo.6a5b0becd5.webp"},"luoghi":{"aeroporto":"img/arene-royale-luoghi-aeroporto.81e8ce98d4.webp","base-militare":"img/arene-royale-luoghi-base-militare.67f3a7de9d.webp","centrale-elettrica":"img/arene-royale-luoghi-centrale-elettrica.05ee57458a.webp","fattoria":"img/arene-royale-luoghi-fattoria.7c780dda87.webp","foresta":"img/arene-royale-luoghi-foresta.03b47644d0.webp","villaggio-costiero":"img/arene-royale-luoghi-villaggio-costiero.568519eb7c.webp"},"pericoli":{"cane-da-guardia-addestrato":"img/arene-royale-pericoli-cane-da-guardia-addestrato.c7853a67a0.webp","drone-armato":"img/arene-royale-pericoli-drone-armato.30d0b73e01.webp","elicottero-da-caccia":"img/arene-royale-pericoli-elicottero-da-caccia.8c68e62346.webp"}},"scifi":{"armi":{"bastone-a-impulsi":"img/arene-scifi-armi-bastone-a-impulsi.4e17e074e7.webp","cannone-a-rotaia-portatile":"img/arene-scifi-armi-cannone-a-rotaia-portatile.9a59b97d98.webp","frusta-monofilamento":"img/arene-scifi-armi-frusta-monofilamento.5ee8081aa9.webp","fucile-al-plasma":"img/arene-scifi-armi-fucile-al-plasma.ea2384a239.webp","granata-emp":"img/arene-scifi-armi-granata-emp.04cfd31203.webp","lama-di-servizio":"img/arene-scifi-armi-lama-di-servizio.a47d434464.webp","lama-vibrante":"img/arene-scifi-armi-lama-vibrante.02b0f47ff8.webp","lancia-da-abbordaggio":"img/arene-scifi-armi-lancia-da-abbordaggio.cf167e52ff.webp","perforatore-portatile":"img/arene-scifi-armi-perforatore-portatile.aa7e92ecab.webp","pistola-a-scarica":"img/arene-scifi-armi-pistola-a-scarica.33b3e5929e.webp","pistola-laser":"img/arene-scifi-armi-pistola-laser.aed4bbf3ed.webp","taglierino-ceramico":"img/arene-scifi-armi-taglierino-ceramico.b45d524836.webp","taser-a-impulsi":"img/arene-scifi-armi-taser-a-impulsi.360e29e1d5.webp"},"luoghi":{"condotti-di-servizio":"img/arene-scifi-luoghi-condotti-di-servizio.6817134b5e.webp","hangar":"img/arene-scifi-luoghi-hangar.6de551833b.webp","moduli-abitativi":"img/arene-scifi-luoghi-moduli-abitativi.9f5bb96d39.webp","ponte-di-comando":"img/arene-scifi-luoghi-ponte-di-comando.3e9ffd005a.webp","reattore":"img/arene-scifi-luoghi-reattore.d10a335006.webp","serra-idroponica":"img/arene-scifi-luoghi-serra-idroponica.b6f4407853.webp"},"pericoli":{"androide-da-combattimento":"img/arene-scifi-pericoli-androide-da-combattimento.1a3d3eb38e.webp","creatura-aliena-dai-tentacoli":"img/arene-scifi-pericoli-creatura-aliena-dai-tentacoli.b6b314ddd9.webp","drone-di-sicurezza-impazzito":"img/arene-scifi-pericoli-drone-di-sicurezza-impazzito.c8a9c6f9e3.webp","sciame-di-nanobot":"img/arene-scifi-pericoli-sciame-di-nanobot.d43296f047.webp"}},"ufficio":{"armi":{"badge-clonato-del-capo":"img/arene-ufficio-armi-badge-clonato-del-capo.be9f7381fe.webp","dossier-dei-risultati":"img/arene-ufficio-armi-dossier-dei-risultati.1888e2f671.webp","elenco-dei-contributi":"img/arene-ufficio-armi-elenco-dei-contributi.3de4fbe5bf.webp","fascicolo-delle-fonti":"img/arene-ufficio-armi-fascicolo-delle-fonti.02df27dfbf.webp","foglio-excel-con-le-prove":"img/arene-ufficio-armi-foglio-excel-con-le-prove.944f6ec708.webp","mail-in-copia-a-tutti":"img/arene-ufficio-armi-mail-in-copia-a-tutti.1d4304df14.webp","nota-spese-gonfiata":"img/arene-ufficio-armi-nota-spese-gonfiata.d2683cca4c.webp","presentazione-rubata":"img/arene-ufficio-armi-presentazione-rubata.815dc5c8b4.webp","prospetto-delle-metriche":"img/arene-ufficio-armi-prospetto-delle-metriche.356da1d2d9.webp","registro-delle-revisioni":"img/arene-ufficio-armi-registro-delle-revisioni.509eab44df.webp","report-pieno-di-errori-altrui":"img/arene-ufficio-armi-report-pieno-di-errori-altrui.c01c0ef897.webp","riepilogo-delle-approvazioni":"img/arene-ufficio-armi-riepilogo-delle-approvazioni.9394dadd6b.webp"},"luoghi":{"cucina":"img/arene-ufficio-luoghi-cucina.d968f8861d.webp","open-space":"img/arene-ufficio-luoghi-open-space.b6b7990c99.webp","parcheggio":"img/arene-ufficio-luoghi-parcheggio.d593f2ed83.webp","sala-riunioni":"img/arene-ufficio-luoghi-sala-riunioni.f92c4030a9.webp","sala-stampanti":"img/arene-ufficio-luoghi-sala-stampanti.1727f50082.webp","ufficio-del-direttore":"img/arene-ufficio-luoghi-ufficio-del-direttore.bb3b6cabab.webp"},"pericoli":{"consulente-esterno":"img/arene-ufficio-pericoli-consulente-esterno.ce6e200c3f.webp","direttore-generale":"img/arene-ufficio-pericoli-direttore-generale.da2eb1f708.webp","riorganizzazione-aziendale":"img/arene-ufficio-pericoli-riorganizzazione-aziendale.1fd57b76b3.webp","ufficio-risorse-umane":"img/arene-ufficio-pericoli-ufficio-risorse-umane.8392df7518.webp"}},"wasteland":{"armi":{"balestra-artigianale":"img/arene-wasteland-armi-balestra-artigianale.e09826852f.webp","catena":"img/arene-wasteland-armi-catena.866183d584.webp","coltello-da-strada":"img/arene-wasteland-armi-coltello-da-strada.1083c4429d.webp","fucile-arrugginito":"img/arene-wasteland-armi-fucile-arrugginito.797601f16e.webp","lama-di-recupero":"img/arene-wasteland-armi-lama-di-recupero.1ad13cfc78.webp","lancia-di-ferraglia":"img/arene-wasteland-armi-lancia-di-ferraglia.99d9f41307.webp","lancia-ricavata-da-un-tubo":"img/arene-wasteland-armi-lancia-ricavata-da-un-tubo.53b934e449.webp","lanciachiodi":"img/arene-wasteland-armi-lanciachiodi.e4f51e42e2.webp","mannaia":"img/arene-wasteland-armi-mannaia.518ae9c11c.webp","martello-da-officina":"img/arene-wasteland-armi-martello-da-officina.851055795e.webp","mazza-di-tubi":"img/arene-wasteland-armi-mazza-di-tubi.91babe82ac.webp","molotov":"img/arene-wasteland-armi-molotov.303d6fa315.webp","scure-da-demolizione":"img/arene-wasteland-armi-scure-da-demolizione.066ea5e066.webp"},"luoghi":{"autostrada-spezzata":"img/arene-wasteland-luoghi-autostrada-spezzata.19a72a0b97.webp","citta-fantasma":"img/arene-wasteland-luoghi-citta-fantasma.fe22bb72b2.webp","cratere":"img/arene-wasteland-luoghi-cratere.04de7ca40a.webp","deposito":"img/arene-wasteland-luoghi-deposito.f98aa31220.webp","diga":"img/arene-wasteland-luoghi-diga.3be9abe15a.webp","discarica":"img/arene-wasteland-luoghi-discarica.b8783ad9c6.webp","raffineria":"img/arene-wasteland-luoghi-raffineria.081e2d2ad6.webp"},"pericoli":{"banda-di-predoni":"img/arene-wasteland-pericoli-banda-di-predoni.1dfcfd1628.webp","branco-di-cani-mutati":"img/arene-wasteland-pericoli-branco-di-cani-mutati.442fabfc39.webp","scorpione-gigante":"img/arene-wasteland-pericoli-scorpione-gigante.2dd8911367.webp","verme-delle-sabbie":"img/arene-wasteland-pericoli-verme-delle-sabbie.a0d445beeb.webp"}},"zombie":{"armi":{"accetta-da-soccorso":"img/arene-zombie-armi-accetta-da-soccorso.6d36eb13ac.webp","accetta":"img/arene-zombie-armi-accetta.0eed163720.webp","balestra":"img/arene-zombie-armi-balestra.d705131d17.webp","coltello-da-campeggio":"img/arene-zombie-armi-coltello-da-campeggio.2abab58e78.webp","fucile-a-pompa":"img/arene-zombie-armi-fucile-a-pompa.b00b1d6a70.webp","katana":"img/arene-zombie-armi-katana.f631ad392f.webp","machete-da-potatura":"img/arene-zombie-armi-machete-da-potatura.94a93108a1.webp","martello-da-carpentiere":"img/arene-zombie-armi-martello-da-carpentiere.021e8a80f2.webp","mazza-chiodata":"img/arene-zombie-armi-mazza-chiodata.b4e11dcadb.webp","mazza-da-lavoro":"img/arene-zombie-armi-mazza-da-lavoro.c36a90108f.webp","motosega":"img/arene-zombie-armi-motosega.f74e603615.webp","piede-di-porco":"img/arene-zombie-armi-piede-di-porco.c185a97e0d.webp","pistola":"img/arene-zombie-armi-pistola.6d30022ca6.webp"},"luoghi":{"centro-commerciale":"img/arene-zombie-luoghi-centro-commerciale.333f4699d5.webp","metropolitana":"img/arene-zombie-luoghi-metropolitana.878a263605.webp","ospedale":"img/arene-zombie-luoghi-ospedale.f25de413a4.webp","periferia":"img/arene-zombie-luoghi-periferia.e28a7d70c7.webp","piazza":"img/arene-zombie-luoghi-piazza.b6ed86b3ad.webp","scuola":"img/arene-zombie-luoghi-scuola.153ddbaa75.webp","stazione-di-polizia":"img/arene-zombie-luoghi-stazione-di-polizia.157f7a17f5.webp"},"pericoli":{"cane-infetto":"img/arene-zombie-pericoli-cane-infetto.fdff913d6f.webp","gigante-mutato":"img/arene-zombie-pericoli-gigante-mutato.91fad36b70.webp","infetto-corridore":"img/arene-zombie-pericoli-infetto-corridore.61f48faafd.webp","orda-di-zombi":"img/arene-zombie-pericoli-orda-di-zombi.e0fc6d1b56.webp"}}}};
 ;
-window.LOS_BUILD = "5d082a61e0ff710928e238042547e528ed0109189673166ce89d9bb28cb56add";
+window.LOS_BUILD = "ea58b3d06edc0cfbbb57e4ab718341ff47e9b799e85629740b6f55194fffb290";
 ;
 /* Last One Standing — grafica vettoriale: logo, icone delle arene, illustrazioni.
  * Tutto è SVG generato in codice: nessuna immagine esterna. */
@@ -18386,7 +18522,19 @@ window.LOS_BUILD = "5d082a61e0ff710928e238042547e528ed0109189673166ce89d9bb28cb5
   const nTeams = () => new Set(S.cast.map((t) => t.team)).size;
   const plural = (n, s, p) => n + ' ' + (n === 1 ? s : p);
   // tinta e attributo dell'arena (data-arena; data-theme resta per chiaro/scuro). Segue l'arena della partita aperta, anche nei replay.
-  function setHue(id) { const t = THEMES[id]; if (t) { document.documentElement.style.setProperty('--h', t.hue); document.documentElement.dataset.arena = t.id; } }
+  // l'atmosfera dipinta: dietro tutto il sito c'è il banner dell'arena attiva (in home la panoramica),
+  // sfocato e velato; cambia con una dissolvenza tra due livelli
+  let atmoSrc = '', atmoFlip = 0;
+  function setAtmo(src) {
+    if (!src || src === atmoSrc) return;
+    const layers = document.querySelectorAll('#atmo .atmo-l'); if (layers.length < 2) return;
+    atmoSrc = src; atmoFlip = 1 - atmoFlip;
+    const on = layers[atmoFlip], off = layers[1 - atmoFlip];
+    on.style.backgroundImage = 'url("' + src.replace(/"/g, '%22') + '")';
+    on.classList.add('on'); off.classList.remove('on');
+  }
+  const arenaArt = (id) => (ART.assets.arene && ART.assets.arene[id]) || (ART.sceneDataUri ? ART.sceneDataUri(id) : '');
+  function setHue(id) { const t = THEMES[id]; if (t) { document.documentElement.style.setProperty('--h', t.hue); document.documentElement.dataset.arena = t.id; setAtmo(arenaArt(t.id)); } }
 
   /* ---------------- tema chiaro/scuro ---------------- */
   function applyUi() { if (S.ui) document.documentElement.dataset.theme = S.ui; else delete document.documentElement.dataset.theme; }
@@ -18426,7 +18574,7 @@ window.LOS_BUILD = "5d082a61e0ff710928e238042547e528ed0109189673166ce89d9bb28cb5
     $('#liveDot').hidden = !SIM;
     if (v !== 'diretta') stopPlay();
     if (v !== 'home') stopHomeLoop();
-    if (v === 'home' && ART.assets.logo) { document.documentElement.style.setProperty('--h', 162); delete document.documentElement.dataset.arena; }
+    if (v === 'home' && ART.assets.logo) { document.documentElement.style.setProperty('--h', 162); delete document.documentElement.dataset.arena; setAtmo(ART.assets.panoramica || arenaArt(S.settings.theme)); }
     else setHue((v === 'diretta' || v === 'esito') && SIM ? SIM.theme : S.settings.theme);
     if (v === 'home') renderHome();
     if (v === 'cast') { renderCast(); if (changed) playEntrance('castenter'); }

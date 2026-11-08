@@ -8,7 +8,7 @@
       b: `
 1 test:A=agi13 ok:+arma:A ok:+attrezzo:A ko:pr:A+15 | Quando le luci della cena si spengono, {A} afferra al buio {arma} e {attrezzo} dalla credenza. || Quando le luci della cena si spengono, {A} afferra al buio quella che crede un'arma. È una mano. Fredda.
 1 +attrezzo:A @int | Mentre gli altri si contendono i coltelli da tavola, {A} prende un candelabro acceso: {attrezzo}. Nella villa, la luce è tutto.
-1 @cow +cibo:A | {A} si infila sotto il tavolo della cena con un vassoio di {cibo} e resta lì finché le urla non finiscono.
+1 @cow +cibo:A | {A} si infila sotto il tavolo della cena portandosi dietro {cibo} e resta lì finché le urla non finiscono.
 2 al:AB @soc | {A} e {B} si ritrovano chiusi nello stesso armadio a muro durante il blackout. Si stringono le mani al buio. Ne escono alleati.
 2 hit:A>B steal:A<B=arma @agg | {A} strappa dalle mani di {B} il coltello d'argento della cena, con una forchettata sul dorso della mano.
 1 test:A=cor12 ok:+mappa:A ko:pr:A+20 | {A} stacca dal muro del Salone una pianta incorniciata della villa: {mappa}. || {A} stacca dal muro una cornice credendo fosse una pianta della villa. Era un ritratto. Il ritratto apre gli occhi.
