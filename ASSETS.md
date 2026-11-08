@@ -12,7 +12,7 @@ descrive la provenienza documentata, senza attribuire una licenza alle immagini.
 | `assets/panoramica.webp`, `anteprima.jpg` | Illustrazione della home e anteprima per i link generate con imagegen per il progetto. |
 | `assets/sagome/*.webp` | Tre sagome generiche generate con imagegen per il progetto. |
 | SVG e icone prodotti da `src/art.js` e `src/ui.js` | Disegnati e conservati nel codice del progetto. |
-| Lastre, fasce e cartelli degli «stacchi» | Forme del foglio di stile, nessun file. Le pennellate, i sigilli e la grana facoltativi in `assets/fx/` sono da fornire: prompt, formati e nomi in [docs-dev/movimento.md](docs-dev/movimento.md). |
+| `assets/fx/*.webp` | Quattro pennellate, dieci sigilli delle arene e una grana della carta generati con Midjourney dai prompt di [docs-dev/movimento.md](docs-dev/movimento.md), forniti per il progetto e trasformati in maschere trasparenti WebP. Nessun simbolo o marchio di opere esistenti. |
 | `assets/arene/<arena>/<sezione>/*.webp` | Immagini della guida delle arene, da fornire. Specifiche, nomi dei file e prompt di luoghi, pericoli e armi sono in [docs-dev/immagini-arene.md](docs-dev/immagini-arene.md); meteo, disastri e oggetti seguiranno. Finché mancano, `src/atlas.js` disegna illustrazioni vettoriali provvisorie. |
 
 Il registro di lavorazione dei pacchetti di immagini documenta la creazione il

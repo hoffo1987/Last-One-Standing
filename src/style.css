@@ -2646,7 +2646,7 @@ html, body { margin: 0; }
 .stc-cal { gap: 6px 22px; }
 /* il disastro: la fascia ha le strisce di pericolo e il titolo arriva di colpo, con due lampi a scatti */
 .stc-dis .stc-band { background: repeating-linear-gradient(-45deg, hsl(var(--h) 90% 55% / .07) 0 14px, transparent 14px 28px), linear-gradient(90deg, hsl(var(--h) 45% 6% / .97), hsl(var(--h) 70% 16% / .97) 60%, hsl(var(--h) 45% 8% / .97)); }
-.stc-t { font-family: var(--f-display); font-weight: 900; font-size: clamp(30px, 5.4vw, 64px); line-height: 1; color: #fff; text-shadow: 0 0 30px hsl(var(--h) 95% 55% / .9);
+.stc-t { font-family: var(--f-display); font-weight: 900; font-size: clamp(24px, 3.8vw, 50px); line-height: 1.05; max-width: 22ch; text-wrap: balance; color: #fff; text-shadow: 0 0 30px hsl(var(--h) 95% 55% / .9);
   animation: stcSlam .4s var(--ease-snap) .32s both, stcFlick .2s steps(2) .72s 2; }
 @keyframes stcSlam { from { opacity: 0; transform: scale(2.2); letter-spacing: .2em; } }
 @keyframes stcFlick { 50% { opacity: .35; } }
@@ -2704,3 +2704,42 @@ html, body { margin: 0; }
 #resBody .reveal.revealed { transform: none; }
 [data-reduced-motion] #resBody .reveal { transform: none; }
 @media (prefers-reduced-motion: reduce) { #resBody .reveal { transform: none; } .btn:active:not(:disabled) { transform: none; } }
+
+/* =====================================================================
+ * STACCHI DIPINTI: pennellate, sigilli e grana (assets/fx)
+ * Le classi fx-pen, fx-grana e fx-seal su <html> le accende anim.js solo se le maschere sono caricabili;
+ * senza, restano le lastre e le fasce disegnate qui sopra.
+ * ===================================================================== */
+/* la tendina: tre colpi di pennello enormi, la coda con gli schizzi è il bordo che avanza */
+.fx-pen .stacco i { left: -60vw; width: 210vw; top: -45vh; bottom: -45vh; -webkit-mask: var(--pm) center / 100% 100% no-repeat; mask: var(--pm) center / 100% 100% no-repeat; }
+.fx-pen .stacco .st-a { left: -25%; width: 150%; top: -12%; bottom: -12%; -webkit-mask: none; mask: none; }
+.fx-pen .stacco .st-b { --pm: var(--pb, var(--fx-pen2)); }
+.fx-pen .stacco .st-c { --pm: var(--pc, var(--fx-pen4)); top: 32vh; bottom: 32vh; background: linear-gradient(180deg, hsl(var(--wh) 95% 66%), hsl(var(--wh) 95% 52%)); }
+.fx-grana .stacco .st-b::after { opacity: 1; background: hsl(var(--wh) 90% 82% / .55); -webkit-mask: var(--fx-grana) 0 0 / 384px 384px repeat; mask: var(--fx-grana) 0 0 / 384px 384px repeat; }
+/* il sigillo dell'arena di arrivo, dietro il nome della sezione */
+.stacco .st-seal { position: absolute; left: 50%; top: 50%; width: min(52vmin, 440px); aspect-ratio: 1; opacity: 0; transform: translate(-50%, -50%) rotate(-10deg); pointer-events: none;
+  background: hsl(var(--wh) 60% 8% / .55); -webkit-mask: var(--ws) center / contain no-repeat; mask: var(--ws) center / contain no-repeat; }
+/* i cartelli: la fascia diventa un colpo di pennello, la linea una pennellata sottile */
+.fx-pen .stc-band { -webkit-mask: var(--fx-pen3) center / 100% 100% no-repeat; mask: var(--fx-pen3) center / 100% 100% no-repeat; height: 76%; }
+.fx-pen .stc-line { height: 16px; top: 85%; -webkit-mask: var(--fx-pen4) center / 100% 100% no-repeat; mask: var(--fx-pen4) center / 100% 100% no-repeat; box-shadow: none; filter: drop-shadow(0 0 10px hsl(var(--h) 95% 60%)); }
+.fx-pen .stc-dis .stc-band { -webkit-mask-image: var(--fx-pen2); mask-image: var(--fx-pen2); height: 90%; }
+.fx-grana .broadcast > .stc .stc-band { background-image: none; }
+.fx-grana .broadcast > .stc .stc-band, .fx-grana .stc-dis .stc-band { background-color: hsl(var(--h) 50% 9% / .97); }
+.fx-grana .broadcast > .stc::before { content: ""; position: absolute; inset: 0; pointer-events: none; z-index: 0; opacity: .5; background: hsl(var(--h) 90% 80% / .35); -webkit-mask: var(--fx-grana) 0 0 / 384px 384px repeat; mask: var(--fx-grana) 0 0 / 384px 384px repeat; animation: stcIn .3s var(--ease-snap) .1s both, stcGone .2s var(--ease-cut) calc(var(--stc-dur, 1.6s) - .5s) forwards; }
+.fx-grana .stc-dis .stc-band::after { content: ""; position: absolute; inset: 0; background: repeating-linear-gradient(-45deg, hsl(var(--h) 90% 55% / .08) 0 14px, transparent 14px 28px); }
+/* la filigrana del sigillo nei cartelli */
+.fx-seal .broadcast > .stc::after { content: ""; position: absolute; z-index: 0; right: 5%; top: 50%; height: 78%; aspect-ratio: 1; transform: translateY(-50%) rotate(-10deg); pointer-events: none;
+  background: hsl(var(--h) 95% 62% / .2); -webkit-mask: var(--fx-sigillo) center / contain no-repeat; mask: var(--fx-sigillo) center / contain no-repeat;
+  animation: stcSeal .4s var(--ease-snap) .22s both, stcGone .2s var(--ease-cut) calc(var(--stc-dur, 1.6s) - .5s) forwards; }
+@keyframes stcSeal { from { opacity: 0; transform: translateY(-50%) rotate(-30deg) scale(1.5); } }
+.broadcast > .stc > .stc-in { z-index: 1; }
+@media (max-width: 760px) { .fx-seal .broadcast > .stc::after { right: 50%; transform: translate(50%, -50%) rotate(-10deg); height: 70%; } @keyframes stcSeal { from { opacity: 0; transform: translate(50%, -50%) rotate(-30deg) scale(1.5); } } }
+/* l'esito: il sigillo dell'arena si stampa sul ritratto di chi vince */
+.fn-seal { display: none; }
+.fx-seal .fn-seal { display: block; position: absolute; right: -18px; bottom: -8px; width: clamp(64px, 6vw, 84px); aspect-ratio: 1; transform: rotate(-12deg); pointer-events: none;
+  background: hsl(var(--h) 95% 64%); -webkit-mask: var(--fx-sigillo) center / contain no-repeat; mask: var(--fx-sigillo) center / contain no-repeat;
+  filter: drop-shadow(0 4px 10px rgba(0,0,0,.6)) drop-shadow(0 0 12px hsl(var(--h) 95% 55% / .6)); }
+.fn-play .fn-seal { animation: fnSealIn .42s var(--ease-snap) 1.22s both, stcFlick .16s steps(2) 1.64s 2; }
+@keyframes fnSealIn { 0% { opacity: 0; transform: rotate(-40deg) scale(2.8); } 70% { opacity: 1; transform: rotate(-10deg) scale(.9); } 100% { transform: rotate(-12deg) scale(1); } }
+@media (max-width: 760px) { .fx-seal .fn-seal { width: 56px; right: -10px; } }
+[data-reduced-motion] .stacco .st-seal { display: none; }

@@ -554,7 +554,7 @@
     on.classList.add('on'); off.classList.remove('on');
   }
   const arenaArt = (id) => (ART.assets.arene && ART.assets.arene[id]) || (ART.sceneDataUri ? ART.sceneDataUri(id) : '');
-  function setHue(id) { const t = THEMES[id]; if (t) { document.documentElement.style.setProperty('--h', t.hue); document.documentElement.dataset.arena = t.id; setAtmo(arenaArt(t.id)); } }
+  function setHue(id) { const t = THEMES[id]; if (t) { document.documentElement.style.setProperty('--h', t.hue); document.documentElement.dataset.arena = t.id; setAtmo(arenaArt(t.id)); AN.seal(t.id); } }
 
   /* ---------------- tema chiaro/scuro ---------------- */
   function applyUi() { if (S.ui) document.documentElement.dataset.theme = S.ui; else delete document.documentElement.dataset.theme; }
@@ -610,7 +610,7 @@
     let v = (location.hash || '').slice(1); if (!VIEWS.includes(v)) v = 'home';
     if (v === curView) { route(); return; }
     const t = THEMES[(v === 'diretta' || v === 'esito') && SIM ? SIM.theme : S.settings.theme];
-    AN.wipe(route, { label: VIEW_LABEL[v] || '', hue: v === 'home' ? 162 : t ? t.hue : null });
+    AN.wipe(route, { label: VIEW_LABEL[v] || '', hue: v === 'home' ? 162 : t ? t.hue : null, arena: v === 'home' || !t ? null : t.id });
   });
   document.addEventListener('click', (e) => {
     const q = e.target.closest('[data-quick]'); if (q) { e.preventDefault(); quickPlay(); return; }
@@ -2207,7 +2207,7 @@
       const sub = '<p class="fn-sub">Squadra ' + w.team + (w.traits.length ? ' · ' + w.traits.map((x) => TRAITS[x].name).join(', ') : '') + '</p>';
       const cell = (v, l) => '<div><b>' + v + '</b><span>' + l + '</span></div>';
       hero = '<div class="winhero finale">' + scene + top +
-        '<div class="fn-mid"><div class="fn-portrait"><div class="fn-halo" aria-hidden="true"></div>' + avHTML(w, { btn: true }) + '<span class="fn-crown">' + crown + '</span></div>' +
+        '<div class="fn-mid"><div class="fn-portrait"><div class="fn-halo" aria-hidden="true"></div>' + avHTML(w, { btn: true }) + '<span class="fn-crown">' + crown + '</span><span class="fn-seal" aria-hidden="true"></span></div>' +
         '<div class="fn-text"><div class="fn-title">' + G3(w.gender, 'Ultimo', 'Ultima', 'Ultimə') + ' in piedi</div><h1>' + esc(w.name) + '</h1>' + sub + '</div></div>' +
         '<div class="wstats fn-stats">' + cell(w.kills, soft ? 'eliminazioni' : 'uccisioni') + cell(w.events, 'eventi') + cell(w.alliancesFormed, 'alleanze') + cell(w.items, 'oggetti') + '</div></div>';
     } else if (W.length > 1) {

@@ -36,7 +36,15 @@ function assetsFor(uri) {
       });
     });
   }
-  return 'window.LOS_ASSETS = ' + JSON.stringify({ logo: uri('logo.webp', 'image/webp'), icona: uri('icona.webp', 'image/webp'), favicon: uri('favicon.png', 'image/png'), panoramica: uri('panoramica.webp', 'image/webp'), sagome, arene, atlas }) + ';';
+  // pennellate, sigilli e grana degli «stacchi»: maschere trasparenti, piccole, incorporate anche nel file portatile
+  const fx = { pennellate: [], sigilli: {}, grana: null };
+  if (fs.existsSync(path.join(A, 'fx'))) fs.readdirSync(path.join(A, 'fx')).sort().forEach((f) => {
+    const u = () => uri('fx/' + f, 'image/webp'); let m;
+    if (/^pennellata-\d+\.webp$/.test(f)) fx.pennellate.push(u());
+    else if ((m = f.match(/^sigillo-([\w-]+)\.webp$/))) fx.sigilli[m[1]] = u();
+    else if (f === 'grana.webp') fx.grana = u();
+  });
+  return 'window.LOS_ASSETS = ' + JSON.stringify({ logo: uri('logo.webp', 'image/webp'), icona: uri('icona.webp', 'image/webp'), favicon: uri('favicon.png', 'image/png'), panoramica: uri('panoramica.webp', 'image/webp'), sagome, arene, atlas, fx }) + ';';
 }
 const engineScripts = ['data-core.js', 'data-themes.js', ...content, 'engine-systems.js', 'engine-geography.js', 'engine.js'];
 const appScripts = ['art.js', 'atlas.js', 'anim.js', 'simulator.js', 'replay.js', 'experiments.js', 'map-view.js', 'studio.js', 'photo-search.js', 'ui.js'];

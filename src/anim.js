@@ -430,6 +430,24 @@
    * frena (uscita esponenziale), si esce accelerando; i momenti importanti hanno un cartello che arriva, resta fermo
    * il tempo di leggerlo e se ne va; il nuovo stato prende il colore d'accento; le uscite variano di poco i tempi
    * perché un ritmo tutto uguale sembra meccanico. Con il movimento ridotto non parte niente e il contenuto cambia subito. */
+  // pennellate, sigilli e grana dipinti (assets/fx): diventano variabili CSS. Le maschere chiedono la stessa origine,
+  // quindi da file:// valgono solo quelle incorporate; senza, restano le forme del foglio di stile
+  const FX = (G.LOS_ASSETS && G.LOS_ASSETS.fx) || {};
+  const fxOk = (u) => !!u && (/^data:/.test(u) || (G.location && /^https?:$/.test(G.location.protocol)));
+  const cssUrl = (u) => 'url("' + u + '")';
+  const PENS = (FX.pennellate || []).filter(fxOk);
+  if (typeof document !== 'undefined' && document.documentElement) {
+    const root = document.documentElement;
+    PENS.forEach((u, k) => root.style.setProperty('--fx-pen' + (k + 1), cssUrl(u)));
+    if (PENS.length >= 4) root.classList.add('fx-pen');
+    if (fxOk(FX.grana)) { root.style.setProperty('--fx-grana', cssUrl(FX.grana)); root.classList.add('fx-grana'); }
+  }
+  const sealOf = (theme) => (FX.sigilli && fxOk(FX.sigilli[theme]) ? FX.sigilli[theme] : null);
+  function seal(theme) {
+    const root = document.documentElement, u = sealOf(theme);
+    if (u) root.style.setProperty('--fx-sigillo', cssUrl(u)); else root.style.removeProperty('--fx-sigillo');
+    root.classList.toggle('fx-seal', !!u);
+  }
   const EASE_IN = 'cubic-bezier(.75,0,.25,1)', EASE_OUT = 'cubic-bezier(.16,1,.3,1)', EASE_CUT = 'cubic-bezier(.7,0,.84,0)';
   let wipeEl = null, wiping = false;
   function wipe(swap, opt) {
@@ -439,29 +457,38 @@
     wiping = true;
     if (!wipeEl || !wipeEl.isConnected) {
       wipeEl = document.createElement('div'); wipeEl.className = 'stacco'; wipeEl.setAttribute('aria-hidden', 'true');
-      wipeEl.innerHTML = '<i class="st-a"></i><i class="st-b"></i><i class="st-c"></i><b class="st-mark"></b>';
+      wipeEl.innerHTML = '<i class="st-a"></i><i class="st-b"></i><i class="st-c"></i><span class="st-seal"></span><b class="st-mark"></b>';
       body.appendChild(wipeEl);
     }
     const el = wipeEl, [a, b, c] = el.querySelectorAll('i'), mark = el.querySelector('.st-mark');
     if (opt.hue != null) el.style.setProperty('--wh', opt.hue); else el.style.removeProperty('--wh');
     mark.textContent = opt.label || '';
+    const ws = opt.arena && sealOf(opt.arena), sealEl = el.querySelector('.st-seal');
+    sealEl.style.display = ws ? '' : 'none'; if (ws) el.style.setProperty('--ws', cssUrl(ws));
+    if (PENS.length >= 4) { const order = [1, 2, 3, 4].sort(() => Math.random() - 0.5); ['--pa', '--pb', '--pc'].forEach((v, k) => el.style.setProperty(v, 'var(--fx-pen' + order[k] + ')')); }
     el.hidden = false;
-    const sk = ' skewX(-16deg)', jit = () => Math.round(R(-12, 12));
+    // con le pennellate l'inclinazione è più lieve: la forma del colpo di pennello dà già il movimento
+    const sk = PENS.length >= 4 ? ' skewX(-8deg)' : ' skewX(-16deg)', jit = () => Math.round(R(-12, 12));
     const slide = (n, from, to, o) => n.animate([{ transform: 'translateX(' + from + ')' + sk }, { transform: 'translateX(' + to + ')' + sk }], o);
     let swapped = false;
     const doSwap = () => { if (swapped) return; swapped = true; try { swap(); } catch (e) { setTimeout(() => { throw e; }); } };
-    const cover = [[a, 0], [b, 40], [c, 80]].map(([n, d]) => slide(n, '-170vw', '0', { duration: 230, delay: Math.max(0, d + jit()), easing: EASE_IN, fill: 'both' }));
+    // con le pennellate entra prima il colpo di pennello e per ultima la lastra piena, che garantisce la copertura;
+    // in uscita la lastra va via per prima e la pagina si scopre dietro il bordo dipinto
+    const P4 = PENS.length >= 4;
+    const cover = (P4 ? [[b, 0], [c, 45], [a, 95]] : [[a, 0], [b, 40], [c, 80]]).map(([n, d]) => slide(n, '-230vw', '0', { duration: 230, delay: Math.max(0, d + jit()), easing: EASE_IN, fill: 'both' }));
     mark.animate([{ opacity: 0, transform: 'translate(-50%, -50%) rotate(-7deg) scale(1.8)' }, { opacity: 1, transform: 'translate(-50%, -50%) rotate(-7deg) scale(1)' }], { duration: 200, delay: 220, easing: EASE_OUT, fill: 'both' });
+    if (ws) sealEl.animate([{ opacity: 0, transform: 'translate(-50%, -50%) rotate(-30deg) scale(1.6)' }, { opacity: 1, transform: 'translate(-50%, -50%) rotate(-10deg) scale(1)' }], { duration: 260, delay: 200, easing: EASE_OUT, fill: 'both' });
     Promise.all(cover.map((x) => x.finished))
       .then(() => new Promise((res) => setTimeout(res, opt.hold || 90)))
       .then(() => {
         doSwap();
         mark.animate([{ opacity: 1, transform: 'translate(-50%, -50%) rotate(-7deg) scale(1)' }, { opacity: 0, transform: 'translate(-20%, -50%) rotate(-7deg) scale(1)' }], { duration: 180, easing: EASE_CUT, fill: 'both' });
-        const out = [[c, 0], [b, 40], [a, 85]].map(([n, d]) => slide(n, '0', '170vw', { duration: 320, delay: Math.max(0, d + jit()), easing: EASE_OUT, fill: 'both' }));
+        if (ws) sealEl.animate([{ opacity: 1, transform: 'translate(-50%, -50%) rotate(-10deg) scale(1)' }, { opacity: 0, transform: 'translate(-30%, -50%) rotate(-4deg) scale(1)' }], { duration: 180, easing: EASE_CUT, fill: 'both' });
+        const out = (P4 ? [[a, 0], [c, 30], [b, 70]] : [[c, 0], [b, 40], [a, 85]]).map(([n, d]) => slide(n, '0', '230vw', { duration: 320, delay: Math.max(0, d + jit()), easing: EASE_OUT, fill: 'both' }));
         return Promise.all(out.map((x) => x.finished));
       })
       .catch(() => {})
-      .then(() => { doSwap(); el.hidden = true; wiping = false; [a, b, c, mark].forEach((n) => n.getAnimations().forEach((x) => x.cancel())); });
+      .then(() => { doSwap(); el.hidden = true; wiping = false; [a, b, c, mark, sealEl].forEach((n) => n.getAnimations().forEach((x) => x.cancel())); });
   }
   // un cartello sopra la scena della diretta: arriva, resta fermo il tempo di leggerlo, se ne va (la regia è nel CSS)
   function card(host, html, cls, dur) {
@@ -528,5 +555,5 @@
     })();
   }
 
-  G.LOS_ANIM = { get reduced() { return reduced; }, setReduced, field, countTo, kinetic, dice, domBurst, tilt, parallax, ripple, reveal, phaseFx, wipe, card, stage, intensityFor, confetti };
+  G.LOS_ANIM = { get reduced() { return reduced; }, setReduced, field, countTo, kinetic, dice, domBurst, tilt, parallax, ripple, reveal, phaseFx, wipe, card, stage, seal, intensityFor, confetti };
 })(typeof window !== 'undefined' ? window : globalThis);

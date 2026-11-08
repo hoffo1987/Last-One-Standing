@@ -50,9 +50,17 @@ Due cose le ho dedotte dal mestiere dell'animazione, non da una fonte su Persona
 
 Mentre un cartello copre la diretta, il titolo della fase aspetta e entra subito dopo.
 
-## Asset che renderebbero tutto più nostro
+## Asset dipinti
 
-Il sistema funziona già senza immagini: le lastre e le fasce sono forme del foglio di stile. Con questi asset diventerebbe dipinto come i banner. Quando me li dai li monto io.
+Gli asset sono montati in `assets/fx/`. Gli originali (nero su bianco) sono stati trasformati in maschere trasparenti: il colore lo mette il foglio di stile con la tinta dell'arena.
+
+- **Pennellate** (`pennellata-1…4.webp`): due colpi di pennello a caso per ogni stacco tra le sezioni, con la coda di schizzi come bordo che avanza; sotto passa per ultima una lastra piena, così lo schermo resta sempre coperto. Nei cartelli della diretta la fascia e la linea d'accento sono pennellate.
+- **Sigilli** (`sigillo-<arena>.webp`): dietro il nome della sezione durante lo stacco (quello dell'arena di arrivo), come filigrana nei cartelli e stampati sul ritratto di chi vince.
+- **Grana** (`grana.webp`): puntinatura sulle pennellate e sulle fasce.
+
+Le maschere chiedono la stessa origine: nel file portatile sono incorporate e funzionano sempre; il sito le carica dal suo dominio. Se non si possono caricare (per esempio aprendo `docs/index.html` da disco), restano le forme del foglio di stile.
+
+Qui sotto i prompt usati, per rigenerarli o aggiungerne.
 
 ### 1. Pennellate per le tendine (la richiesta più utile)
 
