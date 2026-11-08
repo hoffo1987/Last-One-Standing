@@ -22,12 +22,13 @@ function assetsFor(uri) {
   const arene = {};
   fs.readdirSync(path.join(A, 'arene')).filter((f) => f.endsWith('.webp')).forEach((f) => (arene[f.replace('.webp', '')] = uri('arene/' + f, 'image/webp')));
   const sagome = fs.readdirSync(path.join(A, 'sagome')).filter((f) => f.endsWith('.webp')).sort().map((f) => uri('sagome/' + f, 'image/webp'));
-  // atlante: assets/arene/<arena>/<sezione>/<nome>.webp — solo nel sito, per non gonfiare il file unico
+  // Le armi sono disponibili anche nel file portatile; i grandi fondali
+  // dell'atlante restano esterni nella sola versione web.
   const atlas = {};
   const MIME = { webp: 'image/webp', png: 'image/png', jpg: 'image/jpeg', jpeg: 'image/jpeg', avif: 'image/avif' };
-  if (uri === linked) {
+  {
     fs.readdirSync(path.join(A, 'arene'), { withFileTypes: true }).filter((d) => d.isDirectory()).forEach((th) => {
-      fs.readdirSync(path.join(A, 'arene', th.name), { withFileTypes: true }).filter((d) => d.isDirectory()).forEach((kd) => {
+      fs.readdirSync(path.join(A, 'arene', th.name), { withFileTypes: true }).filter((d) => d.isDirectory() && (uri === linked || d.name === 'armi')).forEach((kd) => {
         fs.readdirSync(path.join(A, 'arene', th.name, kd.name)).forEach((f) => {
           const m = f.match(/^(.+)\.(webp|png|jpe?g|avif)$/i); if (!m) return;
           ((atlas[th.name] = atlas[th.name] || {})[kd.name] = atlas[th.name][kd.name] || {})[m[1].toLowerCase()] = uri('arene/' + th.name + '/' + kd.name + '/' + f, MIME[m[2].toLowerCase()]);

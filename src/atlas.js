@@ -9,6 +9,10 @@
   const norm = (s) => String(s || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
   // nome del file: senza articolo iniziale, senza accenti, parole separate da trattini
   const slug = (s) => norm(s).replace(/^(il |lo |la |l'|i |gli |le |un |uno |una |un'|delle |dei |degli |del |della |dell')/, '').replace(/['’]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+  // Le varianti del mondo conservano la stessa identità visiva del modello;
+  // presa, usura, qualità e provenienza restano indicate nei dati dello zaino.
+  const weaponBaseName = (name) => String(name || '').replace(/ con (?:presa in tessuto|laccio da polso|presa in cuoio|contrappeso ad anello|fodero di recupero|riferimenti datati|annotazioni verificabili|una copia firmata|indice analitico|allegati numerati|firmware aggiornato|modulo di puntamento|batteria potenziata|circuiti schermati|modalità silenziosa)$/i, '');
+  const weaponKey = (name) => slug(weaponBaseName(name).replace(/’/g, "'"));
   const has = (theme, kind, key) => !!(ASSETS[theme] && ASSETS[theme][kind] && ASSETS[theme][kind][key]);
   const url = (theme, kind, key) => (has(theme, kind, key) ? ASSETS[theme][kind][key] : null);
   const count = (theme) => { const a = ASSETS[theme] || {}; return Object.keys(a).reduce((s, k) => s + Object.keys(a[k]).length, 0); };
@@ -241,7 +245,7 @@
   /* ---------------- API ---------------- */
   // restituisce l'immagine vera se esiste, altrimenti l'illustrazione
   function pic(theme, kind, name, h, opts) {
-    const key = kind === 'oggetti' ? name : slug(name);
+    const key = kind === 'oggetti' ? name : kind === 'armi' ? weaponKey(name) : slug(name);
     const fam = (kind === 'meteo' || kind === 'disastri') ? family(name, opts && opts.extra, theme) : null;
     const real = url(theme, kind, key) || (fam && url(theme, kind, '_' + fam));
     const cls = 'ax ax-' + kind + (real ? ' ax-real' : '');
@@ -263,5 +267,5 @@
     return '<span class="' + cls + '" data-fam="' + (fam || '') + '">' + art + '</span>';
   }
 
-  G.LOS_ATLAS = { pic, slug, family, has, count, kinds: ['luoghi', 'pericoli', 'armi', 'meteo', 'disastri', 'oggetti'], families: FAM.map((f) => f[0]) };
+  G.LOS_ATLAS = { pic, slug, weaponBaseName, weaponKey, family, has, count, kinds: ['luoghi', 'pericoli', 'armi', 'meteo', 'disastri', 'oggetti'], families: FAM.map((f) => f[0]) };
 })(typeof window !== 'undefined' ? window : globalThis);

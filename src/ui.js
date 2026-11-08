@@ -82,7 +82,8 @@
       const usesBar = it.u != null && it.m ? '<span class="uses" title="Usura: ' + it.u + ' su ' + it.m + '"><b style="width:' + Math.round((it.u / it.m) * 100) + '%"></b></span>' : '';
       const tag = it.x === 'veleno' ? '<span class="itag bad">Avvelenata</span>' : it.x === 'bomba' ? '<span class="itag bad">Esplosiva</span>' : '';
       const desc = inf.d ? esc(inf.d) + (inf.td ? ' ' + esc(inf.td) : '') : esc(ty.desc);
-      return '<div class="bitem t-' + esc(it.t) + '"><span class="bic">' + (ITIC[it.t] || ITIC.valore) + '</span><div class="bbody"><div class="btop"><b>' + esc(capFirst(stripArt(it.n))) + '</b>' + stars + tag + '</div>' +
+      const art = it.t === 'arma' && ATL.has(theme.id, 'armi', ATL.weaponKey(it.n)) ? ATL.pic(theme.id, 'armi', it.n, theme.hue) : null;
+      return '<div class="bitem t-' + esc(it.t) + (art ? ' illustrated' : '') + '"><span class="bic">' + (art || ITIC[it.t] || ITIC.valore) + '</span><div class="bbody"><div class="btop"><b>' + esc(capFirst(stripArt(it.n))) + '</b>' + stars + tag + '</div>' +
         '<div class="bmeta"><span class="btype">' + esc(ty.label) + '</span><span>' + how + '</span>' + usesBar + '</div><p>' + desc + '</p>' +
         (uses.length ? '<ul class="buses">' + uses.map((u) => '<li>' + esc(u) + '</li>').join('') + '</ul>' : '') + '</div></div>';
     }).join('') + '</div>';
@@ -1444,10 +1445,13 @@
       '<div class="pl-cols"><div><h5>Contano di più</h5><ol class="pl-keys">' + (A.key || []).map((k) => '<li>' + esc(ECO.attrNames[k] || k) + '</li>').join('') + '</ol></div>' +
       '<div><h5>Da tenere d\'occhio</h5><div class="chips">' + [lb.hp, lb.en, lb.mo, lb.food].map((x) => '<span class="chip dim">' + esc(x) + '</span>').join('') + (m ? '<span class="chip st">' + esc(m.name) + '</span>' : '') + '</div></div></div></div></section>' : '';
     const arms = t.lex.arma.slice(0, 10).map((x) => '<li class="arm">' + ATL.pic(t.id, 'armi', x, t.hue) + '<span>' + esc(capFirst(stripArt(x))) + '</span></li>').join('');
+    const baseKeys = new Set(t.lex.arma.map(ATL.weaponKey));
+    const extraArms = [...new Set((D.world?.compile(t)?.items || []).filter(it => it.type === 'arma').map(it => ATL.weaponBaseName(it.name)))].filter(name => !baseKeys.has(ATL.weaponKey(name)));
+    const moreArms = extraArms.length ? '<details class="weapon-more"><summary>Altri modelli dell’arena · ' + extraArms.length + '</summary><ul class="rack">' + extraArms.map(name => '<li class="arm">' + ATL.pic(t.id, 'armi', name, t.hue) + '<span>' + esc(capFirst(stripArt(name))) + '</span></li>').join('') + '</ul><p class="help">Le varianti conservano l’immagine del modello; qualità, impugnatura e provenienza sono indicate nello zaino.</p></details>' : '';
     const beasts = t.lex.mostro.map((x, i) => '<article class="wanted" style="--r:' + ((i % 2 ? 1 : -1) * (1 + i % 3)) + 'deg">' + ATL.pic(t.id, 'pericoli', x, t.hue) + '<div class="wd-body"><span class="wd-tag">' + (t.soft ? 'Attenzione' : 'Pericolo') + '</span><h4>' + esc(capFirst(stripArt(x))) + '</h4></div></article>').join('');
     return chHead('Il campo di gioco', plural(Z.length, 'zona', 'zone') + ' collegate da passaggi. Gli spostamenti consumano energia e gli incontri richiedono la presenza nello stesso luogo. Le zone ricche aiutano a trovare cibo; di notte il riparo e i compagni presenti favoriscono il recupero. Gli imprevisti locali coinvolgono chi è sul posto e possono riemergere nei dialoghi delle fasi successive.') +
       '<div class="zboard">' + zones + '</div>' + plaque +
-      '<div class="dx-split"><section class="arsenal"><div class="ch-sub"><h4>' + (t.soft ? 'Armi improprie' : 'Armeria') + '</h4><p>' + (t.soft ? 'Con queste si fanno fuori i rivali, senza versare sangue.' : (t.id === 'cyberpunk' ? 'Si raccolgono in giro, si rubano agli altri o arrivano dai fixer. Gli impianti, una volta installati, non passano di mano.' : 'Si raccolgono in giro, si rubano agli altri o arrivano dagli sponsor.')) + '</p></div><ul class="rack">' + arms + '</ul></section>' +
+      '<div class="dx-split"><section class="arsenal"><div class="ch-sub"><h4>' + (t.soft ? 'Armi improprie' : 'Armeria') + '</h4><p>' + (t.soft ? 'Con queste si fanno fuori i rivali, senza versare sangue.' : (t.id === 'cyberpunk' ? 'Si raccolgono in giro, si rubano agli altri o arrivano dai fixer. Gli impianti, una volta installati, non passano di mano.' : 'Si raccolgono in giro, si rubano agli altri o arrivano dagli sponsor.')) + '</p></div><ul class="rack">' + arms + '</ul>' + moreArms + '</section>' +
       '<section class="bestiary"><div class="ch-sub"><h4>' + (t.soft ? 'Da evitare' : 'Pericoli') + '</h4><p>' + (t.soft ? 'Girano per i corridoi: chi resta da solo rischia di finire nei guai.' : 'Di notte attaccano chi dorme da solo, soprattutto nelle zone pericolose.') + '</p></div><div class="wanted-grid">' + beasts + '</div></section></div>';
   }
 

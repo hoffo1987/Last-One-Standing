@@ -333,3 +333,7 @@ I fatti vissuti restano nel registro della partita, compresi i finali e le conse
 
 ## Complotti riservati e finale aperto
 Nuovi piani di imboscata, sabotaggio e accordo a tre restano nascosti fino all'esecuzione, anche nei diari e nel grafo dei rapporti. Possono fallire o essere ribaltati da un complice. I piani sono pochi (circa uno ogni tre concorrenti) e si rivelano con frasi diverse che non si ripetono nella stessa partita. La stretta finale si svolge in più atti con titoli e introduzioni che dicono quanti restano e cosa cambia; le frasi che chiudono la partita («l'ultimo scontro», «vince la partita») compaiono solo quando restano in due. Risorse conservate, schermaglie e confronti su abilità diverse possono cambiare gli equilibri. Preparazioni, oggetti, posizioni e regole di vittoria restano verificabili nel replay. [Regole, limiti e verifiche](docs-dev/complotti-e-finale.md).
+
+## Armi illustrate
+I 132 modelli d'arma delle dieci arene hanno illustrazioni individuali con sfondo trasparente, visibili nell'armeria e negli zaini delle partite. Le varianti usano l'immagine del proprio modello e conservano nome, qualità, usura e provenienza. Lo stile degli oggetti segue materiali e colori dell'arena, compresi gli strumenti sociali di Liceo e Ufficio. Le immagini sono disponibili anche nel file portatile. [Catalogo e prompt](assets/armi-manifest.json) · [Integrazione e verifiche](docs-dev/illustrazioni-armi.md).
+

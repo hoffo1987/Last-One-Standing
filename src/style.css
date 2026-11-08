@@ -962,6 +962,9 @@ img.scene { object-fit: cover; object-position: center; user-select: none; }
 .bitem { display: grid; grid-template-columns: 34px minmax(0, 1fr); gap: 10px; padding: 10px; border: 1px solid var(--line); border-radius: 10px; background: var(--panel); min-width: 0; }
 .bic { width: 34px; height: 34px; border-radius: 9px; display: grid; place-items: center; background: var(--panel-2); color: var(--ink); }
 .bic svg { width: 19px; height: 19px; }
+.bitem.illustrated { grid-template-columns: 68px minmax(0, 1fr); }
+.bitem.illustrated .bic { width: 68px; height: 68px; background: transparent; }
+.bitem.illustrated .ax { width: 100%; height: 100%; border-radius: 8px; background: transparent; }
 .t-arma .bic, .t-esplosivo .bic, .t-trap .bic, .t-veleno .bic { color: color-mix(in srgb, var(--c-kill) 75%, var(--ink)); background: color-mix(in srgb, var(--c-kill) 12%, var(--panel-2)); }
 .t-med .bic, .t-cibo .bic, .t-armatura .bic { color: color-mix(in srgb, var(--c-heal) 75%, var(--ink)); background: color-mix(in srgb, var(--c-heal) 12%, var(--panel-2)); }
 .t-ricordo .bic, .t-amuleto .bic { color: color-mix(in srgb, var(--c-love) 75%, var(--ink)); background: color-mix(in srgb, var(--c-love) 12%, var(--panel-2)); }
@@ -1561,6 +1564,10 @@ details.card > summary { font-size: 16px; }
 /* immagini dell'atlante */
 .ax { display: block; position: relative; overflow: hidden; background: hsl(var(--h) 30% 20%); }
 .ax svg, .ax img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.ax-armi.ax-real img { object-fit: contain; padding: 4px; }
+.weapon-more { margin-top: 16px; }
+.weapon-more summary { cursor: pointer; font-weight: 600; }
+.weapon-more .rack { margin-block: 14px; }
 .ax-crop { background-size: 300% auto; background-repeat: no-repeat; filter: saturate(1.05); }
 
 /* zone */
