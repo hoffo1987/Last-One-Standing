@@ -9641,6 +9641,167 @@ Il gas nervino | I militari rilasciano un gas per fermare gli infetti. Ferma anc
 })(typeof window !== 'undefined' ? window : globalThis);
 
 ;
+/* Night City — Zona Rossa, contenuti per adulti (solo con il filtro 18+ attivo).
+ * Sesso esplicito e sboccato, sempre tra adulti consenzienti e lucidi: coppie già formate,
+ * nuove coppie solo quando il motore lo permette (love:), avventure solo tra amici single.
+ * Gore senza freni negli scontri, nelle morti e nei disastri; mai violenza a sfondo sessuale.
+ * Stesse regole degli altri pacchetti: ogni fatto raccontato ha il suo effetto,
+ * le azioni dei netrunner avvengono sul posto, il Sovraccarico cala solo con cure o diagnosi. */
+(function (G) {
+  const D = (G.LOS_DATA = G.LOS_DATA || {}); D.packs = D.packs || [];
+  D.packs.push({
+    theme: 'cyberpunk', adult: true,
+    ev: {
+      b: `
+2 at:6 k:A>B @agg w:A | Nel caos della Piazza, {A} pianta {arma:A} nello stomaco di {B} e la gira finché {B} non smette di urlare. Le budella finiscono sui piedi di un turista.
+2 at:6 k:A>B @agg | {A} sbatte la testa di {B} contro la serranda che scende, una volta, due, tre. Alla quarta la serranda scende lo stesso, e la testa di {B} resta dall'altra parte.
+1 at:6 d:A | {A} prova a passare sotto una barriera di sicurezza nel momento sbagliato. La barriera sale e lo apre in due dal mento allo sterno.
+2 at:6 friend:AB single:A single:B amo:A>B+10 amo:B>A+10 mo:A+10 mo:B+10 | Chiusi nell'ascensore di servizio della torre durante lo sgombero, {A} e {B} decidono che, se devono morire, non moriranno vergini di quell'ascensore. Quando le porte si riaprono, hanno il fiato corto e i vestiti al contrario.
+2 at:6 hit:A>B | Nella calca, {A} morde l'orecchio di {B} per farsi largo e se ne tiene un pezzo in bocca per tre isolati.
+3 at:6 k:A>BC *0.4 @agg | {A} lancia una granata nel vano scala dove si nascondono {B} e {C}. Per giorni i robot delle pulizie trovano pezzi di entrambi sul corrimano.
+`,
+      d: `
+2 at:0 love:AB | Al Mercato di Kabuki, {A} e {B} si infilano nel retro di un banco di ottiche usate e fanno l'amore tra scatole di occhi di ricambio che li fissano da ogni scaffale. Da quel giorno sono una coppia, e hanno un pubblico.
+2 at:0 couple:AB mo:A+12 mo:B+12 en:A-8 en:B-8 | Al Mercato, {A} e {B} affittano per mezz'ora il furgone di un venditore di spiedini. Il furgone dondola così tanto che dal tetto cadono tre insegne e un cuoco.
+1 at:0 mo:A+12 star:A | Al Mercato, {A} prova un impianto «per il piacere personale» in offerta al banco di un ripperdoc ambulante. La dimostrazione dal vivo, per fortuna sotto un telo, raduna quaranta curiosi e un'ovazione.
+1 at:0 s:A=ubriaco mo:A+10 | Al Mercato, {A} accetta da una vecchietta un liquore fatto con serpenti sintetici e qualcosa che lei chiama «il segreto della virilità». Il segreto è il novanta per cento di alcol.
+2 at:0 k:A>B @agg | Al Mercato, {A} infila la testa di {B} nella friggitrice dei noodle e la tiene giù. Il venditore, per non sprecare l'olio, continua a friggere.
+2 at:0 k:A>B @agg | Al Mercato, {A} trascina {B} dietro il banco del macellaio di carne coltivata e usa la mannaia del banco. Per qualche ora, il macellaio vende anche «carne non coltivata».
+1 at:0 d:A | Al Mercato, {A} mangia gli spiedini del banco più economico. Dopo un'ora, quello che esce da entrambe le estremità ha il colore delle insegne. Muore in un bagno chimico, tra le lacrime di tutti quelli in fila.
+1 at:0 s:A=avvelenato | Al Mercato, {A} beve un frullato «afrodisiaco al cento per cento». Effetto garantito: dodici ore di vampate, sudore freddo e vomito a getto. Niente di tutto questo aiuta.
+2 at:0 test:A=car12 ok:mo:A+15 ok:mo:B+10 ok:amo:B>A+8 ko:mo:A-10 friend:AB single:A single:B | Al Mercato, {A} vince a {B} una bambola gonfiabile olografica al tiro a segno, poi la butta via e propone di esercitarsi direttamente tra loro. {B} ride, e accetta. || Al Mercato, {A} vince a {B} una bambola gonfiabile olografica al tiro a segno. {B} sceglie la bambola.
+1 at:1 en:A+10 mo:A+10 | Al Megablocco, {A} si addormenta ascoltando dal muro sottile della capsula accanto i vicini che fanno sesso con la regolarità di un metronomo. Alla fine è quasi rilassante.
+2 at:1 couple:AB mo:A+12 mo:B+12 | Al Megablocco, {A} e {B} fanno l'amore in una capsula-letto progettata per una persona sola. Rompono la ventola e il sensore antincendio, ma ne vale la pena.
+2 at:1 love:AB | Al Megablocco, {A} e {B} restano bloccat[AB:i/e] sul ballatoio del quarantesimo piano sotto la pioggia acida. Si scaldano come possono, e possono parecchio. Scendono le scale tenendosi per mano: sono una coppia.
+2 at:1 k:A>B @agg | Al Megablocco, {A} spinge {B} nella tromba dell'ascensore. {B} rimbalza su tre cavi prima di arrivare in fondo, ormai in più pezzi che piani.
+2 at:1 k:A>B @agg | Al Megablocco, {A} tiene {B} contro il condotto della spazzatura e lo usa come tritacarne. Il condotto si intasa al ventesimo piano.
+1 at:1 d:A | Al Megablocco, {A} cade dal ballatoio e si infilza sull'antenna del piano di sotto. Resta lì per due giorni, come un'insegna macabra.
+2 at:1 enemy:AB hit:A>B | Al Megablocco, {A} chiude la porta blindata impazzita sulla mano di {B}. Tre dita restano dall'altra parte.
+1 at:2 test:A=res13 ok:pr:A-20 ok:mo:A+10 ko:s:A=ferito | Alla Clinica, Doc Ferraglia propone a {A} un impianto «per le prestazioni di coppia» in offerta lancio. Durante l'installazione ricalibra anche tutti gli altri impianti, e il sovraccarico scende. || Alla Clinica, Doc Ferraglia prova a installare a {A} un impianto «per le prestazioni di coppia». Lo installa nel posto sbagliato. Sanguina tutto, ovunque.
+2 at:2 couple:AB need:B=ferito cure:B mo:A+10 | Alla Clinica, {A} si offre come «anestetico naturale» mentre Doc Ferraglia ricuce {B}. Funziona così bene che il Doc chiede di brevettarlo. Ferite chiuse e impianti ricalibrati.
+2 at:2 k:A>B @agg | Alla Clinica, {A} lega {B} al lettino operatorio e accende il braccio chirurgico automatico. Il braccio esegue un trapianto completo di tutti gli organi, verso il pavimento.
+2 at:2 enemy:AB test:A=furt12 ok:k:A>B ko:hit:B>A | Alla Clinica, {A} scambia la sacca di sangue di {B} con una di liquido di raffreddamento. {B} diventa blu, poi grigio, poi niente. || Alla Clinica, {A} prova a scambiare la sacca di sangue di {B}, ma {B} si sveglia e [A:gli/le] pianta un bisturi nella coscia.
+1 at:2 d:A | Alla Clinica, {A} si sottopone a una liposuzione rapida da Doc Ferraglia. La macchina aspira troppo, e troppo a lungo. Il Doc canta il requiem.
+1 at:2 s:A=sconvolto | Alla Clinica, {A} apre il frigorifero sbagliato: dentro ci sono trenta peni cibernetici in vari colori, con il prezzo. Uno lampeggia.
+1 at:3 con:A=valore -valore:A mo:A+15 en:A+10 | Al Club, {A} paga con {valore:A} un'ora con una professionista della casa delle bambole, l'ala riservata del Club. Escono entrambi soddisfatti, e lei [A:gli/le] lascia anche il biglietto da visita.
+1 at:3 pr:A+12 mo:A+15 | Al Club, {A} prova una braindance per adulti registrata da una star del porno di quarant'anni fa. Esce barcollando, con gli impianti in fiamme e un sorriso ebete.
+2 at:3 couple:AB mo:A+12 mo:B+12 | Al Club, {A} e {B} fanno sesso in una cabina per la braindance, con il visore acceso su un documentario sulle balene. Nessuno dei due se ne accorge fino alla fine.
+2 at:3 love:AB | Al Club, {A} e {B} ballano così vicini che il buttafuori chiede loro di prendere una stanza. La prendono, e ne escono coppia.
+2 at:3 friend:AB single:A single:B amo:A>B+10 amo:B>A+10 mo:A+12 mo:B+12 | Al Club, {A} e {B} si chiudono nel bagno per «parlare in privato». La fila fuori dal bagno, dopo venti minuti, applaude.
+3 at:3 friend:AB friend:AC friend:BC single:A single:B single:C mo:A+12 mo:B+12 mo:C+12 en:A-10 en:B-10 en:C-10 | Al Club, {A}, {B} e {C} finiscono nella stessa cabina privata con tre cocktail e nessuna intenzione di guardare la braindance. Escono all'alba, sfinit[ABC:i/e] e senza un calzino.
+1 at:3 s:A=ubriaco mo:A+10 | Al Club, {A} fa uno spogliarello sul bancone per una scommessa. Vince la scommessa, perde i pantaloni e diventa una leggenda del locale.
+2 at:3 k:A>B @agg | Al Club, {A} spacca una bottiglia cromata in testa a {B} e usa quello che resta del collo per finire il lavoro. La musica copre tutto, tranne il sangue sulla pista.
+2 at:3 k:A>B @agg | Al Club, {A} collega il visore di {B} a una braindance di morte registrata dal vero e alza il volume al massimo. A {B} esplode un occhio, poi l'altro.
+1 at:3 d:A | Al Club, {A} prova una braindance proibita registrata durante un incidente d'auto. Il cervello non distingue: le costole si spezzano davvero.
+2 at:4 k:A>B @agg | All'Officina, {A} infila {B} nella pressa idraulica dei Maelstrom. Esce un rettangolo di trenta centimetri per quaranta, piuttosto decorativo. I Maelstrom lo appendono al muro.
+2 at:4 k:A>B @agg | All'Officina, {A} lega {B} alla ruota posteriore di una moto e dà gas. Sulla strada resta una scia lunga un isolato.
+2 at:4 hit:A>B | All'Officina, {A} strappa a mani nude il braccio cromato di {B}. Viene via con i tendini attaccati.
+1 at:4 test:A=res13 ok:star:A ok:mo:A+10 ko:s:A=ferito | All'Officina, i Maelstrom propongono a {A} il loro rito d'ingresso: un chiodo nella lingua, a freddo, davanti a tutti. {A} non fa una piega. || All'Officina, i Maelstrom propongono a {A} il rito del chiodo nella lingua. {A} urla, sputa sangue per un'ora e viene chiamat[A:o/a] «Muta» per sempre.
+2 at:4 couple:AB mo:A+12 mo:B+12 | All'Officina, {A} e {B} fanno sesso sul cofano di una moto blindata appena verniciata. La vernice non era asciutta: hanno entrambi il logo dei Maelstrom stampato sul culo.
+1 at:4 d:A | All'Officina, {A} si avvicina troppo al cane cibernetico dei Maelstrom. Del corpo di {A} restano gli stivali, ancora allacciati.
+2 at:5 k:A>B @agg | Al Nodo dati, {A} infila la presa di {B} nel cavo dell'alta tensione dei server. Il fumo esce dalle orecchie, dal naso e da posti che non si nominano.
+2 at:5 enemy:AB test:A=int13 ok:k:A>B ko:pr:A+15 | Al Nodo dati, {A} collega la presa di {B} al terminale e lancia un attacco di surriscaldamento. Il cervello di {B} bolle; gli occhi cotti scoppiano come uova. || Al Nodo dati, {A} prova a collegare la presa di {B} al terminale, ma l'ICE devia la scarica nei propri impianti.
+1 at:5 d:A | Al Nodo dati, {A} resta chius[A:o/a] nella sala server mentre il gas di raffreddamento ghiaccia tutto. Quando la porta si riapre, {A} si spezza come vetro.
+1 at:5 star:A mo:A+8 | Al Nodo dati, {A} trova sul terminale l'archivio privato di un dirigente della Kagemura Dynamics: dodici anni di video amatoriali con la sua amante. Li manda in onda sul megaschermo della Piazza.
+2 at:6 k:A>B @agg w:A | In Piazza, sotto il megaschermo, {A} decapita {B} con {arma:A}. La testa rotola fino ai piedi della statua del fondatore, che continua a sorridere.
+2 at:6 couple:AB star:A star:B | In Piazza, {A} e {B} si baciano sotto il megaschermo, che li inquadra per sbaglio. Poi smettono di limitarsi a baciarsi. La diretta batte ogni record.
+1 at:6 d:A | In Piazza, {A} viene colpit[A:o/a] da un cecchino corporativo. Il proiettile a frammentazione [A:gli/le] apre il cranio come un fiore.
+2 couple:AB stat:A>pr60 stat:B>pr60 mo:A+12 mo:B+12 pr:A+5 pr:B+5 | Con gli impianti al limite, {A} e {B} collegano le prese e fanno sesso in rete, senza toccarsi. Gli impianti vanno in tilt per il piacere, e il sovraccarico sale per entrambi.
+2 couple:AB mo:A+10 mo:B+10 en:A-6 en:B-6 | {A} e {B} trovano un'auto abbandonata con i sedili ribaltabili. L'auto non si muove, ma le sospensioni lavorano per ore.
+2 couple:AB test:A=car12 ok:mo:A+15 ok:mo:B+15 ko:mo:A-8 | {A} propone a {B} di provare un gioco con le manette trovate in una volante. Funziona benissimo. || {A} propone a {B} di provare le manette trovate in una volante. La chiave delle manette resta nella volante, e la volante se ne va.
+2 couple:AB s:A=ferito mo:B+10 | {A} prova a sollevare {B} contro un muro come nelle braindance. Il muro regge, la schiena di {A} no.
+2 single:A single:B friend:AB amo:A>B+12 amo:B>A+12 mo:A+10 mo:B+10 | {A} e {B} si rifugiano dalla pioggia acida in una cabina per fototessere. La cabina, ad ogni movimento, scatta una foto. Ne escono con sedici foto e nessun rimpianto.
+2 love:AB | Al riparo in un portone, incuranti della pioggia acida, {A} e {B} si strappano i vestiti a vicenda. Quando smette di piovere, si mettono insieme.
+2 crush:A>B test:A=car12 ok:love:AB ko:mo:A-12 | {A} invita {B} nella propria capsula con una frase da braindance di serie B. Incredibilmente, funziona, e la mattina sono una coppia. || {A} invita {B} nella propria capsula con una frase da braindance di serie B. {B} ride così forte che si sveglia tutto il piano.
+2 couple:AB grudge:A>B *0.5 mo:A+8 | {A} e {B} litigano, si insultano, si odiano, e poi fanno sesso con la rabbia di due motori truccati. Il rancore resta, ma per un'ora non conta.
+1 mo:A+10 | {A} scopre che le proprie ottiche hanno una modalità «vista ai raggi X» che non aveva mai attivato. La attiva. Passa la giornata ad arrossire.
+1 s:A=ubriaco mo:A+8 | {A} si ubriaca e manda un messaggio vocale esplicito al numero sbagliato. Il numero è quello di Radio Zona Rossa, e DJ Saetta lo manda in onda.
+1 pr:A+10 mo:A+10 | {A} si fa installare da un ripperdoc di strada un piercing luminoso in un posto molto privato. Lampeggia a tempo con la musica. Gli impianti scaldano, e non solo quelli.
+2 enemy:AB k:A>B @agg w:A | {A} insegue {B} in un vicolo cieco e usa {arma:A} per aprirl[B:o/a] come una lattina. Ci mette il tempo che serve.
+2 enemy:AB k:A>B @agg | {A} strangola {B} con il cavo del suo stesso cyberdeck, finché le ottiche di {B} non diventano nere.
+2 enemy:AB k:A>B @agg | {A} strappa a {B} gli impianti uno per uno, a mani nude, finché non resta niente da strappare. Li getta in un tombino, ancora caldi.
+2 enemy:AB hit:A>B | {A} prende {B} a calci nei testicoli, o in quello che {B} ha installato al loro posto, con lo stivale chiodato.
+2 grudge:A>B k:A>B @agg | {A} raggiunge {B} e [B:gli/le] taglia la lingua prima del resto, «così non dici più niente su di me».
+2 k:A>B @agg @stl | {A} tende un filo monomolecolare all'altezza del collo in un corridoio buio. {B} ci passa di corsa. La testa fa ancora due passi.
+2 k:A>B @agg | {A} raccoglie una katana termica abbandonata e la usa su {B}. La lama cauterizza mentre taglia: nemmeno una goccia di sangue, solo l'odore della carne bruciata.
+3 k:A>BC *0.4 @agg | {A} apre la valvola del gas di un ristorante di noodle dove {B} e {C} stanno mangiando, e accende un fiammifero. Le scodelle volano a tre isolati di distanza, e anche il resto.
+1 trait:A=ubriacone s:A=ubriaco mo:A+10 | {A} beve un cocktail chiamato «Orgasmo neurale». Non fa quello che promette, ma fa abbastanza.
+1 trait:A=esibizionista star:A mo:A+10 | {A} gira nud[A:o/a] per il Mercato per un'intera mattina «per una protesta contro le corporazioni». Nessuno capisce contro cosa, tutti filmano.
+1 trait:A=folle mo:A+10 pr:A+6 | {A} si innamora del distributore Gino e gli dedica una serenata con le mani sul vetro. Gino arrossisce, nei limiti di un distributore. Gli impianti di {A}, invece, scaldano.
+1 trait:A=romantico mo:A+12 | {A} scrive una poesia erotica sul muro di un bagno del Club. Nel giro di un'ora ha quattordici risposte, due proposte di matrimonio e un disegno anatomicamente scorretto.
+1 trait:A=spietato star:A | {A} appende i corpi di chi ha ucciso ai lampioni del quartiere, con un'insegna olografica sopra ciascuno. I fixer pagano bene per le foto.
+1 trait:A=paranoico s:A=ferito | {A} si convince di avere un localizzatore sotto la pelle e prova a estrarselo con un coltello da cucina. Non trova niente. Trova solo molto sangue.
+1 trait:A=goloso s:A=malato | {A} mangia una ciotola di vermi fritti «afrodisiaci» del Mercato. La notte la passa sul water, ma non per i motivi promessi.
+1 trait:A=sfortunato s:A=ferito | {A} si siede su una panchina elettrificata dagli Scav per scoraggiare i clochard. Si alza con la sedia ancora attaccata ai pantaloni e la pelle no.
+1 trait:A=bruto star:A | {A} sfida a una rissa un Maelstrom con il torace d'acciaio, vince e beve un bicchiere del suo sangue davanti a tutti, per rispetto della tradizione.
+1 trait:A=sopravvissuto test:A=res13 ok:hp:A+15 ko:hp:A-10 | {A} si cauterizza una ferita con la canna rovente di una pistola appena usata. Urla, ma la ferita si chiude. || {A} prova a cauterizzarsi una ferita con una canna rovente, ma la canna si è già raffreddata e serve solo a farsi più male.
+`,
+      n: `
+2 couple:AB mo:A+12 mo:B+12 en:A-6 en:B-6 | Di notte {A} e {B} fanno l'amore sul tetto, sotto una tettoia che gocciola e le insegne che cambiano colore. Nessuno dei due guarda le insegne.
+2 couple:AB mo:A+10 mo:B+10 | Di notte {A} e {B} si chiudono in una capsula-letto del Megablocco. Il vicino batte sul muro tre volte, poi si arrende e mette le cuffie.
+2 love:AB | Di notte, durante il blackout, {A} e {B} si trovano a tentoni nello stesso vano tecnico. Quando le luci tornano, non hanno più niente addosso e sono una coppia.
+2 single:A single:B friend:AB amo:A>B+10 amo:B>A+10 en:A-8 en:B-8 mo:A+10 mo:B+10 | Di notte {A} e {B} dividono l'unica coperta rimasta. Poi dividono anche il resto. Al mattino nessuno dei due ne parla, ma sorridono.
+2 couple:AB pr:A+6 pr:B+6 mo:A+12 mo:B+12 | Di notte {A} e {B} si collegano a una braindance erotica in due. Il segnale si sovrappone e ognuno sente quello che sente l'altro. Gli impianti vanno in sovraccarico, e non se ne pentono.
+1 mo:A+10 en:A+6 | Di notte {A} si concede un'ora con il catalogo olografico della casa delle bambole del Club. Senza pagare. Il catalogo ha una modalità anteprima molto generosa.
+2 k:A>B @stl @agg | Di notte {A} raggiunge {B} che dorme e [B:gli/le] infila un cacciavite nell'orecchio fino al manico. {B} non si sveglia più.
+2 k:A>B @stl @agg | Di notte {A} versa acido di batteria sulla faccia di {B} addormentat[B:o/a]. Le urla svegliano tutto il palazzo, poi smettono.
+2 enemy:AB test:A=furt12 ok:k:A>B ko:hit:B>A | Di notte {A} entra nel nascondiglio di {B} con un filo monomolecolare tra le mani. Il filo trova il collo al primo tentativo. || Di notte {A} entra nel nascondiglio di {B} con un filo monomolecolare, ma {B} si sveglia e [A:gli/le] trancia due dita con lo stesso filo.
+1 d:A | Di notte {A} si addormenta nel vicolo sbagliato. Gli Scav [A:gli/le] prelevano reni, cornee e fegato, con precisione chirurgica. Quando si sveglia, non si sveglia.
+1 s:A=sconvolto | Di notte {A} trova nel cassonetto dietro la Clinica un sacco di arti cibernetici con ancora la carne attaccata. Uno saluta.
+1 trait:A=solitario mo:A+8 | Di notte {A} scopre che il proprio braccio cromato ha una funzione vibrante. Passa una notte di solitudine molto meno solitaria del solito.
+1 trait:A=sonnambulo s:A=ferito | Nel sonno {A} cammina fino a una finestra del Megablocco, la apre e si sporge. Si sveglia appes[A:o/a] a un cavo, con il braccio slogato e il pigiama strappato.
+1 trait:A=vendicativo mo:A+8 | Di notte {A} affila un coltello e ripete ad alta voce, con dovizia di dettagli anatomici, cosa farà ai propri nemici. Si addormenta seren[A:o/a].
+2 grudge:A>B k:A>B @agg | Di notte {A} trova {B} e [B:gli/le] cava gli occhi cibernetici con un cucchiaio, prima di chiudere il conto. Gli occhi restano accesi per un'ora, sul pavimento.
+3 couple:AB friend:AC friend:BC single:C mo:A+10 mo:B+10 mo:C+12 | Di notte {A} e {B} invitano {C} nella loro capsula «per stare più caldi». Fa effettivamente molto caldo.
+`,
+      f: `
+1 +arma:A star:A | Alla consegna, {A} trova nella cassa {arma} e una scatola di preservativi cromati con il logo di Nonna Kiku. La nonna pensa a tutto.
+2 k:A>B @agg | Alla consegna, {A} e {B} afferrano la stessa cassa. {A} usa il coperchio come ghigliottina: la cassa arriva intera, {B} no.
+2 k:A>B @agg w:A | Alla consegna, {A} spara a {B} in faccia da mezzo metro. Il fixer, che filmava, dovrà ripulire l'obiettivo.
+1 d:A | Alla consegna, {A} apre la cassa con l'etichetta «Non aprire». Era una mina. Pezzi di {A} decorano il tendone di un banco del Mercato.
+2 couple:AB mo:A+12 mo:B+12 | Alla consegna, {A} e {B} trovano nella cassa uno strano dispositivo vibrante con il manuale in sei lingue. Lo provano subito, nel retro di un banco. Funziona in tutte e sei.
+3 k:A>BC *0.4 @agg | Alla consegna, {A} lancia nella calca la granata trovata nella cassa. {B} e {C} finiscono spalmat[BC:i/e] sul banco dei biscotti di Nonna Kiku, che si arrabbia moltissimo.
+`,
+      finale: `
+2 k:A>B | Sotto la torre, {A} schiaccia la testa di {B} contro il basamento della statua finché la statua non è rossa fino alle ginocchia.
+2 k:A>B w:A | {A} svuota {arma:A} nel petto di {B} e continua a sparare anche dopo. Il megaschermo inquadra tutto, al rallentatore.
+2 k:A>B | {A} strappa a {B} il braccio cromato e lo usa per finirl[B:o/a]. Il braccio, per riflesso, fa ancora il pugno.
+2 k:A>B | {A} infila le dita nelle prese neurali di {B} e tira. Viene via un mazzo di cavi, e quello che c'era attaccato.
+2 k:A>B trait:A=spietato | {A} apre {B} dalla gola all'ombelico con un solo gesto, guardando dritto nel megaschermo. Poi sorride al pubblico.
+2 k:A>B | {A} usa le barriere della Piazza come una pressa: {B} resta in mezzo mentre salgono, e il rumore si sente fino al Club.
+2 k:A>B con:A=esplosivo esplosivo:A | {A} infila {esplosivo:A} nella giacca di {B} e la chiude con la zip. Il resto lo racconteranno i robot delle pulizie.
+2 k:A>B stat:A<hp40 | Ferit[A:o/a] e piegat[A:o/a] in due, {A} affonda i denti nella gola di {B} e non molla finché il cuore di {B} non smette di pompare.
+`,
+      sponsor: `
+1 +armatura:A mo:A+8 @gift | Nonna Kiku manda a {A} {armatura} e una confezione di preservativi al gusto di noodle. Il biglietto dice: «Proteggiti, in tutti i sensi».
+1 +alcol:A mo:A+10 @gift | Un fixer anonimo manda a {A} {alcol} e un buono per un'ora alla casa delle bambole del Club. «Per rilassarti», dice il biglietto.
+1 +arma:A star:A @gift | La Kagemura Dynamics manda a {A} {arma} con una richiesta precisa: «Più sangue in camera, grazie. Gli spettatori pagano a schizzo».
+1 +med:A @gift | Doc Ferraglia manda a {A} {med} e una cartolina: «Per quando ti apriranno. Perché ti apriranno».
+`,
+      ds: `
+1 s:A=ferito | {A} si salva, ma lascia sul marciapiede due dita e un orecchio.
+1 d:A | {A} non si salva. Del corpo di {A} si trova solo il braccio cromato, che continua a muovere le dita.
+2 k:A>B | Nel caos, {A} usa {B} come scudo umano. Funziona: {B} assorbe tutto, a pezzi.
+`,
+    },
+    dis: `
+Il tritacarne degli Scav | Gli Scav allestiscono una macelleria di organi in un parcheggio sotterraneo e vanno a caccia di donatori. | {A} viene caricat[A:o/a] su un furgone e svuotat[A:o/a] come un pesce, organo per organo. | {A} sfugge agli Scav con un rene in meno e una cicatrice da orecchio a orecchio. | {A} convince gli Scav di avere organi pessimi. Gli Scav controllano, e [A:gli/le] danno ragione.
+La strage del cyberpsicotico al Mercato di Kabuki | Un uomo con quattro braccia cromate e due motoseghe al posto delle mani entra nel Mercato di Kabuki. | {A} viene tagliat[A:o/a] in sei pezzi, uno per ogni colpo. | {A} perde un braccio, ma lo recupera e se lo porta a casa sotto l'ascella. | {A} si finge mort[A:o/a] sotto un mucchio di corpi veri.
+La pioggia di carne | Un drone delle consegne del Mercato si schianta mentre trasporta carne coltivata, e la carne piove sul distretto. Non tutta era coltivata. | {A} viene colpit[A:o/a] da un quarto di bue sintetico in caduta libera e resta schiacciat[A:o/a] sotto. | {A} viene centrat[A:o/a] da un fegato, non sintetico. | {A} apre l'ombrello e ascolta il rumore, molto pesante. | sconvolto
+L'orgia della Velltech in Piazza della torre | La Velltech organizza in Piazza della torre una festa aziendale che degenera in un'orgia di dirigenti, vodka al neon e droni con le telecamere accese. | {A} si avvicina troppo al palco dei dirigenti, e la sicurezza spara prima di chiedere. | {A} si sveglia il giorno dopo su un tavolo da buffet, senza vestiti, con il logo della Velltech tatuato sul sedere. | {A} si gode l'open bar da lontano e prende appunti. | ubriaco
+La braindance assassina del Club della braindance | Al Club della braindance circola una braindance che fa vivere a chi la prova la morte di trenta persone diverse. | {A} prova la registrazione e muore trenta volte di fila, l'ultima per davvero. | {A} strappa il visore alla quinta morte e vomita per ore. | {A} si rifiuta di indossare il visore e preferisce un cocktail. | sconvolto
+Il mattatoio dei Maelstrom all'Officina dei Maelstrom | I Maelstrom organizzano all'Officina dei Maelstrom una gara a chi installa più cromo su un prigioniero vivo. | {A} viene scelt[A:o/a] come prigioniero. | {A} riesce a liberarsi con una vite conficcata nel ginocchio. | {A} vince la scommessa sulla gara e se la ride.
+La febbre del piacere | Un lotto di impianti per il piacere difettosi manda in tilt mezzo distretto: la gente si spoglia per strada e non riesce a smettere di ridere. | {A} ride così tanto che il cuore non regge. | {A} si sveglia nud[A:o/a] in un'aiuola con una slogatura e tre numeri di telefono scritti sul braccio. | {A} non ha mai comprato impianti per il piacere a basso costo. | sconvolto
+Il crollo del parcheggio multipiano | Un parcheggio multipiano pieno di auto blindate collassa su sé stesso. | {A} viene schiacciat[A:o/a] tra due piani di cemento, e di {A} resta solo una sagoma rossa. | {A} esce dalle macerie con una sbarra di ferro conficcata nella spalla. | {A} era parcheggiat[A:o/a] fuori. Per fortuna.
+Gli esattori della Orbis Pharma | Gli esattori della Orbis Pharma recuperano gli impianti non pagati, direttamente dai corpi dei clienti. | {A} non aveva pagato le ultime rate, e gli esattori recuperano tutto, compresa la colonna vertebrale. | {A} viene alleggerit[A:o/a] di un occhio cibernetico, senza anestesia. | {A} aveva pagato in contanti.
+La vasca dei liquami del Megablocco | La fossa biologica del Megablocco scoppia e un'onda di liquami invade i piani bassi. | {A} soffoca nei liquami del Megablocco. Il peggior modo di andarsene, per distacco. | {A} esce dai liquami con un'infezione e l'odore addosso per sempre. | {A} era al piano di sopra, e rideva. | malato
+La retata nella casa delle bambole del Club della braindance | La sicurezza corporativa fa irruzione nella casa delle bambole del Club e spara a chiunque abbia i pantaloni abbassati. | {A} aveva i pantaloni abbassati. | {A} scappa dalla finestra senza pantaloni e si taglia sul vetro. | {A} era solo al bar a bere un succo.
+Il sushi sbagliato del Mercato di Kabuki | Un ristorante di sushi del Mercato serve un pesce sintetico difettoso che liquefà gli intestini. | {A} si scioglie dall'interno, in un bagno chimico. | {A} passa tre giorni tra crampi e sudore freddo. | {A} aveva ordinato il ramen. | avvelenato
+`,
+  });
+})(typeof window === 'object' ? window : globalThis);
+
+;
 /* Relazioni: eventi che nascono da fiducia, paura, rispetto, attrazione, promesse ed ex. */
 (function (G) {
   const D = (G.LOS_DATA = G.LOS_DATA || {}); D.packs = D.packs || [];
@@ -10119,6 +10280,119 @@ Il gas nervino | I militari rilasciano un gas per fermare gli infetti. Ferma anc
 2 k:A>B w:A @agg | Il festino è un macello: {A} non lascia a {B} il tempo di raggiungere il tavolo.
 `,
     },
+  });
+})(typeof window === 'object' ? window : globalThis);
+
+;
+/* Night City — Zona Rossa, secondo pacchetto per adulti (solo con il filtro 18+ attivo).
+ * Stesse regole di pack3-cyberpunk-18.js: sesso solo tra adulti consenzienti e lucidi,
+ * gore senza freni ma mai a sfondo sessuale, ogni fatto con il suo effetto. */
+(function (G) {
+  const D = (G.LOS_DATA = G.LOS_DATA || {}); D.packs = D.packs || [];
+  D.packs.push({
+    theme: 'cyberpunk', adult: true,
+    ev: {
+      b: `
+2 at:6 k:A>B @agg | {A} spinge {B} sotto le eliche di una volante che decolla. La nebbia rossa si vede dall'ultimo piano della torre.
+2 at:6 k:A>B @agg w:A | {A} spara a {B} con {arma:A} a bruciapelo, così da vicino che il colpo esce dall'altra parte con metà della spina dorsale.
+1 at:6 s:A=sconvolto | Nella fuga {A} scivola su qualcosa di caldo e molle. Guarda per terra, e si pente subito di aver guardato.
+2 at:6 couple:AB mo:A+10 mo:B+10 | Mentre la Piazza brucia, {A} e {B} si baciano come in un film catastrofico. Poi si ricordano che le serrande stanno scendendo e corrono, ancora abbracciat[AB:i/e].
+`,
+      d: `
+2 at:0 couple:AB mo:A+12 mo:B+12 | Al Mercato, {A} e {B} scoprono un banco che vende lubrificante al gusto di ramen piccante. Lo comprano per scherzo. Lo usano non per scherzo. Se ne pentono per tutt'altro motivo.
+1 at:0 test:A=car12 ok:+valore:A ok:star:A ko:mo:A-8 | Al Mercato, {A} fa da modell[A:o/a] nud[A:o/a] per un pittore di ritratti olografici. Il ritratto viene venduto in un'ora, e il pittore divide l'incasso: {valore}. || Al Mercato, {A} posa nud[A:o/a] per un pittore olografico, che alla fine si rifiuta di pagare perché «la luce non era giusta».
+2 at:0 enemy:AB k:A>B @agg | Al Mercato, {A} affoga {B} nel pentolone del brodo di ossa. Il brodo, da quel giorno, ha un sapore più ricco.
+2 at:0 k:A>B @agg | Al Mercato, {A} infila {B} nel tritaghiaccio di un banco di granite. La granita del giorno è alla fragola. Non è fragola.
+1 at:0 s:A=ferito | Al Mercato, {A} prova un paio di labbra cibernetiche «autoregolanti» al banco delle prove gratuite. Le labbra si regolano su una sola posizione: il morso.
+1 at:1 mo:A+10 | Al Megablocco, {A} scopre che il palazzo ha un canale interno che trasmette solo le telecamere degli ascensori. A quest'ora, il canale è più spinto del Club.
+2 at:1 love:AB | Al Megablocco, {A} e {B} si chiudono nella lavanderia comune e fanno partire tutte le lavatrici per coprire il rumore. Escono con i vestiti puliti, ma non quelli che avevano addosso. Da oggi sono una coppia.
+2 at:1 couple:AB test:A=agi12 ok:mo:A+12 ok:mo:B+12 ko:s:A=ferito | Al Megablocco, {A} e {B} fanno l'amore sulla scala antincendio al cinquantesimo piano, legati a una ringhiera con un cavo. È la cosa più romantica e più stupida che abbiano mai fatto. || Al Megablocco, {A} e {B} provano a fare l'amore sulla scala antincendio. La ringhiera cede di un piano e {A} atterra sul gomito.
+2 at:1 k:A>B @agg | Al Megablocco, {A} butta {B} nel trituratore dei rifiuti del seminterrato. Il trituratore si inceppa a metà lavoro, e {A} lo sblocca a calci.
+1 at:1 d:A | Al Megablocco, {A} rimane incastrat[A:o/a] nelle porte dell'ascensore mentre la cabina riparte. La parte di sopra arriva al trentesimo piano, quella di sotto resta al pianterreno.
+2 at:2 couple:AB mo:A+10 mo:B+10 | Alla Clinica, mentre Doc Ferraglia è in pausa, {A} e {B} provano il lettino regolabile in tutte le sue posizioni. Il lettino ne ha ventisei. Arrivano alla diciannove.
+1 at:2 test:A=res12 ok:mo:A+12 ok:pr:A-10 ko:s:A=ferito | Alla Clinica, {A} si fa rifare il seno, o il petto, con un impianto in offerta. Doc Ferraglia approfitta dell'anestesia per una diagnosi completa degli impianti: il sovraccarico scende. || Alla Clinica, {A} si fa rifare il petto con un impianto in offerta. Uno dei due impianti esplode durante la convalescenza.
+2 at:2 k:A>B @agg | Alla Clinica, {A} infila {B} nella macchina per il lavaggio degli impianti e preme «ciclo intensivo». Ne esce un sacchetto di ossa pulitissime.
+2 at:2 enemy:AB test:A=int12 ok:k:A>B ko:hit:B>A | Alla Clinica, {A} riprogramma il braccio chirurgico per un'amputazione completa e lo punta su {B}. Il braccio è molto accurato. || Alla Clinica, {A} prova a riprogrammare il braccio chirurgico contro {B}, ma il braccio sceglie {A} e [A:gli/le] taglia un dito, per correttezza.
+1 at:2 s:A=sconvolto | Alla Clinica, {A} assiste a un intervento di Doc Ferraglia: un trapianto di faccia, senza anestesia, mentre il Doc canta. La faccia nuova sorride. Quella vecchia, nel secchio, pure.
+1 at:3 con:A=valore -valore:A mo:A+15 | Al Club, {A} paga con {valore:A} uno spettacolo privato di un androide ballerino con otto braccia. Tutte e otto molto occupate.
+1 at:3 test:A=car11 ok:mo:A+15 ok:en:A+10 ko:mo:A-10 | Al Club, {A} si fa invitare nell'ala privata della casa delle bambole da una ragazza che dice di trovarl[A:o/a] simpatic[A:o/a]. Lo trova davvero, e non fa nemmeno pagare. || Al Club, {A} prova a farsi invitare nell'ala privata della casa delle bambole, ma il buttafuori [A:gli/le] mostra il listino. Il listino è lungo.
+2 at:3 couple:AB s:A=ubriaco s:B=ubriaco mo:A+12 mo:B+12 | Al Club, {A} e {B} vincono la gara di ballo sensuale bevendo shottini tra un giro e l'altro. Il premio è una bottiglia. La bottiglia non arriva a mezzanotte.
+2 at:3 k:A>B @agg | Al Club, {A} spinge {B} sulla pista allagata e butta nell'acqua un cavo delle luci scoperto. {B} balla l'ultimo pezzo, fumando.
+1 at:3 pr:A+15 s:A=sconvolto | Al Club, {A} prova per sbaglio la braindance di un serial killer. Per un'ora ha nelle mani la sensazione del manico del coltello. Gli impianti bruciano.
+2 at:3 single:A single:B friend:AB amo:A>B+12 amo:B>A+12 mo:A+12 mo:B+12 | Al Club, {A} e {B} giocano a obbligo o verità con le regole della casa. Nessuno dei due sceglie mai verità.
+2 at:4 couple:AB mo:A+12 mo:B+12 | All'Officina, {A} e {B} si chiudono nella cabina di verniciatura. Ne escono due ore dopo, verniciat[AB:i/e] di rosso fiamma dalla testa ai piedi, tranne due impronte di mani nei posti giusti.
+2 at:4 k:A>B @agg | All'Officina, {A} tiene la faccia di {B} sulla mola accesa finché la faccia non è più una faccia.
+2 at:4 k:A>B @agg | All'Officina, {A} usa la saldatrice al plasma su {B}, partendo dai piedi. I Maelstrom fanno il tifo.
+1 at:4 test:A=cor13 ok:star:A ok:+arma:A ko:s:A=ferito | All'Officina, i Maelstrom sfidano {A} a mangiare un occhio cibernetico crudo. {A} lo mastica guardandoli dritti negli occhi e vince {arma}. || All'Officina, i Maelstrom sfidano {A} a mangiare un occhio cibernetico crudo. {A} ci prova, si spacca un dente e vomita sulle scarpe del capo.
+1 at:4 d:A | All'Officina, {A} inciampa nella catena del cane cibernetico. Il cane decide che la catena serve a portarsi a cuccia la cena.
+2 at:5 k:A>B @agg | Al Nodo dati, {A} trascina {B} nella sala server e l[B:o/a] chiude dentro mentre parte il gas di raffreddamento. Attraverso il vetro, {B} si copre lentamente di brina, dagli occhi in giù.
+2 at:5 enemy:AB test:A=int13 ok:k:A>B ko:pr:A+12 | Al Nodo dati, {A} collega la presa di {B} al terminale e carica nel cervello di {B} un intero archivio aziendale in un secondo. La testa di {B} fuma dalle orecchie. || Al Nodo dati, {A} prova a sovraccaricare il cervello di {B} dal terminale, ma l'archivio si scarica negli impianti sbagliati.
+1 at:5 test:A=int12 ok:star:A ok:mo:A+10 ko:pr:A+10 | Al Nodo dati, {A} si collega al terminale e sostituisce tutti gli sfondi aziendali della Velltech con le foto del sedere del loro amministratore delegato, trovate nel suo archivio privato. || Al Nodo dati, {A} prova a cambiare gli sfondi della Velltech dal terminale, ma l'ICE [A:gli/le] rimanda le foto direttamente negli impianti, con una scarica.
+2 at:6 k:A>B @agg | In Piazza, {A} impala {B} su una delle barriere di sicurezza che salgono dal selciato. La barriera continua a salire, e {B} con lei.
+2 at:6 couple:AB mo:A+10 mo:B+10 star:A star:B | In Piazza, {A} e {B} fanno sesso dentro la cabina della metropolitana sopraelevata ferma, con il treno vuoto. Le telecamere del treno trasmettono tutto sul megaschermo. Il quartiere applaude.
+1 at:6 d:A | In Piazza, {A} viene travolt[A:o/a] da una volante corporativa che atterra. Il carrello d'atterraggio [A:gli/le] passa sulla testa, che si apre come un melone.
+2 couple:AB mo:A+12 mo:B+12 en:A-8 en:B-8 | {A} e {B} trovano un motel a ore ancora aperto, con il letto vibrante a gettoni. Finiscono i gettoni. Continuano senza.
+2 couple:AB test:A=int11 ok:mo:A+12 ok:mo:B+12 ko:mo:A-6 | {A} hackera gli impianti tattili di {B}, con il consenso di {B} e il cavo collegato, per farl[B:o/a] sentire tutto dieci volte più forte. {B} chiede il bis. || {A} prova a potenziare gli impianti tattili di {B} con il cavo, ma sbaglia parametro: {B} sente tutto dieci volte più piano e si addormenta.
+2 couple:AB s:B=ferito mo:A+8 | {A} e {B} provano una posizione vista in una braindance per acrobati. {B} si stira un muscolo che non sapeva di avere.
+2 couple:AB mo:A+12 mo:B+12 | {A} e {B} trovano in un appartamento abbandonato un armadio pieno di costumi in lattice. Ne provano undici. Il dodicesimo lo tengono.
+2 single:A single:B friend:AB amo:A>B+10 amo:B>A+10 mo:A+12 mo:B+12 | Bloccat[AB:i/e] in un vagone della metropolitana fermo, {A} e {B} si annoiano per dieci minuti. Poi smettono di annoiarsi.
+2 crush:A>B test:A=car12 ok:love:AB ko:mo:A-10 | {A} manda a {B} un messaggio olografico in cui si vede in mutande a dichiarare il proprio amore. {B} lo guarda tre volte, poi corre da {A}: sono una coppia. || {A} manda a {B} un messaggio olografico in mutande per dichiararsi. {B} lo inoltra per sbaglio a tutto il distretto.
+1 mo:A+10 | {A} trova in un negozio di elettronica abbandonato una scatola di giocattoli per adulti con la batteria ancora carica. Li prova tutti, per scrupolo scientifico.
+1 s:A=ubriaco mo:A+10 | {A} beve al bancone di un bar uno shot chiamato «Pompino cromato». Non ha nessun ingrediente cromato. Ha moltissimo alcol.
+1 s:A=malato | {A} si fa un tatuaggio olografico sul sedere in un garage, con un ago non sterilizzato. Il tatuaggio è bellissimo. L'infezione pure.
+1 test:A=fort12 ok:mo:A+15 ko:s:A=sconvolto | {A} trova in una cabina pubblica una braindance erotica abbandonata. È fantastica. || {A} trova in una cabina pubblica una braindance erotica abbandonata. Il protagonista è un vecchio vicino di casa.
+2 enemy:AB k:A>B @agg w:A | {A} rompe le gambe di {B} con {arma:A}, poi le braccia, poi aspetta. {B} non ha più niente da rompere quando arriva la fine.
+2 enemy:AB k:A>B @agg | {A} schiaccia la testa di {B} sotto lo sportello di un'auto blindata, aprendo e chiudendo, aprendo e chiudendo.
+2 enemy:AB k:A>B @agg | {A} spinge {B} sotto un treno della metropolitana sopraelevata. Il treno si ferma con quattro minuti di ritardo, per lavare il muso.
+2 enemy:AB k:A>B @agg | {A} costringe {B} a ingoiare una granata a impulso e conta fino a tre. Al tre, gli impianti di {B} si spengono, e anche tutto il resto.
+2 enemy:AB hit:A>B | {A} strappa a {B} un'ottica dall'orbita con due dita. L'ottica continua a trasmettere da terra.
+2 enemy:AB hit:A>B | {A} morde {B} sul naso così forte da staccarne la punta. La sputa per terra e sorride con i denti rossi.
+2 grudge:A>B k:A>B @agg | {A} lega {B} a un'insegna al neon e la accende. L'insegna diceva «Hot Dog». Adesso è vero.
+2 k:A>B @agg | {A} usa un tirapugni elettrificato su {B}. Al decimo pugno, la mascella di {B} finisce dall'altra parte della strada.
+2 k:A>B @agg | {A} schiaccia {B} sotto un distributore automatico rovesciato. Il distributore, prima di spegnersi, dice: «Grazie per l'acquisto».
+2 k:A>B @agg | {A} usa una motosega da cantiere su {B}. Ci vuole un po', e il rumore copre le urla solo in parte.
+3 k:AB>C @agg | {A} e {B} prendono {C} per le braccia e tirano in direzioni opposte, finché le braccia cromate di {C} non vengono via. Il resto di {C} resta in mezzo.
+3 couple:AB friend:AC friend:BC single:C mo:A+12 mo:B+12 mo:C+12 | {A} e {B} propongono a {C} un'avventura a tre in un motel a ore. {C} accetta, e per una notte la parola «alleanza» assume un significato nuovo.
+1 trait:A=esibizionista star:A mo:A+10 | {A} trasmette la propria doccia in diretta su un canale pirata, per «ringraziare i fan». Gli spettatori ringraziano a loro volta, con insistenza.
+1 trait:A=goloso s:A=malato | {A} mangia un panino con «carne di fonte non specificata» da un banco degli Scav. La fonte, a giudicare dal tatuaggio trovato dentro, era specificabile.
+1 trait:A=pacifista s:A=sconvolto | {A} trova il corpo di uno sconosciuto smontato pezzo per pezzo dagli Scav e allineato sul marciapiede come in un catalogo. Vomita, poi piange, poi vomita ancora.
+1 trait:A=spietato star:A | {A} fa un tatuaggio con l'inchiostro mescolato al sangue dell'ultima vittima. I fixer lo chiamano «il Pittore».
+1 trait:A=furtivo test:A=furt12 ok:+valore:A ko:s:A=ferito | {A} si infila nella stanza di un dirigente corporativo all'hotel di lusso mentre lui è distratto da tre accompagnatrici. Ne esce con {valore}. || {A} si infila nella stanza di un dirigente corporativo all'hotel, ma una delle accompagnatrici era la guardia del corpo.
+1 trait:A=bruto star:A | {A} sfonda a testate la vetrina di un sexy shop per prendere un giocattolo gigante e usarlo come mazza. Vince la rissa successiva e l'ammirazione del quartiere.
+1 trait:A=romantico mo:A+12 | {A} registra per la persona amata una braindance in cui si spoglia lentamente al tramonto artificiale di un megaschermo. Non la manda mai, ma riguardarla dà coraggio.
+1 trait:A=folle mo:A+10 | {A} sposa con una cerimonia ufficiale un'insegna olografica a forma di donna che fa l'occhiolino. Il prete è un distributore. Gino, invitato, non viene.
+`,
+      n: `
+2 couple:AB mo:A+12 mo:B+12 en:A-8 en:B-8 | Di notte {A} e {B} fanno l'amore sopra un'insegna gigante a forma di bottiglia di birra, a sessanta metri da terra. L'insegna, dopo, sembra più brillante.
+2 couple:AB pr:A+6 pr:B+6 mo:A+12 mo:B+12 | Di notte {A} e {B} collegano gli impianti a una braindance erotica e sincronizzano i battiti. Si addormentano esausti, con gli impianti ancora caldi.
+2 love:AB | Di notte {A} e {B} si ritrovano nella stessa vasca idromassaggio di un hotel abbandonato. L'acqua è fredda, loro no. Al mattino escono coppia, e un po' raggrinzit[AB:i/e].
+2 single:A single:B friend:AB amo:A>B+10 amo:B>A+10 mo:A+10 mo:B+10 | Di notte {A} e {B} non riescono a dormire, e trovano un modo creativo per stancarsi.
+2 k:A>B @stl @agg | Di notte {A} entra nella capsula di {B} e [B:gli/le] infila nella bocca il tubo di scarico di un generatore acceso. Al mattino la capsula è piena di fumo, e di silenzio.
+2 k:A>B @stl @agg | Di notte {A} trova {B} addormentat[B:o/a] e [B:gli/le] taglia la gola così in profondità che la testa resta attaccata per un filo, di quelli monomolecolari.
+1 d:A | Di notte {A} si addormenta in un vagone abbandonato. Un branco di ratti cibernetici [A:gli/le] mangia la faccia prima che si svegli, e poi non si sveglia.
+1 s:A=sconvolto | Di notte {A} sente nel muro della capsula un rumore di unghie. Dietro il muro, scopre, c'è una stanza piena di teste conservate sotto vetro, tutte con gli occhi aperti.
+1 mo:A+10 | Di notte {A} guarda dalla finestra il palazzo di fronte, dove trenta finestre su trenta sono occupate da coppie impegnate. Sembra un calendario dell'avvento per adulti.
+2 enemy:AB test:A=furt13 ok:k:A>B ko:hit:B>A | Di notte {A} si cala dal condotto dell'aria sopra la capsula di {B} con una corda e un coltello. Il coltello arriva prima della corda. || Di notte {A} si cala dal condotto dell'aria sopra {B}, ma la corda si spezza e {A} atterra sulla faccia di {B}, che [A:gli/le] spacca il naso.
+`,
+      finale: `
+2 k:A>B | {A} infila il pollice nell'occhio di {B} fino alla nocca, e gira.
+2 k:A>B | {A} strappa la mandibola cromata di {B} e la tiene in mano come un trofeo davanti al megaschermo.
+2 k:A>B w:A | {A} decapita {B} con {arma:A} e solleva la testa davanti ai droni. La diretta, per la prima volta, va in pausa pubblicitaria.
+2 k:A>B | {A} e {B} rotolano sul selciato della Piazza, si mordono, si accecano. Alla fine si rialza solo {A}, con un orecchio in meno, ma si rialza.
+`,
+      ds: `
+1 s:A=ferito | {A} si salva, ma una scheggia [A:gli/le] apre la guancia fino all'orecchio.
+2 k:A>B | Nel caos, {A} lancia {B} contro la minaccia per guadagnare tempo. Il tempo guadagnato è di tre secondi. Quello che resta di {B} è meno.
+`,
+    },
+    dis: `
+I ratti cibernetici del Megablocco | Dalle fogne del Megablocco salgono migliaia di ratti cibernetici affamati, con denti di titanio. | {A} viene ricopert[A:o/a] dai ratti in un corridoio. Quando si disperdono, resta uno scheletro pulito, con i vestiti. | {A} scappa con mezzo polpaccio in meno. | {A} si chiude in un frigorifero e aspetta che passino.
+La festa delle mutande al Club della braindance | Il Club della braindance organizza una notte a tema «solo biancheria intima»; la sicurezza corporativa fa irruzione cercando un ricercato in mutande leopardate. | {A} indossa mutande leopardate. | {A} viene trascinat[A:o/a] fuori in mutande e pres[A:o/a] a manganellate sul marciapiede. | {A} indossa mutande a pois e viene ignorat[A:o/a].
+Le lame impazzite dell'Officina dei Maelstrom | Un prototipo di lame da avambraccio dei Maelstrom si attiva da solo e taglia tutto quello che si muove nell'Officina dei Maelstrom. | {A} si muove. In molte direzioni, dopo. | {A} perde due dita e una ciocca di capelli. | {A} resta immobile come una statua per tre ore.
+Il gas esilarante della Clinica del ripperdoc | Un serbatoio di gas esilarante della Clinica del ripperdoc si rompe, e tutti ridono mentre il braccio chirurgico opera chi capita. | {A} ride mentre il braccio chirurgico [A:gli/le] asporta tutto quello che trova. | {A} si sveglia con un impianto in più che non ha chiesto e una cicatrice che ride. | {A} trattiene il respiro e trascina fuori Doc Ferraglia, che canta ancora.
+La caccia al trofeo | Una squadra di dirigenti annoiati della Kagemura Dynamics compra un permesso di caccia nel distretto e va in giro su un furgone blindato con fucili di precisione. | {A} finisce appes[A:o/a] alla parete di un ufficio corporativo, come trofeo. | {A} viene colpit[A:o/a] a una gamba mentre si nasconde dietro un cassonetto. | {A} si traveste da dirigente e chiede di partecipare alla caccia.
+L'esplosione del furgone dei preservativi | Un furgone delle consegne carico di preservativi cromati esplode in mezzo al distretto e copre tutto di lattice fuso. | {A} resta incollat[A:o/a] al marciapiede dal lattice fuso mentre arriva il resto dell'incendio. | {A} si ustiona le braccia staccandosi dal lattice. | {A} raccoglie una scorta per i giorni migliori.
+`,
   });
 })(typeof window === 'object' ? window : globalThis);
 
@@ -15608,7 +15882,7 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
 </script>
 <script>window.LOS_ASSETS = {"logo":"img/logo.f2d5175789.webp","icona":"img/icona.8b02ddeb49.webp","favicon":"img/favicon.86774dc7cf.png","panoramica":"img/panoramica.66c4c27255.webp","sagome":["img/sagome-cappuccio.e8876ba986.webp","img/sagome-esploratore.9a99fd13f8.webp","img/sagome-viaggiatore.5e36435604.webp"],"arene":{"classico":"img/arene-classico.42c6ba42ee.webp","fantasy":"img/arene-fantasy.75b7fb0d32.webp","horror":"img/arene-horror.48052d80b4.webp","liceo":"img/arene-liceo.05ed578a90.webp","royale":"img/arene-royale.36c9952cd7.webp","scifi":"img/arene-scifi.403694f00f.webp","ufficio":"img/arene-ufficio.67b271bea3.webp","wasteland":"img/arene-wasteland.889002ace8.webp","zombie":"img/arene-zombie.36c9135a12.webp"},"atlas":{"classico":{"luoghi":{"altopiano":"img/arene-classico-luoghi-altopiano.36a37512d3.webp","bosco":"img/arene-classico-luoghi-bosco.2e9163544b.webp","cornucopia":"img/arene-classico-luoghi-cornucopia.393b2dabe1.webp","fiume":"img/arene-classico-luoghi-fiume.22b335a914.webp","paludi":"img/arene-classico-luoghi-paludi.77cf115eb4.webp","rovine":"img/arene-classico-luoghi-rovine.9ea4f70ca9.webp"},"pericoli":{"branco-di-lupi-mutanti":"img/arene-classico-pericoli-branco-di-lupi-mutanti.d786a62875.webp","orso-affamato":"img/arene-classico-pericoli-orso-affamato.e4f38a9892.webp","sciame-di-vespe-velenose":"img/arene-classico-pericoli-sciame-di-vespe-velenose.5adb2c7b8d.webp","serpente-gigante":"img/arene-classico-pericoli-serpente-gigante.b17e7f3d91.webp"}},"fantasy":{"luoghi":{"foresta-elfica":"img/arene-fantasy-luoghi-foresta-elfica.0448fcfbd3.webp","lago-nebbioso":"img/arene-fantasy-luoghi-lago-nebbioso.f19abc7c81.webp","miniere":"img/arene-fantasy-luoghi-miniere.5baa916ec9.webp","palude-stregata":"img/arene-fantasy-luoghi-palude-stregata.6a0b2af4a7.webp","picco-del-drago":"img/arene-fantasy-luoghi-picco-del-drago.06bdfd84b1.webp","torre-in-rovina":"img/arene-fantasy-luoghi-torre-in-rovina.ac716863c7.webp"},"pericoli":{"branco-di-lupi-mannari":"img/arene-fantasy-pericoli-branco-di-lupi-mannari.1c9124ceee.webp","spettro-errante":"img/arene-fantasy-pericoli-spettro-errante.056074bc23.webp","troll-di-caverna":"img/arene-fantasy-pericoli-troll-di-caverna.31aa2444f0.webp","viverna":"img/arene-fantasy-pericoli-viverna.577b91a819.webp"}},"horror":{"luoghi":{"biblioteca":"img/arene-horror-luoghi-biblioteca.00d6ab97f4.webp","cappella":"img/arene-horror-luoghi-cappella.a51e505028.webp","cimitero":"img/arene-horror-luoghi-cimitero.7a441de089.webp","serra":"img/arene-horror-luoghi-serra.b3d91121d4.webp","soffitta":"img/arene-horror-luoghi-soffitta.466d40cea3.webp"},"pericoli":{"bambola-posseduta":"img/arene-horror-pericoli-bambola-posseduta.7064eef1d7.webp","entita-senza-volto":"img/arene-horror-pericoli-entita-senza-volto.2c28467bdd.webp","spettro-urlante":"img/arene-horror-pericoli-spettro-urlante.25fa554e05.webp","stormo-di-corvi":"img/arene-horror-pericoli-stormo-di-corvi.fe5c85d7ae.webp"}},"liceo":{"luoghi":{"aula-magna":"img/arene-liceo-luoghi-aula-magna.0478e35c5c.webp","biblioteca":"img/arene-liceo-luoghi-biblioteca.1ae806ae58.webp","cortile":"img/arene-liceo-luoghi-cortile.51bf433337.webp","laboratorio-di-chimica":"img/arene-liceo-luoghi-laboratorio-di-chimica.eba1434683.webp","mensa":"img/arene-liceo-luoghi-mensa.67bcbc7e37.webp","palestra":"img/arene-liceo-luoghi-palestra.8ecb872849.webp"},"pericoli":{"bidello-di-turno":"img/arene-liceo-pericoli-bidello-di-turno.191c43a8bd.webp","ispezione-a-sorpresa":"img/arene-liceo-pericoli-ispezione-a-sorpresa.bef087d9b9.webp","preside":"img/arene-liceo-pericoli-preside.033f6c9aae.webp","professoressa-di-matematica":"img/arene-liceo-pericoli-professoressa-di-matematica.6cb65c6a3f.webp"}},"royale":{"luoghi":{"aeroporto":"img/arene-royale-luoghi-aeroporto.81e8ce98d4.webp","base-militare":"img/arene-royale-luoghi-base-militare.67f3a7de9d.webp","centrale-elettrica":"img/arene-royale-luoghi-centrale-elettrica.05ee57458a.webp","fattoria":"img/arene-royale-luoghi-fattoria.7c780dda87.webp","foresta":"img/arene-royale-luoghi-foresta.03b47644d0.webp","villaggio-costiero":"img/arene-royale-luoghi-villaggio-costiero.568519eb7c.webp"},"pericoli":{"cane-da-guardia-addestrato":"img/arene-royale-pericoli-cane-da-guardia-addestrato.c7853a67a0.webp","drone-armato":"img/arene-royale-pericoli-drone-armato.30d0b73e01.webp","elicottero-da-caccia":"img/arene-royale-pericoli-elicottero-da-caccia.8c68e62346.webp"}},"scifi":{"luoghi":{"hangar":"img/arene-scifi-luoghi-hangar.6de551833b.webp","moduli-abitativi":"img/arene-scifi-luoghi-moduli-abitativi.9f5bb96d39.webp","ponte-di-comando":"img/arene-scifi-luoghi-ponte-di-comando.3e9ffd005a.webp","reattore":"img/arene-scifi-luoghi-reattore.d10a335006.webp","serra-idroponica":"img/arene-scifi-luoghi-serra-idroponica.b6f4407853.webp"},"pericoli":{"androide-da-combattimento":"img/arene-scifi-pericoli-androide-da-combattimento.1a3d3eb38e.webp","creatura-aliena-dai-tentacoli":"img/arene-scifi-pericoli-creatura-aliena-dai-tentacoli.b6b314ddd9.webp","drone-di-sicurezza-impazzito":"img/arene-scifi-pericoli-drone-di-sicurezza-impazzito.c8a9c6f9e3.webp","sciame-di-nanobot":"img/arene-scifi-pericoli-sciame-di-nanobot.d43296f047.webp"}},"ufficio":{"luoghi":{"cucina":"img/arene-ufficio-luoghi-cucina.d968f8861d.webp","open-space":"img/arene-ufficio-luoghi-open-space.b6b7990c99.webp","parcheggio":"img/arene-ufficio-luoghi-parcheggio.d593f2ed83.webp","sala-stampanti":"img/arene-ufficio-luoghi-sala-stampanti.1727f50082.webp","ufficio-del-direttore":"img/arene-ufficio-luoghi-ufficio-del-direttore.bb3b6cabab.webp"},"pericoli":{"consulente-esterno":"img/arene-ufficio-pericoli-consulente-esterno.ce6e200c3f.webp","direttore-generale":"img/arene-ufficio-pericoli-direttore-generale.da2eb1f708.webp","riorganizzazione-aziendale":"img/arene-ufficio-pericoli-riorganizzazione-aziendale.1fd57b76b3.webp","ufficio-risorse-umane":"img/arene-ufficio-pericoli-ufficio-risorse-umane.8392df7518.webp"}},"wasteland":{"luoghi":{"autostrada-spezzata":"img/arene-wasteland-luoghi-autostrada-spezzata.19a72a0b97.webp","citta-fantasma":"img/arene-wasteland-luoghi-citta-fantasma.fe22bb72b2.webp","cratere":"img/arene-wasteland-luoghi-cratere.04de7ca40a.webp","diga":"img/arene-wasteland-luoghi-diga.3be9abe15a.webp","discarica":"img/arene-wasteland-luoghi-discarica.b8783ad9c6.webp","raffineria":"img/arene-wasteland-luoghi-raffineria.081e2d2ad6.webp"},"pericoli":{"banda-di-predoni":"img/arene-wasteland-pericoli-banda-di-predoni.1dfcfd1628.webp","branco-di-cani-mutati":"img/arene-wasteland-pericoli-branco-di-cani-mutati.442fabfc39.webp","scorpione-gigante":"img/arene-wasteland-pericoli-scorpione-gigante.2dd8911367.webp","verme-delle-sabbie":"img/arene-wasteland-pericoli-verme-delle-sabbie.a0d445beeb.webp"}},"zombie":{"luoghi":{"centro-commerciale":"img/arene-zombie-luoghi-centro-commerciale.333f4699d5.webp","metropolitana":"img/arene-zombie-luoghi-metropolitana.878a263605.webp","periferia":"img/arene-zombie-luoghi-periferia.e28a7d70c7.webp","scuola":"img/arene-zombie-luoghi-scuola.153ddbaa75.webp","stazione-di-polizia":"img/arene-zombie-luoghi-stazione-di-polizia.157f7a17f5.webp"},"pericoli":{"cane-infetto":"img/arene-zombie-pericoli-cane-infetto.fdff913d6f.webp","gigante-mutato":"img/arene-zombie-pericoli-gigante-mutato.91fad36b70.webp","infetto-corridore":"img/arene-zombie-pericoli-infetto-corridore.61f48faafd.webp","orda-di-zombi":"img/arene-zombie-pericoli-orda-di-zombi.e0fc6d1b56.webp"}}}};
 ;
-window.LOS_BUILD = "16ceddfbae4a329806a6e8e17cba2ffca90ffa7c96ef3add5fe77024b46462f8";
+window.LOS_BUILD = "783344cd18b7f56b560cc3da7ca6e3ad4bd6b09070cc53c3c5a025bd0c42d406";
 ;
 /* Last One Standing — grafica vettoriale: logo, icone delle arene, illustrazioni.
  * Tutto è SVG generato in codice: nessuna immagine esterna. */
