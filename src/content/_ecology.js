@@ -267,6 +267,9 @@
         { n: 'Tregua del quartiere', d: 'Le gang si accordano per un giorno senza sparare. Nessuno ci crede, ma tutti respirano.', fx: { lethal: 0.85, pr: -4, heal: 1.15 } },
         { n: 'Disturbi ottici', d: 'Le ottiche di tutti mostrano sfarfallii e immagini doppie: mirare è difficile, sparire è più facile.', fx: { stl: 1.2, tb: { agi: -1, furt: 1 } } },
         { n: 'Notte di neon', d: 'Le insegne si accendono tutte insieme e le dirette dei fixer cercano facce nuove.', fx: { fame: 1.5, pr: 2 } },
+        { n: 'Saldi notturni del Mercato', d: 'Il Mercato di Kabuki fa i saldi di mezzanotte: tutto a metà prezzo, comprese cose che non dovrebbero essere in vendita.', fx: { forage: 1.35, fame: 1.2 } },
+        { n: 'Parata corporativa', d: 'La Velltech fa sfilare carri olografici e droni di sicurezza per festeggiare il proprio anniversario. Le pattuglie sono ovunque, i fixer filmano tutto.', fx: { fame: 1.6, beast: 1.3 } },
+        { n: 'Festa delle lanterne olografiche', d: 'Il quartiere accende migliaia di lanterne olografiche per ricordare chi non c’è più. Per una notte, tutti abbassano la voce.', fx: { pr: -3, lethal: 0.9, heal: 1.1 } },
       ],
       txt: {
         meterUp: ['Le ottiche di {0} cominciano a mostrare righe di codice che nessuno ha scritto. Il sovraccarico neurale è oltre la soglia.', '{0} sente gli impianti scaldarsi sotto la pelle e deve fermarsi a respirare: il sovraccarico neurale è alto.', 'A {0} trema la mano cromata e la voce dei pensieri arriva in ritardo. Il sovraccarico neurale non scende.', 'Il diagnostico interno di {0} lampeggia in rosso: troppo carico, troppo a lungo.'],

@@ -791,6 +791,15 @@ module.exports = {
         "mitra-compatto": [
           "Mitra compatto con caricatore lungo e mirino olografico.",
           "A compact submachine gun with a long curved magazine, a folding stock and a small holographic sight glowing magenta."],
+        "ventaglio-da-combattimento-in-titanio": [
+          "Ventaglio da combattimento in titanio aperto, con i bordi affilati.",
+          "An open combat fan made of brushed titanium blades with razor-sharp edges, a small cyan light on the pivot and a black silk tassel."],
+        "sparachiodi-riprogrammato": [
+          "Sparachiodi da cantiere modificato con cavi scoperti e un caricatore di chiodi.",
+          "A modified construction nail gun with its safety removed, exposed wires taped along the body, a long strip of nails loaded and a hazard yellow stripe."],
+        "tirapugni-elettrificato": [
+          "Tirapugni di metallo con una piccola batteria e una scintilla azzurra.",
+          "A metal knuckle duster with a small battery pack on the back and a tiny arc of blue electricity jumping between the rings."],
       },
     },
   },

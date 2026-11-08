@@ -59,7 +59,7 @@ for (const e of own) for (const [txt, fx] of [[e.text, e.fx], [e.okText, e.ok.fx
 // nessuna riga d'autore viene riscritta dal filtro geografico
 for (const e of own) assert.equal(Geo.prepare(e, theme, zones).adapted, undefined, 'riscritta: ' + e.text);
 // le azioni da netrunner su un'altra persona avvengono sul posto, con un contatto fisico
-for (const e of own.filter((x) => x.n >= 2 && /ICE|virus|shard|presa|picco/.test(x.text))) assert.ok(/presa|cavo|terminale|infila|collega/.test(e.text), 'azione a distanza: ' + e.text);
+for (const e of own.filter((x) => x.n >= 2 && /\b(?:ICE|virus|shard|presa|picco)\b/.test(x.text))) assert.ok(/presa|cavo|terminale|infila|collega/.test(e.text), 'azione a distanza: ' + e.text);
 ok(own.length + ' eventi e ' + dis + ' disastri d’autore; ' + hacking.length + ' prove di hacking, ' + sabotage.length + ' di sabotaggio, ' + diagnosis.length + ' di diagnosi');
 
 // 6. oggetti: tutte le 13 famiglie con scheda; gli impianti sono dichiarati e non trasferibili

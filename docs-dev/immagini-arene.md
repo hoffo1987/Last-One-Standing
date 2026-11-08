@@ -2,7 +2,7 @@
 
 _Generato da `node tools/atlas-slots.js` a partire da `tools/atlas-brief.js`: per cambiare un testo o un prompt modifica il brief e rigenera, non questo file._
 
-**Immagini presenti: 85 su 179** (luoghi 50/66, pericoli 35/39, armi 0/74). **Video presenti: 0 su 105** (luoghi e pericoli). Meteo, disastri e oggetti arriveranno dopo.
+**Immagini presenti: 85 su 182** (luoghi 50/66, pericoli 35/39, armi 0/77). **Video presenti: 0 su 105** (luoghi e pericoli). Meteo, disastri e oggetti arriveranno dopo.
 
 ## 1. Lo stile
 
@@ -95,7 +95,7 @@ Sul sito i video partiranno da soli, muti e in loop, con l'immagine ferma mentre
 | [Terre Desolate](#terre-desolate) | 7 | 4 | 7 |
 | [Liceo Spietato](#liceo-spietato) | 7 | 4 | 6 |
 | [Ufficio Open Space](#ufficio-open-space) | 6 | 4 | 6 |
-| [Night City — Zona Rossa](#night-city--zona-rossa) | 7 | 4 | 7 |
+| [Night City — Zona Rossa](#night-city--zona-rossa) | 7 | 4 | 10 |
 
 ---
 
@@ -2844,4 +2844,37 @@ File: `assets/arene/cyberpunk/armi/mitra-compatto.webp`
 
 ```text
 A compact submachine gun with a long curved magazine, a folding stock and a small holographic sight glowing magenta. Single game inventory prop in three-quarter view, laid diagonally from lower left to upper right with a generous empty margin, isolated on a plain flat light grey background. Stylized painterly prop concept art with expressive brushwork, faceted planes and a crisp silhouette with a thin dark outline. Lit by an electric cyan neon key light with a magenta rim light and a faint acid yellow glint. --v 8.2 --ar 1:1 --no text, letters, signature, watermark, hands, person, scenery, background objects, cast shadow, frame, border
+```
+
+#### Ventaglio da combattimento in titanio
+
+Ventaglio da combattimento in titanio aperto, con i bordi affilati.  
+File: `assets/arene/cyberpunk/armi/ventaglio-da-combattimento-in-titanio.webp`
+
+**Immagine**
+
+```text
+An open combat fan made of brushed titanium blades with razor-sharp edges, a small cyan light on the pivot and a black silk tassel. Single game inventory prop in three-quarter view, laid diagonally from lower left to upper right with a generous empty margin, isolated on a plain flat light grey background. Stylized painterly prop concept art with expressive brushwork, faceted planes and a crisp silhouette with a thin dark outline. Lit by an electric cyan neon key light with a magenta rim light and a faint acid yellow glint. --v 8.2 --ar 1:1 --no text, letters, signature, watermark, hands, person, scenery, background objects, cast shadow, frame, border
+```
+
+#### Sparachiodi riprogrammato
+
+Sparachiodi da cantiere modificato con cavi scoperti e un caricatore di chiodi.  
+File: `assets/arene/cyberpunk/armi/sparachiodi-riprogrammato.webp`
+
+**Immagine**
+
+```text
+A modified construction nail gun with its safety removed, exposed wires taped along the body, a long strip of nails loaded and a hazard yellow stripe. Single game inventory prop in three-quarter view, laid diagonally from lower left to upper right with a generous empty margin, isolated on a plain flat light grey background. Stylized painterly prop concept art with expressive brushwork, faceted planes and a crisp silhouette with a thin dark outline. Lit by an electric cyan neon key light with a magenta rim light and a faint acid yellow glint. --v 8.2 --ar 1:1 --no text, letters, signature, watermark, hands, person, scenery, background objects, cast shadow, frame, border
+```
+
+#### Tirapugni elettrificato
+
+Tirapugni di metallo con una piccola batteria e una scintilla azzurra.  
+File: `assets/arene/cyberpunk/armi/tirapugni-elettrificato.webp`
+
+**Immagine**
+
+```text
+A metal knuckle duster with a small battery pack on the back and a tiny arc of blue electricity jumping between the rings. Single game inventory prop in three-quarter view, laid diagonally from lower left to upper right with a generous empty margin, isolated on a plain flat light grey background. Stylized painterly prop concept art with expressive brushwork, faceted planes and a crisp silhouette with a thin dark outline. Lit by an electric cyan neon key light with a magenta rim light and a faint acid yellow glint. --v 8.2 --ar 1:1 --no text, letters, signature, watermark, hands, person, scenery, background objects, cast shadow, frame, border
 ```

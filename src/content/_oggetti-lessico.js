@@ -290,10 +290,22 @@ arma|un fucile a pompa da strada|Canne segate e calcio coperto di adesivi delle 
 arma|una mazza da baseball chiodata|Legno vero e chiodi veri: un pezzo d'antiquariato con un brutto carattere.|forza:0.5 prova:for+1
 arma|un taser da buttafuori|Due elettrodi e una scarica che manda a terra chiunque, impianti compresi.|forza:0 posti:1 belve:2
 arma|un mitra compatto|Tanti colpi, poca precisione. Si svuota in fretta.|forza:1 usi:-1 posti:2
+arma|un ventaglio da combattimento in titanio|Si apre con uno scatto e ha i bordi affilati come rasoi. Elegante, e fa anche aria.|forza:0.5 prova:agi+1 posti:1
+arma|uno sparachiodi riprogrammato|Un utensile da cantiere con il limitatore tolto: spara chiodi a raffica.|forza:1 usi:-1 posti:2 prova:int+1
+arma|un tirapugni elettrificato|Quattro anelli di metallo e una batteria: ogni pugno arriva con una scossa.|forza:0.5 posti:0 prova:for+1
 cibo|una barretta di proteine sintetiche|Sa di cartone alla fragola, ma sfama.|cibo:0 posti:0
 cibo|una scatola di noodle istantanei|Acqua calda, tre minuti, e la giornata migliora.|cibo:5
 cibo|una lattina di bevanda energetica|Zucchero, caffeina e qualcosa che non è scritto sull'etichetta.|cibo:-25 energia:20 posti:0
 cibo|un panino di soia in busta|Pane di soia e salsa di soia. Sfama.|cibo:0
+cibo|una porzione di ramen al vapore|Brodo caldo, uova sintetiche e un cucchiaio di plastica che si scioglie un po'. Rimette in pace con il mondo.|cibo:10 morale:3
+cibo|un onigiri di riso sintetico|Un triangolo di riso con un cuore di alghe: compatto e onesto.|cibo:0 posti:0
+cibo|un sacchetto di grilli fritti|Croccanti, salati, ricchi di proteine. Non pensarci troppo.|cibo:-5 energia:10 posti:0
+cibo|un biscotto di Nonna Kiku|Un biscotto al burro fatto a mano da una fixer di ottantadue anni. Il migliore del distretto, e nessuno osa dire il contrario.|cibo:-25 morale:10 posti:0
+alcol|una bottiglia di vodka al neon|Brilla al buio di un azzurro innaturale. Anche chi la beve, per un po'.|morale:7 posti:1
+alcol|un cocktail «Riavvio di sistema»|La specialità del Club della braindance: tre strati colorati e un riavvio immediato.|morale:6 energia:-5 posti:0
+veleno|un microago avvelenato|Un ago sottile come un capello, da nascondere in una stretta di mano.|posti:0
+esplosivo|una granata a impulso|Non fa danni alle cose: spegne impianti e luci di tutti quelli che ha intorno.|posti:1
+esplosivo|un drone kamikaze riprogrammato|Un drone delle consegne con un pacco speciale. Lo consegna una volta sola.|posti:2
 amuleto|un defibrillatore sottocutaneo|Un impianto sotto lo sterno: se il cuore si ferma, una scarica lo riavvia. Come ogni portafortuna salva una volta sola, poi si brucia.|posti:0 impianto:1
 alcol|una bottiglia di sakè sintetico|Sakè di laboratorio: scalda, consola e fa dire cose di cui ci si pente.|morale:6 posti:1
 alcol|una lattina di birra di riso|Tiepida, amara e sociale.|morale:5 posti:0

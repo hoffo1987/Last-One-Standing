@@ -3668,15 +3668,35 @@ details.card > summary { font-size: 16px; }
       climax: { titles: ['La stretta corporativa', 'Le ultime linee aperte', 'Il blocco totale'], intro: 'La stretta corporativa chiude un isolato dopo l’altro: resta aperta solo la strada verso {z}. Da qui si esce soltanto vincendo.' },
       intro: {
         b: 'Il colpo ai dati è saltato: le serrande del distretto si abbassano e i droni di sicurezza bloccano gli svincoli. Tutti scappano con quello che riescono ad afferrare.',
-        d: 'Le insegne olografiche tremolano nello smog: comincia un altro giorno nella zona sigillata.',
-        n: 'Il cielo sopra Watson diventa viola di neon. Nei vicoli si spengono i segnali, uno alla volta.',
-        f: 'Un fixer manda lo stesso messaggio a tutti: c’è una consegna, e la roba va a chi arriva per primo.',
+        // più introduzioni per fase: si alternano un giorno dopo l'altro (i bollettini di Radio Zona Rossa)
+        d: [
+          'Le insegne olografiche tremolano nello smog: comincia un altro giorno nella zona sigillata.',
+          'Radio Zona Rossa, buongiorno: «Qui DJ Saetta. Il distretto è ancora chiuso, il caffè è ancora finto e voi siete ancora vivi. Due su tre non è male».',
+          'Il megaschermo della torre annuncia che la riapertura del distretto è «imminente». Lo annuncia da tre giorni.',
+          'Radio Zona Rossa: «Previsioni del giorno: smog al mattino, pioggia acida al pomeriggio, pallottole a qualsiasi ora. Portatevi un ombrello blindato».',
+          'All’alba i robot delle pulizie lavano via quello che è successo durante la notte. Ci mettono più del solito.',
+          'Radio Zona Rossa: «Un saluto speciale a Nonna Kiku, che ci ascolta e che ci ha mandato i biscotti. Nonna, ti vogliamo bene, non spararci».',
+          'La Kagemura Dynamics si scusa con un comunicato per il disagio causato dalla chiusura del distretto, e offre a tutti uno sconto del cinque per cento sul prossimo impianto.',
+          'Radio Zona Rossa: «Ricordate, ragazzi: in questa città non esistono amici. Esistono solo persone che non vi hanno ancora tradito. Ecco la prossima canzone».',
+        ],
+        n: [
+          'Il cielo sopra Watson diventa viola di neon. Nei vicoli si spengono i segnali, uno alla volta.',
+          'Radio Zona Rossa, notturno: «DJ Saetta vi tiene compagnia fino all’alba. Spegnete le luci, abbassate la voce, e se sentite un drone, non salutatelo».',
+          'Le insegne del Club della braindance pulsano a tempo con una musica che si sente da tutto il distretto. Chi dorme, dorme male.',
+          'Di notte il distretto sembra un acquario: luci, riflessi nelle pozzanghere, e qualcosa di grosso che nuota nell’ombra.',
+          'Radio Zona Rossa: «Notte di pioggia, notte di ricordi. Chiamatemi e ditemi chi vi manca: lo leggo in diretta».',
+          'Un dirigibile pubblicitario attraversa il cielo del distretto proiettando sulle nuvole la faccia sorridente di un testimonial. Nessuno sorride indietro.',
+        ],
+        f: [
+          'Un fixer manda lo stesso messaggio a tutti: c’è una consegna, e la roba va a chi arriva per primo.',
+          'Nonna Kiku annuncia su tutte le reti: «Ho preparato una consegna per i miei ragazzi. Chi arriva tardi resta senza biscotti».',
+        ],
         finale: 'La stretta corporativa chiude un isolato dopo l’altro: restano aperte solo le vie verso la Piazza della torre.',
       },
       fallen: ['Sulla rete del quartiere nessun biochip si spegne.', 'Sulla rete del quartiere si spegne un biochip.', 'Sulla rete del quartiere si spengono {n} biochip.'],
       lex: {
-        arma: ['una pistola smart', 'una katana termica', 'un fucile a pompa da strada', 'una mazza da baseball chiodata', 'una pistola a rotaia artigianale', 'un taser da buttafuori', 'un mitra compatto'],
-        cibo: ['una barretta di proteine sintetiche', 'una scatola di noodle istantanei', 'una lattina di bevanda energetica', 'un panino di soia in busta'],
+        arma: ['una pistola smart', 'una katana termica', 'un fucile a pompa da strada', 'una mazza da baseball chiodata', 'una pistola a rotaia artigianale', 'un taser da buttafuori', 'un mitra compatto', 'un ventaglio da combattimento in titanio', 'uno sparachiodi riprogrammato', 'un tirapugni elettrificato'],
+        cibo: ['una barretta di proteine sintetiche', 'una scatola di noodle istantanei', 'una lattina di bevanda energetica', 'un panino di soia in busta', 'una porzione di ramen al vapore', 'un onigiri di riso sintetico', 'un sacchetto di grilli fritti', 'un biscotto di Nonna Kiku'],
         luogo: ['il Mercato di Kabuki', 'il Megablocco', 'la Clinica del ripperdoc', 'il Club della braindance', 'l\'Officina dei Maelstrom', 'il Nodo dati corporativo'],
         mostro: ['una squadra di sicurezza corporativa', 'uno sciame di droni di pattuglia', 'una banda di Scav', 'una gang di cromati'],
         trappola: ['una mina a prossimità', 'un filo monomolecolare teso in un corridoio', 'una torretta automatica riprogrammata'],
@@ -4002,6 +4022,9 @@ details.card > summary { font-size: 16px; }
         { n: 'Tregua del quartiere', d: 'Le gang si accordano per un giorno senza sparare. Nessuno ci crede, ma tutti respirano.', fx: { lethal: 0.85, pr: -4, heal: 1.15 } },
         { n: 'Disturbi ottici', d: 'Le ottiche di tutti mostrano sfarfallii e immagini doppie: mirare è difficile, sparire è più facile.', fx: { stl: 1.2, tb: { agi: -1, furt: 1 } } },
         { n: 'Notte di neon', d: 'Le insegne si accendono tutte insieme e le dirette dei fixer cercano facce nuove.', fx: { fame: 1.5, pr: 2 } },
+        { n: 'Saldi notturni del Mercato', d: 'Il Mercato di Kabuki fa i saldi di mezzanotte: tutto a metà prezzo, comprese cose che non dovrebbero essere in vendita.', fx: { forage: 1.35, fame: 1.2 } },
+        { n: 'Parata corporativa', d: 'La Velltech fa sfilare carri olografici e droni di sicurezza per festeggiare il proprio anniversario. Le pattuglie sono ovunque, i fixer filmano tutto.', fx: { fame: 1.6, beast: 1.3 } },
+        { n: 'Festa delle lanterne olografiche', d: 'Il quartiere accende migliaia di lanterne olografiche per ricordare chi non c’è più. Per una notte, tutti abbassano la voce.', fx: { pr: -3, lethal: 0.9, heal: 1.1 } },
       ],
       txt: {
         meterUp: ['Le ottiche di {0} cominciano a mostrare righe di codice che nessuno ha scritto. Il sovraccarico neurale è oltre la soglia.', '{0} sente gli impianti scaldarsi sotto la pelle e deve fermarsi a respirare: il sovraccarico neurale è alto.', 'A {0} trema la mano cromata e la voce dei pensieri arriva in ritardo. Il sovraccarico neurale non scende.', 'Il diagnostico interno di {0} lampeggia in rosso: troppo carico, troppo a lungo.'],
@@ -5496,10 +5519,22 @@ arma|un fucile a pompa da strada|Canne segate e calcio coperto di adesivi delle 
 arma|una mazza da baseball chiodata|Legno vero e chiodi veri: un pezzo d'antiquariato con un brutto carattere.|forza:0.5 prova:for+1
 arma|un taser da buttafuori|Due elettrodi e una scarica che manda a terra chiunque, impianti compresi.|forza:0 posti:1 belve:2
 arma|un mitra compatto|Tanti colpi, poca precisione. Si svuota in fretta.|forza:1 usi:-1 posti:2
+arma|un ventaglio da combattimento in titanio|Si apre con uno scatto e ha i bordi affilati come rasoi. Elegante, e fa anche aria.|forza:0.5 prova:agi+1 posti:1
+arma|uno sparachiodi riprogrammato|Un utensile da cantiere con il limitatore tolto: spara chiodi a raffica.|forza:1 usi:-1 posti:2 prova:int+1
+arma|un tirapugni elettrificato|Quattro anelli di metallo e una batteria: ogni pugno arriva con una scossa.|forza:0.5 posti:0 prova:for+1
 cibo|una barretta di proteine sintetiche|Sa di cartone alla fragola, ma sfama.|cibo:0 posti:0
 cibo|una scatola di noodle istantanei|Acqua calda, tre minuti, e la giornata migliora.|cibo:5
 cibo|una lattina di bevanda energetica|Zucchero, caffeina e qualcosa che non è scritto sull'etichetta.|cibo:-25 energia:20 posti:0
 cibo|un panino di soia in busta|Pane di soia e salsa di soia. Sfama.|cibo:0
+cibo|una porzione di ramen al vapore|Brodo caldo, uova sintetiche e un cucchiaio di plastica che si scioglie un po'. Rimette in pace con il mondo.|cibo:10 morale:3
+cibo|un onigiri di riso sintetico|Un triangolo di riso con un cuore di alghe: compatto e onesto.|cibo:0 posti:0
+cibo|un sacchetto di grilli fritti|Croccanti, salati, ricchi di proteine. Non pensarci troppo.|cibo:-5 energia:10 posti:0
+cibo|un biscotto di Nonna Kiku|Un biscotto al burro fatto a mano da una fixer di ottantadue anni. Il migliore del distretto, e nessuno osa dire il contrario.|cibo:-25 morale:10 posti:0
+alcol|una bottiglia di vodka al neon|Brilla al buio di un azzurro innaturale. Anche chi la beve, per un po'.|morale:7 posti:1
+alcol|un cocktail «Riavvio di sistema»|La specialità del Club della braindance: tre strati colorati e un riavvio immediato.|morale:6 energia:-5 posti:0
+veleno|un microago avvelenato|Un ago sottile come un capello, da nascondere in una stretta di mano.|posti:0
+esplosivo|una granata a impulso|Non fa danni alle cose: spegne impianti e luci di tutti quelli che ha intorno.|posti:1
+esplosivo|un drone kamikaze riprogrammato|Un drone delle consegne con un pacco speciale. Lo consegna una volta sola.|posti:2
 amuleto|un defibrillatore sottocutaneo|Un impianto sotto lo sterno: se il cuore si ferma, una scarica lo riavvia. Come ogni portafortuna salva una volta sola, poi si brucia.|posti:0 impianto:1
 alcol|una bottiglia di sakè sintetico|Sakè di laboratorio: scalda, consola e fa dire cose di cui ci si pente.|morale:6 posti:1
 alcol|una lattina di birra di riso|Tiepida, amara e sociale.|morale:5 posti:0
@@ -5962,7 +5997,7 @@ con allegati numerati|Gli allegati in ordine fanno durare l'effetto più a lungo
     wasteland: { amuleto: ['una piastra di metallo cucita nella giacca', 'un tappo di bottiglia fortunato'], alcol: ['una bottiglia di liquore distillato in un radiatore', 'una tanica di birra di cactus'], veleno: ['una fiala di veleno di scorpione', 'una bottiglia d\'acqua radioattiva'], mappa: ['una mappa delle sorgenti nascoste'], esplosivo: ['una molotov', 'un barile di carburante'] },
     liceo: { amuleto: ['una raccomandazione del preside', 'un certificato medico in bianco'], alcol: ['una lattina di energy drink'], veleno: ['un pettegolezzo avvelenato', 'uno screenshot compromettente'], mappa: ['l\'orario segreto delle verifiche'], esplosivo: ['un video virale', 'una petizione con trecento firme'] },
     ufficio: { amuleto: ['uno zio nel consiglio di amministrazione', 'un contratto blindato'], alcol: ['una bottiglia di prosecco aziendale', 'una bottiglia di limoncello del capo'], veleno: ['una mail anonima all\'ufficio del personale', 'una segnalazione anonima'], mappa: ['l\'organigramma segreto della riorganizzazione'], esplosivo: ['un report che fa saltare tutto', 'la registrazione di una riunione riservata'] },
-    cyberpunk: { amuleto: ['un defibrillatore sottocutaneo', 'un santino olografico'], alcol: ['una bottiglia di sakè sintetico', 'una lattina di birra di riso'], veleno: ['una fiala di neurotossina', 'una cartuccia di veleno per lame'], mappa: ['una mappa dei punti ciechi delle telecamere'], esplosivo: ['una granata a frammentazione', 'una carica di plastico'] },
+    cyberpunk: { amuleto: ['un defibrillatore sottocutaneo', 'un santino olografico', 'un portachiavi a forma di gatto fortunato'], alcol: ['una bottiglia di sakè sintetico', 'una lattina di birra di riso', 'una bottiglia di vodka al neon', 'un cocktail «Riavvio di sistema»'], veleno: ['una fiala di neurotossina', 'una cartuccia di veleno per lame', 'un microago avvelenato'], mappa: ['una mappa dei punti ciechi delle telecamere', 'un registro delle ronde corporative'], esplosivo: ['una granata a frammentazione', 'una carica di plastico', 'una granata a impulso', 'un drone kamikaze riprogrammato'] },
   };
   Object.keys(LEX).forEach((id) => D.packs.push({ theme: id, lex: LEX[id] }));
 
@@ -6439,68 +6474,161 @@ Vortice nel Fiume | Il Fiume comincia a girare su se stesso in un vortice enorme
 })(typeof window !== 'undefined' ? window : globalThis);
 
 ;
-/* Night City — Zona Rossa: voci, conversazioni, azioni e diario propri dell'arena.
- * Sostituiscono i testi comuni che parlano di fuochi, boschi, stelle o sponsor;
- * le altre arene continuano a usare i testi di sempre. */
+/* Night City — Zona Rossa: voci, conversazioni, azioni, diario e testi automatici propri.
+ * Sostituiscono o affiancano i testi comuni che parlano di fuochi, boschi, stelle o sponsor;
+ * le altre arene continuano a usare i testi di sempre.
+ * Personaggi di contorno ricorrenti (originali): Nonna Kiku (fixer), Doc Ferraglia (ripperdoc),
+ * DJ Saetta (Radio Zona Rossa), Gino (distributore parlante), Pixel (gatto olografico). */
 (function (G) {
   const D = G.LOS_DATA; if (!D) return;
   const ID = 'cyberpunk';
+  const more = (o, k, l) => { o[k] = (o[k] || []).concat(l); };
+
+  /* ---------- battute sotto gli eventi ---------- */
   const put = (kind, list) => { const v = D.voice && D.voice[kind]; if (!v) return; (v.arena = v.arena || {})[ID] = list; };
-  put('kill', ['Biochip spento.', 'Contratto chiuso.', 'Niente di personale: solo eddie.', 'Il cromo non ti ha salvato.', 'Night City non si ricorda di nessuno.']);
-  put('last', ['Dite al fixer che il lavoro non l’ho finito.', 'Almeno questa volta non mi hanno fregato gli impianti.', 'Speravo in un’uscita di scena più al neon.', 'Il mio backup... qualcuno ha fatto il backup?']);
-  put('ally', ['Metà dei rischi, metà della paga.', 'Io controllo i droni, tu le porte.', 'Se ti friggono gli impianti, ti porto alla Clinica. Promesso.']);
-  put('love', ['In tutta Night City, proprio tu.', 'Quando usciamo dal distretto, ti porto a vedere il mare vero.', 'Le insegne mentono. Tu no.']);
-  put('taunt', ['Torna quando avrai il cromo giusto.', 'Gonk.', 'Hai l’ICE di un tostapane.']);
-  put('disaster', ['Odio questa città.', 'Qualcuno spenga la rete, vi prego.', 'Ancora vivo, ancora senza eddie.']);
+  put('kill', ['Biochip spento.', 'Contratto chiuso.', 'Niente di personale: solo eddie.', 'Il cromo non ti ha salvato.', 'Night City non si ricorda di nessuno.', 'Disconnessione completata.', 'Ti avevo detto di aggiornare il firmware.', 'Saluta Gino da parte mia.', 'Riavvio negato.', 'Un nome in meno sul megaschermo.']);
+  put('last', ['Dite al fixer che il lavoro non l’ho finito.', 'Almeno questa volta non mi hanno fregato gli impianti.', 'Speravo in un’uscita di scena più al neon.', 'Il mio backup... qualcuno ha fatto il backup?', 'Avevo ancora tre rate da pagare. Ah, ah.', 'DJ Saetta, metti qualcosa di bello.', 'Ditelo a Nonna Kiku. Con delicatezza.', 'Errore 404: futuro non trovato.']);
+  put('revenge', ['Questo è per {2}. Con gli interessi.', '{2} ti manda i suoi saluti. Dal cloud.', 'Ho scaricato tutto quello che sapevi su {2}. Ora tocca a te.']);
+  put('betray', ['Era un contratto a tempo. È scaduto.', 'Night City insegna una cosa sola, e te l’ho appena insegnata.', 'Non prenderla male: ho solo cambiato fixer.', 'L’alleanza era in prova. Non hai superato il periodo di prova.']);
+  put('ally', ['Metà dei rischi, metà della paga.', 'Io controllo i droni, tu le porte.', 'Se ti friggono gli impianti, ti porto alla Clinica. Promesso.', 'Affare fatto. Niente clausole scritte in piccolo.', 'Tu porti il cromo, io porto il cervello.', 'Se Nonna Kiku chiede, siamo cugini.']);
+  put('love', ['In tutta Night City, proprio tu.', 'Quando usciamo dal distretto, ti porto a vedere il mare vero.', 'Le insegne mentono. Tu no.', 'Ti salverei anche il backup.', 'Hai il battito più bello che le mie ottiche abbiano mai misurato.', 'Neanche in braindance mi sono mai sentit[0:o/a] così.']);
+  put('saved', ['Te ne devo una. In eddie o in favori, scegli tu.', 'Stavo per riavviarmi definitivamente. Grazie.', 'Il mio diagnostico dice che sei una brava persona. È la prima volta che lo dice.', 'Ok. Ok. Respiro. Gli impianti respirano.']);
+  put('taunt', ['Torna quando avrai il cromo giusto.', 'Gonk.', 'Hai l’ICE di un tostapane.', 'Le tue ottiche sono di seconda mano. Si vede.', 'Ti ha installato gli impianti tuo cugino, vero?', 'Ci vediamo sul megaschermo. Tu in versione «ricercat[1:o/a]».']);
+  put('sponsor', ['Grazie, Nonna Kiku! Mangio, mangio.', 'Un regalo dal fixer? Ora sono preoccupat[0:o/a].', 'Lo apro piano. Non si sa mai.', 'Ringrazio i fixer, la Clinica e il mio ripperdoc di fiducia.']);
+  put('disaster', ['Odio questa città.', 'Qualcuno spenga la rete, vi prego.', 'Ancora viv[0:o/a], ancora senza eddie.', 'Questo non era nel contratto.', 'DJ Saetta, se mi senti: aiuto.', 'Mi rimborsa qualcuno? No? Immaginavo.']);
+  put('feast', ['Prima i biscotti di Nonna Kiku, poi le armi.', 'Prendo la cassa più piccola: nessuno la guarda mai.', 'Se è una trappola, almeno è una trappola gratis.']);
+
+  /* ---------- conversazioni notturne ---------- */
   if (D.chats) {
     const A = D.chats.arena || (D.chats.arena = {});
-    A[ID] = (A[ID] || []).concat([
+    more(A, ID, [
       ['Quanto sovraccarico hai?', 'Abbastanza da vedere le pubblicità anche a occhi chiusi.'],
       ['Ti fidi del fixer?', 'Mi fido degli eddie del fixer. Del fixer, no.'],
       ['Domani passiamo dal Mercato?', 'Domani passiamo dove non ci sono droni. Se esiste.'],
       ['Hai mai visto il cielo senza smog?', 'Una volta, in una braindance. Era finto anche quello.'],
       ['Senti anche tu quel ronzio?', 'Sono le insegne. O i miei impianti. Spero le insegne.'],
       ['Cosa farai con la tua parte?', 'Un biglietto per fuori città. Solo andata.'],
+      ['Hai sentito DJ Saetta stasera?', 'Ha dedicato una canzone «a chi non ce la farà». Simpatico.'],
+      ['Secondo te Gino ce l’ha con me?', 'Gino ce l’ha con tutti. È un distributore con dei sentimenti.'],
+      ['Chi è questa Nonna Kiku?', 'Una che ha ottantadue anni, un braccio cromato e una lista. Non vuoi essere sulla lista.'],
+      ['Doc Ferraglia sa davvero quello che fa?', 'Sa cantare. Sul resto, diciamo che è ottimista.'],
+      ['Se esco di qui mi tolgo tutti gli impianti.', 'E poi come fai a sapere che ore sono?'],
+      ['Hai mai provato a toccare Pixel?', 'Tutti ci hanno provato. Pixel vince sempre.'],
+      ['Perché la chiamano Zona Rossa?', 'Per le insegne. Almeno, all’inizio era per le insegne.'],
+      ['Mi presti il cyberdeck?', 'Ti presto un rene, prima. Il cyberdeck no.'],
+      ['Secondo te ci stanno guardando?', 'In diretta su tre canali, con le quote delle scommesse in sovrimpressione.'],
+      ['Ti ricordi com’era prima della chiusura?', 'Uguale. Ma con il permesso di uscire.'],
     ]);
   }
+
+  /* ---------- azioni dei concorrenti ---------- */
   const M = D.mind; if (!M) return;
   (M.actsArena = M.actsArena || {})[ID] = {
-    recruit: ['{0} convince {1} a unirsi al gruppo: «A Night City da soli si dura una notte».', '{0} offre a {1} un posto nella capsula-letto e un’alleanza. {1} accetta.', '{0} parla con {1} per mezz’ora, sotto una tettoia. Alla fine si stringono la mano: ora fanno parte della stessa alleanza.'],
-    show: ['{0} improvvisa una diretta per le telecamere dei fixer. Le visualizzazioni salgono.', '{0} fa un discorso commovente al drone più vicino. Chi guarda la diretta applaude.', '{0} si mette in posa sotto un’insegna al neon, per nessun motivo pratico. I fixer prendono nota.'],
-    speech: ['{0} raduna l’alleanza e divide i compiti: chi controlla i droni, chi le porte, chi gli impianti. Il gruppo respira.', '{0} fa un discorso da film sulla fine delle corporazioni. Funziona: tutti dormono meglio.'],
-    ritual: ['{0} tocca {i} tre volte prima di dormire. Non si sa mai.', '{0} recita a bassa voce la preghiera stampata su un santino del quartiere. Si sente subito meglio.', '{0} riavvia gli impianti nello stesso ordine di ogni sera. Il rito calma più del diagnostico.'],
+    recruit: ['{0} convince {1} a unirsi al gruppo: «A Night City da soli si dura una notte».', '{0} offre a {1} un posto nella capsula-letto e un’alleanza. {1} accetta.', '{0} parla con {1} per mezz’ora sotto una tettoia. Alla fine si stringono la mano: ora fanno parte della stessa alleanza.', '{0} mostra a {1} un contratto scritto su un tovagliolo del Mercato. Clausola unica: «Non tradirsi prima di domani». {1} firma.'],
+    mediate: ['{0} si mette in mezzo tra {1} e {2} e li obbliga a dividere una scatola di noodle. A metà scatola smettono di guardarsi male.', '{0} costringe {1} e {2} a parlarsi davanti a Gino il distributore, che commenta ogni frase. Ridono, e la lite finisce.'],
+    bully: ['{0} si piazza davanti a {1}, fa scrocchiare le nocche cromate e allunga la mano. {1} consegna {i} senza fiatare.', '{0} spiega a {1} che nel quartiere c’è una nuova tassa, e che si paga in {i}. {1} paga.'],
+    brawl: ['{0} e {1} si incrociano in {z} e finisce a pugni sotto un’insegna che lampeggia. Nessuno vince, il sangue sì.', 'Una parola di troppo tra {0} e {1}, e volano pugni cromati. Si separano tra lividi e scintille.'],
+    healStranger: ['{0} trova {1} ferit[1:o/a] in un vicolo e, senza chiedere niente, l[1:o/a] medica con la colla chirurgica.', '{0} non conosce {1}, ma non riesce a lasciarl[1:o/a] sanguinare sotto la pioggia acida. L[1:o/a] ricuce in silenzio.'],
+    gift: ['{0} regala {i} a {1}, che ha l’aria di averne bisogno.', '{0} lascia {i} accanto a {1} che dorme, con un post-it olografico: «Offre la casa».'],
+    show: ['{0} improvvisa una diretta per le telecamere dei fixer. Le visualizzazioni salgono.', '{0} fa un discorso commovente al drone più vicino. Chi guarda la diretta applaude.', '{0} si mette in posa sotto un’insegna al neon, per nessun motivo pratico. I fixer prendono nota.', '{0} commenta la partita in diretta come un telecronista, compreso il proprio nome. Il canale pirata che l[0:o/a] trasmette raddoppia gli spettatori.'],
+    speech: ['{0} raduna l’alleanza e divide i compiti: chi controlla i droni, chi le porte, chi gli impianti. Il gruppo respira.', '{0} fa un discorso da film sulla fine delle corporazioni. Funziona: tutti dormono meglio.', '{0} legge all’alleanza le regole della notte, scritte a pennarello sul braccio: «Niente luci, niente nomi, niente eroi».'],
+    ritual: ['{0} tocca {i} tre volte prima di dormire. Non si sa mai.', '{0} recita a bassa voce la preghiera stampata su un santino del quartiere. Si sente subito meglio.', '{0} riavvia gli impianti nello stesso ordine di ogni sera. Il rito calma più del diagnostico.', '{0} accende per un minuto l’insegna di un tempio di quartiere e chiede una cosa sola. Non la dice a nessuno.'],
     sleepwalk: ['{0} si alza nel sonno e cammina fino a {z}. Si sveglia lì, con le ottiche accese e nessun ricordo del percorso.', 'Gli altri vedono {0} passare nel buio, a occhi chiusi, in direzione di {z}. Nessuno ha il coraggio di fermarl[0:o/a].'],
-    madness: ['{0} passa la notte a discutere con un distributore automatico. Il distributore, a quanto pare, ha torto.', '{0} dipinge una faccia sul proprio zaino e lo presenta a tutti come un nuovo socio.', '{0} ride da sol[0:o/a] per un’ora davanti a una pubblicità di impianti. Nessuno chiede perché.'],
-    mishap: ['{0} inciampa nel buio e perde {i} in un tombino. Addio.', '{0} si siede su una presa di corrente scoperta. Non è una metafora.', '{0} usa {i} come cuscino. Al mattino {i} non c’è più.'],
-    hunt: ['{0} torna da un giro tra i distributori con {cibo} per tutta l’alleanza.', '{0} esce all’alba e rientra con {cibo}. Nessuno chiede da dove venga.'],
-    plan: ['{0} proietta la mappa del quartiere su un muro e ripassa il piano tre volte.', '{0} studia gli spostamenti degli altri dalle telecamere di un negozio e prende appunti. Domani sarà pront[0:o/a].', '{0} ripassa a mente le vie di fuga, una per una, finché non le sa a memoria.'],
-    letter: ['{0} registra un messaggio per {1} e lo lascia sul suo zaino, in uno shard.', '{0} scrive a {1} un messaggio pieno di cancellature e lo infila nel suo zaino.'],
-    paranoid: ['{0} dorme con le ottiche accese. Letteralmente.', '{0} cambia nascondiglio tre volte durante la notte.'],
+    madness: ['{0} passa la notte a discutere con un distributore automatico. Il distributore, a quanto pare, ha torto.', '{0} dipinge una faccia sul proprio zaino e lo presenta a tutti come un nuovo socio.', '{0} ride da sol[0:o/a] per un’ora davanti a una pubblicità di impianti. Nessuno chiede perché.', '{0} prova a convincere Pixel, il gatto olografico, a fondare un partito politico.'],
+    mishap: ['{0} inciampa nel buio e perde {i} in un tombino. Addio.', '{0} si siede su una presa di corrente scoperta. Non è una metafora.', '{0} usa {i} come cuscino. Al mattino {i} non c’è più.', '{0} appoggia {i} su un robot delle pulizie che passava. Il robot se lo porta via, con efficienza.'],
+    glutton: ['{0} si mangia {i} in un boccone, anche se non aveva fame. Domani se ne pentirà.', '{0} «assaggia» {i} davanti a un’insegna di ramen. Ne resta solo il ricordo.'],
+    drink: ['{0} svuota {i} fino all’ultima goccia. La notte diventa più calda, più rumorosa e più al neon.', '{0} brinda alla salute del distretto con {i}. Anche delle parti del distretto che vorrebbe veder bruciare.'],
+    disinfect: ['{0} versa {i} sulla ferita infetta di {1}. Urla, ma la febbre scende.'],
     loner: ['{0} lascia l’alleanza: troppa gente, troppi biochip vicini. Meglio sol[0:o/a].', '{0} se ne va prima dell’alba. Non è niente di personale: a Night City funziona così.'],
-    sponsorBonus: ['Nella consegna, per {0}, c’è anche {i}.', 'Il fixer aggiunge {i}: ha capito di cosa ha bisogno {0}.'],
-    luckyFind: ['{0} inciampa su {i}. A volte la fortuna è solo guardare per terra.', '{0} trova {i} in un cassonetto dove nessuno aveva guardato.'],
+    plan: ['{0} proietta la mappa del quartiere su un muro e ripassa il piano tre volte.', '{0} studia gli spostamenti degli altri dalle telecamere di un negozio e prende appunti. Domani sarà pront[0:o/a].', '{0} ripassa a mente le vie di fuga, una per una, finché non le sa a memoria.', '{0} disegna il piano per domani sul vetro appannato di una capsula-letto, con le frecce.'],
+    craftPoison: ['{0} carica il veleno nell’impugnatura di {ip}, con molta, molta attenzione.', '{0} passa la notte a trattare {ip} con una tossina del Mercato. Ora basta un graffio.'],
+    craftBomb: ['{0} combina la trappola con l’esplosivo e un timer preso da una sveglia a forma di gatto. Il risultato è piccolo, brutto e pericolosissimo.'],
+    craftRepair: ['{0} rimette in sesto {ip} con l’attrezzo giusto e un aggiornamento scaricato da una rete pubblica. Quasi come nuov[0:o/a].', '{0} pulisce, regola e ricalibra {ip} per tutta la notte.'],
+    craftTrap: ['{0} costruisce una trappola con {i} e due batterie prese da un monopattino.', 'Con {i} e quello che trova nei cassonetti, {0} si fa una trappola. Non è elegante, ma funziona.'],
+    trade: ['{0} cede {i} a {1} in cambio di {j}. Affare fatto, senza ricevuta.', '{0} e {1} contrattano per un’ora come al Mercato: alla fine {0} dà {i} e ottiene {j}.'],
+    tradeGreedy: ['{1} vende {j} a {0} a prezzo da corporazione: {0} deve dare {i} e anche {k}.'],
+    tradeFree: ['{1} vede la fame di {0} e [0:gli/le] regala {j}. «Me lo restituirai in un altro modo.»', '{1} lascia {j} a {0} senza chiedere niente in cambio. A Night City, è quasi un miracolo.'],
+    nightTheft: ['{0} sfila {i} dallo zaino di {1} mentre dorme. Mattina amara per {1}.', 'Nel buio di un blackout, {0} alleggerisce lo zaino di {1}: sparisce {i}.'],
+    confessYes: ['{0} trova il coraggio e confessa tutto a {1} sotto un’insegna rosa. {1} sorride: era ora.', '{0} dice a {1} quello che prova. {1} non risponde: l[0:o/a] bacia mentre le insegne cambiano colore.'],
+    confessNo: ['{0} confessa i suoi sentimenti a {1}. {1} risponde che preferisce un rapporto di amicizia. Gino il distributore, in sottofondo, dice «Ahia».', '{0} si dichiara a {1}, che arrossisce e cambia argomento. Molto, molto in fretta.'],
+    letter: ['{0} registra un messaggio per {1} e lo lascia sul suo zaino, in uno shard.', '{0} scrive a {1} un messaggio pieno di cancellature e lo infila nel suo zaino.'],
+    jealous: ['{0} vede {1} e {2} insieme sotto le luci del Club, e qualcosa si rompe. Non dice niente. Per ora.', 'La notizia di {1} e {2} arriva anche a {0}, in diretta su un canale pirata. Da quel momento, {0} guarda {2} in un altro modo.'],
+    oath: ['{0} giura a {1} che nessuno l[1:o/a] toccherà finché c’è l[0:ui/ei], e se lo scrive sul braccio con il pennarello.', '{0} si mette di guardia davanti alla capsula di {1} tutta la notte, senza che nessuno glielo chieda.'],
+    hunt: ['{0} torna da un giro tra i distributori con {cibo} per tutta l’alleanza.', '{0} esce all’alba e rientra con {cibo}. Nessuno chiede da dove venga.', '{0} convince Gino il distributore a fare uno sconto all’alleanza. Gino cede, e sputa {cibo}.'],
+    paranoid: ['{0} dorme con le ottiche accese. Letteralmente.', '{0} cambia nascondiglio tre volte durante la notte.', '{0} copre con il nastro adesivo tutte le telecamere visibili dalla capsula. Poi anche quelle che non vede.'],
+    stalk: ['{0} segue il segnale del biochip di {1} fino a {z}.', '{0} segue le tracce di {1} fino a {z}, leggendo le ricevute dei distributori.'],
+    hide: ['{0} trova un vano tecnico dietro le insegne in {z} e decide di non uscire per un po’.'],
+    armorSave: ['{0} viene colpit[0:o/a] in pieno, ma {ip} regge: {0} si rialza ammaccat[0:o/a], ma viv[0:o/a].', 'Il colpo era mortale, ma {ip} si spacca al posto di {0}. Il cromo ringrazia.'],
+    sponsorBonus: ['Nella consegna, per {0}, c’è anche {i}.', 'Il fixer aggiunge {i}: ha capito di cosa ha bisogno {0}.', 'Nonna Kiku infila nella cassa anche {i}, con un biglietto: «Mangia».'],
+    luckyFind: ['{0} inciampa su {i}. A volte la fortuna è solo guardare per terra.', '{0} trova {i} in un cassonetto dove nessuno aveva guardato.', 'Pixel il gatto olografico si siede sopra {i}. {0} lo raccoglie: nessuno lo reclama.'],
   };
+
+  /* ---------- diario segreto ---------- */
   (M.diaryArena = M.diaryArena || {})[ID] = {
-    lonely: ['{0} non parla con nessuno da giorni. Ha iniziato a rispondere alle pubblicità.', '{0} guarda le luci di un’altra alleanza dalla finestra di un palazzo e non sa se sia invidia o sollievo.'],
-    calm: ['{0} pensa a cosa farà fuori dal distretto e fa una lista. È una lista lunga.', '{0} guarda le insegne lampeggiare e prova a contarle per addormentarsi.', '{0} si chiede chi stia guardando la sua diretta, là fuori.'],
+    lonely: ['{0} non parla con nessuno da giorni. Ha iniziato a rispondere alle pubblicità.', '{0} guarda le luci di un’altra alleanza dalla finestra di un palazzo e non sa se sia invidia o sollievo.', '{0} saluta Gino il distributore ogni mattina. Gino risponde. È già qualcosa.'],
+    calm: ['{0} pensa a cosa farà fuori dal distretto e fa una lista. È una lista lunga.', '{0} guarda le insegne lampeggiare e prova a contarle per addormentarsi.', '{0} si chiede chi stia guardando la sua diretta, là fuori.', '{0} ascolta la pioggia sul tetto della capsula. Per un momento sembra il suono di casa.'],
     crush: ['{0} guarda {1} dormire e si chiede se sia il momento giusto per dirglielo.', 'Ogni volta che {1} ride, {0} dimentica per un attimo dove si trova.', '{0} ha salvato una foto di {1} in un angolo della memoria delle ottiche. Imbarazzante.'],
     keepsakeDead: ['{0} stringe {i} tra le mani. È tutto quello che resta di {1}.', '{0} guarda {i} alla luce di un’insegna. {1} non c’è più, ma in quel ricordo sì.'],
     star: ['{0} ripassa le pose migliori per i droni dei fixer. Il pubblico, dopotutto, è un alleato.', '{0} ha capito come funziona: più fai notizia, più i fixer ti mandano roba.'],
     hungry: ['{0} sogna {cibo} e si sveglia masticando l’aria.', '{0} conta le razioni che non ha. Il conto è veloce.', 'Lo stomaco di {0} brontola così forte che teme di farsi sentire dai droni.'],
+    fear: ['{0} trema per tutta la notte, e non è per il freddo dei condizionatori.', '{0} sussulta a ogni drone che passa. Ne passano tanti.', '{0} si chiede, per la prima volta, se vale la pena continuare.'],
+    grief: ['Di notte, {0} parla a bassa voce con {1}, come se fosse ancora lì.', '{0} riguarda per l’ennesima volta la registrazione delle ottiche in cui {1} ride.', '{0} manda un messaggio al numero di {1}. Il messaggio resta lì, senza la seconda spunta.'],
+    pride: ['{0} tiene il conto: {n}. Il numero non l[0:o/a] spaventa più.', '{0} dorme benissimo. È questo, forse, il dettaglio più inquietante.'],
+    guilt: ['{0} sogna {1}. Nel sogno, {1} non dice niente. Guarda e basta, con le ottiche spente.', '{0} si chiede se {1} avesse qualcuno ad aspettarl[1:o/a] fuori dal distretto.'],
+    suspicion: ['{0} non si fida di {1}. Non c’è un motivo preciso, ed è proprio questo il punto.', '{0} ha controllato il registro dei biochip: {1} era nel posto sbagliato al momento sbagliato. Due volte.'],
     trait: {
-      superstizioso: ['{0} ha contato le insegne rotte sulla strada: sette. Sette è un buon numero. Forse.'],
-      fortunato: ['{0} trova sempre un distributore funzionante. Sempre.'],
-      romantico: ['{0} scrive poesie sul vetro appannato di una capsula-letto e le cancella prima dell’alba.'],
-      sonnambulo: ['{0} si sveglia con le scarpe bagnate di pioggia acida e nessun ricordo della notte.'],
-      ubriacone: ['{0} sogna un bancone del Club e un bicchiere pieno. Si sveglia con la bocca secca.'],
-      folle: ['{0} ha dato un nome a tutti i droni della zona. Il preferito si chiama Gianfranco.'],
+      leale: ['{0} ripete i nomi degli alleati prima di dormire, come una password da non dimenticare.'],
       traditore: ['{0} si esercita a sembrare sincer[0:o/a] davanti al riflesso di una vetrina.'],
-      bruto: ['{0} fa flessioni nel buio per tenersi svegli[0:o/a] e per farsi sentire.'],
-      guaritore: ['{0} controlla le scorte di colla chirurgica. Prima o poi serviranno.'],
-      ingegnoso: ['{0} smonta e rimonta un vecchio cyberdeck per tutta la notte. Non si sa per fare cosa.'],
+      codardo: ['{0} ha trovato un nascondiglio perfetto dietro un’insegna e non lo dirà a nessuno.'],
+      spietato: ['{0} pulisce l’arma alla luce di un’insegna, con una calma che mette i brividi.'],
+      pacifista: ['{0} si chiede se ci sia un modo per uscirne senza fare del male a nessuno. Anche solo uno.'],
+      stratega: ['{0} ha un piano. E un piano di riserva. E uno per quando il fixer cambia idea.'],
+      impulsivo: ['{0} ha deciso di cambiare piano tre volte in un’ora, ogni volta per colpa di un’insegna diversa.'],
       cacciatore: ['{0} legge le tracce dei droni sul cemento bagnato come un libro aperto.'],
+      guaritore: ['{0} controlla le scorte di colla chirurgica. Prima o poi serviranno.'],
+      sopravvissuto: ['{0} ha visto di peggio. Davvero. Una volta il distretto è rimasto senza caffè per una settimana.'],
+      carismatico: ['{0} sa già chi convincerà domani. E con quale battuta.'],
+      paranoico: ['{0} ha sentito dei passi. Erano i suoi. Il diagnostico conferma.'],
+      fortunato: ['{0} trova sempre un distributore funzionante. Sempre.'],
+      sfortunato: ['A {0} piove acido addosso. Solo a {0}.'],
+      furtivo: ['{0} ha passato la notte a osservare gli altri dai tetti. Sa più cose di quante ne dirà.'],
+      bruto: ['{0} fa flessioni nel buio per tenersi svegli[0:o/a] e per farsi sentire.'],
+      ingegnoso: ['{0} smonta e rimonta un vecchio cyberdeck per tutta la notte. Non si sa per fare cosa.'],
+      folle: ['{0} ha dato un nome a tutti i droni della zona. Il preferito si chiama Gianfranco.'],
+      romantico: ['{0} scrive poesie sul vetro appannato di una capsula-letto e le cancella prima dell’alba.'],
+      vendicativo: ['{0} ha una lista salvata nelle ottiche. Non è la lista della spesa.'],
+      clemente: ['{0} prova a ricordare il viso di tutti, anche di quelli che l[0:o/a] hanno ferit[0:o/a]. Non porta rancore. Quasi mai.'],
+      generoso: ['{0} pensa a chi ha meno di l[0:ui/ei]. A Night City è un pensiero scomodo.'],
+      avido: ['{0} conta e riconta le cose nello zaino. [0:Gli/Le] piace sentirle pesare.'],
+      esibizionista: ['{0} prova le battute per l’intervista finale con DJ Saetta. È sicur[0:o/a] che ci sarà.'],
+      ubriacone: ['{0} sogna un bancone del Club e un bicchiere pieno. Si sveglia con la bocca secca.'],
+      superstizioso: ['{0} ha contato le insegne rotte sulla strada: sette. Sette è un buon numero. Forse.'],
+      goloso: ['{0} nasconde un pezzo di {cibo} per i tempi difficili. Lo mangia subito.'],
+      sonnambulo: ['{0} si sveglia con le scarpe bagnate di pioggia acida e nessun ricordo della notte.'],
+      leader: ['{0} non dorme finché tutta l’alleanza non dorme. Poi controlla i droni. Poi forse dorme.'],
+      solitario: ['{0} finalmente ha un po’ di silenzio, sul tetto, tra le antenne. Lo assapora.'],
     },
   };
+
+  /* ---------- testi automatici dell'ecosistema: più varianti ---------- */
+  const T = D.eco && D.eco.arenas[ID] && D.eco.arenas[ID].txt; if (!T) return;
+  more(T, 'meterUp', ['Le ottiche di {0} cominciano a sottotitolare i pensieri degli altri. Sono tutti sbagliati: è il sovraccarico neurale.', '{0} sente il proprio braccio cromato fare un commento sarcastico. Il sovraccarico neurale ha superato la soglia.', 'Il diagnostico di {0} mostra un messaggio nuovo: «Consigliamo una vacanza». Il sovraccarico neurale è alto.']);
+  more(T, 'meterDeath', ['Gli impianti di {0} mandano un ultimo messaggio di errore e si spengono tutti insieme. Il biochip segue poco dopo.']);
+  more(T, 'meterRest', ['{0} dorme mentre {1} tiene il diagnostico sulle ginocchia e spegne i moduli che scaldano, uno alla volta. Il sovraccarico neurale scende.']);
+  more(T, 'forage', ['{0} convince Gino il distributore che è un ispettore della qualità. Gino, terrorizzato, consegna {cibo}.', '{0} aiuta un cuoco di strada a riaccendere la piastra e viene pagat[0:o/a] in natura: {cibo}.']);
+  more(T, 'beastHit', ['{mostro} passa per il vicolo dove dorme {0}. {0} si sveglia in tempo per scappare, ma non per scappare indenne.']);
+  more(T, 'beastFend', ['{mostro} ronda intorno al riparo del gruppo di {0}. Il gruppo spegne tutto, trattiene il fiato e aspetta: passa oltre.']);
+  more(T, 'nurse', ['{0} ricuce {1} seguendo un tutorial in diretta di Doc Ferraglia. Il Doc canta anche durante il tutorial.']);
+  more(T, 'watch', ['{0} fa la guardia a {1} con una radiolina sintonizzata su Radio Zona Rossa, a volume bassissimo.']);
+  more(T, 'exhausted', ['{0} si addormenta in piedi in fila davanti a un distributore. Il distributore aspetta educatamente.']);
+  more(T, 'comfort', ['{0} fa vedere a {1} una vecchia registrazione di Pixel il gatto olografico che rincorre un raggio laser. {1} ride per la prima volta da giorni.']);
+  more(T, 'remorse', ['{0} cancella la registrazione delle proprie ottiche. Poi la recupera dal cestino. Poi la cancella di nuovo.']);
+  more(T, 'bloodlust', ['{0} ha cominciato a segnare le proprie vittime con piccoli adesivi sul braccio cromato. Sono adesivi a forma di stella.']);
+  more(T, 'share', ['{0} divide {i} con {1} sul tetto, sotto la pioggia, con una cerimonia degna di un ristorante stellato.']);
+  more(T, 'greed', ['{0} mangia {i} nascost[0:o/a] dietro un distributore. Il distributore lo racconta a {1}.']);
+  more(T, 'trapSet', ['{0} nasconde {i} in {z}, dietro la pubblicità olografica di un materasso. Nessuno guarda mai le pubblicità dei materassi.']);
+  more(T, 'scavenge', ['{0} trova in {z} lo zaino di {1}, abbandonato accanto a un distributore, e ci recupera {i}.']);
+  more(T, 'starveDeath', ['{0} muore di fame davanti a una vetrina piena di ramen olografici. Nessuno di quei ramen era vero.']);
 })(typeof window !== 'undefined' ? window : globalThis);
 
 ;
@@ -8414,6 +8542,296 @@ La notte senza fine | Gli organizzatori spengono il sole: è notte per un giorno
 `,
   });
 })(typeof window !== 'undefined' ? window : globalThis);
+
+;
+/* Night City — Zona Rossa, secondo pacchetto: la vita del distretto sigillato.
+ * Personaggi di contorno originali e ricorrenti (mai al posto dei concorrenti):
+ *   Nonna Kiku, fixer di ottantadue anni con un braccio cromato e un debole per i biscotti;
+ *   Doc Ferraglia, ripperdoc della Clinica che canta l'opera mentre opera;
+ *   DJ Saetta, voce di Radio Zona Rossa, l'unica stazione che trasmette ancora;
+ *   Gino, distributore automatico del Mercato con un'intelligenza artificiale permalosa;
+ *   Pixel, il gatto olografico del Mercato, che nessuno riesce ad accarezzare;
+ *   le corporazioni Kagemura Dynamics, Orbis Pharma e Velltech, inventate.
+ * Zone: 0 Mercato · 1 Megablocco · 2 Clinica · 3 Club · 4 Officina · 5 Nodo dati · 6 Piazza.
+ * Regole come nel primo pacchetto: ogni fatto raccontato ha il suo effetto, gli attacchi
+ * dei netrunner avvengono sul posto e il Sovraccarico cala solo con cure o diagnosi. */
+(function (G) {
+  const D = (G.LOS_DATA = G.LOS_DATA || {}); D.packs = D.packs || [];
+  D.packs.push({
+    theme: 'cyberpunk',
+    ev: {
+      b: `
+1 at:6 +arma:A @luck | Una guardia corporativa scivola sul cemento bagnato e perde {arma}. {A} la raccoglie prima che la guardia si rialzi.
+1 at:6 test:A=agi13 ok:+valore:A ko:s:A=ferito | {A} si arrampica sulla volante corporativa ferma in mezzo alla Piazza e strappa dal cruscotto {valore}. || {A} si arrampica sulla volante corporativa ferma in mezzo alla Piazza, ma il sistema antifurto si accende e [A:gli/le] dà una scossa che l[A:o/a] butta giù.
+1 at:6 mo:A+10 | Mentre tutti scappano, il megaschermo della torre trasmette per sbaglio la pubblicità di un detersivo. {A} ride così forte da dimenticare la paura.
+1 at:6 pr:A+8 en:A+10 | {A} si inietta lo stimolante d'emergenza del proprio kit: le gambe volano, ma gli impianti cominciano subito a scaldare.
+1 at:6 s:A=ferito | {A} prova a superare una barriera di sicurezza con un salto da film. La barriera non ha visto il film.
+1 at:6 @stl en:A+6 | {A} si infila in un cassonetto della Piazza e ci resta finché il primo caos non passa. Odora di noodle, ma è vivo.
+1 at:6 +cibo:A @food | Nella fuga {A} travolge un carretto di spiedini. Il venditore urla, {A} si scusa, e si porta via {cibo}.
+1 at:6 test:A=int12 ok:+mappa:A ko:mo:A-6 | {A} fotografa con le ottiche la mappa del distretto sul pannello della metropolitana prima che si spenga: ora ha {mappa}. || {A} prova a fotografare la mappa della metropolitana, ma il pannello si spegne a metà e resta solo la scritta «Benvenuti».
+2 at:6 test:A=car11 ok:al:AB ko:rel:AB-6 | Sotto il megaschermo, {A} e {B} si riconoscono: stessa linea della metropolitana, tutte le mattine, per anni. {A} propone di uscirne insieme e {B} accetta. || Sotto il megaschermo, {A} saluta {B} come un vecchio amico. {B} non l[A:o/a] ha mai visto prima e si allontana di un passo.
+2 at:6 save:A>B @heal | {A} afferra {B} per il colletto un attimo prima che le barriere della Piazza l[B:o/a] schiaccino. Non dice niente, ma {B} se lo ricorderà.
+2 at:6 hit:A>B | Nella calca, {A} pianta una gomitata a {B} per passare per prim[A:o/a] sotto la serranda.
+2 at:6 k:A>B @agg w:A | {A} punta {arma:A} contro {B} nel caos dello sgombero e non aspetta di sapere da che parte stia.
+3 at:6 test:A=car12 ok:al:ABC ko:mo:A-6 | {A} fa da regista nella calca della Piazza: «Tu a destra, tu a sinistra, io in mezzo». Per qualche miracolo {B} e {C} obbediscono, e nasce un gruppo. || {A} prova a dare ordini a {B} e {C} nella calca della Piazza. Nessuno dei due l[A:o/a] ascolta.
+3 at:6 k:A>BC *0.4 @agg | {A} fa cadere un'insegna olografica sopra {B} e {C}, che cercavano riparo sotto il portico.
+`,
+      d: `
+1 at:0 test:A=car12 ok:+cibo:A ok:mo:A+6 ko:mo:A-6 | Al Mercato, {A} vince una sfida di karaoke contro un venditore di ottiche usate. Il premio è {cibo} e un applauso di tre bancarelle. || Al Mercato, {A} sfida a karaoke un venditore di ottiche usate e perde contro un uomo che canta con il volume dell'impianto vocale al massimo.
+1 at:0 test:A=int11 ok:+valore:A ko:mo:A-5 | Al Mercato, Gino il distributore parlante propone un indovinello. {A} risponde giusto e Gino, offeso, sputa {valore}. || Al Mercato, Gino il distributore parlante propone un indovinello. {A} sbaglia e Gino [A:gli/le] recita per dieci minuti tutte le risposte giuste.
+1 at:0 mo:A+8 | Al Mercato, {A} prova ad accarezzare Pixel, il gatto olografico. La mano attraversa il gatto. Pixel fa le fusa lo stesso.
+1 at:0 con:A=valore -valore:A +armatura:A | Al Mercato, {A} contratta con un sarto che cuce kevlar nelle giacche dei turisti: cede {valore:A} e si porta via {armatura}.
+1 at:0 con:A=valore -valore:A +arma:A | Al Mercato, {A} scambia {valore:A} con {arma} presso un banco che espone le armi tra i peluche, per non dare nell'occhio.
+1 at:0 test:A=sop11 ok:+cibo:A ok:+cibo:A ko:s:A=malato | Al Mercato, {A} riconosce al primo assaggio i noodle buoni da quelli fatti con l'acqua del condizionatore e compra solo i primi. || Al Mercato, {A} mangia i noodle del banco più economico. Erano economici per un motivo.
+1 at:0 test:A=furt12 ok:+attrezzo:A ko:hp:A-8 | Al Mercato, {A} si infila sotto il tendone di un ricettatore mentre lui dorme e si porta via {attrezzo}. || Al Mercato, {A} si infila sotto il tendone di un ricettatore, ma il ricettatore dorme con un occhio cibernetico aperto e [A:gli/le] tira dietro una sedia.
+1 at:0 star:A | Al Mercato, {A} si ferma davanti a una telecamera di un banco di souvenir e saluta. Due minuti dopo vendono già magliette con la sua faccia.
+1 at:0 pr:A+6 mo:A+6 | Al Mercato, {A} prova un paio di ottiche usate «solo per vedere com'è». Vede in dodici colori nuovi, e gli impianti se ne lamentano per ore.
+1 at:0 s:A=avvelenato | Al Mercato, {A} beve un frullato «al gusto di frutta vera». Di vero c'era solo il bicchiere.
+1 at:0 test:A=emp12 ok:+med:A ko:mo:A-4 | Al Mercato, {A} aiuta una bambina a ritrovare la madre tra le bancarelle. La madre vende farmaci e ricambia con {med}. || Al Mercato, {A} aiuta una bambina a cercare la madre per un'ora. Si scopre che la bambina era un ologramma pubblicitario.
+2 at:0 test:A=car12 ok:steal:A<B=cibo ko:rel:AB-8 | Al Mercato, {A} distrae {B} indicando Pixel il gatto olografico e intanto [B:gli/le] sfila {cibo:B}. || Al Mercato, {A} indica Pixel il gatto olografico per distrarre {B}, ma {B} odia i gatti e non si gira.
+2 at:0 con:A=cibo give:A>B=cibo rel:AB+10 | Al Mercato, {A} offre a {B} {cibo:A} senza dire niente. In un posto dove tutto ha un prezzo, è quasi un gesto rivoluzionario.
+2 at:0 enemy:AB test:A=furt12 ok:hit:A>B ko:hit:B>A | Al Mercato, {A} rovescia un pentolone di brodo bollente sulla strada di {B}. || Al Mercato, {A} prova a rovesciare un pentolone sulla strada di {B}, ma {B} lo vede arrivare e glielo rimanda indietro.
+2 at:0 k:A>B @agg | Al Mercato, {A} spinge {B} contro un banco di batterie gonfie. Il banco esplode, {B} non si rialza.
+2 at:0 trait:A=avido con:B=valore steal:A<B=valore @secret | Al Mercato, {A} si offre di custodire le cose di {B} mentre {B} prova un paio di stivali. Gli stivali restano, {valore:B} no.
+1 at:1 en:A+12 mo:A+6 | Al Megablocco, una vicina invita {A} a cena senza fare domande. Il riso è scotto, la compagnia è perfetta.
+1 at:1 test:A=agi12 ok:+valore:A ko:s:A=ferito | Al Megablocco, {A} passa da un balcone all'altro al trentesimo piano per entrare in un appartamento vuoto e trova {valore}. || Al Megablocco, {A} prova a passare da un balcone all'altro al trentesimo piano. Il secondo balcone era solo dipinto sul muro, e {A} cade su quello di sotto.
+1 at:1 test:A=int12 ok:+attrezzo:A ko:pr:A+8 | Al Megablocco, {A} ripara l'ascensore di servizio con un cavo e tanta fede. Il portinaio ricambia con {attrezzo}. || Al Megablocco, {A} prova a riparare l'ascensore di servizio, ma prende una scarica che passa dritta negli impianti.
+1 at:1 mo:A-8 | Al Megablocco, {A} trova sulla porta di un appartamento un biglietto: «Torno subito». La polvere sul biglietto dice che risale a tre anni fa.
+1 at:1 @luck +ricordo:A | Al Megablocco, {A} trova in un corridoio {ricordo}. Lo tiene, perché qualcuno dovrebbe farlo.
+1 at:1 test:A=res12 ok:mo:A+8 ko:en:A-10 | Al Megablocco, {A} sale a piedi sessanta piani per raggiungere il tetto e vedere com'è il distretto dall'alto. Bellissimo, e terribile. || Al Megablocco, {A} prova a salire a piedi sessanta piani. Al ventesimo si siede sulle scale e ci resta un'ora.
+1 at:1 s:A=sconvolto | Al Megablocco, {A} apre la porta sbagliata e trova una famiglia di cinque persone che guarda una braindance tutti insieme, in silenzio, con i visori addosso. Nessuno si gira.
+1 at:1 @cow en:A+8 | Al Megablocco, {A} si chiude in una lavanderia comune e passa la giornata a guardare le lavatrici girare. È la cosa più rilassante successa da giorni.
+2 at:1 couple:AB mo:A+10 mo:B+10 amo:A>B+5 | Al Megablocco, {A} e {B} trovano un appartamento con la vista su tutto il distretto e fingono, per un'ora, che sia casa loro.
+2 at:1 test:A=emp12 ok:forgive:A>B ok:mo:A+6 ko:rel:AB-6 grudge:A>B | Nel corridoio del Megablocco, {A} incrocia {B} davanti al distributore d'acqua. Parlano per la prima volta senza alzare la voce, e il rancore si scioglie. || Nel corridoio del Megablocco, {A} incrocia {B} davanti al distributore d'acqua. Bastano tre parole per ricominciare a litigare.
+2 at:1 enemy:AB k:A>B @agg | Al Megablocco, {A} aspetta {B} sul pianerottolo e fa saltare le luci delle scale. Al buio, {B} non arriva al piano di sotto.
+2 at:1 ally:AB en:A+8 en:B+8 | Al Megablocco, {A} e {B} si dividono una capsula-letto: uno dorme, l'altr[B:o/a] fa la guardia, poi si cambia.
+1 at:2 stat:A>pr50 test:A=int13 ok:pr:A-30 ko:pr:A+8 ko:s:A=ferito | Alla Clinica, Doc Ferraglia lascia {A} da sol[A:o/a] con il diagnostico avanzato «solo per un minuto». {A} lo usa benissimo e il sovraccarico crolla. || Alla Clinica, {A} prova a usare il diagnostico avanzato di Doc Ferraglia e sbaglia leva: il lettino si ribalta e gli impianti mandano una scarica.
+1 at:2 mo:A+10 | Alla Clinica, Doc Ferraglia opera un paziente cantando un'aria d'opera a squarciagola. {A} rimane ad ascoltare fino all'ultimo acuto.
+1 at:2 stat:A<hp60 test:A=car12 ok:cure:A ko:mo:A-8 | Alla Clinica, {A} convince Doc Ferraglia a curarl[A:o/a] promettendogli di procurargli un disco d'opera originale. Ferite chiuse e impianti ricalibrati. || Alla Clinica, {A} prova a farsi curare a credito, ma Doc Ferraglia appende al muro il cartello «Niente eddie, niente punti».
+1 at:2 +med:A @heal | Alla Clinica, {A} aiuta Doc Ferraglia a spostare un frigorifero pieno di reni sintetici. Il Doc ringrazia con {med}.
+1 at:2 test:A=furt12 ok:+med:A ok:+med:A ko:s:A=ferito | Alla Clinica, {A} entra nel magazzino del Doc mentre lui canta sotto la doccia e riempie le tasche. || Alla Clinica, {A} entra nel magazzino del Doc, ma il Doc non stava cantando sotto la doccia: stava aspettando dietro la porta con un bisturi.
+1 at:2 pr:A+10 mo:A+8 | Alla Clinica, {A} si fa installare gratis un impianto «in prova» per un sondaggio della Orbis Pharma. Ora sa sempre che ore sono, in tre fusi orari. Gli impianti, però, scaldano.
+1 at:2 stat:A>pr40 trait:A=paranoico test:A=int12 ok:pr:A-18 ko:pr:A+6 | Alla Clinica, {A} si rifiuta di farsi toccare da chiunque: fa da sol[A:o/a] la diagnosi dei propri impianti, leggendo il manuale ad alta voce. Funziona. || Alla Clinica, {A} prova a fare da sol[A:o/a] la diagnosi degli impianti leggendo il manuale, ma il manuale è in una lingua che non conosce e il sovraccarico sale.
+2 at:2 stat:B<hp60 trait:A=guaritore cure:B debt:B>A @heal | Alla Clinica, {A} prende in prestito gli attrezzi di Doc Ferraglia, ricuce {B} e ricalibra gli impianti. Il Doc guarda, annuisce e torna a cantare.
+2 at:2 need:B=avvelenato test:A=int11 ok:cure:B ok:debt:B>A ko:hp:B-10 | Alla Clinica, {A} trova nel registro del Doc l'antidoto giusto per {B}. Dieci minuti dopo {B} sta meglio, e anche gli impianti. || Alla Clinica, {A} cerca l'antidoto giusto per {B}, ma confonde due fiale e {B} peggiora.
+2 at:2 enemy:AB test:A=furt13 ok:poison:A>B ko:rel:AB-10 | Alla Clinica, {A} scambia di nascosto la flebo di {B} con una sacca di qualcos'altro. || Alla Clinica, {A} prova a manomettere la flebo di {B}, ma Doc Ferraglia l[A:o/a] scopre e l[A:o/a] caccia a colpi di stetoscopio.
+1 at:3 s:A=ubriaco mo:A+12 | Al Club, {A} accetta un cocktail che si chiama «Riavvio di sistema». Il riavvio è immediato.
+1 at:3 test:A=agi12 ok:star:A ok:mo:A+10 ko:mo:A-8 | Al Club, {A} vince una gara di ballo contro un androide da compagnia. Il pubblico impazzisce, l'androide chiede la rivincita. || Al Club, {A} sfida a ballo un androide da compagnia e perde. L'androide è gentile, ed è peggio.
+1 at:3 pr:A+14 test:A=res12 ok:mo:A+10 ko:s:A=sconvolto | Al Club, {A} prova la braindance più venduta della settimana: un salto da un grattacielo. Gli impianti scaldano, ma {A} esce ridendo. || Al Club, {A} prova la braindance più venduta della settimana: un salto da un grattacielo. Gli impianti scaldano, e {A} per ore non riesce a guardare giù da un marciapiede.
+1 at:3 test:A=car12 ok:+valore:A ko:mo:A-5 | Al Club, {A} convince il barista a pagarl[A:o/a] per fare il DJ per mezz'ora. Mette solo musica di un secolo fa e il locale si riempie: {valore}. || Al Club, {A} si propone come DJ, ma il barista ha già un DJ: è un frigorifero con le casse.
+1 at:3 @stl en:A+10 | Al Club, {A} dorme quattro ore in una poltrona per la braindance, con il visore spento sugli occhi. Nessuno disturba chi sembra in sessione.
+2 at:3 test:A=car12 ok:love:AB ko:mo:A-10 crush:A>B | Al Club, {A} chiede al DJ di dedicare una canzone a {B}. {B} arrossisce sotto le luci, poi attraversa la pista e l[A:o/a] bacia. || Al Club, {A} chiede al DJ di dedicare una canzone a {B}. Il DJ sbaglia nome e la dedica va a un buttafuori.
+2 at:3 ally:AB s:A=ubriaco s:B=ubriaco mo:A+8 mo:B+8 | Al Club, {A} e {B} festeggiano di essere ancora vivi con troppi cocktail colorati. Domani sarà un problema.
+2 at:3 enemy:AB test:A=car13 ok:hit:A>B ko:mo:A-8 | Al Club, {A} convince il buttafuori cromato che {B} ha rubato la giacca di qualcuno. Il buttafuori non chiede prove. || Al Club, {A} prova ad aizzare il buttafuori contro {B}, ma il buttafuori si è appena licenziato.
+2 at:3 rival:AB test:A=agi12 ok:ris:B>A+10 ok:star:A ko:mo:A-6 | Al Club, {A} e {B} si sfidano a una partita di un vecchio videogioco a gettoni. Vince {A}, con un record che resterà sullo schermo per sempre. || Al Club, {A} e {B} si sfidano a un vecchio videogioco a gettoni. {B} vince senza nemmeno guardare lo schermo.
+1 at:4 test:A=int12 ok:+arma:A ko:s:A=ferito | All'Officina, {A} assembla {arma} con un tubo di scarico, un motorino d'avviamento e una pazienza infinita. || All'Officina, {A} prova ad assemblare un'arma con un tubo di scarico. Il tubo di scarico, offeso, esplode.
+1 at:4 test:A=cor13 ok:+armatura:A ok:star:A ko:s:A=ferito | All'Officina, {A} sfida a braccio di ferro un Maelstrom con un braccio idraulico. Perde, ma con tanto stile che il Maelstrom [A:gli/le] regala {armatura}. || All'Officina, {A} sfida a braccio di ferro un Maelstrom con un braccio idraulico. Il braccio idraulico non ha il senso dello stile.
+1 at:4 pr:A+12 star:A | All'Officina, i Maelstrom installano a {A} un led rosso in fronte «per la squadra». Non si spegne più, e gli impianti scaldano.
+1 at:4 test:A=furt12 ok:+esplosivo:A ko:s:A=ferito | All'Officina, {A} sottrae {esplosivo} dal banco degli artificieri mentre provano un razzo nel cortile. || All'Officina, {A} prova a sottrarre qualcosa dal banco degli artificieri proprio mentre il razzo del cortile torna indietro.
+1 at:4 en:A-10 +attrezzo:A | All'Officina, {A} lavora un'ora gratis al banco dei Maelstrom per farsi accettare. Esce sporc[A:o/a] di grasso fino ai capelli, ma con {attrezzo}.
+1 at:4 s:A=ferito | All'Officina, {A} accarezza il cane cibernetico dei Maelstrom. Il cane cibernetico ha un'altra opinione sulle carezze.
+2 at:4 ally:AB con:A=attrezzo test:A=int12 ok:+armatura:B ko:en:A-8 | All'Officina, {A} usa {attrezzo:A} per montare su {B} una protezione ricavata dal parafango di una moto. {B} ora ha {armatura}. || All'Officina, {A} prova a montare una protezione su {B}, ma il parafango non vuole saperne di diventare un'armatura.
+2 at:4 enemy:AB k:A>B @agg | All'Officina, {A} spinge {B} sotto il ponte sollevatore e preme il pulsante sbagliato. Di proposito.
+2 at:4 test:A=car12 ok:al:AB ko:hit:B>A | All'Officina, {A} e {B} si ritrovano a riparare la stessa moto e scoprono di odiare gli stessi Maelstrom. Basta per un'alleanza. || All'Officina, {A} prova a farsi prestare una chiave inglese da {B}. {B} gliela presta, ma in faccia.
+1 at:5 test:A=int13 ok:+mappa:A ok:+valore:A ko:pr:A+15 ko:s:A=ferito | Al Nodo dati, {A} si collega a un terminale della Kagemura Dynamics e scarica in un colpo solo {mappa} e i dati di un conto dimenticato. || Al Nodo dati, {A} si collega a un terminale della Kagemura Dynamics, ma l'ICE è nuovo di zecca e la scarica [A:gli/le] fa sanguinare il naso.
+1 at:5 test:A=int12 ok:star:A ok:mo:A+8 ko:pr:A+10 | Al Nodo dati, {A} si collega al terminale delle comunicazioni e sostituisce lo screensaver di tutti gli uffici della Velltech con la foto di un gatto. || Al Nodo dati, {A} prova a cambiare lo screensaver della Velltech dal terminale, ma l'ICE [A:gli/le] rimanda indietro la foto del gatto direttamente negli impianti.
+1 at:5 pr:A+10 s:A=sconvolto | Al Nodo dati, {A} legge per sbaglio sul terminale il piano della Orbis Pharma per il quartiere dopo la riapertura. Gli impianti scaldano, e la voglia di vivere qui cala.
+1 at:5 test:A=furt13 ok:+attrezzo:A ko:s:A=ferito | Al Nodo dati, {A} si infila nel condotto di raffreddamento e ne esce dall'altra parte con {attrezzo} preso da un tecnico addormentato. || Al Nodo dati, {A} si infila nel condotto di raffreddamento. Il condotto si accende e [A:gli/le] ustiona le braccia.
+1 at:5 test:A=int12 ok:+trap:A ko:pr:A+12 | Al Nodo dati, {A} si collega al pannello di una torretta di sicurezza, la scollega dal sistema e se la porta via: {trap}. || Al Nodo dati, {A} prova a scollegare una torretta dal pannello, ma la torretta si accorge di tutto e risponde con un impulso.
+2 at:5 ally:AB test:A=int13 ok:+valore:A ok:+valore:B ko:pr:A+12 ko:pr:B+12 | Al Nodo dati, {A} si collega al terminale e {B} tiene d'occhio le torrette: in tre minuti svuotano un conto della Velltech e se lo dividono. || Al Nodo dati, {A} si collega al terminale mentre {B} sorveglia le torrette, ma l'ICE frigge gli impianti a entrambi.
+2 at:5 enemy:AB test:A=int13 ok:k:A>B ko:hit:B>A | Al Nodo dati, {A} chiude la porta stagna proprio mentre {B} ci passa sotto e blocca il comando dal terminale. || Al Nodo dati, {A} prova a chiudere la porta stagna su {B} dal terminale, ma {B} l[A:o/a] raggiunge prima che la porta scenda.
+1 at:6 mo:A+6 | In Piazza, il megaschermo della torre trasmette per un'ora la replica di un quiz di trent'anni fa. {A} indovina tutte le risposte, e nessuno lo saprà mai.
+1 at:6 test:A=agi12 ok:+valore:A ko:s:A=ferito | In Piazza, {A} raccoglie le chiavette di eddie cadute da un drone pubblicitario abbattuto: {valore}. || In Piazza, {A} corre verso un drone pubblicitario abbattuto, ma un secondo drone pubblicitario non ha ancora finito di cadere.
+1 at:6 test:A=car12 ok:star:A ok:mo:A+8 ko:mo:A-8 | In Piazza, {A} sale sul basamento della statua del fondatore della Kagemura Dynamics e tiene un comizio contro le corporazioni. Tre droni registrano tutto. || In Piazza, {A} sale sul basamento della statua del fondatore della Kagemura Dynamics per un comizio, ma il basamento parte con l'inno aziendale e copre la voce.
+2 at:6 test:A=cor12 ok:save:A>B ko:s:A=ferito | In Piazza, {A} si mette tra {B} e una volante che atterra e [B:gli/le] fa scudo. || In Piazza, {A} prova a fare scudo a {B} contro una volante che atterra, ma lo spostamento d'aria travolge prima l[A:ui/ei].
+2 at:6 grudge:A>B k:A>B @agg | In Piazza, sotto il megaschermo che li inquadra, {A} regola i conti con {B}. Le registrazioni fanno il giro del distretto.
+1 test:A=int12 ok:pr:A-15 ko:pr:A+5 stat:A>pr50 | {A} trova in una cabina telefonica abbandonata un diagnostico pubblico «a moneta». Inserisce una moneta, segue le istruzioni, e il sovraccarico scende. || {A} trova un diagnostico pubblico «a moneta» in una cabina abbandonata. Inserisce la moneta: il diagnostico la mangia, resta muto, e il sovraccarico sale ancora.
+1 stat:A>pr65 @mad pr:A+6 | Con il sovraccarico oltre la soglia, {A} comincia a sentire DJ Saetta di Radio Zona Rossa anche senza radio. Trasmette solo per l[A:ui/ei], dice.
+1 stat:A>pr70 test:A=emp12 ok:mo:A+10 ko:s:A=sconvolto | Con gli impianti al limite, {A} scrive su un muro il proprio nome e quello di tutte le persone che [A:gli/le] vogliono bene, per ricordarsi chi è. Funziona. || Con gli impianti al limite, {A} prova a scrivere su un muro i nomi delle persone care, ma si accorge di non ricordarne uno.
+1 stat:A>pr60 trait:A=folle mo:A+12 pr:A+5 | Con il sovraccarico alto, {A} decide che le interferenze nelle ottiche sono arte e le descrive ad alta voce a chiunque passi. Gli impianti protestano, il morale vola.
+1 stat:A<hp40 trait:A=sopravvissuto test:A=res12 ok:hp:A+20 ko:hp:A-5 | {A} ricuce da sol[A:o/a] la ferita peggiore con un ago da tappezziere e il filo di una giacca. Non è bello, ma tiene. || {A} prova a ricucire da sol[A:o/a] la ferita peggiore, ma il filo della giacca si spezza a metà.
+1 stat:A<food30 test:A=sop12 ok:+cibo:A ko:s:A=affamato | Affamat[A:o/a], {A} trova nel retro di un ristorante chiuso una cella frigorifera ancora in funzione: {cibo}. || Affamat[A:o/a], {A} trova la cella frigorifera di un ristorante chiuso. La corrente è saltata da una settimana.
+1 stat:A<mo30 mo:A+15 | Nel momento peggiore, Radio Zona Rossa manda la canzone preferita di {A}. DJ Saetta la dedica «a chi è ancora in piedi là fuori».
+1 stat:A<en25 en:A+15 @cow | Sfinit[A:o/a], {A} si sdraia sul sedile posteriore di un taxi automatico fermo. Il taxi parte per un giro panoramico del distretto e {A} dorme per tutto il viaggio.
+1 trait:A=stratega con:A=mappa test:A=int11 ok:+trap:A ok:mo:A+5 ko:en:A-6 | {A} studia {mappa:A} e individua l'unico vicolo che tutti dovranno attraversare. Ci prepara {trap}. || {A} studia {mappa:A} per trovare il vicolo giusto, ma la mappa ha due anni e il vicolo è diventato un parcheggio.
+1 trait:A=carismatico test:A=car12 ok:+med:A ok:+cibo:A ko:mo:A-5 | {A} convince un gruppo di turisti bloccati nel distretto che è una guida ufficiale. I turisti pagano in natura: {med} e {cibo}. || {A} si presenta a un gruppo di turisti come guida ufficiale. Una turista è davvero una guida ufficiale.
+1 trait:A=leader mo:A+10 star:A | {A} organizza nel quartiere una distribuzione d'acqua per i vicini rimasti. I fixer lo raccontano in diretta, e il nome di {A} comincia a girare.
+1 trait:A=generoso food:A-8 mo:A+10 | {A} divide il proprio pranzo con un ragazzino che vende biglietti della lotteria olografica. Non vince niente, ma il ragazzino racconta a tutti la storia.
+1 trait:A=codardo test:A=furt11 ok:en:A+10 ko:mo:A-10 | {A} passa la giornata travestit[A:o/a] da manichino nella vetrina di un negozio di abbigliamento. Nessuno l[A:o/a] nota. || {A} passa la giornata travestit[A:o/a] da manichino in vetrina, ma un commesso prova a cambiarl[A:o/a] d'abito.
+1 trait:A=esibizionista test:A=car12 ok:star:A ok:mo:A+8 ko:mo:A-8 | {A} si fa tingere i capelli di un verde che si vede anche dallo spazio e gira per il distretto salutando i droni. I fixer adorano. || {A} si fa tingere i capelli di verde fluorescente per farsi notare, ma la tinta è difettosa e diventa marrone in un'ora.
+1 trait:A=superstizioso +amuleto:A mo:A+6 | {A} riceve in regalo da un predicatore di strada {amuleto} «benedetto da tre santi e da un ingegnere». Lo stringe forte.
+1 trait:A=sfortunato s:A=ferito | {A} viene investit[A:o/a] da un monopattino a guida automatica che, secondo il display, stava «evitando un ostacolo».
+1 trait:A=fortunato +valore:A @luck | Gino junior, il distributore fratello minore del famoso Gino del Mercato, sputa a {A} {valore} senza motivo. Dice che è un errore, e se ne vergogna.
+1 trait:A=ingegnoso con:A=attrezzo test:A=int12 ok:+armatura:A ko:en:A-8 | {A} usa {attrezzo:A} per trasformare un vassoio da cucina e due cinture in {armatura}. || {A} prova a trasformare un vassoio da cucina in una protezione con {attrezzo:A}, ma il vassoio resta un vassoio.
+1 trait:A=romantico mo:A+10 | {A} registra un messaggio d'amore per qualcuno fuori dal distretto e lo affida a un drone delle consegne. Il drone parte. Forse arriverà.
+1 trait:A=goloso con:A=cibo cibo:A mo:A+8 | {A} si ferma a mangiare {cibo:A} su una panchina sotto un'insegna rosa. Per cinque minuti, nient'altro esiste.
+1 trait:A=solitario test:A=sop12 ok:+cibo:A ok:en:A+8 ko:en:A-8 | {A} passa la giornata sui tetti, trova un orto abbandonato in vecchi secchi e baratta gli ultimi pomodori con un vicino in cambio di {cibo}. || {A} cerca un posto tranquillo sui tetti, ma trova solo antenne che ronzano e un vento che non dà tregua.
+1 trait:A=bruto test:A=for13 ok:+valore:A ok:star:A ko:s:A=ferito | {A} sfonda a spallate la vetrina blindata di una gioielleria chiusa. La vetrina cede e {A} si porta via {valore}. || {A} prova a sfondare a spallate la vetrina blindata di una gioielleria. La vetrina era blindata davvero, la spalla di {A} no.
+1 trait:A=cacciatore test:A=sop12 ok:+cibo:A ko:en:A-6 | {A} segue gli scarafaggi meccanici dello smaltimento rifiuti fino al loro deposito, dove le cucine di strada buttano le razioni del giorno prima: {cibo}. || {A} segue gli scarafaggi meccanici dello smaltimento rifiuti, ma i robot lo portano solo all'inceneritore.
+1 trait:A=sonnambulo pr:A+5 | In un pisolino pomeridiano, {A} si collega nel sonno a una presa pubblicitaria e si sveglia canticchiando il jingle di una bevanda energetica. Gli impianti ne risentono.
+1 trait:A=impulsivo test:A=fort12 ok:+valore:A ko:mo:A-8 | {A} punta tutto quello che ha su una corsa di droni clandestina. Vince il drone sul quale nessuno aveva puntato, cioè il suo. || {A} punta tutto su una corsa di droni clandestina. Il drone su cui ha puntato decolla al contrario.
+1 trait:A=pacifista mo:A+10 | {A} passa la giornata ad aggiustare le insegne rotte di una strada, una lettera alla volta. Alla fine la strada si chiama di nuovo «via della Pace».
+1 trait:A=clemente mo:A+8 | {A} trova sul marciapiede il portafoglio di qualcuno con dentro un biglietto «Se lo trovi, chiamami». Lo restituisce. Dall'altra parte del telefono, qualcuno piange.
+1 trait:A=traditore mo:A+5 | {A} si allena a sorridere davanti alla vetrina di un negozio. Il riflesso sembra sincero. Il riflesso mente benissimo.
+1 trait:A=leale mo:A+8 | {A} disegna con lo spray sul muro di un vicolo i nomi degli alleati, per ricordarsi per chi sta combattendo.
+1 trait:A=ubriacone +alcol:A s:A=ubriaco | {A} trova una distilleria clandestina in un garage. Il proprietario offre un assaggio. Poi un altro. Poi regala {alcol}.
+1 trait:A=furtivo test:A=furt12 ok:+attrezzo:A ko:mo:A-6 | {A} sfila {attrezzo} dalla cintura di un tecnico della rete mentre il tecnico è al telefono con la moglie. || {A} prova a sfilare un attrezzo dalla cintura di un tecnico della rete, ma il tecnico ha la cintura antifurto.
+1 trait:A=guaritore +med:A mo:A+6 | {A} passa la mattina ad aiutare una clinica di strada senza ripperdoc. Gli infermieri, grati, ricambiano con {med}.
+1 trait:A=avido test:A=car12 ok:+valore:A ko:hp:A-8 | {A} vende a un turista un «pezzo autentico della torre del colpo»: è un pezzo di marciapiede. Il turista paga con {valore}. || {A} prova a vendere un pezzo di marciapiede come reliquia del colpo a un turista, ma il turista è un poliziotto in vacanza, che [A:gli/le] torce il braccio.
+1 trait:A=spietato star:A mo:A+5 | {A} affigge sui muri del quartiere la lista di chi è ancora in gara, con una croce già pronta accanto a ogni nome tranne il proprio.
+2 couple:AB test:A=car11 ok:mo:A+12 ok:mo:B+12 ko:mo:A-5 | {A} porta {B} in un ristorante di sushi sintetico con un nastro trasportatore che va troppo veloce. Ridono tanto da dimenticare dove si trovano. || {A} porta {B} in un ristorante di sushi sintetico, ma il nastro trasportatore si inceppa e [B:gli/le] spara un piatto addosso.
+2 couple:AB stat:A>pr60 stat:B>pr60 *2 | {A} e {B} hanno entrambi gli impianti al limite. Si tengono per mano e guardano lo stesso sfarfallio nelle ottiche, come due persone che guardano le stelle.
+2 couple:AB test:A=fort11 ok:+ricordo:A ko:mo:A-4 | {A} e {B} si fanno fare una foto da una cabina automatica. La cabina stampa la foto con una cornice a cuori, poi la sputa: {ricordo}. || {A} e {B} entrano in una cabina per fototessere, ma la cabina stampa solo il codice a barre di uno sconosciuto.
+2 ally:AB test:A=int12 ok:fid:B>A+10 ok:mo:B+8 ko:rel:AB-6 | {A} insegna a {B} come capire dalle insegne quali vicoli sono sorvegliati: i colori più freddi indicano le telecamere nuove. {B} non lo dimenticherà. || {A} spiega a {B} come leggere le insegne per evitare le telecamere, ma sbaglia esempio e li inquadrano entrambi.
+2 ally:AB trait:A=traditore test:A=furt13 ok:steal:A<B=arma ok:mo:A+4 ko:rel:AB-15 | {A} si offre di pulire {arma:B} e non la restituisce più. «L'ho persa», dice. || {A} si offre di pulire {arma:B}, ma {B} non si fida e la tiene con sé.
+2 ally:AB stat:B<hp50 con:A=med -med:A cure:B debt:B>A @heal | {A} usa {med:A} per rimettere in piedi {B} sotto la tettoia di una fermata dell'autobus, mentre l'annuncio automatico ripete che il servizio è sospeso.
+2 friend:AB mo:A+8 mo:B+8 | {A} e {B} passano mezz'ora a inventare il nome della band che fonderanno quando usciranno dal distretto. Vince «I Biochip Spenti».
+2 enemy:AB test:A=car12 ok:pau:B>A+15 ko:mo:A-6 | {A} fa recapitare a {B} da un drone delle consegne una corona di fiori di plastica con il suo nome. {B} capisce il messaggio. || {A} manda a {B} una corona di fiori di plastica con un drone delle consegne, ma il drone la consegna a un funerale vero.
+2 enemy:AB test:A=furt12 ok:steal:A<B=valore ko:hit:B>A | {A} segue {B} tra la folla e [B:gli/le] sfila {valore:B} con due dita. || {A} segue {B} tra la folla per derubarl[B:o/a], ma {B} se ne accorge e [A:gli/le] pesta la mano.
+2 enemy:AB k:A>B w:A @agg | {A} aspetta che {B} esca da un negozio automatico e usa {arma:A} prima che le porte si richiudano.
+2 rival:AB test:A=car12 ok:star:A ok:ris:B>A+8 ko:star:B | {A} e {B} vengono intervistat[AB:i/e] da un drone di un notiziario pirata. {A} è brillante, {B} balbetta. || {A} e {B} vengono intervistat[AB:i/e] da un drone di un notiziario pirata. {B} è brillante, {A} guarda dritto nella telecamera sbagliata.
+2 fear:A>B test:A=furt12 ok:en:A+6 ko:hit:B>A | {A} vede {B} in fondo alla strada e si nasconde dentro una cabina olografica che proietta un vestito da sposa. {B} passa oltre. || {A} vede {B} e prova a nascondersi in una cabina olografica, ma la cabina annuncia ad alta voce «Benvenut[A:o/a]!» e {B} l[A:o/a] raggiunge subito.
+2 owe:A>B test:A=car11 ok:repay:A>B ok:rel:AB+8 ko:mo:A-5 | {A} paga il debito con {B} in un modo molto Night City: [B:gli/le] procura un tavolo al Club senza fare la fila. || {A} prova a pagare il debito con {B} procurandogli un tavolo al Club, ma il buttafuori non fa entrare nessuno dei due.
+2 trust:A>B test:A=emp11 ok:promise:A>B=protezione ok:fid:B>A+8 ko:mo:A-4 | Sotto la pioggia acida, {A} promette a {B} di proteggerl[B:o/a] fino alla riapertura del distretto, e poi di portarl[B:o/a] a vedere il mare. Lo dice come se fosse una cosa normale. || Sotto la pioggia acida, {A} prova a promettere qualcosa a {B}, ma il tuono di un trasformatore che salta copre ogni parola.
+2 single:A single:B crush:A>B test:A=car12 ok:love:AB ko:mo:A-8 | {A} aspetta che il blackout spenga tutte le insegne della strada e chiede a {B}: «Adesso che non ci vede nessuno?». {B} ride, poi risponde con un bacio. || {A} aspetta il blackout per dichiararsi a {B}, ma il blackout dura troppo poco e le insegne si riaccendono a metà frase.
+3 ally:ABC test:A=int12 ok:+mappa:A ok:mo:B+6 ok:mo:C+6 ko:en:A-6 | {A}, {B} e {C} ricostruiscono la mappa del distretto mettendo insieme quello che ognuno ricorda. Il risultato è {mappa}, con molte frecce. || {A}, {B} e {C} provano a ricostruire la mappa del distretto, ma ognuno ricorda un distretto diverso.
+3 al:ABC @soc | {A}, {B} e {C} si ritrovano bloccat[ABC:i/e] nello stesso ascensore per un'ora. Quando le porte si riaprono, sono un'alleanza.
+3 trait:A=leader ally:AB ally:AC mo:B+8 mo:C+8 star:A | {A} organizza per l'alleanza una cena in un ristorante abbandonato, con le tovaglie e tutto. {B} e {C} ridono come non facevano da giorni.
+4 k:AB>CD *0.3 @agg | {A} e {B} attirano {C} e {D} in un parcheggio sotterraneo con una falsa consegna del fixer. La consegna non c'è, l'agguato sì.
+`,
+      n: `
+1 at:0 +cibo:A @food | Di notte, al Mercato, {A} aiuta la signora dei noodle a chiudere il banco. Lei [A:gli/le] lascia gli avanzi: {cibo}.
+1 at:0 mo:A+8 | Di notte, Pixel il gatto olografico del Mercato si addormenta accanto a {A}. Non scalda, ma tiene compagnia.
+1 at:1 en:A+12 | Nel Megablocco, {A} trova una capsula-letto con le lenzuola pulite. È una cosa così rara che ci mette un'ora ad addormentarsi dall'emozione.
+1 at:1 test:A=furt12 ok:+valore:A ko:mo:A-6 | Di notte, nel Megablocco, {A} entra in un appartamento evacuato e trova {valore} sotto un materasso. || Di notte, nel Megablocco, {A} entra in un appartamento evacuato. Non era evacuato.
+1 at:2 stat:A>pr45 test:A=res12 ok:pr:A-18 ko:en:A-8 | Di notte, alla Clinica, {A} dorme collegat[A:o/a] al diagnostico mentre Doc Ferraglia russa sul divano. Al mattino il sovraccarico è sceso. || Di notte, alla Clinica, {A} prova a dormire collegat[A:o/a] al diagnostico, ma i bip non l[A:o/a] lasciano chiudere occhio.
+1 at:3 s:A=ubriaco mo:A+10 | Di notte, al Club, {A} si lascia convincere a provare tutti i cocktail del menu in ordine alfabetico. Arriva alla «M».
+1 at:4 test:A=furt13 ok:+arma:A ko:s:A=ferito | Di notte, all'Officina, {A} scavalca il cancello dei Maelstrom mentre festeggiano e torna con {arma}. || Di notte, all'Officina, {A} scavalca il cancello dei Maelstrom. La festa era una trappola per i ladri, e funziona.
+1 at:5 test:A=int13 ok:+valore:A ko:pr:A+12 | Di notte, al Nodo dati, {A} si collega al terminale durante il backup notturno, quando l'ICE dorme, e scarica {valore}. || Di notte, al Nodo dati, {A} si collega al terminale durante il backup. L'ICE non dorme mai.
+1 at:6 pr:A+6 mo:A+6 | Di notte, in Piazza, il megaschermo della torre trasmette lo spettacolo di fuochi d'artificio olografici previsto per una festa aziendale annullata. {A} guarda tutto. Le ottiche bruciano un po'.
+1 mo:A+10 | Di notte, DJ Saetta di Radio Zona Rossa legge in diretta i messaggi degli ascoltatori. Uno dice soltanto: «Resisti». {A} decide che era per l[A:ui/ei].
+1 stat:A>pr60 pr:A+6 | Di notte {A} sogna in codice binario. Si sveglia con il sovraccarico più alto e la sensazione di aver capito qualcosa di importante.
+1 stat:A>pr55 test:A=int12 ok:pr:A-14 ko:mo:A-6 | Di notte {A} spegne gli impianti uno alla volta, come le luci di una casa, e lascia acceso solo il cuore. Il sovraccarico scende. || Di notte {A} prova a spegnere gli impianti uno alla volta, ma uno si rifiuta e manda in loop una pubblicità di materassi.
+1 trait:A=paranoico pr:A+5 | Di notte {A} copre con il nastro adesivo tutte le spie luminose dei propri impianti. Gli impianti, offesi, scaldano lo stesso.
+1 trait:A=goloso con:A=cibo cibo:A | Di notte {A} mangia {cibo:A} sotto le coperte, per non condividerlo con nessuno. Nemmeno con sé stess[A:o/a] di domani.
+1 trait:A=romantico mo:A+12 | Di notte {A} trova un'insegna rotta che lampeggia la parola «AMORE» da un ristorante che si chiamava «AMORETTI». Decide che è un segno.
+1 trait:A=stratega mo:A+6 | Di notte {A} disegna sul vetro appannato di una finestra il piano per domani, con le frecce. All'alba il piano è sparito, ma {A} lo ricorda tutto.
+1 trait:A=furtivo test:A=furt12 ok:+cibo:A ok:+med:A ko:en:A-8 | Di notte {A} passa da un tetto all'altro e svuota la cassetta delle consegne di un palazzo intero. || Di notte {A} prova a passare da un tetto all'altro, ma un drone delle consegne l[A:o/a] scambia per un pacco e l[A:o/a] segue.
+1 trait:A=bruto en:A-6 mo:A+6 | Di notte {A} fa flessioni sul tetto finché la gang del palazzo di fronte non comincia ad applaudire.
+1 trait:A=sopravvissuto en:A+12 | Di notte {A} dorme dentro una lavatrice industriale spenta. È il posto più sicuro del distretto: nessuno lava niente da giorni.
+1 trait:A=ubriacone con:A=alcol alcol:A | Di notte {A} brinda da sol[A:o/a] alla salute del distretto con {alcol:A}. Il distretto non risponde.
+1 trait:A=solitario en:A+10 mo:A-3 | Di notte {A} sale sull'insegna più alta del quartiere e si siede dentro la lettera «O». Nessuno l[A:o/a] trova.
+1 @stl en:A+8 | Di notte {A} si addormenta in un armadio a muro di un hotel a capsule. Il check-out è alle dieci, ma nessuno controlla.
+1 s:A=sconvolto | Di notte, una pubblicità olografica di un'agenzia funebre si accende davanti alla finestra di {A} e recita il suo nome per sbaglio. {A} non dorme più.
+2 couple:AB mo:A+12 mo:B+12 | Di notte {A} e {B} ballano in un vicolo sulla musica che esce dal Club tre isolati più in là. Le pozzanghere riflettono le insegne. Sembrano un videoclip.
+2 couple:AB stat:B>pr55 test:A=emp12 ok:pr:B-15 ko:en:A-6 | Di notte {A} canta a bassa voce a {B} una ninna nanna mentre il diagnostico riavvia gli impianti di {B}. Il sovraccarico scende. || Di notte {A} prova a cantare una ninna nanna a {B} durante la diagnosi, ma stona e il diagnostico si interrompe.
+2 ally:AB mo:A+8 mo:B+8 | Di notte {A} e {B} giocano a carte con un mazzo olografico che bara. Perdono entrambi, ridono entrambi.
+2 ally:AB trait:A=leale en:A-6 fid:B>A+8 | Di notte {A} rimane svegli[A:o/a] a guardare le volanti dalla finestra, così {B} può dormire con la luce spenta.
+2 ally:AB trait:A=traditore test:A=furt12 ok:steal:A<B=med ko:rel:AB-12 | Di notte {A} fruga nello zaino di {B} con la torcia delle ottiche al minimo e si prende {med:B}. || Di notte {A} fruga nello zaino di {B}, ma la torcia delle ottiche si accende al massimo.
+2 enemy:AB test:A=furt13 ok:k:A>B ko:hit:B>A | Di notte {A} raggiunge il nascondiglio di {B} passando dal condotto dell'aria. || Di notte {A} prova a raggiungere {B} dal condotto dell'aria, ma il condotto rimbomba come un tamburo.
+2 grudge:A>B pau:B>A+10 | Di notte {A} lascia davanti al nascondiglio di {B} una piccola insegna olografica con scritto: «Ti vedo». {B} non dorme più.
+2 crush:A>B test:A=car11 ok:amo:B>A+10 ko:mo:A-6 | Di notte {A} lascia a {B} una lattina di bevanda calda con un cuore disegnato col pennarello. {B} sorride al buio. || Di notte {A} lascia a {B} una lattina con un cuore disegnato. La lattina viene rubata da un drone delle pulizie.
+2 trait:A=generoso give:A>B=cibo con:A=cibo rel:AB+10 | Di notte {A} lascia {cibo:A} davanti alla capsula di {B}, con un biglietto: «Mangia, che domani serve».
+3 ally:ABC mo:A+8 mo:B+8 mo:C+8 | Di notte {A}, {B} e {C} ascoltano Radio Zona Rossa con una radiolina e votano le canzoni con le dita. DJ Saetta, per una volta, sembra parlare proprio a loro.
+`,
+      f: `
+1 test:A=agi12 ok:+arma:A ok:+armatura:A ko:s:A=ferito | Alla consegna di Nonna Kiku, {A} si infila sotto la rete di sicurezza ed esce con {arma} e {armatura}. || Alla consegna di Nonna Kiku, {A} si infila sotto la rete di sicurezza, ma Nonna Kiku [A:gli/le] dà una bastonata sulle dita «per insegnare l'educazione».
+1 +cibo:A mo:A+8 | Alla consegna, Nonna Kiku distribuisce biscotti fatti in casa insieme alle armi. {A} prende {cibo} e due biscotti. I biscotti sono buonissimi.
+1 test:A=car12 ok:+med:A ok:+med:A ko:mo:A-6 | Alla consegna, {A} fa i complimenti a Nonna Kiku per il braccio cromato. Nonna Kiku arrossisce e [A:gli/le] regala due kit invece di uno. || Alla consegna, {A} fa i complimenti al braccio cromato di Nonna Kiku. Nonna Kiku dice che è il braccio di suo marito, e lo dice in un modo che mette i brividi.
+1 pr:A+8 +attrezzo:A | Alla consegna, {A} trova nella cassa {attrezzo} con un aggiornamento automatico già avviato. Gli impianti lo scaricano senza chiedere: scaldano per un'ora.
+1 +esplosivo:A @luck | Alla consegna, {A} apre una cassa con l'etichetta «Giocattoli». Dentro c'è {esplosivo}. Nonna Kiku fa finta di niente.
+1 star:A mo:A+6 | Alla consegna, Nonna Kiku stringe la mano a {A} davanti ai droni e dice: «Questo mi piace». La diretta impazzisce.
+2 al:AB @soc | Alla consegna, {A} e {B} si mettono in fila insieme per i biscotti di Nonna Kiku e, tra un biscotto e l'altro, decidono di allearsi.
+2 test:A=for12 ok:steal:A<B=arma ko:hit:B>A | Alla consegna, {A} e {B} si contendono la stessa cassa a strattoni. Vince {A} e si porta via {arma:B}. || Alla consegna, {A} e {B} si contendono la stessa cassa a strattoni. {B} non molla, e il coperchio finisce in faccia a {A}.
+2 k:A>B @agg w:A | Alla consegna, {A} aspetta che {B} apra la cassa e la riempie di piombo prima che possa prendere qualcosa.
+2 save:A>B @heal | Alla consegna, {A} tira {B} via da una cassa con l'etichetta «Fragile» proprio prima che esploda. Era fragile davvero.
+3 k:A>B k:A>C *0.3 @agg | Alla consegna, {A} trasforma la cassa delle granate di Nonna Kiku in un argomento definitivo per {B} e {C}.
+`,
+      finale: `
+2 k:A>B | In Piazza, sotto il megaschermo che trasmette in diretta lo scontro, {A} e {B} si affrontano. Quando le telecamere tornano a fuoco, in piedi c'è {A}.
+2 k:A>B stat:A>pr60 | Gli impianti di {A} sono al limite e vedono tutto al rallentatore. Per una volta, è un vantaggio: {A} anticipa ogni mossa di {B}.
+2 k:A>B con:A=esplosivo esplosivo:A | {A} lancia {esplosivo:A} contro il riparo di {B} sotto il portico della Piazza. Il portico non esiste più, e nemmeno {B}.
+2 k:A>B trait:A=esibizionista | {A} saluta i droni, si sistema i capelli e solo dopo affronta {B}. Ha tempo per entrambe le cose.
+2 k:A>B trait:A=stratega | {A} conduce {B} esattamente dove voleva: sotto le barriere della Piazza, che salgono al momento giusto.
+2 k:A>B trait:A=codardo | {A} scappa per tutta la Piazza finché {B} non inciampa nelle barriere. Allora torna indietro.
+2 k:A>B stat:B<en25 | {B} non ha più energie: si appoggia a una colonna della torre per riprendere fiato. {A} non gliene lascia il tempo.
+2 k:A>B trait:A=ingegnoso con:A=attrezzo | {A} collega {attrezzo:A} al pannello delle barriere della Piazza. Le barriere salgono tutte insieme, e {B} è nel posto sbagliato.
+2 k:A>B trait:A=furtivo | {A} sparisce nel vapore delle grate della Piazza. Quando riappare, è alle spalle di {B}.
+2 k:A>B trait:A=pacifista | {A} chiede a {B} di fermarsi. {B} non si ferma. {A} fa quello che deve, e non se lo perdonerà.
+`,
+      sponsor: `
+1 +arma:A @gift | Nonna Kiku manda a {A} {arma} in una scatola di biscotti. Sul coperchio c'è scritto: «Mangia anche, mi raccomando».
+1 +med:A +cibo:A @gift | Un drone di Nonna Kiku consegna a {A} {med} e {cibo}, con una nota scritta a mano: «Sei troppo magr[A:o/a]».
+1 +trap:A @gift | Un fixer anonimo manda a {A} {trap} con un biglietto: «Usala con creatività».
+1 +valore:A @gift | La Kagemura Dynamics, che ha comprato i diritti della diretta, manda a {A} {valore} «come incentivo alla partecipazione».
+1 +amuleto:A mo:A+8 @gift | Un fan anonimo fa recapitare a {A} {amuleto} con un biglietto pieno di cuori.
+1 +attrezzo:A @gift | DJ Saetta annuncia in diretta che Radio Zona Rossa manda a {A} {attrezzo}. Un drone lo lancia dal tetto con tre secondi di ritardo sull'annuncio.
+1 +alcol:A mo:A+6 @gift | Un drone del Club lascia a {A} {alcol} con un biglietto: «Offre la casa».
+1 +esplosivo:A @gift | Un fixer dal senso dell'umorismo discutibile manda a {A} {esplosivo} in una confezione regalo con il fiocco.
+1 +armatura:A @gift | La Orbis Pharma manda a {A} {armatura} con la richiesta di indossarla con il logo ben visibile. Il logo è enorme.
+`,
+      fallback: `
+1 | {A} passa la giornata ad ascoltare DJ Saetta che legge le previsioni del meteo: «Pioggia acida con possibilità di altra pioggia acida».
+1 | {A} litiga per dieci minuti con un'insegna pubblicitaria che continua a chiamarl[A:o/a] per nome.
+1 | {A} prova a dormire, ma il megaschermo del palazzo di fronte trasmette la pubblicità di un materasso. Ironico.
+1 | {A} conta le volanti che attraversano il cielo. Arriva a quarantadue e perde il conto.
+1 | {A} guarda la pioggia scivolare sulle insegne e pensa che, da lontano, Night City è quasi bella.
+1 | {A} passa davanti a Gino, il distributore parlante. Gino dice «Ciao». {A} non risponde. Gino se la lega al dito.
+1 | {A} legge su un muro la scritta «Qui c'era un albergo». Sotto, a mano: «C'è ancora, ma non ti conviene».
+1 | {A} fa la fila a un distributore di caffè per un'ora. Il distributore dà solo acqua calda. {A} la beve lo stesso.
+1 | {A} osserva un robot delle pulizie che pulisce lo stesso metro di marciapiede da tre ore. Prova una strana solidarietà.
+1 | {A} guarda una pubblicità di impianti per la felicità «con il 30% di sconto». Si chiede quanto costi la felicità intera.
+1 | {A} si ferma ad ascoltare un artista di strada che suona il violino con quattro braccia. È meraviglioso.
+1 | {A} prova a ricordare l'ultima volta che ha visto il sole senza filtri. Non ci riesce.
+`,
+      ds: `
+1 | {A} si nasconde sotto un distributore automatico, che commenta ad alta voce la situazione.
+1 @luck | {A} era in fila al Club, e il buttafuori non faceva uscire nessuno.
+1 en:A-10 | {A} corre tre isolati per mettersi al sicuro. Ci arriva senza fiato.
+1 pr:A+12 | {A} si salva, ma le ottiche registrano ogni dettaglio e gli impianti lo fanno rivivere a ripetizione.
+2 save:A>B | Nel caos, {A} afferra {B} per un braccio e l[B:o/a] tira dentro una porta di servizio.
+2 hit:A>B | Nel caos, {A} spinge via {B} per passare per prim[A:o/a].
+`,
+    },
+    dis: `
+L'aggiornamento obbligatorio | La Kagemura Dynamics lancia un aggiornamento obbligatorio per tutti gli impianti del distretto, alle tre di pomeriggio, senza preavviso. | {A} viene spent[A:o/a] dall'aggiornamento a metà di una scala e non si riaccende più. | {A} si riavvia in mezzo alla strada e cade battendo la testa. | {A} aveva disattivato gli aggiornamenti automatici anni fa.
+Il blocco della metropolitana sopraelevata | Il treno della metropolitana si ferma tra due stazioni e le porte si aprono da sole sul vuoto. | {A} cade dalla carrozza aperta. | {A} si aggrappa alla porta e resta appes[A:o/a] per un'ora prima di risalire. | {A} si siede e aspetta i soccorsi, che arrivano davvero.
+La pioggia di pubblicità | Cento droni pubblicitari perdono il controllo e precipitano sulle strade del distretto. | {A} viene colpit[A:o/a] da un drone che pubblicizza un'assicurazione sulla vita. | {A} viene colpit[A:o/a] di striscio da un drone che canta un jingle. | {A} si ripara sotto un'insegna robusta.
+Il giorno del recupero crediti | Gli esattori della Orbis Pharma girano per il distretto a recuperare gli impianti non pagati. | {A} non ha mai pagato le rate, e gli esattori non accettano scuse. | {A} paga con una ferita e un pezzo di orgoglio. | {A} mostra le ricevute, tutte in regola.
+La guerra delle gang al Mercato di Kabuki | Due gang si contendono il Mercato di Kabuki a colpi di arma da fuoco. | {A} resta nel fuoco incrociato tra le bancarelle. | {A} si prende una pallottola di rimbalzo. | {A} si nasconde nel banco dei noodle con la signora che li cucina.
+L'inondazione del Megablocco | Le tubature del Megablocco cedono tutte insieme e l'acqua scende dai piani alti come una cascata. | {A} viene trascinat[A:o/a] giù per le scale dall'acqua. | {A} viene sbattut[A:o/a] contro un pianerottolo. | {A} si arrampica su un armadio e aspetta che l'acqua passi.
+Il blackout totale della Clinica del ripperdoc | Il generatore della Clinica del ripperdoc si spegne durante tre operazioni insieme. | {A} è sul lettino quando le macchine si spengono. | {A} si sveglia dall'anestesia con un impianto montato a metà. | {A} tiene in mano la torcia per Doc Ferraglia finché la corrente torna.
+La rissa al Club della braindance | Al Club della braindance una rissa per un posto al bancone diventa una battaglia. | {A} viene colpit[A:o/a] da una bottiglia cromata e non si rialza. | {A} esce dalla rissa con un occhio nero e un dente in meno. | {A} si nasconde dietro il DJ, che continua a suonare.
+La gara clandestina all'Officina dei Maelstrom | I Maelstrom organizzano una gara di moto tra le strade chiuse, e nessuno avverte i pedoni. | {A} viene investit[A:o/a] dal vincitore. | {A} viene sfiorat[A:o/a] da una moto e cade sull'asfalto. | {A} guarda la gara dal balcone con una bibita.
+Il furto di dati al Nodo dati corporativo | Al Nodo dati corporativo qualcuno ruba un archivio intero, e la sicurezza spara a chiunque abbia un cavo in mano. | {A} ha un cavo in mano. | {A} getta il cavo appena in tempo, ma non abbastanza da evitare un colpo. | {A} non ha mai toccato un cavo in vita sua, e lo dice.
+L'ondata di cyberpsicosi | Un lotto difettoso di impianti a basso costo manda in tilt metà del quartiere: la gente parla con i muri e i muri rispondono. | {A} perde il controllo degli impianti e corre dritt[A:o/a] in mezzo al traffico delle volanti. | {A} passa la giornata a litigare con il proprio braccio cromato. | {A} non ha mai comprato impianti a basso costo. | sconvolto
+La festa aziendale in Piazza della torre | La Velltech organizza in Piazza della torre una festa per i dipendenti, con open bar e una sicurezza nervosissima. | {A} si avvicina troppo al palco dei dirigenti. | {A} esagera con l'open bar e viene spint[A:o/a] fuori dal cordone, ubriac[A:o/a] fradic[A:io/ia]. | {A} si gode l'open bar con moderazione e senza farsi notare. | ubriaco
+Il gelo dei condizionatori | I condizionatori del distretto impazziscono e soffiano aria gelida per tutta la notte. | {A} si addormenta all'aperto e non si sveglia. | {A} passa la notte a tremare e si sveglia con la febbre. | {A} si avvolge in tre giacche e un tappeto. | malato
+Lo sciopero dei robot delle pulizie | I robot delle pulizie incrociano le braccia: in un giorno la spazzatura sommerge le strade. | {A} finisce sepolt[A:o/a] sotto una frana di sacchi della spazzatura. | {A} si taglia su un rifiuto metallico e la ferita si infetta. | {A} si costruisce un passaggio sopra i cassonetti. | malato
+L'ispezione della MaxTac | La MaxTac setaccia il distretto a caccia di chiunque abbia troppo cromo addosso. | {A} ha troppo cromo addosso. | {A} viene fermat[A:o/a] e interrogat[A:o/a] con metodi pesanti. | {A} sembra così normale che la MaxTac non l[A:o/a] guarda nemmeno.
+`,
+  });
+  // 18+: solo con il filtro per adulti attivo, come nelle altre arene
+  D.packs.push({
+    theme: 'cyberpunk', adult: true,
+    ev: {
+      d: `
+2 love:AB at:3 | Al Club, {A} e {B} affittano una cabina privata per la braindance. Non accendono il visore.
+1 s:A=ubriaco at:3 | Al Club, {A} beve un cocktail che si accende quando lo tocchi. Poi si accende anche {A}, e balla sul bancone.
+2 k:A>B @agg at:4 | All'Officina, {A} usa la pressa idraulica su {B}. I Maelstrom applaudono, e uno prende appunti.
+1 @mad s:A=sconvolto | {A} prova una braindance illegale registrata da qualcuno che stava morendo. Ne esce con lo sguardo di chi ha visto qualcosa che non doveva vedere.
+2 need:A=ubriaco love:AB @drunk | Ubriac[A:o/a], {A} trascina {B} dentro una cabina per fototessere. La cabina stampa sedici foto che nessuno vedrà mai.
+`,
+      n: `
+2 couple:AB at:1 | Nel Megablocco, {A} e {B} passano la notte in una capsula-letto progettata per una persona. Ci stanno benissimo.
+2 k:A>B @stl | Di notte {A} raggiunge {B} che dorme e usa un filo monomolecolare. Un gesto solo, silenzioso.
+`,
+    },
+    dis: `
+La notte delle braindance proibite | Al Club della braindance circolano registrazioni vietate in tutta la città. | {A} prova la registrazione sbagliata e il cuore non regge. | {A} ne esce con i ricordi di uno sconosciuto mescolati ai propri. | {A} preferisce un cocktail. | sconvolto
+`,
+  });
+})(typeof window === 'object' ? window : globalThis);
 
 ;
 /* Reame Incantato — secondo pacchetto. */
@@ -14765,6 +15183,8 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
       }
     }
 
+    // un'arena può dare più introduzioni alla stessa fase: si alternano giorno per giorno, senza estrazioni
+    const introOf = (kind) => { const v = theme.intro[kind]; return Array.isArray(v) ? v[(day - 1) % v.length] : v; };
     function runPhase(kind, pool, title, intro, opt) {
       const events = pendingNotes.splice(0);
       SYS = [];
@@ -15054,12 +15474,12 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
       newDay();
       if (day === 1) runPhase('b', pools.b, theme.phase.b, theme.intro.b);
       if (isEnded() || lateEnd()) break;
-      runPhase('d', pools.d, theme.phase.d + ' ' + day, theme.intro.d);
+      runPhase('d', pools.d, theme.phase.d + ' ' + day, introOf('d'));
       if (isEnded() || lateEnd()) break;
       const a = alive().length;
       if (!feastDone && day >= 3 && a >= 4 && (rng.chance(0.35) || day >= 6)) {
         feastDone = true;
-        runPhase('f', pools.f, theme.phase.f, theme.intro.f);
+        runPhase('f', pools.f, theme.phase.f, introOf('f'));
       } else if (day >= 2 && pools.disasters.length && day - lastDisaster > 1 && rng.chance(0.32 * Math.min(1.5, diff))) {
         const eligible=pools.disasters.filter(d=>!d.zones||d.zones.some(z=>!closed.has(z)&&alive().some(t=>t.zone===z)));
         let opts = eligible.filter((d) => !usedDisasters.has(d.n));
@@ -15071,7 +15491,7 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
         runPhase('dis', dz.contentId?dz.out:dz.out.concat(pools.ds), dz.n, dz.intro, Object.assign({ adult: !!dz.adult },areas.length?{affectedZones:areas}:{},dz.contentId?{contentId:dz.contentId,worldIncident:{scene:dz.scene,exposed:alive().filter(t=>areas.includes(t.zone)).map(t=>t.id)}}:{}));
       }
       if (isEnded() || lateEnd()) break;
-      runPhase('n', pools.n, theme.phase.n + ' ' + day, theme.intro.n);
+      runPhase('n', pools.n, theme.phase.n + ' ' + day, introOf('n'));
       if (isEnded() || lateEnd()) break;
       pushFallen();
       if (day >= maxDays) { runFinale(); break; }
@@ -15188,7 +15608,7 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
 </script>
 <script>window.LOS_ASSETS = {"logo":"img/logo.f2d5175789.webp","icona":"img/icona.8b02ddeb49.webp","favicon":"img/favicon.86774dc7cf.png","panoramica":"img/panoramica.66c4c27255.webp","sagome":["img/sagome-cappuccio.e8876ba986.webp","img/sagome-esploratore.9a99fd13f8.webp","img/sagome-viaggiatore.5e36435604.webp"],"arene":{"classico":"img/arene-classico.42c6ba42ee.webp","fantasy":"img/arene-fantasy.75b7fb0d32.webp","horror":"img/arene-horror.48052d80b4.webp","liceo":"img/arene-liceo.05ed578a90.webp","royale":"img/arene-royale.36c9952cd7.webp","scifi":"img/arene-scifi.403694f00f.webp","ufficio":"img/arene-ufficio.67b271bea3.webp","wasteland":"img/arene-wasteland.889002ace8.webp","zombie":"img/arene-zombie.36c9135a12.webp"},"atlas":{"classico":{"luoghi":{"altopiano":"img/arene-classico-luoghi-altopiano.36a37512d3.webp","bosco":"img/arene-classico-luoghi-bosco.2e9163544b.webp","cornucopia":"img/arene-classico-luoghi-cornucopia.393b2dabe1.webp","fiume":"img/arene-classico-luoghi-fiume.22b335a914.webp","paludi":"img/arene-classico-luoghi-paludi.77cf115eb4.webp","rovine":"img/arene-classico-luoghi-rovine.9ea4f70ca9.webp"},"pericoli":{"branco-di-lupi-mutanti":"img/arene-classico-pericoli-branco-di-lupi-mutanti.d786a62875.webp","orso-affamato":"img/arene-classico-pericoli-orso-affamato.e4f38a9892.webp","sciame-di-vespe-velenose":"img/arene-classico-pericoli-sciame-di-vespe-velenose.5adb2c7b8d.webp","serpente-gigante":"img/arene-classico-pericoli-serpente-gigante.b17e7f3d91.webp"}},"fantasy":{"luoghi":{"foresta-elfica":"img/arene-fantasy-luoghi-foresta-elfica.0448fcfbd3.webp","lago-nebbioso":"img/arene-fantasy-luoghi-lago-nebbioso.f19abc7c81.webp","miniere":"img/arene-fantasy-luoghi-miniere.5baa916ec9.webp","palude-stregata":"img/arene-fantasy-luoghi-palude-stregata.6a0b2af4a7.webp","picco-del-drago":"img/arene-fantasy-luoghi-picco-del-drago.06bdfd84b1.webp","torre-in-rovina":"img/arene-fantasy-luoghi-torre-in-rovina.ac716863c7.webp"},"pericoli":{"branco-di-lupi-mannari":"img/arene-fantasy-pericoli-branco-di-lupi-mannari.1c9124ceee.webp","spettro-errante":"img/arene-fantasy-pericoli-spettro-errante.056074bc23.webp","troll-di-caverna":"img/arene-fantasy-pericoli-troll-di-caverna.31aa2444f0.webp","viverna":"img/arene-fantasy-pericoli-viverna.577b91a819.webp"}},"horror":{"luoghi":{"biblioteca":"img/arene-horror-luoghi-biblioteca.00d6ab97f4.webp","cappella":"img/arene-horror-luoghi-cappella.a51e505028.webp","cimitero":"img/arene-horror-luoghi-cimitero.7a441de089.webp","serra":"img/arene-horror-luoghi-serra.b3d91121d4.webp","soffitta":"img/arene-horror-luoghi-soffitta.466d40cea3.webp"},"pericoli":{"bambola-posseduta":"img/arene-horror-pericoli-bambola-posseduta.7064eef1d7.webp","entita-senza-volto":"img/arene-horror-pericoli-entita-senza-volto.2c28467bdd.webp","spettro-urlante":"img/arene-horror-pericoli-spettro-urlante.25fa554e05.webp","stormo-di-corvi":"img/arene-horror-pericoli-stormo-di-corvi.fe5c85d7ae.webp"}},"liceo":{"luoghi":{"aula-magna":"img/arene-liceo-luoghi-aula-magna.0478e35c5c.webp","biblioteca":"img/arene-liceo-luoghi-biblioteca.1ae806ae58.webp","cortile":"img/arene-liceo-luoghi-cortile.51bf433337.webp","laboratorio-di-chimica":"img/arene-liceo-luoghi-laboratorio-di-chimica.eba1434683.webp","mensa":"img/arene-liceo-luoghi-mensa.67bcbc7e37.webp","palestra":"img/arene-liceo-luoghi-palestra.8ecb872849.webp"},"pericoli":{"bidello-di-turno":"img/arene-liceo-pericoli-bidello-di-turno.191c43a8bd.webp","ispezione-a-sorpresa":"img/arene-liceo-pericoli-ispezione-a-sorpresa.bef087d9b9.webp","preside":"img/arene-liceo-pericoli-preside.033f6c9aae.webp","professoressa-di-matematica":"img/arene-liceo-pericoli-professoressa-di-matematica.6cb65c6a3f.webp"}},"royale":{"luoghi":{"aeroporto":"img/arene-royale-luoghi-aeroporto.81e8ce98d4.webp","base-militare":"img/arene-royale-luoghi-base-militare.67f3a7de9d.webp","centrale-elettrica":"img/arene-royale-luoghi-centrale-elettrica.05ee57458a.webp","fattoria":"img/arene-royale-luoghi-fattoria.7c780dda87.webp","foresta":"img/arene-royale-luoghi-foresta.03b47644d0.webp","villaggio-costiero":"img/arene-royale-luoghi-villaggio-costiero.568519eb7c.webp"},"pericoli":{"cane-da-guardia-addestrato":"img/arene-royale-pericoli-cane-da-guardia-addestrato.c7853a67a0.webp","drone-armato":"img/arene-royale-pericoli-drone-armato.30d0b73e01.webp","elicottero-da-caccia":"img/arene-royale-pericoli-elicottero-da-caccia.8c68e62346.webp"}},"scifi":{"luoghi":{"hangar":"img/arene-scifi-luoghi-hangar.6de551833b.webp","moduli-abitativi":"img/arene-scifi-luoghi-moduli-abitativi.9f5bb96d39.webp","ponte-di-comando":"img/arene-scifi-luoghi-ponte-di-comando.3e9ffd005a.webp","reattore":"img/arene-scifi-luoghi-reattore.d10a335006.webp","serra-idroponica":"img/arene-scifi-luoghi-serra-idroponica.b6f4407853.webp"},"pericoli":{"androide-da-combattimento":"img/arene-scifi-pericoli-androide-da-combattimento.1a3d3eb38e.webp","creatura-aliena-dai-tentacoli":"img/arene-scifi-pericoli-creatura-aliena-dai-tentacoli.b6b314ddd9.webp","drone-di-sicurezza-impazzito":"img/arene-scifi-pericoli-drone-di-sicurezza-impazzito.c8a9c6f9e3.webp","sciame-di-nanobot":"img/arene-scifi-pericoli-sciame-di-nanobot.d43296f047.webp"}},"ufficio":{"luoghi":{"cucina":"img/arene-ufficio-luoghi-cucina.d968f8861d.webp","open-space":"img/arene-ufficio-luoghi-open-space.b6b7990c99.webp","parcheggio":"img/arene-ufficio-luoghi-parcheggio.d593f2ed83.webp","sala-stampanti":"img/arene-ufficio-luoghi-sala-stampanti.1727f50082.webp","ufficio-del-direttore":"img/arene-ufficio-luoghi-ufficio-del-direttore.bb3b6cabab.webp"},"pericoli":{"consulente-esterno":"img/arene-ufficio-pericoli-consulente-esterno.ce6e200c3f.webp","direttore-generale":"img/arene-ufficio-pericoli-direttore-generale.da2eb1f708.webp","riorganizzazione-aziendale":"img/arene-ufficio-pericoli-riorganizzazione-aziendale.1fd57b76b3.webp","ufficio-risorse-umane":"img/arene-ufficio-pericoli-ufficio-risorse-umane.8392df7518.webp"}},"wasteland":{"luoghi":{"autostrada-spezzata":"img/arene-wasteland-luoghi-autostrada-spezzata.19a72a0b97.webp","citta-fantasma":"img/arene-wasteland-luoghi-citta-fantasma.fe22bb72b2.webp","cratere":"img/arene-wasteland-luoghi-cratere.04de7ca40a.webp","diga":"img/arene-wasteland-luoghi-diga.3be9abe15a.webp","discarica":"img/arene-wasteland-luoghi-discarica.b8783ad9c6.webp","raffineria":"img/arene-wasteland-luoghi-raffineria.081e2d2ad6.webp"},"pericoli":{"banda-di-predoni":"img/arene-wasteland-pericoli-banda-di-predoni.1dfcfd1628.webp","branco-di-cani-mutati":"img/arene-wasteland-pericoli-branco-di-cani-mutati.442fabfc39.webp","scorpione-gigante":"img/arene-wasteland-pericoli-scorpione-gigante.2dd8911367.webp","verme-delle-sabbie":"img/arene-wasteland-pericoli-verme-delle-sabbie.a0d445beeb.webp"}},"zombie":{"luoghi":{"centro-commerciale":"img/arene-zombie-luoghi-centro-commerciale.333f4699d5.webp","metropolitana":"img/arene-zombie-luoghi-metropolitana.878a263605.webp","periferia":"img/arene-zombie-luoghi-periferia.e28a7d70c7.webp","scuola":"img/arene-zombie-luoghi-scuola.153ddbaa75.webp","stazione-di-polizia":"img/arene-zombie-luoghi-stazione-di-polizia.157f7a17f5.webp"},"pericoli":{"cane-infetto":"img/arene-zombie-pericoli-cane-infetto.fdff913d6f.webp","gigante-mutato":"img/arene-zombie-pericoli-gigante-mutato.91fad36b70.webp","infetto-corridore":"img/arene-zombie-pericoli-infetto-corridore.61f48faafd.webp","orda-di-zombi":"img/arene-zombie-pericoli-orda-di-zombi.e0fc6d1b56.webp"}}}};
 ;
-window.LOS_BUILD = "9d09a132ee16c1c17052677d11a1f8e6e624f44757c7d89426bbac641e22d97a";
+window.LOS_BUILD = "16ceddfbae4a329806a6e8e17cba2ffca90ffa7c96ef3add5fe77024b46462f8";
 ;
 /* Last One Standing — grafica vettoriale: logo, icone delle arene, illustrazioni.
  * Tutto è SVG generato in codice: nessuna immagine esterna. */
@@ -15633,7 +16053,8 @@ window.LOS_BUILD = "9d09a132ee16c1c17052677d11a1f8e6e624f44757c7d89426bbac641e22
     if (real) return '<span class="' + cls + '"><img src="' + real + '" alt="" loading="lazy" decoding="async"></span>';
     let art;
     // luoghi senza foto: un ritaglio diverso del banner dell'arena, così restano immagini vere
-    const banner = G.LOS_ASSETS && G.LOS_ASSETS.arene && G.LOS_ASSETS.arene[theme];
+    // senza un banner vero (Night City, per ora) si ritaglia la locandina vettoriale dell'arena
+    const banner = (G.LOS_ASSETS && G.LOS_ASSETS.arene && G.LOS_ASSETS.arene[theme]) || (kind === 'luoghi' && G.LOS_ART && G.LOS_ART.sceneDataUri && theme === 'cyberpunk' ? G.LOS_ART.sceneDataUri(theme) : null);
     if (kind === 'luoghi' && banner) {
       const P = ['12% 70%', '50% 35%', '88% 60%', '28% 95%', '72% 85%', '50% 100%', '0% 40%', '100% 30%'];
       return '<span class="' + cls + ' ax-crop" style="background-image:url(&quot;' + banner + '&quot;);background-position:' + P[((opts && opts.index) || 0) % P.length] + '"></span>';

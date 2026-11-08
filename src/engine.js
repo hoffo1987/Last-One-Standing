@@ -2650,6 +2650,8 @@
       }
     }
 
+    // un'arena può dare più introduzioni alla stessa fase: si alternano giorno per giorno, senza estrazioni
+    const introOf = (kind) => { const v = theme.intro[kind]; return Array.isArray(v) ? v[(day - 1) % v.length] : v; };
     function runPhase(kind, pool, title, intro, opt) {
       const events = pendingNotes.splice(0);
       SYS = [];
@@ -2939,12 +2941,12 @@
       newDay();
       if (day === 1) runPhase('b', pools.b, theme.phase.b, theme.intro.b);
       if (isEnded() || lateEnd()) break;
-      runPhase('d', pools.d, theme.phase.d + ' ' + day, theme.intro.d);
+      runPhase('d', pools.d, theme.phase.d + ' ' + day, introOf('d'));
       if (isEnded() || lateEnd()) break;
       const a = alive().length;
       if (!feastDone && day >= 3 && a >= 4 && (rng.chance(0.35) || day >= 6)) {
         feastDone = true;
-        runPhase('f', pools.f, theme.phase.f, theme.intro.f);
+        runPhase('f', pools.f, theme.phase.f, introOf('f'));
       } else if (day >= 2 && pools.disasters.length && day - lastDisaster > 1 && rng.chance(0.32 * Math.min(1.5, diff))) {
         const eligible=pools.disasters.filter(d=>!d.zones||d.zones.some(z=>!closed.has(z)&&alive().some(t=>t.zone===z)));
         let opts = eligible.filter((d) => !usedDisasters.has(d.n));
@@ -2956,7 +2958,7 @@
         runPhase('dis', dz.contentId?dz.out:dz.out.concat(pools.ds), dz.n, dz.intro, Object.assign({ adult: !!dz.adult },areas.length?{affectedZones:areas}:{},dz.contentId?{contentId:dz.contentId,worldIncident:{scene:dz.scene,exposed:alive().filter(t=>areas.includes(t.zone)).map(t=>t.id)}}:{}));
       }
       if (isEnded() || lateEnd()) break;
-      runPhase('n', pools.n, theme.phase.n + ' ' + day, theme.intro.n);
+      runPhase('n', pools.n, theme.phase.n + ' ' + day, introOf('n'));
       if (isEnded() || lateEnd()) break;
       pushFallen();
       if (day >= maxDays) { runFinale(); break; }

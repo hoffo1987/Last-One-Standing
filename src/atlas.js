@@ -248,7 +248,8 @@
     if (real) return '<span class="' + cls + '"><img src="' + real + '" alt="" loading="lazy" decoding="async"></span>';
     let art;
     // luoghi senza foto: un ritaglio diverso del banner dell'arena, così restano immagini vere
-    const banner = G.LOS_ASSETS && G.LOS_ASSETS.arene && G.LOS_ASSETS.arene[theme];
+    // senza un banner vero (Night City, per ora) si ritaglia la locandina vettoriale dell'arena
+    const banner = (G.LOS_ASSETS && G.LOS_ASSETS.arene && G.LOS_ASSETS.arene[theme]) || (kind === 'luoghi' && G.LOS_ART && G.LOS_ART.sceneDataUri && theme === 'cyberpunk' ? G.LOS_ART.sceneDataUri(theme) : null);
     if (kind === 'luoghi' && banner) {
       const P = ['12% 70%', '50% 35%', '88% 60%', '28% 95%', '72% 85%', '50% 100%', '0% 40%', '100% 30%'];
       return '<span class="' + cls + ' ax-crop" style="background-image:url(&quot;' + banner + '&quot;);background-position:' + P[((opts && opts.index) || 0) % P.length] + '"></span>';
