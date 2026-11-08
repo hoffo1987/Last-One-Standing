@@ -86,6 +86,14 @@ Ogni concorrente prova qualcosa di diverso per ognuno degli altri, e non sempre 
 - **Ogni morte pesa in modo diverso**: lutto per chi amava, sollievo per chi odiava, liberazione per chi aveva paura, omaggio dei rivali che rispettavano, senso di colpa per chi ha ucciso qualcuno a cui teneva.
 - **Tutto è collegato**: fiducia e paura decidono alleanze, spostamenti (chi ha paura cambia zona), chi condivide il cibo, a chi credono le spie, chi il traditore sceglie come vittima (chi si fida di più) e quali eventi accadono (`trust:A>B`, `fear:A>B`, `respect:A>B`, `attract:A>B`, `rival:AB`, `ex:AB`, `close:AB`, `promise:A>B`, e gli effetti `fid:`, `ris:`, `pau:`, `amo:`, `promise:A>B=protezione`, `breakup:AB`, `reunite:AB`).
 
+**Coerenza dei rapporti** (regole verificate da `tools/test-relations.js`):
+- *Chi entra in un'alleanza deve poter stare con tutti i membri*, non solo con chi lo invita: un rancore aperto, un affetto o una fiducia molto negativi, o una ferita recente (tradimento, colpo, furto, umiliazione negli ultimi giorni) impediscono il patto. Vale per eventi, reclutamenti, coppie, coalizioni e protezione.
+- *Le alleanze si sciolgono quando il rapporto si guasta*: se tra due membri nasce un rancore o una ferita fresca, chi ha subito se ne va, con un evento che lo racconta. Chi trama in segreto invece resta: è il senso del complotto.
+- *Il tono decide chi partecipa*: un gesto amichevole (alleanza, dono, cura, bacio, aiuto) non coinvolge chi si odia, un'aggressione non colpisce chi si ama o un amico stretto (salvo follia, ubriachezza, tradimento o quando ne restano pochi). Nelle prove conta l'esito voluto, non il fallimento.
+- *Il disgelo è lento*: dopo un torto la fiducia e l'affetto risalgono a piccoli passi; il perdono toglie il rancore ma non cancella tutto. I dialoghi seguono il rapporto reale: rivali, alleati, amici, coppie.
+
+**Il contesto degli eventi** («Il contesto» sotto ogni evento) spiega perché quelle persone, in quel momento, con fatti già accaduti: il motivo richiesto dall'evento (un rancore e la sua causa, un debito, una cotta, un obiettivo, la condizione fisica), oppure il ricordo più recente che c'entra con il tono del gesto («Bruno ricorda quello che è successo ieri con Vito: «Ha ucciso Oscar.»»), oppure lo stato del rapporto («Tra Rocco e Aldo non corre buon sangue»). Se non c'è niente di pertinente da dire, il contesto non compare.
+
 Dove si vede: nella diretta, la scheda **Legami** ha in cima il riepilogo (alleanze, coppie, vendette, debiti) e la **mappa dei legami**: un grafo dei vivi colorato per tipo di legame, con i nomi accanto ai volti, frecce per i sentimenti non ricambiati e filtri con il conteggio. Toccando un volto lo si seleziona: si accendono solo i suoi legami e sotto compare l'elenco, in parole, di cosa prova verso ciascuno e cosa riceve in cambio, con il pulsante per aprire la scheda. Seguono alleanze, coppie, vendette e debiti in schede leggibili. Nella scheda di ogni concorrente, "Cosa prova per gli altri" mostra etichetta, dimensioni, cosa prova l'altro in cambio e i ricordi; "Promesse" elenca quelle fatte e ricevute e come sono finite. Nell'esito, **Le storie della partita** raccontano il grande amore, l'amicizia più forte, la nemesi, il tradimento più crudele, il gesto di pietà, l'amore non corrisposto, maestro e allievo, l'odio e la paura più grandi.
 
 ## Caratteristiche, tratti e prove
@@ -217,11 +225,14 @@ node tools/test-replay.js        # archivio dei risultati, immutabilità e guast
 node tools/test-persistence-ui.js # ripresa senza risimulazione, migrazione legacy e operazioni asincrone
 node tools/test-reading.js       # timeline senza spoiler, tempi adattivi e gestione della pausa
 node tools/test-variety-history.js # varietà, memoria storica e contesto degli eventi
+node tools/test-relations.js       # coerenza di alleanze, tono degli eventi, contesti e finale
+node tools/audit-relations.js 12   # misure di coerenza dei rapporti su molte partite (--esempi per i casi)
+node tools/audit-narrative.js 6    # testi: segnaposto, ripetizioni, morti che agiscono, «ieri» sbagliati
 node tools/test-worker.js        # stesso risultato nel worker e nel motore principale
 node tools/test-studio.js        # legami iniziali, eventi avanzati, laboratorio, stagioni e percorsi della vittoria
 node tools/test-storage-ui.js    # scritture fallite, classifica persistita e deduplicazione delle foto
 node tools/test-photo-search.js   # fonti della ricerca foto, unione dei risultati e funzione /api/immagini
-node tools/test-engine-baseline.js # confronto completo con 36 risultati precedenti al refactoring
+node tools/test-engine-baseline.js # confronto completo con 36 risultati di riferimento (--record per registrarli di nuovo dopo un cambio voluto del motore)
 node tools/test-item-facts.js    # registro oggetti, assenza di mutazioni e compatibilità dei replay
 node tools/test-experiments.js   # controllo delle coppie, riproducibilità e annullamento parziale
 node tools/measure-variety.js 10 # misura ripetizioni con cast e semi riproducibili in tutte le arene
@@ -308,7 +319,7 @@ Sono stati completati questi interventi:
 La [guida a registro, sistemi ed esperimenti](docs-dev/simulazione.md) descrive i limiti delle misure e il protocollo di verifica.
 
 ## Memoria persistente dell’arena
-I fatti vissuti restano nel registro della partita, compresi i finali e le conseguenze sintetizzate nel diario. Le esperienze locali influenzano percorsi, ripari e prudenza; i rapporti mantengono riferimenti agli incontri precedenti. La mappa mostra la memoria della zona o dell’intera arena fino alla fase consultata, e i contesti degli eventi possono richiamare fatti realmente condivisi. Gli incidenti non vengono dimenticati dopo otto fasi. [Regole e verifiche](docs-dev/memoria-arena.md).
+I fatti vissuti restano nel registro della partita, compresi i finali e le conseguenze sintetizzate nel diario. Le esperienze locali influenzano percorsi, ripari e prudenza; i rapporti mantengono riferimenti agli incontri precedenti. La mappa mostra la memoria della zona o dell’intera arena fino alla fase consultata, e i fatti collegati restano nel registro del replay (il contesto leggibile degli eventi cita solo ricordi pertinenti tra i protagonisti). Gli incidenti non vengono dimenticati dopo otto fasi. [Regole e verifiche](docs-dev/memoria-arena.md).
 
 ## Complotti riservati e finale aperto
-Nuovi piani di imboscata, sabotaggio e accordo a tre restano nascosti fino all'esecuzione, anche nei diari e nel grafo dei rapporti. Possono fallire o essere ribaltati da un complice. La stretta finale si svolge in più fasi: risorse conservate, schermaglie e confronti su abilità diverse possono cambiare gli equilibri. Preparazioni, oggetti, posizioni e regole di vittoria restano verificabili nel replay. [Regole, limiti e verifiche](docs-dev/complotti-e-finale.md).
+Nuovi piani di imboscata, sabotaggio e accordo a tre restano nascosti fino all'esecuzione, anche nei diari e nel grafo dei rapporti. Possono fallire o essere ribaltati da un complice. I piani sono pochi (circa uno ogni tre concorrenti) e si rivelano con frasi diverse che non si ripetono nella stessa partita. La stretta finale si svolge in più atti con titoli e introduzioni che dicono quanti restano e cosa cambia; le frasi che chiudono la partita («l'ultimo scontro», «vince la partita») compaiono solo quando restano in due. Risorse conservate, schermaglie e confronti su abilità diverse possono cambiare gli equilibri. Preparazioni, oggetti, posizioni e regole di vittoria restano verificabili nel replay. [Regole, limiti e verifiche](docs-dev/complotti-e-finale.md).

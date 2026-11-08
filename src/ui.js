@@ -1342,7 +1342,7 @@
       const headers = entries.map((e) => '<th scope="col">' + esc(e.title || e.result.seed) + '</th>').join('');
       const rows = [['Arena', (r) => THEMES[r.theme].name], ['Seme', (r) => r.seed], ['Concorrenti', (r) => r.tributes.length], ['Durata', (r) => plural(r.days, 'giorno', 'giorni')],
         ['Vittoria', (r) => r.winners.map((id) => r.tributes.find((t) => t.id === id).name).join(', ')], ['Eliminazioni attribuite', (r) => r.stats.killDeaths], ['Eliminazioni dell’arena', (r) => r.stats.envDeaths], ['Eventi', (r) => r.stats.events]];
-      $('#archiveComparison').innerHTML = '<div class="tablewrap"><table><caption>Confronto delle partite selezionate</caption><thead><tr><th scope="col">Dato</th>' + headers + '</tr></thead><tbody>' +
+      $('#archiveComparison').innerHTML = '<div class="tablewrap" tabindex="0" role="region" aria-label="Confronto delle partite"><table><caption>Confronto delle partite selezionate</caption><thead><tr><th scope="col">Dato</th>' + headers + '</tr></thead><tbody>' +
         rows.map(([label, get]) => '<tr><th scope="row">' + label + '</th>' + entries.map((e) => '<td>' + esc(get(e.result)) + '</td>').join('') + '</tr>').join('') + '</tbody></table></div>';
       $('#archiveMsg').textContent = 'Confronto aggiornato.';
     } catch (e) { $('#archiveMsg').textContent = e.message; }
@@ -2226,7 +2226,7 @@
         (podium ? '<section class="block card"><h2>Il podio</h2>' + podium + '</section>' : '') +
         '<section class="block card"><h2>I premi della partita</h2>' + awardsH + '</section>' +
         '<section class="block card"><h2>Momenti salienti</h2>' + hlH + '</section>' +
-        '<section class="block card"><h2>Classifica completa</h2><div class="tablewrap"><table><thead><tr><th>Pos.</th><th>Concorrente</th><th>Sq.</th><th>' + (soft ? 'Elim.' : 'Ucc.') + '</th><th>' + (soft ? 'Eliminazione attribuita a' : 'Per mano di') + '</th><th>Giorno</th><th>Come è andata</th></tr></thead><tbody>' + rows + '</tbody></table></div></section>' +
+        '<section class="block card"><h2>Classifica completa</h2><div class="tablewrap" tabindex="0" role="region" aria-label="Classifica completa"><table><thead><tr><th>Pos.</th><th>Concorrente</th><th>Sq.</th><th>' + (soft ? 'Elim.' : 'Ucc.') + '</th><th>' + (soft ? 'Eliminazione attribuita a' : 'Per mano di') + '</th><th>Giorno</th><th>Come è andata</th></tr></thead><tbody>' + rows + '</tbody></table></div></section>' +
       '</div><div>' +
         '<section class="block card"><h2>Concorrenti in gara nel tempo</h2>' + chart + resultStats(st, soft) + ecoSummary(st, theme) + '</section>' + storiesHTML(st, soft) +
         '<section class="block card"><h2>' + (soft ? 'Chi ha eliminato di più' : 'Chi ha ucciso di più') + '</h2><div class="bars">' + kbars + '</div></section>' +

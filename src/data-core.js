@@ -207,6 +207,15 @@
 `,
     fallback: `
 1 | {A} passa il tempo senza che accada nulla di rilevante.
+1 | {A} resta in disparte e osserva gli altri da lontano.
+1 | {A} si concede qualche ora di silenzio. Nessuno l[A:o/a] cerca.
+1 | {A} rifà il punto della situazione e decide di non muoversi.
+1 | {A} conta le proprie cose due volte, per sicurezza.
+1 | {A} aspetta. L'attesa è la parte più difficile.
+1 | {A} ascolta i rumori intorno finché non li riconosce tutti.
+1 | {A} ripensa a casa per un momento, poi torna a concentrarsi.
+1 | {A} trova un angolo tranquillo e ci resta.
+1 | {A} cambia posizione un paio di volte, senza mai farsi vedere.
 `,
   };
 

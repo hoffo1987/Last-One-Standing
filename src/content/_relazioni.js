@@ -100,6 +100,8 @@
       mentor: ['{0} insegna a {1} come sopravvivere: dove dormire, cosa mangiare, quando scappare.', '{0} passa la notte a insegnare a {1} tutto quello che sa. {1} prende appunti mentali.'],
       tribute: ['{0} si ferma dove è cadut[1:o/a] {1}. Erano rivali, ma l[1:o/a] rispettava.', '{0} lascia un sasso sul punto in cui è cadut[1:o/a] {1}. È il saluto tra rivali.'],
       split: ['{0} e {1} litigano davanti a tutto il gruppo. L\'alleanza si spacca in due.', 'Troppa diffidenza: {0} se ne va dall\'alleanza portandosi dietro chi la pensa come l[0:ui/ei], e lascia {1} con gli altri.'],
+      drift: ['{0} raccoglie le sue cose e lascia {1}. Dopo quello che è successo, dormire nello stesso posto non è più possibile.', '{0} e {1} non si rivolgono più la parola. Al mattino prendono strade diverse: l\'alleanza è finita.', '{0} dice a {1} che non si fida più. Nessuna scenata: si separano e basta.'],
+      leave: ['{0} lascia il gruppo: finché c\'è {1}, non può restare.', '{0} se ne va dall\'alleanza. Il motivo ha un nome solo: {1}.'],
       hardship: ['{0} e {1} hanno superato insieme il peggio di oggi. Il rancore tra loro sembra una cosa piccola.'],
       fadeGrudge: ['{0} si accorge di non pensare più a {1} con rabbia. Il rancore si è consumato da solo.'],
       guilt: ['{0} non riesce a guardare in faccia {1}. Quello che è successo pesa.'],

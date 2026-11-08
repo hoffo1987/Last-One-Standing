@@ -29,7 +29,7 @@ test('il contesto descrive i requisiti presenti prima dell’evento senza aggiun
   vm.createContext(c); vm.runInContext(extract('    function eventReason(', '    function apply('), c);
   const a = { name: 'Ada', hp: 18, grudges: { b: { victim: 'c' } } }, b = { id: 'b', name: 'Bruno' };
   const reason = c.eventReason({ req: [{ t: 'stat', r: [0], k: 'hp' }] }, [a, b]);
-  a.hp = 100; assert.match(reason, /reputazione 18\/100/);
+  a.hp = 100; assert.match(reason, /reputazione a 18\/100/);
   assert.match(c.eventReason({ req: [{ t: 'grudge', r: [0, 1] }] }, [a, b]), /Ada.*Bruno.*Carla/);
   assert.equal(c.eventReason({ req: [] }, [a, b]), '');
 });

@@ -529,12 +529,95 @@
         if (k === 'p' && v > 0) v *= Math.max(0.35, 1.35 - a.attr.cor * 0.07) * (tr('codardo') ? 1.4 : 1);
         if (k === 't' && v > 0) v *= tr('romantico') ? 1.5 : 1;
         if (k === 'r' && v > 0) v *= tr('stratega') || tr('cacciatore') ? 1.2 : 1;
+        // un torto aperto rallenta il disgelo: fiducia e affetto tornano a piccoli passi
+        if ((k === 'f' || k === 'l') && v > 0 && (a.grudges[b.id] || x[k] <= -40)) v *= a.grudges[b.id] ? 0.4 : 0.6;
         x[k] = clamp(x[k] + v, LIM[k][0], LIM[k][1]);
       }
     }
     const like = (a, b) => clamp(aff(a, b) + peek(a, b).l, -100, 100);
     const trustOf = (a, b) => peek(a, b).f, fearOf = (a, b) => peek(a, b).p, respectOf = (a, b) => peek(a, b).r, attractOf = (a, b) => peek(a, b).t;
     const tally = (a, b, key) => { const x = bond(a, b); x.n[key] = (x.n[key] || 0) + 1; };
+    // ferite recenti: un tradimento, un colpo, un furto o un'umiliazione pesano per giorni, anche se i numeri risalgono
+    const WOUNDS = new Set(['betrayed', 'hit', 'robbed', 'nightTheft', 'tried', 'killedDear', 'exposed', 'trap', 'expelled', 'bullied', 'liedTo', 'promiseBroken', 'split', 'breakup']);
+    const recentWound = (a, b, span) => (a.memoryHistory[b.id] || []).some((m) => WOUNDS.has(m.k) && phases.length - m.ph <= (span || 6));
+    // quanto due persone si respingono: 0 niente, 1 attrito, 2 non possono fare squadra, 3 rancore aperto
+    function hostility(a, b, keepPlots) {
+      if (a.grudges[b.id] || b.grudges[a.id]) return 3;
+      // chi trama resta vicino alla vittima: il piano non allontana, ma impedisce di stringere patti nuovi
+      if (!keepPlots && (a.plot === b.id || b.plot === a.id)) return 2.5;
+      const l = Math.min(like(a, b), like(b, a)), f = Math.min(trustOf(a, b), trustOf(b, a));
+      let h = l <= -45 || f <= -45 ? 2 : l <= -25 || f <= -25 ? 1 : 0;
+      if (h < 2 && (recentWound(a, b) || recentWound(b, a))) h = 2;
+      return h;
+    }
+    /* il contesto di un evento: perché quelle persone, in quel momento. Si usano solo fatti già accaduti
+       tra i protagonisti (mai quelli della fase in corso) e lo stato del loro rapporto prima dell'azione. */
+    const MEM_POS = new Set(['saved', 'cured', 'shared', 'gift', 'allied', 'repaid', 'warned', 'mediated', 'comforted', 'healedStranger', 'letter', 'oath', 'recruited', 'promise', 'promiseKept', 'spared', 'fought', 'coalition', 'mentor', 'student', 'hardship', 'love', 'reunion', 'initialFriend', 'initialTrust', 'initialCrush']);
+    const MEM_NEG = new Set(['denied', 'robbed', 'hit', 'killedDear', 'betrayed', 'fleeced', 'exposed', 'trap', 'expelled', 'tried', 'bullied', 'brawl', 'rejected', 'jealous', 'nightTheft', 'liedTo', 'promiseBroken', 'breakup', 'rivalLove', 'split', 'initialRival', 'sawKill']);
+    const memText = (k) => (theme.soft && ((MIND.memSoft || {})[k] || (BD.memSoft || {})[k])) || (MIND.mem || {})[k] || (BD.mem || {})[k] || '';
+    const unitName = theme.id === 'scifi' ? 'ciclo' : 'giorno';
+    const whenTxt = (ph) => { const d = (phases[ph] && phases[ph].day) || 1; return d === day ? 'oggi' : d === day - 1 ? (theme.id === 'scifi' ? 'nel ciclo precedente' : 'ieri') : 'il ' + unitName + ' ' + d; };
+    const REL_LINE = {
+      amore: '{a} e {b} sono una coppia.', ex: '{a} e {b} sono stati una coppia.', cotta: '{a} ha una cotta per {b}.', nemesi: 'Per {a}, {b} è il nemico da battere.', vendetta: '{a} vuole vendetta su {b}.',
+      rivaleAmore: '{a} e {b} hanno una cotta per la stessa persona.', terrore: '{a} ha il terrore di {b}.', gratitudine: '{a} deve la vita a {b}.', fratelli: 'Tra {a} e {b} c\'è un legame fraterno.',
+      mentore: '{b} ha fatto da guida a {a}.', protetto: '{a} ha promesso di proteggere {b}.', amico: 'Tra {a} e {b} c\'è amicizia.', paura: '{a} ha paura di {b}.', colpa: '{a} si sente in colpa verso {b}.',
+      complice: 'Nell\'alleanza, {a} si fida di {b}.', alleatoComodo: '{a} sta con {b} solo per convenienza.', alleato: '{a} e {b} fanno parte della stessa alleanza.', debito: '{a} deve un favore a {b}.',
+      rivale: '{a} e {b} sono rivali e si rispettano.', ammirazione: '{a} ammira {b}.', odio: '{a} odia {b}.', diffidenza: '{a} non si fida di {b}.', antipatia: 'Tra {a} e {b} non corre buon sangue.', simpatia: '{a} prova simpatia per {b}.',
+    };
+    function bondLine(a, b, tone, memOnly) {
+      const now = phases.length;
+      const mems = [];
+      [[a, b], [b, a]].forEach(([x, y]) => (x.memoryHistory[y.id] || []).forEach((m) => { if (m.ph < now) mems.push({ x, y, m }); }));
+      const want = tone === 'warm' || tone === 'social' ? MEM_POS : tone === 'hostile' || tone === 'betray' || tone === 'reconcile' ? MEM_NEG : null;
+      const pick = want && mems.filter(({ m }) => want.has(m.k)).sort((p, q) => q.m.ph - p.m.ph)[0];
+      if (pick) {
+        const txt = memText(pick.m.k).replace('{2}', pick.m.x && byId[pick.m.x] ? byId[pick.m.x].name : 'qualcuno');
+        if (txt) return pick.x.name + ' ricorda ' + (pick.m.k.startsWith('initial') ? 'quello che c\'era prima dei giochi' : 'quello che è successo ' + whenTxt(pick.m.ph)) + ' con ' + pick.y.name + ': «' + txt + '»';
+      }
+      // nei gesti già compiuti (personalActs) lo stato attuale è l'effetto, non la causa: lì contano solo i ricordi
+      if (memOnly) return '';
+      const lbl = labelOf(a, b), back = labelOf(b, a);
+      const line = (l, x, y) => (l && l !== 'complotto' && REL_LINE[l] ? REL_LINE[l].replace('{a}', x.name).replace('{b}', y.name) : '');
+      const first = line(lbl, a, b) || line(back, b, a);
+      if (first) return first;
+      if (tone === 'warm' && toneAlly) return 'Prima d\'ora ' + a.name + ' e ' + b.name + ' non avevano niente in comune: è un patto di convenienza.';
+      return '';
+    }
+    let toneAlly = false;
+    // «a Aldo» → «ad Aldo», «e Emma» → «ed Emma», «a la Cornucopia» → «alla Cornucopia»
+    const ctxFix = (s) => s.replace(/ a (?=[AÀ][a-zà-ú])/g, ' ad ').replace(/ e (?=[EÈ][a-zà-ú])/g, ' ed ');
+    const atZone = (z) => { const m = String(z).match(/^(il |lo |la |l'|i |gli |le )(.*)$/i); return m ? ({ 'il ': 'al ', 'lo ': 'allo ', 'la ': 'alla ', "l'": "all'", 'i ': 'ai ', 'gli ': 'agli ', 'le ': 'alle ' }[m[1].toLowerCase()] + m[2]) : 'a ' + z; };
+    function eventContext(ev, roles) {
+      const parts = [], req = eventReason(ev, roles);
+      if (req) parts.push(req);
+      if (ev.n >= 2 && roles.length >= 2) {
+        const tone = toneOf(ev);
+        const pr = (tone === 'hostile' || tone === 'betray' ? ev.tonePairs.hostile[0] : ev.tonePairs.warm[0]) || [0, 1];
+        const a = roles[pr[0]], b = roles[pr[1]];
+        if (a && b) {
+          toneAlly = ev.fx.some((f) => f.t === 'al');
+          let line = bondLine(a, b, tone === 'betray' ? 'betray' : tone);
+          if (tone === 'betray' && a.allyId != null && a.allyId === b.allyId) { const since = (a.memoryHistory[b.id] || []).filter((m) => m.k === 'allied' || m.k === 'recruited').slice(-1)[0]; if (since) line = a.name + ' e ' + b.name + ' erano alleati ' + whenTxt(since.ph).replace(/^oggi$/, 'da poche ore').replace(/^ieri$/, 'da ieri').replace(/^nel /, 'dal ').replace(/^il /, 'dal ') + '. ' + line; }
+          if (line && !(req && req.includes(a.name) && req.includes(b.name))) parts.push(line);
+        }
+      }
+      return ctxFix(parts.join(' '));
+    }
+    function sysContext(people, cat) {
+      if (people.length < 2) return '';
+      const tone = /^(ally|love|heal)$/.test(cat) ? 'warm' : /^(hurt|kill)$/.test(cat) ? 'hostile' : cat === 'betray' ? 'betray' : 'neutral';
+      if (tone === 'neutral') return '';
+      toneAlly = false;
+      return ctxFix(bondLine(people[0], people[1], tone, tone !== 'hostile' && tone !== 'betray'));
+    }
+    // un'alleanza unisce tutti i membri: chi entra deve poter stare con ciascuno di loro, non solo con chi lo invita
+    function canTeam(ts) {
+      const all = new Set();
+      ts.forEach((t) => { all.add(t); if (t.allyId != null) (alliances.get(t.allyId) || []).forEach((id) => all.add(byId[id])); });
+      const xs = [...all].filter((x) => x && x.alive);
+      for (let i = 0; i < xs.length; i++) for (let j = i + 1; j < xs.length; j++) if (hostility(xs[i], xs[j]) >= 2) return false;
+      return true;
+    }
 
     const alliances = new Map();
     let nextAlly = 1;
@@ -639,7 +722,7 @@
             const size = gids.size ? alliances.get([...gids][0]).size + ts.filter((t) => t.allyId == null).length : ts.length;
             if (size > (ts.some((t) => hasTrait(t, 'leader')) ? 6 : 5)) return false;
             if (cfg.teamWin && new Set(ts.map((t) => t.team)).size > 1 && cfg.teamsAllied) return false;
-            for (const a of ts) for (const b of ts) if (a !== b && (a.grudges[b.id] || aff(a, b) <= -40 || trustOf(a, b) <= -45)) return false;
+            if (!canTeam(ts)) return false;
             break;
           }
           case 'hasAlly': if (A.allyId == null) return false; break;
@@ -770,8 +853,67 @@
       return w * variety.weight(ev);
     }
 
-    function relKey(P, t) {
+    /* il tono di un evento decide chi può esserci: un gesto d'affetto non si fa con chi si odia,
+       un'aggressione non si rivolge (salvo follia o tradimento) a chi si ama */
+    function toneOf(ev) {
+      if (ev.tone) return ev.tone;
+      // il tono si legge dall'esito voluto (effetti fissi e riuscita della prova); il fallimento conta solo se il resto è neutro
+      const warm = [], hostile = [];
+      const pair = (list, a, b) => { if (a != null && b != null && a !== b) list.push([Math.min(a, b), Math.max(a, b)]); };
+      const read = (fxs, ks) => {
+        fxs.forEach((f) => {
+          if (f.t === 'al') for (let i = 0; i < f.r.length; i++) for (let j = i + 1; j < f.r.length; j++) pair(warm, f.r[i], f.r[j]);
+          if (['love', 'give', 'save', 'repay', 'mkpromise'].includes(f.t)) pair(warm, f.r[0], f.r[1]);
+          if (f.t === 'cure' && ev.n >= 2 && f.r[0] !== 0) pair(warm, 0, f.r[0]);
+          if (['hit', 'poison', 'steal'].includes(f.t)) pair(hostile, f.r[0], f.r[1]);
+          if (f.t === 'rel' || f.t === 'bondfx') pair(f.v > 0 && f.k !== 'p' ? warm : hostile, f.r[0], f.r[1]);
+        });
+        ks.forEach((k) => { if (!k.betray) k.by.forEach((a) => k.v.forEach((b) => pair(hostile, a, b))); for (let i = 0; i < k.by.length; i++) for (let j = i + 1; j < k.by.length; j++) pair(warm, k.by[i], k.by[j]); });
+      };
+      read(ev.fx.concat(ev.ok.fx), ev.kills.concat(ev.ok.kills));
+      if (!warm.length && !hostile.length) read(ev.ko.fx, ev.ko.kills);
+      const fx = ev.fx.concat(ev.ok.fx, ev.ko.fx), has = (t) => fx.some((f) => f.t === t), rq = (t) => ev.req.some((r) => r.t === t), tg = (t) => ev.tags.includes(t);
+      const kills = ev.kills.concat(ev.ok.kills, ev.ko.kills);
+      ev.req.forEach((r) => { if ((r.t === 'friend' || r.t === 'b_close' || r.t === 'b_trust' || r.t === 'couple') && r.r) pair(warm, r.r[0], r.r[1]); });
+      const all = []; for (let i = 0; i < ev.n; i++) for (let j = i + 1; j < ev.n; j++) all.push([i, j]);
+      let tone = 'neutral';
+      if (has('forgive') || rq('grudge') && has('forgive')) tone = 'reconcile';
+      else if (tg('betray') || has('br') || kills.some((k) => k.betray)) tone = 'betray';
+      else if (warm.length && !hostile.length) tone = 'warm';
+      else if (hostile.length || tg('agg') || tg('steal') || rq('enemy') || rq('grudge') || rq('plot')) tone = 'hostile';
+      else if (tg('give') || tg('love') || tg('ally')) tone = 'warm';
+      else if (tg('soc')) tone = 'social';
+      // le coppie su cui pesa il tono: quelle delle etichette, altrimenti chi agisce verso gli altri
+      const lead = []; for (let j = 1; j < ev.n; j++) lead.push([0, j]);
+      ev.tonePairs = { warm: warm.length ? warm : tone === 'warm' || tone === 'social' ? all : [], hostile: hostile.length ? hostile : tone === 'hostile' ? lead : [] };
+      ev.toneLicence = rq('grudge') || rq('enemy') || rq('plot') || rq('b_distrust') || rq('b_rival') || rq('b_fear') || tg('mad') || tg('drunk');
+      return (ev.tone = tone);
+    }
+    // quanto un gruppo di partecipanti stona con il tono dell'evento (Infinity = impossibile)
+    function toneClash(ev, roles) {
+      const tone = toneOf(ev); if (ev.n < 2 || tone === 'neutral' || tone === 'reconcile') return 0;
+      let cost = 0;
+      for (const [i, j] of ev.tonePairs.warm) {
+        const a = roles[i], b = roles[j]; if (!a || !b) continue;
+        const h = hostility(a, b);
+        if (h >= 2 && !ev.toneLicence) { if (tone === 'warm') return Infinity; cost += 8; }
+        else if (h >= 1) cost += tone === 'warm' ? 3 : 1.5;
+        if (fearOf(a, b) >= 60 || fearOf(b, a) >= 60) cost += 2;
+      }
+      for (const [i, j] of ev.tonePairs.hostile) {
+        const a = roles[i], b = roles[j]; if (!a || !b) continue;
+        const close = a.partner === b.id || (like(a, b) >= 45 && trustOf(a, b) >= 25);
+        if (close && !ev.toneLicence && !(a.st.ubriaco != null || a.st.sconvolto != null)) { if (alive().length > 4) return Infinity; cost += 6; }
+        if (hostility(a, b) >= 2) cost -= 2;
+      }
+      return cost;
+    }
+    function relKey(P, t, tone) {
       let k = (t.zone === P.zone ? 0 : 1) + rng.f() * 1.3;
+      const kind = tone === 'warm' || tone === 'social' ? 'warm' : tone === 'hostile' || tone === 'betray' ? 'hostile' : '';
+      if (kind === 'warm') { if (P.grudges[t.id] || t.grudges[P.id]) k += 2.5; if (like(P, t) <= -40) k += 1.2; if (like(P, t) >= 40) k -= 0.5; }
+      if (kind === 'hostile') { if (P.partner === t.id) k += 2.4; if (like(P, t) >= 45) k += 1; }
+      if (kind === 'warm') return k;
       if (P.grudges[t.id]) k -= 2.2;
       if (P.partner === t.id) k -= 1.6;
       if (P.owes[t.id] || t.owes[P.id]) k -= 1.1;
@@ -791,11 +933,13 @@
       if (others.length < ev.n - 1) return null;
       let best = null, bestScore = -Infinity;
       for (let attempt = 0; attempt < 12; attempt++) {
-        const keyed = others.map((t) => [t, relKey(P, t)]).sort((a, b) => a[1] - b[1]);
+        const tone = toneOf(ev);
+        const keyed = others.map((t) => [t, relKey(P, t, tone)]).sort((a, b) => a[1] - b[1]);
         const group = keyed.slice(0, ev.n - 1).map((x) => x[0]);
         const roles = attempt % 2 === 0 ? [P].concat(rng.shuffle(group)) : rng.shuffle([P].concat(group));
         if (!checkReq(ev, roles)) continue;
-        let score = rng.f() * 6;
+        const clash = toneClash(ev, roles); if (clash === Infinity) continue;
+        let score = rng.f() * 6 - clash;
         for (const k of ev.kills) {
           score += 0.6 * (k.by.reduce((s, i) => s + combat(roles[i]), 0) / k.by.length - k.v.reduce((s, i) => s + combat(roles[i]), 0) / k.v.length);
           k.v.forEach((i) => (score -= 0.5 * survival(roles[i])));
@@ -812,7 +956,9 @@
       const g = A.grudges[B.id];
       if (!g) return 'tutto quello che ha fatto';
       if (g.victim && byId[g.victim]) return '{@' + g.victim + '}';
-      return { betray: 'il tradimento', steal: 'il furto di ieri', attack: 'l\'agguato di ieri', love: 'il cuore spezzato', greed: 'il cibo negato' }[g.why] || 'tutto quello che è successo';
+      // quando è successo davvero: stesso giorno, il giorno prima, o qualche giorno fa
+      const d = (phases[g.phase] && phases[g.phase].day) || day || 1, when = d >= day ? 'di oggi' : d === day - 1 ? 'di ieri' : 'di qualche giorno fa';
+      return { betray: 'il tradimento', steal: 'il furto ' + when, attack: 'l\'agguato ' + when, love: 'il cuore spezzato', greed: 'il cibo negato' }[g.why] || 'tutto quello che è successo';
     }
     function render(text, roles, lexPick, ev) {
       let s = text
@@ -1068,19 +1214,19 @@
         if (!A) continue;
         if (r.t === 'grudge' && B) {
           const g = A.grudges[B.id], lost = g && byId[g.victim];
-          return A.name + ' ha un rancore verso ' + B.name + (lost ? ' per la perdita di ' + lost.name : '') + '.';
+          return A.name + ' portava rancore a ' + B.name + (lost ? ' per la perdita di ' + lost.name : g && g.why === 'steal' ? ' per un furto' : g && g.why === 'betray' ? ' per un tradimento' : '') + '.';
         }
         if (r.t === 'owe' && B) return A.name + ' deve un favore a ' + B.name + '.';
         if (r.t === 'couple' && B) return A.name + ' e ' + B.name + ' sono una coppia.';
-        if (r.t === 'crush' && B) return A.name + ' prova una cotta segreta per ' + B.name + '.';
-        if (r.t === 'plot' && B) return A.name + ' sta tramando contro ' + B.name + '.';
+        if (r.t === 'crush' && B) return A.name + ' ha una cotta segreta per ' + B.name + '.';
+        if (r.t === 'plot' && B) return A.name + ' tramava da tempo contro ' + B.name + '.';
         if (r.t === 'goal' && A.goal) {
           const goal = (MIND.goals || {})[A.goal.k];
           if (goal) return 'Obiettivo di ' + A.name + ': ' + goal.label.replace('{1}', A.goal.tg && byId[A.goal.tg] ? byId[A.goal.tg].name : 'qualcuno') + '.';
         }
         if (r.t === 'stat') {
           const labels = Object.assign({ hp: 'salute', en: 'energia', mo: 'morale', food: 'sazietà', pr: M ? M.name : 'indicatore' }, theme.soft ? { hp: 'reputazione', en: 'energie' } : {});
-          return A.name + ': ' + labels[r.k] + ' ' + Math.round(A[r.k]) + '/100 prima dell\'evento.';
+          return A.name + ' arrivava a questo momento con ' + labels[r.k] + ' a ' + Math.round(A[r.k]) + '/100.';
         }
       }
       return '';
@@ -1089,7 +1235,7 @@
       CTX = null;
       if (geo && !geo.accepts(ev,roles)) throw new Error('Evento fuori posizione: '+ev.text);
       if(!geo)variety.record(ev);
-      const reason = eventReason(ev, roles);
+      const reason = eventContext(ev, roles);
       if (ev.test) ev = resolveTest(ev, roles);
       if (geo) {
         const space = Geography.rule(ev.text,geographyZones,ev.location);
@@ -1265,12 +1411,12 @@
             itemLedger.record('poison', t, u, heldItems[f.r[0]].find(it => it.type === 'veleno'), before, 'Veleno applicato nell’evento');
           } break;
           case 'save': if (u.alive) { u.owes[t.id] = 'vita'; addAff(t, u, 40); u.mo += 15; remember(u, t, 'saved'); tally(u, t, 'sv'); witness(t, 'save', u, roles); settlePromise(t, u, 'protezione', true, out); if (rng.chance(0.35)) pushVoice(out, voice('saved', u, [t])); t.saves++; t.fame += 1; const e = echo(E.saved, [u, t], 'good'); if (e) out.push(e); } break;
-          case 'forgive': delete t.grudges[u.id]; addAff(t, u, 35); remember(t, u, 'forgave'); break;
+          case 'forgive': delete t.grudges[u.id]; addAff(t, u, 20); remember(t, u, 'forgave'); break;
           case 'love': if (u.alive) {
             t.partner = u.id; u.partner = t.id; addAff(t, u, 70); stats.couples++; t.fame += 1; u.fame += 1; t.mo += 25; u.mo += 25;
             remember(t, u, 'love'); remember(u, t, 'love'); if (t.crush === u.id) t.crush = null; if (u.crush === t.id) u.crush = null; jealousy(t, u);
             if (rng.chance(0.5)) { const speaker = rng.chance(0.5) ? t : u; pushVoice(out, voice('love', speaker, [speaker === t ? u : t])); }
-            if (!cfg.teamWin && (t.allyId == null || u.allyId == null || t.allyId === u.allyId)) { const g = t.allyId != null ? alliances.get(t.allyId) : u.allyId != null ? alliances.get(u.allyId) : null; if (!g || g.size < 5) joinAlliance([t, u]); } const e = echo(E.couple, [t, u], 'love'); if (e) out.push(e); } break;
+            if (!cfg.teamWin && (t.allyId == null || u.allyId == null || t.allyId === u.allyId) && canTeam([t, u])) { const g = t.allyId != null ? alliances.get(t.allyId) : u.allyId != null ? alliances.get(u.allyId) : null; if (!g || g.size < 5) joinAlliance([t, u]); } const e = echo(E.couple, [t, u], 'love'); if (e) out.push(e); } break;
           case 'repay': if (u) { delete t.owes[u.id]; addAff(t, u, 20); t.repaid++; remember(u, t, 'repaid'); stats.debtsRepaid++; const e = echo(E.repay, [t, u], 'good'); if (e) out.push(e); } break;
           case 'debt': if (u) t.owes[u.id] = 'favore'; break;
           case 'rel': if (u) addAff(t, u, f.v); break;
@@ -1702,6 +1848,8 @@
     const canFight = (a, b) => !isAlly(a, b) && a.partner !== b.id && !(cfg.teamWin && a.team === b.team);
     const intrigue = geo ? Systems.createIntrigue({ rng: makeRng('intrigue|' + seed + '|' + theme.id), people: T, phase: () => phases.length, day: () => day, ally: isAlly, like, teamWin: !!cfg.teamWin }) : null;
     const traitName = (id) => (traitMap[id] ? traitMap[id].name : '');
+    // le frasi dei complotti vengono dai contenuti, con varianti che non si ripetono nella stessa partita
+    const INTR = (type, outcome) => (((theme.soft ? D.intrigueSoft : D.intrigue) || {})[type] || {})[outcome] || [];
     function revealIntrigue(events, finale = false) {
       if (!intrigue || isEnded()) return;
       const p = intrigue.take(finale); if (!p) return;
@@ -1725,13 +1873,11 @@
           remember(b, c, 'saved'); remember(a, c, 'betrayed'); addGrudge(a, c, 'betray');
           if (isAlly(a, c)) { settlePromise(c, a, 'fedelta', false, out); leaveAlliance(c); c.betrayals++; c.traitor = true; stats.betrayals++; }
           settlePromise(c, b, 'protezione', true, out); b.owes[c.id] = 'vita';
-          text = theme.soft ? '{0} dà il segnale per il piano concordato con {2} contro {1}. Ma {2} cambia parte: avverte {1} e fa perdere terreno a {0}. Il patto era vero; l’ultima scelta no.' : '{0} dà a {2} il segnale per accerchiare {1}. Ma {2} cambia parte: avverte {1} e colpisce {0}. Il patto era vero; l’ultima scelta no.';
+          text = INTR('patto', 'doppio');
         } else {
           damaged = contest.pass ? a : b; hurt(damaged, contest.pass ? 18 : 38, contest.pass ? b : a, 'wound');
           remember(a, c, 'fought'); remember(c, a, 'fought');
-          text = contest.pass
-            ? (theme.soft ? '{0} e {2} rivelano il loro accordo contro {1}. {1} legge il segnale in tempo e manda a vuoto la manovra: è {0} a perdere terreno.' : '{0} e {2} scattano insieme contro {1}: si erano accordati in segreto. {1} legge il segnale e reagisce, ferendo {0}.')
-            : (theme.soft ? '{0} e {2} smettono di fingere: il loro accordo era contro {1}. La manovra coordinata costa a {1} energie preziose.' : '{0} e {2} smettono di fingere: il loro accordo era contro {1}. L’attacco coordinato ferisce {1}, prima che riesca a reagire.');
+          text = INTR('patto', contest.pass ? 'sventato' : 'riuscito');
         }
       } else if (p.type === 'sabotaggio') {
         damaged = contest.pass ? a : b;
@@ -1739,20 +1885,16 @@
         if (!contest.pass) { p.item.q = Math.max(1, (p.item.q || 1) - 1); if (p.item.u != null) p.item.u = Math.max(1, p.item.u - 1); }
         hurt(damaged, contest.pass ? 16 : 24, contest.pass ? b : a, 'wound');
         itemLedger.record('attack', a, b, p.item, before, contest.pass ? 'Sabotaggio riconosciuto prima dell’uso; oggetto integro' : 'Sabotaggio rivelato: qualità e durata ridotte, con minimo 1');
-        text = contest.pass
-          ? (theme.soft ? '{1} riconosce la manomissione di {i} prima di usarlo. {0} ammette di aver preparato il sabotaggio, ma la contromossa di {1} manda a vuoto il piano.' : '{1} riconosce la manomissione di {i} prima di usarlo. {0} rivela il sabotaggio, ma {1} reagisce e ferisce {0}.')
-          : (theme.soft ? 'Il sabotaggio si manifesta quando {1} usa {i}. {0} rivela di averlo preparato: {1} perde tempo ed energie per rimediare.' : 'Il sabotaggio si manifesta quando {1} usa {i}. {0} rivela di averlo preparato e approfitta dell’apertura per ferire {1}.');
+        text = INTR('sabotaggio', contest.pass ? 'sventato' : 'riuscito');
       } else {
         damaged = contest.pass ? a : b; hurt(damaged, contest.pass ? 20 : 34, contest.pass ? b : a, 'wound');
-        text = contest.pass
-          ? (theme.soft ? '{0} prova la manovra tenuta nascosta contro {1}. {1} riconosce la finta e la ribalta: è {0} a consumare energie per recuperare.' : '{0} prova la finta preparata contro {1}. {1} ne riconosce il ritmo, evita il colpo e ferisce {0}: l’imboscata si ritorce contro chi l’ha ideata.')
-          : (theme.soft ? '{0} cambia improvvisamente ritmo: la finta contro {1} era preparata. {1} abbocca e deve spendere energie per recuperare.' : '{0} cambia improvvisamente ritmo: la finta contro {1} era preparata. {1} abbocca e viene ferit[1:o/a] prima di capire il piano.');
+        text = INTR('imboscata', contest.pass ? 'sventato' : 'riuscito');
       }
       const attacker = damaged === a ? (outcome === 'doppio-gioco' ? c : b) : a;
       remember(damaged, attacker, 'tried'); addGrudge(damaged, attacker, 'attack');
       people.forEach(syncSt);
-      const tx = fmt([text], people, { i: p.item?.name || '' });
-      const ev = { html: tx.html, plain: tx.plain, ids: people.map(t => t.id), deaths: [], lethal: false, origin: 'sys', cat: betray || outcome === 'doppio-gioco' ? 'betray' : 'hurt', why: 'complotto', whyTxt: 'Piano rivelato', reason: 'Preparazione: giorno ' + p.day + ', fase ' + (p.ph + 1) + '; luogo: ' + zoneName(p.zone) + '. I partecipanti erano presenti nello stesso luogo; il piano diventa noto soltanto adesso.', echo: out.slice(0, 3), place, intrigue: { type: p.type, outcome, prepared: { ph: p.ph, day: p.day, zone: p.zone } } };
+      const tx = useFmt(text, people, { i: p.item?.name || '' });
+      const ev = { html: tx.html, plain: tx.plain, ids: people.map(t => t.id), deaths: [], lethal: false, origin: 'sys', cat: betray || outcome === 'doppio-gioco' ? 'betray' : 'hurt', why: 'complotto', whyTxt: 'Piano rivelato', reason: 'Il piano era stato preparato di nascosto ' + (p.day === day ? 'oggi' : 'il ' + unitName + ' ' + p.day) + ', ' + atZone(zoneName(p.zone)) + ', quando i protagonisti si trovavano lì. Fino a questo momento nessuno ne sapeva niente.', echo: out.slice(0, 3), place, intrigue: { type: p.type, outcome, prepared: { ph: p.ph, day: p.day, zone: p.zone } } };
       if (outcome !== 'doppio-gioco') ev.test = Object.assign({ who: b.id, attr: p.type === 'imboscata' ? 'agi' : 'int' }, contest);
       stats.intrigues = (stats.intrigues || 0) + 1;
       events.push(ev); people.forEach(t => remember1(t, ev.html, 'fatto'));
@@ -1773,7 +1915,8 @@
     function proseDepartures(text){return Geography.rule(text.replace(/\{(\d)\}/g,(_,i)=>'{'+String.fromCharCode(65+(+i))+'}'),geographyZones).depart||[];}
     function moveAfterProse(tx,people){for(const i of proseDepartures(Geography.adaptText(tx.src||'',theme))){const t=people[i];if(!t?.alive)continue;const exits=geographyZones[t.zone].links.filter(z=>!closed.has(z));if(exits.length)geo.move(t,rng.pick(exits),'Si allontana dal gruppo',{mode:'event'});}}
     function sys2(tx, people, cat, whyTxt, pri, ids) {
-      SYS.push({ pri: pri || 1, ev: Object.assign({ html: tx.html, plain: tx.plain, ids: ids || people.map((p) => p.id), deaths: [], lethal: false, origin: 'sys', cat: cat || 'none', why: 'carattere', whyTxt: whyTxt || '', echo: [] },geo?{place:geo.locate(ids?people.filter(p=>ids.includes(p.id)):people)}:{},tx.contentId?{contentId:tx.contentId,contentCategory:tx.contentCategory}:{}) });
+      const reason = sysContext(people, cat || 'none');
+      SYS.push({ pri: pri || 1, ev: Object.assign({ html: tx.html, plain: tx.plain, ids: ids || people.map((p) => p.id), deaths: [], lethal: false, origin: 'sys', cat: cat || 'none', why: 'carattere', whyTxt: whyTxt || '', echo: [] }, reason ? { reason } : {},geo?{place:geo.locate(ids?people.filter(p=>ids.includes(p.id)):people)}:{},tx.contentId?{contentId:tx.contentId,contentCategory:tx.contentCategory}:{}) });
       if(geo)moveAfterProse(tx,people);
     }
 
@@ -1930,7 +2073,7 @@
         if (yes) {
           t.partner = u.id; u.partner = t.id; u.crush = null; addAff(t, u, 60); stats.couples++; t.mo += 25; u.mo += 25; t.fame += 1; u.fame += 1;
           remember(t, u, 'love'); remember(u, t, 'love');
-          if (!cfg.teamWin && (t.allyId == null || u.allyId == null || t.allyId === u.allyId)) { const g = t.allyId != null ? alliances.get(t.allyId) : u.allyId != null ? alliances.get(u.allyId) : null; if (!g || g.size < 5) joinAlliance([t, u]); }
+          if (!cfg.teamWin && (t.allyId == null || u.allyId == null || t.allyId === u.allyId) && canTeam([t, u])) { const g = t.allyId != null ? alliances.get(t.allyId) : u.allyId != null ? alliances.get(u.allyId) : null; if (!g || g.size < 5) joinAlliance([t, u]); }
           tweak(t, u, { t: 20 }); tweak(u, t, { t: 25 });
           const e = fmt(ACT('confessYes'), [t, u]); if (e) sys2(e, [t, u], 'love', 'Dichiarazione', 4);
           jealousy(t, u);
@@ -1954,7 +2097,7 @@
         const say = (k, people, vars, cat, why, pri) => { const e = fmt(ACT(k), people, vars); if (e) sys2(e, people, cat, why, pri); t.acts++; people.forEach((p) => done.add(p.id)); return true; };
         // reclutare
         if (t.allyId == null || (alliances.get(t.allyId) || new Set()).size < (tr('leader') ? 6 : 5)) {
-          const u = mates.find((x) => x.allyId == null && aff(t, x) > -20 && !t.grudges[x.id] && !x.grudges[t.id] && !hasTrait(x, 'solitario') && !(cfg.teamWin && cfg.teamsAllied && x.team !== t.team));
+          const u = mates.find((x) => x.allyId == null && hostility(t, x) === 0 && like(x, t) > -15 && !hasTrait(x, 'solitario') && !(cfg.teamWin && cfg.teamsAllied && x.team !== t.team) && canTeam([t, x]));
           if (u) add((t.goal && t.goal.k === 'reclutare' ? 2 : 0) + (tr('leader') ? 1.2 : 0) + (tr('carismatico') ? 1.2 : 0) + (t.attr.car >= 8 ? 0.5 : 0), () => {
             if (!rng.chance(0.35 + t.attr.car * 0.05 + aff(t, u) / 200)) return false;
             joinAlliance([t, u]); stats.alliances++; t.alliancesFormed++; u.alliancesFormed++; addAff(t, u, 22); remember(u, t, 'recruited'); remember(t, u, 'allied');
@@ -1989,7 +2132,7 @@
         }
         // curare uno sconosciuto
         if (tr('guaritore') || (t.attr.emp >= 8 && t.attr.int >= 5)) {
-          const u = mates.find((x) => x.hp < 50 && !isAlly(t, x) && x.partner !== t.id);
+          const u = mates.find((x) => x.hp < 50 && !isAlly(t, x) && x.partner !== t.id && hostility(t, x) < 2);
           if (u) add(1.6, () => {
             u.hp += (18 + t.attr.int) * MOD.heal; u.owes[t.id] = 'cura'; addAff(t, u, 25); remember(u, t, 'healedStranger'); t.saves++; t.nursed++; syncSt(u);
             return say('healStranger', [t, u], {}, 'heal', traitName(tr('guaritore') ? 'guaritore' : '') || 'Empatia', 3);
@@ -1997,7 +2140,7 @@
         }
         // regalare
         if (tr('generoso') || t.attr.emp >= 8) {
-          const u = mates.concat(allyMates(t)).find((x) => x.mo < 35 || x.food < 30);
+          const u = mates.concat(allyMates(t)).find((x) => (x.mo < 35 || x.food < 30) && hostility(t, x) < 2);
           const it = t.inv.find((x) => (u && u.food < 30 ? x.type === 'cibo' : /cibo|valore|alcol|amuleto/.test(x.type)));
           if (u && it) add(1.3 + (tr('generoso') ? 1 : 0), () => {
             takeItem(t, it); addItem(u, Object.assign({}, it, { how: 'dono', from: t.id, d: day })); if (it.type === 'cibo' && u.food < 45) eat(u);
@@ -2050,7 +2193,7 @@
             const grp = allyMates(plotter);
             leaveAlliance(plotter); grp.forEach((x) => { addAff(x, plotter, -35); }); plotter.plot = null; plotter.traitor = true;
             addAff(victim, t, 25); remember(victim, t, 'warned'); remember(plotter, t, 'exposed'); addGrudge(plotter, t, 'betray');
-            return say('spyExpose', [t, plotter, victim], {}, 'betray', traitName(tr('furtivo') ? 'furtivo' : tr('paranoico') ? 'paranoico' : '') || 'Intuito', 4);
+            return say(victim === t ? 'spyExposeSelf' : 'spyExpose', victim === t ? [t, plotter] : [t, plotter, victim], {}, 'betray', traitName(tr('furtivo') ? 'furtivo' : tr('paranoico') ? 'paranoico' : '') || 'Intuito', 4);
           });
         }
         // furto notturno
@@ -2102,8 +2245,10 @@
       alive().forEach((a) => zoneMates(a).forEach((b) => { if (a.ix < b.ix) pairs.push([a, b]); }));
       rng.shuffle(pairs).slice(0, 2 + (rng.chance(0.4) ? 1 : 0)).forEach(([a, b]) => {
         if (!rng.chance(0.6)) return;
-        const kind = a.partner === b.id ? 'coppia' : isAlly(a, b) ? 'alleati' : aff(a, b) <= -30 || a.grudges[b.id] || b.grudges[a.id] ? 'rivali' : 'sconosciuti';
-        const ar = CH.arena && CH.arena[theme.id] ? CH.arena[theme.id].filter((x) => !USED.has(x[0])) : [];
+        const h = hostility(a, b), friends = like(a, b) >= 40 && like(b, a) >= 40;
+        const kind = a.partner === b.id && h < 2 ? 'coppia' : h >= 2 || Math.min(like(a, b), like(b, a)) <= -30 ? 'rivali' : isAlly(a, b) || friends ? 'alleati' : 'sconosciuti';
+        // le battute d'ambiente parlano al plurale («andiamo», «ci resta»): non vanno bene tra rivali
+        const ar = kind !== 'rivali' && CH.arena && CH.arena[theme.id] ? CH.arena[theme.id].filter((x) => !USED.has(x[0])) : [];
         const local=D.world?.dialogues(world,a.zone,kind,a,b,phases).filter(x=>!USED.has(x.lines[0]))||[];
         const chooseLocal=local.length&&rng.chance(0.7);
         const list = chooseLocal?local.map(x=>x.lines):(!world&&rng.chance(0.4) && ar.length ? ar : (CH[kind] || []).filter((x) => !USED.has(x[0]))) || [];
@@ -2122,7 +2267,7 @@
         const want = b.food < 40 && !hasItem(b, 'cibo') ? 'cibo' : b.hp < 50 && !hasItem(b, 'med') ? 'med' : null;
         if (!want) return;
         const pay = b.inv.filter((x) => x.type === 'valore' || x.type === 'alcol' || (x.type === 'arma' && b.attr.for <= 4) || x.type === 'esplosivo' || x.type === 'veleno');
-        const sellers = zoneMates(b).concat(allyMates(b)).filter((x) => x !== b && aff(b, x) > -30 && (want === 'cibo' ? x.inv.filter((it) => it.type === 'cibo').length >= (x.food >= 55 ? 1 : 2) : hasItem(x, 'med') && x.hp >= 70));
+        const sellers = zoneMates(b).concat(allyMates(b)).filter((x) => x !== b && hostility(b, x) < 2 && (want === 'cibo' ? x.inv.filter((it) => it.type === 'cibo').length >= (x.food >= 55 ? 1 : 2) : hasItem(x, 'med') && x.hp >= 70));
         const s2 = sellers[0]; if (!s2) return;
         const food = itemOf(s2, want);
         if (hasTrait(s2, 'generoso') || (aff(s2, b) >= 50 && rng.chance(0.5))) {
@@ -2374,7 +2519,7 @@
         const afraid = A.filter((x) => x !== F && !isAlly(x, F) && fearOf(x, F) >= 35);
         for (let i = 0; i < afraid.length; i++) for (let j = i + 1; j < afraid.length; j++) {
           const a = afraid[i], b = afraid[j];
-          if (a.zone !== b.zone || isAlly(a, b) || a.grudges[b.id] || b.grudges[a.id] || like(a, b) < -20 || (cfg.teamWin && cfg.teamsAllied && a.team !== b.team) || !rng.chance(0.3)) continue;
+          if (a.zone !== b.zone || isAlly(a, b) || hostility(a, b) >= 1 || (cfg.teamWin && cfg.teamsAllied && a.team !== b.team) || !canTeam([a, b]) || !rng.chance(0.3)) continue;
           if ((a.allyId != null && (alliances.get(a.allyId) || new Set()).size >= 5) || (b.allyId != null && (alliances.get(b.allyId) || new Set()).size >= 5)) continue;
           joinAlliance([a, b]); stats.alliances++; a.alliancesFormed++; b.alliancesFormed++;
           remember(a, b, 'coalition', F); remember(b, a, 'coalition', F); a.hunt = F.id; b.hunt = F.id; tweak(a, F, { p: -10 }); tweak(b, F, { p: -10 });
@@ -2386,7 +2531,7 @@
       // chi ha troppa paura si mette sotto la protezione del più forte
       A.forEach((a) => {
         if (!a.alive || a.allyId != null || hasTrait(a, 'solitario')) return;
-        const S = A.find((x) => x !== a && fearOf(a, x) >= 60 && x.zone === a.zone && !x.grudges[a.id] && !(cfg.teamWin && x.team !== a.team) && (x.allyId == null || (alliances.get(x.allyId) || new Set()).size < 5));
+        const S = A.find((x) => x !== a && fearOf(a, x) >= 60 && x.zone === a.zone && hostility(a, x) < 3 && !recentWound(a, x, 3) && !(cfg.teamWin && x.team !== a.team) && (x.allyId == null || (alliances.get(x.allyId) || new Set()).size < 5) && canTeam([x, a]));
         if (!S || !rng.chance(0.3)) return;
         const it = a.inv.filter((x) => x.type !== 'ricordo').sort((x, y) => itemScore(y) - itemScore(x))[0];
         if (it && !hasTrait(S, 'pacifista')) { takeItem(a, it); addItem(S, Object.assign({}, it, { how: 'dono', from: a.id, d: day })); }
@@ -2405,6 +2550,20 @@
         stats.mentors = (stats.mentors || 0) + 1;
         const e = useFmt(BA('mentor'), [a, s2]); if (e) sys2(e, [a, s2], 'heal', 'Mentore', 2);
       });
+      // un'alleanza non sopravvive a un rancore o a una ferita fresca tra i suoi membri: chi ha subito se ne va
+      if (!cfg.teamWin) {
+        const seen = new Set();
+        A.forEach((a) => {
+          if (a.allyId == null || seen.has(a.allyId)) return; seen.add(a.allyId);
+          const g = [a].concat(allyMates(a, true));
+          let worst = null, wh = 1;
+          g.forEach((x) => g.forEach((y) => { if (x !== y) { const h = hostility(x, y, true) + (x.grudges[y.id] ? 0.5 : 0) + (like(x, y) < like(y, x) ? 0.1 : 0); if (h > wh) { wh = h; worst = [x, y]; } } }));
+          if (!worst || wh < 2 || !rng.chance(wh >= 3 ? 0.9 : 0.55)) return;
+          const [x, y] = worst, pair = g.length === 2;
+          leaveAlliance(x); remember(x, y, 'split'); stats.drifts = (stats.drifts || 0) + 1;
+          const e = useFmt(BA(pair ? 'drift' : 'leave'), [x, y]); if (e) sys2(e, [x, y], 'betray', 'Alleanza finita', 3);
+        });
+      }
       // alleanze minate dalla diffidenza si spaccano
       const done = new Set();
       A.forEach((a) => {
@@ -2416,7 +2575,7 @@
         const [x, y] = worst;
         const faction = g.filter((m) => m !== y && (m === x || like(m, x) > like(m, y)));
         faction.forEach((m) => leaveAlliance(m));
-        if (faction.length > 1) joinAlliance(faction);
+        if (faction.length > 1 && canTeam(faction)) joinAlliance(faction);
         remember(x, y, 'split'); remember(y, x, 'split'); stats.splits = (stats.splits || 0) + 1;
         const e = useFmt(BA('split'), [x, y]); if (e) sys2(e, [x, y], 'betray', 'Scissione', 3);
       });
@@ -2434,7 +2593,7 @@
       const visible = new Set(events), all = [...new Set([...events, ...extra])].sort((a,b) => (a.place?.seq ?? -1) - (b.place?.seq ?? -1));
       for (const event of all) {
         const fact = worldMemory.record(event, phases.length, day, visible.has(event));
-        if (fact?.parents.length) event.reason = (event.reason ? event.reason + ' ' : '') + 'Fatti precedenti ricordati: ' + worldMemory.describe(fact.parents.map(id => worldMemory.data.facts[id]), geographyZones);
+        void fact; // i fatti collegati restano in memoryRefs; il contesto leggibile nasce da eventContext
       }
     }
 
@@ -2541,10 +2700,24 @@
       return isEnded();
     }
 
+    // titoli e introduzioni degli atti finali: dicono quanti restano e cosa cambia, senza ripetersi
+    const FINAL_ONLY = /ultimo scontro|ultima sfida|vince la partita|fine della partita|ultimo cerchio|il liceo sceglie|all'ultima (interrogazione|riunione)/i;
+    function climaxTitle(round, n) {
+      if (n === 2) return round === 0 ? 'Faccia a faccia' : theme.soft ? 'La sfida finale' : 'Il duello finale';
+      return ['Gli ultimi equilibri', 'Le carte sul tavolo', 'Il punto di rottura'][round] || (theme.soft ? ['Fino all’ultima mossa', 'Nessun passo indietro', 'L’ultimo rilancio'] : ['L’ultimo rilancio', 'Nessun passo indietro', 'Fino all’ultimo respiro'])[(round - 3) % 3];
+    }
+    function climaxIntro(round, n, meeting) {
+      const where = atZone(zoneName(meeting));
+      if (round === 0) return (n === 2 ? 'Restano in due' : 'Restano in ' + n) + '. Tutti si dirigono verso ' + zoneName(meeting) + ': da qui si esce solo vincendo.';
+      if (n === 2) return theme.soft ? 'Restano in due. Ne resterà uno solo.' : 'Restano in due. Solo uno uscirà dall\'arena.';
+      if (round === 1) return 'Restano in ' + n + '. Prima di colpire davvero, ci si studia e si saggiano le forze.';
+      if (round === 2) return 'Nessuno può più allontanarsi: si resta ' + where + '. Adesso conta quello che ognuno ha messo da parte.';
+      return 'Restano in ' + n + '. ' + ['Ogni errore, adesso, costa caro.', 'La stanchezza comincia a farsi sentire.', 'Nessuno ha più niente da nascondere.'][(round - 3) % 3];
+    }
     function runClimax() {
       let meeting = null, round = 0;
       while (!isEnded() && round < 40) {
-        const pair = alive();
+        const pair = alive(), startCount = pair.length;
         if (pair.length === 2 && pair[0].partner === pair[1].id && runLovers()) return;
         const events = []; SYS = []; ORIGIN = null; CURKIND = 'finale'; geo.reset();
         if (round === 0) meeting = gather('finale');
@@ -2558,7 +2731,7 @@
           events.push(apply(ev, [recovery]));
         }
         if (round === 0) {
-          const text = theme.soft ? 'Gli ultimi concorrenti si ritrovano. I patti ancora validi restano in piedi: nessuno conosce tutte le intenzioni altrui.' : 'I superstiti si ritrovano. I patti ancora validi restano in piedi: nessuno conosce tutte le intenzioni altrui.';
+          const text = (theme.soft ? 'Gli ultimi concorrenti si ritrovano faccia a faccia.' : 'I superstiti si ritrovano faccia a faccia.') + (alive().some(t => t.allyId != null) ? ' Le alleanze reggono ancora, ma tutti sanno che non dureranno.' : ' Nessuno ha più alleati: ognuno guarda gli altri come un ostacolo.');
           events.push({ html: text, plain: text, ids: [], deaths: [], lethal: false, note: true });
         } else {
           maybeDissolve(events);
@@ -2566,7 +2739,7 @@
             const pact = alive().some(t => t.allyId != null);
             alive().forEach(leaveAlliance);
             if (pact) {
-              const text = 'Il confronto si stringe: i patti di convenienza finiscono. Restano i legami personali e le regole di vittoria della partita.';
+              const text = 'Le alleanze si sciolgono: da qui in avanti ognuno gioca per sé.' + (cfg.teamWin ? ' Le squadre, però, restano unite fino alla fine.' : alive().some(t => t.partner && aliveId(t.partner)) ? ' Solo chi si ama non si combatte.' : '');
               events.push({ html: text, plain: text, ids: [], deaths: [], lethal: false, note: true });
             }
           }
@@ -2577,19 +2750,22 @@
             if (j < 0) continue;
             const B = available.splice(j, 1)[0];
             if (round < 3 && alive().length > 2 && rng.chance(0.4)) {
-              const ev = parseLine(theme.soft ? '2 hit:A>B | {A} sorprende {B} con una manovra e costringe {B} a consumare energie. Il confronto resta aperto.' : '2 hit:A>B | {A} ferisce {B} con un attacco rapido. Il confronto resta aperto.');
+              const opts = theme.soft ? FINALE_JAB_SOFT : FINALE_JAB, freshOpts = opts.filter((x) => !USED.has(x)), line = rng.pick(freshOpts.length ? freshOpts : opts); USED.add(line);
+              const ev = parseLine(line);
               events.push(apply(ev, [A, B])); continue;
             }
             const attr = rng.pick(theme.soft ? ['int', 'agi', 'car', 'furt', 'res'] : ['for', 'agi', 'int', 'furt', 'res']);
             const left = rollTest(A, attr, 0), right = rollTest(B, attr, 0);
             const wins = left.roll >= right.roll, roles = wins ? [A, B] : [B, A];
-            let pool = pools.finale.filter(e => e.n === 2 && e.lethal && e.space.every(s => (s.at == null || s.at === meeting) && (s.travel == null || s.travel === meeting)) && checkReq(e, roles));
+            // le frasi che chiudono la partita («l'ultimo scontro», «vince la partita») solo quando restano in due
+            const lastTwo = alive().length <= 2;
+            let pool = pools.finale.filter(e => e.n === 2 && e.lethal && (lastTwo || !FINAL_ONLY.test(e.text)) && e.space.every(s => (s.at == null || s.at === meeting) && (s.travel == null || s.travel === meeting)) && checkReq(e, roles));
             if (!pool.length) pool = [parseLine(theme.soft ? '2 k:A>B | {A} prevale su {B}, che esce dalla gara.' : '2 k:A>B | {A} prevale nello scontro con {B}, che perde la vita.')];
             const ev = rng.wpick(pool, e => weightFor(e, roles[0]) * variety.weight(e));
             const result = apply(ev, roles);
             result.test = { who: A.id, attr, roll: left.roll, dc: right.roll, pass: wins };
             result.duel = { a: A.id, b: B.id, attr, left: left.roll, right: right.roll };
-            result.reason = (result.reason ? result.reason + ' ' : '') + 'Confronto opposto di ' + (D.attrs.find(x => x.id === attr)?.name || attr) + ': ' + A.name + ' ' + left.roll + ', ' + B.name + ' ' + right.roll + '. Contano la caratteristica, i dadi, le condizioni e gli oggetti adatti; in parità mantiene l’iniziativa chi agisce per primo.';
+            result.reason = (result.reason ? result.reason + ' ' : '') + 'Scontro di ' + (D.attrs.find(x => x.id === attr)?.name || attr).toLowerCase() + ': ' + A.name + ' ' + left.roll + ' contro ' + B.name + ' ' + right.roll + '. Contano la caratteristica, le condizioni e gli oggetti; a parità vince chi attacca.';
             A.tests++; B.tests++; stats.tests += 2; roles[0].testsPassed++; stats.testsPassed++;
             events.push(result);
           }
@@ -2598,13 +2774,15 @@
         events.sort((a,b) => (a.place?.seq ?? -1) - (b.place?.seq ?? -1));
         rememberPhase(events);
         if (!isEnded()) intrigue.prepare();
-        const titles = ['Gli ultimi equilibri', 'Le carte sul tavolo', 'Il punto di rottura'];
-        phases.push({ kind: 'finale', day, title: titles[round] || 'L’ultimo rilancio', intro: round === 0 ? 'La partita entra nella stretta finale. Punto di ritrovo: ' + zoneName(meeting) + '. Arrivare qui non significa aver già vinto.' : round === 2 ? 'I passaggi esterni vengono chiusi. Le risorse rimaste e le scelte precedenti possono ancora cambiare il confronto.' : 'Il confronto continua: il vantaggio del momento non garantisce il risultato.', events, snap: snapshot() });
+        phases.push({ kind: 'finale', day, title: climaxTitle(round, startCount), intro: climaxIntro(round, startCount, meeting), events, snap: snapshot() });
         round++;
       }
       if (!isEnded()) throw new Error('La stretta finale non ha prodotto un vincitore.');
     }
 
+    // i colpi di assaggio dello scontro finale: varianti che non si ripetono
+    const FINALE_JAB = ['2 hit:A>B | {A} ferisce {B} con un attacco rapido. Il confronto resta aperto.', '2 hit:A>B | {A} e {B} si studiano a lungo. Il primo colpo è di {A}, e lascia il segno.', '2 hit:A>B | {A} attacca per prim[A:o/a] e costringe {B} a ripiegare, ferit[B:o/a].', '2 hit:A>B | Un errore di {B}, e {A} ne approfitta subito. Nessuno dei due, però, cede.'];
+    const FINALE_JAB_SOFT = ['2 hit:A>B | {A} sorprende {B} con una manovra e costringe {B} a consumare energie. Il confronto resta aperto.', '2 hit:A>B | {A} mette {B} in difficoltà davanti a tutti. {B} incassa, ma resta in gara.', '2 hit:A>B | {A} anticipa la mossa di {B} e guadagna terreno. Il confronto continua.'];
     function runFinale() {
       if (geo) return runClimax();
       const events = [];

@@ -527,6 +527,11 @@
 `,
         fallback: `
 1 | {A} passa la giornata senza farsi notare.
+1 | {A} tiene un profilo basso e lascia parlare gli altri.
+1 | {A} resta al proprio posto e osserva.
+1 | {A} fa il minimo indispensabile. Nessuno se ne accorge.
+1 | {A} ripassa mentalmente chi sta con chi.
+1 | {A} evita tutti con molta educazione.
 `,
       },
       disasters: [
@@ -647,6 +652,11 @@
 `,
         fallback: `
 1 | {A} passa la giornata davanti a un foglio Excel.
+1 | {A} risponde a tre mail e ne archivia quaranta. Giornata tranquilla.
+1 | {A} si fa vedere molto impegnat[A:o/a] senza fare niente di preciso.
+1 | {A} resta alla scrivania con le cuffie e non alza la testa.
+1 | {A} prende il caffè alla macchinetta del piano di sopra, per non incontrare nessuno.
+1 | {A} riordina la scrivania per la terza volta. Nessuno nota niente.
 `,
       },
       disasters: [

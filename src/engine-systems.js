@@ -149,7 +149,8 @@
     const willing = (a, b) => opponent(a, b) && (!trait(a, 'pacifista') || !!a.grudges[b.id]) && (!ally(a, b) || !trait(a, 'leale') && !trait(a, 'pacifista') && (trait(a, 'traditore') || like(a, b) <= -20));
     function prepare() {
       const living = people.filter(t => t.alive);
-      if (living.length < 2 || pending.length >= 4 || prepared >= Math.min(24, people.length * 2) || !rng.chance(0.85)) return false;
+      // pochi piani, ma che contano: circa uno ogni tre concorrenti, al massimo tre in attesa
+      if (living.length < 2 || pending.length >= 3 || prepared >= Math.max(3, Math.ceil(people.length / 3)) || !rng.chance(0.6)) return false;
       const candidates = [];
       for (const owner of living) {
         if (pending.some(p => p.owner === owner) || (counts.get(owner.id) || 0) >= 2) continue;

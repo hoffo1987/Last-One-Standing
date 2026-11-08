@@ -168,7 +168,7 @@
         { n: 'Visita del notaio', d: 'Un notaio spettrale legge il testamento: c\'è cibo in dispensa per tutti.', fx: { forage: 1.6 } },
       ],
       txt: {
-        meterUp: ['{0} vede una figura nello specchio che non si muove insieme a l[0:ui/ei]. Non dorme più.', '{0} sente qualcuno chiamare il suo nome dalla Cantina. Con la voce di sua madre.', '{0} conta le porte del corridoio: ieri erano sette. Oggi sono otto.', '{0} trova un ritratto di sé nella Biblioteca. Dipinto nel 1802.', 'Il carillon in Soffitta suona da solo. {0} è l\'unic[0:o/a] a sentirlo.', '{0} giura di aver visto la propria tomba nel Cimitero. Con la data di domani.'],
+        meterUp: ['{0} vede una figura nello specchio che non si muove insieme a l[0:ui/ei]. Non dorme più.', '{0} sente qualcuno chiamare il suo nome dalla Cantina. Con la voce di sua madre.', '{0} conta le porte del corridoio: prima erano sette. Adesso sono otto.', '{0} trova un ritratto di sé nella Biblioteca. Dipinto nel 1802.', 'Il carillon in Soffitta suona da solo. {0} è l\'unic[0:o/a] a sentirlo.', '{0} giura di aver visto la propria tomba nel Cimitero. Con la data di domani.'],
         meterDeath: ['{0} vede qualcosa in fondo al corridoio. Nessuno sa cosa: {0} non è più tornat[0:o/a].', 'Il cuore di {0} si ferma di colpo durante la notte. Sul viso, un\'espressione che nessuno vuole ricordare.', '{0} entra nella Soffitta per controllare un rumore. La porta si chiude da sola.'],
         aloneNight: ['{0} dorme da sol[0:o/a]. Prima regola dei film dell\'orrore: mai dormire da soli.'],
         forage: ['{0} trova {cibo} nella dispensa. È ancora caldo, il che non è affatto rassicurante.', '{0} scopre {cibo} su una tavola apparecchiata per uno. Mangia guardandosi alle spalle.'],

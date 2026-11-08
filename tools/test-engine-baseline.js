@@ -16,12 +16,12 @@ if (process.argv.includes('--record')) {
   for (const theme of globalThis.LOS_DATA.themes) for (let i = 0; i < 4; i++) {
     const cfg = { cast: LOS.randomCast([2, 12, 24, 48][i], 'baseline-cast-' + i, i % 2 ? 3 : 1), theme: theme.id, seed: 'baseline-' + theme.id + '-' + i, difficulty: ['bassa', 'normale', 'alta', 'massacro'][i], maxDays: i === 3 ? 40 : 12, adult: !!(i % 2) && !theme.noAdult, teamsAllied: !!(i % 2), teamWin: i === 2, custom: i === 1 ? [{ raw: '2 test:A=int12 ok:save:A>B ko:hp:A-10 | {A} aiuta {B}. || {A} non riesce.', phase: 'd' }] : [] };
     if (i === 3) cfg.initialRelations = [{ from: cfg.cast[0].id, to: cfg.cast[1].id, type: 'coppia' }];
-    cases.push({ cfg, digest: digest(LOS.simulate({...cfg,mapVersion:0})) });
+    const result = LOS.simulate({ ...cfg, mapVersion: 0 }); delete result.itemFacts; cases.push({ cfg, digest: digest(result) });
   }
-  fs.mkdirSync(path.dirname(fixturePath), { recursive: true }); fs.writeFileSync(fixturePath, JSON.stringify({ revision: 'b3c8f3b90987f394b86cde9c060636ca55d2ef00', cases }, null, 2));
-  console.log('Registrati ' + cases.length + ' risultati completi prima del refactoring.');
+  fs.mkdirSync(path.dirname(fixturePath), { recursive: true }); fs.writeFileSync(fixturePath, JSON.stringify({ revision: process.env.BASELINE_REVISION || 'relazioni-coerenti', cases }, null, 2));
+  console.log('Registrati ' + cases.length + ' risultati completi di riferimento.');
 } else {
   const fixture = JSON.parse(fs.readFileSync(fixturePath, 'utf8'));
   for (const test of fixture.cases) { const result = LOS.simulate({...test.cfg,mapVersion:0}); delete result.itemFacts; assert.equal(digest(result), test.digest, 'Risultato storico cambiato: ' + test.cfg.seed); }
-  console.log('OK: ' + fixture.cases.length + ' risultati completi identici al motore ' + fixture.revision.slice(0, 7) + '.');
+  console.log('OK: ' + fixture.cases.length + ' risultati completi identici alla registrazione «' + fixture.revision + '».');
 }
