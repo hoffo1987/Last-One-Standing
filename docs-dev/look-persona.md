@@ -85,4 +85,24 @@ Il codice sta in `src/look.css` (caricato dopo `style.css`) e `src/look.js` (dop
 
 Riserve: volti, occhi e vincitori si scelgono per genere (`m`, `f`, `n`) con un hash stabile dell'id, quindi lo stesso concorrente riceve sempre la stessa immagine. Le sagome restano negli avatar piccoli, dove contano le iniziali.
 
+### Regia degli stacchi, seconda versione (`src/regia.js`)
+
+Problema riportato: transizioni «a bassa risoluzione, sempre uguali, staccate». Le cause misurate erano tre: le pennellate (1200 px) venivano stirate su circa 2700 px e i sigilli (320 px) su 440; i fondali, moltiplicati dentro le lastre, diventavano fango; e c'era una sola coreografia, ripetuta identica.
+
+La nuova regia è vettoriale: un SVG alla risoluzione dello schermo, forme rigenerate a ogni stacco, nitide a ogni densità di pixel.
+
+- **Quattro famiglie:**
+  - lame diagonali con bordo strappato e lame di carta;
+  - schegge triangolari che partono dal lato o dal punto toccato;
+  - sipario di strisce inclinate che entrano da lati alterni;
+  - esplosione a stella con anello di carta, che esce con un taglio diagonale e due metà che si separano.
+- **Varietà con una regola:** ogni sezione ha la sua famiglia preferita (Esito → esplosione, Arena → schegge, Concorrenti → sipario, Diretta e Home → lame). Nel 30% dei casi se ne sceglie un'altra, mai la stessa due volte di fila. Angoli, numero di pezzi, colori e bordi cambiano ogni volta.
+- **Direzione:** avanti nei passi va verso destra, indietro verso sinistra.
+- **Cartello:** lastra di carta che si apre, lettere che cadono una per una con rotazioni diverse, sottotitolo «Passo N di 4» su fondo nero, sigillo piccolo (entro la sua risoluzione). Il cartello si stringe e si sposta per restare sempre dentro lo schermo.
+- **Ingresso della pagina:** mentre la copertura esce, i blocchi visibili della sezione nuova entrano a strati dal lato della direzione (36 ms tra uno e l'altro). Sono esclusi quelli che hanno già una loro regia.
+- **Cartelli della diretta:** la fascia è tagliata in vettoriale, con bordi diversi a ogni cartello.
+- **Curve comuni:** `out`, `in`, `io` e `kick`, le stesse in tutta la regia.
+
+`LOS_REGIA.force = 'schegge'` forza una famiglia, solo per provare.
+
 Da fare: un secondo giro di volti (10 per 24 concorrenti fa ripetere i volti nello scontro finale), una mascotte se la vogliamo, e l'ascolto dei suoni su dispositivi veri.

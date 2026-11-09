@@ -166,6 +166,31 @@ h3 { font-weight: 800; }
 @media (prefers-reduced-motion: reduce) { .fn-portrait > .fn-star, .fn-play > .fn-figure, .ev.in.fx-kill .avs::before { animation: none; } }
 [data-reduced-motion] .fn-portrait > .fn-star, [data-reduced-motion] .fn-play > .fn-figure, [data-reduced-motion] .ev.in.fx-kill .avs::before { animation: none; }
 
+/* ================= REGIA DEGLI STACCHI (src/regia.js) =================
+ * La copertura è un SVG alla risoluzione dello schermo; il cartello è testo vero. Niente immagini stirate. */
+.lx { position: fixed; inset: 0; z-index: 9999; pointer-events: none; overflow: hidden; contain: strict; }
+.lx[hidden] { display: none; }
+.lx-svg { position: absolute; inset: 0; width: 100%; height: 100%; display: block; overflow: visible; shape-rendering: geometricPrecision; }
+.lx-svg polygon, .lx-svg rect, .lx-svg g { will-change: transform; }
+.lx-cap { position: absolute; font-size: clamp(40px, 10vw, 138px); transform: translate(-50%, -50%) rotate(var(--rot, -7deg)); display: grid; justify-items: start; gap: .35em; white-space: nowrap; }
+.lx-slab { position: absolute; left: -.42em; right: -.55em; top: .06em; height: 1.02em; font-size: 1em; background: #f7f5f0; transform-origin: 0 50%;
+  box-shadow: .09em .09em 0 #0a0a0c, -.04em -.04em 0 var(--lx-key); clip-path: polygon(0 4%, 100% 0, 98.5% 100%, 1.2% 96%); }
+.lx-word { position: relative; font-family: var(--f-display); font-style: italic; font-weight: 900; font-stretch: 116%; font-size: 1em; line-height: 1.1; letter-spacing: -.02em;
+  text-transform: uppercase; color: #0a0a0c; }
+.lx-word span { display: inline-block; }
+.lx-word span:nth-child(3n+2) { transform-origin: 50% 80%; }
+.lx-sub { position: relative; margin-left: .2em; padding: .32em .8em .34em; font: 800 clamp(11px, 1.3vw, 15px) / 1 var(--f-body); letter-spacing: .26em; text-transform: uppercase; color: var(--lx-key); background: #0a0a0c; clip-path: polygon(4% 0, 100% 0, 96% 100%, 0 100%); }
+.lx-seal { position: absolute; left: 50%; top: 50%; width: min(30vmin, 240px); aspect-ratio: 1; transform: translate(-50%, -50%); opacity: 0; background: hsl(0 0% 0% / .32);
+  -webkit-mask: var(--seal) center / contain no-repeat; mask: var(--seal) center / contain no-repeat; }
+.stacco { display: none !important; }
+/* la pagina nuova entra con la regia di regia.js, non con la vecchia dissolvenza */
+.view-enter { animation: none; }
+
+/* cartelli della diretta: fascia tagliata in vettoriale, diversa a ogni cartello */
+.stc.lx-cut .stc-band { -webkit-mask: none; mask: none; clip-path: var(--lx-clip); transform: translateY(-50%) skewY(var(--lx-tilt, -2.2deg)); height: 70%; }
+.stc.lx-cut .stc-line { -webkit-mask: none; mask: none; height: 5px; clip-path: polygon(0 0, 100% 30%, 100% 100%, 0 70%); transform: translateY(-50%) skewY(var(--lx-tilt, -2.2deg)); }
+.stc.lx-cut.stc-dis .stc-band { -webkit-mask: none; mask: none; }
+
 /* ---------- interruttore dei suoni nell'intestazione ---------- */
 #sfxBtn .off { display: none; }
 #sfxBtn[aria-pressed="false"] .on { display: none; }
