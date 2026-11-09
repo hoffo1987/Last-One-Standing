@@ -1,0 +1,42 @@
+{
+  "volto-m-1": {
+    "occhi": 0.53,
+    "descrizione": "uomo robusto, testa rasata"
+  },
+  "volto-m-2": {
+    "occhi": 0.6,
+    "descrizione": "giovane magro con gli occhiali tondi"
+  },
+  "volto-m-3": {
+    "occhi": 0.43,
+    "descrizione": "uomo di mezza età con la barba folta"
+  },
+  "volto-m-4": {
+    "occhi": 0.39,
+    "descrizione": "ragazzo coi capelli ricci e un cerotto sul naso"
+  },
+  "volto-m-5": {
+    "occhi": 0.575,
+    "descrizione": "giovane con i capelli lunghi raccolti"
+  },
+  "volto-f-1": {
+    "occhi": 0.52,
+    "descrizione": "giovane donna con le lentiggini e i capelli mossi"
+  },
+  "volto-f-2": {
+    "occhi": 0.49,
+    "descrizione": "donna con le treccine corte"
+  },
+  "volto-f-3": {
+    "occhi": 0.41,
+    "descrizione": "giovane donna col caschetto e una cicatrice"
+  },
+  "volto-f-4": {
+    "occhi": 0.46,
+    "descrizione": "donna anziana con i capelli raccolti"
+  },
+  "volto-n-1": {
+    "occhi": 0.55,
+    "descrizione": "giovane androgino con il buzzcut e un orecchino"
+  }
+}

@@ -3,7 +3,7 @@
 <meta name="description" content="Simulatore di battle royale in italiano: crea il cast, scegli l'arena e guarda chi resta in piedi.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&family=Figtree:ital,wght@0,400..800;1,400..600&family=JetBrains+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:ital,wdth,wght@0,62..125,400..900;1,62..125,400..900&family=Bricolage+Grotesque:opsz,wght@12..96,500..800&family=Figtree:ital,wght@0,400..800;1,400..600&family=JetBrains+Mono:wght@400;500&display=swap">
 <style>/*@CSS@*/</style>
 
 <!-- l'atmosfera dipinta: il banner dell'arena attiva, sfocato, dietro tutto il sito -->
@@ -21,6 +21,9 @@
       <a href="#diretta" data-tab="diretta"><span class="num">3</span><span class="lbl">Diretta</span><span class="livedot" id="liveDot" hidden></span></a>
       <a href="#esito" data-tab="esito"><span class="num">4</span><span class="lbl">Esito</span></a>
     </nav>
+    <button class="iconbtn" id="sfxBtn" type="button" aria-pressed="false" aria-label="Accendi o spegni i suoni" title="Suoni spenti">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z"/><path class="on" d="M15.5 9a4 4 0 0 1 0 6M18 6.5a7.5 7.5 0 0 1 0 11"/><path class="off" d="M16 9.5l5 5M21 9.5l-5 5"/></svg>
+    </button>
     <button class="iconbtn" id="themeBtn" type="button" aria-label="Passa al tema chiaro o scuro" title="Tema chiaro o scuro">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5Z"/></svg>
     </button>

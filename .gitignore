@@ -1,3 +1,6 @@
 node_modules/
 .DS_Store
 *.log
+
+# Download di Midjourney in attesa di import (tools/import-fx.py)
+da-importare/

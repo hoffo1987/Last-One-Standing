@@ -1,0 +1,183 @@
+/* ================= LOOK =================
+ * Secondo strato del foglio di stile, caricato dopo style.css: porta l'aspetto dalla «regia» degli stacchi
+ * alla forma di tutto il resto. Forme tagliate e inclinate invece degli angoli tondi, display corsivo pesante,
+ * una tinta piena per arena (--key) più nero e carta, un cursore di selezione che scivola tra le voci, righe
+ * della diretta che entrano a cascata, cut-in degli occhi nell'esito. Il perché è in docs-dev/look-persona.md.
+ * Tutto quello che si muove qui rispetta il movimento ridotto (vedi in fondo). */
+:root {
+  --f-display: 'Archivo', 'Bricolage Grotesque', 'Figtree', 'Segoe UI', system-ui, sans-serif;
+  --key: hsl(var(--h) 92% 54%);
+  --key-ink: #0a0a0c;          /* lo aggiorna look.js in base al contrasto della tinta */
+  --void: #0a0a0c;
+  --paper: #f7f5f0;
+  --hard: var(--void);         /* ombra piena sfalsata, al posto delle ombre sfumate */
+  --slant: -8deg;
+  --unslant: 8deg;
+  --cut: 12px;
+  --r: 0px;
+  --look-out: cubic-bezier(.16, 1, .3, 1);
+}
+:root[data-theme="dark"] { --hard: hsl(var(--h) 25% 88%); }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --hard: hsl(var(--h) 25% 88%); } }
+
+/* ---------- forme: niente angoli tondi, tranne volti, puntini e mappa ---------- */
+:where(*):not(.rec, .livedot, .av, .av *, .avbtn, .avbtn *, .ripple, .sil, .mn-disc, .lg-node, .lg-ring, .fi, .fn-halo, .switch, .switch *, .map-node *) { border-radius: 0 !important; }
+
+/* ---------- tipografia: display corsivo, pesante, largo nei titoli ---------- */
+h1, h2, h3 { font-style: italic; font-weight: 900; letter-spacing: -.015em; }
+h1 { font-stretch: 112%; }
+h3 { font-weight: 800; }
+.btn.xl, .stc-k, .stc-t, .stc-num, .fn-title, .stacco .st-mark { font-style: italic; }
+.eyebrow { text-transform: uppercase; letter-spacing: .12em; font-weight: 800; font-size: 12px; }
+
+/* ---------- pulsanti: lastre inclinate con ombra piena ---------- */
+.btn { transform: skewX(var(--slant)); }
+.btn > svg { transform: skewX(var(--unslant)); }
+.btn:active:not(:disabled) { transform: skewX(var(--slant)) scale(.95); }
+.btn.primary { background: var(--key); border-color: var(--key); color: var(--key-ink); font-weight: 800; font-style: italic; box-shadow: 4px 4px 0 var(--hard); }
+.btn.primary:hover { filter: none; box-shadow: 6px 6px 0 var(--hard); }
+.btn.primary:active:not(:disabled) { box-shadow: 1px 1px 0 var(--hard); }
+.iconbtn[aria-pressed="true"] { background: var(--key); border-color: var(--key); color: var(--key-ink); }
+
+/* ---------- navigazione e segmenti: il cursore che scivola (look.js) ---------- */
+.steps, .seg { position: relative; isolation: isolate; }
+.steps a { transform: skewX(var(--slant)); }
+.steps .num { border-width: 2px; }
+.steps a[aria-current="page"] { background: var(--key); color: var(--key-ink); }
+.steps a[aria-current="page"] .num { background: var(--void); border-color: var(--void); color: var(--key); }
+.steps.has-cursor a[aria-current="page"], .seg.has-cursor button[aria-pressed="true"] { background: transparent; box-shadow: none; color: var(--key-ink); }
+.seg button[aria-pressed="true"] { background: var(--key); color: var(--key-ink); }
+.sel-cursor { position: absolute; left: 0; top: 0; width: 0; height: 0; z-index: -1; pointer-events: none; background: var(--key); transform: skewX(var(--slant)); box-shadow: 3px 3px 0 var(--hard); opacity: 0; }
+.seg .sel-cursor { box-shadow: none; }
+.has-cursor > .sel-cursor { opacity: 1; }
+
+/* ---------- etichette e chip ---------- */
+.chip { transform: skewX(var(--slant)); }
+.ev .cat { transform: skewX(var(--slant)); background: var(--cc); color: var(--panel); text-transform: uppercase; letter-spacing: .08em; font-size: 11px; font-weight: 800; }
+.ev .cat svg { transform: skewX(var(--unslant)); }
+
+/* ---------- diretta: righe tagliate che entrano a cascata ---------- */
+.ev { clip-path: polygon(0 0, 100% 0, 100% calc(100% - var(--cut)), calc(100% - var(--cut)) 100%, 0 100%); }
+.ev.in { animation-name: lookRowIn; animation-duration: .42s; animation-timing-function: var(--look-out); }
+.ev.in.fx-kill { animation-name: lookRowIn, hitShake; }
+@keyframes lookRowIn { from { opacity: 0; transform: translateX(-36px) skewX(-12deg); } 55% { opacity: 1; } to { opacity: 1; transform: none; } }
+
+/* ---------- stacchi: tinta piena, nero e una lama di carta ---------- */
+.stacco .st-a { background: var(--void); }
+.stacco .st-b { background: hsl(var(--wh) 92% 52%); }
+.stacco .st-b::after { opacity: .9; background: repeating-linear-gradient(90deg, transparent 0 46px, hsl(0 0% 0% / .08) 46px 49px); }
+.stacco .st-c { left: 44%; width: 7%; background: var(--paper); }
+.fx-pen .stacco .st-c { background: var(--paper); }
+.stacco .st-seal { background: hsl(0 0% 0% / .3); }
+.stacco .st-mark { font-stretch: 118%; color: var(--void); text-shadow: none; background: var(--paper); padding: .02em .32em .08em; box-shadow: .1em .1em 0 var(--void); }
+
+/* ---------- cartelli della diretta ---------- */
+.stc-band { background-color: var(--void); }
+.stc-num .n { color: var(--key); text-shadow: .06em .06em 0 var(--void); }
+/* scontro finale: i volti diventano fasce sugli occhi */
+.stc-faces { flex-wrap: wrap; justify-content: center; gap: 6px; max-width: 760px; }
+.stc-faces .av { --s: auto; width: clamp(96px, 15vw, 170px); height: clamp(28px, 4vw, 44px); border-radius: 0; box-shadow: none; clip-path: polygon(7% 0, 100% 0, 93% 100%, 0 100%); font-size: clamp(16px, 2.4vw, 24px); font-style: italic; }
+.stc-faces .av img { object-position: 50% 37%; filter: contrast(1.12); }
+
+/* ---------- esito ---------- */
+.winhero { clip-path: polygon(0 0, calc(100% - 30px) 0, 100% 30px, 100% 100%, 30px 100%, 0 calc(100% - 30px)); }
+.winhero h1 { font-style: italic; font-stretch: 118%; text-transform: uppercase; letter-spacing: -.02em; }
+.winhero .wstats b { font-style: italic; color: var(--key); }
+/* il cut-in: una fascia nera taglia la scena con gli occhi di chi vince (look.js, alla fine della rivelazione) */
+.cutin { position: absolute; inset: 0; z-index: 20; pointer-events: none; overflow: hidden; }
+.cutin .ci-flash { position: absolute; inset: 0; background: var(--paper); opacity: 0; animation: ciFlash .5s steps(2, end) both; }
+.cutin .ci-band { position: absolute; left: -12%; right: -12%; top: 33%; height: 30%; background: var(--void); transform: skewY(-5deg); transform-origin: left center; animation: ciBand 1.05s var(--look-out) both; }
+.cutin .ci-eyes { position: absolute; left: 0; right: 0; top: 9%; bottom: 9%; overflow: hidden; background: var(--key); display: grid; place-items: center; }
+.cutin .ci-eyes img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 37%; filter: contrast(1.15) saturate(1.1); animation: ciDrift 1.05s linear both; }
+.cutin .ci-eyes .ci-ini { font-family: var(--f-display); font-style: italic; font-weight: 900; font-stretch: 125%; font-size: clamp(48px, 9vw, 120px); line-height: 1; color: var(--key-ink); letter-spacing: .3em; }
+.cutin .ci-line { position: absolute; left: 0; right: 0; height: 4px; background: var(--key); }
+.cutin .ci-line.t { top: 0; } .cutin .ci-line.b { bottom: 0; }
+@keyframes ciFlash { 0% { opacity: .85; } 100% { opacity: 0; } }
+@keyframes ciBand { 0% { transform: skewY(-5deg) scaleX(0); } 14% { transform: skewY(-5deg) scaleX(1); } 78% { transform: skewY(-5deg) translateX(0); opacity: 1; } 100% { transform: skewY(-5deg) translateX(110%); opacity: 1; } }
+@keyframes ciDrift { from { transform: scale(1.12) translateX(-3%); } to { transform: scale(1.04) translateX(2%); } }
+
+/* ================= ASSET DIPINTI (assets/fx, assets/vincitori) =================
+ * Le maschere (forme, impatto, mezzitoni) diventano variabili CSS e la classe .fx-forme le accende (look.js);
+ * fondali, volti e vincitori arrivano come immagini solo nella versione web: senza, resta il disegno di prima. */
+
+/* volti in bianco e nero, tinti con la tinta dell'arena: la luminosità del disegno, il colore della tinta */
+.av.has-volto { background: var(--key); }
+.av.has-volto > .volto { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 50% 30%; mix-blend-mode: luminosity; }
+.av.has-volto > .sil { display: none; }
+.av.has-volto > .ini { z-index: 1; }
+.stc-faces .av.has-volto > .volto { object-position: 50% 50%; }
+.stc-faces .av.has-volto > .ini { display: none; }
+
+/* esito: il fondale dell'arena al posto della scena, con un velo per leggere il testo */
+.winhero > .fn-bg { position: absolute; inset: 0; z-index: 0; pointer-events: none; background: var(--fx-fondale-win) center / cover no-repeat; }
+.winhero > .fn-bg::after { content: ""; position: absolute; inset: 0; background: linear-gradient(100deg, hsl(0 0% 0% / .78) 0%, hsl(0 0% 0% / .55) 45%, hsl(0 0% 0% / .1) 80%); }
+.winhero.has-fondale > .wscene { display: none; }
+.winhero > .fn-dots { position: absolute; left: -4%; bottom: -10%; width: 46%; aspect-ratio: 1; z-index: 1; pointer-events: none; background: var(--key); opacity: .22;
+  -webkit-mask: var(--fx-mezzitoni) center / cover no-repeat; mask: var(--fx-mezzitoni) center / cover no-repeat; transform: rotate(180deg); }
+/* le figure di Midjourney escono spesso dal quadro: si appoggiano al bordo destro e in basso, e il taglio a sinistra sfuma */
+.winhero > .fn-figure { position: absolute; right: 0; bottom: 0; height: 112%; max-width: 46%; z-index: 1; pointer-events: none; object-fit: contain; object-position: right bottom;
+  filter: drop-shadow(14px 8px 0 var(--key)) drop-shadow(-3px 0 0 var(--void));
+  -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 24%); mask-image: linear-gradient(90deg, transparent 0, #000 24%); }
+.fn-play > .fn-figure { animation: lookFigIn .7s var(--look-out) .25s both; }
+@keyframes lookFigIn { from { opacity: 0; transform: translateX(14%) skewX(-6deg); } to { opacity: 1; transform: none; } }
+.winhero.has-figure .fn-mid::before { right: 40%; }
+/* la stella dietro il ritratto, che gira piano */
+.fn-portrait > .fn-star { position: absolute; z-index: -1; left: 50%; top: 50%; width: 190%; aspect-ratio: 1; pointer-events: none; background: var(--key);
+  -webkit-mask: var(--fx-stella) center / contain no-repeat; mask: var(--fx-stella) center / contain no-repeat; transform: translate(-50%, -50%); animation: lookSpin 48s linear infinite; }
+.fx-forme .fn-halo { opacity: .35; }
+@keyframes lookSpin { to { transform: translate(-50%, -50%) rotate(360deg); } }
+/* «Ultimo in piedi» su una fascia dipinta */
+.fx-forme .fn-title { position: relative; isolation: isolate; color: var(--key-ink); text-shadow: none; padding: .45em 1.6em .45em .8em; }
+.fx-forme .fn-title::after { display: none; }
+.fx-forme .fn-title::before { content: ""; position: absolute; inset: 0 -6% 0 -4%; z-index: -1; background: var(--key); -webkit-mask: var(--fx-fascia) center / 100% 100% no-repeat; mask: var(--fx-fascia) center / 100% 100% no-repeat; }
+
+/* cartelli della diretta: l'etichetta su una fascia, il disastro su carta strappata */
+.fx-forme .stc-k { position: relative; isolation: isolate; color: var(--key-ink); padding: .4em 1.4em .4em .9em; }
+.fx-forme .stc-k::before { content: ""; position: absolute; inset: 0; z-index: -1; background: var(--key); -webkit-mask: var(--fx-fascia) center / 100% 100% no-repeat; mask: var(--fx-fascia) center / 100% 100% no-repeat; }
+.fx-forme .stc-dis .stc-band { -webkit-mask: var(--fx-strappo) center / 100% 100% no-repeat; mask: var(--fx-strappo) center / 100% 100% no-repeat; height: 78%; }
+
+/* uccisioni: una macchia d'impatto esplode dietro i volti */
+.ev .avs { position: relative; isolation: isolate; }
+.fx-forme .ev.in.fx-kill .avs::before { content: ""; position: absolute; z-index: -1; left: 50%; top: 50%; width: 190%; aspect-ratio: 1; background: var(--c-kill);
+  -webkit-mask: var(--fx-impatto) center / contain no-repeat; mask: var(--fx-impatto) center / contain no-repeat; transform: translate(-50%, -50%);
+  animation: lookSplat .5s var(--look-out) both; animation-delay: calc(var(--d, 0ms) + 260ms); }
+@keyframes lookSplat { from { opacity: 0; transform: translate(-50%, -50%) scale(.2) rotate(-30deg); } 30% { opacity: .9; } to { opacity: .55; transform: translate(-50%, -50%) scale(1) rotate(0); } }
+
+/* stacchi: il fondale dell'arena di arrivo dentro la lastra di tinta, mezzitoni sulla lastra nera, una freccia dopo il nome */
+.stacco.has-fondale .st-b { background: hsl(var(--wh) 92% 52%) var(--fx-wf) center / cover no-repeat; background-blend-mode: multiply; }
+.fx-forme .stacco .st-a::after { content: ""; position: absolute; inset: 0; background: hsl(var(--wh) 92% 52% / .3); -webkit-mask: var(--fx-mezzitoni) center / 60vmax repeat; mask: var(--fx-mezzitoni) center / 60vmax repeat; }
+.fx-forme .stacco .st-mark::after { content: ""; position: absolute; left: 100%; top: 50%; width: .9em; height: .5em; margin-left: .25em; transform: translateY(-50%); background: hsl(var(--wh) 92% 52%);
+  -webkit-mask: var(--fx-freccia) center / contain no-repeat; mask: var(--fx-freccia) center / contain no-repeat; }
+
+/* cut-in: un fulmine di carta taglia la scena prima della fascia */
+.cutin .ci-bolt { position: absolute; left: 8%; top: 8%; width: 84%; height: 84%; background: var(--paper); opacity: 0;
+  -webkit-mask: var(--fx-fulmine) center / contain no-repeat; mask: var(--fx-fulmine) center / contain no-repeat; animation: ciBolt .32s steps(3, end) both; }
+@keyframes ciBolt { 0% { opacity: 1; transform: scale(.7); } 100% { opacity: 0; transform: scale(1.1); } }
+.cutin .ci-eyes { background: var(--void); }
+.cutin .ci-panel { display: block; height: 100%; aspect-ratio: 5 / 1; max-width: 100%; overflow: hidden; background: var(--key); clip-path: polygon(4% 0, 100% 0, 96% 100%, 0 100%); }
+.cutin .ci-panel img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: 50% 37%; filter: contrast(1.15) saturate(1.1); animation: ciDrift 1.05s linear both; }
+.cutin .ci-panel.tint img { object-position: 50% 50%; mix-blend-mode: luminosity; filter: contrast(1.2); }
+
+@media (max-width: 760px) {
+  .winhero > .fn-figure { height: 70%; max-width: 60%; right: -6%; opacity: .45; }
+  .winhero.has-figure .fn-mid::before { right: -14px; }
+  .winhero > .fn-bg::after { background: hsl(0 0% 0% / .62); }
+}
+@media (prefers-reduced-motion: reduce) { .fn-portrait > .fn-star, .fn-play > .fn-figure, .ev.in.fx-kill .avs::before { animation: none; } }
+[data-reduced-motion] .fn-portrait > .fn-star, [data-reduced-motion] .fn-play > .fn-figure, [data-reduced-motion] .ev.in.fx-kill .avs::before { animation: none; }
+
+/* ---------- interruttore dei suoni nell'intestazione ---------- */
+#sfxBtn .off { display: none; }
+#sfxBtn[aria-pressed="false"] .on { display: none; }
+#sfxBtn[aria-pressed="false"] .off { display: inline; }
+
+/* ---------- movimento ridotto: le forme restano, il movimento no ---------- */
+@media (prefers-reduced-motion: reduce) { .ev.in { animation: none; } .cutin { display: none; } }
+[data-reduced-motion] .ev.in { animation: none; }
+[data-reduced-motion] .cutin { display: none; }
+
+/* ---------- telefono: tagli e inclinazioni più lievi ---------- */
+@media (max-width: 600px) {
+  :root { --slant: -6deg; --unslant: 6deg; --cut: 8px; }
+  .winhero { clip-path: polygon(0 0, calc(100% - 18px) 0, 100% 18px, 100% 100%, 18px 100%, 0 calc(100% - 18px)); }
+}

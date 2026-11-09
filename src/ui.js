@@ -514,7 +514,8 @@
     const sil = !t.img && ART.assets.sagome && ART.assets.sagome.length ? silIndex(t.id) : -1;
     const inner = t.img ? '<img src="' + esc(t.img) + '" alt="">' : sil >= 0 ? '<i class="sil sil-' + sil + '" aria-hidden="true"></i><span class="ini">' + esc(initials(t.name)) + '</span>' : esc(initials(t.name));
     const cls = 'av' + (opt.dead ? ' dead' : '') + (sil >= 0 ? ' has-sil' : '');
-    const st = 'style="--c:' + esc(t.color || teamColor(t.team || 1)) + '"';
+    // data-g e data-k: genere e chiave stabile, per scegliere volti e fasce di riserva coerenti (look.js)
+    const st = 'style="--c:' + esc(t.color || teamColor(t.team || 1)) + '" data-g="' + esc(t.gender || 'M') + '" data-k="' + esc(t.id) + '"';
     if (opt.btn) return '<button type="button" class="' + cls + '" ' + st + ' data-prof="' + esc(t.id) + '" title="' + esc(t.name) + '" aria-label="Scheda di ' + esc(t.name) + '">' + inner + '</button>';
     return '<span class="' + cls + '" ' + st + ' title="' + esc(t.name) + '">' + inner + '</span>';
   }

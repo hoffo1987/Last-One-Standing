@@ -37,21 +37,33 @@ function assetsFor(uri) {
     });
   }
   // pennellate, sigilli e grana degli «stacchi»: maschere trasparenti, piccole, incorporate anche nel file portatile
-  const fx = { pennellate: [], sigilli: {}, grana: null };
+  // Il «look»: forme, impatto, mezzitoni e fasce sugli occhi sono piccoli e vanno ovunque; fondali delle arene,
+  // volti e vincitori a figura intera sono grandi e restano esterni nella sola versione web (come l'atlante).
+  const web = uri === linked;
+  const fx = { pennellate: [], sigilli: {}, grana: null, forme: {}, impatto: null, mezzitoni: null, occhi: {}, fondali: {}, volti: {}, vincitori: {} };
   if (fs.existsSync(path.join(A, 'fx'))) fs.readdirSync(path.join(A, 'fx')).sort().forEach((f) => {
     const u = () => uri('fx/' + f, 'image/webp'); let m;
     if (/^pennellata-\d+\.webp$/.test(f)) fx.pennellate.push(u());
     else if ((m = f.match(/^sigillo-([\w-]+)\.webp$/))) fx.sigilli[m[1]] = u();
     else if (f === 'grana.webp') fx.grana = u();
+    else if ((m = f.match(/^forma-([\w-]+)\.webp$/))) fx.forme[m[1]] = u();
+    else if (f === 'impatto.webp') fx.impatto = u();
+    else if (f === 'mezzitoni.webp') fx.mezzitoni = u();
+    else if ((m = f.match(/^occhi-([mfn]-\d+)\.webp$/))) fx.occhi[m[1]] = u();
+    else if (web && (m = f.match(/^fondale-([\w-]+)\.webp$/))) fx.fondali[m[1]] = u();
+    else if (web && (m = f.match(/^volto-([mfn]-\d+)\.webp$/))) fx.volti[m[1]] = u();
+  });
+  if (web && fs.existsSync(path.join(A, 'vincitori'))) fs.readdirSync(path.join(A, 'vincitori')).sort().forEach((f) => {
+    const m = f.match(/^vincitore-([mfn]-\d+)\.webp$/); if (m) fx.vincitori[m[1]] = uri('vincitori/' + f, 'image/webp');
   });
   return 'window.LOS_ASSETS = ' + JSON.stringify({ logo: uri('logo.webp', 'image/webp'), icona: uri('icona.webp', 'image/webp'), favicon: uri('favicon.png', 'image/png'), panoramica: uri('panoramica.webp', 'image/webp'), sagome, arene, atlas, fx }) + ';';
 }
 const engineScripts = ['data-core.js', 'data-themes.js', ...content, 'engine-systems.js', 'engine-geography.js', 'engine.js'];
-const appScripts = ['art.js', 'atlas.js', 'anim.js', 'simulator.js', 'replay.js', 'experiments.js', 'map-view.js', 'studio.js', 'photo-search.js', 'ui.js'];
+const appScripts = ['art.js', 'atlas.js', 'anim.js', 'look.js', 'simulator.js', 'replay.js', 'experiments.js', 'map-view.js', 'studio.js', 'photo-search.js', 'ui.js'];
 const scripts = [...engineScripts, ...appScripts];
 // Impronta dei sorgenti, indipendente dai fine riga del checkout e dagli output generati.
 const buildHash = require('crypto').createHash('sha256');
-for (const f of [...scripts, 'style.css', 'shell.html']) buildHash.update(f + '\0' + src(f).replace(/\r\n/g, '\n') + '\0');
+for (const f of [...scripts, 'style.css', 'look.css', 'shell.html']) buildHash.update(f + '\0' + src(f).replace(/\r\n/g, '\n') + '\0');
 buildHash.update(fs.readFileSync(__filename, 'utf8').replace(/\r\n/g, '\n'));
 const buildId = buildHash.digest('hex');
 const engineCode = engineScripts.map(src).join('\n;\n');
@@ -59,7 +71,7 @@ const code = 'window.LOS_BUILD = ' + JSON.stringify(buildId) + ';\n;\n' + appScr
 const page = (assetsJs) => {
   const js = assetsJs + '\n;\n' + code;
   if (/<\/script/i.test(js + engineCode)) throw new Error('Il JS contiene </script>');
-  return src('shell.html').replace('/*@CSS@*/', () => src('style.css')).replace('/*@ENGINE@*/', () => engineCode).replace('/*@JS@*/', () => js);
+  return src('shell.html').replace('/*@CSS@*/', () => src('style.css') + '\n' + src('look.css')).replace('/*@ENGINE@*/', () => engineCode).replace('/*@JS@*/', () => js);
 };
 fs.rmSync(path.join(DOCS, 'img'), { recursive: true, force: true });
 const html = page(assetsFor(inline));
