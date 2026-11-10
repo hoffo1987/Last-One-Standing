@@ -1,4 +1,4 @@
-# Origine delle risorse visive
+# Origine delle risorse visive e sonore
 
 Il progetto mantiene i diritti riservati: vedere [LICENSE](LICENSE). Questo elenco
 descrive la provenienza documentata, senza attribuire una licenza alle immagini.
@@ -14,6 +14,7 @@ descrive la provenienza documentata, senza attribuire una licenza alle immagini.
 | SVG e icone prodotti da `src/art.js` e `src/ui.js` | Disegnati e conservati nel codice del progetto. |
 | `assets/fx/*.webp` | Quattro pennellate, dieci sigilli delle arene e una grana della carta generati con Midjourney dai prompt di [docs-dev/movimento.md](docs-dev/movimento.md), forniti per il progetto e trasformati in maschere trasparenti WebP. Nessun simbolo o marchio di opere esistenti. |
 | `assets/fx/fondale-<arena>.webp`, `forma-*.webp`, `impatto.webp`, `mezzitoni.webp`, `volto-*.webp`, `occhi-*.webp` e `assets/vincitori/*.webp` | Asset del nuovo look (9 novembre 2026), generati con Midjourney v8.2 dai prompt di [docs-dev/prompt-midjourney.md](docs-dev/prompt-midjourney.md), forniti per il progetto e convertiti con `tools/import-fx.py`. Le forme sono maschere trasparenti; i vincitori sono stati scontornati; le fasce `occhi-*` sono ritagli dei volti alle quote di `assets/fx/volti.json`. Personaggi originali, nessun simbolo o marchio di opere esistenti. Fondali, volti e vincitori sono solo nella versione web. |
+| `assets/audio/*` | Audio fornito per il progetto (10 novembre 2026): `musica-dark-hour.mp3` è il brano «ダークアワー (Dark Hour)», generato con Suno (lo dichiarano i metadati del file originale); `ui-hover`, `ui-tick`, `ui-click`, `colpo`, `scontro` e `vittoria` sono effetti generati per il sito. Ridotti, sfumati e normalizzati con ffmpeg (effetti brevi in WAV mono a 32 kHz, il resto in MP3); la musica è solo nella versione web. Il mixaggio è in `src/look.js`. |
 | `assets/arene/<arena>/<sezione>/*.webp` | Immagini della guida delle arene, da fornire. Specifiche, nomi dei file e prompt di luoghi, pericoli e armi sono in [docs-dev/immagini-arene.md](docs-dev/immagini-arene.md); meteo, disastri e oggetti seguiranno. Finché mancano, `src/atlas.js` disegna illustrazioni vettoriali provvisorie. |
 
 Il registro di lavorazione dei pacchetti di immagini documenta la creazione il

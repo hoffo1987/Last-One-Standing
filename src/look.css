@@ -220,6 +220,10 @@ h3 { font-weight: 800; }
 #sfxBtn .off { display: none; }
 #sfxBtn[aria-pressed="false"] .on { display: none; }
 #sfxBtn[aria-pressed="false"] .off { display: inline; }
+#musicBtn .off { display: none; }
+#musicBtn[aria-pressed="false"] .off { display: inline; }
+#musicBtn:disabled { opacity: .4; cursor: default; }
+#musicBtn[hidden] { display: none; }
 
 /* ---------- movimento ridotto: le forme restano, il movimento no ---------- */
 @media (prefers-reduced-motion: reduce) { .ev.in { animation: none; } .cutin { display: none; } }

@@ -195,7 +195,7 @@
     [...t.children].forEach((s, i) => anim(s, [{ transform: 'translateY(-120%) rotate(' + R(-10, 10) + 'deg) scale(1.6)', opacity: 0 }, { opacity: 1, offset: 0.5 }, { transform: 'none', opacity: 1 }], { duration: 300, delay: 260 + i * 90, easing: E.kick }));
     const main = document.querySelector('main');
     if (main) main.animate([0, 1, 2, 3, 4, 5, 6].map((i) => ({ translate: (i === 6 ? 0 : R(-9, 9) * (1 - i / 7)).toFixed(1) + 'px ' + (i === 6 ? 0 : R(-6, 6) * (1 - i / 7)).toFixed(1) + 'px' })), { duration: 520, delay: 280, easing: 'steps(7, end)' });
-    sfx('cut'); sfx('stamp', { at: 280 }); sfx('stamp', { at: 420 });
+    sfx('cut'); sfx('disaster', { at: 200 });
   }
 
   // scontro finale: gli occhi di chi resta, da lati alterni
@@ -215,7 +215,7 @@
     anim(b.querySelector('.pb-veil'), [{ opacity: 0 }, { opacity: 1, offset: 0.08 }, { opacity: 1, offset: 0.86 }, { opacity: 0 }], { duration: D });
     anim(head, [{ transform: 'translate(-50%,-50%) rotate(-6deg) scale(2.2)', opacity: 0 }, { transform: 'translate(-50%,-50%) rotate(-6deg) scale(1)', opacity: 1 }], { duration: 260, delay: 220 + list.length * 70, easing: E.kick });
     anim(head, [{ opacity: 1 }, { opacity: 0 }], { duration: 160, delay: D - 260, easing: E.in, fill: 'forwards' });
-    sfx('duel'); sfx('stamp', { at: 240 + list.length * 70 });
+    sfx('cut'); sfx('finale', { at: 120 }); sfx('stamp', { at: 240 + list.length * 70 });
   }
 
   /* cut-in di un'eliminazione, in cinque tempi:
@@ -310,7 +310,7 @@
     anim(halfB, [{ translate: '0 0', opacity: 1 }, { translate: '36px ' + (ph * 1.2).toFixed(0) + 'px', rotate: '7deg', opacity: 0 }], { duration: 340, delay: D - 360, easing: E.in, fill: 'forwards' });
     anim(stamp, [{ scale: '1', opacity: 1 }, { scale: '1.14', opacity: 0 }], { duration: 180, delay: D - 250, easing: E.in, fill: 'forwards' });
     anim(ink, [{ opacity: 1 }, { opacity: 0 }], { duration: 200, delay: D - 250, easing: E.in, fill: 'forwards' });
-    sfx('elimination', { at: CUT }); sfx('stamp', { at: CUT + 180 });
+    sfx('slash', { at: CUT - 40 }); sfx('kill', { at: CUT + 30 }); sfx('stamp', { at: CUT + 300 });
   }
   function watchKills() {
     const feed = document.getElementById('phBody'); if (!feed) return;
@@ -397,13 +397,13 @@
     // 1 · il taglio
     anim(q('.pf-slash'), [{ transform: 'translate(-50%,-50%) rotate(-24deg) scaleX(0)' }, { transform: 'translate(-50%,-50%) rotate(-24deg) scaleX(1)' }], { duration: 170, easing: E.io });
     anim(q('.pf-slash'), [{ opacity: 1 }, { opacity: 0 }], { duration: 160, delay: 190 });
-    sfx('victory');
+    sfx('slash');
     // 2 · gli occhi
     anim(eyesBand, [{ clipPath: 'inset(50% 0 50% 0)' }, { clipPath: 'inset(0 0 0 0)' }], { duration: 180, delay: 150, easing: E.out });
     qa('.pf-eyes .pe').forEach((p, i) => anim(p, [{ transform: 'translateX(' + (i % 2 ? -1 : 1) * 46 + '%) skewX(-10deg)', opacity: 0 }, { transform: 'translateX(0) skewX(-10deg)', opacity: 1 }], { duration: 280, delay: 170 + i * 60, easing: E.out }));
     qa('.pf-eyes .pe img').forEach((im) => anim(im, [{ transform: 'scale(1.16) translateX(-3%)' }, { transform: 'scale(1.04) translateX(2%)' }], { duration: 900, delay: 170, easing: 'linear' }));
     // 3 · il cartellone
-    later(840, () => { sfx('stamp'); });
+    later(780, () => { sfx('victory'); }); later(840, () => { sfx('stamp'); });
     anim(q('.pf-flash'), [{ opacity: 0 }, { opacity: 1 }, { opacity: 0 }], { duration: 300, delay: 760, easing: 'steps(3, end)' });
     anim(card, [{ visibility: 'hidden' }, { visibility: 'visible' }], { duration: 1, delay: 860 });
     anim(eyesBand, [{ visibility: 'visible' }, { visibility: 'hidden' }], { duration: 1, delay: 860 });

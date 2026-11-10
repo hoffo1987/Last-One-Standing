@@ -137,3 +137,22 @@ Metodo: si avvia l'effetto, si mettono in pausa tutte le animazioni e si sposta 
 - **Cut-in delle eliminazioni.** Era una striscia nera sulla pagina ancora leggibile, con una linea sottile sul volto di chi cade e il timbro sopra i volti; la «spaccatura» non avveniva. Ora: vignetta rossa sulla pagina, linee di velocità nella fascia, riflesso sugli occhi di chi colpisce, chi cade a colori fino al colpo; lampo, lama luminosa lungo la diagonale, il pannello si divide davvero in due metà che scivolano lungo il taglio, schizzi che volano e colano, volto in grigio e rosso, nome barrato, scena che trema; il timbro cade sotto la fascia su una macchia d'inchiostro; in uscita le metà cadono. Durata 1,6 s; un comando la chiude subito come prima.
 - **Ritagli delle figure.** Le figure dei vincitori toccano i bordi dell'immagine (a destra fino all'88%, in basso fino al 100%) e lì restava una linea dritta, ripassata dall'ombra colorata. `LOS_LOOK.feather` misura su una miniatura quanta figura tocca ciascun bordo e sfuma solo quei lati, con una curva in quattro tappe; vale per l'esito e per il cartellone della vittoria.
 - **Regola per le uscite programmate.** Un'animazione d'uscita creata all'inizio con un ritardo (`delay: D - …`) deve avere `fill: 'forwards'`: con `both` il suo riempimento all'indietro vince sull'entrata e la annulla. Succedeva a calendario, disastro, scontro finale (le righe non entravano) e al cut-in.
+
+## Audio: suoni e musica (10 novembre 2026)
+
+File in `assets/audio` (provenienza in ASSETS.md), preparati con ffmpeg: effetti brevi tagliati sull'attacco, sfumati e portati a −3 dBFS di picco (uno arrivava a −44 dB); gli effetti lunghi e la musica in MP3. Analisi di partenza: `ui-click` è un clic secco e rumoroso (50 ms), `ui-tick` un rintocco tonale a circa 1050 e 800 Hz, `ui-hover` un soffio sopra i 13 kHz, `colpo` un impatto che decade in 3 s, `scontro` 1 s di attacco brillante poi un tonfo basso, `vittoria` un breve tema nu-jazz.
+
+| Momento | Suono | Livello |
+| --- | --- | --- |
+| Passaggio su un comando (solo mouse) | `ui-hover` con lieve variazione d'intonazione | 0,22 |
+| Cursore che scivola | `ui-hover` più acuto | 0,42 |
+| Comandi secondari | `ui-tick`, accorciato | 0,26 |
+| Comandi principali | `ui-click` | 0,62 |
+| Timbro (arena, cartelli) | `ui-click` due ottave sotto, filtrato, sopra un tonfo sintetico | 0,7 |
+| Lama | fruscio sintetico + attacco di `scontro` | 0,5 |
+| Eliminazione | `colpo` | 0,72 |
+| Disastro | `scontro` | 0,7 |
+| Scontro finale | `colpo` più grave | 0,68 |
+| Vittoria | `vittoria` | 0,66 |
+
+La musica gira in loop a 0,2 (circa −30 LUFS, sotto i suoni e sotto la lettura) e si fa da parte sotto i momenti forti: eliminazione al 30% con un passa-basso a 1,4 kHz per 2,2 s, disastro e scontro finale per 3 s, vittoria al 12% per 5,6 s; poi torna in circa un secondo e mezzo. Tutto passa da un limitatore. Parte al primo gesto (regola dei browser), con 3,5 s di dissolvenza; si ferma quando la scheda non si vede. Due interruttori nell'intestazione: tutto l'audio e la sola musica, accesi di default e ricordati nel browser. Nel file portatile ci sono gli effetti ma non la musica.
