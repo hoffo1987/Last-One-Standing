@@ -215,7 +215,7 @@
     anim(b.querySelector('.pb-veil'), [{ opacity: 0 }, { opacity: 1, offset: 0.08 }, { opacity: 1, offset: 0.86 }, { opacity: 0 }], { duration: D });
     anim(head, [{ transform: 'translate(-50%,-50%) rotate(-6deg) scale(2.2)', opacity: 0 }, { transform: 'translate(-50%,-50%) rotate(-6deg) scale(1)', opacity: 1 }], { duration: 260, delay: 220 + list.length * 70, easing: E.kick });
     anim(head, [{ opacity: 1 }, { opacity: 0 }], { duration: 160, delay: D - 260, easing: E.in, fill: 'forwards' });
-    sfx('cut'); sfx('stamp', { at: 240 + list.length * 70 });
+    sfx('duel'); sfx('stamp', { at: 240 + list.length * 70 });
   }
 
   /* cut-in di un'eliminazione, in cinque tempi:
@@ -310,7 +310,7 @@
     anim(halfB, [{ translate: '0 0', opacity: 1 }, { translate: '36px ' + (ph * 1.2).toFixed(0) + 'px', rotate: '7deg', opacity: 0 }], { duration: 340, delay: D - 360, easing: E.in, fill: 'forwards' });
     anim(stamp, [{ scale: '1', opacity: 1 }, { scale: '1.14', opacity: 0 }], { duration: 180, delay: D - 250, easing: E.in, fill: 'forwards' });
     anim(ink, [{ opacity: 1 }, { opacity: 0 }], { duration: 200, delay: D - 250, easing: E.in, fill: 'forwards' });
-    sfx('slash', { at: CUT }); sfx('stamp', { at: CUT + 180 });
+    sfx('elimination', { at: CUT }); sfx('stamp', { at: CUT + 180 });
   }
   function watchKills() {
     const feed = document.getElementById('phBody'); if (!feed) return;
@@ -397,7 +397,7 @@
     // 1 · il taglio
     anim(q('.pf-slash'), [{ transform: 'translate(-50%,-50%) rotate(-24deg) scaleX(0)' }, { transform: 'translate(-50%,-50%) rotate(-24deg) scaleX(1)' }], { duration: 170, easing: E.io });
     anim(q('.pf-slash'), [{ opacity: 1 }, { opacity: 0 }], { duration: 160, delay: 190 });
-    sfx('slash');
+    sfx('victory');
     // 2 · gli occhi
     anim(eyesBand, [{ clipPath: 'inset(50% 0 50% 0)' }, { clipPath: 'inset(0 0 0 0)' }], { duration: 180, delay: 150, easing: E.out });
     qa('.pf-eyes .pe').forEach((p, i) => anim(p, [{ transform: 'translateX(' + (i % 2 ? -1 : 1) * 46 + '%) skewX(-10deg)', opacity: 0 }, { transform: 'translateX(0) skewX(-10deg)', opacity: 1 }], { duration: 280, delay: 170 + i * 60, easing: E.out }));

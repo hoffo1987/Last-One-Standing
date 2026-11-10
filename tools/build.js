@@ -2,17 +2,18 @@
 const fs = require('fs'), path = require('path');
 const src = (f) => fs.readFileSync(path.join(__dirname, '..', 'src', f), 'utf8');
 const content = fs.readdirSync(path.join(__dirname, '..', 'src', 'content')).filter((f) => f.endsWith('.js')).sort().map((f) => 'content/' + f);
-// immagini in assets/ incorporate come data URI
+// risorse in assets/ incorporate come data URI
 const A = path.join(__dirname, '..', 'assets');
 const DOCS = path.join(__dirname, '..', 'docs');
-// due modi di includere le immagini: incorporate (file unico, per l'artifact) oppure come file
+// due modi di includere le risorse: incorporate (file unico, per l'artifact) oppure come file
 // separati con l'impronta del contenuto nel nome (per il sito: pagina più leggera e cache lunga)
 const inline = (f, type) => 'data:' + type + ';base64,' + fs.readFileSync(path.join(A, f)).toString('base64');
 const written = new Set();
-const linked = (f) => {
+const linked = (f, type) => {
   const buf = fs.readFileSync(path.join(A, f));
   const hash = require('crypto').createHash('sha1').update(buf).digest('hex').slice(0, 10);
-  const name = 'img/' + f.replace(/\//g, '-').replace(/(\.\w+)$/, '.' + hash + '$1');
+  const dir = type === 'audio/wav' ? 'audio/' : 'img/';
+  const name = dir + f.replace(/^audio\//, '').replace(/\//g, '-').replace(/(\.\w+)$/, '.' + hash + '$1');
   const dest = path.join(DOCS, name);
   fs.mkdirSync(path.dirname(dest), { recursive: true });
   if (!written.has(dest)) { fs.writeFileSync(dest, buf); written.add(dest); }
@@ -56,7 +57,11 @@ function assetsFor(uri) {
   if (web && fs.existsSync(path.join(A, 'vincitori'))) fs.readdirSync(path.join(A, 'vincitori')).sort().forEach((f) => {
     const m = f.match(/^vincitore-([mfn]-\d+)\.webp$/); if (m) fx.vincitori[m[1]] = uri('vincitori/' + f, 'image/webp');
   });
-  return 'window.LOS_ASSETS = ' + JSON.stringify({ logo: uri('logo.webp', 'image/webp'), icona: uri('icona.webp', 'image/webp'), favicon: uri('favicon.png', 'image/png'), panoramica: uri('panoramica.webp', 'image/webp'), sagome, arene, atlas, fx }) + ';';
+  const audio = {};
+  for (const cue of ['move', 'confirm', 'cut', 'elimination', 'duel', 'victory']) {
+    audio[cue] = uri('audio/' + cue + '.wav', 'audio/wav');
+  }
+  return 'window.LOS_ASSETS = ' + JSON.stringify({ logo: uri('logo.webp', 'image/webp'), icona: uri('icona.webp', 'image/webp'), favicon: uri('favicon.png', 'image/png'), panoramica: uri('panoramica.webp', 'image/webp'), sagome, arene, atlas, fx, audio }) + ';';
 }
 const engineScripts = ['data-core.js', 'data-themes.js', ...content, 'engine-systems.js', 'engine-geography.js', 'engine.js'];
 const appScripts = ['art.js', 'atlas.js', 'anim.js', 'look.js', 'regia.js', 'palco.js', 'simulator.js', 'replay.js', 'experiments.js', 'map-view.js', 'studio.js', 'photo-search.js', 'ui.js'];
@@ -74,6 +79,7 @@ const page = (assetsJs) => {
   return src('shell.html').replace('/*@CSS@*/', () => src('style.css') + '\n' + src('look.css') + '\n' + src('palco.css')).replace('/*@ENGINE@*/', () => engineCode).replace('/*@JS@*/', () => js);
 };
 fs.rmSync(path.join(DOCS, 'img'), { recursive: true, force: true });
+fs.rmSync(path.join(DOCS, 'audio'), { recursive: true, force: true });
 const html = page(assetsFor(inline));
 const webHtml = page(assetsFor(linked));
 const out = path.join(__dirname, '..', 'dist', 'last-one-standing.html');
@@ -89,4 +95,4 @@ const preload = '<link rel="preload" as="image" href="' + linked('logo.webp') + 
 fs.writeFileSync(path.join(DOCS, 'index.html'), head.replace('</head>', preload + '</head>') + webHtml + '\n</body>\n</html>\n');
 ['anteprima.jpg', 'favicon.png', 'icona-180.png'].forEach((f) => { fs.copyFileSync(path.join(A, f), path.join(__dirname, '..', 'dist', f)); fs.copyFileSync(path.join(A, f), path.join(DOCS, f)); });
 fs.writeFileSync(path.join(DOCS, '.nojekyll'), '');
-console.log('Creato', path.relative(process.cwd(), out), (html.length / 1024).toFixed(1) + ' KB · sito web', (fs.statSync(path.join(DOCS, 'index.html')).size / 1024).toFixed(1) + ' KB + ' + written.size + ' immagini');
+console.log('Creato', path.relative(process.cwd(), out), (html.length / 1024).toFixed(1) + ' KB · sito web', (fs.statSync(path.join(DOCS, 'index.html')).size / 1024).toFixed(1) + ' KB + ' + written.size + ' risorse');

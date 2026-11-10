@@ -2,8 +2,8 @@
  * - colore del testo sopra la tinta piena dell'arena (--key-ink), scelto per contrasto;
  * - il cursore di selezione che scivola tra le voci di navigazione e dei segmenti;
  * - il cut-in degli occhi di chi vince, alla fine della rivelazione dell'esito;
- * - gli effetti sonori, sintetizzati con WebAudio (spenti finché il giocatore non li accende).
- * Si aggancia a LOS_ANIM avvolgendone wipe, card e stage: ui.js non cambia. Va caricato dopo anim.js e prima di ui.js. */
+ * - gli effetti sonori riprodotti dai WAV (spenti finché il giocatore non li accende).
+ * Si aggancia a LOS_ANIM e va caricato dopo anim.js e prima di ui.js. */
 (function (G) {
   'use strict';
   if (typeof document === 'undefined') return;
@@ -33,51 +33,87 @@
   }
 
   /* ================= EFFETTI SONORI ================= */
-  // Tutto sintetizzato: niente file audio, niente suoni presi da altri giochi.
   const SFX = (() => {
-    let ctx = null, master = null, on = store.get('los-sfx') === '1', lastUser = 0;
-    const ensure = () => {
-      if (ctx) return ctx;
-      const C = G.AudioContext || G.webkitAudioContext; if (!C) return null;
-      ctx = new C(); master = ctx.createGain(); master.gain.value = 0.32; master.connect(ctx.destination); return ctx;
-    };
-    let noiseBuf = null;
-    const noise = () => {
-      if (noiseBuf) return noiseBuf;
-      noiseBuf = ctx.createBuffer(1, ctx.sampleRate * 0.6, ctx.sampleRate);
-      const d = noiseBuf.getChannelData(0); for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
-      return noiseBuf;
-    };
-    const env = (g, t, a, peak, dur) => { g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(peak, t + a); g.gain.exponentialRampToValueAtTime(0.0001, t + dur); };
-    function tone(type, f0, f1, dur, peak, at) {
-      const t = ctx.currentTime + (at || 0), o = ctx.createOscillator(), g = ctx.createGain();
-      o.type = type; o.frequency.setValueAtTime(f0, t); o.frequency.exponentialRampToValueAtTime(Math.max(20, f1), t + dur);
-      env(g, t, 0.004, peak, dur); o.connect(g).connect(master); o.start(t); o.stop(t + dur + 0.02);
-    }
-    function hiss(f0, f1, q, dur, peak, at, type) {
-      const t = ctx.currentTime + (at || 0), s = ctx.createBufferSource(), f = ctx.createBiquadFilter(), g = ctx.createGain();
-      s.buffer = noise(); f.type = type || 'bandpass'; f.Q.value = q; f.frequency.setValueAtTime(f0, t); f.frequency.exponentialRampToValueAtTime(f1, t + dur);
-      env(g, t, 0.01, peak, dur); s.connect(f).connect(g).connect(master); s.start(t); s.stop(t + dur + 0.02);
-    }
+    const files = (G.LOS_ASSETS && G.LOS_ASSETS.audio) || {};
+    const buffers = new Map(), active = new Set();
+    let ctx = null, waking = null, on = store.get('los-sfx') === '1', lastUser = 0, generation = 0;
+    // I WAV hanno livelli diversi. Gli offset e le durate saltano le code silenziose.
     const voices = {
-      move() { tone('square', 1500, 950, 0.035, 0.12); },
-      confirm() { tone('triangle', 660, 660, 0.07, 0.35); tone('triangle', 990, 990, 0.12, 0.3, 0.06); hiss(5000, 3000, 1, 0.05, 0.2); },
-      cut() { hiss(500, 4200, 1.4, 0.26, 0.55); },
-      stamp() { tone('sine', 140, 48, 0.2, 0.9); hiss(1800, 600, 0.8, 0.09, 0.5); },
-      slash() { hiss(7000, 900, 2, 0.22, 0.6, 0, 'highpass'); tone('sawtooth', 880, 220, 0.18, 0.12); tone('sawtooth', 893, 230, 0.18, 0.1); },
+      move: { clip: 'move', gain: 1.8, offset: 0.055, duration: 0.16 },
+      confirm: { clip: 'confirm', gain: 0.25 },
+      cut: { clip: 'cut', gain: 25 },
+      stamp: { clip: 'confirm', gain: 0.4 },
+      elimination: { clip: 'elimination', gain: 0.24, duration: 1.3 },
+      duel: { clip: 'duel', gain: 0.23, offset: 0.14, duration: 2 },
+      victory: { clip: 'victory', gain: 0.24, duration: 4.65 },
     };
-    const mark = () => { lastUser = Date.now(); };
-    ['pointerdown', 'keydown'].forEach((e) => document.addEventListener(e, mark, true));
+
+    function load(clip) {
+      if (!buffers.has(clip)) {
+        const pending = G.fetch(files[clip]).then((res) => {
+          if (!res.ok) throw new Error('WAV non disponibile: ' + clip);
+          return res.arrayBuffer();
+        }).then((data) => ctx.decodeAudioData(data)).catch(() => {
+          buffers.delete(clip);
+          return null;
+        });
+        buffers.set(clip, pending);
+      }
+      return buffers.get(clip);
+    }
+    function unlock() {
+      const C = G.AudioContext || G.webkitAudioContext;
+      if (!on || !C) return;
+      try {
+        if (!ctx) {
+          ctx = new C();
+          Object.keys(files).forEach(load);
+        }
+        if (ctx.state !== 'running' && !waking) {
+          waking = ctx.resume().catch(() => {}).finally(() => { waking = null; });
+        }
+      } catch (e) { /* audio non disponibile */ }
+    }
+    const mark = (e) => {
+      lastUser = Date.now();
+      if (e.isTrusted) unlock();
+    };
+    ['pointerdown', 'keydown', 'click'].forEach((e) => document.addEventListener(e, mark, true));
+
     return {
       get on() { return on; },
-      set(v) { on = !!v; store.set('los-sfx', on ? '1' : '0'); if (on) { const c = ensure(); if (c && c.state === 'suspended') c.resume(); } },
+      set(v) {
+        on = !!v;
+        store.set('los-sfx', on ? '1' : '0');
+        if (on) unlock();
+        else {
+          generation++;
+          active.forEach((source) => source.stop());
+          active.clear();
+        }
+      },
       // userOnly: suona solo se il cambio arriva da un tocco o un tasto appena premuto (non dai cambi automatici)
-      play(name, opt) {
-        if (!on || !voices[name]) return;
-        if (opt && opt.userOnly && Date.now() - lastUser > 700) return;
-        const c = ensure(); if (!c) return; if (c.state === 'suspended') c.resume();
-        const run = () => { try { voices[name](); } catch (e) { /* audio non disponibile */ } };
-        if (opt && opt.at) setTimeout(run, opt.at); else run();
+      async play(name, { at = 0, userOnly = false } = {}) {
+        const voice = voices[name];
+        if (!on || !ctx || !voice || !files[voice.clip]) return;
+        if (userOnly && Date.now() - lastUser > 700) return;
+        const epoch = generation, when = ctx.currentTime + at / 1000;
+        try {
+          const buffer = await load(voice.clip);
+          if (waking) await waking;
+          if (!buffer || !on || generation !== epoch || ctx.state !== 'running') return;
+          const source = ctx.createBufferSource(), gain = ctx.createGain();
+          source.buffer = buffer;
+          gain.gain.value = voice.gain;
+          source.connect(gain).connect(ctx.destination);
+          source.onended = () => {
+            active.delete(source);
+            source.disconnect();
+            gain.disconnect();
+          };
+          source.start(Math.max(ctx.currentTime, when), voice.offset || 0, voice.duration || buffer.duration);
+          active.add(source);
+        } catch (e) { /* audio non disponibile */ }
       },
     };
   })();
@@ -233,7 +269,7 @@
     else if (reserve) panel(reserve, true);
     else { const s = document.createElement('b'); s.className = 'ci-ini'; s.textContent = ini; eyes.appendChild(s); }
     host.appendChild(el);
-    SFX.play('slash'); SFX.play('stamp', { at: 140 });
+    SFX.play('cut'); SFX.play('stamp', { at: 140 });
     const end = () => el.remove();
     setTimeout(end, 1150);
     host.addEventListener('pointerdown', end, { once: true });
@@ -241,8 +277,6 @@
 
   /* ================= AGGANCI A LOS_ANIM ================= */
   function wrap(name, fn) { const orig = AN[name]; if (typeof orig !== 'function') return; AN[name] = function () { fn.apply(this, arguments); return orig.apply(this, arguments); }; }
-  wrap('wipe', () => { if (!reduced()) { SFX.play('cut'); SFX.play('stamp', { at: 230 }); } });
-  wrap('card', (host, html, cls) => { if (reduced() || !host) return; SFX.play('cut'); SFX.play('stamp', { at: /stc-day|stc-cal/.test(cls || '') || /stc-cal/.test(html || '') ? 700 : 380 }); });
   function after(name, fn) { const orig = AN[name]; if (typeof orig !== 'function') return; AN[name] = function () { const r = orig.apply(this, arguments); try { fn.apply(this, arguments); } catch (e) { /* solo decorazione */ } return r; }; }
   // la lastra di tinta dello stacco prende il fondale dell'arena di arrivo
   after('wipe', (swap, opt) => {
