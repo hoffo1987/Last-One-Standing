@@ -20,6 +20,7 @@
   const RI = (a, b) => Math.floor(R(a, b + 1));
   const pick = (a) => a[Math.floor(Math.random() * a.length)];
   const rad = (d) => (d * Math.PI) / 180;
+  const emit = (name, detail) => { try { document.dispatchEvent(new CustomEvent(name, { detail })); } catch (e) { /* niente */ } };
   const sfx = (n, o) => { const L = G.LOS_LOOK; if (L && L.sfx) L.sfx.play(n, o); };
 
   /* ---------- token di movimento: gli stessi per tutto il sito ---------- */
@@ -179,13 +180,56 @@
     };
   }
 
-  const FAMILIES = { lame, schegge, sipario, esplosione };
+  // retino: un mezzitono che cresce fino a coprire tutto, dal punto toccato o da un angolo
+  function retino(g, W, H, dir, P, defs, origin) {
+    const s = Math.max(W, H) / RI(11, 15), cols = Math.ceil(W / s) + 2, rows = Math.ceil(H / (s * 0.9)) + 2; // una riga e una colonna in più: i bordi restano coperti
+    const ox = origin ? origin.x : dir > 0 ? 0 : W, oy = origin ? origin.y : pick([0, H]), far = Math.hypot(Math.max(ox, W - ox), Math.max(oy, H - oy));
+    const base = [], ink = [], ga = R(0, Math.PI * 2), gx = Math.cos(ga), gy = Math.sin(ga);
+    const dot = (cx, cy, r, fill, list) => { const c = el('circle', { cx: cx.toFixed(1), cy: cy.toFixed(1), r: r.toFixed(1), fill }, g); c.style.transformOrigin = cx.toFixed(1) + 'px ' + cy.toFixed(1) + 'px'; c.__d = Math.hypot(cx - ox, cy - oy) / far; list.push(c); };
+    for (let r = 0; r < rows; r++) for (let c = 0; c < cols; c++) dot(c * s + (r % 2 ? s / 2 : 0), r * s * 0.9, s * 0.8, P.key, base);
+    // sopra, puntini neri di grandezza crescente lungo una diagonale: il retino vero e proprio
+    for (let r = 0; r < rows; r++) for (let c = 0; c < cols; c++) {
+      const cx = c * s + (r % 2 ? 0 : s / 2), cy = r * s * 0.9 + s * 0.45, t = ((cx / W - 0.5) * gx + (cy / H - 0.5) * gy) + 0.5;
+      if (t > 0.18) dot(cx, cy, s * Math.min(0.46, 0.06 + 0.42 * t), P.void, ink);
+    }
+    return {
+      cover: () => all(base.map((c) => anim(c, [{ transform: 'scale(0)' }, { transform: 'scale(1)' }], { duration: 300, delay: c.__d * 300 + R(0, 20), easing: E.out }))
+        .concat(ink.map((c) => anim(c, [{ transform: 'scale(0)' }, { transform: 'scale(1)' }], { duration: 260, delay: 120 + c.__d * 300 + R(0, 20), easing: E.kick })))),
+      uncover: () => all(ink.map((c) => anim(c, [{ transform: 'scale(1)' }, { transform: 'scale(0)' }], { duration: 180, delay: (1 - c.__d) * 140, easing: E.in }))
+        .concat(base.map((c) => anim(c, [{ transform: 'scale(1)' }, { transform: 'scale(0)' }], { duration: 300, delay: 60 + (1 - c.__d) * 280 + R(0, 20), easing: E.in })))),
+    };
+  }
+
+  // titoli: fasce di testo che scorrono, la parola della sezione ripetuta a tutta larghezza
+  function titoli(g, W, H, dir, P) {
+    const n = RI(5, 7), hh = (H * 1.3) / n, word = ((P.label || 'Last One Standing') + ' ').toUpperCase(), rows = [];
+    for (let i = 0; i < n; i++) {
+      const y = -H * 0.15 + i * hh, row = el('g', {}, g), dark = i % 2 === 0, side = (i % 2 ? 1 : -1) * dir;
+      el('rect', { x: -W * 0.3, y: y - 1, width: W * 1.6, height: hh + 2, fill: dark ? P.void : i % 4 === 1 ? P.key : P.deep }, row);
+      const fs = hh * 0.86, t = el('text', { x: -W * 0.3 - R(0, fs * 2), y: y + hh * 0.8, 'font-size': fs.toFixed(0), 'font-weight': 900, 'font-style': 'italic', fill: dark ? 'none' : P.void, 'fill-opacity': dark ? 1 : 0.28, stroke: dark ? P.key : 'none', 'stroke-width': dark ? 2 : 0, 'stroke-opacity': 0.75 }, row);
+      t.style.fontFamily = "Archivo, 'Bricolage Grotesque', sans-serif"; t.style.fontStretch = '118%'; t.style.letterSpacing = '-.02em';
+      t.textContent = word.repeat(Math.ceil((W * 1.7) / (fs * 0.62 * word.length)) + 1);
+      if (i % 3 === 2) el('rect', { x: -W * 0.3, y: y + hh - 5, width: W * 1.6, height: 5, fill: P.paper }, row);
+      row.__side = side; row.__i = i; row.__t = t; rows.push(row);
+    }
+    const off = W * 1.7;
+    return {
+      cover: () => all(rows.map((r) => {
+        // il testo continua a scorrere finché la fascia resta in scena
+        r.__t.animate([{ transform: 'translateX(0)' }, { transform: 'translateX(' + -r.__side * 160 + 'px)' }], { duration: 1600, easing: 'linear', fill: 'both' });
+        return anim(r, [{ transform: 'translateX(' + -r.__side * off + 'px)' }, { transform: 'translateX(0)' }], { duration: 320, delay: r.__i * 30 + R(0, 16), easing: E.io });
+      })),
+      uncover: () => all(rows.map((r) => anim(r, [{ transform: 'translateX(0)' }, { transform: 'translateX(' + r.__side * off + 'px)' }], { duration: 360, delay: (n - 1 - r.__i) * 24 + R(0, 14), easing: E.in }))),
+    };
+  }
+
+  const FAMILIES = { lame, schegge, sipario, esplosione, retino, titoli };
   // la sezione d'arrivo ha una famiglia di casa; ogni tanto si cambia, ma mai la stessa due volte di fila
-  const HOME = { home: ['lame', 'schegge'], cast: ['sipario', 'lame'], arena: ['schegge', 'lame'], diretta: ['lame', 'sipario'], esito: ['esplosione', 'schegge'] };
+  const HOME = { home: ['titoli', 'lame'], cast: ['sipario', 'retino'], arena: ['schegge', 'titoli'], diretta: ['lame', 'retino'], esito: ['esplosione', 'schegge'] };
   function choose(view) {
     if (G.LOS_REGIA && FAMILIES[G.LOS_REGIA.force]) return (lastFamily = G.LOS_REGIA.force); // solo per provare
     const pref = HOME[view] || ['lame'];
-    let f = Math.random() < 0.7 ? pref[0] : pick(pref.concat(Object.keys(FAMILIES)));
+    let f = Math.random() < 0.55 ? pref[0] : pick(pref.concat(Object.keys(FAMILIES)));
     if (f === lastFamily) f = pref.find((x) => x !== lastFamily) || Object.keys(FAMILIES).find((x) => x !== lastFamily);
     lastFamily = f; return f;
   }
@@ -209,8 +253,8 @@
     // il cartello resta sempre dentro lo schermo: le parole lunghe si stringono, poi si sposta il centro
     const W = G.innerWidth, fit = () => cap.getBoundingClientRect();
     let r = fit();
-    if (r.width > W * 0.9) { cap.style.fontSize = 'calc(clamp(40px, 10vw, 138px) * ' + ((W * 0.9) / r.width).toFixed(3) + ')'; r = fit(); }
-    const pad = W * 0.04;
+    if (r.width > W * 0.8) { cap.style.fontSize = 'calc(clamp(40px, 10vw, 138px) * ' + ((W * 0.8) / r.width).toFixed(3) + ')'; r = fit(); }
+    const pad = W * 0.06;
     if (r.left < pad) cap.style.left = 'calc(' + place[0] + '% + ' + (pad - r.left).toFixed(0) + 'px)';
     else if (r.right > W - pad) cap.style.left = 'calc(' + place[0] + '% - ' + (r.right - W + pad).toFixed(0) + 'px)';
     const letters = [...w.children];
@@ -231,7 +275,7 @@
   }
 
   /* ---------- la pagina nuova entra a strati ---------- */
-  const ENTER = 'h1, h2, .card, .poster-card, .facts > *, .cta, .lead, .kicker, .hh-board, .broadcast, .winhero, .podium, .block, .award, .steps-hint, .arena-grid > *, .rules > *, .dock';
+  const ENTER = '.pagehead > div > p, h2, .card, .poster-card, .facts > *, .cta, .lead, .kicker, .hh-board, .broadcast, .winhero, .podium, .block, .award, .steps-hint, .arena-grid > *, .rules > *, .dock';
   function enter(view, dir) {
     const sec = document.getElementById('v-' + view); if (!sec) return;
     const vh = G.innerHeight, list = [];
@@ -257,7 +301,7 @@
     if (AN.reduced || busy || !body || typeof body.animate !== 'function') { swap(); return; }
     busy = true;
     const dir = ORDER.indexOf(to) >= ORDER.indexOf(from) ? 1 : -1;
-    const W = G.innerWidth, H = G.innerHeight, P = palette(opt.hue);
+    const W = G.innerWidth, H = G.innerHeight, P = palette(opt.hue); P.label = opt.label;
     if (!layer || !layer.isConnected) { layer = document.createElement('div'); layer.className = 'lx'; layer.setAttribute('aria-hidden', 'true'); body.appendChild(layer); }
     layer.innerHTML = ''; layer.hidden = false;
     const svg = el('svg', { width: W, height: H, viewBox: '0 0 ' + W + ' ' + H, class: 'lx-svg' });
@@ -269,7 +313,7 @@
     // lo specchio per la direzione: le lame e il sipario arrivano dal lato giusto
     if (dir < 0 && (fam === 'lame')) g.setAttribute('transform', 'translate(' + W + ',0) scale(-1,1)');
     // il sipario non è mai dritto: qualche grado d'inclinazione, ingrandito quanto basta a coprire gli angoli
-    if (fam === 'sipario') g.setAttribute('transform', 'translate(' + W / 2 + ' ' + H / 2 + ') rotate(' + (R(3, 7) * -dir).toFixed(1) + ') scale(1.22) translate(' + -W / 2 + ' ' + -H / 2 + ')');
+    if (fam === 'sipario' || fam === 'titoli') g.setAttribute('transform', 'translate(' + W / 2 + ' ' + H / 2 + ') rotate(' + (R(3, 7) * -dir).toFixed(1) + ') scale(1.22) translate(' + -W / 2 + ' ' + -H / 2 + ')');
     // il sigillo dell'arena, timbrato vicino al nome (piccolo: la sorgente è di 320 px)
     const FX = (G.LOS_ASSETS && G.LOS_ASSETS.fx) || {}, sealUrl = opt.arena && FX.sigilli && FX.sigilli[opt.arena];
     let seal = null;
@@ -287,6 +331,7 @@
         if (seal) seal.animate([{ transform: 'translate(-50%,-50%) rotate(-28deg) scale(1.7)', opacity: 0 }, { transform: 'translate(-50%,-50%) rotate(-10deg) scale(1)', opacity: 0.9 }], { duration: 220, easing: E.out, fill: 'both' });
         sfx('stamp', { at: 80 });
         doSwap();
+        emit('los:cover', { view: to, dir, hue: P.hue });
         return Promise.all([cap ? cap.shown : null, new Promise((r) => setTimeout(r, 140))]);
       })
       .then(() => new Promise((r) => setTimeout(r, opt.hold || 110)))
@@ -294,6 +339,7 @@
         const outs = [cap ? cap.out() : null];
         if (seal) outs.push(all([seal.animate([{ opacity: 0.9 }, { opacity: 0, transform: 'translate(-50%,-50%) rotate(-4deg) scale(.9)' }], { duration: 160, easing: E.in, fill: 'both' })]));
         enter(to, dir);
+        emit('los:enter', { view: to, dir });
         return Promise.all(outs.concat([new Promise((r) => setTimeout(r, 70)).then(() => shape.uncover())]));
       })
       .catch(() => {})

@@ -228,7 +228,7 @@
     // il cut-in arriva quando la rivelazione ha finito di entrare; un tocco che salta la regia lo annulla
     let skipped = false; const skip = () => { skipped = true; };
     el.addEventListener('pointerdown', skip, { once: true }); document.addEventListener('keydown', skip, { once: true });
-    setTimeout(() => { el.removeEventListener('pointerdown', skip); document.removeEventListener('keydown', skip); if (!skipped) cutin(el); }, 1850);
+    setTimeout(() => { el.removeEventListener('pointerdown', skip); document.removeEventListener('keydown', skip); if (!skipped && !(G.LOS_PALCO && G.LOS_PALCO.finale)) cutin(el); }, 1850); // con il palco la vittoria ha la sua sequenza a tutto schermo
   });
 
   function start() {
@@ -241,5 +241,5 @@
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start); else start();
 
-  G.LOS_LOOK = { sfx: SFX, cutin, place };
+  G.LOS_LOOK = { sfx: SFX, cutin, place, pickFor, fx: FXA };
 })(typeof window !== 'undefined' ? window : globalThis);

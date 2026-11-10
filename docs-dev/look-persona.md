@@ -105,4 +105,25 @@ La nuova regia è vettoriale: un SVG alla risoluzione dello schermo, forme rigen
 
 `LOS_REGIA.force = 'schegge'` forza una famiglia, solo per provare.
 
+### Il palco (`src/palco.js`, `src/palco.css`)
+
+Terzo strato, sopra look e regia: tutto quello che vive a tutto schermo. Usa solo nero, carta e la tinta dell'arena.
+
+| Cosa | Dove | Come |
+|---|---|---|
+| Fondale vivo | dietro ogni pagina | Due fasce con il nome della sezione che scorrono in versi opposti, il numero del passo gigante in contorno, due schegge a mezzitoni. Segue piano il puntatore. Cambia mentre lo stacco copre lo schermo. |
+| Testate | Concorrenti, Arena | Titolo da manifesto in maiuscolo con ombra piena nella tinta; le lettere entrano una per una, la riga sotto si disegna. |
+| Scintilla | ogni tocco su un comando | Raggi vettoriali dal punto toccato. |
+| Inchiostro | pulsanti secondari | Al passaggio il colore attraversa la lastra da sinistra. |
+| Calendario | cambio di giorno | Fascia nera a tutta larghezza; la striscia dei giorni scorre di un posto e il nuovo si ferma nel selettore di carta (numeri in fusione «difference»). |
+| Disastro | fase disastro | Nastri di pericolo che scorrono, titolo che cade parola per parola, la pagina trema. |
+| Scontro finale | primo atto del finale | Gli occhi di chi resta entrano da lati alterni; il titolo si stampa al centro. |
+| Cut-in | un'eliminazione per fase, quando si avanza | Chi colpisce nella tinta, chi cade in grigio; una lama taglia, il pannello si spezza e si tinge, il timbro prende l'etichetta dell'evento. |
+| Contatore | superstiti | Accusa il colpo quando scende. |
+| Vittoria | prima rivelazione dell'esito | Taglio, occhi con linee di velocità, poi il cartellone: figura (o foto, o squadra) su stella di carta, titolo su due lastre, nome lettera per lettera, nastri che scorrono. Un tocco o un tasto la chiude; si chiude da sola dopo circa 4 secondi. |
+
+Due famiglie in più per gli stacchi: `retino` (mezzitoni che crescono dal punto toccato) e `titoli` (fasce con il nome della sezione). In tutto sono sei.
+
+Regole: i cartelli non bloccano mai i comandi e un comando della diretta li chiude subito; il cut-in non parte se c'è già un cartello o se ne è appena passato uno; con il movimento ridotto non parte niente. `LOS_PALCO.hold = true` tiene aperta la vittoria, solo per provare.
+
 Da fare: un secondo giro di volti (10 per 24 concorrenti fa ripetere i volti nello scontro finale), una mascotte se la vogliamo, e l'ascolto dei suoni su dispositivi veri.
