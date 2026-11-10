@@ -169,7 +169,7 @@
     band.style.setProperty('--tilt', tilt + 'deg');
     anim(b.querySelector('.pb-veil'), [{ opacity: 0 }, { opacity: 1, offset: 0.12 }, { opacity: 1, offset: 0.82 }, { opacity: 0 }], { duration: D });
     anim(band, [{ clipPath: 'inset(0 100% 0 0)' }, { clipPath: 'inset(0 0 0 0)' }], { duration: 260, easing: E.io });
-    anim(band, [{ clipPath: 'inset(0 0 0 0)' }, { clipPath: 'inset(0 0 0 100%)' }], { duration: 240, delay: D - 250, easing: E.in });
+    anim(band, [{ clipPath: 'inset(0 0 0 0)' }, { clipPath: 'inset(0 0 0 100%)' }], { duration: 240, delay: D - 250, easing: E.in, fill: 'forwards' });
     // la striscia parte con il giorno vecchio al centro e scorre di un posto
     anim(strip, [{ transform: 'translateX(var(--slot))' }, { transform: 'translateX(0)' }], { duration: 460, delay: 300, easing: E.io });
     anim(sel, [{ transform: 'translate(-50%,-50%) skewX(-12deg) scaleX(0)' }, { transform: 'translate(-50%,-50%) skewX(-12deg) scaleX(1)' }], { duration: 240, delay: 160, easing: E.out });
@@ -190,7 +190,7 @@
     String(title || '').split(/\s+/).forEach((w, i, a) => { const s = h('span', null, esc(w)); t.appendChild(s); if (i < a.length - 1) t.appendChild(document.createTextNode(' ')); });
     anim(b.querySelector('.pb-veil'), [{ opacity: 0 }, { opacity: 1, offset: 0.1 }, { opacity: 1, offset: 0.84 }, { opacity: 0 }], { duration: D });
     anim(band, [{ transform: 'rotate(var(--tilt)) scaleY(0)' }, { transform: 'rotate(var(--tilt)) scaleY(1)' }], { duration: 200, easing: E.out });
-    anim(band, [{ transform: 'rotate(var(--tilt)) scaleY(1)', opacity: 1 }, { transform: 'rotate(var(--tilt)) scaleY(0)', opacity: 1 }], { duration: 200, delay: D - 210, easing: E.in });
+    anim(band, [{ transform: 'rotate(var(--tilt)) scaleY(1)', opacity: 1 }, { transform: 'rotate(var(--tilt)) scaleY(0)', opacity: 1 }], { duration: 200, delay: D - 210, easing: E.in, fill: 'forwards' });
     anim(b.querySelector('.pb-k'), [{ translate: '-60px 0', opacity: 0 }, { translate: '0 0', opacity: 1 }], { duration: 240, delay: 140, easing: E.out });
     [...t.children].forEach((s, i) => anim(s, [{ transform: 'translateY(-120%) rotate(' + R(-10, 10) + 'deg) scale(1.6)', opacity: 0 }, { opacity: 1, offset: 0.5 }, { transform: 'none', opacity: 1 }], { duration: 300, delay: 260 + i * 90, easing: E.kick }));
     const main = document.querySelector('main');
@@ -208,42 +208,109 @@
       row.appendChild(p); row.appendChild(h('span', 'pb-name', esc(p.dataset.name)));
       row.style.setProperty('--i', i); rows.appendChild(row);
       anim(row, [{ transform: 'translateX(' + (i % 2 ? 110 : -110) + '%) skewX(-10deg)' }, { transform: 'translateX(0) skewX(-10deg)' }], { duration: 300, delay: 160 + i * 70, easing: E.out });
-      anim(row, [{ transform: 'translateX(0) skewX(-10deg)' }, { transform: 'translateX(' + (i % 2 ? -110 : 110) + '%) skewX(-10deg)' }], { duration: 240, delay: D - 300 + i * 20, easing: E.in });
+      anim(row, [{ transform: 'translateX(0) skewX(-10deg)' }, { transform: 'translateX(' + (i % 2 ? -110 : 110) + '%) skewX(-10deg)' }], { duration: 240, delay: D - 300 + i * 20, easing: E.in, fill: 'forwards' });
       setTimeout(() => sfx('move'), 160 + i * 70);
     });
     const head = b.querySelector('.pb-head');
     anim(b.querySelector('.pb-veil'), [{ opacity: 0 }, { opacity: 1, offset: 0.08 }, { opacity: 1, offset: 0.86 }, { opacity: 0 }], { duration: D });
     anim(head, [{ transform: 'translate(-50%,-50%) rotate(-6deg) scale(2.2)', opacity: 0 }, { transform: 'translate(-50%,-50%) rotate(-6deg) scale(1)', opacity: 1 }], { duration: 260, delay: 220 + list.length * 70, easing: E.kick });
-    anim(head, [{ opacity: 1 }, { opacity: 0 }], { duration: 160, delay: D - 260, easing: E.in });
+    anim(head, [{ opacity: 1 }, { opacity: 0 }], { duration: 160, delay: D - 260, easing: E.in, fill: 'forwards' });
     sfx('cut'); sfx('stamp', { at: 240 + list.length * 70 });
   }
 
-  // cut-in di un'eliminazione: chi colpisce a sinistra, chi cade a destra, un taglio in mezzo e il timbro
+  /* cut-in di un'eliminazione, in cinque tempi:
+   * 1 · la pagina si spegne in una vignetta rossa, la fascia nera si strappa da destra con le linee di velocità;
+   * 2 · chi colpisce entra da sinistra e un riflesso gli attraversa gli occhi, chi cade entra da destra ancora a colori;
+   * 3 · lampo, la lama attraversa il pannello di chi cade, che si spezza davvero in due metà lungo il taglio: schizzi,
+   *     il volto diventa grigio e rosso, la scena trema, il nome viene barrato;
+   * 4 · il timbro cade sotto la fascia, sopra una macchia d'inchiostro;
+   * 5 · le due metà cadono, il timbro si stacca e la fascia esce. */
   let lastKill = 0;
+  const KILL = '#e5484d', BLOOD = '#8f1118';
   function killCut(row) {
     if (reduced() || Date.now() < boardBusy || Date.now() - lastKill < 1500) return;
     const avs = [...row.querySelectorAll('.avs .av')], dead = avs.filter((a) => a.classList.contains('dead')), live = avs.filter((a) => !a.classList.contains('dead'));
     if (!dead.length) return;
     lastKill = Date.now();
-    const D = 1150, b = openBoard('pb-kill' + (live.length ? '' : ' solo'), D);
+    const D = 1600, CUT = 520, b = openBoard('pb-kill' + (live.length ? '' : ' solo'), D);
     const label = ((row.querySelector('.cat') || {}).textContent || 'Fuori').trim();
-    b.innerHTML = '<div class="pb-band"><i class="pb-bg"></i><div class="pb-duel"></div><i class="pb-cutline"></i><b class="pb-stamp">' + esc(label) + '</b></div>';
-    const band = b.querySelector('.pb-band'), duel = b.querySelector('.pb-duel'), stamp = b.querySelector('.pb-stamp'), line = b.querySelector('.pb-cutline');
+    b.innerHTML = '<i class="pb-veil"></i><div class="pb-band"><i class="pb-bg"></i><i class="pb-speed"></i><div class="pb-duel"></div><i class="pb-flash"></i></div>' +
+      '<i class="pb-inksplat"></i><b class="pb-stamp">' + esc(label) + '</b>';
+    const band = b.querySelector('.pb-band'), duel = b.querySelector('.pb-duel'), stamp = b.querySelector('.pb-stamp'), ink = b.querySelector('.pb-inksplat');
     b.querySelector('.pb-bg').style.clipPath = torn(R(4, 9), R(91, 96), 2.4);
-    band.style.setProperty('--tilt', R(-5.5, -3.5).toFixed(1) + 'deg');
-    const side = (av, cls) => { const s = h('div', 'pb-side ' + cls), p = eyes(av); s.appendChild(p); s.appendChild(h('span', 'pb-name', esc(p.dataset.name))); duel.appendChild(s); return s; };
-    const L = live.length ? side(live[0], 'atk') : null, Rt = side(dead[0], 'vic');
-    anim(band, [{ clipPath: 'inset(0 0 0 100%)' }, { clipPath: 'inset(0 0 0 0)' }], { duration: 200, easing: E.io });
-    anim(band, [{ clipPath: 'inset(0 0 0 0)' }, { clipPath: 'inset(0 100% 0 0)' }], { duration: 200, delay: D - 210, easing: E.in });
-    if (L) anim(L, [{ transform: 'translateX(-60%)', opacity: 0 }, { transform: 'none', opacity: 1 }], { duration: 260, delay: 90, easing: E.out });
-    anim(Rt, [{ transform: 'translateX(60%)', opacity: 0 }, { transform: 'none', opacity: 1 }], { duration: 260, delay: 130, easing: E.out });
-    // il taglio: una lama di carta attraversa, il pannello di chi cade si spezza in due metà sfalsate
-    anim(line, [{ transform: 'translate(-50%,-50%) rotate(-58deg) scaleX(0)', opacity: 1 }, { transform: 'translate(-50%,-50%) rotate(-58deg) scaleX(1)', opacity: 1, offset: 0.5 }, { transform: 'translate(-50%,-50%) rotate(-58deg) scaleX(1)', opacity: 0 }], { duration: 280, delay: 400, easing: E.out });
-    setTimeout(() => { if (Rt.isConnected) Rt.classList.add('cut'); }, 480);
-    anim(stamp, [{ transform: 'translate(-50%,-50%) rotate(-9deg) scale(2.6)', opacity: 0 }, { transform: 'translate(-50%,-50%) rotate(-9deg) scale(1)', opacity: 1 }], { duration: 220, delay: 520, easing: E.kick });
+    const tilt = R(-5.5, -3.5);
+    band.style.setProperty('--tilt', tilt.toFixed(1) + 'deg');
+    b.style.setProperty('--srot', (R(-9, -5) + (Math.random() < 0.3 ? 12 : 0)).toFixed(1) + 'deg');
+    // chi colpisce
+    let L = null;
+    if (live.length) {
+      L = h('div', 'pb-side atk'); const p = eyes(live[0]);
+      L.appendChild(p); L.appendChild(h('span', 'pb-name', esc(p.dataset.name))); duel.appendChild(L);
+    }
+    // chi cade: due copie dello stesso pannello, ciascuna ritagliata da un lato del taglio
+    const Rt = h('div', 'pb-side vic'), pv = eyes(dead[0]), split = h('div', 'pb-split');
+    const halfA = h('div', 'pb-half a'), halfB = h('div', 'pb-half b'), slash = h('i', 'pb-slash');
+    halfA.appendChild(pv); halfB.appendChild(pv.cloneNode(true));
+    const svg = document.createElementNS(NS, 'svg'); svg.setAttribute('class', 'pb-blood'); svg.setAttribute('aria-hidden', 'true');
+    split.append(halfA, halfB, slash, svg);
+    const vname = h('span', 'pb-name', esc(pv.dataset.name));
+    Rt.append(split, vname); duel.appendChild(Rt);
+    // la geometria del taglio: dal 61% in alto al 39% in basso del pannello, la lama segue la stessa diagonale
+    const pw = split.offsetWidth || 600, ph = split.offsetHeight || 120;
+    const tx = -0.22 * pw, ty = ph, tl = Math.hypot(tx, ty), ux = tx / tl, uy = ty / tl, nx = uy, ny = -ux; // tangente (giù a sinistra) e normale (su a destra)
+    slash.style.setProperty('--ang', ((Math.atan2(ty, tx) * 180) / Math.PI).toFixed(1) + 'deg');
+    // gli schizzi: gocce allungate nella direzione del volo, da tutte e due le parti del taglio, che poi colano
+    const drops = [];
+    for (let i = 0; i < 18; i++) {
+      const s = Math.random() < 0.6 ? 1 : -1, along = R(-0.9, 0.9), out = R(0.35, 1);
+      const vx = (nx * s * out + ux * along) * R(40, 150), vy = (ny * s * out + uy * along) * R(40, 150);
+      const r = R(2, 8) * (ph / 120), e = document.createElementNS(NS, 'ellipse');
+      e.setAttribute('rx', (r * R(1.3, 2.6)).toFixed(1)); e.setAttribute('ry', r.toFixed(1));
+      e.setAttribute('fill', i % 5 === 0 ? '#0a0a0c' : i % 2 ? KILL : BLOOD);
+      svg.appendChild(e); drops.push({ e, vx, vy, a: (Math.atan2(vy, vx) * 180) / Math.PI, g: R(8, 26) });
+    }
+    // 1 · scena
+    anim(b.querySelector('.pb-veil'), [{ opacity: 0 }, { opacity: 1, offset: 0.1 }, { opacity: 1, offset: 0.88 }, { opacity: 0 }], { duration: D });
+    anim(band, [{ clipPath: 'inset(0 0 0 100%)' }, { clipPath: 'inset(0 0 0 0)' }], { duration: 220, easing: E.io });
+    anim(band, [{ clipPath: 'inset(0 0 0 0)' }, { clipPath: 'inset(0 100% 0 0)' }], { duration: 210, delay: D - 220, easing: E.in, fill: 'forwards' });
+    // 2 · i due volti
+    if (L) {
+      anim(L, [{ transform: 'translateX(-70%) skewX(14deg)', opacity: 0 }, { opacity: 1, offset: 0.3 }, { transform: 'translateX(3%) skewX(-4deg)', offset: 0.7 }, { transform: 'none', opacity: 1 }], { duration: 320, delay: 110, easing: E.out });
+      const pe = L.querySelector('.pe');
+      if (pe) anim(pe, [{ backgroundPosition: '160% 0' }, { backgroundPosition: '-60% 0' }], { duration: 420, delay: 300, easing: E.io, pseudoElement: '::after' });
+      // dopo il colpo, chi ha colpito accompagna il gesto
+      anim(L, [{ translate: '0 0' }, { translate: '18px 0', offset: 0.35 }, { translate: '0 0' }], { duration: 360, delay: CUT, easing: E.out });
+    }
+    anim(Rt, [{ transform: 'translateX(70%) skewX(14deg)', opacity: 0 }, { opacity: 1, offset: 0.3 }, { transform: 'translateX(-3%) skewX(-4deg)', offset: 0.7 }, { transform: 'none', opacity: 1 }], { duration: 320, delay: 160, easing: E.out });
+    // 3 · il colpo
+    anim(b.querySelector('.pb-flash'), [{ opacity: 0 }, { opacity: 0.85 }, { opacity: 0 }], { duration: 150, delay: CUT - 30, easing: 'steps(3, end)' });
+    anim(slash, [{ transform: 'translate(-50%,-50%) rotate(var(--ang)) scaleX(0)', opacity: 1, transformOrigin: '100% 50%' }, { transform: 'translate(-50%,-50%) rotate(var(--ang)) scaleX(1)', opacity: 1, offset: 0.45 }, { transform: 'translate(-50%,-50%) rotate(var(--ang)) scaleX(1) scaleY(.2)', opacity: 0 }], { duration: 300, delay: CUT, easing: E.out });
+    const sep = Math.max(12, ph * 0.16);
+    anim(halfA, [{ transform: 'none' }, { transform: 'translate(' + (ux * sep - nx * sep * 0.5).toFixed(1) + 'px,' + (uy * sep - ny * sep * 0.5).toFixed(1) + 'px) rotate(-2.5deg)' }], { duration: 240, delay: CUT + 40, easing: E.out });
+    anim(halfB, [{ transform: 'none' }, { transform: 'translate(' + (-ux * sep + nx * sep * 0.5).toFixed(1) + 'px,' + (-uy * sep + ny * sep * 0.5).toFixed(1) + 'px) rotate(2deg)' }], { duration: 240, delay: CUT + 40, easing: E.out });
+    setTimeout(() => { if (Rt.isConnected) Rt.classList.add('cut'); }, CUT + 30);
+    drops.forEach((d, i) => anim(d.e, [
+      { transform: 'translate(0,0) rotate(' + d.a.toFixed(0) + 'deg) scale(.2)', opacity: 1 },
+      { transform: 'translate(' + d.vx.toFixed(1) + 'px,' + d.vy.toFixed(1) + 'px) rotate(' + d.a.toFixed(0) + 'deg) scale(1)', opacity: 1, offset: 0.55 },
+      { transform: 'translate(' + d.vx.toFixed(1) + 'px,' + (d.vy + d.g).toFixed(1) + 'px) rotate(90deg) scale(.7, 1.1)', opacity: 1 },
+    ], { duration: 620, delay: CUT + 50 + i * 6, easing: E.out }));
+    anim(svg, [{ opacity: 1 }, { opacity: 0 }], { duration: 240, delay: D - 380, easing: E.in, fill: 'forwards' });
+    anim(band, [{ translate: '0 0' }, { translate: '-12px 6px' }, { translate: '10px -5px' }, { translate: '-6px 3px' }, { translate: '3px -1px' }, { translate: '0 0' }], { duration: 300, delay: CUT + 40, easing: 'steps(5, end)', fill: 'none' });
     const feed = document.getElementById('phBody');
-    if (feed) feed.animate([{ translate: '0 0' }, { translate: '-7px 3px' }, { translate: '6px -3px' }, { translate: '-3px 2px' }, { translate: '0 0' }], { duration: 260, delay: 500, easing: 'steps(4, end)' });
-    sfx('slash', { at: 400 }); sfx('stamp', { at: 540 });
+    if (feed) feed.animate([{ translate: '0 0' }, { translate: '-7px 3px' }, { translate: '6px -3px' }, { translate: '-3px 2px' }, { translate: '0 0' }], { duration: 260, delay: CUT + 40, easing: 'steps(4, end)' });
+    // 4 · il timbro, sopra una macchia d'inchiostro
+    anim(ink, [{ transform: 'translate(-50%,-50%) rotate(var(--srot)) scale(.3)', opacity: 0 }, { transform: 'translate(-50%,-50%) rotate(var(--srot)) scale(1.05)', opacity: 1, offset: 0.6 }, { transform: 'translate(-50%,-50%) rotate(var(--srot)) scale(1)', opacity: 1 }], { duration: 300, delay: CUT + 170, easing: E.out });
+    anim(stamp, [
+      { transform: 'translate(-50%,-50%) rotate(calc(var(--srot) - 16deg)) scale(2.6)', opacity: 0, filter: 'drop-shadow(14px 18px 6px rgb(0 0 0 / .5))', easing: 'cubic-bezier(.55,0,1,.45)' },
+      { transform: 'translate(-50%,-50%) rotate(var(--srot)) scale(.92)', opacity: 1, filter: 'drop-shadow(0 0 0 rgb(0 0 0 / 0))', offset: 0.6, easing: E.out },
+      { transform: 'translate(-50%,-50%) rotate(var(--srot)) scale(1)', opacity: 1, filter: 'drop-shadow(0 0 0 rgb(0 0 0 / 0))' },
+    ], { duration: 280, delay: CUT + 140 });
+    // 5 · l'uscita: le metà cadono con la gravità, il timbro si stacca
+    anim(halfA, [{ translate: '0 0', opacity: 1 }, { translate: '-30px ' + (ph * 1.4).toFixed(0) + 'px', rotate: '-9deg', opacity: 0 }], { duration: 340, delay: D - 380, easing: E.in, fill: 'forwards' });
+    anim(halfB, [{ translate: '0 0', opacity: 1 }, { translate: '36px ' + (ph * 1.2).toFixed(0) + 'px', rotate: '7deg', opacity: 0 }], { duration: 340, delay: D - 360, easing: E.in, fill: 'forwards' });
+    anim(stamp, [{ scale: '1', opacity: 1 }, { scale: '1.14', opacity: 0 }], { duration: 180, delay: D - 250, easing: E.in, fill: 'forwards' });
+    anim(ink, [{ opacity: 1 }, { opacity: 0 }], { duration: 200, delay: D - 250, easing: E.in, fill: 'forwards' });
+    sfx('slash', { at: CUT }); sfx('stamp', { at: CUT + 180 });
   }
   function watchKills() {
     const feed = document.getElementById('phBody'); if (!feed) return;
@@ -314,7 +381,7 @@
     (team ? crew.slice(0, 3) : [av]).forEach((a) => { if (a) eyesBand.appendChild(eyes(a)); });
     // l'eroe: figura intera di riserva, foto in cornice inclinata, squadra in fila, oppure le iniziali
     if (team) { hero.classList.add('crew'); crew.slice(0, 6).forEach((a) => { const c = a.cloneNode(true); c.removeAttribute('data-prof'); c.tabIndex = -1; hero.appendChild(c); }); }
-    else if (figure) { const im = h('img', 'pf-fig'); im.alt = ''; im.src = figure; hero.appendChild(im); }
+    else if (figure) { const im = h('img', 'pf-fig'); im.alt = ''; im.src = figure; hero.appendChild(im); if (LOOK().feather) LOOK().feather(im); }
     else if (photo) { const f = h('div', 'pf-photo'); const im = h('img'); im.alt = ''; im.src = photo.currentSrc || photo.src; f.appendChild(im); hero.appendChild(f); }
     else hero.appendChild(h('b', 'pf-ini', esc(((av && (av.querySelector('.ini') || av).textContent) || '').trim())));
     [...name].forEach((ch) => { const s = h('span'); s.textContent = ch === ' ' ? ' ' : ch; nword.appendChild(s); });

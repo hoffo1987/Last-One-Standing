@@ -611,7 +611,7 @@
     let v = (location.hash || '').slice(1); if (!VIEWS.includes(v)) v = 'home';
     if (v === curView) { route(); return; }
     const t = THEMES[(v === 'diretta' || v === 'esito') && SIM ? SIM.theme : S.settings.theme];
-    AN.wipe(route, { label: VIEW_LABEL[v] || '', hue: v === 'home' ? 162 : t ? t.hue : null, arena: v === 'home' || !t ? null : t.id });
+    AN.wipe(route, { label: VIEW_LABEL[v] || '', hue: v === 'home' ? 162 : t ? t.hue : null, arena: v === 'home' || !t ? null : t.id, arenaName: v === 'home' || !t ? '' : t.name });
   });
   document.addEventListener('click', (e) => {
     const q = e.target.closest('[data-quick]'); if (q) { e.preventDefault(); quickPlay(); return; }

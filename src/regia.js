@@ -67,6 +67,18 @@
   const anim = (n, kf, o) => n.animate(kf, Object.assign({ fill: 'both' }, o));
   const all = (a) => Promise.all(a.map((x) => x.finished)).catch(() => {});
 
+  // linee di velocità: barre sottili di carta e di tinta che attraversano tutto lo schermo più veloci delle lastre,
+  // sopra di esse, e spariscono; danno il senso dello spostamento a coperture fatte di sole superfici piene
+  function speed(g, W, H, P, n) {
+    const out = [];
+    for (let i = 0; i < n; i++) {
+      const y = R(-0.05, 1.05) * H, h = Math.random() < 0.7 ? R(1.5, 4) : R(6, 12), w = W * R(0.18, 0.55);
+      const r = el('rect', { x: -w, y: y.toFixed(1), width: w.toFixed(0), height: h.toFixed(1), fill: Math.random() < 0.6 ? P.paper : P.light }, g);
+      out.push({ r, w });
+    }
+    return () => out.map(({ r, w }) => r.animate([{ transform: 'translateX(0)', opacity: 0.9 }, { transform: 'translateX(' + (W + w * 2).toFixed(0) + 'px)', opacity: 0.9 }], { duration: R(220, 360), delay: R(0, 260), easing: 'cubic-bezier(.5,0,.6,1)', fill: 'none' }));
+  }
+
   function lame(g, W, H, dir, P, defs) {
     const ang = R(13, 23), sl = H * Math.tan(rad(ang)), span = W + sl * 2;
     const n = RI(4, 6), wts = Array.from({ length: n }, () => R(0.6, 1.4)), sum = wts.reduce((a, b) => a + b, 0);
@@ -84,10 +96,10 @@
       if (Math.random() < 0.55) { const t = R(5, 12), xp = x + w; blades.push(el('polygon', { points: pts([[xp + sl - t, -m], [xp + sl, -m], [xp, H + m], [xp - t, H + m]]), fill: P.paper }, g)); }
       x += w - 24;
     }
-    const off = span + sl;
+    const off = span + sl, fly = speed(g, W, H, P, RI(7, 11));
     blades.forEach((b, i) => { b.__i = b.__twin ? b.__twin.__i : blades.length - i; });
     return {
-      cover: () => all(blades.map((b) => anim(b, [{ transform: 'translateX(' + -off + 'px)' }, { transform: 'translateX(0)' }], { duration: 300, delay: b.__i * 26 + R(0, 14), easing: E.io }))),
+      cover: () => (fly(), all(blades.map((b) => anim(b, [{ transform: 'translateX(' + -off + 'px)' }, { transform: 'translateX(0)' }], { duration: 300, delay: b.__i * 26 + R(0, 14), easing: E.io })))),
       uncover: () => all(blades.map((b) => anim(b, [{ transform: 'translateX(0)' }, { transform: 'translateX(' + off + 'px)' }], { duration: 360, delay: (blades.length - b.__i) * 18 + R(0, 12), easing: E.in, composite: 'replace' }))),
     };
   }
@@ -135,9 +147,9 @@
       if (Math.random() < 0.4) { const t = R(4, 8); strips.push(Object.assign(el('rect', { x: -60, y: y + h - t, width: W + 140, height: t, fill: P.paper }, g), { __side: side, __i: i })); }
       y += h - 2;
     }
-    const off = W + 160;
+    const off = W + 160, fly = speed(g, W, H, P, RI(6, 9));
     return {
-      cover: () => all(strips.map((s) => anim(s, [{ transform: 'translateX(' + -s.__side * off + 'px)' }, { transform: 'translateX(0)' }], { duration: 290, delay: s.__i * 24 + R(0, 16), easing: E.io }))),
+      cover: () => (fly(), all(strips.map((s) => anim(s, [{ transform: 'translateX(' + -s.__side * off + 'px)' }, { transform: 'translateX(0)' }], { duration: 290, delay: s.__i * 24 + R(0, 16), easing: E.io })))),
       uncover: () => all(strips.map((s) => anim(s, [{ transform: 'translateX(0)' }, { transform: 'translateX(' + s.__side * off + 'px)' }], { duration: 340, delay: (n - 1 - s.__i) * 20 + R(0, 14), easing: E.in }))),
     };
   }
@@ -265,11 +277,66 @@
     ];
     if (subEl) inA.push(anim(subEl, [{ transform: 'translateX(' + -dir * 24 + 'px)', opacity: 0 }, { transform: 'none', opacity: 1 }], { duration: 240, delay: 160 + letters.length * 22, easing: E.out }));
     return {
+      el: cap,
       shown: all(inA),
       out: () => all([
         ...letters.map((s, i) => anim(s, [{ transform: 'none', opacity: 1 }, { transform: 'translateX(' + dir * 0.6 + 'em) skewX(-20deg)', opacity: 0 }], { duration: 150, delay: i * 9, easing: E.in })),
         anim(slab, [{ transform: 'scaleX(1)' }, { transform: 'scaleX(0)', transformOrigin: dir > 0 ? '100% 50%' : '0 50%' }], { duration: 200, delay: 60, easing: E.in }),
         ...(subEl ? [anim(subEl, [{ opacity: 1 }, { opacity: 0 }], { duration: 120, easing: E.in })] : []),
+      ]),
+    };
+  }
+
+  /* ---------- il timbro dell'arena ----------
+   * Prima era un'ombra nera al 32% sotto il cartello: si vedeva appena. Ora è un timbro vero, accanto al cartello:
+   * una lastra di carta dal bordo irregolare, il sigillo in inchiostro nero con una seconda passata nella tinta
+   * dell'arena appena fuori registro, il nome dell'arena su un nastro. Cade dall'alto con l'ombra che si stringe
+   * (sollevato → premuto), e all'impatto: due onde, schizzi d'inchiostro, la lastra che slitta, la scena che trema. */
+  function stamp(host, url, P, opt, capEl) {
+    const W = G.innerWidth, H = G.innerHeight;
+    const S = Math.round(Math.max(124, Math.min(Math.min(W, H) * 0.4, 320)));
+    const st = document.createElement('div'); st.className = 'lx-stamp';
+    st.style.setProperty('--seal', 'url("' + url + '")'); st.style.setProperty('--lx-key', P.key); st.style.setProperty('--S', S + 'px');
+    st.style.setProperty('--srot', (R(-14, -6) * (Math.random() < 0.25 ? -1 : 1)).toFixed(1) + 'deg');
+    const edge = [];
+    for (let i = 0; i < 64; i++) { const a = (i / 64) * Math.PI * 2, r = 50 - R(0, 1.6) - (Math.random() < 0.14 ? R(0.6, 2.2) : 0); edge.push((50 + Math.cos(a) * r).toFixed(2) + '% ' + (50 + Math.sin(a) * r).toFixed(2) + '%'); }
+    const name = String(opt.arenaName || '').trim();
+    st.innerHTML = '<svg class="lx-st-fx" viewBox="-100 -100 200 200"></svg><div class="lx-st-body"><i class="lx-st-plate"></i><i class="lx-st-mis"></i><i class="lx-st-ink"></i>' + (name ? '<b class="lx-st-name"></b>' : '') + '</div>';
+    if (name) { st.querySelector('.lx-st-name').textContent = name; if (name.length > 15) st.style.setProperty('--rf', (15 / name.length).toFixed(3)); } // i nomi lunghi stringono il nastro
+    st.querySelector('.lx-st-plate').style.clipPath = 'polygon(' + edge.join(',') + ')';
+    host.appendChild(st);
+    // accanto al cartello, sopra l'angolo destro (o sotto, se sopra non c'è posto), sempre dentro lo schermo
+    let cx = W * 0.5, cy = H * 0.26;
+    if (capEl) { const r = capEl.getBoundingClientRect(); cx = r.right - S * 0.12; cy = r.top > S * 0.95 ? r.top - S * 0.58 : r.bottom + S * 0.6; }
+    const pad = 10 + S / 2;
+    st.style.left = Math.min(W - pad, Math.max(pad, cx)).toFixed(0) + 'px'; st.style.top = Math.min(H - pad, Math.max(pad, cy)).toFixed(0) + 'px';
+    const body = st.querySelector('.lx-st-body'), mis = st.querySelector('.lx-st-mis'), fx = st.querySelector('.lx-st-fx'), rib = st.querySelector('.lx-st-name');
+    const T0 = 110, DUR = 300, IMP = T0 + DUR * 0.6;
+    const sh = Math.max(5, Math.round(S * 0.03)), pressed = 'drop-shadow(' + sh + 'px ' + Math.round(sh * 1.15) + 'px 0 #0a0a0c)';
+    const fall = anim(body, [
+      { transform: 'rotate(calc(var(--srot) - 28deg)) scale(2.5)', opacity: 0, filter: 'drop-shadow(26px 34px 16px rgb(0 0 0 / .55))', easing: 'cubic-bezier(.55,0,1,.45)' },
+      { transform: 'rotate(var(--srot)) scale(.9)', opacity: 1, filter: pressed, offset: 0.6, easing: E.out },
+      { transform: 'rotate(calc(var(--srot) - 2deg)) scale(1.035)', offset: 0.8 },
+      { transform: 'rotate(var(--srot)) scale(1)', opacity: 1, filter: pressed },
+    ], { duration: DUR, delay: T0 });
+    const slip = (S * 0.022).toFixed(1);
+    anim(mis, [{ translate: '0 0' }, { translate: '0 0', offset: 0.6 }, { translate: slip + 'px -' + slip + 'px' }], { duration: DUR, delay: T0, easing: E.out });
+    // l'impatto: due onde e gli schizzi, nelle unità della lastra (raggio 50)
+    const wave = (color, w, delay, dur) => { const c = el('circle', { cx: 0, cy: 0, r: 51, fill: 'none', stroke: color, 'stroke-width': w }, fx); anim(c, [{ transform: 'scale(.94)', opacity: 0, strokeWidth: w }, { opacity: 1, offset: 0.06 }, { transform: 'scale(1.9)', opacity: 0, strokeWidth: 0.6 }], { duration: dur, delay, easing: E.out }); };
+    wave(P.paper, 5, IMP, 460); wave(P.key, 8, IMP + 60, 540);
+    for (let i = 0; i < 24; i++) {
+      const a = R(0, Math.PI * 2), d = R(54, 96), r = i < 6 ? R(3, 4.6) : R(0.9, 2.6), dot = el('ellipse', { cx: 0, cy: 0, rx: (r * R(1.2, 2.2)).toFixed(1), ry: r.toFixed(1), fill: Math.random() < 0.62 ? P.void : P.key }, fx);
+      const deg = ((a * 180) / Math.PI).toFixed(0);
+      anim(dot, [{ transform: 'translate(' + (Math.cos(a) * 44).toFixed(1) + 'px,' + (Math.sin(a) * 44).toFixed(1) + 'px) rotate(' + deg + 'deg) scale(0)' }, { transform: 'translate(' + (Math.cos(a) * d).toFixed(1) + 'px,' + (Math.sin(a) * d).toFixed(1) + 'px) rotate(' + deg + 'deg) scale(1)' }], { duration: R(200, 300), delay: IMP + R(0, 30), easing: E.out });
+    }
+    host.animate([{ translate: '0 0' }, { translate: '-7px 5px' }, { translate: '6px -4px' }, { translate: '-3px 2px' }, { translate: '0 0' }], { duration: 220, delay: IMP, easing: 'steps(4, end)' });
+    if (rib) anim(rib, [{ clipPath: 'inset(0 100% 0 0)', letterSpacing: '.5em' }, { clipPath: 'inset(0 0 0 0)', letterSpacing: '.18em' }], { duration: 280, delay: IMP + 50, easing: E.out });
+    sfx('stamp', { at: IMP });
+    return {
+      landed: fall.finished.catch(() => {}),
+      out: () => all([
+        anim(body, [{ transform: 'rotate(var(--srot)) scale(1)', opacity: 1 }, { transform: 'rotate(calc(var(--srot) + 7deg)) scale(1.14)', opacity: 0 }], { duration: 210, easing: E.in }),
+        anim(fx, [{ opacity: 1 }, { opacity: 0 }], { duration: 160, easing: E.in }),
       ]),
     };
   }
@@ -314,12 +381,10 @@
     if (dir < 0 && (fam === 'lame')) g.setAttribute('transform', 'translate(' + W + ',0) scale(-1,1)');
     // il sipario non è mai dritto: qualche grado d'inclinazione, ingrandito quanto basta a coprire gli angoli
     if (fam === 'sipario' || fam === 'titoli') g.setAttribute('transform', 'translate(' + W / 2 + ' ' + H / 2 + ') rotate(' + (R(3, 7) * -dir).toFixed(1) + ') scale(1.22) translate(' + -W / 2 + ' ' + -H / 2 + ')');
-    // il sigillo dell'arena, timbrato vicino al nome (piccolo: la sorgente è di 320 px)
+    // il sigillo dell'arena: un timbro vero accanto al cartello (vedi stamp)
     const FX = (G.LOS_ASSETS && G.LOS_ASSETS.fx) || {}, sealUrl = opt.arena && FX.sigilli && FX.sigilli[opt.arena];
+    const canSeal = !!(sealUrl && (/^data:/.test(sealUrl) || /^https?:$/.test(G.location.protocol)));
     let seal = null;
-    if (sealUrl && (/^data:/.test(sealUrl) || /^https?:$/.test(G.location.protocol))) {
-      seal = document.createElement('i'); seal.className = 'lx-seal'; seal.style.setProperty('--seal', 'url("' + sealUrl + '")'); seal.style.setProperty('--lx-key', P.key); layer.appendChild(seal);
-    }
     let swapped = false;
     const doSwap = () => { if (swapped) return; swapped = true; try { swap(); } catch (e) { setTimeout(() => { throw e; }); } };
     sfx('cut');
@@ -328,16 +393,17 @@
     shape.cover()
       .then(() => {
         cap = caption(layer, opt, to, fam, P, dir);
-        if (seal) seal.animate([{ transform: 'translate(-50%,-50%) rotate(-28deg) scale(1.7)', opacity: 0 }, { transform: 'translate(-50%,-50%) rotate(-10deg) scale(1)', opacity: 0.9 }], { duration: 220, easing: E.out, fill: 'both' });
-        sfx('stamp', { at: 80 });
+        if (canSeal) seal = stamp(layer, sealUrl, P, opt, cap && cap.el);
+        else sfx('stamp', { at: 80 });
         doSwap();
         emit('los:cover', { view: to, dir, hue: P.hue });
-        return Promise.all([cap ? cap.shown : null, new Promise((r) => setTimeout(r, 140))]);
+        return Promise.all([cap ? cap.shown : null, seal ? seal.landed : null, new Promise((r) => setTimeout(r, 140))]);
       })
-      .then(() => new Promise((r) => setTimeout(r, opt.hold || 110)))
+      // con il timbro il cartello resta fermo un po' di più: il tempo di leggere nome e sigillo
+      .then(() => new Promise((r) => setTimeout(r, opt.hold || (seal ? 420 : 110))))
       .then(() => {
         const outs = [cap ? cap.out() : null];
-        if (seal) outs.push(all([seal.animate([{ opacity: 0.9 }, { opacity: 0, transform: 'translate(-50%,-50%) rotate(-4deg) scale(.9)' }], { duration: 160, easing: E.in, fill: 'both' })]));
+        if (seal) outs.push(seal.out());
         enter(to, dir);
         emit('los:enter', { view: to, dir });
         return Promise.all(outs.concat([new Promise((r) => setTimeout(r, 70)).then(() => shape.uncover())]));

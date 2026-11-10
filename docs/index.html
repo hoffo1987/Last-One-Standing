@@ -2894,8 +2894,15 @@ h3 { font-weight: 800; }
   mask-composite: intersect; }
 /* le figure di Midjourney escono spesso dal quadro: si appoggiano al bordo destro e in basso, e il taglio a sinistra sfuma */
 .winhero > .fn-figure { position: absolute; right: 0; bottom: 0; height: 112%; max-width: 46%; z-index: 1; pointer-events: none; object-fit: contain; object-position: right bottom;
-  filter: drop-shadow(14px 8px 0 var(--key)) drop-shadow(-3px 0 0 var(--void));
-  -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 24%); mask-image: linear-gradient(90deg, transparent 0, #000 24%); }
+  filter: drop-shadow(14px 8px 0 var(--key)) drop-shadow(-3px 0 0 var(--void)); --fl-min: 24%; }
+/* ritagli sfumati (look.js → feather): ogni lato che tocca il bordo dell'immagine svanisce con una curva morbida,
+   non lineare (quattro tappe per lato), così non resta la linea dritta del ritaglio né l'ombra colorata che la segue */
+.feather { --fl: 14%; --fr: 14%; --ft: 6%; --fb: 10%; --flx: max(var(--fl), var(--fl-min, 0%));
+  --fh: linear-gradient(90deg, transparent 0, rgb(0 0 0 / .12) calc(var(--flx) * .25), rgb(0 0 0 / .42) calc(var(--flx) * .5), rgb(0 0 0 / .8) calc(var(--flx) * .75), #000 var(--flx),
+    #000 calc(100% - var(--fr)), rgb(0 0 0 / .8) calc(100% - var(--fr) * .75), rgb(0 0 0 / .42) calc(100% - var(--fr) * .5), rgb(0 0 0 / .12) calc(100% - var(--fr) * .25), transparent 100%);
+  --fv: linear-gradient(180deg, transparent 0, rgb(0 0 0 / .12) calc(var(--ft) * .25), rgb(0 0 0 / .42) calc(var(--ft) * .5), rgb(0 0 0 / .8) calc(var(--ft) * .75), #000 var(--ft),
+    #000 calc(100% - var(--fb)), rgb(0 0 0 / .8) calc(100% - var(--fb) * .75), rgb(0 0 0 / .42) calc(100% - var(--fb) * .5), rgb(0 0 0 / .12) calc(100% - var(--fb) * .25), transparent 100%);
+  -webkit-mask-image: var(--fh), var(--fv); -webkit-mask-composite: source-in; mask-image: var(--fh), var(--fv); mask-composite: intersect; }
 .fn-play > .fn-figure { animation: lookFigIn .7s var(--look-out) .25s both; }
 @keyframes lookFigIn { from { opacity: 0; transform: translateX(14%) skewX(-6deg); } to { opacity: 1; transform: none; } }
 .winhero.has-figure .fn-mid::before { right: 40%; }
@@ -2958,8 +2965,18 @@ h3 { font-weight: 800; }
 .lx-word span { display: inline-block; }
 .lx-word span:nth-child(3n+2) { transform-origin: 50% 80%; }
 .lx-sub { position: relative; margin-left: .2em; padding: .32em .8em .34em; font: 800 clamp(11px, 1.3vw, 15px) / 1 var(--f-body); letter-spacing: .26em; text-transform: uppercase; color: var(--lx-key); background: #0a0a0c; clip-path: polygon(4% 0, 100% 0, 96% 100%, 0 100%); }
-.lx-seal { position: absolute; left: 50%; top: 50%; width: min(30vmin, 240px); aspect-ratio: 1; transform: translate(-50%, -50%); opacity: 0; background: hsl(0 0% 0% / .32);
-  -webkit-mask: var(--seal) center / contain no-repeat; mask: var(--seal) center / contain no-repeat; }
+/* il timbro dell'arena (regia.js → stamp): lastra di carta, sigillo in nero con una passata nella tinta fuori registro, nastro col nome */
+.lx-stamp { position: absolute; z-index: 2; width: var(--S); height: var(--S); margin: calc(var(--S) / -2) 0 0 calc(var(--S) / -2); }
+.lx-st-body { position: absolute; inset: 0; opacity: 0; transform: rotate(var(--srot)); filter: drop-shadow(9px 10px 0 #0a0a0c); }
+.lx-st-plate { position: absolute; inset: 0; background: radial-gradient(circle, #f7f5f0 56%, color-mix(in srgb, var(--lx-key) 24%, #f7f5f0) 100%); }
+.lx-st-mis, .lx-st-ink { position: absolute; inset: 5.5%; -webkit-mask: var(--seal) center / contain no-repeat; mask: var(--seal) center / contain no-repeat; }
+.lx-st-mis { background: var(--lx-key); }
+.lx-st-ink { background: #0a0a0c; }
+.lx-st-name { position: absolute; left: 50%; bottom: 2%; transform: translateX(-50%) rotate(-4deg); background: #0a0a0c; color: var(--lx-key);
+  font: italic 900 max(9px, calc(var(--S) * .066 * var(--rf, 1))) / 1 var(--f-display); font-stretch: 112%; text-transform: uppercase; letter-spacing: .18em; white-space: nowrap;
+  padding: .5em 1em .46em 1.2em; clip-path: polygon(5% 0, 100% 0, 95% 100%, 0 100%); }
+.lx-st-fx { position: absolute; left: -50%; top: -50%; width: 200%; height: 200%; overflow: visible; }
+.lx-st-fx * { transform-box: fill-box; transform-origin: center; }
 .stacco { display: none !important; }
 /* la pagina nuova entra con la regia di regia.js, non con la vecchia dissolvenza */
 .view-enter { animation: none; }
@@ -3087,22 +3104,45 @@ h2.sec { text-transform: uppercase; font-stretch: 114%; letter-spacing: -.02em; 
 .pb-head .pb-k { font-size: clamp(30px, 6.6vw, 96px); letter-spacing: -.01em; background: var(--paper); color: var(--void); box-shadow: .1em .1em 0 var(--key); clip-path: none; padding: .08em .4em .12em; }
 
 /* cut-in di un'eliminazione */
+.pb-kill { --kill: #e5484d; }
 .pb-kill .pb-band { height: min(31vh, 260px); --tilt: -4.5deg; }
+/* la pagina si spegne: buio al centro, rosso ai bordi */
+.pb-kill .pb-veil { background: radial-gradient(ellipse 75% 65% at 50% 50%, hsl(0 0% 0% / .5) 30%, color-mix(in srgb, var(--kill) 34%, hsl(0 0% 2% / .9)) 100%); }
+.pb-speed { position: absolute; inset: 0; opacity: .55; background: repeating-linear-gradient(90deg, transparent 0 70px, hsl(0 0% 100% / .1) 70px 73px, transparent 73px 170px, color-mix(in srgb, var(--kill) 45%, transparent) 170px 172px);
+  animation: pbSpeed .36s linear infinite; clip-path: inset(12% 0 12% 0); }
+@keyframes pbSpeed { to { background-position: 344px 0; } }
+.pb-flash { position: absolute; inset: 0; background: var(--paper); opacity: 0; mix-blend-mode: screen; }
 .pb-duel { position: relative; display: flex; align-items: center; justify-content: center; gap: 7vw; width: 100vw; }
-.pb-side { display: grid; gap: 8px; justify-items: start; width: min(38vw, 600px); }
-.pb-side .pe { width: 100%; transition: transform .12s steps(2, end); }
+.pb-side { position: relative; display: grid; gap: 8px; justify-items: start; width: min(38vw, 600px); }
+.pb-side .pe { width: 100%; }
 .pb-side.vic { justify-items: end; }
-.pb-side.vic .pe img { filter: grayscale(1) contrast(1.25); mix-blend-mode: normal; }
-.pb-side.vic .pe { background: #9a9a9a; border-color: var(--c-kill); }
-.pb-side.vic.cut .pe { transform: translate(8px, -5px) rotate(1.6deg); }
-.pb-side.vic.cut .pe::after { content: ""; position: absolute; inset: 0; background: linear-gradient(118deg, transparent 47.5%, var(--paper) 47.5% 50.5%, transparent 50.5%), var(--c-kill); mix-blend-mode: multiply; }
-.pb-side.vic.cut .pe::before { content: ""; position: absolute; inset: 0; z-index: 1; background: linear-gradient(118deg, transparent 47.5%, var(--paper) 47.5% 50.5%, transparent 50.5%); }
+/* chi colpisce: un riflesso attraversa gli occhi (animato da palco.js) */
+.pb-side.atk .pe::after { content: ""; position: absolute; inset: 0; background: linear-gradient(105deg, transparent 38%, hsl(0 0% 100% / .5) 48%, hsl(0 0% 100% / .1) 54%, transparent 62%) 160% 0 / 250% 100% no-repeat; mix-blend-mode: overlay; pointer-events: none; }
+/* chi cade: a colori finché non arriva il colpo, poi grigio con il rosso stampato sopra */
+.pb-split { position: relative; width: 100%; }
+.pb-half { position: relative; }
+.pb-half.a { clip-path: polygon(0 0, 61.3% 0, 39.3% 100%, 0 100%); }
+.pb-half.b { position: absolute; inset: 0; clip-path: polygon(60.7% 0, 100% 0, 100% 100%, 38.7% 100%); }
+.pb-side.vic .pe img { transition: filter .1s steps(2, end); }
+.pb-side.vic .pe { border-color: var(--kill); }
+.pb-side.vic.cut .pe img { filter: grayscale(1) contrast(1.35) brightness(.9); }
+.pb-side.vic.cut .pe::after { content: ""; position: absolute; inset: 0; background: var(--kill); mix-blend-mode: multiply; opacity: .7; }
+.pb-slash { position: absolute; left: 50%; top: 50%; width: 260%; height: 14px; z-index: 3; opacity: 0; pointer-events: none;
+  background: linear-gradient(90deg, transparent, var(--paper) 30%, #fff 50%, var(--paper) 70%, transparent); filter: drop-shadow(0 0 10px var(--kill)) drop-shadow(0 0 2px #fff);
+  clip-path: polygon(0 50%, 10% 20%, 100% 38%, 100% 62%, 10% 80%); }
+.pb-blood { position: absolute; left: 50%; top: 50%; width: 1px; height: 1px; overflow: visible; z-index: 2; pointer-events: none; }
+.pb-side .pb-name { position: relative; }
+.pb-side.vic.cut .pb-name { color: color-mix(in srgb, var(--paper) 60%, transparent); }
+.pb-side.vic.cut .pb-name::after { content: ""; position: absolute; left: 0; right: 0; top: 52%; height: .2em; background: var(--kill); transform-origin: 0 50%; animation: pbStrike .26s var(--look-out, ease-out) .12s both; }
+@keyframes pbStrike { from { transform: scaleX(0); } }
 .pb-kill.solo .pb-side { width: min(56vw, 760px); }
-.pb-cutline { position: absolute; left: 50%; top: 50%; width: 80vh; height: 12px; background: var(--paper); opacity: 0; clip-path: polygon(0 50%, 12% 0, 100% 40%, 100% 60%, 12% 100%); }
-.pb-kill.solo .pb-cutline { left: 50%; }
-.pb-stamp { position: absolute; left: 50%; top: 50%; z-index: 2; font: italic 900 clamp(24px, 4.6vw, 66px) / 1 var(--f-display); font-stretch: 116%; text-transform: uppercase; white-space: nowrap; color: var(--paper); background: var(--c-kill); padding: .12em .5em .16em; box-shadow: .1em .1em 0 var(--void); opacity: 0; }
+/* il timbro sta sotto la fascia, non sopra i volti; dietro, una macchia d'inchiostro */
+.pb-stamp, .pb-inksplat { position: absolute; left: 50%; top: calc(50% + min(15.5vh, 130px)); }
+.pb-stamp { z-index: 2; font: italic 900 clamp(26px, 4.8vw, 70px) / 1 var(--f-display); font-stretch: 116%; text-transform: uppercase; white-space: nowrap; color: var(--paper); background: var(--kill);
+  padding: .12em .5em .16em; box-shadow: .1em .1em 0 var(--void), -.05em -.05em 0 var(--paper); opacity: 0; clip-path: polygon(1.5% 4%, 100% 0, 98.5% 96%, 0 100%); }
 .pb-stamp svg { display: none; }
-.pb-kill.solo .pb-stamp { left: 50%; top: 80%; }
+.pb-inksplat { width: clamp(220px, 34vw, 520px); aspect-ratio: 1000 / 906; background: var(--void); opacity: 0;
+  -webkit-mask: var(--fx-impatto, radial-gradient(circle, #000 40%, transparent 42%)) center / contain no-repeat; mask: var(--fx-impatto, radial-gradient(circle, #000 40%, transparent 42%)) center / contain no-repeat; }
 
 /* ---------- sequenza di vittoria ---------- */
 .pf { position: fixed; inset: 0; z-index: 10001; overflow: hidden; cursor: pointer; }
@@ -16717,7 +16757,7 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
 </script>
 <script>window.LOS_ASSETS = {"logo":"img/logo.f2d5175789.webp","icona":"img/icona.8b02ddeb49.webp","favicon":"img/favicon.86774dc7cf.png","panoramica":"img/panoramica.66c4c27255.webp","sagome":["img/sagome-cappuccio.e8876ba986.webp","img/sagome-esploratore.9a99fd13f8.webp","img/sagome-viaggiatore.5e36435604.webp"],"arene":{"classico":"img/arene-classico.c2887324d1.webp","cyberpunk":"img/arene-cyberpunk.713b4c77ea.webp","fantasy":"img/arene-fantasy.ee494a9322.webp","horror":"img/arene-horror.76225517ca.webp","liceo":"img/arene-liceo.c591ac5f32.webp","royale":"img/arene-royale.46515caf90.webp","scifi":"img/arene-scifi.bc9d8e04eb.webp","ufficio":"img/arene-ufficio.a2e36d4f7f.webp","wasteland":"img/arene-wasteland.734ed966b2.webp","zombie":"img/arene-zombie.11476cf1ca.webp"},"atlas":{"classico":{"armi":{"arco":"img/arene-classico-armi-arco.57fa716aa9.webp","ascia":"img/arene-classico-armi-ascia.f48629747b.webp","coltello-da-campo":"img/arene-classico-armi-coltello-da-campo.3393de240f.webp","coltello":"img/arene-classico-armi-coltello.a0134af05c.webp","falce-corta":"img/arene-classico-armi-falce-corta.3131158a9f.webp","fionda":"img/arene-classico-armi-fionda.48c8c32c43.webp","lancia-da-caccia":"img/arene-classico-armi-lancia-da-caccia.6f2be560ec.webp","lancia":"img/arene-classico-armi-lancia.115909650b.webp","machete":"img/arene-classico-armi-machete.e1c9ef25d7.webp","mazza-corta":"img/arene-classico-armi-mazza-corta.e1092f0628.webp","mazza":"img/arene-classico-armi-mazza.1fddf37b46.webp","pugnale-da-cintura":"img/arene-classico-armi-pugnale-da-cintura.0bedc8a501.webp","pugnale":"img/arene-classico-armi-pugnale.fda9dbf38a.webp","scure-da-legna":"img/arene-classico-armi-scure-da-legna.837c5d1f78.webp","spada-corta":"img/arene-classico-armi-spada-corta.952e6b7f6a.webp","tridente":"img/arene-classico-armi-tridente.2fcb3547d9.webp"},"luoghi":{"altopiano":"img/arene-classico-luoghi-altopiano.36a37512d3.webp","bosco":"img/arene-classico-luoghi-bosco.2e9163544b.webp","cornucopia":"img/arene-classico-luoghi-cornucopia.393b2dabe1.webp","fiume":"img/arene-classico-luoghi-fiume.22b335a914.webp","paludi":"img/arene-classico-luoghi-paludi.77cf115eb4.webp","rovine":"img/arene-classico-luoghi-rovine.9ea4f70ca9.webp"},"pericoli":{"branco-di-lupi-mutanti":"img/arene-classico-pericoli-branco-di-lupi-mutanti.d786a62875.webp","orso-affamato":"img/arene-classico-pericoli-orso-affamato.e4f38a9892.webp","sciame-di-vespe-velenose":"img/arene-classico-pericoli-sciame-di-vespe-velenose.5adb2c7b8d.webp","serpente-gigante":"img/arene-classico-pericoli-serpente-gigante.b17e7f3d91.webp"}},"cyberpunk":{"armi":{"coltello-vibrante-in-ceramica":"img/arene-cyberpunk-armi-coltello-vibrante-in-ceramica.6bbcd0e9e4.webp","fucile-a-pompa-da-strada":"img/arene-cyberpunk-armi-fucile-a-pompa-da-strada.dbd0de34e1.webp","fucile-a-pompa-elettromagnetico":"img/arene-cyberpunk-armi-fucile-a-pompa-elettromagnetico.0555418cd0.webp","katana-termica":"img/arene-cyberpunk-armi-katana-termica.f1ff597173.webp","mazza-a-impulsi":"img/arene-cyberpunk-armi-mazza-a-impulsi.22d841ed1d.webp","mazza-da-baseball-chiodata":"img/arene-cyberpunk-armi-mazza-da-baseball-chiodata.db2996f744.webp","mitra-compatto":"img/arene-cyberpunk-armi-mitra-compatto.eaa3815798.webp","pistola-a-rotaia-artigianale":"img/arene-cyberpunk-armi-pistola-a-rotaia-artigianale.f9e83bda89.webp","pistola-smart":"img/arene-cyberpunk-armi-pistola-smart.2aa922ba8c.webp","sparachiodi-riprogrammato":"img/arene-cyberpunk-armi-sparachiodi-riprogrammato.70f6190cb0.webp","taser-da-buttafuori":"img/arene-cyberpunk-armi-taser-da-buttafuori.60b58b451d.webp","tirapugni-elettrificato":"img/arene-cyberpunk-armi-tirapugni-elettrificato.1ce19bab37.webp","ventaglio-da-combattimento-in-titanio":"img/arene-cyberpunk-armi-ventaglio-da-combattimento-in-titanio.f3b7bb5a10.webp"},"luoghi":{"clinica-del-ripperdoc":"img/arene-cyberpunk-luoghi-clinica-del-ripperdoc.8ef0cb941b.webp","club-della-braindance":"img/arene-cyberpunk-luoghi-club-della-braindance.7765542e70.webp","megablocco":"img/arene-cyberpunk-luoghi-megablocco.28b72e6ecf.webp","mercato-di-kabuki":"img/arene-cyberpunk-luoghi-mercato-di-kabuki.d5c8ab7b96.webp","nodo-dati-corporativo":"img/arene-cyberpunk-luoghi-nodo-dati-corporativo.56ca3e1335.webp","officina-dei-maelstrom":"img/arene-cyberpunk-luoghi-officina-dei-maelstrom.d69285cf21.webp","piazza-della-torre":"img/arene-cyberpunk-luoghi-piazza-della-torre.1e400212c8.webp"},"pericoli":{"banda-di-scav":"img/arene-cyberpunk-pericoli-banda-di-scav.f1a2b2ccc4.webp","gang-di-cromati":"img/arene-cyberpunk-pericoli-gang-di-cromati.74e5576e23.webp","sciame-di-droni-di-pattuglia":"img/arene-cyberpunk-pericoli-sciame-di-droni-di-pattuglia.6fb4b17ad9.webp","squadra-di-sicurezza-corporativa":"img/arene-cyberpunk-pericoli-squadra-di-sicurezza-corporativa.6195a3b15d.webp"}},"fantasy":{"armi":{"arco-elfico":"img/arene-fantasy-armi-arco-elfico.8012f9136d.webp","ascia-nanica":"img/arene-fantasy-armi-ascia-nanica.6913fdf008.webp","balestra":"img/arene-fantasy-armi-balestra.7767becc83.webp","bastone-magico":"img/arene-fantasy-armi-bastone-magico.0781aee860.webp","daga-dei-giuramenti":"img/arene-fantasy-armi-daga-dei-giuramenti.3b6d4b398c.webp","falcetto-dargento":"img/arene-fantasy-armi-falcetto-dargento.1ce0e4e163.webp","lancia-incantata":"img/arene-fantasy-armi-lancia-incantata.7371199824.webp","lancia-silvana":"img/arene-fantasy-armi-lancia-silvana.08fbc01ede.webp","martello-da-guerra":"img/arene-fantasy-armi-martello-da-guerra.4eb03f4db7.webp","martello-nanico":"img/arene-fantasy-armi-martello-nanico.82ad6b9b14.webp","mazza-di-quercia":"img/arene-fantasy-armi-mazza-di-quercia.0f6a8345a9.webp","pugnale-avvelenato":"img/arene-fantasy-armi-pugnale-avvelenato.aba554d177.webp","spada-da-viaggio":"img/arene-fantasy-armi-spada-da-viaggio.a7bdcab5f4.webp","spada-runica":"img/arene-fantasy-armi-spada-runica.ec4012c6cf.webp"},"luoghi":{"altare-delle-armi":"img/arene-fantasy-luoghi-altare-delle-armi.db06de44c1.webp","foresta-elfica":"img/arene-fantasy-luoghi-foresta-elfica.0448fcfbd3.webp","lago-nebbioso":"img/arene-fantasy-luoghi-lago-nebbioso.f19abc7c81.webp","miniere":"img/arene-fantasy-luoghi-miniere.5baa916ec9.webp","palude-stregata":"img/arene-fantasy-luoghi-palude-stregata.6a0b2af4a7.webp","picco-del-drago":"img/arene-fantasy-luoghi-picco-del-drago.06bdfd84b1.webp","torre-in-rovina":"img/arene-fantasy-luoghi-torre-in-rovina.ac716863c7.webp"},"pericoli":{"branco-di-lupi-mannari":"img/arene-fantasy-pericoli-branco-di-lupi-mannari.1c9124ceee.webp","spettro-errante":"img/arene-fantasy-pericoli-spettro-errante.056074bc23.webp","troll-di-caverna":"img/arene-fantasy-pericoli-troll-di-caverna.31aa2444f0.webp","viverna":"img/arene-fantasy-pericoli-viverna.577b91a819.webp"}},"horror":{"armi":{"ascia":"img/arene-horror-armi-ascia.f6793c220e.webp","attizzatoio":"img/arene-horror-armi-attizzatoio.12b9bf75af.webp","bastone-da-passeggio":"img/arene-horror-armi-bastone-da-passeggio.1a636ce4ab.webp","candelabro-dargento":"img/arene-horror-armi-candelabro-dargento.7d962054de.webp","coltello-dargento":"img/arene-horror-armi-coltello-dargento.73a6bb81ea.webp","crocifisso-appuntito":"img/arene-horror-armi-crocifisso-appuntito.203b41a170.webp","daga-da-cerimonia":"img/arene-horror-armi-daga-da-cerimonia.a597e15c53.webp","falce":"img/arene-horror-armi-falce.6513df8fa2.webp","fucile-da-caccia":"img/arene-horror-armi-fucile-da-caccia.169dc367e1.webp","pugnale-depoca":"img/arene-horror-armi-pugnale-depoca.f148afd005.webp","pugnale-rituale":"img/arene-horror-armi-pugnale-rituale.944cb9056c.webp","scure-da-legna":"img/arene-horror-armi-scure-da-legna.a11379a412.webp"},"luoghi":{"biblioteca":"img/arene-horror-luoghi-biblioteca.00d6ab97f4.webp","cantina":"img/arene-horror-luoghi-cantina.a196828c1d.webp","cappella":"img/arene-horror-luoghi-cappella.a51e505028.webp","cimitero":"img/arene-horror-luoghi-cimitero.7a441de089.webp","salone":"img/arene-horror-luoghi-salone.37f10c88c7.webp","serra":"img/arene-horror-luoghi-serra.b3d91121d4.webp","soffitta":"img/arene-horror-luoghi-soffitta.466d40cea3.webp"},"pericoli":{"bambola-posseduta":"img/arene-horror-pericoli-bambola-posseduta.7064eef1d7.webp","entita-senza-volto":"img/arene-horror-pericoli-entita-senza-volto.2c28467bdd.webp","spettro-urlante":"img/arene-horror-pericoli-spettro-urlante.25fa554e05.webp","stormo-di-corvi":"img/arene-horror-pericoli-stormo-di-corvi.fe5c85d7ae.webp"}},"liceo":{"armi":{"compito-copiato":"img/arene-liceo-armi-compito-copiato.c9ade27d61.webp","dossier-delle-revisioni":"img/arene-liceo-armi-dossier-delle-revisioni.77676a0f5f.webp","elenco-delle-correzioni":"img/arene-liceo-armi-elenco-delle-correzioni.04be1154c8.webp","fascicolo-di-risposte-motivate":"img/arene-liceo-armi-fascicolo-di-risposte-motivate.c29995b581.webp","foto-imbarazzante":"img/arene-liceo-armi-foto-imbarazzante.ff7d3ef284.webp","gossip-esplosivo":"img/arene-liceo-armi-gossip-esplosivo.552b1e6236.webp","pallone-da-dodgeball":"img/arene-liceo-armi-pallone-da-dodgeball.60a2576785.webp","profilo-falso":"img/arene-liceo-armi-profilo-falso.d1dac05a2b.webp","prospetto-dei-contributi":"img/arene-liceo-armi-prospetto-dei-contributi.0c121fd79a.webp","quaderno-delle-verifiche":"img/arene-liceo-armi-quaderno-delle-verifiche.7d8b07341a.webp","registro-rubato":"img/arene-liceo-armi-registro-rubato.67eb4b9eff.webp","riepilogo-delle-fonti":"img/arene-liceo-armi-riepilogo-delle-fonti.3c889a0ed5.webp"},"luoghi":{"aula-magna":"img/arene-liceo-luoghi-aula-magna.0478e35c5c.webp","aule":"img/arene-liceo-luoghi-aule.b3142d07cc.webp","biblioteca":"img/arene-liceo-luoghi-biblioteca.1ae806ae58.webp","cortile":"img/arene-liceo-luoghi-cortile.51bf433337.webp","laboratorio-di-chimica":"img/arene-liceo-luoghi-laboratorio-di-chimica.eba1434683.webp","mensa":"img/arene-liceo-luoghi-mensa.67bcbc7e37.webp","palestra":"img/arene-liceo-luoghi-palestra.8ecb872849.webp"},"pericoli":{"bidello-di-turno":"img/arene-liceo-pericoli-bidello-di-turno.191c43a8bd.webp","ispezione-a-sorpresa":"img/arene-liceo-pericoli-ispezione-a-sorpresa.bef087d9b9.webp","preside":"img/arene-liceo-pericoli-preside.033f6c9aae.webp","professoressa-di-matematica":"img/arene-liceo-pericoli-professoressa-di-matematica.6cb65c6a3f.webp"}},"royale":{"armi":{"balestra":"img/arene-royale-armi-balestra.64563b6cea.webp","carabina-compatta":"img/arene-royale-armi-carabina-compatta.a0fa150fbe.webp","coltello-da-combattimento":"img/arene-royale-armi-coltello-da-combattimento.74a64bca77.webp","coltello-tattico":"img/arene-royale-armi-coltello-tattico.8e9cb56197.webp","fucile-a-pompa":"img/arene-royale-armi-fucile-a-pompa.3d7fc7d83c.webp","fucile-da-cecchino":"img/arene-royale-armi-fucile-da-cecchino.fc3c4f19f1.webp","fucile-dassalto":"img/arene-royale-armi-fucile-dassalto.b91ccb0ec8.webp","granata":"img/arene-royale-armi-granata.fd9c359b27.webp","lancia-da-sopravvivenza":"img/arene-royale-armi-lancia-da-sopravvivenza.8a39c1a5e5.webp","manganello":"img/arene-royale-armi-manganello.dc6284893b.webp","mitraglietta":"img/arene-royale-armi-mitraglietta.6dcc3246e6.webp","pistola-da-segnalazione-modificata":"img/arene-royale-armi-pistola-da-segnalazione-modificata.1c7f899ca7.webp","pistola":"img/arene-royale-armi-pistola.acae268814.webp","scure-da-campo":"img/arene-royale-armi-scure-da-campo.6a5b0becd5.webp"},"luoghi":{"aeroporto":"img/arene-royale-luoghi-aeroporto.81e8ce98d4.webp","base-militare":"img/arene-royale-luoghi-base-militare.67f3a7de9d.webp","centrale-elettrica":"img/arene-royale-luoghi-centrale-elettrica.05ee57458a.webp","fattoria":"img/arene-royale-luoghi-fattoria.7c780dda87.webp","foresta":"img/arene-royale-luoghi-foresta.03b47644d0.webp","villaggio-costiero":"img/arene-royale-luoghi-villaggio-costiero.568519eb7c.webp"},"pericoli":{"cane-da-guardia-addestrato":"img/arene-royale-pericoli-cane-da-guardia-addestrato.c7853a67a0.webp","drone-armato":"img/arene-royale-pericoli-drone-armato.30d0b73e01.webp","elicottero-da-caccia":"img/arene-royale-pericoli-elicottero-da-caccia.8c68e62346.webp"}},"scifi":{"armi":{"bastone-a-impulsi":"img/arene-scifi-armi-bastone-a-impulsi.4e17e074e7.webp","cannone-a-rotaia-portatile":"img/arene-scifi-armi-cannone-a-rotaia-portatile.9a59b97d98.webp","frusta-monofilamento":"img/arene-scifi-armi-frusta-monofilamento.5ee8081aa9.webp","fucile-al-plasma":"img/arene-scifi-armi-fucile-al-plasma.ea2384a239.webp","granata-emp":"img/arene-scifi-armi-granata-emp.04cfd31203.webp","lama-di-servizio":"img/arene-scifi-armi-lama-di-servizio.a47d434464.webp","lama-vibrante":"img/arene-scifi-armi-lama-vibrante.02b0f47ff8.webp","lancia-da-abbordaggio":"img/arene-scifi-armi-lancia-da-abbordaggio.cf167e52ff.webp","perforatore-portatile":"img/arene-scifi-armi-perforatore-portatile.aa7e92ecab.webp","pistola-a-scarica":"img/arene-scifi-armi-pistola-a-scarica.33b3e5929e.webp","pistola-laser":"img/arene-scifi-armi-pistola-laser.aed4bbf3ed.webp","taglierino-ceramico":"img/arene-scifi-armi-taglierino-ceramico.b45d524836.webp","taser-a-impulsi":"img/arene-scifi-armi-taser-a-impulsi.360e29e1d5.webp"},"luoghi":{"condotti-di-servizio":"img/arene-scifi-luoghi-condotti-di-servizio.6817134b5e.webp","hangar":"img/arene-scifi-luoghi-hangar.6de551833b.webp","moduli-abitativi":"img/arene-scifi-luoghi-moduli-abitativi.9f5bb96d39.webp","ponte-di-comando":"img/arene-scifi-luoghi-ponte-di-comando.3e9ffd005a.webp","reattore":"img/arene-scifi-luoghi-reattore.d10a335006.webp","serra-idroponica":"img/arene-scifi-luoghi-serra-idroponica.b6f4407853.webp"},"pericoli":{"androide-da-combattimento":"img/arene-scifi-pericoli-androide-da-combattimento.1a3d3eb38e.webp","creatura-aliena-dai-tentacoli":"img/arene-scifi-pericoli-creatura-aliena-dai-tentacoli.b6b314ddd9.webp","drone-di-sicurezza-impazzito":"img/arene-scifi-pericoli-drone-di-sicurezza-impazzito.c8a9c6f9e3.webp","sciame-di-nanobot":"img/arene-scifi-pericoli-sciame-di-nanobot.d43296f047.webp"}},"ufficio":{"armi":{"badge-clonato-del-capo":"img/arene-ufficio-armi-badge-clonato-del-capo.be9f7381fe.webp","dossier-dei-risultati":"img/arene-ufficio-armi-dossier-dei-risultati.1888e2f671.webp","elenco-dei-contributi":"img/arene-ufficio-armi-elenco-dei-contributi.3de4fbe5bf.webp","fascicolo-delle-fonti":"img/arene-ufficio-armi-fascicolo-delle-fonti.02df27dfbf.webp","foglio-excel-con-le-prove":"img/arene-ufficio-armi-foglio-excel-con-le-prove.944f6ec708.webp","mail-in-copia-a-tutti":"img/arene-ufficio-armi-mail-in-copia-a-tutti.1d4304df14.webp","nota-spese-gonfiata":"img/arene-ufficio-armi-nota-spese-gonfiata.d2683cca4c.webp","presentazione-rubata":"img/arene-ufficio-armi-presentazione-rubata.815dc5c8b4.webp","prospetto-delle-metriche":"img/arene-ufficio-armi-prospetto-delle-metriche.356da1d2d9.webp","registro-delle-revisioni":"img/arene-ufficio-armi-registro-delle-revisioni.509eab44df.webp","report-pieno-di-errori-altrui":"img/arene-ufficio-armi-report-pieno-di-errori-altrui.c01c0ef897.webp","riepilogo-delle-approvazioni":"img/arene-ufficio-armi-riepilogo-delle-approvazioni.9394dadd6b.webp"},"luoghi":{"cucina":"img/arene-ufficio-luoghi-cucina.d968f8861d.webp","open-space":"img/arene-ufficio-luoghi-open-space.b6b7990c99.webp","parcheggio":"img/arene-ufficio-luoghi-parcheggio.d593f2ed83.webp","sala-riunioni":"img/arene-ufficio-luoghi-sala-riunioni.f92c4030a9.webp","sala-stampanti":"img/arene-ufficio-luoghi-sala-stampanti.1727f50082.webp","ufficio-del-direttore":"img/arene-ufficio-luoghi-ufficio-del-direttore.bb3b6cabab.webp"},"pericoli":{"consulente-esterno":"img/arene-ufficio-pericoli-consulente-esterno.ce6e200c3f.webp","direttore-generale":"img/arene-ufficio-pericoli-direttore-generale.da2eb1f708.webp","riorganizzazione-aziendale":"img/arene-ufficio-pericoli-riorganizzazione-aziendale.1fd57b76b3.webp","ufficio-risorse-umane":"img/arene-ufficio-pericoli-ufficio-risorse-umane.8392df7518.webp"}},"wasteland":{"armi":{"balestra-artigianale":"img/arene-wasteland-armi-balestra-artigianale.e09826852f.webp","catena":"img/arene-wasteland-armi-catena.866183d584.webp","coltello-da-strada":"img/arene-wasteland-armi-coltello-da-strada.1083c4429d.webp","fucile-arrugginito":"img/arene-wasteland-armi-fucile-arrugginito.797601f16e.webp","lama-di-recupero":"img/arene-wasteland-armi-lama-di-recupero.1ad13cfc78.webp","lancia-di-ferraglia":"img/arene-wasteland-armi-lancia-di-ferraglia.99d9f41307.webp","lancia-ricavata-da-un-tubo":"img/arene-wasteland-armi-lancia-ricavata-da-un-tubo.53b934e449.webp","lanciachiodi":"img/arene-wasteland-armi-lanciachiodi.e4f51e42e2.webp","mannaia":"img/arene-wasteland-armi-mannaia.518ae9c11c.webp","martello-da-officina":"img/arene-wasteland-armi-martello-da-officina.851055795e.webp","mazza-di-tubi":"img/arene-wasteland-armi-mazza-di-tubi.91babe82ac.webp","molotov":"img/arene-wasteland-armi-molotov.303d6fa315.webp","scure-da-demolizione":"img/arene-wasteland-armi-scure-da-demolizione.066ea5e066.webp"},"luoghi":{"autostrada-spezzata":"img/arene-wasteland-luoghi-autostrada-spezzata.19a72a0b97.webp","citta-fantasma":"img/arene-wasteland-luoghi-citta-fantasma.fe22bb72b2.webp","cratere":"img/arene-wasteland-luoghi-cratere.04de7ca40a.webp","deposito":"img/arene-wasteland-luoghi-deposito.f98aa31220.webp","diga":"img/arene-wasteland-luoghi-diga.3be9abe15a.webp","discarica":"img/arene-wasteland-luoghi-discarica.b8783ad9c6.webp","raffineria":"img/arene-wasteland-luoghi-raffineria.081e2d2ad6.webp"},"pericoli":{"banda-di-predoni":"img/arene-wasteland-pericoli-banda-di-predoni.1dfcfd1628.webp","branco-di-cani-mutati":"img/arene-wasteland-pericoli-branco-di-cani-mutati.442fabfc39.webp","scorpione-gigante":"img/arene-wasteland-pericoli-scorpione-gigante.2dd8911367.webp","verme-delle-sabbie":"img/arene-wasteland-pericoli-verme-delle-sabbie.a0d445beeb.webp"}},"zombie":{"armi":{"accetta-da-soccorso":"img/arene-zombie-armi-accetta-da-soccorso.6d36eb13ac.webp","accetta":"img/arene-zombie-armi-accetta.0eed163720.webp","balestra":"img/arene-zombie-armi-balestra.d705131d17.webp","coltello-da-campeggio":"img/arene-zombie-armi-coltello-da-campeggio.2abab58e78.webp","fucile-a-pompa":"img/arene-zombie-armi-fucile-a-pompa.b00b1d6a70.webp","katana":"img/arene-zombie-armi-katana.f631ad392f.webp","machete-da-potatura":"img/arene-zombie-armi-machete-da-potatura.94a93108a1.webp","martello-da-carpentiere":"img/arene-zombie-armi-martello-da-carpentiere.021e8a80f2.webp","mazza-chiodata":"img/arene-zombie-armi-mazza-chiodata.b4e11dcadb.webp","mazza-da-lavoro":"img/arene-zombie-armi-mazza-da-lavoro.c36a90108f.webp","motosega":"img/arene-zombie-armi-motosega.f74e603615.webp","piede-di-porco":"img/arene-zombie-armi-piede-di-porco.c185a97e0d.webp","pistola":"img/arene-zombie-armi-pistola.6d30022ca6.webp"},"luoghi":{"centro-commerciale":"img/arene-zombie-luoghi-centro-commerciale.333f4699d5.webp","metropolitana":"img/arene-zombie-luoghi-metropolitana.878a263605.webp","ospedale":"img/arene-zombie-luoghi-ospedale.f25de413a4.webp","periferia":"img/arene-zombie-luoghi-periferia.e28a7d70c7.webp","piazza":"img/arene-zombie-luoghi-piazza.b6ed86b3ad.webp","scuola":"img/arene-zombie-luoghi-scuola.153ddbaa75.webp","stazione-di-polizia":"img/arene-zombie-luoghi-stazione-di-polizia.157f7a17f5.webp"},"pericoli":{"cane-infetto":"img/arene-zombie-pericoli-cane-infetto.fdff913d6f.webp","gigante-mutato":"img/arene-zombie-pericoli-gigante-mutato.91fad36b70.webp","infetto-corridore":"img/arene-zombie-pericoli-infetto-corridore.61f48faafd.webp","orda-di-zombi":"img/arene-zombie-pericoli-orda-di-zombi.e0fc6d1b56.webp"}}},"fx":{"pennellate":["img/fx-pennellata-1.5527b3e9bd.webp","img/fx-pennellata-2.8526d34dcf.webp","img/fx-pennellata-3.a7f3e74ff3.webp","img/fx-pennellata-4.fe1f612999.webp"],"sigilli":{"classico":"img/fx-sigillo-classico.b781c63b8d.webp","cyberpunk":"img/fx-sigillo-cyberpunk.134a7f507c.webp","fantasy":"img/fx-sigillo-fantasy.d854d9ac19.webp","horror":"img/fx-sigillo-horror.54149e6a7e.webp","liceo":"img/fx-sigillo-liceo.7f1566a7a8.webp","royale":"img/fx-sigillo-royale.bedbb77f68.webp","scifi":"img/fx-sigillo-scifi.6c50b79280.webp","ufficio":"img/fx-sigillo-ufficio.fcbbcc051a.webp","wasteland":"img/fx-sigillo-wasteland.86f44d1714.webp","zombie":"img/fx-sigillo-zombie.44ac2a6473.webp"},"grana":"img/fx-grana.c1e72fd2da.webp","forme":{"fascia":"img/fx-forma-fascia.8a2f8ab92d.webp","freccia":"img/fx-forma-freccia.4e8039be8f.webp","fulmine":"img/fx-forma-fulmine.c9a15d227c.webp","stella":"img/fx-forma-stella.e773ba5dda.webp","strappo":"img/fx-forma-strappo.0e6a41d0d9.webp"},"impatto":"img/fx-impatto.fd13ac9554.webp","mezzitoni":"img/fx-mezzitoni.f9ef4df053.webp","occhi":{"f-1":"img/fx-occhi-f-1.3779df529a.webp","f-2":"img/fx-occhi-f-2.2f47e4535b.webp","f-3":"img/fx-occhi-f-3.8b10fc4b00.webp","f-4":"img/fx-occhi-f-4.08132e01f9.webp","m-1":"img/fx-occhi-m-1.fd94d5b0eb.webp","m-2":"img/fx-occhi-m-2.c7b9661e6b.webp","m-3":"img/fx-occhi-m-3.91ff950ae4.webp","m-4":"img/fx-occhi-m-4.d0a0e73220.webp","m-5":"img/fx-occhi-m-5.f4c19f2141.webp","n-1":"img/fx-occhi-n-1.21fc3b7adf.webp"},"fondali":{"classico":"img/fx-fondale-classico.8a3fc35342.webp","cyberpunk":"img/fx-fondale-cyberpunk.283c80cc1e.webp","fantasy":"img/fx-fondale-fantasy.0ca9b3f315.webp","horror":"img/fx-fondale-horror.4ba1241b63.webp","liceo":"img/fx-fondale-liceo.fb428a57f7.webp","royale":"img/fx-fondale-royale.aac1246425.webp","scifi":"img/fx-fondale-scifi.27ee2ce8cc.webp","ufficio":"img/fx-fondale-ufficio.780789ce70.webp","wasteland":"img/fx-fondale-wasteland.02311ed21d.webp","zombie":"img/fx-fondale-zombie.83b8d35716.webp"},"volti":{"f-1":"img/fx-volto-f-1.96d62771c1.webp","f-2":"img/fx-volto-f-2.79d3485864.webp","f-3":"img/fx-volto-f-3.aeb7664a4e.webp","f-4":"img/fx-volto-f-4.2f2c864354.webp","m-1":"img/fx-volto-m-1.f8b83b073e.webp","m-2":"img/fx-volto-m-2.b9eb346a31.webp","m-3":"img/fx-volto-m-3.5311549074.webp","m-4":"img/fx-volto-m-4.10b102bdb0.webp","m-5":"img/fx-volto-m-5.63e5c91778.webp","n-1":"img/fx-volto-n-1.02cf4d1c97.webp"},"vincitori":{"f-1":"img/vincitori-vincitore-f-1.10b1ec0d22.webp","f-2":"img/vincitori-vincitore-f-2.03d8a3a92a.webp","f-3":"img/vincitori-vincitore-f-3.bc0adcd66a.webp","m-1":"img/vincitori-vincitore-m-1.c597436dca.webp","m-2":"img/vincitori-vincitore-m-2.9c8b48e9f8.webp","n-1":"img/vincitori-vincitore-n-1.1539fc78b2.webp"}}};
 ;
-window.LOS_BUILD = "0b65b55216b4cbf0a7ab72ea39ac4a371bae6917efeb42aa9822116180911850";
+window.LOS_BUILD = "f0adadf8aa1969464dbca48973fb9f5d030e5242bebbb1435fb99e95225a521d";
 ;
 /* Last One Standing — grafica vettoriale: logo, icone delle arene, illustrazioni.
  * Tutto è SVG generato in codice: nessuna immagine esterna. */
@@ -17914,6 +17954,35 @@ window.LOS_BUILD = "0b65b55216b4cbf0a7ab72ea39ac4a371bae6917efeb42aa982211618091
     const im = document.createElement('img'); im.className = cls; im.alt = ''; im.src = u; im.decoding = 'async';
     av.prepend(im); av.classList.add('has-volto');
   }
+  /* ritagli che sfumano: le figure di Midjourney toccano spesso i bordi dell'immagine (a destra, in basso, a volte a
+   * sinistra) e lì il ritaglio è una linea dritta. Si misura su una miniatura quanta figura tocca ciascun bordo e si
+   * sfuma solo quel lato, tanto più quanto più è pieno; i lati già trasparenti restano intatti. */
+  const featherCache = new Map();
+  function measureEdges(img) {
+    const w = 48, h = Math.max(8, Math.round((48 * img.naturalHeight) / img.naturalWidth));
+    const c = document.createElement('canvas'); c.width = w; c.height = h;
+    const g = c.getContext('2d', { willReadFrequently: true }); g.drawImage(img, 0, 0, w, h);
+    const a = g.getImageData(0, 0, w, h).data, at = (x, y) => a[(y * w + x) * 4 + 3];
+    // due pixel di profondità: il bordo antialiasato della miniatura non conta come vuoto
+    const cov = (n, f) => { let k = 0; for (let i = 0; i < n; i++) if (f(i) > 96) k++; return k / n; };
+    return {
+      t: cov(w, (x) => Math.max(at(x, 0), at(x, 1))), b: cov(w, (x) => Math.max(at(x, h - 1), at(x, h - 2))),
+      l: cov(h, (y) => Math.max(at(0, y), at(1, y))), r: cov(h, (y) => Math.max(at(w - 1, y), at(w - 2, y))),
+    };
+  }
+  function feather(img) {
+    if (!img) return;
+    const apply = () => {
+      try {
+        let e = featherCache.get(img.src); if (!e) { e = measureEdges(img); featherCache.set(img.src, e); }
+        const side = (cv, base, k) => (cv > 0.03 ? base + k * Math.min(1, cv) : 0).toFixed(1) + '%';
+        img.style.setProperty('--fl', side(e.l, 12, 18)); img.style.setProperty('--fr', side(e.r, 12, 18));
+        img.style.setProperty('--ft', side(e.t, 6, 10)); img.style.setProperty('--fb', side(e.b, 8, 14));
+      } catch (err) { /* immagine non leggibile (file locale): restano le sfumature generiche del foglio di stile */ }
+      img.classList.add('feather');
+    };
+    if (img.complete && img.naturalWidth) apply(); else img.addEventListener('load', apply, { once: true });
+  }
   const fondaleOf = (arena) => (FXA.fondali && arena && FXA.fondali[arena]) || null;
   // l'esito: fondale, mezzitoni, stella dietro il ritratto, volto e figura di riserva per chi vince senza foto
   function decorateWin(wh) {
@@ -17928,7 +17997,7 @@ window.LOS_BUILD = "0b65b55216b4cbf0a7ab72ea39ac4a371bae6917efeb42aa982211618091
     if (av && !av.querySelector('img')) {
       giveFace(av, FXA.volti, 'volto');
       const u = pickFor(FXA.vincitori, av.dataset.g, av.dataset.k);
-      if (u) { const fig = document.createElement('img'); fig.className = 'fn-figure'; fig.alt = ''; fig.src = u; fig.decoding = 'async'; fig.setAttribute('aria-hidden', 'true'); wh.appendChild(fig); wh.classList.add('has-figure'); }
+      if (u) { const fig = document.createElement('img'); fig.className = 'fn-figure'; fig.alt = ''; fig.src = u; fig.decoding = 'async'; fig.setAttribute('aria-hidden', 'true'); wh.appendChild(fig); wh.classList.add('has-figure'); feather(fig); }
     }
   }
   function watchWins() {
@@ -17989,7 +18058,7 @@ window.LOS_BUILD = "0b65b55216b4cbf0a7ab72ea39ac4a371bae6917efeb42aa982211618091
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start); else start();
 
-  G.LOS_LOOK = { sfx: SFX, cutin, place, pickFor, fx: FXA };
+  G.LOS_LOOK = { sfx: SFX, cutin, place, pickFor, feather, fx: FXA };
 })(typeof window !== 'undefined' ? window : globalThis);
 
 ;
@@ -18062,6 +18131,18 @@ window.LOS_BUILD = "0b65b55216b4cbf0a7ab72ea39ac4a371bae6917efeb42aa982211618091
   const anim = (n, kf, o) => n.animate(kf, Object.assign({ fill: 'both' }, o));
   const all = (a) => Promise.all(a.map((x) => x.finished)).catch(() => {});
 
+  // linee di velocità: barre sottili di carta e di tinta che attraversano tutto lo schermo più veloci delle lastre,
+  // sopra di esse, e spariscono; danno il senso dello spostamento a coperture fatte di sole superfici piene
+  function speed(g, W, H, P, n) {
+    const out = [];
+    for (let i = 0; i < n; i++) {
+      const y = R(-0.05, 1.05) * H, h = Math.random() < 0.7 ? R(1.5, 4) : R(6, 12), w = W * R(0.18, 0.55);
+      const r = el('rect', { x: -w, y: y.toFixed(1), width: w.toFixed(0), height: h.toFixed(1), fill: Math.random() < 0.6 ? P.paper : P.light }, g);
+      out.push({ r, w });
+    }
+    return () => out.map(({ r, w }) => r.animate([{ transform: 'translateX(0)', opacity: 0.9 }, { transform: 'translateX(' + (W + w * 2).toFixed(0) + 'px)', opacity: 0.9 }], { duration: R(220, 360), delay: R(0, 260), easing: 'cubic-bezier(.5,0,.6,1)', fill: 'none' }));
+  }
+
   function lame(g, W, H, dir, P, defs) {
     const ang = R(13, 23), sl = H * Math.tan(rad(ang)), span = W + sl * 2;
     const n = RI(4, 6), wts = Array.from({ length: n }, () => R(0.6, 1.4)), sum = wts.reduce((a, b) => a + b, 0);
@@ -18079,10 +18160,10 @@ window.LOS_BUILD = "0b65b55216b4cbf0a7ab72ea39ac4a371bae6917efeb42aa982211618091
       if (Math.random() < 0.55) { const t = R(5, 12), xp = x + w; blades.push(el('polygon', { points: pts([[xp + sl - t, -m], [xp + sl, -m], [xp, H + m], [xp - t, H + m]]), fill: P.paper }, g)); }
       x += w - 24;
     }
-    const off = span + sl;
+    const off = span + sl, fly = speed(g, W, H, P, RI(7, 11));
     blades.forEach((b, i) => { b.__i = b.__twin ? b.__twin.__i : blades.length - i; });
     return {
-      cover: () => all(blades.map((b) => anim(b, [{ transform: 'translateX(' + -off + 'px)' }, { transform: 'translateX(0)' }], { duration: 300, delay: b.__i * 26 + R(0, 14), easing: E.io }))),
+      cover: () => (fly(), all(blades.map((b) => anim(b, [{ transform: 'translateX(' + -off + 'px)' }, { transform: 'translateX(0)' }], { duration: 300, delay: b.__i * 26 + R(0, 14), easing: E.io })))),
       uncover: () => all(blades.map((b) => anim(b, [{ transform: 'translateX(0)' }, { transform: 'translateX(' + off + 'px)' }], { duration: 360, delay: (blades.length - b.__i) * 18 + R(0, 12), easing: E.in, composite: 'replace' }))),
     };
   }
@@ -18130,9 +18211,9 @@ window.LOS_BUILD = "0b65b55216b4cbf0a7ab72ea39ac4a371bae6917efeb42aa982211618091
       if (Math.random() < 0.4) { const t = R(4, 8); strips.push(Object.assign(el('rect', { x: -60, y: y + h - t, width: W + 140, height: t, fill: P.paper }, g), { __side: side, __i: i })); }
       y += h - 2;
     }
-    const off = W + 160;
+    const off = W + 160, fly = speed(g, W, H, P, RI(6, 9));
     return {
-      cover: () => all(strips.map((s) => anim(s, [{ transform: 'translateX(' + -s.__side * off + 'px)' }, { transform: 'translateX(0)' }], { duration: 290, delay: s.__i * 24 + R(0, 16), easing: E.io }))),
+      cover: () => (fly(), all(strips.map((s) => anim(s, [{ transform: 'translateX(' + -s.__side * off + 'px)' }, { transform: 'translateX(0)' }], { duration: 290, delay: s.__i * 24 + R(0, 16), easing: E.io })))),
       uncover: () => all(strips.map((s) => anim(s, [{ transform: 'translateX(0)' }, { transform: 'translateX(' + s.__side * off + 'px)' }], { duration: 340, delay: (n - 1 - s.__i) * 20 + R(0, 14), easing: E.in }))),
     };
   }
@@ -18260,11 +18341,66 @@ window.LOS_BUILD = "0b65b55216b4cbf0a7ab72ea39ac4a371bae6917efeb42aa982211618091
     ];
     if (subEl) inA.push(anim(subEl, [{ transform: 'translateX(' + -dir * 24 + 'px)', opacity: 0 }, { transform: 'none', opacity: 1 }], { duration: 240, delay: 160 + letters.length * 22, easing: E.out }));
     return {
+      el: cap,
       shown: all(inA),
       out: () => all([
         ...letters.map((s, i) => anim(s, [{ transform: 'none', opacity: 1 }, { transform: 'translateX(' + dir * 0.6 + 'em) skewX(-20deg)', opacity: 0 }], { duration: 150, delay: i * 9, easing: E.in })),
         anim(slab, [{ transform: 'scaleX(1)' }, { transform: 'scaleX(0)', transformOrigin: dir > 0 ? '100% 50%' : '0 50%' }], { duration: 200, delay: 60, easing: E.in }),
         ...(subEl ? [anim(subEl, [{ opacity: 1 }, { opacity: 0 }], { duration: 120, easing: E.in })] : []),
+      ]),
+    };
+  }
+
+  /* ---------- il timbro dell'arena ----------
+   * Prima era un'ombra nera al 32% sotto il cartello: si vedeva appena. Ora è un timbro vero, accanto al cartello:
+   * una lastra di carta dal bordo irregolare, il sigillo in inchiostro nero con una seconda passata nella tinta
+   * dell'arena appena fuori registro, il nome dell'arena su un nastro. Cade dall'alto con l'ombra che si stringe
+   * (sollevato → premuto), e all'impatto: due onde, schizzi d'inchiostro, la lastra che slitta, la scena che trema. */
+  function stamp(host, url, P, opt, capEl) {
+    const W = G.innerWidth, H = G.innerHeight;
+    const S = Math.round(Math.max(124, Math.min(Math.min(W, H) * 0.4, 320)));
+    const st = document.createElement('div'); st.className = 'lx-stamp';
+    st.style.setProperty('--seal', 'url("' + url + '")'); st.style.setProperty('--lx-key', P.key); st.style.setProperty('--S', S + 'px');
+    st.style.setProperty('--srot', (R(-14, -6) * (Math.random() < 0.25 ? -1 : 1)).toFixed(1) + 'deg');
+    const edge = [];
+    for (let i = 0; i < 64; i++) { const a = (i / 64) * Math.PI * 2, r = 50 - R(0, 1.6) - (Math.random() < 0.14 ? R(0.6, 2.2) : 0); edge.push((50 + Math.cos(a) * r).toFixed(2) + '% ' + (50 + Math.sin(a) * r).toFixed(2) + '%'); }
+    const name = String(opt.arenaName || '').trim();
+    st.innerHTML = '<svg class="lx-st-fx" viewBox="-100 -100 200 200"></svg><div class="lx-st-body"><i class="lx-st-plate"></i><i class="lx-st-mis"></i><i class="lx-st-ink"></i>' + (name ? '<b class="lx-st-name"></b>' : '') + '</div>';
+    if (name) { st.querySelector('.lx-st-name').textContent = name; if (name.length > 15) st.style.setProperty('--rf', (15 / name.length).toFixed(3)); } // i nomi lunghi stringono il nastro
+    st.querySelector('.lx-st-plate').style.clipPath = 'polygon(' + edge.join(',') + ')';
+    host.appendChild(st);
+    // accanto al cartello, sopra l'angolo destro (o sotto, se sopra non c'è posto), sempre dentro lo schermo
+    let cx = W * 0.5, cy = H * 0.26;
+    if (capEl) { const r = capEl.getBoundingClientRect(); cx = r.right - S * 0.12; cy = r.top > S * 0.95 ? r.top - S * 0.58 : r.bottom + S * 0.6; }
+    const pad = 10 + S / 2;
+    st.style.left = Math.min(W - pad, Math.max(pad, cx)).toFixed(0) + 'px'; st.style.top = Math.min(H - pad, Math.max(pad, cy)).toFixed(0) + 'px';
+    const body = st.querySelector('.lx-st-body'), mis = st.querySelector('.lx-st-mis'), fx = st.querySelector('.lx-st-fx'), rib = st.querySelector('.lx-st-name');
+    const T0 = 110, DUR = 300, IMP = T0 + DUR * 0.6;
+    const sh = Math.max(5, Math.round(S * 0.03)), pressed = 'drop-shadow(' + sh + 'px ' + Math.round(sh * 1.15) + 'px 0 #0a0a0c)';
+    const fall = anim(body, [
+      { transform: 'rotate(calc(var(--srot) - 28deg)) scale(2.5)', opacity: 0, filter: 'drop-shadow(26px 34px 16px rgb(0 0 0 / .55))', easing: 'cubic-bezier(.55,0,1,.45)' },
+      { transform: 'rotate(var(--srot)) scale(.9)', opacity: 1, filter: pressed, offset: 0.6, easing: E.out },
+      { transform: 'rotate(calc(var(--srot) - 2deg)) scale(1.035)', offset: 0.8 },
+      { transform: 'rotate(var(--srot)) scale(1)', opacity: 1, filter: pressed },
+    ], { duration: DUR, delay: T0 });
+    const slip = (S * 0.022).toFixed(1);
+    anim(mis, [{ translate: '0 0' }, { translate: '0 0', offset: 0.6 }, { translate: slip + 'px -' + slip + 'px' }], { duration: DUR, delay: T0, easing: E.out });
+    // l'impatto: due onde e gli schizzi, nelle unità della lastra (raggio 50)
+    const wave = (color, w, delay, dur) => { const c = el('circle', { cx: 0, cy: 0, r: 51, fill: 'none', stroke: color, 'stroke-width': w }, fx); anim(c, [{ transform: 'scale(.94)', opacity: 0, strokeWidth: w }, { opacity: 1, offset: 0.06 }, { transform: 'scale(1.9)', opacity: 0, strokeWidth: 0.6 }], { duration: dur, delay, easing: E.out }); };
+    wave(P.paper, 5, IMP, 460); wave(P.key, 8, IMP + 60, 540);
+    for (let i = 0; i < 24; i++) {
+      const a = R(0, Math.PI * 2), d = R(54, 96), r = i < 6 ? R(3, 4.6) : R(0.9, 2.6), dot = el('ellipse', { cx: 0, cy: 0, rx: (r * R(1.2, 2.2)).toFixed(1), ry: r.toFixed(1), fill: Math.random() < 0.62 ? P.void : P.key }, fx);
+      const deg = ((a * 180) / Math.PI).toFixed(0);
+      anim(dot, [{ transform: 'translate(' + (Math.cos(a) * 44).toFixed(1) + 'px,' + (Math.sin(a) * 44).toFixed(1) + 'px) rotate(' + deg + 'deg) scale(0)' }, { transform: 'translate(' + (Math.cos(a) * d).toFixed(1) + 'px,' + (Math.sin(a) * d).toFixed(1) + 'px) rotate(' + deg + 'deg) scale(1)' }], { duration: R(200, 300), delay: IMP + R(0, 30), easing: E.out });
+    }
+    host.animate([{ translate: '0 0' }, { translate: '-7px 5px' }, { translate: '6px -4px' }, { translate: '-3px 2px' }, { translate: '0 0' }], { duration: 220, delay: IMP, easing: 'steps(4, end)' });
+    if (rib) anim(rib, [{ clipPath: 'inset(0 100% 0 0)', letterSpacing: '.5em' }, { clipPath: 'inset(0 0 0 0)', letterSpacing: '.18em' }], { duration: 280, delay: IMP + 50, easing: E.out });
+    sfx('stamp', { at: IMP });
+    return {
+      landed: fall.finished.catch(() => {}),
+      out: () => all([
+        anim(body, [{ transform: 'rotate(var(--srot)) scale(1)', opacity: 1 }, { transform: 'rotate(calc(var(--srot) + 7deg)) scale(1.14)', opacity: 0 }], { duration: 210, easing: E.in }),
+        anim(fx, [{ opacity: 1 }, { opacity: 0 }], { duration: 160, easing: E.in }),
       ]),
     };
   }
@@ -18309,12 +18445,10 @@ window.LOS_BUILD = "0b65b55216b4cbf0a7ab72ea39ac4a371bae6917efeb42aa982211618091
     if (dir < 0 && (fam === 'lame')) g.setAttribute('transform', 'translate(' + W + ',0) scale(-1,1)');
     // il sipario non è mai dritto: qualche grado d'inclinazione, ingrandito quanto basta a coprire gli angoli
     if (fam === 'sipario' || fam === 'titoli') g.setAttribute('transform', 'translate(' + W / 2 + ' ' + H / 2 + ') rotate(' + (R(3, 7) * -dir).toFixed(1) + ') scale(1.22) translate(' + -W / 2 + ' ' + -H / 2 + ')');
-    // il sigillo dell'arena, timbrato vicino al nome (piccolo: la sorgente è di 320 px)
+    // il sigillo dell'arena: un timbro vero accanto al cartello (vedi stamp)
     const FX = (G.LOS_ASSETS && G.LOS_ASSETS.fx) || {}, sealUrl = opt.arena && FX.sigilli && FX.sigilli[opt.arena];
+    const canSeal = !!(sealUrl && (/^data:/.test(sealUrl) || /^https?:$/.test(G.location.protocol)));
     let seal = null;
-    if (sealUrl && (/^data:/.test(sealUrl) || /^https?:$/.test(G.location.protocol))) {
-      seal = document.createElement('i'); seal.className = 'lx-seal'; seal.style.setProperty('--seal', 'url("' + sealUrl + '")'); seal.style.setProperty('--lx-key', P.key); layer.appendChild(seal);
-    }
     let swapped = false;
     const doSwap = () => { if (swapped) return; swapped = true; try { swap(); } catch (e) { setTimeout(() => { throw e; }); } };
     sfx('cut');
@@ -18323,16 +18457,17 @@ window.LOS_BUILD = "0b65b55216b4cbf0a7ab72ea39ac4a371bae6917efeb42aa982211618091
     shape.cover()
       .then(() => {
         cap = caption(layer, opt, to, fam, P, dir);
-        if (seal) seal.animate([{ transform: 'translate(-50%,-50%) rotate(-28deg) scale(1.7)', opacity: 0 }, { transform: 'translate(-50%,-50%) rotate(-10deg) scale(1)', opacity: 0.9 }], { duration: 220, easing: E.out, fill: 'both' });
-        sfx('stamp', { at: 80 });
+        if (canSeal) seal = stamp(layer, sealUrl, P, opt, cap && cap.el);
+        else sfx('stamp', { at: 80 });
         doSwap();
         emit('los:cover', { view: to, dir, hue: P.hue });
-        return Promise.all([cap ? cap.shown : null, new Promise((r) => setTimeout(r, 140))]);
+        return Promise.all([cap ? cap.shown : null, seal ? seal.landed : null, new Promise((r) => setTimeout(r, 140))]);
       })
-      .then(() => new Promise((r) => setTimeout(r, opt.hold || 110)))
+      // con il timbro il cartello resta fermo un po' di più: il tempo di leggere nome e sigillo
+      .then(() => new Promise((r) => setTimeout(r, opt.hold || (seal ? 420 : 110))))
       .then(() => {
         const outs = [cap ? cap.out() : null];
-        if (seal) outs.push(all([seal.animate([{ opacity: 0.9 }, { opacity: 0, transform: 'translate(-50%,-50%) rotate(-4deg) scale(.9)' }], { duration: 160, easing: E.in, fill: 'both' })]));
+        if (seal) outs.push(seal.out());
         enter(to, dir);
         emit('los:enter', { view: to, dir });
         return Promise.all(outs.concat([new Promise((r) => setTimeout(r, 70)).then(() => shape.uncover())]));
@@ -18533,7 +18668,7 @@ window.LOS_BUILD = "0b65b55216b4cbf0a7ab72ea39ac4a371bae6917efeb42aa982211618091
     band.style.setProperty('--tilt', tilt + 'deg');
     anim(b.querySelector('.pb-veil'), [{ opacity: 0 }, { opacity: 1, offset: 0.12 }, { opacity: 1, offset: 0.82 }, { opacity: 0 }], { duration: D });
     anim(band, [{ clipPath: 'inset(0 100% 0 0)' }, { clipPath: 'inset(0 0 0 0)' }], { duration: 260, easing: E.io });
-    anim(band, [{ clipPath: 'inset(0 0 0 0)' }, { clipPath: 'inset(0 0 0 100%)' }], { duration: 240, delay: D - 250, easing: E.in });
+    anim(band, [{ clipPath: 'inset(0 0 0 0)' }, { clipPath: 'inset(0 0 0 100%)' }], { duration: 240, delay: D - 250, easing: E.in, fill: 'forwards' });
     // la striscia parte con il giorno vecchio al centro e scorre di un posto
     anim(strip, [{ transform: 'translateX(var(--slot))' }, { transform: 'translateX(0)' }], { duration: 460, delay: 300, easing: E.io });
     anim(sel, [{ transform: 'translate(-50%,-50%) skewX(-12deg) scaleX(0)' }, { transform: 'translate(-50%,-50%) skewX(-12deg) scaleX(1)' }], { duration: 240, delay: 160, easing: E.out });
@@ -18554,7 +18689,7 @@ window.LOS_BUILD = "0b65b55216b4cbf0a7ab72ea39ac4a371bae6917efeb42aa982211618091
     String(title || '').split(/\s+/).forEach((w, i, a) => { const s = h('span', null, esc(w)); t.appendChild(s); if (i < a.length - 1) t.appendChild(document.createTextNode(' ')); });
     anim(b.querySelector('.pb-veil'), [{ opacity: 0 }, { opacity: 1, offset: 0.1 }, { opacity: 1, offset: 0.84 }, { opacity: 0 }], { duration: D });
     anim(band, [{ transform: 'rotate(var(--tilt)) scaleY(0)' }, { transform: 'rotate(var(--tilt)) scaleY(1)' }], { duration: 200, easing: E.out });
-    anim(band, [{ transform: 'rotate(var(--tilt)) scaleY(1)', opacity: 1 }, { transform: 'rotate(var(--tilt)) scaleY(0)', opacity: 1 }], { duration: 200, delay: D - 210, easing: E.in });
+    anim(band, [{ transform: 'rotate(var(--tilt)) scaleY(1)', opacity: 1 }, { transform: 'rotate(var(--tilt)) scaleY(0)', opacity: 1 }], { duration: 200, delay: D - 210, easing: E.in, fill: 'forwards' });
     anim(b.querySelector('.pb-k'), [{ translate: '-60px 0', opacity: 0 }, { translate: '0 0', opacity: 1 }], { duration: 240, delay: 140, easing: E.out });
     [...t.children].forEach((s, i) => anim(s, [{ transform: 'translateY(-120%) rotate(' + R(-10, 10) + 'deg) scale(1.6)', opacity: 0 }, { opacity: 1, offset: 0.5 }, { transform: 'none', opacity: 1 }], { duration: 300, delay: 260 + i * 90, easing: E.kick }));
     const main = document.querySelector('main');
@@ -18572,42 +18707,109 @@ window.LOS_BUILD = "0b65b55216b4cbf0a7ab72ea39ac4a371bae6917efeb42aa982211618091
       row.appendChild(p); row.appendChild(h('span', 'pb-name', esc(p.dataset.name)));
       row.style.setProperty('--i', i); rows.appendChild(row);
       anim(row, [{ transform: 'translateX(' + (i % 2 ? 110 : -110) + '%) skewX(-10deg)' }, { transform: 'translateX(0) skewX(-10deg)' }], { duration: 300, delay: 160 + i * 70, easing: E.out });
-      anim(row, [{ transform: 'translateX(0) skewX(-10deg)' }, { transform: 'translateX(' + (i % 2 ? -110 : 110) + '%) skewX(-10deg)' }], { duration: 240, delay: D - 300 + i * 20, easing: E.in });
+      anim(row, [{ transform: 'translateX(0) skewX(-10deg)' }, { transform: 'translateX(' + (i % 2 ? -110 : 110) + '%) skewX(-10deg)' }], { duration: 240, delay: D - 300 + i * 20, easing: E.in, fill: 'forwards' });
       setTimeout(() => sfx('move'), 160 + i * 70);
     });
     const head = b.querySelector('.pb-head');
     anim(b.querySelector('.pb-veil'), [{ opacity: 0 }, { opacity: 1, offset: 0.08 }, { opacity: 1, offset: 0.86 }, { opacity: 0 }], { duration: D });
     anim(head, [{ transform: 'translate(-50%,-50%) rotate(-6deg) scale(2.2)', opacity: 0 }, { transform: 'translate(-50%,-50%) rotate(-6deg) scale(1)', opacity: 1 }], { duration: 260, delay: 220 + list.length * 70, easing: E.kick });
-    anim(head, [{ opacity: 1 }, { opacity: 0 }], { duration: 160, delay: D - 260, easing: E.in });
+    anim(head, [{ opacity: 1 }, { opacity: 0 }], { duration: 160, delay: D - 260, easing: E.in, fill: 'forwards' });
     sfx('cut'); sfx('stamp', { at: 240 + list.length * 70 });
   }
 
-  // cut-in di un'eliminazione: chi colpisce a sinistra, chi cade a destra, un taglio in mezzo e il timbro
+  /* cut-in di un'eliminazione, in cinque tempi:
+   * 1 · la pagina si spegne in una vignetta rossa, la fascia nera si strappa da destra con le linee di velocità;
+   * 2 · chi colpisce entra da sinistra e un riflesso gli attraversa gli occhi, chi cade entra da destra ancora a colori;
+   * 3 · lampo, la lama attraversa il pannello di chi cade, che si spezza davvero in due metà lungo il taglio: schizzi,
+   *     il volto diventa grigio e rosso, la scena trema, il nome viene barrato;
+   * 4 · il timbro cade sotto la fascia, sopra una macchia d'inchiostro;
+   * 5 · le due metà cadono, il timbro si stacca e la fascia esce. */
   let lastKill = 0;
+  const KILL = '#e5484d', BLOOD = '#8f1118';
   function killCut(row) {
     if (reduced() || Date.now() < boardBusy || Date.now() - lastKill < 1500) return;
     const avs = [...row.querySelectorAll('.avs .av')], dead = avs.filter((a) => a.classList.contains('dead')), live = avs.filter((a) => !a.classList.contains('dead'));
     if (!dead.length) return;
     lastKill = Date.now();
-    const D = 1150, b = openBoard('pb-kill' + (live.length ? '' : ' solo'), D);
+    const D = 1600, CUT = 520, b = openBoard('pb-kill' + (live.length ? '' : ' solo'), D);
     const label = ((row.querySelector('.cat') || {}).textContent || 'Fuori').trim();
-    b.innerHTML = '<div class="pb-band"><i class="pb-bg"></i><div class="pb-duel"></div><i class="pb-cutline"></i><b class="pb-stamp">' + esc(label) + '</b></div>';
-    const band = b.querySelector('.pb-band'), duel = b.querySelector('.pb-duel'), stamp = b.querySelector('.pb-stamp'), line = b.querySelector('.pb-cutline');
+    b.innerHTML = '<i class="pb-veil"></i><div class="pb-band"><i class="pb-bg"></i><i class="pb-speed"></i><div class="pb-duel"></div><i class="pb-flash"></i></div>' +
+      '<i class="pb-inksplat"></i><b class="pb-stamp">' + esc(label) + '</b>';
+    const band = b.querySelector('.pb-band'), duel = b.querySelector('.pb-duel'), stamp = b.querySelector('.pb-stamp'), ink = b.querySelector('.pb-inksplat');
     b.querySelector('.pb-bg').style.clipPath = torn(R(4, 9), R(91, 96), 2.4);
-    band.style.setProperty('--tilt', R(-5.5, -3.5).toFixed(1) + 'deg');
-    const side = (av, cls) => { const s = h('div', 'pb-side ' + cls), p = eyes(av); s.appendChild(p); s.appendChild(h('span', 'pb-name', esc(p.dataset.name))); duel.appendChild(s); return s; };
-    const L = live.length ? side(live[0], 'atk') : null, Rt = side(dead[0], 'vic');
-    anim(band, [{ clipPath: 'inset(0 0 0 100%)' }, { clipPath: 'inset(0 0 0 0)' }], { duration: 200, easing: E.io });
-    anim(band, [{ clipPath: 'inset(0 0 0 0)' }, { clipPath: 'inset(0 100% 0 0)' }], { duration: 200, delay: D - 210, easing: E.in });
-    if (L) anim(L, [{ transform: 'translateX(-60%)', opacity: 0 }, { transform: 'none', opacity: 1 }], { duration: 260, delay: 90, easing: E.out });
-    anim(Rt, [{ transform: 'translateX(60%)', opacity: 0 }, { transform: 'none', opacity: 1 }], { duration: 260, delay: 130, easing: E.out });
-    // il taglio: una lama di carta attraversa, il pannello di chi cade si spezza in due metà sfalsate
-    anim(line, [{ transform: 'translate(-50%,-50%) rotate(-58deg) scaleX(0)', opacity: 1 }, { transform: 'translate(-50%,-50%) rotate(-58deg) scaleX(1)', opacity: 1, offset: 0.5 }, { transform: 'translate(-50%,-50%) rotate(-58deg) scaleX(1)', opacity: 0 }], { duration: 280, delay: 400, easing: E.out });
-    setTimeout(() => { if (Rt.isConnected) Rt.classList.add('cut'); }, 480);
-    anim(stamp, [{ transform: 'translate(-50%,-50%) rotate(-9deg) scale(2.6)', opacity: 0 }, { transform: 'translate(-50%,-50%) rotate(-9deg) scale(1)', opacity: 1 }], { duration: 220, delay: 520, easing: E.kick });
+    const tilt = R(-5.5, -3.5);
+    band.style.setProperty('--tilt', tilt.toFixed(1) + 'deg');
+    b.style.setProperty('--srot', (R(-9, -5) + (Math.random() < 0.3 ? 12 : 0)).toFixed(1) + 'deg');
+    // chi colpisce
+    let L = null;
+    if (live.length) {
+      L = h('div', 'pb-side atk'); const p = eyes(live[0]);
+      L.appendChild(p); L.appendChild(h('span', 'pb-name', esc(p.dataset.name))); duel.appendChild(L);
+    }
+    // chi cade: due copie dello stesso pannello, ciascuna ritagliata da un lato del taglio
+    const Rt = h('div', 'pb-side vic'), pv = eyes(dead[0]), split = h('div', 'pb-split');
+    const halfA = h('div', 'pb-half a'), halfB = h('div', 'pb-half b'), slash = h('i', 'pb-slash');
+    halfA.appendChild(pv); halfB.appendChild(pv.cloneNode(true));
+    const svg = document.createElementNS(NS, 'svg'); svg.setAttribute('class', 'pb-blood'); svg.setAttribute('aria-hidden', 'true');
+    split.append(halfA, halfB, slash, svg);
+    const vname = h('span', 'pb-name', esc(pv.dataset.name));
+    Rt.append(split, vname); duel.appendChild(Rt);
+    // la geometria del taglio: dal 61% in alto al 39% in basso del pannello, la lama segue la stessa diagonale
+    const pw = split.offsetWidth || 600, ph = split.offsetHeight || 120;
+    const tx = -0.22 * pw, ty = ph, tl = Math.hypot(tx, ty), ux = tx / tl, uy = ty / tl, nx = uy, ny = -ux; // tangente (giù a sinistra) e normale (su a destra)
+    slash.style.setProperty('--ang', ((Math.atan2(ty, tx) * 180) / Math.PI).toFixed(1) + 'deg');
+    // gli schizzi: gocce allungate nella direzione del volo, da tutte e due le parti del taglio, che poi colano
+    const drops = [];
+    for (let i = 0; i < 18; i++) {
+      const s = Math.random() < 0.6 ? 1 : -1, along = R(-0.9, 0.9), out = R(0.35, 1);
+      const vx = (nx * s * out + ux * along) * R(40, 150), vy = (ny * s * out + uy * along) * R(40, 150);
+      const r = R(2, 8) * (ph / 120), e = document.createElementNS(NS, 'ellipse');
+      e.setAttribute('rx', (r * R(1.3, 2.6)).toFixed(1)); e.setAttribute('ry', r.toFixed(1));
+      e.setAttribute('fill', i % 5 === 0 ? '#0a0a0c' : i % 2 ? KILL : BLOOD);
+      svg.appendChild(e); drops.push({ e, vx, vy, a: (Math.atan2(vy, vx) * 180) / Math.PI, g: R(8, 26) });
+    }
+    // 1 · scena
+    anim(b.querySelector('.pb-veil'), [{ opacity: 0 }, { opacity: 1, offset: 0.1 }, { opacity: 1, offset: 0.88 }, { opacity: 0 }], { duration: D });
+    anim(band, [{ clipPath: 'inset(0 0 0 100%)' }, { clipPath: 'inset(0 0 0 0)' }], { duration: 220, easing: E.io });
+    anim(band, [{ clipPath: 'inset(0 0 0 0)' }, { clipPath: 'inset(0 100% 0 0)' }], { duration: 210, delay: D - 220, easing: E.in, fill: 'forwards' });
+    // 2 · i due volti
+    if (L) {
+      anim(L, [{ transform: 'translateX(-70%) skewX(14deg)', opacity: 0 }, { opacity: 1, offset: 0.3 }, { transform: 'translateX(3%) skewX(-4deg)', offset: 0.7 }, { transform: 'none', opacity: 1 }], { duration: 320, delay: 110, easing: E.out });
+      const pe = L.querySelector('.pe');
+      if (pe) anim(pe, [{ backgroundPosition: '160% 0' }, { backgroundPosition: '-60% 0' }], { duration: 420, delay: 300, easing: E.io, pseudoElement: '::after' });
+      // dopo il colpo, chi ha colpito accompagna il gesto
+      anim(L, [{ translate: '0 0' }, { translate: '18px 0', offset: 0.35 }, { translate: '0 0' }], { duration: 360, delay: CUT, easing: E.out });
+    }
+    anim(Rt, [{ transform: 'translateX(70%) skewX(14deg)', opacity: 0 }, { opacity: 1, offset: 0.3 }, { transform: 'translateX(-3%) skewX(-4deg)', offset: 0.7 }, { transform: 'none', opacity: 1 }], { duration: 320, delay: 160, easing: E.out });
+    // 3 · il colpo
+    anim(b.querySelector('.pb-flash'), [{ opacity: 0 }, { opacity: 0.85 }, { opacity: 0 }], { duration: 150, delay: CUT - 30, easing: 'steps(3, end)' });
+    anim(slash, [{ transform: 'translate(-50%,-50%) rotate(var(--ang)) scaleX(0)', opacity: 1, transformOrigin: '100% 50%' }, { transform: 'translate(-50%,-50%) rotate(var(--ang)) scaleX(1)', opacity: 1, offset: 0.45 }, { transform: 'translate(-50%,-50%) rotate(var(--ang)) scaleX(1) scaleY(.2)', opacity: 0 }], { duration: 300, delay: CUT, easing: E.out });
+    const sep = Math.max(12, ph * 0.16);
+    anim(halfA, [{ transform: 'none' }, { transform: 'translate(' + (ux * sep - nx * sep * 0.5).toFixed(1) + 'px,' + (uy * sep - ny * sep * 0.5).toFixed(1) + 'px) rotate(-2.5deg)' }], { duration: 240, delay: CUT + 40, easing: E.out });
+    anim(halfB, [{ transform: 'none' }, { transform: 'translate(' + (-ux * sep + nx * sep * 0.5).toFixed(1) + 'px,' + (-uy * sep + ny * sep * 0.5).toFixed(1) + 'px) rotate(2deg)' }], { duration: 240, delay: CUT + 40, easing: E.out });
+    setTimeout(() => { if (Rt.isConnected) Rt.classList.add('cut'); }, CUT + 30);
+    drops.forEach((d, i) => anim(d.e, [
+      { transform: 'translate(0,0) rotate(' + d.a.toFixed(0) + 'deg) scale(.2)', opacity: 1 },
+      { transform: 'translate(' + d.vx.toFixed(1) + 'px,' + d.vy.toFixed(1) + 'px) rotate(' + d.a.toFixed(0) + 'deg) scale(1)', opacity: 1, offset: 0.55 },
+      { transform: 'translate(' + d.vx.toFixed(1) + 'px,' + (d.vy + d.g).toFixed(1) + 'px) rotate(90deg) scale(.7, 1.1)', opacity: 1 },
+    ], { duration: 620, delay: CUT + 50 + i * 6, easing: E.out }));
+    anim(svg, [{ opacity: 1 }, { opacity: 0 }], { duration: 240, delay: D - 380, easing: E.in, fill: 'forwards' });
+    anim(band, [{ translate: '0 0' }, { translate: '-12px 6px' }, { translate: '10px -5px' }, { translate: '-6px 3px' }, { translate: '3px -1px' }, { translate: '0 0' }], { duration: 300, delay: CUT + 40, easing: 'steps(5, end)', fill: 'none' });
     const feed = document.getElementById('phBody');
-    if (feed) feed.animate([{ translate: '0 0' }, { translate: '-7px 3px' }, { translate: '6px -3px' }, { translate: '-3px 2px' }, { translate: '0 0' }], { duration: 260, delay: 500, easing: 'steps(4, end)' });
-    sfx('slash', { at: 400 }); sfx('stamp', { at: 540 });
+    if (feed) feed.animate([{ translate: '0 0' }, { translate: '-7px 3px' }, { translate: '6px -3px' }, { translate: '-3px 2px' }, { translate: '0 0' }], { duration: 260, delay: CUT + 40, easing: 'steps(4, end)' });
+    // 4 · il timbro, sopra una macchia d'inchiostro
+    anim(ink, [{ transform: 'translate(-50%,-50%) rotate(var(--srot)) scale(.3)', opacity: 0 }, { transform: 'translate(-50%,-50%) rotate(var(--srot)) scale(1.05)', opacity: 1, offset: 0.6 }, { transform: 'translate(-50%,-50%) rotate(var(--srot)) scale(1)', opacity: 1 }], { duration: 300, delay: CUT + 170, easing: E.out });
+    anim(stamp, [
+      { transform: 'translate(-50%,-50%) rotate(calc(var(--srot) - 16deg)) scale(2.6)', opacity: 0, filter: 'drop-shadow(14px 18px 6px rgb(0 0 0 / .5))', easing: 'cubic-bezier(.55,0,1,.45)' },
+      { transform: 'translate(-50%,-50%) rotate(var(--srot)) scale(.92)', opacity: 1, filter: 'drop-shadow(0 0 0 rgb(0 0 0 / 0))', offset: 0.6, easing: E.out },
+      { transform: 'translate(-50%,-50%) rotate(var(--srot)) scale(1)', opacity: 1, filter: 'drop-shadow(0 0 0 rgb(0 0 0 / 0))' },
+    ], { duration: 280, delay: CUT + 140 });
+    // 5 · l'uscita: le metà cadono con la gravità, il timbro si stacca
+    anim(halfA, [{ translate: '0 0', opacity: 1 }, { translate: '-30px ' + (ph * 1.4).toFixed(0) + 'px', rotate: '-9deg', opacity: 0 }], { duration: 340, delay: D - 380, easing: E.in, fill: 'forwards' });
+    anim(halfB, [{ translate: '0 0', opacity: 1 }, { translate: '36px ' + (ph * 1.2).toFixed(0) + 'px', rotate: '7deg', opacity: 0 }], { duration: 340, delay: D - 360, easing: E.in, fill: 'forwards' });
+    anim(stamp, [{ scale: '1', opacity: 1 }, { scale: '1.14', opacity: 0 }], { duration: 180, delay: D - 250, easing: E.in, fill: 'forwards' });
+    anim(ink, [{ opacity: 1 }, { opacity: 0 }], { duration: 200, delay: D - 250, easing: E.in, fill: 'forwards' });
+    sfx('slash', { at: CUT }); sfx('stamp', { at: CUT + 180 });
   }
   function watchKills() {
     const feed = document.getElementById('phBody'); if (!feed) return;
@@ -18678,7 +18880,7 @@ window.LOS_BUILD = "0b65b55216b4cbf0a7ab72ea39ac4a371bae6917efeb42aa982211618091
     (team ? crew.slice(0, 3) : [av]).forEach((a) => { if (a) eyesBand.appendChild(eyes(a)); });
     // l'eroe: figura intera di riserva, foto in cornice inclinata, squadra in fila, oppure le iniziali
     if (team) { hero.classList.add('crew'); crew.slice(0, 6).forEach((a) => { const c = a.cloneNode(true); c.removeAttribute('data-prof'); c.tabIndex = -1; hero.appendChild(c); }); }
-    else if (figure) { const im = h('img', 'pf-fig'); im.alt = ''; im.src = figure; hero.appendChild(im); }
+    else if (figure) { const im = h('img', 'pf-fig'); im.alt = ''; im.src = figure; hero.appendChild(im); if (LOOK().feather) LOOK().feather(im); }
     else if (photo) { const f = h('div', 'pf-photo'); const im = h('img'); im.alt = ''; im.src = photo.currentSrc || photo.src; f.appendChild(im); hero.appendChild(f); }
     else hero.appendChild(h('b', 'pf-ini', esc(((av && (av.querySelector('.ini') || av).textContent) || '').trim())));
     [...name].forEach((ch) => { const s = h('span'); s.textContent = ch === ' ' ? ' ' : ch; nword.appendChild(s); });
@@ -20620,7 +20822,7 @@ window.LOS_BUILD = "0b65b55216b4cbf0a7ab72ea39ac4a371bae6917efeb42aa982211618091
     let v = (location.hash || '').slice(1); if (!VIEWS.includes(v)) v = 'home';
     if (v === curView) { route(); return; }
     const t = THEMES[(v === 'diretta' || v === 'esito') && SIM ? SIM.theme : S.settings.theme];
-    AN.wipe(route, { label: VIEW_LABEL[v] || '', hue: v === 'home' ? 162 : t ? t.hue : null, arena: v === 'home' || !t ? null : t.id });
+    AN.wipe(route, { label: VIEW_LABEL[v] || '', hue: v === 'home' ? 162 : t ? t.hue : null, arena: v === 'home' || !t ? null : t.id, arenaName: v === 'home' || !t ? '' : t.name });
   });
   document.addEventListener('click', (e) => {
     const q = e.target.closest('[data-quick]'); if (q) { e.preventDefault(); quickPlay(); return; }

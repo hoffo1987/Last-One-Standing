@@ -166,6 +166,35 @@
     const im = document.createElement('img'); im.className = cls; im.alt = ''; im.src = u; im.decoding = 'async';
     av.prepend(im); av.classList.add('has-volto');
   }
+  /* ritagli che sfumano: le figure di Midjourney toccano spesso i bordi dell'immagine (a destra, in basso, a volte a
+   * sinistra) e lì il ritaglio è una linea dritta. Si misura su una miniatura quanta figura tocca ciascun bordo e si
+   * sfuma solo quel lato, tanto più quanto più è pieno; i lati già trasparenti restano intatti. */
+  const featherCache = new Map();
+  function measureEdges(img) {
+    const w = 48, h = Math.max(8, Math.round((48 * img.naturalHeight) / img.naturalWidth));
+    const c = document.createElement('canvas'); c.width = w; c.height = h;
+    const g = c.getContext('2d', { willReadFrequently: true }); g.drawImage(img, 0, 0, w, h);
+    const a = g.getImageData(0, 0, w, h).data, at = (x, y) => a[(y * w + x) * 4 + 3];
+    // due pixel di profondità: il bordo antialiasato della miniatura non conta come vuoto
+    const cov = (n, f) => { let k = 0; for (let i = 0; i < n; i++) if (f(i) > 96) k++; return k / n; };
+    return {
+      t: cov(w, (x) => Math.max(at(x, 0), at(x, 1))), b: cov(w, (x) => Math.max(at(x, h - 1), at(x, h - 2))),
+      l: cov(h, (y) => Math.max(at(0, y), at(1, y))), r: cov(h, (y) => Math.max(at(w - 1, y), at(w - 2, y))),
+    };
+  }
+  function feather(img) {
+    if (!img) return;
+    const apply = () => {
+      try {
+        let e = featherCache.get(img.src); if (!e) { e = measureEdges(img); featherCache.set(img.src, e); }
+        const side = (cv, base, k) => (cv > 0.03 ? base + k * Math.min(1, cv) : 0).toFixed(1) + '%';
+        img.style.setProperty('--fl', side(e.l, 12, 18)); img.style.setProperty('--fr', side(e.r, 12, 18));
+        img.style.setProperty('--ft', side(e.t, 6, 10)); img.style.setProperty('--fb', side(e.b, 8, 14));
+      } catch (err) { /* immagine non leggibile (file locale): restano le sfumature generiche del foglio di stile */ }
+      img.classList.add('feather');
+    };
+    if (img.complete && img.naturalWidth) apply(); else img.addEventListener('load', apply, { once: true });
+  }
   const fondaleOf = (arena) => (FXA.fondali && arena && FXA.fondali[arena]) || null;
   // l'esito: fondale, mezzitoni, stella dietro il ritratto, volto e figura di riserva per chi vince senza foto
   function decorateWin(wh) {
@@ -180,7 +209,7 @@
     if (av && !av.querySelector('img')) {
       giveFace(av, FXA.volti, 'volto');
       const u = pickFor(FXA.vincitori, av.dataset.g, av.dataset.k);
-      if (u) { const fig = document.createElement('img'); fig.className = 'fn-figure'; fig.alt = ''; fig.src = u; fig.decoding = 'async'; fig.setAttribute('aria-hidden', 'true'); wh.appendChild(fig); wh.classList.add('has-figure'); }
+      if (u) { const fig = document.createElement('img'); fig.className = 'fn-figure'; fig.alt = ''; fig.src = u; fig.decoding = 'async'; fig.setAttribute('aria-hidden', 'true'); wh.appendChild(fig); wh.classList.add('has-figure'); feather(fig); }
     }
   }
   function watchWins() {
@@ -241,5 +270,5 @@
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start); else start();
 
-  G.LOS_LOOK = { sfx: SFX, cutin, place, pickFor, fx: FXA };
+  G.LOS_LOOK = { sfx: SFX, cutin, place, pickFor, feather, fx: FXA };
 })(typeof window !== 'undefined' ? window : globalThis);

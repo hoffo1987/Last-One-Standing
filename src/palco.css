@@ -100,22 +100,45 @@ h2.sec { text-transform: uppercase; font-stretch: 114%; letter-spacing: -.02em; 
 .pb-head .pb-k { font-size: clamp(30px, 6.6vw, 96px); letter-spacing: -.01em; background: var(--paper); color: var(--void); box-shadow: .1em .1em 0 var(--key); clip-path: none; padding: .08em .4em .12em; }
 
 /* cut-in di un'eliminazione */
+.pb-kill { --kill: #e5484d; }
 .pb-kill .pb-band { height: min(31vh, 260px); --tilt: -4.5deg; }
+/* la pagina si spegne: buio al centro, rosso ai bordi */
+.pb-kill .pb-veil { background: radial-gradient(ellipse 75% 65% at 50% 50%, hsl(0 0% 0% / .5) 30%, color-mix(in srgb, var(--kill) 34%, hsl(0 0% 2% / .9)) 100%); }
+.pb-speed { position: absolute; inset: 0; opacity: .55; background: repeating-linear-gradient(90deg, transparent 0 70px, hsl(0 0% 100% / .1) 70px 73px, transparent 73px 170px, color-mix(in srgb, var(--kill) 45%, transparent) 170px 172px);
+  animation: pbSpeed .36s linear infinite; clip-path: inset(12% 0 12% 0); }
+@keyframes pbSpeed { to { background-position: 344px 0; } }
+.pb-flash { position: absolute; inset: 0; background: var(--paper); opacity: 0; mix-blend-mode: screen; }
 .pb-duel { position: relative; display: flex; align-items: center; justify-content: center; gap: 7vw; width: 100vw; }
-.pb-side { display: grid; gap: 8px; justify-items: start; width: min(38vw, 600px); }
-.pb-side .pe { width: 100%; transition: transform .12s steps(2, end); }
+.pb-side { position: relative; display: grid; gap: 8px; justify-items: start; width: min(38vw, 600px); }
+.pb-side .pe { width: 100%; }
 .pb-side.vic { justify-items: end; }
-.pb-side.vic .pe img { filter: grayscale(1) contrast(1.25); mix-blend-mode: normal; }
-.pb-side.vic .pe { background: #9a9a9a; border-color: var(--c-kill); }
-.pb-side.vic.cut .pe { transform: translate(8px, -5px) rotate(1.6deg); }
-.pb-side.vic.cut .pe::after { content: ""; position: absolute; inset: 0; background: linear-gradient(118deg, transparent 47.5%, var(--paper) 47.5% 50.5%, transparent 50.5%), var(--c-kill); mix-blend-mode: multiply; }
-.pb-side.vic.cut .pe::before { content: ""; position: absolute; inset: 0; z-index: 1; background: linear-gradient(118deg, transparent 47.5%, var(--paper) 47.5% 50.5%, transparent 50.5%); }
+/* chi colpisce: un riflesso attraversa gli occhi (animato da palco.js) */
+.pb-side.atk .pe::after { content: ""; position: absolute; inset: 0; background: linear-gradient(105deg, transparent 38%, hsl(0 0% 100% / .5) 48%, hsl(0 0% 100% / .1) 54%, transparent 62%) 160% 0 / 250% 100% no-repeat; mix-blend-mode: overlay; pointer-events: none; }
+/* chi cade: a colori finché non arriva il colpo, poi grigio con il rosso stampato sopra */
+.pb-split { position: relative; width: 100%; }
+.pb-half { position: relative; }
+.pb-half.a { clip-path: polygon(0 0, 61.3% 0, 39.3% 100%, 0 100%); }
+.pb-half.b { position: absolute; inset: 0; clip-path: polygon(60.7% 0, 100% 0, 100% 100%, 38.7% 100%); }
+.pb-side.vic .pe img { transition: filter .1s steps(2, end); }
+.pb-side.vic .pe { border-color: var(--kill); }
+.pb-side.vic.cut .pe img { filter: grayscale(1) contrast(1.35) brightness(.9); }
+.pb-side.vic.cut .pe::after { content: ""; position: absolute; inset: 0; background: var(--kill); mix-blend-mode: multiply; opacity: .7; }
+.pb-slash { position: absolute; left: 50%; top: 50%; width: 260%; height: 14px; z-index: 3; opacity: 0; pointer-events: none;
+  background: linear-gradient(90deg, transparent, var(--paper) 30%, #fff 50%, var(--paper) 70%, transparent); filter: drop-shadow(0 0 10px var(--kill)) drop-shadow(0 0 2px #fff);
+  clip-path: polygon(0 50%, 10% 20%, 100% 38%, 100% 62%, 10% 80%); }
+.pb-blood { position: absolute; left: 50%; top: 50%; width: 1px; height: 1px; overflow: visible; z-index: 2; pointer-events: none; }
+.pb-side .pb-name { position: relative; }
+.pb-side.vic.cut .pb-name { color: color-mix(in srgb, var(--paper) 60%, transparent); }
+.pb-side.vic.cut .pb-name::after { content: ""; position: absolute; left: 0; right: 0; top: 52%; height: .2em; background: var(--kill); transform-origin: 0 50%; animation: pbStrike .26s var(--look-out, ease-out) .12s both; }
+@keyframes pbStrike { from { transform: scaleX(0); } }
 .pb-kill.solo .pb-side { width: min(56vw, 760px); }
-.pb-cutline { position: absolute; left: 50%; top: 50%; width: 80vh; height: 12px; background: var(--paper); opacity: 0; clip-path: polygon(0 50%, 12% 0, 100% 40%, 100% 60%, 12% 100%); }
-.pb-kill.solo .pb-cutline { left: 50%; }
-.pb-stamp { position: absolute; left: 50%; top: 50%; z-index: 2; font: italic 900 clamp(24px, 4.6vw, 66px) / 1 var(--f-display); font-stretch: 116%; text-transform: uppercase; white-space: nowrap; color: var(--paper); background: var(--c-kill); padding: .12em .5em .16em; box-shadow: .1em .1em 0 var(--void); opacity: 0; }
+/* il timbro sta sotto la fascia, non sopra i volti; dietro, una macchia d'inchiostro */
+.pb-stamp, .pb-inksplat { position: absolute; left: 50%; top: calc(50% + min(15.5vh, 130px)); }
+.pb-stamp { z-index: 2; font: italic 900 clamp(26px, 4.8vw, 70px) / 1 var(--f-display); font-stretch: 116%; text-transform: uppercase; white-space: nowrap; color: var(--paper); background: var(--kill);
+  padding: .12em .5em .16em; box-shadow: .1em .1em 0 var(--void), -.05em -.05em 0 var(--paper); opacity: 0; clip-path: polygon(1.5% 4%, 100% 0, 98.5% 96%, 0 100%); }
 .pb-stamp svg { display: none; }
-.pb-kill.solo .pb-stamp { left: 50%; top: 80%; }
+.pb-inksplat { width: clamp(220px, 34vw, 520px); aspect-ratio: 1000 / 906; background: var(--void); opacity: 0;
+  -webkit-mask: var(--fx-impatto, radial-gradient(circle, #000 40%, transparent 42%)) center / contain no-repeat; mask: var(--fx-impatto, radial-gradient(circle, #000 40%, transparent 42%)) center / contain no-repeat; }
 
 /* ---------- sequenza di vittoria ---------- */
 .pf { position: fixed; inset: 0; z-index: 10001; overflow: hidden; cursor: pointer; }

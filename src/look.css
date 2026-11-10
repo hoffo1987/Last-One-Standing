@@ -124,8 +124,15 @@ h3 { font-weight: 800; }
   mask-composite: intersect; }
 /* le figure di Midjourney escono spesso dal quadro: si appoggiano al bordo destro e in basso, e il taglio a sinistra sfuma */
 .winhero > .fn-figure { position: absolute; right: 0; bottom: 0; height: 112%; max-width: 46%; z-index: 1; pointer-events: none; object-fit: contain; object-position: right bottom;
-  filter: drop-shadow(14px 8px 0 var(--key)) drop-shadow(-3px 0 0 var(--void));
-  -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 24%); mask-image: linear-gradient(90deg, transparent 0, #000 24%); }
+  filter: drop-shadow(14px 8px 0 var(--key)) drop-shadow(-3px 0 0 var(--void)); --fl-min: 24%; }
+/* ritagli sfumati (look.js → feather): ogni lato che tocca il bordo dell'immagine svanisce con una curva morbida,
+   non lineare (quattro tappe per lato), così non resta la linea dritta del ritaglio né l'ombra colorata che la segue */
+.feather { --fl: 14%; --fr: 14%; --ft: 6%; --fb: 10%; --flx: max(var(--fl), var(--fl-min, 0%));
+  --fh: linear-gradient(90deg, transparent 0, rgb(0 0 0 / .12) calc(var(--flx) * .25), rgb(0 0 0 / .42) calc(var(--flx) * .5), rgb(0 0 0 / .8) calc(var(--flx) * .75), #000 var(--flx),
+    #000 calc(100% - var(--fr)), rgb(0 0 0 / .8) calc(100% - var(--fr) * .75), rgb(0 0 0 / .42) calc(100% - var(--fr) * .5), rgb(0 0 0 / .12) calc(100% - var(--fr) * .25), transparent 100%);
+  --fv: linear-gradient(180deg, transparent 0, rgb(0 0 0 / .12) calc(var(--ft) * .25), rgb(0 0 0 / .42) calc(var(--ft) * .5), rgb(0 0 0 / .8) calc(var(--ft) * .75), #000 var(--ft),
+    #000 calc(100% - var(--fb)), rgb(0 0 0 / .8) calc(100% - var(--fb) * .75), rgb(0 0 0 / .42) calc(100% - var(--fb) * .5), rgb(0 0 0 / .12) calc(100% - var(--fb) * .25), transparent 100%);
+  -webkit-mask-image: var(--fh), var(--fv); -webkit-mask-composite: source-in; mask-image: var(--fh), var(--fv); mask-composite: intersect; }
 .fn-play > .fn-figure { animation: lookFigIn .7s var(--look-out) .25s both; }
 @keyframes lookFigIn { from { opacity: 0; transform: translateX(14%) skewX(-6deg); } to { opacity: 1; transform: none; } }
 .winhero.has-figure .fn-mid::before { right: 40%; }
@@ -188,8 +195,18 @@ h3 { font-weight: 800; }
 .lx-word span { display: inline-block; }
 .lx-word span:nth-child(3n+2) { transform-origin: 50% 80%; }
 .lx-sub { position: relative; margin-left: .2em; padding: .32em .8em .34em; font: 800 clamp(11px, 1.3vw, 15px) / 1 var(--f-body); letter-spacing: .26em; text-transform: uppercase; color: var(--lx-key); background: #0a0a0c; clip-path: polygon(4% 0, 100% 0, 96% 100%, 0 100%); }
-.lx-seal { position: absolute; left: 50%; top: 50%; width: min(30vmin, 240px); aspect-ratio: 1; transform: translate(-50%, -50%); opacity: 0; background: hsl(0 0% 0% / .32);
-  -webkit-mask: var(--seal) center / contain no-repeat; mask: var(--seal) center / contain no-repeat; }
+/* il timbro dell'arena (regia.js → stamp): lastra di carta, sigillo in nero con una passata nella tinta fuori registro, nastro col nome */
+.lx-stamp { position: absolute; z-index: 2; width: var(--S); height: var(--S); margin: calc(var(--S) / -2) 0 0 calc(var(--S) / -2); }
+.lx-st-body { position: absolute; inset: 0; opacity: 0; transform: rotate(var(--srot)); filter: drop-shadow(9px 10px 0 #0a0a0c); }
+.lx-st-plate { position: absolute; inset: 0; background: radial-gradient(circle, #f7f5f0 56%, color-mix(in srgb, var(--lx-key) 24%, #f7f5f0) 100%); }
+.lx-st-mis, .lx-st-ink { position: absolute; inset: 5.5%; -webkit-mask: var(--seal) center / contain no-repeat; mask: var(--seal) center / contain no-repeat; }
+.lx-st-mis { background: var(--lx-key); }
+.lx-st-ink { background: #0a0a0c; }
+.lx-st-name { position: absolute; left: 50%; bottom: 2%; transform: translateX(-50%) rotate(-4deg); background: #0a0a0c; color: var(--lx-key);
+  font: italic 900 max(9px, calc(var(--S) * .066 * var(--rf, 1))) / 1 var(--f-display); font-stretch: 112%; text-transform: uppercase; letter-spacing: .18em; white-space: nowrap;
+  padding: .5em 1em .46em 1.2em; clip-path: polygon(5% 0, 100% 0, 95% 100%, 0 100%); }
+.lx-st-fx { position: absolute; left: -50%; top: -50%; width: 200%; height: 200%; overflow: visible; }
+.lx-st-fx * { transform-box: fill-box; transform-origin: center; }
 .stacco { display: none !important; }
 /* la pagina nuova entra con la regia di regia.js, non con la vecchia dissolvenza */
 .view-enter { animation: none; }
