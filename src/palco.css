@@ -140,18 +140,18 @@ h2.sec { text-transform: uppercase; font-stretch: 114%; letter-spacing: -.02em; 
 .pf-rib span { display: inline-block; animation: plMarq 40s linear infinite; }
 .pf-rib.a { top: 8%; background: var(--void); color: var(--key); }
 .pf-rib.b { bottom: 8%; background: var(--paper); color: var(--void); } .pf-rib.b span { animation-direction: reverse; }
-.pf-hero { position: absolute; right: 1vw; top: 0; bottom: 0; width: 54vw; display: grid; place-items: end center; filter: drop-shadow(1.3vw .9vw 0 var(--void)); }
+.pf-figure { position: absolute; right: 1vw; top: 0; bottom: 0; width: 54vw; display: grid; place-items: end center; filter: drop-shadow(1.3vw .9vw 0 var(--void)); }
 .pf-fig { display: block; height: 104vh; max-width: 100%; object-fit: contain; object-position: center bottom; }
 .pf-photo { align-self: center; width: min(40vw, 60vh); aspect-ratio: 3 / 4; overflow: hidden; background: var(--void); clip-path: polygon(13% 0, 100% 0, 87% 100%, 0 100%); }
 .pf-photo img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: 50% 28%; }
 .pf-ini { align-self: center; font: italic 900 34vh / 1 var(--f-display); font-stretch: 120%; color: var(--void); }
-.pf-hero.crew { display: flex; flex-wrap: wrap; align-content: center; justify-content: center; gap: 1.6vw; padding: 0 4vw; }
-.pf-hero.crew .av { --s: clamp(84px, 12vw, 176px); font-size: calc(var(--s) * .36); box-shadow: 0 0 0 5px var(--void); pointer-events: none; }
+.pf-figure.crew { display: flex; flex-wrap: wrap; align-content: center; justify-content: center; gap: 1.6vw; padding: 0 4vw; }
+.pf-figure.crew .av { --s: clamp(84px, 12vw, 176px); font-size: calc(var(--s) * .36); box-shadow: 0 0 0 5px var(--void); pointer-events: none; }
 .pf-txt { position: absolute; left: 6vw; top: 50%; transform: translateY(-50%) rotate(-5deg); display: grid; gap: 1.7vh; justify-items: start; max-width: 60vw; }
 .pf-tag { font: 800 clamp(11px, 1.25vw, 16px) / 1 var(--f-body); letter-spacing: .22em; text-transform: uppercase; background: var(--key); color: var(--key-ink); padding: .5em 1.4em .46em 1em; clip-path: polygon(0 0, 100% 0, calc(100% - .7em) 100%, 0 100%); white-space: nowrap; max-width: 100%; overflow: hidden; }
-.pf-title { display: grid; gap: .1em; justify-items: start; font: italic 900 clamp(26px, 5.4vw, 86px) / 1 var(--f-display); font-stretch: 118%; text-transform: uppercase; letter-spacing: -.02em; }
-.pf-title b { display: block; background: var(--paper); color: var(--void); padding: .04em .34em .1em; white-space: nowrap; }
-.pf-title b + b { margin-left: .9em; background: var(--key); color: var(--key-ink); }
+.pf-head { display: grid; gap: .1em; justify-items: start; font: italic 900 clamp(26px, 5.4vw, 86px) / 1 var(--f-display); font-stretch: 118%; text-transform: uppercase; letter-spacing: -.02em; }
+.pf-head b { display: block; background: var(--paper); color: var(--void); padding: .04em .34em .1em; white-space: nowrap; }
+.pf-head b + b { margin-left: .9em; background: var(--key); color: var(--key-ink); }
 .pf-name { position: relative; font-size: var(--nfs, 12vw); line-height: 1; padding: .05em .22em .1em; margin-top: .06em; }
 .pf-nslab { position: absolute; inset: 0; background: var(--paper); box-shadow: .07em .07em 0 var(--key), .14em .14em 0 var(--void); transform: skewX(-10deg); transform-origin: 0 50%; }
 .pf-nword { position: relative; display: block; font: italic 900 1em / 1 var(--f-display); font-stretch: 122%; text-transform: uppercase; letter-spacing: -.03em; color: var(--void); white-space: nowrap; }
@@ -163,6 +163,8 @@ h2.sec { text-transform: uppercase; font-stretch: 114%; letter-spacing: -.02em; 
 /* ---------- telefono ---------- */
 @media (max-width: 760px) {
   .pagehead { padding-block: 26px 16px; }
+  /* le parole del titolo non vanno a capo (animazione per lettera): «CONCORRENTI» deve entrare in 320px */
+  .pagehead h1 { font-size: clamp(28px, 9.6vw, 44px); }
   .pl-num { font-size: 46vh; right: -4vw; }
   .pb-day .pb-band { --slot: 34vw; height: min(40vh, 320px); }
   .pb-duel { gap: 3vw; } .pb-side { width: 45vw; }
@@ -170,7 +172,7 @@ h2.sec { text-transform: uppercase; font-stretch: 114%; letter-spacing: -.02em; 
   .pf-txt { left: 5vw; top: 30%; width: 88vw; max-width: 88vw; }
   .pf-tag { white-space: normal; line-height: 1.5; letter-spacing: .14em; }
   .pf-name { font-size: var(--nfsm, 16vw); }
-  .pf-hero { width: 100vw; right: 0; top: 44%; }
+  .pf-figure { width: 100vw; right: 0; top: 44%; }
   .pf-fig { height: 62vh; }
   .pf-photo { width: 56vw; }
   .pf-burst { left: 60%; top: 72%; width: 90vh; }

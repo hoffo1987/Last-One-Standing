@@ -41,6 +41,8 @@ h3 { font-weight: 800; }
 
 /* ---------- navigazione e segmenti: il cursore che scivola (look.js) ---------- */
 .steps, .seg { position: relative; isolation: isolate; }
+/* sul telefono la navigazione resta la barra fissata in basso (style.css): fixed fa già da riferimento al cursore */
+@media (max-width: 760px) { .steps { position: fixed; background: color-mix(in srgb, var(--panel-solid) 97%, transparent); -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); } }
 .steps a { transform: skewX(var(--slant)); }
 .steps .num { border-width: 2px; }
 .steps a[aria-current="page"] { background: var(--key); color: var(--key-ink); }
@@ -112,8 +114,14 @@ h3 { font-weight: 800; }
 .winhero > .fn-bg { position: absolute; inset: 0; z-index: 0; pointer-events: none; background: var(--fx-fondale-win) center / cover no-repeat; }
 .winhero > .fn-bg::after { content: ""; position: absolute; inset: 0; background: linear-gradient(100deg, hsl(0 0% 0% / .78) 0%, hsl(0 0% 0% / .55) 45%, hsl(0 0% 0% / .1) 80%); }
 .winhero.has-fondale > .wscene { display: none; }
-.winhero > .fn-dots { position: absolute; left: -4%; bottom: -10%; width: 46%; aspect-ratio: 1; z-index: 1; pointer-events: none; background: var(--key); opacity: .22;
-  -webkit-mask: var(--fx-mezzitoni) center / cover no-repeat; mask: var(--fx-mezzitoni) center / cover no-repeat; transform: rotate(180deg); }
+/* mezzitoni dietro il ritratto: una seconda maschera ellittica li fa svanire fino a zero proprio sui bordi
+   alto e destro della trama, così non si troncano di netto. Le coordinate del gradiente sono quelle prima
+   della rotazione: 85% 40% corrisponde, a schermo, a 15% da sinistra e 60% dall'alto. */
+.winhero > .fn-dots { position: absolute; left: -4%; bottom: -10%; width: 52%; aspect-ratio: 1; z-index: 1; pointer-events: none; background: var(--key); opacity: .24; transform: rotate(180deg);
+  -webkit-mask: var(--fx-mezzitoni) center / cover no-repeat, radial-gradient(farthest-side at 85% 40%, #000 30%, hsl(0 0% 0% / .55) 62%, transparent 100%);
+  -webkit-mask-composite: source-in;
+  mask: var(--fx-mezzitoni) center / cover no-repeat, radial-gradient(farthest-side at 85% 40%, #000 30%, hsl(0 0% 0% / .55) 62%, transparent 100%);
+  mask-composite: intersect; }
 /* le figure di Midjourney escono spesso dal quadro: si appoggiano al bordo destro e in basso, e il taglio a sinistra sfuma */
 .winhero > .fn-figure { position: absolute; right: 0; bottom: 0; height: 112%; max-width: 46%; z-index: 1; pointer-events: none; object-fit: contain; object-position: right bottom;
   filter: drop-shadow(14px 8px 0 var(--key)) drop-shadow(-3px 0 0 var(--void));
@@ -129,7 +137,7 @@ h3 { font-weight: 800; }
 /* «Ultimo in piedi» su una fascia dipinta */
 .fx-forme .fn-title { position: relative; isolation: isolate; color: var(--key-ink); text-shadow: none; padding: .45em 1.6em .45em .8em; }
 .fx-forme .fn-title::after { display: none; }
-.fx-forme .fn-title::before { content: ""; position: absolute; inset: 0 -6% 0 -4%; z-index: -1; background: var(--key); -webkit-mask: var(--fx-fascia) center / 100% 100% no-repeat; mask: var(--fx-fascia) center / 100% 100% no-repeat; }
+.fx-forme .fn-title::before { content: ""; position: absolute; inset: 0 -6% 0 -4%; width: auto; height: auto; opacity: 1; z-index: -1; background: var(--key); -webkit-mask: var(--fx-fascia) center / 100% 100% no-repeat; mask: var(--fx-fascia) center / 100% 100% no-repeat; }
 
 /* cartelli della diretta: l'etichetta su una fascia, il disastro su carta strappata */
 .fx-forme .stc-k { position: relative; isolation: isolate; color: var(--key-ink); padding: .4em 1.4em .4em .9em; }

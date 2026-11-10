@@ -305,11 +305,11 @@
       '<div class="pf-eyes"><i class="pf-speed"></i></div>' +
       '<div class="pf-card"><i class="pf-bg"></i><i class="pf-shard"></i><i class="pf-dots"></i><i class="pf-burst"></i>' +
       '<div class="pf-rib a"><span>' + (esc(title) + ' • ').repeat(16) + '</span></div><div class="pf-rib b"><span>' + (esc(name) + ' • ').repeat(16) + '</span></div>' +
-      '<div class="pf-hero"></div>' +
-      '<div class="pf-txt"><span class="pf-tag">' + esc(tag) + '</span><div class="pf-title">' + lines.map((l) => '<b><span>' + esc(l) + '</span></b>').join('') + '</div>' +
+      '<div class="pf-figure"></div>' +
+      '<div class="pf-txt"><span class="pf-tag">' + esc(tag) + '</span><div class="pf-head">' + lines.map((l) => '<b><span>' + esc(l) + '</span></b>').join('') + '</div>' +
       '<div class="pf-name"><i class="pf-nslab"></i><span class="pf-nword"></span></div>' + (sub ? '<span class="pf-sub">' + esc(sub) + '</span>' : '') + '</div>' +
       '<span class="pf-skip">Tocca per continuare</span></div><i class="pf-flash"></i>';
-    const card = o.querySelector('.pf-card'), hero = o.querySelector('.pf-hero'), nword = o.querySelector('.pf-nword'), eyesBand = o.querySelector('.pf-eyes');
+    const card = o.querySelector('.pf-card'), hero = o.querySelector('.pf-figure'), nword = o.querySelector('.pf-nword'), eyesBand = o.querySelector('.pf-eyes');
     // gli occhi di chi vince (o dei primi della squadra)
     (team ? crew.slice(0, 3) : [av]).forEach((a) => { if (a) eyesBand.appendChild(eyes(a)); });
     // l'eroe: figura intera di riserva, foto in cornice inclinata, squadra in fila, oppure le iniziali
@@ -345,7 +345,7 @@
     anim(hero, [{ transform: 'translateX(46%) skewX(-12deg)', opacity: 0 }, { opacity: 1, offset: 0.3 }, { transform: 'translateX(-2.5%) skewX(2deg)', opacity: 1, offset: 0.72 }, { transform: 'none', opacity: 1 }], { duration: 560, delay: 900, easing: E.out });
     qa('.pf-rib').forEach((r, i) => anim(r, [{ clipPath: i ? 'inset(0 0 0 100%)' : 'inset(0 100% 0 0)' }, { clipPath: 'inset(0 0 0 0)' }], { duration: 420, delay: 940 + i * 90, easing: E.io }));
     anim(q('.pf-tag'), [{ clipPath: 'inset(0 100% 0 0)' }, { clipPath: 'inset(0 0 0 0)' }], { duration: 300, delay: 1020, easing: E.out });
-    qa('.pf-title b').forEach((b, i) => {
+    qa('.pf-head b').forEach((b, i) => {
       anim(b, [{ clipPath: 'inset(0 100% 0 0)', transform: 'translateX(-40px)' }, { clipPath: 'inset(0 0 0 0)', transform: 'none' }], { duration: 300, delay: 1090 + i * 100, easing: E.out });
       later(1090 + i * 100, () => sfx('move'));
     });
