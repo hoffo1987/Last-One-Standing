@@ -59,7 +59,7 @@
     const word = (WORD[view] || WORD.home).toUpperCase(), line = (word + ' • ').repeat(view === 'home' ? 4 : 8);
     stage.querySelectorAll('.pl-band span').forEach((s) => { s.textContent = line + line; });
     const num = stage.querySelector('.pl-num'), n = ORDER.indexOf(view);
-    num.textContent = n > 0 && n < 5 ? String(n) : ''; // i Trofei non sono un passo della partita
+    num.textContent = n > 0 && n < 5 ? String(n) : '';
     stage.dataset.view = view;
     if (animate && !reduced()) {
       anim(num, [{ transform: 'translate(30%, 20%) rotate(-8deg) scale(1.4)', opacity: 0 }, { transform: 'translate(0,0) rotate(-8deg) scale(1)', opacity: 1 }], { duration: 700, easing: E.out, fill: 'backwards' });
@@ -447,9 +447,8 @@
   };
 
   /* ================= AVVIO ================= */
-  // `still`: lo stacco è stato saltato (pagina nascosta, animazioni ferme): niente ingressi che nascondono il testo in attesa di un fotogramma
-  document.addEventListener('los:cover', (e) => setStage(e.detail.view, !e.detail.still));
-  document.addEventListener('los:enter', (e) => { if (!e.detail.still) headIn(e.detail.view, e.detail.dir); });
+  document.addEventListener('los:cover', (e) => setStage(e.detail.view, true));
+  document.addEventListener('los:enter', (e) => headIn(e.detail.view, e.detail.dir));
   G.addEventListener('hashchange', () => { if (reduced()) setStage(viewOf(G.location.hash), false); });
   function start() {
     buildStage(); watchKills();
