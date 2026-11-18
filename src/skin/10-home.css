@@ -1,0 +1,115 @@
+/* ================= PELLE · HOME =================
+ * La home come schermata del titolo: una diagonale guida lo sguardo dal titolo all'azione principale,
+ * il titolo sta su due lastre (carta e tinta), l'azione è una lastra enorme, il tabellone è un monitor di regia.
+ * Sotto, ogni blocco ha una forma propria: niente griglie di card uguali. Solo dentro #v-home. */
+
+/* ---------- titolo su due lastre (10-home.js divide le righe) ---------- */
+#v-home .homehero h1 { background: none; -webkit-background-clip: border-box; background-clip: border-box; color: var(--void); animation: none; text-shadow: none;
+  display: grid; justify-items: start; gap: .08em; font-size: clamp(34px, 5.6vw, 92px); line-height: .9; white-space: nowrap; text-transform: uppercase; font-stretch: 120%; letter-spacing: -.035em; margin: 14px 0 26px; }
+#v-home .homehero h1 .hl { display: inline-block; padding: .04em .26em .1em .18em; transform: skewX(var(--slant)); }
+#v-home .homehero h1 .hl > span { display: inline-block; transform: skewX(var(--unslant)); }
+#v-home .homehero h1 .hl1 { background: var(--paper); color: var(--void); box-shadow: .07em .07em 0 var(--key); }
+#v-home .homehero h1 .hl2 { background: var(--key); color: var(--key-ink); margin-left: .8em; box-shadow: .07em .07em 0 var(--void); }
+#v-home .homehero h1::first-line { color: inherit; }
+#v-home .hh-emblem { transform: scale(.78); transform-origin: 0 50%; margin-bottom: 0; }
+#v-home .kicker { background: var(--void); color: var(--paper); padding: 7px 14px 7px 10px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; font-size: 11.5px;
+  clip-path: polygon(0 0, 100% 0, calc(100% - 10px) 100%, 0 100%); box-shadow: inset 4px 0 0 var(--key); }
+#v-home .homehero .lead { color: var(--screen-ink); font-size: clamp(16px, 1.45vw, 20px); line-height: 1.5; max-width: 44ch; border-left: 5px solid var(--key); padding-left: 16px; }
+#v-home .homehero .hint { color: var(--screen-muted); font-style: italic; }
+/* l'azione principale: la lastra più grande della pagina, con la freccia che spinge */
+#v-home .cta { gap: 18px; align-items: center; }
+#v-home #quickPlay { font-size: clamp(20px, 2vw, 26px); padding: 18px 34px 18px 28px; text-transform: uppercase; letter-spacing: .01em; animation: none;
+  background: var(--key); border-color: var(--key); color: var(--key-ink); box-shadow: 7px 7px 0 var(--paper); }
+#v-home #quickPlay::before { content: ""; position: absolute; right: -26px; top: 50%; width: 22px; height: 18px; margin-top: -9px; background: var(--key);
+  clip-path: polygon(0 20%, 55% 20%, 55% 0, 100% 50%, 55% 100%, 55% 80%, 0 80%); transform: skewX(var(--unslant)); transition: transform .3s var(--ease-kick); }
+@media (hover: hover) { #v-home #quickPlay:hover::before { transform: skewX(var(--unslant)) translateX(8px); } #v-home #quickPlay:hover { box-shadow: 10px 10px 0 var(--paper); } }
+#v-home .cta .btn.ghost { margin-left: 22px; border: 0; background: transparent; color: var(--screen-ink); text-transform: uppercase; font-size: 15px; letter-spacing: .06em;
+  background-image: linear-gradient(var(--paper), var(--paper)); background-size: 100% 3px; background-position: 0 100%; background-repeat: no-repeat; padding: 10px 4px; }
+@media (hover: hover) { #v-home .cta .btn.ghost:hover { color: var(--void); background-size: 100% 100%; } }
+
+/* ---------- tabellone: un monitor di regia inclinato ---------- */
+#v-home .hh-board { background: var(--void); border: 0; padding: 26px 26px 22px 30px; transform: rotate(-3deg); animation: none; position: relative;
+  box-shadow: 12px 12px 0 var(--key), 0 40px 60px -30px #000; clip-path: polygon(0 0, 100% 0, 100% calc(100% - 26px), calc(100% - 26px) 100%, 0 100%); }
+#v-home .hh-board::before { content: ""; position: absolute; inset: 0 auto 0 0; width: 8px; background: var(--key); }
+#v-home .hh-board::after { content: ""; position: absolute; inset: 0; pointer-events: none; background: repeating-linear-gradient(0deg, transparent 0 3px, hsl(0 0% 100% / .03) 3px 4px); }
+#v-home .hb-top { text-transform: uppercase; letter-spacing: .2em; font-weight: 800; font-size: 11.5px; color: var(--paper); }
+#v-home .hb-day { background: var(--key); color: var(--key-ink); padding: 3px 9px; clip-path: polygon(6px 0, 100% 0, calc(100% - 6px) 100%, 0 100%); letter-spacing: .1em; }
+#v-home .hb-count b { font: italic 900 clamp(64px, 7vw, 104px) / .9 var(--f-display); font-stretch: 118%; color: var(--paper); text-shadow: .05em .05em 0 var(--key); }
+#v-home .hb-count span { color: var(--key); font-weight: 800; text-transform: uppercase; letter-spacing: .08em; font-size: 13px; }
+#v-home .hb-tally i { border-radius: 0; transform: skewX(-14deg); }
+#v-home .hb-line { color: var(--paper); font-size: 15px; line-height: 1.5; border-top: 2px solid color-mix(in srgb, var(--paper) 18%, transparent); padding-top: 12px; }
+#v-home .hb-line b { color: var(--key); }
+
+/* ---------- i numeri del gioco: una banda, numeri enormi, separatori inclinati ---------- */
+#v-home .facts { background: var(--void); border: 0; box-shadow: 8px 8px 0 var(--key); clip-path: polygon(0 0, 100% 0, calc(100% - 18px) 100%, 0 100%); margin-top: -34px; }
+#v-home .fact { border-left: 0; position: relative; padding: 22px 26px 20px; color: var(--paper); }
+#v-home .fact + .fact::before { content: ""; position: absolute; left: 0; top: 18%; bottom: 18%; width: 3px; background: var(--key); transform: skewX(-18deg); }
+#v-home .fact b { font: italic 900 clamp(40px, 4.4vw, 64px) / .9 var(--f-display); font-stretch: 118%; color: var(--key); letter-spacing: -.02em; }
+#v-home .fact span { color: color-mix(in srgb, var(--paper) 78%, transparent); font-size: 13.5px; line-height: 1.4; display: block; margin-top: 6px; }
+
+/* ---------- partita da riprendere: un biglietto ---------- */
+#v-home .resume { border: 0; background: var(--paper); color: var(--void); box-shadow: 8px 8px 0 var(--key); padding: 18px 22px 18px 28px; position: relative; clip-path: polygon(0 0, 100% 0, calc(100% - 14px) 100%, 0 100%); }
+#v-home .resume::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 8px; background: var(--key); }
+#v-home .resume b { color: var(--void); text-transform: uppercase; font-style: italic; font-size: clamp(22px, 2.6vw, 32px); }
+#v-home .resume .muted, #v-home .resume .eyebrow { color: color-mix(in srgb, var(--void) 70%, transparent); }
+
+/* ---------- come si gioca: quattro tempi, numeri in contorno, una diagonale li lega ---------- */
+#v-home .howto { position: relative; gap: 0; margin-top: 54px; counter-reset: none; }
+#v-home .howto::before { content: ""; position: absolute; left: 3%; right: 3%; top: 38px; height: 3px; background: var(--key); transform: skewY(-1.2deg); opacity: .7; }
+#v-home .how { position: relative; padding: 0 22px 0 0; gap: 10px; }
+#v-home .how .hn { width: auto; height: auto; background: none; border-radius: 0; color: transparent; -webkit-text-stroke: 2px var(--key);
+  font: italic 900 clamp(64px, 7vw, 96px) / .82 var(--f-display); font-stretch: 120%; justify-self: start; position: relative; transition: color .2s, transform .3s var(--ease-kick); }
+#v-home .how .hn::after { content: ""; position: absolute; left: 0; bottom: 6px; width: 26px; height: 26px; background: var(--key); transform: translate(-30%, 30%) rotate(45deg) scale(.4); }
+#v-home .how h3 { text-transform: uppercase; font-stretch: 114%; font-size: clamp(19px, 1.8vw, 24px); }
+#v-home .how p { color: var(--ink); opacity: .78; }
+@media (hover: hover) { #v-home .how:hover .hn { color: var(--key); transform: translateX(6px) rotate(-4deg); background: none; } }
+
+/* ---------- le storie: fascicoli inclinati, ognuno con la sua etichetta ---------- */
+#v-home .stories-head .sec { font-size: clamp(30px, 4.4vw, 58px); line-height: .95; }
+#v-home .story-grid { gap: 22px; }
+#v-home .story { border: 0; background: var(--panel-solid, var(--panel)); padding: 16px 16px 18px; position: relative; box-shadow: 6px 6px 0 var(--void);
+  clip-path: polygon(0 0, 100% 0, 100% calc(100% - 16px), calc(100% - 16px) 100%, 0 100%); transition: transform .3s var(--ease-kick), box-shadow .3s; }
+#v-home .story:nth-child(2) { transform: translateY(18px); }
+#v-home .story:nth-child(3) { transform: translateY(36px); }
+#v-home .story .sub { justify-self: start; background: var(--void); color: var(--key); padding: 5px 12px 5px 9px; font-size: 11px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase;
+  clip-path: polygon(0 0, 100% 0, calc(100% - 8px) 100%, 0 100%); }
+@media (hover: hover) { #v-home .story:hover { box-shadow: 9px 9px 0 var(--key); } }
+#v-home .stories { margin-bottom: 40px; }
+
+/* ---------- pilastri: numeri da copertina ---------- */
+#v-home .pillars { gap: 0; margin-top: 54px; }
+#v-home .pillar { background: transparent; color: var(--ink); padding: 8px 18px 8px 0; border-radius: 0; }
+#v-home .pillar::before { display: none; }
+#v-home .pillar b { font: italic 900 clamp(48px, 5.4vw, 80px) / .85 var(--f-display); font-stretch: 120%; color: var(--key); text-shadow: .05em .05em 0 var(--void); }
+#v-home .pillar span { color: var(--ink); opacity: .8; font-size: 14px; border-top: 3px solid var(--key); padding-top: 8px; margin-top: 6px; }
+
+/* ---------- titoli di sezione della home ---------- */
+#v-home h2.sec { font-size: clamp(30px, 4.4vw, 58px); line-height: .95; }
+
+/* ---------- le arene in vetrina: un nastro di locandine inclinate ---------- */
+#v-home #arenaStrip { gap: 14px; }
+#v-home #arenaStrip .poster-card { clip-path: polygon(0 0, 100% 0, 100% calc(100% - 18px), calc(100% - 18px) 100%, 0 100%); box-shadow: none; border: 0; }
+#v-home #arenaStrip .poster-card b { text-transform: uppercase; font-stretch: 116%; font-size: 21px; text-shadow: .06em .06em 0 rgba(0, 0, 0, .7); }
+#v-home #arenaStrip .poster-card::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 5px; background: hsl(var(--ph) 92% 54%); transform: scaleX(0); transform-origin: 0 50%; transition: transform .3s var(--look-out); }
+@media (hover: hover) { #v-home #arenaStrip .poster-card:hover::after { transform: none; } }
+
+/* ---------- stagioni e tornei: un pannello con la testata nera ---------- */
+#v-home .studio-panel { border: 0; padding: 0; background: var(--panel-solid, var(--panel)); box-shadow: 8px 8px 0 var(--void); clip-path: polygon(0 0, 100% 0, 100% calc(100% - 18px), calc(100% - 18px) 100%, 0 100%); }
+#v-home .studio-panel > h2 { background: var(--void); color: var(--paper); padding: 14px 20px; margin: 0; text-transform: uppercase; font-size: clamp(20px, 2.2vw, 28px); box-shadow: 0 4px 0 var(--key); }
+#v-home .studio-panel > :not(h2) { margin-inline: 20px; }
+#v-home .studio-panel > :last-child { margin-bottom: 20px; }
+#v-home .studio-panel > .help:first-of-type { margin-top: 16px; }
+
+/* ---------- telefono ---------- */
+@media (max-width: 760px) {
+  #v-home .homehero h1 { font-size: min(9.2vw, 64px); }
+  #v-home .homehero h1 .hl2 { margin-left: .4em; }
+  #v-home .hh-board { transform: rotate(-1.5deg); }
+  #v-home .facts { clip-path: none; }
+  #v-home .fact + .fact::before { display: none; }
+  #v-home .howto::before { display: none; }
+  #v-home .how { padding: 0 0 18px; }
+  #v-home .story:nth-child(n) { transform: none; }
+  #v-home .cta .btn.ghost { margin-left: 0; }
+  #v-home #quickPlay::before { display: none; }
+}

@@ -804,7 +804,7 @@
       patchHTML($('#castList'), '<div class="teamwrap">' + Object.keys(teams).sort((a, b) => a - b).map((k) => {
         const ms = teams[k].map((x) => x[0]);
         const avg = ms.reduce((s2, t) => s2 + D.attrs.reduce((q, a) => q + (t.attr[a.id] || 5), 0) / D.attrs.length, 0) / ms.length;
-        return '<section class="teamblock card" style="--c:' + teamColor(+k) + '"><h3><i></i><b>Squadra ' + k + '</b><span class="tbcount"><em class="fcount">' + plural(ms.length, 'concorrente', 'concorrenti') + '</em><em class="fcount">Media <b>' + avg.toFixed(1).replace('.', ',') + '</b></em></span>' +
+        return '<section class="teamblock card" style="--c:' + teamColor(+k) + '"><h3><i></i><b>Squadra ' + k + '</b><span class="tbfaces" aria-hidden="true">' + ms.map((t) => avHTML(t)).join('') + '</span><span class="tbcount"><em class="fcount">' + plural(ms.length, 'concorrente', 'concorrenti') + '</em><em class="fcount">Media <b>' + avg.toFixed(1).replace('.', ',') + '</b></em></span>' +
           '<button type="button" class="teamadd" data-team="' + k + '" aria-label="Aggiungi un concorrente alla squadra ' + k + '">+</button></h3><div class="castgrid">' + teams[k].map(([t, i]) => tileHTML(t, i, false)).join('') + '</div></section>';
       }).join('') + '</div><div class="castgrid" style="margin-top:14px">' + add + '</div>');
     } else {
@@ -1901,7 +1901,7 @@
         const m = (ph.snap.mind || {})[t.id], g = m && (MND.goals || {})[m.g];
         const sub = [st.length ? st.map((s) => statusLabel(s, t, theme)).join(', ') : 'in forma', g && !g.secret && m.g !== 'sopravvivere' ? goalLabel(m) : '', inv.length ? plural(inv.length, 'oggetto', 'oggetti') : ''].filter(Boolean).join(' · ');
         const fresh = (t.diary || []).some((d) => d.ph === i);
-        return '<button type="button" class="prow" data-prof="' + esc(t.id) + '">' + avHTML(t) + '<span style="min-width:0"><span class="pn">' + esc(t.name) + (fresh ? '<span class="newdiary" title="Nuova pagina nel diario segreto">diario</span>' : '') + '</span><span class="ps">' + esc(sub) + '</span>' + vbars((ph.snap.vit || {})[t.id], theme, false) + '</span><span class="pk">' + (ph.snap.kills[t.id] || 0) + (soft ? ' elim.' : ' ucc.') + '</span></button>';
+        return '<button type="button" class="prow" data-prof="' + esc(t.id) + '">' + avHTML(t) + '<span style="min-width:0"><span class="pn">' + esc(t.name) + (fresh ? '<span class="newdiary" title="Nuova pagina nel diario segreto">diario</span>' : '') + '</span><span class="ps">' + esc(sub) + '</span>' + vbars((ph.snap.vit || {})[t.id], theme, false) + '</span><span class="pk"><b>' + (ph.snap.kills[t.id] || 0) + '</b>' + (soft ? ' elim.' : ' ucc.') + '</span></button>';
       }).join('') + '</div>';
     } else {
       const groups = {};
@@ -2219,7 +2219,7 @@
 
     const ranked = SIM.tributes.slice().sort((a, b) => a.rank - b.rank || b.kills - a.kills);
     const podiumT = ranked.slice(0, 3);
-    const podium = podiumT.length >= 3 ? '<div class="podium">' + [podiumT[1], podiumT[0], podiumT[2]].map((t, k) => { const p = [2, 1, 3][k]; return '<button type="button" class="pod p' + p + '" data-prof="' + esc(t.id) + '">' + avHTML(t, { dead: !t.alive }) + '<b>' + esc(t.name) + '</b><small>' + kN(t.kills) + (t.alive ? '' : ' · ' + esc(whenLabel(resultTheme(SIM), t.deathPhase, t.deathDay).toLowerCase())) + '</small><span class="step">' + p + '</span></button>'; }).join('') + '</div>' : '';
+    const podium = podiumT.length >= 3 ? '<div class="podium">' + [podiumT[1], podiumT[0], podiumT[2]].map((t, k) => { const p = [2, 1, 3][k]; return '<button type="button" class="pod p' + p + '" data-prof="' + esc(t.id) + '">' + avHTML(t, { dead: !t.alive }) + '<b>' + esc(t.name) + '</b><small>' + kN(t.kills) + (t.alive ? '' : ' · ' + esc(whenLabel(resultTheme(SIM), t.deathPhase, t.deathDay).toLowerCase())) + '</small><span class="step">' + t.rank + '</span></button>'; }).join('') + '</div>' : '';
 
     const awards = [];
     const maxBy = (f) => SIM.tributes.slice().sort((a, b) => f(b) - f(a) || a.rank - b.rank)[0];

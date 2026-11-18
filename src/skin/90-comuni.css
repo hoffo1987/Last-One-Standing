@@ -1,0 +1,114 @@
+/* ================= PELLE · COMUNI =================
+ * Controlli, dialoghi, intestazione, piè di pagina, stati vuoti, notifiche: tutto ciò che si ripete in ogni sezione.
+ * Regole dal brief (docs-dev/overhaul-brief.md): forme intenzionali, niente vetri sfocati, niente bordi grigi da 1 px
+ * come unico disegno, la selezione è un evento, il secondo livello si vede (entra inclinato, il sotto si scurisce). */
+
+/* ---------- selezione del testo, focus, barre di scorrimento ---------- */
+::selection { background: var(--key); color: var(--key-ink); }
+:focus-visible { outline: 3px solid var(--key); outline-offset: 3px; }
+html { scrollbar-color: var(--key) transparent; scrollbar-width: thin; }
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--key); border: 3px solid var(--bg); }
+
+/* ---------- intestazione: una banda piena, non un vetro ---------- */
+.top { background: var(--panel-solid, var(--panel)); -webkit-backdrop-filter: none; backdrop-filter: none; border-bottom: 0;
+  box-shadow: 0 3px 0 var(--key), 0 18px 30px -24px rgba(0, 0, 0, .7); }
+.top::after { content: ""; position: absolute; left: 0; right: 0; bottom: -3px; height: 3px; background: repeating-linear-gradient(-60deg, var(--void) 0 6px, transparent 6px 14px); opacity: .55; pointer-events: none; }
+.brand b { font-style: italic; }
+.iconbtn { transform: skewX(var(--slant)); transition: background-color .18s, color .18s, transform .26s var(--ease-kick), box-shadow .2s; }
+.iconbtn > svg { transform: skewX(var(--unslant)); }
+@media (hover: hover) { .iconbtn:hover { background: var(--ink); color: var(--bg); border-color: var(--ink); box-shadow: 3px 3px 0 var(--key); transform: skewX(var(--slant)) translate(-1px, -1px); } }
+
+/* ---------- campi di testo: lastra con il filo in basso che si accende ---------- */
+input[type="text"], input[type="number"], input[type="search"], input[type="email"], input:not([type]), select, textarea {
+  background: color-mix(in srgb, var(--panel-2) 80%, transparent); border: 0; border-bottom: 2px solid color-mix(in srgb, var(--ink) 30%, transparent);
+  padding: 9px 12px 8px; color: var(--ink); transition: border-color .18s, background-color .18s, box-shadow .22s var(--look-out); }
+input[type="text"]:hover, input[type="number"]:hover, input[type="search"]:hover, select:hover, textarea:hover { border-bottom-color: var(--ink); }
+input[type="text"]:focus, input[type="number"]:focus, input[type="search"]:focus, input:not([type]):focus, select:focus, textarea:focus {
+  outline: none; border-bottom-color: var(--key); background: var(--panel-2); box-shadow: 4px 4px 0 var(--key); }
+::placeholder { color: color-mix(in srgb, var(--ink) 42%, transparent); font-style: italic; }
+textarea { line-height: 1.55; }
+/* select: freccia propria, nella tinta */
+select { -webkit-appearance: none; appearance: none; padding-right: 34px; cursor: pointer;
+  background-image: linear-gradient(45deg, transparent 50%, var(--key) 50%), linear-gradient(135deg, var(--key) 50%, transparent 50%);
+  background-position: calc(100% - 17px) 55%, calc(100% - 11px) 55%; background-size: 6px 6px, 6px 6px; background-repeat: no-repeat; }
+select option { background: var(--panel-solid, var(--panel)); color: var(--ink); }
+
+/* casella di spunta: un quadro inclinato che si riempie con un timbro */
+input[type="checkbox"] { -webkit-appearance: none; appearance: none; width: 20px; height: 20px; flex: none; margin: 0 6px 0 0; vertical-align: -4px; cursor: pointer;
+  border: 2px solid color-mix(in srgb, var(--ink) 55%, transparent); background: transparent; transform: skewX(var(--slant)); position: relative;
+  transition: background-color .15s, border-color .15s, transform .26s var(--ease-kick); }
+input[type="checkbox"]:hover { border-color: var(--key); }
+input[type="checkbox"]:checked { background: var(--key); border-color: var(--key); transform: skewX(var(--slant)) scale(1.08); }
+input[type="checkbox"]:checked::after { content: ""; position: absolute; left: 5px; top: 1px; width: 5px; height: 10px; border: solid var(--key-ink); border-width: 0 3px 3px 0; transform: skewX(var(--unslant)) rotate(42deg); }
+input[type="checkbox"]:disabled { opacity: .45; cursor: not-allowed; }
+input[type="radio"] { accent-color: var(--key); }
+
+/* cursore: binario sottile, la parte piena nella tinta, impugnatura a lastra */
+input[type="range"] { -webkit-appearance: none; appearance: none; height: 26px; background: transparent; cursor: pointer; }
+input[type="range"]::-webkit-slider-runnable-track { height: 6px; background: linear-gradient(90deg, var(--key) var(--fill, 50%), color-mix(in srgb, var(--ink) 18%, transparent) var(--fill, 50%)); clip-path: polygon(0 0, 100% 0, calc(100% - 4px) 100%, 0 100%); }
+input[type="range"]::-moz-range-track { height: 6px; background: color-mix(in srgb, var(--ink) 18%, transparent); }
+input[type="range"]::-moz-range-progress { height: 6px; background: var(--key); }
+input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 16px; height: 26px; margin-top: -10px; background: var(--ink); border: 0; border-radius: 0 !important;
+  clip-path: polygon(30% 0, 100% 0, 70% 100%, 0 100%); box-shadow: none; transition: transform .2s var(--ease-kick); }
+input[type="range"]::-moz-range-thumb { width: 16px; height: 26px; background: var(--ink); border: 0; border-radius: 0; clip-path: polygon(30% 0, 100% 0, 70% 100%, 0 100%); }
+input[type="range"]:active::-webkit-slider-thumb, input[type="range"]:focus-visible::-webkit-slider-thumb { background: var(--key); transform: scale(1.15); }
+
+/* sezioni a scomparsa: la riga è una lastra, la freccia gira */
+details > summary { cursor: pointer; list-style: none; position: relative; padding: 10px 14px 10px 34px; font-weight: 800; font-style: italic; letter-spacing: .01em;
+  transition: background-color .18s, color .18s; }
+details > summary::-webkit-details-marker { display: none; }
+details > summary::before { content: ""; position: absolute; left: 12px; top: 50%; width: 10px; height: 12px; margin-top: -6px; background: var(--key); clip-path: polygon(0 0, 100% 50%, 0 100%); transition: transform .26s var(--ease-kick); }
+details[open] > summary::before { transform: rotate(90deg); }
+@media (hover: hover) { details > summary:hover { background: color-mix(in srgb, var(--key) 14%, transparent); } }
+
+/* ---------- dialoghi: il secondo livello arriva inclinato, il sotto arretra ---------- */
+dialog { border: 0; background: var(--panel-solid, var(--panel)); box-shadow: 10px 10px 0 var(--key), 0 40px 80px -30px rgba(0, 0, 0, .8); }
+dialog::backdrop { background-color: hsl(0 0% 0% / .74); -webkit-backdrop-filter: none; backdrop-filter: none;
+  background-image: radial-gradient(circle, hsl(var(--h) 92% 54% / .22) 1.3px, transparent 1.6px); background-size: 14px 14px; }
+.modal { clip-path: polygon(0 0, calc(100% - 22px) 0, 100% 22px, 100% 100%, 22px 100%, 0 calc(100% - 22px)); box-shadow: none; outline: 3px solid var(--key); outline-offset: -3px; }
+.modal[open] { animation: cmModal .34s var(--look-out) both; }
+.drawer { border-left: 0; box-shadow: -10px 0 0 var(--key), -40px 0 80px -20px rgba(0, 0, 0, .8); }
+.drawer[open] { animation: cmDrawer .38s var(--look-out) both; }
+@keyframes cmModal { from { opacity: 0; transform: translateX(48px) skewX(-6deg) scale(.96); } to { opacity: 1; transform: none; } }
+@keyframes cmDrawer { from { transform: translateX(105%) skewX(-4deg); } to { transform: none; } }
+dialog[open]::backdrop { animation: cmVeil .3s ease both; }
+@keyframes cmVeil { from { opacity: 0; } }
+/* testata del dialogo: banda nera, titolo in carta, filo della tinta */
+.dh { background: var(--void); color: var(--paper); border-bottom: 0; box-shadow: 0 4px 0 var(--key); padding: 16px 20px; }
+.dh h2 { color: var(--paper); text-transform: uppercase; font-stretch: 114%; letter-spacing: -.01em; font-size: clamp(20px, 2.6vw, 28px); }
+.dh .iconbtn { background: transparent; color: var(--paper); border-color: color-mix(in srgb, var(--paper) 40%, transparent); }
+@media (hover: hover) { .dh .iconbtn:hover { background: var(--key); color: var(--key-ink); border-color: var(--key); } }
+.db { gap: 18px; }
+
+/* ---------- notifiche: una fascia nera che arriva di lato ---------- */
+.toast { background: var(--void); color: var(--paper); border-radius: 0; padding: 12px 22px 12px 26px; font-weight: 700; box-shadow: 6px 6px 0 var(--key);
+  clip-path: polygon(10px 0, 100% 0, calc(100% - 10px) 100%, 0 100%); border-left: 6px solid var(--key); }
+
+/* ---------- stati vuoti: un cartello, non tre righe centrate ---------- */
+.emptystate { position: relative; justify-items: start; text-align: left; gap: 18px; padding: clamp(48px, 9vw, 110px) clamp(8px, 4vw, 48px); max-width: 900px; isolation: isolate; }
+.emptystate::before { content: ""; position: absolute; z-index: -1; left: -6%; right: 10%; top: 26%; height: 44%; background: var(--key); opacity: .12; transform: skewY(-4deg);
+  clip-path: polygon(0 8%, 100% 0, 97% 100%, 2% 92%); }
+.emptystate h2 { font-size: clamp(38px, 7vw, 92px); line-height: .92; text-transform: uppercase; font-stretch: 120%; letter-spacing: -.03em; text-shadow: .05em .05em 0 var(--key); max-width: 14ch; }
+.emptystate p { font-size: clamp(16px, 1.6vw, 19px); color: var(--ink); opacity: .8; max-width: 46ch; border-left: 5px solid var(--key); padding-left: 14px; }
+.emptystate .row { justify-content: flex-start; }
+
+/* ---------- piè di pagina: banda nera con il nome che scorre ---------- */
+.foot { position: relative; overflow: hidden; background: var(--void); color: var(--paper); border-top: 0; box-shadow: 0 -4px 0 var(--key); }
+.foot::before { content: "LAST ONE STANDING \2022 LAST ONE STANDING \2022 LAST ONE STANDING \2022 LAST ONE STANDING \2022 LAST ONE STANDING \2022 LAST ONE STANDING \2022 ";
+  position: absolute; left: 0; bottom: calc(env(safe-area-inset-bottom, 0px) + 58px); white-space: nowrap; pointer-events: none;
+  font: italic 900 clamp(60px, 11vw, 160px) / 1 var(--f-display); font-stretch: 122%; color: transparent; -webkit-text-stroke: 1.5px color-mix(in srgb, var(--key) 34%, transparent);
+  animation: cmMarq 70s linear infinite; }
+@keyframes cmMarq { to { transform: translateX(-50%); } }
+.footin { position: relative; padding-block: 30px 26px; }
+.footbrand b { color: var(--paper); text-transform: uppercase; font-style: italic; font-size: 20px; letter-spacing: -.01em; }
+.footbrand span { color: color-mix(in srgb, var(--paper) 62%, transparent); }
+.footnav { gap: 6px; }
+.footnav a { color: var(--paper); padding: 6px 12px; text-transform: uppercase; font-style: italic; font-weight: 800; letter-spacing: .04em; font-size: 13px;
+  transform: skewX(var(--slant)); transition: background-color .18s, color .18s; }
+@media (hover: hover) { .footnav a:hover { background: var(--key); color: var(--key-ink); } }
+
+/* ---------- movimento ridotto ---------- */
+@media (prefers-reduced-motion: reduce) { .modal[open], .drawer[open], dialog[open]::backdrop, .foot::before { animation: none; } }
+[data-reduced-motion] .modal[open], [data-reduced-motion] .drawer[open], [data-reduced-motion] dialog[open]::backdrop, [data-reduced-motion] .foot::before { animation: none; }
