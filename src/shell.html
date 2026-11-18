@@ -49,6 +49,7 @@
             <a class="btn xl ghost" href="#cast">Prepara la tua partita</a>
           </div>
           <p class="hint">La partita lampo usa 24 concorrenti casuali e un'arena a sorpresa.</p>
+          <button class="btn sm hh-bacheca" id="homeBacheca" type="button" hidden>La tua bacheca: trofei e album</button>
         </div>
         <div class="hh-board" aria-hidden="true">
           <div class="hb-top"><span class="rec"></span> In diretta <span class="hb-day" id="hbDay">Giorno 1</span></div>
@@ -347,6 +348,13 @@
       <div class="row"><button class="btn" type="button" id="archiveImport">Importa replay</button><button class="btn" type="button" id="archiveCopy">Copia JSON</button><button class="btn" type="button" id="archiveDownload">Scarica JSON</button></div>
     </details>
     <p id="archiveMsg" class="help" role="status"></p>
+  </div>
+</dialog>
+<dialog id="bachecaDlg" class="modal tool-dialog" aria-labelledby="h-bacheca">
+  <div class="db bacheca-dialog">
+    <div class="row between"><h2 id="h-bacheca">La tua bacheca</h2><button class="iconbtn" type="button" data-close aria-label="Chiudi la bacheca">✕</button></div>
+    <div class="bc-tabs" role="tablist" aria-label="Bacheca"><button type="button" role="tab" data-bc="trofei" aria-selected="true">Trofei</button><button type="button" role="tab" data-bc="album" aria-selected="false">Album</button><button type="button" role="tab" data-bc="record" aria-selected="false">Record</button></div>
+    <div id="bachecaBody" role="tabpanel"></div>
   </div>
 </dialog>
 <dialog id="labDlg" class="modal tool-dialog" aria-labelledby="h-lab"><div class="db studio-dialog">

@@ -37,6 +37,7 @@
     if (!deaths.length && ph.kind !== 'fallen' && ph.kind !== 'b') out.push({ k: 'calma', w: 1 });
     if (ph.kind === 'fallen') out.push({ k: 'caduti', n: ph.deaths ? ph.deaths.length : 0, w: 2 });
     if (i === 0) out.push({ k: 'via', n: SIM.tributes.length, w: 8 });
+    if (i === 0 && ctx.memoria) { const rv = (ctx.memoria.rivali || []).find(([v, k]) => BY[v] && BY[k]); out.push({ k: 'rivincita', n: ctx.memoria.edizione, t: rv && BY[rv[0]], u: rv && BY[rv[1]], w: 9 }); }
     return out.sort((a, b) => b.w - a.w);
   }
 
@@ -46,6 +47,7 @@
     const soft = !!ctx.soft, t = f.t, u = f.u, fuori = soft ? 'fuori dai giochi' : 'fuori';
     switch (f.k) {
       case 'via': return [pick(['Signore e signori, si comincia! ' + f.n + ' concorrenti, una sola via d’uscita.', 'Buonasera e benvenuti! ' + f.n + ' concorrenti, e il segnale sta per suonare!']), pick(['Scommetto che metà non arriva a stasera.', 'Guardateli bene: tra poco ne resteranno molti meno.'])];
+      case 'rivincita': return [pick(['Bentornati alla ' + f.n + 'ª edizione! Stesse facce, nuove cicatrici.', 'Edizione numero ' + f.n + ', amici: chi c’era si ricorda tutto.']) + (t && u ? ' ' + nm(t) + ' torna per regolare i conti con ' + nm(u) + '.' : ''), pick(['L’ultima volta finì male. Stavolta finirà peggio.', 'I rancori sono il miglior carburante della televisione.'])];
       case 'menMorto': return [pick(['Nooo! ' + nm(t) + ' è ' + fuori + '! Il suo mentore starà urlando davanti allo schermo!', 'Incredibile! Cade ' + nm(t) + ', l’allievo del nostro mentore!']), pick(['Il mentore farà meglio a scegliersi un nuovo cavallo.', 'Consigli sbagliati o sfortuna? Io un’idea ce l’ho.'])];
       case 'regia': return [pick(['La regia vuole spettacolo: arriva ' + (CARTA[f.card] || 'una sorpresa') + '!', 'Colpo di scena dalla cabina di regia: ' + (CARTA[f.card] || 'una sorpresa') + '!']), pick(['Finalmente qualcuno che sa fare televisione.', 'Crudele. Mi piace.', 'Vediamo chi ha le spalle abbastanza larghe.'])];
       case 'dono': return [pick(['Un dono dal pubblico per ' + nm(t) + '! Qualcuno a casa crede in ' + lui(t) + '!', 'Paracadute in arrivo! ' + nm(t) + ' ha appena trovato un amico là fuori.']), pick(['Soldi spesi bene? Lo vedremo stanotte.', 'Commovente. E molto, molto costoso.'])];

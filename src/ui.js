@@ -1750,6 +1750,7 @@
     S.cast.forEach((t, i) => { if (!t.name.trim()) t.name = 'Concorrente ' + (i + 1); });
     S.settings.seed = seed || S.settings.seed || newSeed();
     const cfg = currentConfiguration();
+    if (startRun.memoria) { cfg.memoria = startRun.memoria; cfg.edizione = startRun.memoria.edizione; startRun.memoria = null; }
     preGame(cfg).then((pre) => { if (pre === false) return; if (pre) { runSim.pre = pre; if (pre.interviste.length) cfg.interviste = pre.interviste; } runSim(cfg); });
   }
   /* ---------- prima dei giochi: il concorrente da allenare e la sua intervista ---------- */
@@ -1918,7 +1919,7 @@
   }
   /* =============== TELECRONACA E PUBBLICO =============== */
   const TC = window.LOS_TELECRONACA;
-  const tcCtx = () => ({ BY, soft: !!resultTheme(SIM).soft, mentore: S.run && S.run.gioco ? S.run.gioco.mentore : null });
+  const tcCtx = () => ({ BY, soft: !!resultTheme(SIM).soft, mentore: S.run && S.run.gioco ? S.run.gioco.mentore : null, memoria: S.run && S.run.cfg ? S.run.cfg.memoria : null });
   function renderCast(i) {
     const box = $('#ptCast'); if (!box) return;
     if (!TC || !SIM) { box.hidden = true; return; }
@@ -2408,6 +2409,80 @@
     items.push([st.events, 'Eventi']);
     return '<div class="kstats">' + items.map(([v, l]) => '<div class="kstat"><b>' + v + '</b><span>' + l + '</span></div>').join('') + '</div>';
   }
+  /* =============== LA BACHECA: trofei, album, rivincita, interviste =============== */
+  const BC = window.LOS_BACHECA;
+  // all'esito: si registra la partita (una volta sola) e si tengono i trofei nuovi per i ridisegni successivi
+  function closeGame() {
+    if (!BC || !S.run || !SIM) return [];
+    const nuovi = BC.registra(S.run, SIM);
+    if (nuovi.length) { S.run.trofeiNuovi = (S.run.trofeiNuovi || []).concat(nuovi.map((t) => t.id)); save(); }
+    return (S.run.trofeiNuovi || []).map((id) => BC.TROFEI.find((t) => t.id === id)).filter(Boolean);
+  }
+  function trophyHTML(t, on, when) {
+    const hidden = t.segreto && !on;
+    return '<li class="tr' + (on ? ' on' : '') + (hidden ? ' secret' : '') + '" data-tr="' + esc(t.id) + '"><span class="tr-ic" aria-hidden="true"></span><span class="tr-tx"><b>' + (hidden ? 'Trofeo segreto' : esc(t.nome)) + '</b><small>' + (hidden ? 'Si scopre giocando.' : esc(t.desc)) + '</small>' +
+      (on && when ? '<em>' + new Date(when).toLocaleDateString('it-IT') + '</em>' : '') + '</span></li>';
+  }
+  function resultsExtraHTML(nuovi) {
+    if (!BC || !SIM) return '';
+    const theme = resultTheme(SIM), g = S.run && S.run.gioco, ctx = { soft: !!theme.soft, mentore: g && g.mentore, doni: g ? Object.values(g.doni) : [] };
+    // le interviste: chi ha vinto e chi è caduto per ultimo
+    const winner = SIM.winners[0], second = SIM.tributes.filter((t) => !t.alive).sort((a, b) => b.order - a.order)[0];
+    const iv = (id, label) => { const t = BY[id]; if (!t) return ''; const qa = BC.intervista(SIM, id, ctx); return qa.length ? '<article class="iv">' + avHTML(t, { dead: !t.alive }) + '<div class="iv-in"><span class="iv-k">' + esc(label) + '</span><h3>' + esc(t.name) + '</h3><dl>' + qa.map((x) => '<dt>' + x.q + '</dt><dd>«' + x.a + '»</dd>').join('') + '</dl></div></article>' : ''; };
+    const ivs = iv(winner, SIM.winners.length > 1 ? 'Tra chi ha vinto' : 'Chi ha vinto') + (second && second.id !== winner ? iv(second.id, theme.soft ? 'L’ultimo a uscire' : 'L’ultimo a cadere') : '');
+    const ed = S.run.cfg.edizione || 1;
+    return (nuovi.length ? '<section class="block card tr-new"><h2>Trofei sbloccati <span>' + nuovi.length + '</span></h2><ul class="trlist">' + nuovi.map((t) => trophyHTML(t, true)).join('') + '</ul><button class="btn sm" type="button" data-bacheca="trofei">Tutti i trofei</button></section>' : '') +
+      (ivs ? '<section class="block card ivbox"><h2>Le interviste</h2>' + ivs + '</section>' : '') +
+      '<section class="block card rematch"><h2>Rivincita' + (ed > 1 ? ' <span>edizione ' + (ed + 1) + '</span>' : '') + '</h2><p>Lo stesso cast torna nell’arena: chi è sopravvissuto porta una cicatrice e un po’ d’esperienza, chi è caduto torna con i conti in sospeso.</p><div class="row"><button class="btn primary" type="button" id="rRematch">Rivincita</button><button class="btn" type="button" data-bacheca="album">Album dei concorrenti</button></div></section>';
+  }
+  function startRematch() {
+    if (!BC || !SIM || !S.run) return;
+    const res = BC.rivincita(S.run.cfg, SIM, TRAITS);
+    S.cast = normalizeCast(res.cast); try { S.initialRelations = L.normalizeInitialRelations(res.initialRelations, S.cast); } catch (e) { S.initialRelations = L.normalizeInitialRelations(S.run.cfg.initialRelations || [], S.cast); } S.settings.seed = newSeed();
+    startRun.memoria = res.memoria; save();
+    const notes = Object.keys(res.memoria.segni).length;
+    toast('Edizione ' + res.edizione + ': ' + notes + ' concorrenti tornano cambiati, ' + res.memoria.rivali.length + ' conti in sospeso.');
+    startRun(S.settings.seed);
+  }
+  // la bacheca: trofei, album, record
+  let bcTab = 'trofei';
+  function openBacheca(tab) {
+    if (!BC || !PT) return;
+    bcTab = tab || bcTab; stopPlay(); renderBacheca();
+    const d = $('#bachecaDlg'); if (!d.open) d.showModal();
+  }
+  function renderBacheca() {
+    const p = PT.profilo(), tro = p.trofei || {}, album = Object.values(p.album || {});
+    $$('#bachecaDlg [data-bc]').forEach((b) => b.setAttribute('aria-selected', String(b.dataset.bc === bcTab)));
+    let h = '';
+    if (bcTab === 'trofei') {
+      const n = BC.TROFEI.filter((t) => tro[t.id]).length, cats = [...new Set(BC.TROFEI.map((t) => t.cat))];
+      h = '<p class="bc-count"><b>' + n + '</b> trofei su ' + BC.TROFEI.length + '</p>' + cats.map((c) => '<section class="bc-cat"><h3>' + esc(c) + '</h3><ul class="trlist">' + BC.TROFEI.filter((t) => t.cat === c).map((t) => trophyHTML(t, !!tro[t.id], tro[t.id])).join('') + '</ul></section>').join('');
+    } else if (bcTab === 'album') {
+      const order = { leggendaria: 0, epica: 1, rara: 2, comune: 3 };
+      const cards = album.map((x) => [x, BC.rarita(x)]).sort((a, b) => order[a[1].k] - order[b[1].k] || b[0].vittorie - a[0].vittorie || b[0].partite - a[0].partite);
+      h = cards.length ? '<p class="bc-count"><b>' + cards.length + '</b> carte · ' + cards.filter((c) => c[1].k !== 'comune').length + ' rare o meglio</p><ul class="album">' + cards.map(([x, r]) => {
+        const inCast = S.cast.some((t) => t.id === x.id);
+        return '<li class="acard r-' + r.k + '"><span class="ac-r">' + esc(r.nome) + '</span>' + avHTML(x) + '<b class="ac-n">' + esc(x.name) + '</b><span class="ac-st"><span><b>' + x.partite + '</b> ' + (x.partite === 1 ? 'partita' : 'partite') + '</span><span><b>' + x.vittorie + '</b> ' + (x.vittorie === 1 ? 'vittoria' : 'vittorie') + '</span><span><b>' + x.uccisioni + '</b> ' + (x.uccisioni === 1 ? 'eliminazione' : 'eliminazioni') + '</span></span>' +
+          '<span class="ac-best">Migliore: ' + (x.migliore === 1 ? 'vittoria' : x.migliore + 'º posto') + '</span><button type="button" class="btn sm" data-album-add="' + esc(x.id) + '"' + (inCast ? ' disabled' : '') + '>' + (inCast ? 'Già nel cast' : 'Porta nel cast') + '</button></li>';
+      }).join('') + '</ul>' : '<p class="help">L’album si riempie a ogni partita che arriva all’esito: ogni concorrente diventa una carta, e la carta diventa più rara con le vittorie.</p>';
+    } else {
+      const rows = [['Partite giocate', p.partite || 0], ['Crediti record', p.record || 0], ['Puntate vinte', (p.vinte || 0) + ' su ' + (p.puntate || 0)], ['Doni mandati', p.doni || 0], ['Ordini seguiti', (p.seguiti || 0) + ' su ' + (p.ordini || 0)], ['Allievi vincitori', p.mentoriVincenti || 0], ['Arene visitate', (p.arene || []).length + ' su ' + D.themes.length]];
+      h = '<dl class="bc-rec">' + rows.map(([k, v]) => '<div><dt>' + k + '</dt><dd>' + v + '</dd></div>').join('') + '</dl>';
+    }
+    $('#bachecaBody').innerHTML = h;
+  }
+  $('#bachecaDlg').addEventListener('click', (e) => {
+    const tab = e.target.closest('[data-bc]'); if (tab) { bcTab = tab.dataset.bc; renderBacheca(); return; }
+    const add = e.target.closest('[data-album-add]'); if (!add) return;
+    const x = (PT.profilo().album || {})[add.dataset.albumAdd]; if (!x || S.cast.some((t) => t.id === x.id)) return;
+    const t = sanitizeTribute({ id: x.id, name: x.name, gender: x.gender, team: x.team, traits: x.traits, attr: x.attr, img: x.img || '' }, S.cast.length);
+    if (!t) return; S.cast.push(t); save(); updateCounts(); renderBacheca(); toast(x.name + ' torna nel cast.');
+  });
+  document.addEventListener('click', (e) => { const b = e.target.closest('[data-bacheca]'); if (b) openBacheca(b.dataset.bacheca); });
+  $('#homeBacheca').addEventListener('click', () => openBacheca('trofei'));
+  if (BC && PT) $('#homeBacheca').hidden = false;
+
   // il riepilogo del giocatore: crediti, puntate, doni, il destino del concorrente allenato
   function playerSummaryHTML() {
     const g = S.run && S.run.gioco; if (!PT || !g || !SIM) return '';
@@ -2518,7 +2593,7 @@
 
     $('#resBody').innerHTML = hero +
       '<div class="resactions"><button class="btn" type="button" id="rArchive">Archivio partite</button><button class="btn primary lg" type="button" id="rAgain">Rigioca con un nuovo seme</button><button class="btn" type="button" id="rCopy">Copia il riepilogo</button><a class="btn" href="#diretta">Rivedi la diretta</a><a class="btn" href="#cast">Nuova partita</a><span class="help mono">seme ' + esc(SIM.seed) + '</span></div>' +
-      playerSummaryHTML() +
+      playerSummaryHTML() + resultsExtraHTML(closeGame()) +
       '<div class="resgrid"><div>' +
         (podium ? '<section class="block card"><h2>Il podio</h2>' + podium + '</section>' : '') +
         '<section class="block card"><h2>I premi della partita</h2>' + awardsH + '</section>' +
@@ -2531,6 +2606,7 @@
       '</div></div>';
     $('#rAgain').addEventListener('click', () => { const cfg = Object.assign({}, S.run.cfg, { seed: newSeed() }); delete cfg.seasonId; delete cfg.interventi; delete cfg.interviste; runSim(cfg); });
     $('#rArchive').addEventListener('click', openArchive);
+    if ($('#rRematch')) $('#rRematch').addEventListener('click', startRematch);
     $('#rCopy').addEventListener('click', () => copyText(summaryText(), 'Riepilogo copiato negli appunti.'));
     if (S.run && S.run.interattiva && !S.run.replayId) persistRun(S.run, SIM);
     if (typeof studio !== 'undefined' && studio) studio.renderResults();

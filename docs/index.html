@@ -5343,6 +5343,69 @@ body:has(#editDlg[open]) #v-cast > :not(.dock) { translate: -34px 0; }
    e se ne vedeva solo la cima (capelli, fronte). Il ritaglio sugli occhi lo calcola src/skin/05-occhi.js */
 .av.es-strip > img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
 
+/* ================= PELLE · BACHECA, FASE 3 (base) =================
+ * Struttura e leggibilità: trofei sbloccati e interviste nell'Esito, la rivincita, la finestra «La tua bacheca»
+ * (trofei, album delle carte, record) e il pulsante in home. La regia visiva va nei file 6x. */
+
+/* ---------- trofei ---------- */
+.trlist { list-style: none; margin: 0 0 12px; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 8px; }
+.tr { display: grid; grid-template-columns: 38px minmax(0, 1fr); gap: 10px; align-items: center; padding: 10px 12px; background: color-mix(in srgb, var(--ink) 6%, transparent); opacity: .62; }
+.tr.on { opacity: 1; box-shadow: inset 4px 0 0 var(--key); }
+.tr-ic { width: 38px; height: 38px; background: color-mix(in srgb, var(--ink) 18%, transparent); clip-path: polygon(50% 0, 100% 30%, 82% 100%, 18% 100%, 0 30%); }
+.tr.on .tr-ic { background: var(--key); }
+.tr-tx { display: grid; gap: 2px; min-width: 0; }
+.tr-tx b { font: italic 900 15px / 1.15 var(--f-display); text-transform: uppercase; }
+.tr-tx small { font-size: 12.5px; line-height: 1.3; color: color-mix(in srgb, var(--ink) 72%, transparent); }
+.tr-tx em { font-style: normal; font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: color-mix(in srgb, var(--ink) 55%, transparent); }
+.tr.secret .tr-tx b { letter-spacing: .06em; }
+.tr-new h2 span, .rematch h2 span { font: 800 12px / 1 var(--f-body); letter-spacing: .14em; text-transform: uppercase; color: var(--key); margin-left: 8px; }
+
+/* ---------- interviste ---------- */
+.ivbox .iv { display: grid; grid-template-columns: 72px minmax(0, 1fr); gap: 14px; align-items: start; padding: 12px 0; }
+.ivbox .iv + .iv { border-top: 2px solid color-mix(in srgb, var(--ink) 10%, transparent); }
+.ivbox .iv > .av { --s: 72px; }
+.iv-k { font: 800 11px / 1 var(--f-body); letter-spacing: .18em; text-transform: uppercase; color: var(--key); }
+.iv h3 { margin: 4px 0 8px; font: italic 900 22px / 1 var(--f-display); text-transform: uppercase; }
+.iv dl { margin: 0; display: grid; gap: 4px; }
+.iv dt { font-weight: 800; font-size: 13px; letter-spacing: .02em; color: color-mix(in srgb, var(--ink) 70%, transparent); }
+.iv dd { margin: 0 0 6px; font-size: 16px; line-height: 1.4; }
+
+/* ---------- rivincita ---------- */
+.rematch p { max-width: 64ch; }
+.rematch .row { gap: 10px; flex-wrap: wrap; }
+
+/* ---------- la finestra della bacheca ---------- */
+#bachecaDlg { width: min(980px, 100%); }
+.bc-tabs { display: flex; gap: 6px; margin: 10px 0 14px; flex-wrap: wrap; }
+.bc-tabs button { padding: 8px 16px; border: 2px solid color-mix(in srgb, var(--ink) 22%, transparent); background: transparent; color: var(--ink); font: italic 900 14px / 1 var(--f-display); text-transform: uppercase; cursor: pointer; }
+.bc-tabs button[aria-selected="true"] { background: var(--key); color: var(--key-ink); border-color: var(--key); }
+.bc-count { margin: 0 0 12px; font-size: 14px; }
+.bc-count b { font: italic 900 26px / 1 var(--f-display); color: var(--key); }
+.bc-cat h3 { margin: 14px 0 8px; font: italic 900 16px / 1 var(--f-display); text-transform: uppercase; }
+.album { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 12px; }
+.acard { display: grid; justify-items: center; gap: 6px; padding: 12px 10px; text-align: center; background: color-mix(in srgb, var(--ink) 6%, transparent); box-shadow: inset 0 4px 0 color-mix(in srgb, var(--ink) 25%, transparent); }
+.acard.r-rara { box-shadow: inset 0 4px 0 #5aa9e6; }
+.acard.r-epica { box-shadow: inset 0 4px 0 #b06ce0; }
+.acard.r-leggendaria { box-shadow: inset 0 4px 0 #e3b04b; }
+.ac-r { font: 800 10.5px / 1 var(--f-body); letter-spacing: .18em; text-transform: uppercase; }
+.acard .av { --s: 84px; }
+.ac-n { font: italic 900 17px / 1.1 var(--f-display); text-transform: uppercase; }
+.ac-st { display: grid; gap: 2px; font-size: 12.5px; }
+.ac-st b { font-weight: 800; }
+.ac-best { font-size: 12px; color: color-mix(in srgb, var(--ink) 70%, transparent); }
+.bc-rec { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 10px; margin: 0; }
+.bc-rec div { padding: 12px 14px; background: color-mix(in srgb, var(--ink) 6%, transparent); }
+.bc-rec dt { font: 800 11px / 1.2 var(--f-body); letter-spacing: .14em; text-transform: uppercase; color: color-mix(in srgb, var(--ink) 70%, transparent); }
+.bc-rec dd { margin: 6px 0 0; font: italic 900 26px / 1 var(--f-display); }
+.hh-bacheca { margin-top: 10px; }
+
+@media (max-width: 600px) {
+  .trlist { grid-template-columns: 1fr; }
+  .ivbox .iv { grid-template-columns: 52px minmax(0, 1fr); }
+  .ivbox .iv > .av { --s: 52px; }
+  .album { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
 /* ================= PELLE · PARTITA GIOCATA, FASE 2 (base) =================
  * Solo l'ossatura di telecronaca (#ptCast), pubblico (.aud-poll, .aud-chat), minigiochi (.sc-game, .mg-*),
  * segnalini sulla mappa (.mn-pins), doni dalla mappa e dalla scheda, voto della regia nell'Esito (.ps-regia):
@@ -6316,6 +6379,7 @@ dialog[open]::backdrop { animation: cmVeil .3s ease both; }
             <a class="btn xl ghost" href="#cast">Prepara la tua partita</a>
           </div>
           <p class="hint">La partita lampo usa 24 concorrenti casuali e un'arena a sorpresa.</p>
+          <button class="btn sm hh-bacheca" id="homeBacheca" type="button" hidden>La tua bacheca: trofei e album</button>
         </div>
         <div class="hh-board" aria-hidden="true">
           <div class="hb-top"><span class="rec"></span> In diretta <span class="hb-day" id="hbDay">Giorno 1</span></div>
@@ -6614,6 +6678,13 @@ dialog[open]::backdrop { animation: cmVeil .3s ease both; }
       <div class="row"><button class="btn" type="button" id="archiveImport">Importa replay</button><button class="btn" type="button" id="archiveCopy">Copia JSON</button><button class="btn" type="button" id="archiveDownload">Scarica JSON</button></div>
     </details>
     <p id="archiveMsg" class="help" role="status"></p>
+  </div>
+</dialog>
+<dialog id="bachecaDlg" class="modal tool-dialog" aria-labelledby="h-bacheca">
+  <div class="db bacheca-dialog">
+    <div class="row between"><h2 id="h-bacheca">La tua bacheca</h2><button class="iconbtn" type="button" data-close aria-label="Chiudi la bacheca">✕</button></div>
+    <div class="bc-tabs" role="tablist" aria-label="Bacheca"><button type="button" role="tab" data-bc="trofei" aria-selected="true">Trofei</button><button type="button" role="tab" data-bc="album" aria-selected="false">Album</button><button type="button" role="tab" data-bc="record" aria-selected="false">Record</button></div>
+    <div id="bachecaBody" role="tabpanel"></div>
   </div>
 </dialog>
 <dialog id="labDlg" class="modal tool-dialog" aria-labelledby="h-lab"><div class="db studio-dialog">
@@ -19948,7 +20019,7 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
 </script>
 <script>window.LOS_ASSETS = {"logo":"img/logo.f2d5175789.webp","icona":"img/icona.8b02ddeb49.webp","favicon":"img/favicon.86774dc7cf.png","panoramica":"img/panoramica.66c4c27255.webp","sagome":["img/sagome-cappuccio.e8876ba986.webp","img/sagome-esploratore.9a99fd13f8.webp","img/sagome-viaggiatore.5e36435604.webp"],"arene":{"classico":"img/arene-classico.c2887324d1.webp","cyberpunk":"img/arene-cyberpunk.713b4c77ea.webp","fantasy":"img/arene-fantasy.ee494a9322.webp","horror":"img/arene-horror.76225517ca.webp","liceo":"img/arene-liceo.c591ac5f32.webp","royale":"img/arene-royale.46515caf90.webp","scifi":"img/arene-scifi.bc9d8e04eb.webp","ufficio":"img/arene-ufficio.a2e36d4f7f.webp","wasteland":"img/arene-wasteland.734ed966b2.webp","zombie":"img/arene-zombie.11476cf1ca.webp"},"atlas":{"classico":{"armi":{"arco":"img/arene-classico-armi-arco.57fa716aa9.webp","ascia":"img/arene-classico-armi-ascia.f48629747b.webp","coltello-da-campo":"img/arene-classico-armi-coltello-da-campo.3393de240f.webp","coltello":"img/arene-classico-armi-coltello.a0134af05c.webp","falce-corta":"img/arene-classico-armi-falce-corta.3131158a9f.webp","fionda":"img/arene-classico-armi-fionda.48c8c32c43.webp","lancia-da-caccia":"img/arene-classico-armi-lancia-da-caccia.6f2be560ec.webp","lancia":"img/arene-classico-armi-lancia.115909650b.webp","machete":"img/arene-classico-armi-machete.e1c9ef25d7.webp","mazza-corta":"img/arene-classico-armi-mazza-corta.e1092f0628.webp","mazza":"img/arene-classico-armi-mazza.1fddf37b46.webp","pugnale-da-cintura":"img/arene-classico-armi-pugnale-da-cintura.0bedc8a501.webp","pugnale":"img/arene-classico-armi-pugnale.fda9dbf38a.webp","scure-da-legna":"img/arene-classico-armi-scure-da-legna.837c5d1f78.webp","spada-corta":"img/arene-classico-armi-spada-corta.952e6b7f6a.webp","tridente":"img/arene-classico-armi-tridente.2fcb3547d9.webp"},"luoghi":{"altopiano":"img/arene-classico-luoghi-altopiano.36a37512d3.webp","bosco":"img/arene-classico-luoghi-bosco.2e9163544b.webp","cornucopia":"img/arene-classico-luoghi-cornucopia.393b2dabe1.webp","fiume":"img/arene-classico-luoghi-fiume.22b335a914.webp","paludi":"img/arene-classico-luoghi-paludi.77cf115eb4.webp","rovine":"img/arene-classico-luoghi-rovine.9ea4f70ca9.webp"},"pericoli":{"branco-di-lupi-mutanti":"img/arene-classico-pericoli-branco-di-lupi-mutanti.d786a62875.webp","orso-affamato":"img/arene-classico-pericoli-orso-affamato.e4f38a9892.webp","sciame-di-vespe-velenose":"img/arene-classico-pericoli-sciame-di-vespe-velenose.5adb2c7b8d.webp","serpente-gigante":"img/arene-classico-pericoli-serpente-gigante.b17e7f3d91.webp"}},"cyberpunk":{"armi":{"coltello-vibrante-in-ceramica":"img/arene-cyberpunk-armi-coltello-vibrante-in-ceramica.6bbcd0e9e4.webp","fucile-a-pompa-da-strada":"img/arene-cyberpunk-armi-fucile-a-pompa-da-strada.dbd0de34e1.webp","fucile-a-pompa-elettromagnetico":"img/arene-cyberpunk-armi-fucile-a-pompa-elettromagnetico.0555418cd0.webp","katana-termica":"img/arene-cyberpunk-armi-katana-termica.f1ff597173.webp","mazza-a-impulsi":"img/arene-cyberpunk-armi-mazza-a-impulsi.22d841ed1d.webp","mazza-da-baseball-chiodata":"img/arene-cyberpunk-armi-mazza-da-baseball-chiodata.db2996f744.webp","mitra-compatto":"img/arene-cyberpunk-armi-mitra-compatto.eaa3815798.webp","pistola-a-rotaia-artigianale":"img/arene-cyberpunk-armi-pistola-a-rotaia-artigianale.f9e83bda89.webp","pistola-smart":"img/arene-cyberpunk-armi-pistola-smart.2aa922ba8c.webp","sparachiodi-riprogrammato":"img/arene-cyberpunk-armi-sparachiodi-riprogrammato.70f6190cb0.webp","taser-da-buttafuori":"img/arene-cyberpunk-armi-taser-da-buttafuori.60b58b451d.webp","tirapugni-elettrificato":"img/arene-cyberpunk-armi-tirapugni-elettrificato.1ce19bab37.webp","ventaglio-da-combattimento-in-titanio":"img/arene-cyberpunk-armi-ventaglio-da-combattimento-in-titanio.f3b7bb5a10.webp"},"luoghi":{"clinica-del-ripperdoc":"img/arene-cyberpunk-luoghi-clinica-del-ripperdoc.8ef0cb941b.webp","club-della-braindance":"img/arene-cyberpunk-luoghi-club-della-braindance.7765542e70.webp","megablocco":"img/arene-cyberpunk-luoghi-megablocco.28b72e6ecf.webp","mercato-di-kabuki":"img/arene-cyberpunk-luoghi-mercato-di-kabuki.d5c8ab7b96.webp","nodo-dati-corporativo":"img/arene-cyberpunk-luoghi-nodo-dati-corporativo.56ca3e1335.webp","officina-dei-maelstrom":"img/arene-cyberpunk-luoghi-officina-dei-maelstrom.d69285cf21.webp","piazza-della-torre":"img/arene-cyberpunk-luoghi-piazza-della-torre.1e400212c8.webp"},"pericoli":{"banda-di-scav":"img/arene-cyberpunk-pericoli-banda-di-scav.f1a2b2ccc4.webp","gang-di-cromati":"img/arene-cyberpunk-pericoli-gang-di-cromati.74e5576e23.webp","sciame-di-droni-di-pattuglia":"img/arene-cyberpunk-pericoli-sciame-di-droni-di-pattuglia.6fb4b17ad9.webp","squadra-di-sicurezza-corporativa":"img/arene-cyberpunk-pericoli-squadra-di-sicurezza-corporativa.6195a3b15d.webp"}},"fantasy":{"armi":{"arco-elfico":"img/arene-fantasy-armi-arco-elfico.8012f9136d.webp","ascia-nanica":"img/arene-fantasy-armi-ascia-nanica.6913fdf008.webp","balestra":"img/arene-fantasy-armi-balestra.7767becc83.webp","bastone-magico":"img/arene-fantasy-armi-bastone-magico.0781aee860.webp","daga-dei-giuramenti":"img/arene-fantasy-armi-daga-dei-giuramenti.3b6d4b398c.webp","falcetto-dargento":"img/arene-fantasy-armi-falcetto-dargento.1ce0e4e163.webp","lancia-incantata":"img/arene-fantasy-armi-lancia-incantata.7371199824.webp","lancia-silvana":"img/arene-fantasy-armi-lancia-silvana.08fbc01ede.webp","martello-da-guerra":"img/arene-fantasy-armi-martello-da-guerra.4eb03f4db7.webp","martello-nanico":"img/arene-fantasy-armi-martello-nanico.82ad6b9b14.webp","mazza-di-quercia":"img/arene-fantasy-armi-mazza-di-quercia.0f6a8345a9.webp","pugnale-avvelenato":"img/arene-fantasy-armi-pugnale-avvelenato.aba554d177.webp","spada-da-viaggio":"img/arene-fantasy-armi-spada-da-viaggio.a7bdcab5f4.webp","spada-runica":"img/arene-fantasy-armi-spada-runica.ec4012c6cf.webp"},"luoghi":{"altare-delle-armi":"img/arene-fantasy-luoghi-altare-delle-armi.db06de44c1.webp","foresta-elfica":"img/arene-fantasy-luoghi-foresta-elfica.0448fcfbd3.webp","lago-nebbioso":"img/arene-fantasy-luoghi-lago-nebbioso.f19abc7c81.webp","miniere":"img/arene-fantasy-luoghi-miniere.5baa916ec9.webp","palude-stregata":"img/arene-fantasy-luoghi-palude-stregata.6a0b2af4a7.webp","picco-del-drago":"img/arene-fantasy-luoghi-picco-del-drago.06bdfd84b1.webp","torre-in-rovina":"img/arene-fantasy-luoghi-torre-in-rovina.ac716863c7.webp"},"pericoli":{"branco-di-lupi-mannari":"img/arene-fantasy-pericoli-branco-di-lupi-mannari.1c9124ceee.webp","spettro-errante":"img/arene-fantasy-pericoli-spettro-errante.056074bc23.webp","troll-di-caverna":"img/arene-fantasy-pericoli-troll-di-caverna.31aa2444f0.webp","viverna":"img/arene-fantasy-pericoli-viverna.577b91a819.webp"}},"horror":{"armi":{"ascia":"img/arene-horror-armi-ascia.f6793c220e.webp","attizzatoio":"img/arene-horror-armi-attizzatoio.12b9bf75af.webp","bastone-da-passeggio":"img/arene-horror-armi-bastone-da-passeggio.1a636ce4ab.webp","candelabro-dargento":"img/arene-horror-armi-candelabro-dargento.7d962054de.webp","coltello-dargento":"img/arene-horror-armi-coltello-dargento.73a6bb81ea.webp","crocifisso-appuntito":"img/arene-horror-armi-crocifisso-appuntito.203b41a170.webp","daga-da-cerimonia":"img/arene-horror-armi-daga-da-cerimonia.a597e15c53.webp","falce":"img/arene-horror-armi-falce.6513df8fa2.webp","fucile-da-caccia":"img/arene-horror-armi-fucile-da-caccia.169dc367e1.webp","pugnale-depoca":"img/arene-horror-armi-pugnale-depoca.f148afd005.webp","pugnale-rituale":"img/arene-horror-armi-pugnale-rituale.944cb9056c.webp","scure-da-legna":"img/arene-horror-armi-scure-da-legna.a11379a412.webp"},"luoghi":{"biblioteca":"img/arene-horror-luoghi-biblioteca.00d6ab97f4.webp","cantina":"img/arene-horror-luoghi-cantina.a196828c1d.webp","cappella":"img/arene-horror-luoghi-cappella.a51e505028.webp","cimitero":"img/arene-horror-luoghi-cimitero.7a441de089.webp","salone":"img/arene-horror-luoghi-salone.37f10c88c7.webp","serra":"img/arene-horror-luoghi-serra.b3d91121d4.webp","soffitta":"img/arene-horror-luoghi-soffitta.466d40cea3.webp"},"pericoli":{"bambola-posseduta":"img/arene-horror-pericoli-bambola-posseduta.7064eef1d7.webp","entita-senza-volto":"img/arene-horror-pericoli-entita-senza-volto.2c28467bdd.webp","spettro-urlante":"img/arene-horror-pericoli-spettro-urlante.25fa554e05.webp","stormo-di-corvi":"img/arene-horror-pericoli-stormo-di-corvi.fe5c85d7ae.webp"}},"liceo":{"armi":{"compito-copiato":"img/arene-liceo-armi-compito-copiato.c9ade27d61.webp","dossier-delle-revisioni":"img/arene-liceo-armi-dossier-delle-revisioni.77676a0f5f.webp","elenco-delle-correzioni":"img/arene-liceo-armi-elenco-delle-correzioni.04be1154c8.webp","fascicolo-di-risposte-motivate":"img/arene-liceo-armi-fascicolo-di-risposte-motivate.c29995b581.webp","foto-imbarazzante":"img/arene-liceo-armi-foto-imbarazzante.ff7d3ef284.webp","gossip-esplosivo":"img/arene-liceo-armi-gossip-esplosivo.552b1e6236.webp","pallone-da-dodgeball":"img/arene-liceo-armi-pallone-da-dodgeball.60a2576785.webp","profilo-falso":"img/arene-liceo-armi-profilo-falso.d1dac05a2b.webp","prospetto-dei-contributi":"img/arene-liceo-armi-prospetto-dei-contributi.0c121fd79a.webp","quaderno-delle-verifiche":"img/arene-liceo-armi-quaderno-delle-verifiche.7d8b07341a.webp","registro-rubato":"img/arene-liceo-armi-registro-rubato.67eb4b9eff.webp","riepilogo-delle-fonti":"img/arene-liceo-armi-riepilogo-delle-fonti.3c889a0ed5.webp"},"luoghi":{"aula-magna":"img/arene-liceo-luoghi-aula-magna.0478e35c5c.webp","aule":"img/arene-liceo-luoghi-aule.b3142d07cc.webp","biblioteca":"img/arene-liceo-luoghi-biblioteca.1ae806ae58.webp","cortile":"img/arene-liceo-luoghi-cortile.51bf433337.webp","laboratorio-di-chimica":"img/arene-liceo-luoghi-laboratorio-di-chimica.eba1434683.webp","mensa":"img/arene-liceo-luoghi-mensa.67bcbc7e37.webp","palestra":"img/arene-liceo-luoghi-palestra.8ecb872849.webp"},"pericoli":{"bidello-di-turno":"img/arene-liceo-pericoli-bidello-di-turno.191c43a8bd.webp","ispezione-a-sorpresa":"img/arene-liceo-pericoli-ispezione-a-sorpresa.bef087d9b9.webp","preside":"img/arene-liceo-pericoli-preside.033f6c9aae.webp","professoressa-di-matematica":"img/arene-liceo-pericoli-professoressa-di-matematica.6cb65c6a3f.webp"}},"royale":{"armi":{"balestra":"img/arene-royale-armi-balestra.64563b6cea.webp","carabina-compatta":"img/arene-royale-armi-carabina-compatta.a0fa150fbe.webp","coltello-da-combattimento":"img/arene-royale-armi-coltello-da-combattimento.74a64bca77.webp","coltello-tattico":"img/arene-royale-armi-coltello-tattico.8e9cb56197.webp","fucile-a-pompa":"img/arene-royale-armi-fucile-a-pompa.3d7fc7d83c.webp","fucile-da-cecchino":"img/arene-royale-armi-fucile-da-cecchino.fc3c4f19f1.webp","fucile-dassalto":"img/arene-royale-armi-fucile-dassalto.b91ccb0ec8.webp","granata":"img/arene-royale-armi-granata.fd9c359b27.webp","lancia-da-sopravvivenza":"img/arene-royale-armi-lancia-da-sopravvivenza.8a39c1a5e5.webp","manganello":"img/arene-royale-armi-manganello.dc6284893b.webp","mitraglietta":"img/arene-royale-armi-mitraglietta.6dcc3246e6.webp","pistola-da-segnalazione-modificata":"img/arene-royale-armi-pistola-da-segnalazione-modificata.1c7f899ca7.webp","pistola":"img/arene-royale-armi-pistola.acae268814.webp","scure-da-campo":"img/arene-royale-armi-scure-da-campo.6a5b0becd5.webp"},"luoghi":{"aeroporto":"img/arene-royale-luoghi-aeroporto.81e8ce98d4.webp","base-militare":"img/arene-royale-luoghi-base-militare.67f3a7de9d.webp","centrale-elettrica":"img/arene-royale-luoghi-centrale-elettrica.05ee57458a.webp","fattoria":"img/arene-royale-luoghi-fattoria.7c780dda87.webp","foresta":"img/arene-royale-luoghi-foresta.03b47644d0.webp","villaggio-costiero":"img/arene-royale-luoghi-villaggio-costiero.568519eb7c.webp"},"pericoli":{"cane-da-guardia-addestrato":"img/arene-royale-pericoli-cane-da-guardia-addestrato.c7853a67a0.webp","drone-armato":"img/arene-royale-pericoli-drone-armato.30d0b73e01.webp","elicottero-da-caccia":"img/arene-royale-pericoli-elicottero-da-caccia.8c68e62346.webp"}},"scifi":{"armi":{"bastone-a-impulsi":"img/arene-scifi-armi-bastone-a-impulsi.4e17e074e7.webp","cannone-a-rotaia-portatile":"img/arene-scifi-armi-cannone-a-rotaia-portatile.9a59b97d98.webp","frusta-monofilamento":"img/arene-scifi-armi-frusta-monofilamento.5ee8081aa9.webp","fucile-al-plasma":"img/arene-scifi-armi-fucile-al-plasma.ea2384a239.webp","granata-emp":"img/arene-scifi-armi-granata-emp.04cfd31203.webp","lama-di-servizio":"img/arene-scifi-armi-lama-di-servizio.a47d434464.webp","lama-vibrante":"img/arene-scifi-armi-lama-vibrante.02b0f47ff8.webp","lancia-da-abbordaggio":"img/arene-scifi-armi-lancia-da-abbordaggio.cf167e52ff.webp","perforatore-portatile":"img/arene-scifi-armi-perforatore-portatile.aa7e92ecab.webp","pistola-a-scarica":"img/arene-scifi-armi-pistola-a-scarica.33b3e5929e.webp","pistola-laser":"img/arene-scifi-armi-pistola-laser.aed4bbf3ed.webp","taglierino-ceramico":"img/arene-scifi-armi-taglierino-ceramico.b45d524836.webp","taser-a-impulsi":"img/arene-scifi-armi-taser-a-impulsi.360e29e1d5.webp"},"luoghi":{"condotti-di-servizio":"img/arene-scifi-luoghi-condotti-di-servizio.6817134b5e.webp","hangar":"img/arene-scifi-luoghi-hangar.6de551833b.webp","moduli-abitativi":"img/arene-scifi-luoghi-moduli-abitativi.9f5bb96d39.webp","ponte-di-comando":"img/arene-scifi-luoghi-ponte-di-comando.3e9ffd005a.webp","reattore":"img/arene-scifi-luoghi-reattore.d10a335006.webp","serra-idroponica":"img/arene-scifi-luoghi-serra-idroponica.b6f4407853.webp"},"pericoli":{"androide-da-combattimento":"img/arene-scifi-pericoli-androide-da-combattimento.1a3d3eb38e.webp","creatura-aliena-dai-tentacoli":"img/arene-scifi-pericoli-creatura-aliena-dai-tentacoli.b6b314ddd9.webp","drone-di-sicurezza-impazzito":"img/arene-scifi-pericoli-drone-di-sicurezza-impazzito.c8a9c6f9e3.webp","sciame-di-nanobot":"img/arene-scifi-pericoli-sciame-di-nanobot.d43296f047.webp"}},"ufficio":{"armi":{"badge-clonato-del-capo":"img/arene-ufficio-armi-badge-clonato-del-capo.be9f7381fe.webp","dossier-dei-risultati":"img/arene-ufficio-armi-dossier-dei-risultati.1888e2f671.webp","elenco-dei-contributi":"img/arene-ufficio-armi-elenco-dei-contributi.3de4fbe5bf.webp","fascicolo-delle-fonti":"img/arene-ufficio-armi-fascicolo-delle-fonti.02df27dfbf.webp","foglio-excel-con-le-prove":"img/arene-ufficio-armi-foglio-excel-con-le-prove.944f6ec708.webp","mail-in-copia-a-tutti":"img/arene-ufficio-armi-mail-in-copia-a-tutti.1d4304df14.webp","nota-spese-gonfiata":"img/arene-ufficio-armi-nota-spese-gonfiata.d2683cca4c.webp","presentazione-rubata":"img/arene-ufficio-armi-presentazione-rubata.815dc5c8b4.webp","prospetto-delle-metriche":"img/arene-ufficio-armi-prospetto-delle-metriche.356da1d2d9.webp","registro-delle-revisioni":"img/arene-ufficio-armi-registro-delle-revisioni.509eab44df.webp","report-pieno-di-errori-altrui":"img/arene-ufficio-armi-report-pieno-di-errori-altrui.c01c0ef897.webp","riepilogo-delle-approvazioni":"img/arene-ufficio-armi-riepilogo-delle-approvazioni.9394dadd6b.webp"},"luoghi":{"cucina":"img/arene-ufficio-luoghi-cucina.d968f8861d.webp","open-space":"img/arene-ufficio-luoghi-open-space.b6b7990c99.webp","parcheggio":"img/arene-ufficio-luoghi-parcheggio.d593f2ed83.webp","sala-riunioni":"img/arene-ufficio-luoghi-sala-riunioni.f92c4030a9.webp","sala-stampanti":"img/arene-ufficio-luoghi-sala-stampanti.1727f50082.webp","ufficio-del-direttore":"img/arene-ufficio-luoghi-ufficio-del-direttore.bb3b6cabab.webp"},"pericoli":{"consulente-esterno":"img/arene-ufficio-pericoli-consulente-esterno.ce6e200c3f.webp","direttore-generale":"img/arene-ufficio-pericoli-direttore-generale.da2eb1f708.webp","riorganizzazione-aziendale":"img/arene-ufficio-pericoli-riorganizzazione-aziendale.1fd57b76b3.webp","ufficio-risorse-umane":"img/arene-ufficio-pericoli-ufficio-risorse-umane.8392df7518.webp"}},"wasteland":{"armi":{"balestra-artigianale":"img/arene-wasteland-armi-balestra-artigianale.e09826852f.webp","catena":"img/arene-wasteland-armi-catena.866183d584.webp","coltello-da-strada":"img/arene-wasteland-armi-coltello-da-strada.1083c4429d.webp","fucile-arrugginito":"img/arene-wasteland-armi-fucile-arrugginito.797601f16e.webp","lama-di-recupero":"img/arene-wasteland-armi-lama-di-recupero.1ad13cfc78.webp","lancia-di-ferraglia":"img/arene-wasteland-armi-lancia-di-ferraglia.99d9f41307.webp","lancia-ricavata-da-un-tubo":"img/arene-wasteland-armi-lancia-ricavata-da-un-tubo.53b934e449.webp","lanciachiodi":"img/arene-wasteland-armi-lanciachiodi.e4f51e42e2.webp","mannaia":"img/arene-wasteland-armi-mannaia.518ae9c11c.webp","martello-da-officina":"img/arene-wasteland-armi-martello-da-officina.851055795e.webp","mazza-di-tubi":"img/arene-wasteland-armi-mazza-di-tubi.91babe82ac.webp","molotov":"img/arene-wasteland-armi-molotov.303d6fa315.webp","scure-da-demolizione":"img/arene-wasteland-armi-scure-da-demolizione.066ea5e066.webp"},"luoghi":{"autostrada-spezzata":"img/arene-wasteland-luoghi-autostrada-spezzata.19a72a0b97.webp","citta-fantasma":"img/arene-wasteland-luoghi-citta-fantasma.fe22bb72b2.webp","cratere":"img/arene-wasteland-luoghi-cratere.04de7ca40a.webp","deposito":"img/arene-wasteland-luoghi-deposito.f98aa31220.webp","diga":"img/arene-wasteland-luoghi-diga.3be9abe15a.webp","discarica":"img/arene-wasteland-luoghi-discarica.b8783ad9c6.webp","raffineria":"img/arene-wasteland-luoghi-raffineria.081e2d2ad6.webp"},"pericoli":{"banda-di-predoni":"img/arene-wasteland-pericoli-banda-di-predoni.1dfcfd1628.webp","branco-di-cani-mutati":"img/arene-wasteland-pericoli-branco-di-cani-mutati.442fabfc39.webp","scorpione-gigante":"img/arene-wasteland-pericoli-scorpione-gigante.2dd8911367.webp","verme-delle-sabbie":"img/arene-wasteland-pericoli-verme-delle-sabbie.a0d445beeb.webp"}},"zombie":{"armi":{"accetta-da-soccorso":"img/arene-zombie-armi-accetta-da-soccorso.6d36eb13ac.webp","accetta":"img/arene-zombie-armi-accetta.0eed163720.webp","balestra":"img/arene-zombie-armi-balestra.d705131d17.webp","coltello-da-campeggio":"img/arene-zombie-armi-coltello-da-campeggio.2abab58e78.webp","fucile-a-pompa":"img/arene-zombie-armi-fucile-a-pompa.b00b1d6a70.webp","katana":"img/arene-zombie-armi-katana.f631ad392f.webp","machete-da-potatura":"img/arene-zombie-armi-machete-da-potatura.94a93108a1.webp","martello-da-carpentiere":"img/arene-zombie-armi-martello-da-carpentiere.021e8a80f2.webp","mazza-chiodata":"img/arene-zombie-armi-mazza-chiodata.b4e11dcadb.webp","mazza-da-lavoro":"img/arene-zombie-armi-mazza-da-lavoro.c36a90108f.webp","motosega":"img/arene-zombie-armi-motosega.f74e603615.webp","piede-di-porco":"img/arene-zombie-armi-piede-di-porco.c185a97e0d.webp","pistola":"img/arene-zombie-armi-pistola.6d30022ca6.webp"},"luoghi":{"centro-commerciale":"img/arene-zombie-luoghi-centro-commerciale.333f4699d5.webp","metropolitana":"img/arene-zombie-luoghi-metropolitana.878a263605.webp","ospedale":"img/arene-zombie-luoghi-ospedale.f25de413a4.webp","periferia":"img/arene-zombie-luoghi-periferia.e28a7d70c7.webp","piazza":"img/arene-zombie-luoghi-piazza.b6ed86b3ad.webp","scuola":"img/arene-zombie-luoghi-scuola.153ddbaa75.webp","stazione-di-polizia":"img/arene-zombie-luoghi-stazione-di-polizia.157f7a17f5.webp"},"pericoli":{"cane-infetto":"img/arene-zombie-pericoli-cane-infetto.fdff913d6f.webp","gigante-mutato":"img/arene-zombie-pericoli-gigante-mutato.91fad36b70.webp","infetto-corridore":"img/arene-zombie-pericoli-infetto-corridore.61f48faafd.webp","orda-di-zombi":"img/arene-zombie-pericoli-orda-di-zombi.e0fc6d1b56.webp"}}},"fx":{"pennellate":["img/fx-pennellata-1.5527b3e9bd.webp","img/fx-pennellata-2.8526d34dcf.webp","img/fx-pennellata-3.a7f3e74ff3.webp","img/fx-pennellata-4.fe1f612999.webp"],"sigilli":{"classico":"img/fx-sigillo-classico.b781c63b8d.webp","cyberpunk":"img/fx-sigillo-cyberpunk.134a7f507c.webp","fantasy":"img/fx-sigillo-fantasy.d854d9ac19.webp","horror":"img/fx-sigillo-horror.54149e6a7e.webp","liceo":"img/fx-sigillo-liceo.7f1566a7a8.webp","royale":"img/fx-sigillo-royale.bedbb77f68.webp","scifi":"img/fx-sigillo-scifi.6c50b79280.webp","ufficio":"img/fx-sigillo-ufficio.fcbbcc051a.webp","wasteland":"img/fx-sigillo-wasteland.86f44d1714.webp","zombie":"img/fx-sigillo-zombie.44ac2a6473.webp"},"grana":"img/fx-grana.c1e72fd2da.webp","forme":{"fascia":"img/fx-forma-fascia.8a2f8ab92d.webp","freccia":"img/fx-forma-freccia.4e8039be8f.webp","fulmine":"img/fx-forma-fulmine.c9a15d227c.webp","stella":"img/fx-forma-stella.e773ba5dda.webp","strappo":"img/fx-forma-strappo.0e6a41d0d9.webp"},"impatto":"img/fx-impatto.fd13ac9554.webp","mezzitoni":"img/fx-mezzitoni.f9ef4df053.webp","occhi":{"f-1":"img/fx-occhi-f-1.3779df529a.webp","f-2":"img/fx-occhi-f-2.2f47e4535b.webp","f-3":"img/fx-occhi-f-3.8b10fc4b00.webp","f-4":"img/fx-occhi-f-4.08132e01f9.webp","m-1":"img/fx-occhi-m-1.fd94d5b0eb.webp","m-2":"img/fx-occhi-m-2.c7b9661e6b.webp","m-3":"img/fx-occhi-m-3.91ff950ae4.webp","m-4":"img/fx-occhi-m-4.d0a0e73220.webp","m-5":"img/fx-occhi-m-5.f4c19f2141.webp","n-1":"img/fx-occhi-n-1.21fc3b7adf.webp"},"fondali":{"classico":"img/fx-fondale-classico.8a3fc35342.webp","cyberpunk":"img/fx-fondale-cyberpunk.283c80cc1e.webp","fantasy":"img/fx-fondale-fantasy.0ca9b3f315.webp","horror":"img/fx-fondale-horror.4ba1241b63.webp","liceo":"img/fx-fondale-liceo.fb428a57f7.webp","royale":"img/fx-fondale-royale.aac1246425.webp","scifi":"img/fx-fondale-scifi.27ee2ce8cc.webp","ufficio":"img/fx-fondale-ufficio.780789ce70.webp","wasteland":"img/fx-fondale-wasteland.02311ed21d.webp","zombie":"img/fx-fondale-zombie.83b8d35716.webp"},"volti":{"f-1":"img/fx-volto-f-1.96d62771c1.webp","f-2":"img/fx-volto-f-2.79d3485864.webp","f-3":"img/fx-volto-f-3.aeb7664a4e.webp","f-4":"img/fx-volto-f-4.2f2c864354.webp","m-1":"img/fx-volto-m-1.f8b83b073e.webp","m-2":"img/fx-volto-m-2.b9eb346a31.webp","m-3":"img/fx-volto-m-3.5311549074.webp","m-4":"img/fx-volto-m-4.10b102bdb0.webp","m-5":"img/fx-volto-m-5.63e5c91778.webp","n-1":"img/fx-volto-n-1.02cf4d1c97.webp"},"vincitori":{"f-1":"img/vincitori-vincitore-f-1.10b1ec0d22.webp","f-2":"img/vincitori-vincitore-f-2.03d8a3a92a.webp","f-3":"img/vincitori-vincitore-f-3.bc0adcd66a.webp","m-1":"img/vincitori-vincitore-m-1.c597436dca.webp","m-2":"img/vincitori-vincitore-m-2.9c8b48e9f8.webp","n-1":"img/vincitori-vincitore-n-1.1539fc78b2.webp"},"occhiY":{"m-1":0.53,"m-2":0.6,"m-3":0.43,"m-4":0.39,"m-5":0.575,"f-1":0.52,"f-2":0.49,"f-3":0.41,"f-4":0.46,"n-1":0.55}},"audio":{"sfx":{"heavy":"img/audio-colpo.6c66fc3384.mp3","battle":"img/audio-scontro.171fdeb377.mp3","click":"img/audio-ui-click.75370fe5e2.wav","hover":"img/audio-ui-hover.39a84fb194.wav","tick":"img/audio-ui-tick.16c581af00.wav","jazz":"img/audio-vittoria.6a3763dedf.mp3"},"music":"img/audio-musica-dark-hour.53788a2c76.mp3"}};
 ;
-window.LOS_BUILD = "039894cf100688a263efa1217ec9ec483e3f873a47588c542fac4ef29b4614a2";
+window.LOS_BUILD = "ef9d44a76dec37b9d6abacc6a3fc6024fb1965e41a2a01e7e4f09bad177bc474";
 ;
 /* Last One Standing — grafica vettoriale: logo, icone delle arene, illustrazioni.
  * Tutto è SVG generato in codice: nessuna immagine esterna. */
@@ -24992,6 +25063,7 @@ window.LOS_BUILD = "039894cf100688a263efa1217ec9ec483e3f873a47588c542fac4ef29b46
     if (!deaths.length && ph.kind !== 'fallen' && ph.kind !== 'b') out.push({ k: 'calma', w: 1 });
     if (ph.kind === 'fallen') out.push({ k: 'caduti', n: ph.deaths ? ph.deaths.length : 0, w: 2 });
     if (i === 0) out.push({ k: 'via', n: SIM.tributes.length, w: 8 });
+    if (i === 0 && ctx.memoria) { const rv = (ctx.memoria.rivali || []).find(([v, k]) => BY[v] && BY[k]); out.push({ k: 'rivincita', n: ctx.memoria.edizione, t: rv && BY[rv[0]], u: rv && BY[rv[1]], w: 9 }); }
     return out.sort((a, b) => b.w - a.w);
   }
 
@@ -25001,6 +25073,7 @@ window.LOS_BUILD = "039894cf100688a263efa1217ec9ec483e3f873a47588c542fac4ef29b46
     const soft = !!ctx.soft, t = f.t, u = f.u, fuori = soft ? 'fuori dai giochi' : 'fuori';
     switch (f.k) {
       case 'via': return [pick(['Signore e signori, si comincia! ' + f.n + ' concorrenti, una sola via d’uscita.', 'Buonasera e benvenuti! ' + f.n + ' concorrenti, e il segnale sta per suonare!']), pick(['Scommetto che metà non arriva a stasera.', 'Guardateli bene: tra poco ne resteranno molti meno.'])];
+      case 'rivincita': return [pick(['Bentornati alla ' + f.n + 'ª edizione! Stesse facce, nuove cicatrici.', 'Edizione numero ' + f.n + ', amici: chi c’era si ricorda tutto.']) + (t && u ? ' ' + nm(t) + ' torna per regolare i conti con ' + nm(u) + '.' : ''), pick(['L’ultima volta finì male. Stavolta finirà peggio.', 'I rancori sono il miglior carburante della televisione.'])];
       case 'menMorto': return [pick(['Nooo! ' + nm(t) + ' è ' + fuori + '! Il suo mentore starà urlando davanti allo schermo!', 'Incredibile! Cade ' + nm(t) + ', l’allievo del nostro mentore!']), pick(['Il mentore farà meglio a scegliersi un nuovo cavallo.', 'Consigli sbagliati o sfortuna? Io un’idea ce l’ho.'])];
       case 'regia': return [pick(['La regia vuole spettacolo: arriva ' + (CARTA[f.card] || 'una sorpresa') + '!', 'Colpo di scena dalla cabina di regia: ' + (CARTA[f.card] || 'una sorpresa') + '!']), pick(['Finalmente qualcuno che sa fare televisione.', 'Crudele. Mi piace.', 'Vediamo chi ha le spalle abbastanza larghe.'])];
       case 'dono': return [pick(['Un dono dal pubblico per ' + nm(t) + '! Qualcuno a casa crede in ' + lui(t) + '!', 'Paracadute in arrivo! ' + nm(t) + ' ha appena trovato un amico là fuori.']), pick(['Soldi spesi bene? Lo vedremo stanotte.', 'Commovente. E molto, molto costoso.'])];
@@ -25066,6 +25139,193 @@ window.LOS_BUILD = "039894cf100688a263efa1217ec9ec483e3f873a47588c542fac4ef29b46
   }
 
   G.LOS_TELECRONACA = { commento, chat, sondaggio, favorito, fatti };
+})(typeof window !== 'undefined' ? window : globalThis);
+
+;
+/* Last One Standing — la memoria tra le partite (src/bacheca.js).
+ * Trofei (obiettivi, alcuni nascosti), l'album dei concorrenti con la rarità che cresce con le imprese,
+ * la «Rivincita» (lo stesso cast torna con cicatrici, nuovi tratti e conti in sospeso) e le interviste di fine partita.
+ * Tutto si salva nel profilo del giocatore (LOS_PARTITA.profilo) nel browser; nessun dato lascia il dispositivo. */
+(function (G) {
+  'use strict';
+  if (typeof document === 'undefined') return;
+  const PT = () => G.LOS_PARTITA;
+  const esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
+  const suf = (t) => (t && t.gender === 'F' ? 'a' : t && t.gender === 'N' ? 'ə' : 'o');
+  function rngOf(seed) { let h = 2166136261; for (const c of String(seed)) h = Math.imul(h ^ c.charCodeAt(0), 16777619); return () => ((h = Math.imul(h ^ (h >>> 13), 1597334677) + 0x6d2b79f5 | 0) >>> 0) / 4294967296; }
+
+  /* ================= i trofei =================
+   * c: contesto della partita appena chiusa (vedi contesto()); p: profilo già aggiornato con questa partita. */
+  const TROFEI = [
+    // partite
+    { id: 'prima', cat: 'Partite', nome: 'Prima diretta', desc: 'Guarda la tua prima partita fino all’esito.', ok: (c, p) => p.partite >= 1 },
+    { id: 'dieci', cat: 'Partite', nome: 'Abbonato', desc: 'Arriva all’esito di 10 partite.', ok: (c, p) => p.partite >= 10 },
+    { id: 'giramondo', cat: 'Partite', nome: 'Giramondo', desc: 'Gioca in tutte le arene.', ok: (c, p) => c.arene && (p.arene || []).length >= c.arene },
+    { id: 'lampo', cat: 'Partite', nome: 'Fulmine', desc: 'Una partita che finisce in 3 giorni o meno.', ok: (c) => c.SIM.days <= 3 },
+    { id: 'maratona', cat: 'Partite', nome: 'Maratona', desc: 'Una partita che dura 12 giorni o più.', ok: (c) => c.SIM.days >= 12 },
+    { id: 'bagno', cat: 'Partite', nome: 'Bagno di sangue', desc: 'Almeno 10 eliminazioni nel primo giorno.', ok: (c) => c.morti1 >= 10 },
+    { id: 'perbene', cat: 'Partite', nome: 'Gente per bene', desc: 'Una partita senza nessun tradimento.', ok: (c) => !(c.SIM.stats.betrayals > 0) && c.SIM.tributes.length >= 8 },
+    { id: 'serpente', cat: 'Partite', nome: 'Serpente', desc: 'Vince chi ha tradito un alleato.', ok: (c) => c.W.some((t) => t.traitor || t.betrayals > 0) },
+    { id: 'maniPulite', cat: 'Partite', nome: 'Mani pulite', desc: 'Vince chi non ha eliminato nessuno.', ok: (c) => c.W.some((t) => !t.kills) },
+    { id: 'amoreVince', cat: 'Partite', nome: 'Amore vincente', desc: 'Una coppia arriva in fondo insieme.', ok: (c) => (c.SIM.stats.stories || []).some((s) => s.k === 'amore' && s.note === 'insieme' && c.SIM.winners.includes(s.a) && c.SIM.winners.includes(s.b)) },
+    // mentore
+    { id: 'maestro', cat: 'Mentore', nome: 'Maestro', desc: 'Il tuo allievo vince la partita.', ok: (c) => c.mVince },
+    { id: 'podio', cat: 'Mentore', nome: 'Sul podio', desc: 'Il tuo allievo arriva tra i primi tre.', ok: (c) => c.m && c.m.rank <= 3 },
+    { id: 'miracolo', cat: 'Mentore', nome: 'Miracolo', desc: 'Vinci con un allievo che ha forza 3 o meno.', segreto: true, ok: (c) => c.mVince && c.m.attr && c.m.attr.for <= 3 },
+    { id: 'disciplina', cat: 'Mentore', nome: 'Disciplina', desc: 'Il tuo allievo segue 5 ordini in una partita.', ok: (c) => c.ordiniOk >= 5 },
+    { id: 'testaCalda', cat: 'Mentore', nome: 'Testa calda', desc: 'Il tuo allievo ignora 3 ordini in una partita.', segreto: true, ok: (c) => c.ordiniKo >= 3 },
+    { id: 'guerra', cat: 'Mentore', nome: 'Macchina da guerra', desc: 'Il tuo allievo fa 5 eliminazioni.', ok: (c) => c.m && c.m.kills >= 5 },
+    { id: 'ultimoIstante', cat: 'Mentore', nome: 'All’ultimo istante', desc: 'Il consiglio del mentore salva il tuo allievo da un colpo.', ok: (c) => c.g && (c.SIM.stats.mentorSaves || 0) > 0 },
+    { id: 'dalNulla', cat: 'Mentore', nome: 'Ritorno dal nulla', desc: 'Vince un allievo adottato dopo la caduta del primo.', ok: (c) => c.mVince && (c.g.allievi || []).length > 0 },
+    { id: 'sfortuna', cat: 'Mentore', nome: 'Allenatore sfortunato', desc: 'Perdi tre allievi nella stessa partita.', segreto: true, ok: (c) => c.g && (c.g.allievi || []).length >= 3 },
+    // puntate
+    { id: 'fiuto', cat: 'Puntate', nome: 'Fiuto', desc: 'Vinci una puntata.', ok: (c) => c.vinte >= 1 },
+    { id: 'tris', cat: 'Puntate', nome: 'Tris', desc: 'Vinci 3 puntate di fila.', ok: (c) => c.serie >= 3 },
+    { id: 'colpoGrosso', cat: 'Puntate', nome: 'Colpo grosso', desc: 'Vinci una puntata con quota 4 o più.', ok: (c) => c.g && c.g.puntate.some((b) => b.esito === 'vinta' && b.q >= 4) },
+    { id: 'banco', cat: 'Puntate', nome: 'Banco saltato', desc: 'Chiudi una partita con 250 crediti o più.', ok: (c) => c.g && c.g.crediti >= 250 },
+    { id: 'verde', cat: 'Puntate', nome: 'Al verde', desc: 'Chiudi una partita con meno di 10 crediti.', segreto: true, ok: (c) => c.g && c.g.crediti < 10 && (c.g.puntate.length || Object.keys(c.g.doni).length) },
+    // doni
+    { id: 'sponsor', cat: 'Doni', nome: 'Sponsor', desc: 'Manda il tuo primo dono.', ok: (c) => c.doni.length >= 1 },
+    { id: 'mecenate', cat: 'Doni', nome: 'Mecenate', desc: 'Manda 5 doni nella stessa partita.', ok: (c) => c.doni.length >= 5 },
+    { id: 'angelo', cat: 'Doni', nome: 'Angelo custode', desc: 'Chi riceve un tuo dono vince la partita.', ok: (c) => c.doni.some((d) => c.SIM.winners.includes(d.chi)) },
+    // regia
+    { id: 'capolavoro', cat: 'Regia', nome: 'Capolavoro', desc: 'Ottieni un voto della regia di 78 o più.', ok: (c) => c.voto && c.voto.tot >= 78 },
+    { id: 'canale', cat: 'Regia', nome: 'Cambia canale', desc: 'Ottieni un voto della regia sotto 48.', segreto: true, ok: (c) => c.voto && c.voto.tot < 48 },
+    { id: 'carte', cat: 'Regia', nome: 'Tutte le carte in tavola', desc: 'Gioca 4 carte della regia nella stessa partita.', ok: (c) => c.g && (c.g.regia || []).length >= 4 },
+    { id: 'banchetto', cat: 'Regia', nome: 'Banchetto di sangue', desc: 'Nel giorno del tuo banchetto cadono almeno 3 concorrenti.', ok: (c) => c.g && (c.g.regia || []).some((r) => r.k === 'banchetto' && (c.mortiGiorno[r.day] || 0) >= 3) },
+    // prove e pubblico
+    { id: 'riflessi', cat: 'Prove', nome: 'Riflessi d’acciaio', desc: 'Fai un punteggio perfetto in una prova giocata.', ok: (c) => c.g && (c.g.prove || []).some((x) => x.punteggio >= 100) },
+    { id: 'allenamento', cat: 'Prove', nome: 'Allenamento', desc: 'Gioca 3 prove nella stessa partita.', ok: (c) => c.g && (c.g.prove || []).length >= 3 },
+    { id: 'occhio', cat: 'Pubblico', nome: 'Occhio lungo', desc: 'Vota il preferito che poi vince.', ok: (c) => c.g && Object.entries(c.g.voti || {}).some(([k, v]) => k !== 'tot' && c.SIM.winners.includes(v)) },
+    { id: 'tifoso', cat: 'Pubblico', nome: 'Tifoso', desc: 'Vota 5 giorni nella stessa partita.', ok: (c) => c.g && Object.keys(c.g.voti || {}).filter((k) => k !== 'tot').length >= 5 },
+    // rivincite e album
+    { id: 'conti', cat: 'Rivincite', nome: 'Conti in sospeso', desc: 'In una rivincita, qualcuno elimina chi l’aveva eliminato.', ok: (c) => c.vendette > 0 },
+    { id: 'saga', cat: 'Rivincite', nome: 'Saga', desc: 'Arriva alla terza edizione dello stesso cast.', ok: (c) => c.edizione >= 3 },
+    { id: 'collezione', cat: 'Album', nome: 'Collezionista', desc: 'Raccogli 10 carte nell’album.', ok: (c, p) => Object.keys(p.album || {}).length >= 10 },
+    { id: 'leggenda', cat: 'Album', nome: 'Leggenda', desc: 'Fai diventare leggendaria una carta.', ok: (c, p) => Object.values(p.album || {}).some((x) => rarita(x).k === 'leggendaria') },
+    { id: 'bacheca', cat: 'Album', nome: 'Bacheca piena', desc: 'Sblocca 20 trofei.', ok: (c, p) => Object.keys(p.trofei || {}).length >= 20 },
+  ];
+
+  /* ================= l'album ================= */
+  const RARITA = [
+    { k: 'leggendaria', nome: 'Leggendaria', ok: (x) => x.vittorie >= 3 },
+    { k: 'epica', nome: 'Epica', ok: (x) => x.vittorie >= 2 || (x.vittorie >= 1 && x.maxKills >= 5) },
+    { k: 'rara', nome: 'Rara', ok: (x) => x.vittorie >= 1 || x.migliore <= 3 },
+    { k: 'comune', nome: 'Comune', ok: () => true },
+  ];
+  const rarita = (x) => RARITA.find((r) => r.ok(x));
+  // l'immagine si conserva solo se è piccola: l'album non deve riempire la memoria del browser
+  const IMG_MAX = 120000, ALBUM_MAX = 150;
+  function aggiornaAlbum(p, SIM, theme) {
+    p.album = p.album || {};
+    SIM.tributes.forEach((t) => {
+      const old = p.album[t.id] || { id: t.id, partite: 0, vittorie: 0, uccisioni: 0, maxKills: 0, migliore: 99, arene: [] };
+      const card = Object.assign(old, { name: t.name, gender: t.gender, team: t.team, traits: (t.traits || []).slice(0, 3), attr: Object.assign({}, t.attr), img: t.img && t.img.length <= IMG_MAX ? t.img : '' });
+      card.partite++; card.uccisioni += t.kills || 0; card.maxKills = Math.max(card.maxKills, t.kills || 0); card.migliore = Math.min(card.migliore, t.rank || 99);
+      if (SIM.winners.includes(t.id)) card.vittorie++;
+      if (theme && !card.arene.includes(theme)) card.arene = card.arene.concat([theme]).slice(-12);
+      card.ultima = Date.now();
+      p.album[t.id] = card;
+    });
+    const keys = Object.keys(p.album);
+    if (keys.length > ALBUM_MAX) keys.sort((a, b) => (p.album[a].ultima || 0) - (p.album[b].ultima || 0)).slice(0, keys.length - ALBUM_MAX).forEach((k) => delete p.album[k]);
+  }
+
+  /* ================= chiusura della partita: profilo, album, trofei ================= */
+  function contesto(run, SIM, extra) {
+    const g = run && run.gioco, by = Object.fromEntries(SIM.tributes.map((t) => [t.id, t]));
+    const m = g && g.mentore ? by[g.mentore] : null, W = SIM.winners.map((id) => by[id]);
+    const mortiGiorno = {}; SIM.phases.forEach((ph) => { if (ph.kind !== 'fallen') mortiGiorno[ph.day] = (mortiGiorno[ph.day] || 0) + ph.events.reduce((a, e) => a + e.deaths.length, 0); });
+    const pts = g ? g.puntate.filter((b) => b.esito === 'vinta' || b.esito === 'persa').slice().sort((a, b) => (a.fase || 0) - (b.fase || 0)) : [];
+    let serie = 0, cur = 0; pts.forEach((b) => { cur = b.esito === 'vinta' ? cur + 1 : 0; serie = Math.max(serie, cur); });
+    const mem = run && run.cfg && run.cfg.memoria;
+    const vendette = mem ? (mem.rivali || []).filter(([v, k]) => by[k] && (by[k].killerIds || []).includes(v)).length : 0;
+    return Object.assign({ SIM, g, m, W, mVince: !!(m && SIM.winners.includes(m.id)), mortiGiorno, morti1: mortiGiorno[1] || 0,
+      ordiniOk: g ? g.ordini.filter((o) => o.obeys).length : 0, ordiniKo: g ? g.ordini.filter((o) => o.obeys === false).length : 0,
+      vinte: pts.filter((b) => b.esito === 'vinta').length, serie, doni: g ? Object.values(g.doni) : [], voto: g && (g.regia || []).length && PT() ? PT().votoRegia(SIM) : null,
+      vendette, edizione: (run && run.cfg && run.cfg.edizione) || 1 }, extra || {});
+  }
+  // una volta sola per partita: restituisce i trofei appena sbloccati
+  function registra(run, SIM, extra) {
+    const pt = PT(); if (!pt || !run || !SIM) return [];
+    const key = 'b:' + String((run.gioco && run.gioco.inizio) || run.replayId || run.cfg.seed);
+    // le partite giocate le conta chiudiPartita (una volta sola); quelle solo guardate si contano qui
+    if (run.gioco) pt.chiudiPartita(run, SIM);
+    const p = pt.profilo();
+    p.registrate = p.registrate || [];
+    if (p.registrate.includes(key)) return [];
+    p.registrate = p.registrate.concat([key]).slice(-80);
+    if (!run.gioco) p.partite = (p.partite || 0) + 1;
+    p.arene = [...new Set((p.arene || []).concat([SIM.theme]))];
+    aggiornaAlbum(p, SIM, SIM.theme);
+    const c = contesto(run, SIM, extra);
+    p.trofei = p.trofei || {};
+    const nuovi = [];
+    // due giri: i trofei che contano altri trofei vedono anche quelli sbloccati adesso
+    for (let giro = 0; giro < 2; giro++) TROFEI.forEach((t) => { if (p.trofei[t.id]) return; let ok = false; try { ok = !!t.ok(c, p); } catch (e) { ok = false; } if (ok) { p.trofei[t.id] = Date.now(); nuovi.push(t); } });
+    pt.salvaProfilo(p);
+    return nuovi;
+  }
+
+  /* ================= la rivincita ================= */
+  // lo stesso cast torna: chi è sopravvissuto ha una cicatrice e un po' di esperienza, chi è stato eliminato vuole i suoi conti
+  function rivincita(cfg, SIM, TRAITS) {
+    const r = rngOf(SIM.seed + '|rivincita'), by = Object.fromEntries(SIM.tributes.map((t) => [t.id, t]));
+    const ATTRS = ['for', 'agi', 'int', 'car', 'fort', 'res', 'furt', 'cor', 'emp', 'sop'];
+    const segni = {}, rivali = [];
+    const cast = cfg.cast.map((c) => {
+      const t = by[c.id], n = JSON.parse(JSON.stringify(c)); if (!t) return n;
+      const traits = (n.traits || []).slice(), note = [];
+      const addTrait = (id) => { if (traits.length < 3 && !traits.includes(id) && (!TRAITS || TRAITS[id])) { traits.push(id); return true; } return false; };
+      if (t.alive) {
+        n.attr.res = clamp((n.attr.res || 5) + 1, 1, 10); note.push('+1 Resistenza (veterano)');
+        const a = ATTRS.filter((x) => x !== 'res')[Math.floor(r() * 9)]; n.attr[a] = clamp((n.attr[a] || 5) - 1, 1, 10); note.push('cicatrice: −1 ' + a);
+        if (SIM.winners.includes(t.id) && addTrait('sopravvissuto')) note.push('nuovo tratto: Sopravvissuto');
+      } else if ((t.killerIds || []).length) {
+        if (r() < 0.5 && addTrait('vendicativo')) note.push('nuovo tratto: Vendicativo');
+        t.killerIds.slice(0, 1).forEach((k) => { if (by[k]) rivali.push([t.id, k]); });
+      }
+      if (t.kills >= 3 && addTrait('spietato')) note.push('nuovo tratto: Spietato');
+      n.traits = traits; if (note.length) segni[t.id] = note;
+      return n;
+    });
+    // i legami: si tengono quelli di prima, si aggiungono le rivalità (chi è caduto contro chi l'ha eliminato) e le amicizie nate in gara
+    const rel = (cfg.initialRelations || []).slice(), pairOf = (a, b) => [a, b].sort().join('|'), taken = new Set(rel.map((x) => pairOf(x.from, x.to)));
+    const add = (from, to, type) => { const k = pairOf(from, to); if (from === to || taken.has(k) || rel.length >= 190) return; taken.add(k); rel.push({ from, to, type }); };
+    rivali.slice(0, 12).forEach(([v, k]) => add(v, k, 'rivalita'));
+    (SIM.stats.stories || []).forEach((s) => { if (s.k === 'amicizia') add(s.a, s.b, 'amicizia'); if (s.k === 'nemesi' || s.k === 'odio') add(s.a, s.b, 'rivalita'); });
+    const edizione = (cfg.edizione || 1) + 1;
+    return { cast, initialRelations: rel, memoria: { edizione, rivali, vincitore: SIM.winners[0] || null, segni, prima: (cfg.memoria && cfg.memoria.prima) || SIM.seed }, edizione };
+  }
+
+  /* ================= le interviste di fine partita ================= */
+  function intervista(SIM, id, ctx) {
+    const by = Object.fromEntries(SIM.tributes.map((t) => [t.id, t])), t = by[id]; if (!t) return [];
+    const r = rngOf(SIM.seed + '|int|' + id), pick = (a) => a[Math.floor(r() * a.length)], soft = !!ctx.soft, out = [];
+    const win = SIM.winners.includes(id), nm = (x) => esc(x.name);
+    const story = (SIM.stats.stories || []).find((s) => (s.a === id || s.b === id) && (s.k === 'amore' || s.k === 'amicizia' || s.k === 'nemesi' || s.k === 'tradimento'));
+    const other = story ? by[story.a === id ? story.b : story.a] : null;
+    const gifts = (ctx.doni || []).filter((d) => d.chi === id).length;
+    if (win) {
+      out.push({ q: 'Come ti senti?', a: pick(['Non ci credo ancora. Ho le mani che tremano.', 'Stanc' + suf(t) + '. Felice. E un po’ in colpa per essere qui.', 'Come se avessi corso per ' + SIM.days + ' giorni senza mai fermarmi.']) });
+      if (t.kills) out.push({ q: 'Hai eliminato ' + t.kills + (t.kills === 1 ? ' avversario' : ' avversari') + '. Rimpianti?', a: t.kills >= 3 ? pick(['Era loro o me. Ho scelto me.', 'Non li conto. Se li contassi, non dormirei.']) : pick(['Uno solo è già troppo. Ma non avevo scelta.', 'Ci penso ogni volta che chiudo gli occhi.']) });
+      else out.push({ q: 'Hai vinto senza eliminare nessuno. Come hai fatto?', a: pick(['Mi sono fatt' + suf(t) + ' piccol' + suf(t) + '. Ho aspettato. Ho lasciato che fossero gli altri a sbagliare.', 'Fortuna, e tanta pazienza.']) });
+    } else {
+      const killer = (t.killerIds || []).map((k) => by[k]).find(Boolean);
+      out.push({ q: 'Ci sei andat' + suf(t) + ' vicin' + suf(t) + '. Cosa è successo alla fine?', a: killer ? pick([(soft ? 'Mi ha battut' + suf(t) + ' ' : 'Mi ha pres' + suf(t) + ' ') + nm(killer) + '. Non l’ho visto arrivare.', nm(killer) + ' è stat' + suf(killer) + ' più veloce. Tutto qui.']) : pick(['L’arena. Non un avversario, l’arena.', 'Ero allo stremo. Il corpo ha deciso prima di me.']) });
+    }
+    if (other && story) {
+      const q = story.k === 'amore' ? 'E ' + nm(other) + '?' : story.k === 'amicizia' ? 'Cosa diresti a ' + nm(other) + ' adesso?' : 'E con ' + nm(other) + ' come la mettiamo?';
+      const a = story.k === 'amore' ? pick(['Senza di ' + (other.gender === 'F' ? 'lei' : other.gender === 'N' ? 'ləi' : 'lui') + ' non sarei qui. Punto.', 'Ci siamo promessi di uscire insieme. Una promessa è una promessa.']) : story.k === 'amicizia' ? pick(['Grazie. Mi hai coperto le spalle quando nessun altro lo faceva.', 'Che mi deve ancora una cena.']) : pick(['Non è finita. Non finisce mai, con certa gente.', 'Ci rivedremo. E la prossima volta sarò pront' + suf(t) + '.']);
+      out.push({ q, a });
+    }
+    if (ctx.mentore === id) out.push({ q: 'Un messaggio per il tuo mentore?', a: win ? pick(['Grazie. Anche per le volte che non ti ho ascoltato.', 'Ce l’abbiamo fatta. Insieme.']) : pick(['Scusa. Ho fatto di testa mia una volta di troppo.', 'Mi hai dato una possibilità. Non l’ho sprecata del tutto.']) });
+    else if (gifts) out.push({ q: 'Hai ricevuto ' + (gifts === 1 ? 'un dono' : gifts + ' doni') + ' dal pubblico.', a: pick(['A chi me l’ha mandato: ti devo la vita.', 'Quel pacco è arrivato nel momento giusto. Grazie, chiunque tu sia.']) });
+    return out.slice(0, 3);
+  }
+
+  G.LOS_BACHECA = { TROFEI, RARITA, rarita, registra, rivincita, intervista, contesto };
 })(typeof window !== 'undefined' ? window : globalThis);
 
 ;
@@ -26821,6 +27081,7 @@ window.LOS_BUILD = "039894cf100688a263efa1217ec9ec483e3f873a47588c542fac4ef29b46
     S.cast.forEach((t, i) => { if (!t.name.trim()) t.name = 'Concorrente ' + (i + 1); });
     S.settings.seed = seed || S.settings.seed || newSeed();
     const cfg = currentConfiguration();
+    if (startRun.memoria) { cfg.memoria = startRun.memoria; cfg.edizione = startRun.memoria.edizione; startRun.memoria = null; }
     preGame(cfg).then((pre) => { if (pre === false) return; if (pre) { runSim.pre = pre; if (pre.interviste.length) cfg.interviste = pre.interviste; } runSim(cfg); });
   }
   /* ---------- prima dei giochi: il concorrente da allenare e la sua intervista ---------- */
@@ -26989,7 +27250,7 @@ window.LOS_BUILD = "039894cf100688a263efa1217ec9ec483e3f873a47588c542fac4ef29b46
   }
   /* =============== TELECRONACA E PUBBLICO =============== */
   const TC = window.LOS_TELECRONACA;
-  const tcCtx = () => ({ BY, soft: !!resultTheme(SIM).soft, mentore: S.run && S.run.gioco ? S.run.gioco.mentore : null });
+  const tcCtx = () => ({ BY, soft: !!resultTheme(SIM).soft, mentore: S.run && S.run.gioco ? S.run.gioco.mentore : null, memoria: S.run && S.run.cfg ? S.run.cfg.memoria : null });
   function renderCast(i) {
     const box = $('#ptCast'); if (!box) return;
     if (!TC || !SIM) { box.hidden = true; return; }
@@ -27479,6 +27740,80 @@ window.LOS_BUILD = "039894cf100688a263efa1217ec9ec483e3f873a47588c542fac4ef29b46
     items.push([st.events, 'Eventi']);
     return '<div class="kstats">' + items.map(([v, l]) => '<div class="kstat"><b>' + v + '</b><span>' + l + '</span></div>').join('') + '</div>';
   }
+  /* =============== LA BACHECA: trofei, album, rivincita, interviste =============== */
+  const BC = window.LOS_BACHECA;
+  // all'esito: si registra la partita (una volta sola) e si tengono i trofei nuovi per i ridisegni successivi
+  function closeGame() {
+    if (!BC || !S.run || !SIM) return [];
+    const nuovi = BC.registra(S.run, SIM);
+    if (nuovi.length) { S.run.trofeiNuovi = (S.run.trofeiNuovi || []).concat(nuovi.map((t) => t.id)); save(); }
+    return (S.run.trofeiNuovi || []).map((id) => BC.TROFEI.find((t) => t.id === id)).filter(Boolean);
+  }
+  function trophyHTML(t, on, when) {
+    const hidden = t.segreto && !on;
+    return '<li class="tr' + (on ? ' on' : '') + (hidden ? ' secret' : '') + '" data-tr="' + esc(t.id) + '"><span class="tr-ic" aria-hidden="true"></span><span class="tr-tx"><b>' + (hidden ? 'Trofeo segreto' : esc(t.nome)) + '</b><small>' + (hidden ? 'Si scopre giocando.' : esc(t.desc)) + '</small>' +
+      (on && when ? '<em>' + new Date(when).toLocaleDateString('it-IT') + '</em>' : '') + '</span></li>';
+  }
+  function resultsExtraHTML(nuovi) {
+    if (!BC || !SIM) return '';
+    const theme = resultTheme(SIM), g = S.run && S.run.gioco, ctx = { soft: !!theme.soft, mentore: g && g.mentore, doni: g ? Object.values(g.doni) : [] };
+    // le interviste: chi ha vinto e chi è caduto per ultimo
+    const winner = SIM.winners[0], second = SIM.tributes.filter((t) => !t.alive).sort((a, b) => b.order - a.order)[0];
+    const iv = (id, label) => { const t = BY[id]; if (!t) return ''; const qa = BC.intervista(SIM, id, ctx); return qa.length ? '<article class="iv">' + avHTML(t, { dead: !t.alive }) + '<div class="iv-in"><span class="iv-k">' + esc(label) + '</span><h3>' + esc(t.name) + '</h3><dl>' + qa.map((x) => '<dt>' + x.q + '</dt><dd>«' + x.a + '»</dd>').join('') + '</dl></div></article>' : ''; };
+    const ivs = iv(winner, SIM.winners.length > 1 ? 'Tra chi ha vinto' : 'Chi ha vinto') + (second && second.id !== winner ? iv(second.id, theme.soft ? 'L’ultimo a uscire' : 'L’ultimo a cadere') : '');
+    const ed = S.run.cfg.edizione || 1;
+    return (nuovi.length ? '<section class="block card tr-new"><h2>Trofei sbloccati <span>' + nuovi.length + '</span></h2><ul class="trlist">' + nuovi.map((t) => trophyHTML(t, true)).join('') + '</ul><button class="btn sm" type="button" data-bacheca="trofei">Tutti i trofei</button></section>' : '') +
+      (ivs ? '<section class="block card ivbox"><h2>Le interviste</h2>' + ivs + '</section>' : '') +
+      '<section class="block card rematch"><h2>Rivincita' + (ed > 1 ? ' <span>edizione ' + (ed + 1) + '</span>' : '') + '</h2><p>Lo stesso cast torna nell’arena: chi è sopravvissuto porta una cicatrice e un po’ d’esperienza, chi è caduto torna con i conti in sospeso.</p><div class="row"><button class="btn primary" type="button" id="rRematch">Rivincita</button><button class="btn" type="button" data-bacheca="album">Album dei concorrenti</button></div></section>';
+  }
+  function startRematch() {
+    if (!BC || !SIM || !S.run) return;
+    const res = BC.rivincita(S.run.cfg, SIM, TRAITS);
+    S.cast = normalizeCast(res.cast); try { S.initialRelations = L.normalizeInitialRelations(res.initialRelations, S.cast); } catch (e) { S.initialRelations = L.normalizeInitialRelations(S.run.cfg.initialRelations || [], S.cast); } S.settings.seed = newSeed();
+    startRun.memoria = res.memoria; save();
+    const notes = Object.keys(res.memoria.segni).length;
+    toast('Edizione ' + res.edizione + ': ' + notes + ' concorrenti tornano cambiati, ' + res.memoria.rivali.length + ' conti in sospeso.');
+    startRun(S.settings.seed);
+  }
+  // la bacheca: trofei, album, record
+  let bcTab = 'trofei';
+  function openBacheca(tab) {
+    if (!BC || !PT) return;
+    bcTab = tab || bcTab; stopPlay(); renderBacheca();
+    const d = $('#bachecaDlg'); if (!d.open) d.showModal();
+  }
+  function renderBacheca() {
+    const p = PT.profilo(), tro = p.trofei || {}, album = Object.values(p.album || {});
+    $$('#bachecaDlg [data-bc]').forEach((b) => b.setAttribute('aria-selected', String(b.dataset.bc === bcTab)));
+    let h = '';
+    if (bcTab === 'trofei') {
+      const n = BC.TROFEI.filter((t) => tro[t.id]).length, cats = [...new Set(BC.TROFEI.map((t) => t.cat))];
+      h = '<p class="bc-count"><b>' + n + '</b> trofei su ' + BC.TROFEI.length + '</p>' + cats.map((c) => '<section class="bc-cat"><h3>' + esc(c) + '</h3><ul class="trlist">' + BC.TROFEI.filter((t) => t.cat === c).map((t) => trophyHTML(t, !!tro[t.id], tro[t.id])).join('') + '</ul></section>').join('');
+    } else if (bcTab === 'album') {
+      const order = { leggendaria: 0, epica: 1, rara: 2, comune: 3 };
+      const cards = album.map((x) => [x, BC.rarita(x)]).sort((a, b) => order[a[1].k] - order[b[1].k] || b[0].vittorie - a[0].vittorie || b[0].partite - a[0].partite);
+      h = cards.length ? '<p class="bc-count"><b>' + cards.length + '</b> carte · ' + cards.filter((c) => c[1].k !== 'comune').length + ' rare o meglio</p><ul class="album">' + cards.map(([x, r]) => {
+        const inCast = S.cast.some((t) => t.id === x.id);
+        return '<li class="acard r-' + r.k + '"><span class="ac-r">' + esc(r.nome) + '</span>' + avHTML(x) + '<b class="ac-n">' + esc(x.name) + '</b><span class="ac-st"><span><b>' + x.partite + '</b> ' + (x.partite === 1 ? 'partita' : 'partite') + '</span><span><b>' + x.vittorie + '</b> ' + (x.vittorie === 1 ? 'vittoria' : 'vittorie') + '</span><span><b>' + x.uccisioni + '</b> ' + (x.uccisioni === 1 ? 'eliminazione' : 'eliminazioni') + '</span></span>' +
+          '<span class="ac-best">Migliore: ' + (x.migliore === 1 ? 'vittoria' : x.migliore + 'º posto') + '</span><button type="button" class="btn sm" data-album-add="' + esc(x.id) + '"' + (inCast ? ' disabled' : '') + '>' + (inCast ? 'Già nel cast' : 'Porta nel cast') + '</button></li>';
+      }).join('') + '</ul>' : '<p class="help">L’album si riempie a ogni partita che arriva all’esito: ogni concorrente diventa una carta, e la carta diventa più rara con le vittorie.</p>';
+    } else {
+      const rows = [['Partite giocate', p.partite || 0], ['Crediti record', p.record || 0], ['Puntate vinte', (p.vinte || 0) + ' su ' + (p.puntate || 0)], ['Doni mandati', p.doni || 0], ['Ordini seguiti', (p.seguiti || 0) + ' su ' + (p.ordini || 0)], ['Allievi vincitori', p.mentoriVincenti || 0], ['Arene visitate', (p.arene || []).length + ' su ' + D.themes.length]];
+      h = '<dl class="bc-rec">' + rows.map(([k, v]) => '<div><dt>' + k + '</dt><dd>' + v + '</dd></div>').join('') + '</dl>';
+    }
+    $('#bachecaBody').innerHTML = h;
+  }
+  $('#bachecaDlg').addEventListener('click', (e) => {
+    const tab = e.target.closest('[data-bc]'); if (tab) { bcTab = tab.dataset.bc; renderBacheca(); return; }
+    const add = e.target.closest('[data-album-add]'); if (!add) return;
+    const x = (PT.profilo().album || {})[add.dataset.albumAdd]; if (!x || S.cast.some((t) => t.id === x.id)) return;
+    const t = sanitizeTribute({ id: x.id, name: x.name, gender: x.gender, team: x.team, traits: x.traits, attr: x.attr, img: x.img || '' }, S.cast.length);
+    if (!t) return; S.cast.push(t); save(); updateCounts(); renderBacheca(); toast(x.name + ' torna nel cast.');
+  });
+  document.addEventListener('click', (e) => { const b = e.target.closest('[data-bacheca]'); if (b) openBacheca(b.dataset.bacheca); });
+  $('#homeBacheca').addEventListener('click', () => openBacheca('trofei'));
+  if (BC && PT) $('#homeBacheca').hidden = false;
+
   // il riepilogo del giocatore: crediti, puntate, doni, il destino del concorrente allenato
   function playerSummaryHTML() {
     const g = S.run && S.run.gioco; if (!PT || !g || !SIM) return '';
@@ -27589,7 +27924,7 @@ window.LOS_BUILD = "039894cf100688a263efa1217ec9ec483e3f873a47588c542fac4ef29b46
 
     $('#resBody').innerHTML = hero +
       '<div class="resactions"><button class="btn" type="button" id="rArchive">Archivio partite</button><button class="btn primary lg" type="button" id="rAgain">Rigioca con un nuovo seme</button><button class="btn" type="button" id="rCopy">Copia il riepilogo</button><a class="btn" href="#diretta">Rivedi la diretta</a><a class="btn" href="#cast">Nuova partita</a><span class="help mono">seme ' + esc(SIM.seed) + '</span></div>' +
-      playerSummaryHTML() +
+      playerSummaryHTML() + resultsExtraHTML(closeGame()) +
       '<div class="resgrid"><div>' +
         (podium ? '<section class="block card"><h2>Il podio</h2>' + podium + '</section>' : '') +
         '<section class="block card"><h2>I premi della partita</h2>' + awardsH + '</section>' +
@@ -27602,6 +27937,7 @@ window.LOS_BUILD = "039894cf100688a263efa1217ec9ec483e3f873a47588c542fac4ef29b46
       '</div></div>';
     $('#rAgain').addEventListener('click', () => { const cfg = Object.assign({}, S.run.cfg, { seed: newSeed() }); delete cfg.seasonId; delete cfg.interventi; delete cfg.interviste; runSim(cfg); });
     $('#rArchive').addEventListener('click', openArchive);
+    if ($('#rRematch')) $('#rRematch').addEventListener('click', startRematch);
     $('#rCopy').addEventListener('click', () => copyText(summaryText(), 'Riepilogo copiato negli appunti.'));
     if (S.run && S.run.interattiva && !S.run.replayId) persistRun(S.run, SIM);
     if (typeof studio !== 'undefined' && studio) studio.renderResults();
