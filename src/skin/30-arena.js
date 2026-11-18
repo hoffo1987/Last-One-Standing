@@ -27,7 +27,8 @@
   function swapLayer(box, n, animate) {
     settle(box); box.appendChild(n);
     if (!animate) return settle(box);
-    const x = play(n, [{ clipPath: 'polygon(100% 0, 100% 0, 100% 100%, 100% 100%)' }, { clipPath: 'polygon(-30% 0, 100% 0, 100% 100%, 0 100%)' }], { duration: 380, easing: E.out });
+    // dissolvenza con un breve scivolamento: niente tagli a metà, che a schermo sembravano un errore
+    const x = play(n, [{ opacity: 0, transform: 'translateX(18px)' }, { opacity: 1, transform: 'none' }], { duration: 260, easing: E.out });
     if (!x) return settle(box);
     x.onfinish = () => settle(box);
   }
@@ -76,7 +77,7 @@
 
     if (go) {
       play(num, [{ transform: 'translateX(-40%)', opacity: 0 }, { transform: 'none', opacity: 1 }], { duration: 240, easing: E.out });
-      play(title, [{ clipPath: 'inset(0 100% 0 0)', transform: 'translateX(-24px)' }, { clipPath: 'inset(-20px -20px -20px 0)', transform: 'none' }], { duration: 300, delay: 40, easing: E.out });
+      play(title, [{ opacity: 0, transform: 'translateX(-16px)' }, { opacity: 1, transform: 'none' }], { duration: 240, delay: 40, easing: E.out });
       play(tag, [{ opacity: 0, transform: 'translateX(-14px)' }, { opacity: 1, transform: 'none' }], { duration: 260, delay: 90, easing: E.out });
       play(q('.ar-stats'), [{ opacity: 0, transform: 'translateY(10px)' }, { opacity: 1, transform: 'none' }], { duration: 260, delay: 130, easing: E.out });
       // rete di sicurezza: se le animazioni non arrivano in fondo (scheda in secondo piano), lo stato finale si impone lo stesso

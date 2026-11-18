@@ -53,6 +53,9 @@ function assetsFor(uri) {
     else if (web && (m = f.match(/^fondale-([\w-]+)\.webp$/))) fx.fondali[m[1]] = u();
     else if (web && (m = f.match(/^volto-([mfn]-\d+)\.webp$/))) fx.volti[m[1]] = u();
   });
+  // dove stanno gli occhi nei volti di riserva (frazione dell'altezza), misurato a mano in assets/fx/volti.json
+  fx.occhiY = {};
+  try { const vj = JSON.parse(fs.readFileSync(path.join(A, 'fx', 'volti.json'), 'utf8')); Object.keys(vj).forEach((k) => { if (vj[k] && typeof vj[k].occhi === 'number') fx.occhiY[k.replace(/^volto-/, '')] = vj[k].occhi; }); } catch (e) { /* senza file si usa la stima */ }
   if (web && fs.existsSync(path.join(A, 'vincitori'))) fs.readdirSync(path.join(A, 'vincitori')).sort().forEach((f) => {
     const m = f.match(/^vincitore-([mfn]-\d+)\.webp$/); if (m) fx.vincitori[m[1]] = uri('vincitori/' + f, 'image/webp');
   });
