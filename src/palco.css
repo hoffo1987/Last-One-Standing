@@ -233,6 +233,12 @@ h2.sec { text-transform: uppercase; font-stretch: 114%; letter-spacing: -.02em; 
 .pb-crack { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; pointer-events: none; }
 .pb-crack polyline { fill: none; stroke: var(--paper); stroke-width: 1.6; stroke-linejoin: bevel; stroke-dasharray: 1; stroke-dashoffset: 1; opacity: .45; }
 .pb-crack polyline.c2 { stroke: var(--key); stroke-width: 3.2; opacity: .85; }
+/* crepe dipinte (palco.js, solo con la maschera della crepa): prendono il posto delle due spezzate spesse, dentro la
+   fascia e sotto il titolo; chiuse finché non parte la loro finestra, poi si aprono dal centro verso i bordi */
+.pb-crepe { position: absolute; inset: 0; overflow: hidden; pointer-events: none; }
+.pb-crepa { position: absolute; top: 50%; aspect-ratio: 4 / 1; background: var(--key); opacity: .68; transform: translate(-50%, -50%) rotate(var(--rot, 0deg)); clip-path: inset(0 50% 0 50%);
+  -webkit-mask: var(--fx-crepa) center / 100% 100% no-repeat; mask: var(--fx-crepa) center / 100% 100% no-repeat; }
+.pb-crepa.b { background: var(--paper); opacity: .34; }
 .fx-forme .pb-splat { display: block; left: 50%; top: 50%; height: 124%; aspect-ratio: 1000 / 906; background: var(--key); transform: translate(-50%, -50%) scale(.2);
   -webkit-mask: var(--fx-impatto) center / contain no-repeat; mask: var(--fx-impatto) center / contain no-repeat; }
 /* scontro finale */
@@ -242,6 +248,11 @@ h2.sec { text-transform: uppercase; font-stretch: 114%; letter-spacing: -.02em; 
 /* eliminazione */
 .fx-pen .pb-brush { display: block; left: 50%; top: 50%; width: 150%; height: 40%; z-index: 2; background: linear-gradient(90deg, #8f1118, var(--kill) 62%); transform: translate(-50%, -50%) rotate(var(--ang));
   -webkit-mask: var(--fx-pen4) center / 100% 100% no-repeat; mask: var(--fx-pen4) center / 100% 100% no-repeat; }
+/* con la maschera del fendente la pennellata lungo il taglio è un colpo asciutto con gli schizzi in testa: la testa sta
+   dal lato da cui la lama entra (il disegno è specchiato), il ritaglio animato da palco.js resta sullo strato esterno */
+.fx-fendente .pb-brush { display: block; left: 50%; top: 50%; width: 132%; height: 150%; z-index: 2; background: none; -webkit-mask: none; mask: none; transform: translate(-50%, -50%) rotate(var(--ang)); }
+.fx-fendente .pb-brush::before { content: ""; position: absolute; inset: 0; background: linear-gradient(90deg, var(--kill) 48%, #8f1118); transform: scaleX(-1);
+  -webkit-mask: var(--fx-fendente) center / 100% 100% no-repeat; mask: var(--fx-fendente) center / 100% 100% no-repeat; }
 .pb-rays { position: absolute; left: 50%; top: 50%; width: 175%; aspect-ratio: 1; transform: translate(-50%, -50%); overflow: visible; z-index: 2; pointer-events: none; }
 .pb-rays polygon { opacity: 0; }
 .pb-ul { position: absolute; left: 0; bottom: -9px; width: 58%; height: 5px; background: var(--key); transform: scaleX(0); transform-origin: 0 50%; }

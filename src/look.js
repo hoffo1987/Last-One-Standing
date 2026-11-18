@@ -269,6 +269,8 @@
   const cssUrl = (u) => 'url("' + u + '")';
   function setupMasks() {
     const F = FXA.forme || {}, names = ['stella', 'freccia', 'fulmine', 'strappo', 'fascia'];
+    // fendente e crepa sono facoltative: ognuna accende la sua classe solo se c'è, altrimenti resta il disegno procedurale
+    ['fendente', 'crepa'].forEach((n) => { if (maskOk(F[n])) { root.style.setProperty('--fx-' + n, cssUrl(F[n])); root.classList.add('fx-' + n); } });
     const all = names.map((n) => F[n]).concat([FXA.impatto, FXA.mezzitoni]);
     if (!all.every(maskOk)) return;
     names.forEach((n) => root.style.setProperty('--fx-' + n, cssUrl(F[n])));

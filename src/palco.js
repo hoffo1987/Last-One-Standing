@@ -209,7 +209,19 @@
     deco(() => {
       const svg = b.querySelector('.pb-crack'), bw = band.offsetWidth || 1200, bh = band.offsetHeight || 400, cx = R(0.36, 0.64) * bw;
       svg.setAttribute('viewBox', '0 0 ' + bw + ' ' + bh);
+      // con la maschera della crepa le due spezzate spesse (la prima e la quarta) diventano crepe dipinte: una larga quasi
+      // in piano, una più corta di traverso, dallo stesso centro e nella stessa finestra della spezzata che sostituiscono
+      const painted = document.documentElement.classList.contains('fx-crepa') ? h('i', 'pb-crepe') : null;
+      if (painted) band.insertBefore(painted, svg);
       for (let i = 0; i < 5; i++) {
+        if (painted && i % 3 === 0) {
+          const c = h('i', 'pb-crepa' + (i ? ' b' : ''));
+          c.style.left = cx.toFixed(1) + 'px'; c.style.width = Math.min(bw * (i ? 0.6 : 0.9), bh * (i ? 1.9 : 2.9)).toFixed(0) + 'px';
+          c.style.setProperty('--rot', (i ? R(52, 70) * (Math.random() < 0.5 ? -1 : 1) : R(-9, 9) + (Math.random() < 0.5 ? 180 : 0)).toFixed(1) + 'deg');
+          painted.appendChild(c);
+          anim(c, [{ clipPath: 'inset(0 50% 0 50%)' }, { clipPath: 'inset(0 0 0 0)' }], { duration: 520 - i * 40, delay: 280 + i * 40, easing: E.out });
+          continue;
+        }
         const up = i % 2 ? 1 : -1, pt = [[cx, bh / 2]]; let x = cx, y = bh / 2;
         while (y > -8 && y < bh + 8) { x += R(-0.05, 0.05) * bw + (i - 2) * 0.016 * bw; y += up * R(0.08, 0.17) * bh; pt.push([x, y]); }
         const p = document.createElementNS(NS, 'polyline');

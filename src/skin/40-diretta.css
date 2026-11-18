@@ -515,6 +515,14 @@
 #v-diretta .dx-fx-kill .k-ghost { height: 20px; margin-top: -10px; background: linear-gradient(90deg, transparent, hsl(358 75% 59% / .55) 35%, hsl(358 75% 59% / .55)); animation-name: dxCutGhost; }
 @keyframes dxCut { 0% { opacity: 1; transform: rotate(var(--a)) scaleX(0); } 42%, 70% { opacity: 1; transform: rotate(var(--a)) scaleX(1); } 100% { opacity: 0; transform: rotate(var(--a)) scaleX(1) scaleY(.2); } }
 @keyframes dxCutGhost { 0% { opacity: 0; transform: rotate(var(--a)) scaleX(0); } 55% { opacity: .85; transform: rotate(var(--a)) scaleX(1); } 100% { opacity: 0; transform: rotate(var(--a)) scaleX(1) scaleY(2.6); } }
+/* con la maschera del fendente la scia non è più una fascia sfumata ma un colpo di pennello asciutto: si dipinge da
+ * destra nella stessa finestra del taglio (stesso ritardo, stessa durata, stesse tappe 0 · 55 · 100 della scia) e
+ * svanisce con lei. La testa della pennellata sta a destra, da dove parte la lama (per questo il disegno è specchiato);
+ * resta semitrasparente, così il testo sotto si legge a ogni fotogramma. */
+.fx-fendente #v-diretta .dx-fx-kill .k-ghost { height: 50px; margin-top: -25px; background: none; animation-name: dxCutBrush; }
+.fx-fendente #v-diretta .dx-fx-kill .k-ghost::before { content: ""; position: absolute; inset: 0; background: linear-gradient(90deg, #c8302c, #e5484d 55%); transform: scaleX(-1);
+  -webkit-mask: var(--fx-fendente) center / 100% 100% no-repeat; mask: var(--fx-fendente) center / 100% 100% no-repeat; }
+@keyframes dxCutBrush { 0% { opacity: .62; transform: rotate(var(--a)); clip-path: inset(-30% 0 -30% 100%); } 55% { opacity: .62; transform: rotate(var(--a)); clip-path: inset(-30% 0 -30% 0); } 100% { opacity: 0; transform: rotate(var(--a)) scaleY(1.35); clip-path: inset(-30% 0 -30% 0); } }
 #v-diretta .dx-fx-kill .k-frame { left: 0; top: 0; bottom: 0; width: calc(var(--sp) + 5px); background: var(--dx-paper); mix-blend-mode: difference; clip-path: polygon(0 0, 100% 0, calc(100% - var(--k)) 100%, 0 100%);
   animation: dxImpact .32s steps(2, end) both; animation-delay: calc(var(--d, 0ms) + 300ms); }
 @keyframes dxImpact { from { opacity: 1; } to { opacity: 0; } }
@@ -530,6 +538,13 @@
 @keyframes dxDrain { from { filter: grayscale(0) contrast(1) brightness(1.12); } }
 #v-diretta .ev.in.fx-kill .avs .av.dead::after { animation: dxScar .46s var(--look-out) both; animation-delay: calc(var(--d, 0ms) + 300ms); }
 @keyframes dxScar { from { clip-path: inset(0 0 100% 0); } to { clip-path: inset(0 0 0 0); } }
+/* con la maschera della crepa il segno rosso su chi è caduto è una crepa dipinta lungo la stessa diagonale del volto
+ * (misurata sul volto stesso, che è un contenitore), sotto la targhetta delle iniziali. Sul colpo si apre nel verso
+ * della crepa, negli stessi 460 ms e con lo stesso ritardo del taglio di prima. */
+.fx-crepa #v-diretta .ev .avs .av.dead::after { inset: auto; left: 50%; top: 50%; width: calc(100cqw + 100cqh); height: 46cqh; z-index: 0; background: #e5484d;
+  -webkit-mask: var(--fx-crepa) center / 100% 100% no-repeat; mask: var(--fx-crepa) center / 100% 100% no-repeat;
+  transform: translate(-50%, -50%) rotate(-42deg); transform: translate(-50%, -50%) rotate(calc(-1 * atan2(100cqh, 100cqw))); }
+@media (prefers-reduced-motion: no-preference) { .fx-crepa #v-diretta .ev.in.fx-kill .avs .av.dead::after { animation-name: dxScarBar; } }
 /* il primo nome della riga viene passato con l'evidenziatore, nel tempo del taglio: il colore del testo non cambia mai */
 #v-diretta .ev.in.fx-kill p > .nm:first-of-type { background: linear-gradient(color-mix(in srgb, var(--cc) 36%, transparent), color-mix(in srgb, var(--cc) 36%, transparent)) 0 0 / 0 100% no-repeat; animation: dxMark .55s var(--look-out) both; animation-delay: calc(var(--d, 0ms) + 200ms); }
 @keyframes dxMark { 0% { background-size: 0 100%; background-position: 0 0; } 45% { background-size: 100% 100%; background-position: 0 0; } 55% { background-size: 100% 100%; background-position: 100% 0; } 100% { background-size: 0 100%; background-position: 100% 0; } }
@@ -609,6 +624,9 @@
 #v-diretta .memorial.rise .mem .av.dead > * { animation: dxDrain .7s linear both; animation-delay: var(--md); }
 #v-diretta .memorial.rise .mem .av.dead::after { animation: dxScarBar .7s var(--look-out) both; animation-delay: var(--md); }
 @keyframes dxScarBar { from { clip-path: inset(0 100% 0 0); } to { clip-path: inset(0 0 0 0); } }
+/* la stessa crepa dipinta sui volti dei caduti, al posto della barra: si apre con la stessa animazione di prima */
+.fx-crepa #v-diretta .mem .av.dead::after { left: -8%; right: -8%; top: calc(50% - 21px); height: 42px;
+  -webkit-mask: var(--fx-crepa) center / 100% 100% no-repeat; mask: var(--fx-crepa) center / 100% 100% no-repeat; transform: rotate(-20deg); }
 #v-diretta .memorial.rise .mem::after { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 34%; pointer-events: none; background: linear-gradient(180deg, transparent, hsl(0 0% 100% / .22) 60%, hsl(0 0% 100% / .46) 96%, transparent);
   animation: dxMemSweep .7s var(--look-out) both; animation-delay: var(--md); }
 @keyframes dxMemSweep { from { transform: translateY(-110%); } to { transform: translateY(330%); } }
