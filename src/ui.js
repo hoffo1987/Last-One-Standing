@@ -405,7 +405,7 @@
           const custom = d.run.cfg.custom == null ? [] : normalizeCustoms(d.run.cfg.custom);
           if (d.run.replayId != null && !validId(d.run.replayId)) throw new Error('Riferimento alla partita non valido.');
           const initialRelations = L.normalizeInitialRelations(d.run.cfg.initialRelations, cast);
-          if (cast.length >= 2) next.run = Object.assign({}, d.run, { cfg: Object.assign({}, d.run.cfg, { cast, custom, initialRelations }) }, typeof PT !== 'undefined' && PT ? { gioco: PT.sano(d.run.gioco) } : {});
+          if (cast.length >= 2) next.run = Object.assign({}, d.run, { cfg: Object.assign({}, d.run.cfg, { cast, custom, initialRelations }) }, typeof PT !== 'undefined' && PT ? { gioco: PT.sano(d.run.gioco) } : {}, { ospite: undefined });
         } catch (e) { warnings.push('La partita salvata contiene dati non validi e non è stata ripresa.'); }
       }
       Object.assign(S, next);

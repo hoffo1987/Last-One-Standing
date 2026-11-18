@@ -76,10 +76,12 @@
     }
 
     if (go) {
-      play(num, [{ transform: 'translateX(-40%)', opacity: 0 }, { transform: 'none', opacity: 1 }], { duration: 240, easing: E.out });
-      play(title, [{ opacity: 0, transform: 'translateX(-16px)' }, { opacity: 1, transform: 'none' }], { duration: 240, delay: 40, easing: E.out });
-      play(tag, [{ opacity: 0, transform: 'translateX(-14px)' }, { opacity: 1, transform: 'none' }], { duration: 260, delay: 90, easing: E.out });
-      play(q('.ar-stats'), [{ opacity: 0, transform: 'translateY(10px)' }, { opacity: 1, transform: 'none' }], { duration: 260, delay: 130, easing: E.out });
+      // il numero cade come un timbro, il nome si scopre da sinistra, le targhe salgono una dopo l'altra
+      // (solo translate / scale / rotate / opacity: le inclinazioni proprie degli elementi restano)
+      play(num, [{ translate: '-30% 0', scale: '1.5', rotate: '-8deg', opacity: 0 }, { opacity: 1, offset: 0.4 }, { translate: '0 0', scale: '1', rotate: '0deg', opacity: 1 }], { duration: 300, easing: E.kick });
+      play(title, [{ opacity: 0, translate: '-26px 0', clipPath: 'inset(0 100% 0 0)' }, { opacity: 1, offset: 0.3 }, { opacity: 1, translate: '0 0', clipPath: 'inset(0 -8% 0 0)' }], { duration: 280, delay: 40, easing: E.out });
+      play(tag, [{ opacity: 0, translate: '-18px 0' }, { opacity: 1, translate: '0 0' }], { duration: 260, delay: 100, easing: E.out });
+      [...q('.ar-stats').children].forEach((s, k) => play(s, [{ opacity: 0, translate: '0 14px' }, { opacity: 1, offset: 0.5 }, { opacity: 1, translate: '0 0' }], { duration: 260, delay: 130 + k * 34, easing: E.out }));
       // rete di sicurezza: se le animazioni non arrivano in fondo (scheda in secondo piano), lo stato finale si impone lo stesso
       tidy = setTimeout(() => { if (my === gen) { halt(); boxes().forEach(settle); } }, 900);
     }

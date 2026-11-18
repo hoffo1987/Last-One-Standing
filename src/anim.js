@@ -453,7 +453,8 @@
   function wipe(swap, opt) {
     opt = opt || {};
     const body = document.body;
-    if (reduced || wiping || !body || typeof body.animate !== 'function') { swap(); return; }
+    // pagina nascosta: le animazioni resterebbero ferme, quindi si cambia subito
+    if (reduced || wiping || !body || typeof body.animate !== 'function' || document.hidden) { swap(); return; }
     wiping = true;
     if (!wipeEl || !wipeEl.isConnected) {
       wipeEl = document.createElement('div'); wipeEl.className = 'stacco'; wipeEl.setAttribute('aria-hidden', 'true');
@@ -470,8 +471,12 @@
     // con le pennellate l'inclinazione è più lieve: la forma del colpo di pennello dà già il movimento
     const sk = PENS.length >= 4 ? ' skewX(-8deg)' : ' skewX(-16deg)', jit = () => Math.round(R(-12, 12));
     const slide = (n, from, to, o) => n.animate([{ transform: 'translateX(' + from + ')' + sk }, { transform: 'translateX(' + to + ')' + sk }], o);
-    let swapped = false;
+    let swapped = false, closed = false;
     const doSwap = () => { if (swapped) return; swapped = true; try { swap(); } catch (e) { setTimeout(() => { throw e; }); } };
+    // rete di sicurezza: la pagina cambia comunque entro 420 ms e la copertura sparisce entro 1,2 s, anche se le
+    // animazioni non avanzano (scheda o pannello nascosti); `swap` resta chiamata una volta sola
+    const close = () => { if (closed) return; closed = true; clearTimeout(tSwap); clearTimeout(tClose); doSwap(); el.hidden = true; wiping = false; [a, b, c, mark, sealEl].forEach((n) => n.getAnimations().forEach((x) => x.cancel())); };
+    const tSwap = setTimeout(doSwap, 420), tClose = setTimeout(close, 1200);
     // con le pennellate entra prima il colpo di pennello e per ultima la lastra piena, che garantisce la copertura;
     // in uscita la lastra va via per prima e la pagina si scopre dietro il bordo dipinto
     const P4 = PENS.length >= 4;
@@ -481,14 +486,14 @@
     Promise.all(cover.map((x) => x.finished))
       .then(() => new Promise((res) => setTimeout(res, opt.hold || 90)))
       .then(() => {
-        doSwap();
+        doSwap(); if (closed) return null;
         mark.animate([{ opacity: 1, transform: 'translate(-50%, -50%) rotate(-7deg) scale(1)' }, { opacity: 0, transform: 'translate(-20%, -50%) rotate(-7deg) scale(1)' }], { duration: 180, easing: EASE_CUT, fill: 'both' });
         if (ws) sealEl.animate([{ opacity: 1, transform: 'translate(-50%, -50%) rotate(-10deg) scale(1)' }, { opacity: 0, transform: 'translate(-30%, -50%) rotate(-4deg) scale(1)' }], { duration: 180, easing: EASE_CUT, fill: 'both' });
         const out = (P4 ? [[a, 0], [c, 30], [b, 70]] : [[c, 0], [b, 40], [a, 85]]).map(([n, d]) => slide(n, '0', '230vw', { duration: 320, delay: Math.max(0, d + jit()), easing: EASE_OUT, fill: 'both' }));
         return Promise.all(out.map((x) => x.finished));
       })
       .catch(() => {})
-      .then(() => { doSwap(); el.hidden = true; wiping = false; [a, b, c, mark, sealEl].forEach((n) => n.getAnimations().forEach((x) => x.cancel())); });
+      .then(close);
   }
   // un cartello sopra la scena della diretta: arriva, resta fermo il tempo di leggerlo, se ne va (la regia è nel CSS)
   function card(host, html, cls, dur) {

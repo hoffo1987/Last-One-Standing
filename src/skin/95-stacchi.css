@@ -1,0 +1,75 @@
+/* ================= PELLE · STACCHI SECONDARI =================
+ * Tutte le transizioni «minori» parlano la stessa lingua degli stacchi di sezione (regia.js): si entra veloci e si
+ * frena, si esce accelerando, bordi in diagonale, tinta dell'arena, mai più di 350 ms. Qui stanno: la spia «in onda»
+ * dello stacco verso la Diretta, l'apertura e la chiusura dei dialoghi, le notifiche, il cambio di fase e di filtro
+ * nella Diretta, i cambi di scheda nei dialoghi e il cambio di vista dei Concorrenti. Le classi .st-* le mette
+ * 95-stacchi.js. Si animano solo transform, translate, scale, opacity e clip-path. A riposo niente copre il testo;
+ * con il movimento ridotto non parte niente (in fondo al file). */
+
+/* ---------- stacco verso la Diretta: la spia «in onda» sopra il cartello ---------- */
+.lx-live { position: absolute; left: -.6em; bottom: calc(100% + 10px); display: inline-flex; align-items: center; gap: .55em; padding: .36em .95em .34em .75em;
+  font: normal 900 clamp(11px, 1.5vw, 17px) / 1 var(--f-body); letter-spacing: .26em; text-transform: uppercase; white-space: nowrap;
+  color: #f7f5f0; background: #d42b33; box-shadow: .3em .3em 0 #0a0a0c; transform: skewX(-12deg); }
+.lx-live i { width: .72em; height: .72em; border-radius: 50%; background: #f7f5f0; }
+/* il cartello dell'Esito è un timbro: la lastra ha un secondo bordo nella tinta */
+.lx-cap.lx-verdetto .lx-slab { box-shadow: .09em .09em 0 #0a0a0c, .2em .2em 0 var(--lx-key); }
+
+/* ---------- dialoghi: la lastra si apre da un taglio in diagonale, il contenuto la segue a strati ---------- */
+.modal[open] { animation: stModal .32s var(--look-out) both; }
+@keyframes stModal {
+  from { transform: translateX(54px) skewX(-7deg) scale(.95); clip-path: polygon(0 0, 16% 0, 16% 22px, 0 100%, 0 100%, 0 calc(100% - 22px)); }
+  45% { clip-path: polygon(0 0, calc(100% - 22px) 0, 100% 22px, 100% 100%, 22px 100%, 0 calc(100% - 22px)); }
+  72% { transform: translateX(-5px) skewX(.8deg) scale(1); }
+}
+dialog[open]::backdrop { animation: stVeil .3s var(--look-out) both; }
+@keyframes stVeil { from { opacity: .35; clip-path: polygon(0 0, 0 0, -34% 100%, -34% 100%); } to { opacity: 1; clip-path: polygon(0 0, 134% 0, 100% 100%, -34% 100%); } }
+/* il contenuto: solo all'apertura (classe messa da 95-stacchi.js), così ciò che viene ridisegnato dopo resta fermo */
+.modal.st-opening .dh h2, .modal.st-opening .db > .row.between:first-child > h2 { animation: stSlideX .34s var(--look-out) 70ms backwards; }
+.modal.st-opening .db > * { animation: stRise .32s var(--look-out) backwards; animation-delay: 110ms; }
+.modal.st-opening .db > :nth-child(2) { animation-delay: 140ms; }
+.modal.st-opening .db > :nth-child(3) { animation-delay: 170ms; }
+.modal.st-opening .db > :nth-child(4) { animation-delay: 200ms; }
+.modal.st-opening .db > :nth-child(5) { animation-delay: 225ms; }
+.modal.st-opening .db > :nth-child(n+6) { animation-delay: 250ms; }
+@keyframes stRise { from { opacity: 0; translate: 0 18px; } 45% { opacity: 1; } }
+@keyframes stSlideX { from { opacity: 0; translate: -30px 0; } 45% { opacity: 1; } }
+
+/* chiusura: una lastra vuota con la sagoma del dialogo se ne va di taglio mentre il velo si ritira */
+.st-veil { position: fixed; inset: 0; z-index: 9989; pointer-events: none; background-color: hsl(0 0% 0% / .74);
+  background-image: radial-gradient(circle, hsl(var(--h) 92% 54% / .22) 1.3px, transparent 1.6px); background-size: 14px 14px; }
+.st-ghost { position: fixed; z-index: 9990; pointer-events: none; background: var(--panel-solid, var(--panel)); overflow: hidden; }
+.st-ghost::before { content: ""; position: absolute; left: 0; right: 0; top: 0; height: var(--dh, 0px); background: var(--void); box-shadow: 0 4px 0 var(--key); }
+.st-ghost::after { content: ""; position: absolute; inset: 0; background: repeating-linear-gradient(-60deg, transparent 0 26px, color-mix(in srgb, var(--key) 16%, transparent) 26px 30px); }
+.st-g-modal { clip-path: polygon(0 0, calc(100% - 22px) 0, 100% 22px, 100% 100%, 22px 100%, 0 calc(100% - 22px)); box-shadow: inset 0 0 0 3px var(--key); }
+.st-g-drawer { overflow: visible; box-shadow: -10px 0 0 var(--key); }
+
+/* ---------- notifiche: la fascia entra di taglio ed esce dall'altra parte ---------- */
+.toast.st-out { pointer-events: none; }
+
+/* ---------- Diretta: il cambio di fase è una lama che attraversa il banner ---------- */
+.broadcast > .st-ph { position: absolute; inset: 0; z-index: 5; pointer-events: none; overflow: hidden; border-radius: inherit; }
+.st-ph i { position: absolute; top: -30%; bottom: -30%; left: 0; width: 26%; background: var(--key); will-change: transform; }
+.st-ph i + i { width: 5%; background: var(--paper); }
+.st-ph i + i + i { width: 2%; background: var(--void); }
+
+/* ---------- cambi di scheda nei dialoghi (festa) e di vista (Concorrenti): il contenuto entra dal lato giusto ---------- */
+.st-swap > * { animation: stPlane .3s var(--look-out) backwards; }
+.st-swap > :nth-child(2) { animation-delay: 26ms; }
+.st-swap > :nth-child(3) { animation-delay: 52ms; }
+.st-swap > :nth-child(4) { animation-delay: 78ms; }
+.st-swap > :nth-child(5) { animation-delay: 104ms; }
+.st-swap > :nth-child(n+6) { animation-delay: 130ms; }
+@keyframes stPlane { from { opacity: 0; translate: calc(var(--st-dir, 1) * 34px) 0; } 40% { opacity: 1; } }
+.fs-tabs button[aria-selected="true"]::before, .stabs [aria-selected="true"]::before { animation: stTab .24s var(--ease-kick); }
+@keyframes stTab { from { scale: 1.14 1.28; } }
+
+/* ---------- movimento ridotto ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .modal[open], dialog[open]::backdrop, .modal.st-opening .dh h2, .modal.st-opening .db > *, .modal.st-opening .db > .row.between:first-child > h2, .st-swap > *,
+  .fs-tabs button[aria-selected="true"]::before, .stabs [aria-selected="true"]::before { animation: none; }
+  .st-veil, .st-ghost, .broadcast > .st-ph { display: none; }
+}
+[data-reduced-motion] .modal[open], [data-reduced-motion] dialog[open]::backdrop, [data-reduced-motion] .modal.st-opening .dh h2, [data-reduced-motion] .modal.st-opening .db > *,
+[data-reduced-motion] .modal.st-opening .db > .row.between:first-child > h2, [data-reduced-motion] .st-swap > *,
+[data-reduced-motion] .fs-tabs button[aria-selected="true"]::before, [data-reduced-motion] .stabs [aria-selected="true"]::before { animation: none; }
+[data-reduced-motion] .st-veil, [data-reduced-motion] .st-ghost, [data-reduced-motion] .broadcast > .st-ph { display: none; }

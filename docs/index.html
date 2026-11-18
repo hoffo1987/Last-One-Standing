@@ -7095,6 +7095,82 @@ dialog[open]::backdrop { animation: cmVeil .3s ease both; }
 /* ---------- movimento ridotto ---------- */
 @media (prefers-reduced-motion: reduce) { .modal[open], .drawer[open], dialog[open]::backdrop, .foot::before { animation: none; } }
 [data-reduced-motion] .modal[open], [data-reduced-motion] .drawer[open], [data-reduced-motion] dialog[open]::backdrop, [data-reduced-motion] .foot::before { animation: none; }
+
+/* ================= PELLE · STACCHI SECONDARI =================
+ * Tutte le transizioni «minori» parlano la stessa lingua degli stacchi di sezione (regia.js): si entra veloci e si
+ * frena, si esce accelerando, bordi in diagonale, tinta dell'arena, mai più di 350 ms. Qui stanno: la spia «in onda»
+ * dello stacco verso la Diretta, l'apertura e la chiusura dei dialoghi, le notifiche, il cambio di fase e di filtro
+ * nella Diretta, i cambi di scheda nei dialoghi e il cambio di vista dei Concorrenti. Le classi .st-* le mette
+ * 95-stacchi.js. Si animano solo transform, translate, scale, opacity e clip-path. A riposo niente copre il testo;
+ * con il movimento ridotto non parte niente (in fondo al file). */
+
+/* ---------- stacco verso la Diretta: la spia «in onda» sopra il cartello ---------- */
+.lx-live { position: absolute; left: -.6em; bottom: calc(100% + 10px); display: inline-flex; align-items: center; gap: .55em; padding: .36em .95em .34em .75em;
+  font: normal 900 clamp(11px, 1.5vw, 17px) / 1 var(--f-body); letter-spacing: .26em; text-transform: uppercase; white-space: nowrap;
+  color: #f7f5f0; background: #d42b33; box-shadow: .3em .3em 0 #0a0a0c; transform: skewX(-12deg); }
+.lx-live i { width: .72em; height: .72em; border-radius: 50%; background: #f7f5f0; }
+/* il cartello dell'Esito è un timbro: la lastra ha un secondo bordo nella tinta */
+.lx-cap.lx-verdetto .lx-slab { box-shadow: .09em .09em 0 #0a0a0c, .2em .2em 0 var(--lx-key); }
+
+/* ---------- dialoghi: la lastra si apre da un taglio in diagonale, il contenuto la segue a strati ---------- */
+.modal[open] { animation: stModal .32s var(--look-out) both; }
+@keyframes stModal {
+  from { transform: translateX(54px) skewX(-7deg) scale(.95); clip-path: polygon(0 0, 16% 0, 16% 22px, 0 100%, 0 100%, 0 calc(100% - 22px)); }
+  45% { clip-path: polygon(0 0, calc(100% - 22px) 0, 100% 22px, 100% 100%, 22px 100%, 0 calc(100% - 22px)); }
+  72% { transform: translateX(-5px) skewX(.8deg) scale(1); }
+}
+dialog[open]::backdrop { animation: stVeil .3s var(--look-out) both; }
+@keyframes stVeil { from { opacity: .35; clip-path: polygon(0 0, 0 0, -34% 100%, -34% 100%); } to { opacity: 1; clip-path: polygon(0 0, 134% 0, 100% 100%, -34% 100%); } }
+/* il contenuto: solo all'apertura (classe messa da 95-stacchi.js), così ciò che viene ridisegnato dopo resta fermo */
+.modal.st-opening .dh h2, .modal.st-opening .db > .row.between:first-child > h2 { animation: stSlideX .34s var(--look-out) 70ms backwards; }
+.modal.st-opening .db > * { animation: stRise .32s var(--look-out) backwards; animation-delay: 110ms; }
+.modal.st-opening .db > :nth-child(2) { animation-delay: 140ms; }
+.modal.st-opening .db > :nth-child(3) { animation-delay: 170ms; }
+.modal.st-opening .db > :nth-child(4) { animation-delay: 200ms; }
+.modal.st-opening .db > :nth-child(5) { animation-delay: 225ms; }
+.modal.st-opening .db > :nth-child(n+6) { animation-delay: 250ms; }
+@keyframes stRise { from { opacity: 0; translate: 0 18px; } 45% { opacity: 1; } }
+@keyframes stSlideX { from { opacity: 0; translate: -30px 0; } 45% { opacity: 1; } }
+
+/* chiusura: una lastra vuota con la sagoma del dialogo se ne va di taglio mentre il velo si ritira */
+.st-veil { position: fixed; inset: 0; z-index: 9989; pointer-events: none; background-color: hsl(0 0% 0% / .74);
+  background-image: radial-gradient(circle, hsl(var(--h) 92% 54% / .22) 1.3px, transparent 1.6px); background-size: 14px 14px; }
+.st-ghost { position: fixed; z-index: 9990; pointer-events: none; background: var(--panel-solid, var(--panel)); overflow: hidden; }
+.st-ghost::before { content: ""; position: absolute; left: 0; right: 0; top: 0; height: var(--dh, 0px); background: var(--void); box-shadow: 0 4px 0 var(--key); }
+.st-ghost::after { content: ""; position: absolute; inset: 0; background: repeating-linear-gradient(-60deg, transparent 0 26px, color-mix(in srgb, var(--key) 16%, transparent) 26px 30px); }
+.st-g-modal { clip-path: polygon(0 0, calc(100% - 22px) 0, 100% 22px, 100% 100%, 22px 100%, 0 calc(100% - 22px)); box-shadow: inset 0 0 0 3px var(--key); }
+.st-g-drawer { overflow: visible; box-shadow: -10px 0 0 var(--key); }
+
+/* ---------- notifiche: la fascia entra di taglio ed esce dall'altra parte ---------- */
+.toast.st-out { pointer-events: none; }
+
+/* ---------- Diretta: il cambio di fase è una lama che attraversa il banner ---------- */
+.broadcast > .st-ph { position: absolute; inset: 0; z-index: 5; pointer-events: none; overflow: hidden; border-radius: inherit; }
+.st-ph i { position: absolute; top: -30%; bottom: -30%; left: 0; width: 26%; background: var(--key); will-change: transform; }
+.st-ph i + i { width: 5%; background: var(--paper); }
+.st-ph i + i + i { width: 2%; background: var(--void); }
+
+/* ---------- cambi di scheda nei dialoghi (festa) e di vista (Concorrenti): il contenuto entra dal lato giusto ---------- */
+.st-swap > * { animation: stPlane .3s var(--look-out) backwards; }
+.st-swap > :nth-child(2) { animation-delay: 26ms; }
+.st-swap > :nth-child(3) { animation-delay: 52ms; }
+.st-swap > :nth-child(4) { animation-delay: 78ms; }
+.st-swap > :nth-child(5) { animation-delay: 104ms; }
+.st-swap > :nth-child(n+6) { animation-delay: 130ms; }
+@keyframes stPlane { from { opacity: 0; translate: calc(var(--st-dir, 1) * 34px) 0; } 40% { opacity: 1; } }
+.fs-tabs button[aria-selected="true"]::before, .stabs [aria-selected="true"]::before { animation: stTab .24s var(--ease-kick); }
+@keyframes stTab { from { scale: 1.14 1.28; } }
+
+/* ---------- movimento ridotto ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .modal[open], dialog[open]::backdrop, .modal.st-opening .dh h2, .modal.st-opening .db > *, .modal.st-opening .db > .row.between:first-child > h2, .st-swap > *,
+  .fs-tabs button[aria-selected="true"]::before, .stabs [aria-selected="true"]::before { animation: none; }
+  .st-veil, .st-ghost, .broadcast > .st-ph { display: none; }
+}
+[data-reduced-motion] .modal[open], [data-reduced-motion] dialog[open]::backdrop, [data-reduced-motion] .modal.st-opening .dh h2, [data-reduced-motion] .modal.st-opening .db > *,
+[data-reduced-motion] .modal.st-opening .db > .row.between:first-child > h2, [data-reduced-motion] .st-swap > *,
+[data-reduced-motion] .fs-tabs button[aria-selected="true"]::before, [data-reduced-motion] .stabs [aria-selected="true"]::before { animation: none; }
+[data-reduced-motion] .st-veil, [data-reduced-motion] .st-ghost, [data-reduced-motion] .broadcast > .st-ph { display: none; }
 </style>
 
 <!-- l'atmosfera dipinta: il banner dell'arena attiva, sfocato, dietro tutto il sito -->
@@ -20798,7 +20874,7 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
 </script>
 <script>window.LOS_ASSETS = {"logo":"img/logo.f2d5175789.webp","icona":"img/icona.8b02ddeb49.webp","favicon":"img/favicon.86774dc7cf.png","panoramica":"img/panoramica.66c4c27255.webp","sagome":["img/sagome-cappuccio.e8876ba986.webp","img/sagome-esploratore.9a99fd13f8.webp","img/sagome-viaggiatore.5e36435604.webp"],"arene":{"classico":"img/arene-classico.c2887324d1.webp","cyberpunk":"img/arene-cyberpunk.713b4c77ea.webp","fantasy":"img/arene-fantasy.ee494a9322.webp","horror":"img/arene-horror.76225517ca.webp","liceo":"img/arene-liceo.c591ac5f32.webp","royale":"img/arene-royale.46515caf90.webp","scifi":"img/arene-scifi.bc9d8e04eb.webp","ufficio":"img/arene-ufficio.a2e36d4f7f.webp","wasteland":"img/arene-wasteland.734ed966b2.webp","zombie":"img/arene-zombie.11476cf1ca.webp"},"atlas":{"classico":{"armi":{"arco":"img/arene-classico-armi-arco.57fa716aa9.webp","ascia":"img/arene-classico-armi-ascia.f48629747b.webp","coltello-da-campo":"img/arene-classico-armi-coltello-da-campo.3393de240f.webp","coltello":"img/arene-classico-armi-coltello.a0134af05c.webp","falce-corta":"img/arene-classico-armi-falce-corta.3131158a9f.webp","fionda":"img/arene-classico-armi-fionda.48c8c32c43.webp","lancia-da-caccia":"img/arene-classico-armi-lancia-da-caccia.6f2be560ec.webp","lancia":"img/arene-classico-armi-lancia.115909650b.webp","machete":"img/arene-classico-armi-machete.e1c9ef25d7.webp","mazza-corta":"img/arene-classico-armi-mazza-corta.e1092f0628.webp","mazza":"img/arene-classico-armi-mazza.1fddf37b46.webp","pugnale-da-cintura":"img/arene-classico-armi-pugnale-da-cintura.0bedc8a501.webp","pugnale":"img/arene-classico-armi-pugnale.fda9dbf38a.webp","scure-da-legna":"img/arene-classico-armi-scure-da-legna.837c5d1f78.webp","spada-corta":"img/arene-classico-armi-spada-corta.952e6b7f6a.webp","tridente":"img/arene-classico-armi-tridente.2fcb3547d9.webp"},"luoghi":{"altopiano":"img/arene-classico-luoghi-altopiano.36a37512d3.webp","bosco":"img/arene-classico-luoghi-bosco.2e9163544b.webp","cornucopia":"img/arene-classico-luoghi-cornucopia.393b2dabe1.webp","fiume":"img/arene-classico-luoghi-fiume.22b335a914.webp","paludi":"img/arene-classico-luoghi-paludi.77cf115eb4.webp","rovine":"img/arene-classico-luoghi-rovine.9ea4f70ca9.webp"},"pericoli":{"branco-di-lupi-mutanti":"img/arene-classico-pericoli-branco-di-lupi-mutanti.d786a62875.webp","orso-affamato":"img/arene-classico-pericoli-orso-affamato.e4f38a9892.webp","sciame-di-vespe-velenose":"img/arene-classico-pericoli-sciame-di-vespe-velenose.5adb2c7b8d.webp","serpente-gigante":"img/arene-classico-pericoli-serpente-gigante.b17e7f3d91.webp"}},"cyberpunk":{"armi":{"coltello-vibrante-in-ceramica":"img/arene-cyberpunk-armi-coltello-vibrante-in-ceramica.6bbcd0e9e4.webp","fucile-a-pompa-da-strada":"img/arene-cyberpunk-armi-fucile-a-pompa-da-strada.dbd0de34e1.webp","fucile-a-pompa-elettromagnetico":"img/arene-cyberpunk-armi-fucile-a-pompa-elettromagnetico.0555418cd0.webp","katana-termica":"img/arene-cyberpunk-armi-katana-termica.f1ff597173.webp","mazza-a-impulsi":"img/arene-cyberpunk-armi-mazza-a-impulsi.22d841ed1d.webp","mazza-da-baseball-chiodata":"img/arene-cyberpunk-armi-mazza-da-baseball-chiodata.db2996f744.webp","mitra-compatto":"img/arene-cyberpunk-armi-mitra-compatto.eaa3815798.webp","pistola-a-rotaia-artigianale":"img/arene-cyberpunk-armi-pistola-a-rotaia-artigianale.f9e83bda89.webp","pistola-smart":"img/arene-cyberpunk-armi-pistola-smart.2aa922ba8c.webp","sparachiodi-riprogrammato":"img/arene-cyberpunk-armi-sparachiodi-riprogrammato.70f6190cb0.webp","taser-da-buttafuori":"img/arene-cyberpunk-armi-taser-da-buttafuori.60b58b451d.webp","tirapugni-elettrificato":"img/arene-cyberpunk-armi-tirapugni-elettrificato.1ce19bab37.webp","ventaglio-da-combattimento-in-titanio":"img/arene-cyberpunk-armi-ventaglio-da-combattimento-in-titanio.f3b7bb5a10.webp"},"luoghi":{"clinica-del-ripperdoc":"img/arene-cyberpunk-luoghi-clinica-del-ripperdoc.8ef0cb941b.webp","club-della-braindance":"img/arene-cyberpunk-luoghi-club-della-braindance.7765542e70.webp","megablocco":"img/arene-cyberpunk-luoghi-megablocco.28b72e6ecf.webp","mercato-di-kabuki":"img/arene-cyberpunk-luoghi-mercato-di-kabuki.d5c8ab7b96.webp","nodo-dati-corporativo":"img/arene-cyberpunk-luoghi-nodo-dati-corporativo.56ca3e1335.webp","officina-dei-maelstrom":"img/arene-cyberpunk-luoghi-officina-dei-maelstrom.d69285cf21.webp","piazza-della-torre":"img/arene-cyberpunk-luoghi-piazza-della-torre.1e400212c8.webp"},"pericoli":{"banda-di-scav":"img/arene-cyberpunk-pericoli-banda-di-scav.f1a2b2ccc4.webp","gang-di-cromati":"img/arene-cyberpunk-pericoli-gang-di-cromati.74e5576e23.webp","sciame-di-droni-di-pattuglia":"img/arene-cyberpunk-pericoli-sciame-di-droni-di-pattuglia.6fb4b17ad9.webp","squadra-di-sicurezza-corporativa":"img/arene-cyberpunk-pericoli-squadra-di-sicurezza-corporativa.6195a3b15d.webp"}},"fantasy":{"armi":{"arco-elfico":"img/arene-fantasy-armi-arco-elfico.8012f9136d.webp","ascia-nanica":"img/arene-fantasy-armi-ascia-nanica.6913fdf008.webp","balestra":"img/arene-fantasy-armi-balestra.7767becc83.webp","bastone-magico":"img/arene-fantasy-armi-bastone-magico.0781aee860.webp","daga-dei-giuramenti":"img/arene-fantasy-armi-daga-dei-giuramenti.3b6d4b398c.webp","falcetto-dargento":"img/arene-fantasy-armi-falcetto-dargento.1ce0e4e163.webp","lancia-incantata":"img/arene-fantasy-armi-lancia-incantata.7371199824.webp","lancia-silvana":"img/arene-fantasy-armi-lancia-silvana.08fbc01ede.webp","martello-da-guerra":"img/arene-fantasy-armi-martello-da-guerra.4eb03f4db7.webp","martello-nanico":"img/arene-fantasy-armi-martello-nanico.82ad6b9b14.webp","mazza-di-quercia":"img/arene-fantasy-armi-mazza-di-quercia.0f6a8345a9.webp","pugnale-avvelenato":"img/arene-fantasy-armi-pugnale-avvelenato.aba554d177.webp","spada-da-viaggio":"img/arene-fantasy-armi-spada-da-viaggio.a7bdcab5f4.webp","spada-runica":"img/arene-fantasy-armi-spada-runica.ec4012c6cf.webp"},"luoghi":{"altare-delle-armi":"img/arene-fantasy-luoghi-altare-delle-armi.db06de44c1.webp","foresta-elfica":"img/arene-fantasy-luoghi-foresta-elfica.0448fcfbd3.webp","lago-nebbioso":"img/arene-fantasy-luoghi-lago-nebbioso.f19abc7c81.webp","miniere":"img/arene-fantasy-luoghi-miniere.5baa916ec9.webp","palude-stregata":"img/arene-fantasy-luoghi-palude-stregata.6a0b2af4a7.webp","picco-del-drago":"img/arene-fantasy-luoghi-picco-del-drago.06bdfd84b1.webp","torre-in-rovina":"img/arene-fantasy-luoghi-torre-in-rovina.ac716863c7.webp"},"pericoli":{"branco-di-lupi-mannari":"img/arene-fantasy-pericoli-branco-di-lupi-mannari.1c9124ceee.webp","spettro-errante":"img/arene-fantasy-pericoli-spettro-errante.056074bc23.webp","troll-di-caverna":"img/arene-fantasy-pericoli-troll-di-caverna.31aa2444f0.webp","viverna":"img/arene-fantasy-pericoli-viverna.577b91a819.webp"}},"horror":{"armi":{"ascia":"img/arene-horror-armi-ascia.f6793c220e.webp","attizzatoio":"img/arene-horror-armi-attizzatoio.12b9bf75af.webp","bastone-da-passeggio":"img/arene-horror-armi-bastone-da-passeggio.1a636ce4ab.webp","candelabro-dargento":"img/arene-horror-armi-candelabro-dargento.7d962054de.webp","coltello-dargento":"img/arene-horror-armi-coltello-dargento.73a6bb81ea.webp","crocifisso-appuntito":"img/arene-horror-armi-crocifisso-appuntito.203b41a170.webp","daga-da-cerimonia":"img/arene-horror-armi-daga-da-cerimonia.a597e15c53.webp","falce":"img/arene-horror-armi-falce.6513df8fa2.webp","fucile-da-caccia":"img/arene-horror-armi-fucile-da-caccia.169dc367e1.webp","pugnale-depoca":"img/arene-horror-armi-pugnale-depoca.f148afd005.webp","pugnale-rituale":"img/arene-horror-armi-pugnale-rituale.944cb9056c.webp","scure-da-legna":"img/arene-horror-armi-scure-da-legna.a11379a412.webp"},"luoghi":{"biblioteca":"img/arene-horror-luoghi-biblioteca.00d6ab97f4.webp","cantina":"img/arene-horror-luoghi-cantina.a196828c1d.webp","cappella":"img/arene-horror-luoghi-cappella.a51e505028.webp","cimitero":"img/arene-horror-luoghi-cimitero.7a441de089.webp","salone":"img/arene-horror-luoghi-salone.37f10c88c7.webp","serra":"img/arene-horror-luoghi-serra.b3d91121d4.webp","soffitta":"img/arene-horror-luoghi-soffitta.466d40cea3.webp"},"pericoli":{"bambola-posseduta":"img/arene-horror-pericoli-bambola-posseduta.7064eef1d7.webp","entita-senza-volto":"img/arene-horror-pericoli-entita-senza-volto.2c28467bdd.webp","spettro-urlante":"img/arene-horror-pericoli-spettro-urlante.25fa554e05.webp","stormo-di-corvi":"img/arene-horror-pericoli-stormo-di-corvi.fe5c85d7ae.webp"}},"liceo":{"armi":{"compito-copiato":"img/arene-liceo-armi-compito-copiato.c9ade27d61.webp","dossier-delle-revisioni":"img/arene-liceo-armi-dossier-delle-revisioni.77676a0f5f.webp","elenco-delle-correzioni":"img/arene-liceo-armi-elenco-delle-correzioni.04be1154c8.webp","fascicolo-di-risposte-motivate":"img/arene-liceo-armi-fascicolo-di-risposte-motivate.c29995b581.webp","foto-imbarazzante":"img/arene-liceo-armi-foto-imbarazzante.ff7d3ef284.webp","gossip-esplosivo":"img/arene-liceo-armi-gossip-esplosivo.552b1e6236.webp","pallone-da-dodgeball":"img/arene-liceo-armi-pallone-da-dodgeball.60a2576785.webp","profilo-falso":"img/arene-liceo-armi-profilo-falso.d1dac05a2b.webp","prospetto-dei-contributi":"img/arene-liceo-armi-prospetto-dei-contributi.0c121fd79a.webp","quaderno-delle-verifiche":"img/arene-liceo-armi-quaderno-delle-verifiche.7d8b07341a.webp","registro-rubato":"img/arene-liceo-armi-registro-rubato.67eb4b9eff.webp","riepilogo-delle-fonti":"img/arene-liceo-armi-riepilogo-delle-fonti.3c889a0ed5.webp"},"luoghi":{"aula-magna":"img/arene-liceo-luoghi-aula-magna.0478e35c5c.webp","aule":"img/arene-liceo-luoghi-aule.b3142d07cc.webp","biblioteca":"img/arene-liceo-luoghi-biblioteca.1ae806ae58.webp","cortile":"img/arene-liceo-luoghi-cortile.51bf433337.webp","laboratorio-di-chimica":"img/arene-liceo-luoghi-laboratorio-di-chimica.eba1434683.webp","mensa":"img/arene-liceo-luoghi-mensa.67bcbc7e37.webp","palestra":"img/arene-liceo-luoghi-palestra.8ecb872849.webp"},"pericoli":{"bidello-di-turno":"img/arene-liceo-pericoli-bidello-di-turno.191c43a8bd.webp","ispezione-a-sorpresa":"img/arene-liceo-pericoli-ispezione-a-sorpresa.bef087d9b9.webp","preside":"img/arene-liceo-pericoli-preside.033f6c9aae.webp","professoressa-di-matematica":"img/arene-liceo-pericoli-professoressa-di-matematica.6cb65c6a3f.webp"}},"royale":{"armi":{"balestra":"img/arene-royale-armi-balestra.64563b6cea.webp","carabina-compatta":"img/arene-royale-armi-carabina-compatta.a0fa150fbe.webp","coltello-da-combattimento":"img/arene-royale-armi-coltello-da-combattimento.74a64bca77.webp","coltello-tattico":"img/arene-royale-armi-coltello-tattico.8e9cb56197.webp","fucile-a-pompa":"img/arene-royale-armi-fucile-a-pompa.3d7fc7d83c.webp","fucile-da-cecchino":"img/arene-royale-armi-fucile-da-cecchino.fc3c4f19f1.webp","fucile-dassalto":"img/arene-royale-armi-fucile-dassalto.b91ccb0ec8.webp","granata":"img/arene-royale-armi-granata.fd9c359b27.webp","lancia-da-sopravvivenza":"img/arene-royale-armi-lancia-da-sopravvivenza.8a39c1a5e5.webp","manganello":"img/arene-royale-armi-manganello.dc6284893b.webp","mitraglietta":"img/arene-royale-armi-mitraglietta.6dcc3246e6.webp","pistola-da-segnalazione-modificata":"img/arene-royale-armi-pistola-da-segnalazione-modificata.1c7f899ca7.webp","pistola":"img/arene-royale-armi-pistola.acae268814.webp","scure-da-campo":"img/arene-royale-armi-scure-da-campo.6a5b0becd5.webp"},"luoghi":{"aeroporto":"img/arene-royale-luoghi-aeroporto.81e8ce98d4.webp","base-militare":"img/arene-royale-luoghi-base-militare.67f3a7de9d.webp","centrale-elettrica":"img/arene-royale-luoghi-centrale-elettrica.05ee57458a.webp","fattoria":"img/arene-royale-luoghi-fattoria.7c780dda87.webp","foresta":"img/arene-royale-luoghi-foresta.03b47644d0.webp","villaggio-costiero":"img/arene-royale-luoghi-villaggio-costiero.568519eb7c.webp"},"pericoli":{"cane-da-guardia-addestrato":"img/arene-royale-pericoli-cane-da-guardia-addestrato.c7853a67a0.webp","drone-armato":"img/arene-royale-pericoli-drone-armato.30d0b73e01.webp","elicottero-da-caccia":"img/arene-royale-pericoli-elicottero-da-caccia.8c68e62346.webp"}},"scifi":{"armi":{"bastone-a-impulsi":"img/arene-scifi-armi-bastone-a-impulsi.4e17e074e7.webp","cannone-a-rotaia-portatile":"img/arene-scifi-armi-cannone-a-rotaia-portatile.9a59b97d98.webp","frusta-monofilamento":"img/arene-scifi-armi-frusta-monofilamento.5ee8081aa9.webp","fucile-al-plasma":"img/arene-scifi-armi-fucile-al-plasma.ea2384a239.webp","granata-emp":"img/arene-scifi-armi-granata-emp.04cfd31203.webp","lama-di-servizio":"img/arene-scifi-armi-lama-di-servizio.a47d434464.webp","lama-vibrante":"img/arene-scifi-armi-lama-vibrante.02b0f47ff8.webp","lancia-da-abbordaggio":"img/arene-scifi-armi-lancia-da-abbordaggio.cf167e52ff.webp","perforatore-portatile":"img/arene-scifi-armi-perforatore-portatile.aa7e92ecab.webp","pistola-a-scarica":"img/arene-scifi-armi-pistola-a-scarica.33b3e5929e.webp","pistola-laser":"img/arene-scifi-armi-pistola-laser.aed4bbf3ed.webp","taglierino-ceramico":"img/arene-scifi-armi-taglierino-ceramico.b45d524836.webp","taser-a-impulsi":"img/arene-scifi-armi-taser-a-impulsi.360e29e1d5.webp"},"luoghi":{"condotti-di-servizio":"img/arene-scifi-luoghi-condotti-di-servizio.6817134b5e.webp","hangar":"img/arene-scifi-luoghi-hangar.6de551833b.webp","moduli-abitativi":"img/arene-scifi-luoghi-moduli-abitativi.9f5bb96d39.webp","ponte-di-comando":"img/arene-scifi-luoghi-ponte-di-comando.3e9ffd005a.webp","reattore":"img/arene-scifi-luoghi-reattore.d10a335006.webp","serra-idroponica":"img/arene-scifi-luoghi-serra-idroponica.b6f4407853.webp"},"pericoli":{"androide-da-combattimento":"img/arene-scifi-pericoli-androide-da-combattimento.1a3d3eb38e.webp","creatura-aliena-dai-tentacoli":"img/arene-scifi-pericoli-creatura-aliena-dai-tentacoli.b6b314ddd9.webp","drone-di-sicurezza-impazzito":"img/arene-scifi-pericoli-drone-di-sicurezza-impazzito.c8a9c6f9e3.webp","sciame-di-nanobot":"img/arene-scifi-pericoli-sciame-di-nanobot.d43296f047.webp"}},"ufficio":{"armi":{"badge-clonato-del-capo":"img/arene-ufficio-armi-badge-clonato-del-capo.be9f7381fe.webp","dossier-dei-risultati":"img/arene-ufficio-armi-dossier-dei-risultati.1888e2f671.webp","elenco-dei-contributi":"img/arene-ufficio-armi-elenco-dei-contributi.3de4fbe5bf.webp","fascicolo-delle-fonti":"img/arene-ufficio-armi-fascicolo-delle-fonti.02df27dfbf.webp","foglio-excel-con-le-prove":"img/arene-ufficio-armi-foglio-excel-con-le-prove.944f6ec708.webp","mail-in-copia-a-tutti":"img/arene-ufficio-armi-mail-in-copia-a-tutti.1d4304df14.webp","nota-spese-gonfiata":"img/arene-ufficio-armi-nota-spese-gonfiata.d2683cca4c.webp","presentazione-rubata":"img/arene-ufficio-armi-presentazione-rubata.815dc5c8b4.webp","prospetto-delle-metriche":"img/arene-ufficio-armi-prospetto-delle-metriche.356da1d2d9.webp","registro-delle-revisioni":"img/arene-ufficio-armi-registro-delle-revisioni.509eab44df.webp","report-pieno-di-errori-altrui":"img/arene-ufficio-armi-report-pieno-di-errori-altrui.c01c0ef897.webp","riepilogo-delle-approvazioni":"img/arene-ufficio-armi-riepilogo-delle-approvazioni.9394dadd6b.webp"},"luoghi":{"cucina":"img/arene-ufficio-luoghi-cucina.d968f8861d.webp","open-space":"img/arene-ufficio-luoghi-open-space.b6b7990c99.webp","parcheggio":"img/arene-ufficio-luoghi-parcheggio.d593f2ed83.webp","sala-riunioni":"img/arene-ufficio-luoghi-sala-riunioni.f92c4030a9.webp","sala-stampanti":"img/arene-ufficio-luoghi-sala-stampanti.1727f50082.webp","ufficio-del-direttore":"img/arene-ufficio-luoghi-ufficio-del-direttore.bb3b6cabab.webp"},"pericoli":{"consulente-esterno":"img/arene-ufficio-pericoli-consulente-esterno.ce6e200c3f.webp","direttore-generale":"img/arene-ufficio-pericoli-direttore-generale.da2eb1f708.webp","riorganizzazione-aziendale":"img/arene-ufficio-pericoli-riorganizzazione-aziendale.1fd57b76b3.webp","ufficio-risorse-umane":"img/arene-ufficio-pericoli-ufficio-risorse-umane.8392df7518.webp"}},"wasteland":{"armi":{"balestra-artigianale":"img/arene-wasteland-armi-balestra-artigianale.e09826852f.webp","catena":"img/arene-wasteland-armi-catena.866183d584.webp","coltello-da-strada":"img/arene-wasteland-armi-coltello-da-strada.1083c4429d.webp","fucile-arrugginito":"img/arene-wasteland-armi-fucile-arrugginito.797601f16e.webp","lama-di-recupero":"img/arene-wasteland-armi-lama-di-recupero.1ad13cfc78.webp","lancia-di-ferraglia":"img/arene-wasteland-armi-lancia-di-ferraglia.99d9f41307.webp","lancia-ricavata-da-un-tubo":"img/arene-wasteland-armi-lancia-ricavata-da-un-tubo.53b934e449.webp","lanciachiodi":"img/arene-wasteland-armi-lanciachiodi.e4f51e42e2.webp","mannaia":"img/arene-wasteland-armi-mannaia.518ae9c11c.webp","martello-da-officina":"img/arene-wasteland-armi-martello-da-officina.851055795e.webp","mazza-di-tubi":"img/arene-wasteland-armi-mazza-di-tubi.91babe82ac.webp","molotov":"img/arene-wasteland-armi-molotov.303d6fa315.webp","scure-da-demolizione":"img/arene-wasteland-armi-scure-da-demolizione.066ea5e066.webp"},"luoghi":{"autostrada-spezzata":"img/arene-wasteland-luoghi-autostrada-spezzata.19a72a0b97.webp","citta-fantasma":"img/arene-wasteland-luoghi-citta-fantasma.fe22bb72b2.webp","cratere":"img/arene-wasteland-luoghi-cratere.04de7ca40a.webp","deposito":"img/arene-wasteland-luoghi-deposito.f98aa31220.webp","diga":"img/arene-wasteland-luoghi-diga.3be9abe15a.webp","discarica":"img/arene-wasteland-luoghi-discarica.b8783ad9c6.webp","raffineria":"img/arene-wasteland-luoghi-raffineria.081e2d2ad6.webp"},"pericoli":{"banda-di-predoni":"img/arene-wasteland-pericoli-banda-di-predoni.1dfcfd1628.webp","branco-di-cani-mutati":"img/arene-wasteland-pericoli-branco-di-cani-mutati.442fabfc39.webp","scorpione-gigante":"img/arene-wasteland-pericoli-scorpione-gigante.2dd8911367.webp","verme-delle-sabbie":"img/arene-wasteland-pericoli-verme-delle-sabbie.a0d445beeb.webp"}},"zombie":{"armi":{"accetta-da-soccorso":"img/arene-zombie-armi-accetta-da-soccorso.6d36eb13ac.webp","accetta":"img/arene-zombie-armi-accetta.0eed163720.webp","balestra":"img/arene-zombie-armi-balestra.d705131d17.webp","coltello-da-campeggio":"img/arene-zombie-armi-coltello-da-campeggio.2abab58e78.webp","fucile-a-pompa":"img/arene-zombie-armi-fucile-a-pompa.b00b1d6a70.webp","katana":"img/arene-zombie-armi-katana.f631ad392f.webp","machete-da-potatura":"img/arene-zombie-armi-machete-da-potatura.94a93108a1.webp","martello-da-carpentiere":"img/arene-zombie-armi-martello-da-carpentiere.021e8a80f2.webp","mazza-chiodata":"img/arene-zombie-armi-mazza-chiodata.b4e11dcadb.webp","mazza-da-lavoro":"img/arene-zombie-armi-mazza-da-lavoro.c36a90108f.webp","motosega":"img/arene-zombie-armi-motosega.f74e603615.webp","piede-di-porco":"img/arene-zombie-armi-piede-di-porco.c185a97e0d.webp","pistola":"img/arene-zombie-armi-pistola.6d30022ca6.webp"},"luoghi":{"centro-commerciale":"img/arene-zombie-luoghi-centro-commerciale.333f4699d5.webp","metropolitana":"img/arene-zombie-luoghi-metropolitana.878a263605.webp","ospedale":"img/arene-zombie-luoghi-ospedale.f25de413a4.webp","periferia":"img/arene-zombie-luoghi-periferia.e28a7d70c7.webp","piazza":"img/arene-zombie-luoghi-piazza.b6ed86b3ad.webp","scuola":"img/arene-zombie-luoghi-scuola.153ddbaa75.webp","stazione-di-polizia":"img/arene-zombie-luoghi-stazione-di-polizia.157f7a17f5.webp"},"pericoli":{"cane-infetto":"img/arene-zombie-pericoli-cane-infetto.fdff913d6f.webp","gigante-mutato":"img/arene-zombie-pericoli-gigante-mutato.91fad36b70.webp","infetto-corridore":"img/arene-zombie-pericoli-infetto-corridore.61f48faafd.webp","orda-di-zombi":"img/arene-zombie-pericoli-orda-di-zombi.e0fc6d1b56.webp"}}},"fx":{"pennellate":["img/fx-pennellata-1.5527b3e9bd.webp","img/fx-pennellata-2.8526d34dcf.webp","img/fx-pennellata-3.a7f3e74ff3.webp","img/fx-pennellata-4.fe1f612999.webp"],"sigilli":{"classico":"img/fx-sigillo-classico.b781c63b8d.webp","cyberpunk":"img/fx-sigillo-cyberpunk.134a7f507c.webp","fantasy":"img/fx-sigillo-fantasy.d854d9ac19.webp","horror":"img/fx-sigillo-horror.54149e6a7e.webp","liceo":"img/fx-sigillo-liceo.7f1566a7a8.webp","royale":"img/fx-sigillo-royale.bedbb77f68.webp","scifi":"img/fx-sigillo-scifi.6c50b79280.webp","ufficio":"img/fx-sigillo-ufficio.fcbbcc051a.webp","wasteland":"img/fx-sigillo-wasteland.86f44d1714.webp","zombie":"img/fx-sigillo-zombie.44ac2a6473.webp"},"grana":"img/fx-grana.c1e72fd2da.webp","forme":{"fascia":"img/fx-forma-fascia.8a2f8ab92d.webp","freccia":"img/fx-forma-freccia.4e8039be8f.webp","fulmine":"img/fx-forma-fulmine.c9a15d227c.webp","stella":"img/fx-forma-stella.e773ba5dda.webp","strappo":"img/fx-forma-strappo.0e6a41d0d9.webp"},"impatto":"img/fx-impatto.fd13ac9554.webp","mezzitoni":"img/fx-mezzitoni.f9ef4df053.webp","occhi":{"f-1":"img/fx-occhi-f-1.3779df529a.webp","f-2":"img/fx-occhi-f-2.2f47e4535b.webp","f-3":"img/fx-occhi-f-3.8b10fc4b00.webp","f-4":"img/fx-occhi-f-4.08132e01f9.webp","m-1":"img/fx-occhi-m-1.fd94d5b0eb.webp","m-2":"img/fx-occhi-m-2.c7b9661e6b.webp","m-3":"img/fx-occhi-m-3.91ff950ae4.webp","m-4":"img/fx-occhi-m-4.d0a0e73220.webp","m-5":"img/fx-occhi-m-5.f4c19f2141.webp","n-1":"img/fx-occhi-n-1.21fc3b7adf.webp"},"fondali":{"classico":"img/fx-fondale-classico.8a3fc35342.webp","cyberpunk":"img/fx-fondale-cyberpunk.283c80cc1e.webp","fantasy":"img/fx-fondale-fantasy.0ca9b3f315.webp","horror":"img/fx-fondale-horror.4ba1241b63.webp","liceo":"img/fx-fondale-liceo.fb428a57f7.webp","royale":"img/fx-fondale-royale.aac1246425.webp","scifi":"img/fx-fondale-scifi.27ee2ce8cc.webp","ufficio":"img/fx-fondale-ufficio.780789ce70.webp","wasteland":"img/fx-fondale-wasteland.02311ed21d.webp","zombie":"img/fx-fondale-zombie.83b8d35716.webp"},"volti":{"f-1":"img/fx-volto-f-1.96d62771c1.webp","f-2":"img/fx-volto-f-2.79d3485864.webp","f-3":"img/fx-volto-f-3.aeb7664a4e.webp","f-4":"img/fx-volto-f-4.2f2c864354.webp","m-1":"img/fx-volto-m-1.f8b83b073e.webp","m-2":"img/fx-volto-m-2.b9eb346a31.webp","m-3":"img/fx-volto-m-3.5311549074.webp","m-4":"img/fx-volto-m-4.10b102bdb0.webp","m-5":"img/fx-volto-m-5.63e5c91778.webp","n-1":"img/fx-volto-n-1.02cf4d1c97.webp"},"vincitori":{"f-1":"img/vincitori-vincitore-f-1.10b1ec0d22.webp","f-2":"img/vincitori-vincitore-f-2.03d8a3a92a.webp","f-3":"img/vincitori-vincitore-f-3.bc0adcd66a.webp","m-1":"img/vincitori-vincitore-m-1.c597436dca.webp","m-2":"img/vincitori-vincitore-m-2.9c8b48e9f8.webp","n-1":"img/vincitori-vincitore-n-1.1539fc78b2.webp"},"trofei":{"allenamento":"img/fx-trofeo-allenamento.99cc64bc6b.webp","amorevince":"img/fx-trofeo-amorevince.2f8b4726ae.webp","angelo":"img/fx-trofeo-angelo.e69fb67f09.webp","bacheca":"img/fx-trofeo-bacheca.eb6e920eb1.webp","bagno":"img/fx-trofeo-bagno.80dd84a8fc.webp","banchetto":"img/fx-trofeo-banchetto.c9e4dc478f.webp","banco":"img/fx-trofeo-banco.7990a4d869.webp","canale":"img/fx-trofeo-canale.db02ec0604.webp","capolavoro":"img/fx-trofeo-capolavoro.1967b64f45.webp","carte":"img/fx-trofeo-carte.ef2b82c83e.webp","collezione":"img/fx-trofeo-collezione.b299a5115d.webp","colpogrosso":"img/fx-trofeo-colpogrosso.d7981b7466.webp","conti":"img/fx-trofeo-conti.e70bdb8cbc.webp","coppa":"img/fx-trofeo-coppa.a463810929.webp","dalnulla":"img/fx-trofeo-dalnulla.e42989a993.webp","disciplina":"img/fx-trofeo-disciplina.073557ff2d.webp","fiuto":"img/fx-trofeo-fiuto.1503d3eb4b.webp","giramondo":"img/fx-trofeo-giramondo.0ad02233a6.webp","guerra":"img/fx-trofeo-guerra.eaab7458ad.webp","lampo":"img/fx-trofeo-lampo.34cc1f2954.webp","leggenda":"img/fx-trofeo-leggenda.7d2bf44fc4.webp","maestro":"img/fx-trofeo-maestro.7110bddf3f.webp","manipulite":"img/fx-trofeo-manipulite.34ff575bb7.webp","maratona":"img/fx-trofeo-maratona.2e6b332ae3.webp","mecenate":"img/fx-trofeo-mecenate.67d27ec58b.webp","miracolo":"img/fx-trofeo-miracolo.34f7843bb2.webp","occhio":"img/fx-trofeo-occhio.c95fa91c17.webp","perbene":"img/fx-trofeo-perbene.024374594c.webp","podio":"img/fx-trofeo-podio.d86a25f609.webp","prima":"img/fx-trofeo-prima.3abea42a27.webp","riflessi":"img/fx-trofeo-riflessi.e80d5d2241.webp","saga":"img/fx-trofeo-saga.607283ecfd.webp","serpente":"img/fx-trofeo-serpente.23113bb8df.webp","sfortuna":"img/fx-trofeo-sfortuna.181e207de7.webp","sponsor":"img/fx-trofeo-sponsor.bf69eb2ed0.webp","testacalda":"img/fx-trofeo-testacalda.5494f4ae1f.webp","tifoso":"img/fx-trofeo-tifoso.ca26308e74.webp","tris":"img/fx-trofeo-tris.efd756f45f.webp","ultimoistante":"img/fx-trofeo-ultimoistante.498a128819.webp","verde":"img/fx-trofeo-verde.5e52fd4620.webp"},"foil":"img/fx-foil-oro.1d6a9a6327.webp","occhiY":{"m-1":0.53,"m-2":0.6,"m-3":0.43,"m-4":0.39,"m-5":0.575,"f-1":0.52,"f-2":0.49,"f-3":0.41,"f-4":0.46,"n-1":0.55}},"audio":{"sfx":{"heavy":"img/audio-colpo.6c66fc3384.mp3","battle":"img/audio-scontro.171fdeb377.mp3","click":"img/audio-ui-click.75370fe5e2.wav","hover":"img/audio-ui-hover.39a84fb194.wav","tick":"img/audio-ui-tick.16c581af00.wav","jazz":"img/audio-vittoria.6a3763dedf.mp3"},"music":"img/audio-musica-dark-hour.53788a2c76.mp3"}};
 ;
-window.LOS_BUILD = "8af3630a1f197ef7638508848bc36527a19ae975cf84b93f90d5a4a0cbf45af0";
+window.LOS_BUILD = "ccece833b6648f24a8be6e6ce67a43f93322303957fc4e8bd9cc2bdfac07a9d2";
 ;
 /* Last One Standing — grafica vettoriale: logo, icone delle arene, illustrazioni.
  * Tutto è SVG generato in codice: nessuna immagine esterna. */
@@ -21721,7 +21797,8 @@ window.LOS_BUILD = "8af3630a1f197ef7638508848bc36527a19ae975cf84b93f90d5a4a0cbf4
   function wipe(swap, opt) {
     opt = opt || {};
     const body = document.body;
-    if (reduced || wiping || !body || typeof body.animate !== 'function') { swap(); return; }
+    // pagina nascosta: le animazioni resterebbero ferme, quindi si cambia subito
+    if (reduced || wiping || !body || typeof body.animate !== 'function' || document.hidden) { swap(); return; }
     wiping = true;
     if (!wipeEl || !wipeEl.isConnected) {
       wipeEl = document.createElement('div'); wipeEl.className = 'stacco'; wipeEl.setAttribute('aria-hidden', 'true');
@@ -21738,8 +21815,12 @@ window.LOS_BUILD = "8af3630a1f197ef7638508848bc36527a19ae975cf84b93f90d5a4a0cbf4
     // con le pennellate l'inclinazione è più lieve: la forma del colpo di pennello dà già il movimento
     const sk = PENS.length >= 4 ? ' skewX(-8deg)' : ' skewX(-16deg)', jit = () => Math.round(R(-12, 12));
     const slide = (n, from, to, o) => n.animate([{ transform: 'translateX(' + from + ')' + sk }, { transform: 'translateX(' + to + ')' + sk }], o);
-    let swapped = false;
+    let swapped = false, closed = false;
     const doSwap = () => { if (swapped) return; swapped = true; try { swap(); } catch (e) { setTimeout(() => { throw e; }); } };
+    // rete di sicurezza: la pagina cambia comunque entro 420 ms e la copertura sparisce entro 1,2 s, anche se le
+    // animazioni non avanzano (scheda o pannello nascosti); `swap` resta chiamata una volta sola
+    const close = () => { if (closed) return; closed = true; clearTimeout(tSwap); clearTimeout(tClose); doSwap(); el.hidden = true; wiping = false; [a, b, c, mark, sealEl].forEach((n) => n.getAnimations().forEach((x) => x.cancel())); };
+    const tSwap = setTimeout(doSwap, 420), tClose = setTimeout(close, 1200);
     // con le pennellate entra prima il colpo di pennello e per ultima la lastra piena, che garantisce la copertura;
     // in uscita la lastra va via per prima e la pagina si scopre dietro il bordo dipinto
     const P4 = PENS.length >= 4;
@@ -21749,14 +21830,14 @@ window.LOS_BUILD = "8af3630a1f197ef7638508848bc36527a19ae975cf84b93f90d5a4a0cbf4
     Promise.all(cover.map((x) => x.finished))
       .then(() => new Promise((res) => setTimeout(res, opt.hold || 90)))
       .then(() => {
-        doSwap();
+        doSwap(); if (closed) return null;
         mark.animate([{ opacity: 1, transform: 'translate(-50%, -50%) rotate(-7deg) scale(1)' }, { opacity: 0, transform: 'translate(-20%, -50%) rotate(-7deg) scale(1)' }], { duration: 180, easing: EASE_CUT, fill: 'both' });
         if (ws) sealEl.animate([{ opacity: 1, transform: 'translate(-50%, -50%) rotate(-10deg) scale(1)' }, { opacity: 0, transform: 'translate(-30%, -50%) rotate(-4deg) scale(1)' }], { duration: 180, easing: EASE_CUT, fill: 'both' });
         const out = (P4 ? [[a, 0], [c, 30], [b, 70]] : [[c, 0], [b, 40], [a, 85]]).map(([n, d]) => slide(n, '0', '230vw', { duration: 320, delay: Math.max(0, d + jit()), easing: EASE_OUT, fill: 'both' }));
         return Promise.all(out.map((x) => x.finished));
       })
       .catch(() => {})
-      .then(() => { doSwap(); el.hidden = true; wiping = false; [a, b, c, mark, sealEl].forEach((n) => n.getAnimations().forEach((x) => x.cancel())); });
+      .then(close);
   }
   // un cartello sopra la scena della diretta: arriva, resta fermo il tempo di leggerlo, se ne va (la regia è nel CSS)
   function card(host, html, cls, dur) {
@@ -22242,6 +22323,9 @@ window.LOS_BUILD = "8af3630a1f197ef7638508848bc36527a19ae975cf84b93f90d5a4a0cbf4
  *   (avanti verso destra, indietro verso sinistra), l'esplosione parte dal punto toccato;
  * - entrata e uscita hanno geometrie diverse; la pagina nuova entra a strati mentre la copertura se ne va;
  * - il nome della sezione arriva lettera per lettera su una lastra di carta, resta fermo il tempo di leggerlo.
+ * - Diretta, Esito e Trofei hanno uno stacco di firma (in onda, verdetto, lustro), sempre lo stesso;
+ * - tutto lo stacco dura circa 700 ms e va a tempo con i timer: la pagina cambia sempre, una volta sola, anche se
+ *   le animazioni sono ferme (scheda o pannello nascosti), e in quel caso lo stacco si chiude subito.
  * Con il movimento ridotto il contenuto cambia subito. */
 (function (G) {
   'use strict';
@@ -22263,8 +22347,8 @@ window.LOS_BUILD = "8af3630a1f197ef7638508848bc36527a19ae975cf84b93f90d5a4a0cbf4
     io: 'cubic-bezier(.76,0,.24,1)',     // coperture: partenza e arrivo decisi
     kick: 'cubic-bezier(.34,1.56,.64,1)', // solo dove c'è un impatto
   };
-  const ORDER = ['home', 'cast', 'arena', 'diretta', 'esito'];
-  const LABEL_SUB = { home: 'Simulatore di arena', cast: 'Passo 1 di 4', arena: 'Passo 2 di 4', diretta: 'Passo 3 di 4', esito: 'Passo 4 di 4' };
+  const ORDER = ['home', 'cast', 'arena', 'diretta', 'esito', 'trofei'];
+  const LABEL_SUB = { home: 'Simulatore di arena', cast: 'Passo 1 di 4', arena: 'Passo 2 di 4', diretta: 'Passo 3 di 4', esito: 'Passo 4 di 4', trofei: 'La tua bacheca' };
   const viewOf = (h) => { const v = (h || '').replace(/^#/, ''); return ORDER.includes(v) ? v : 'home'; };
   let lastView = viewOf(G.location && G.location.hash), lastFamily = null, busy = false;
   let lastPointer = null;
@@ -22298,7 +22382,7 @@ window.LOS_BUILD = "8af3630a1f197ef7638508848bc36527a19ae975cf84b93f90d5a4a0cbf4
    * Ognuna riceve il gruppo SVG, le misure, la direzione (1 o -1), la tavolozza e l'origine,
    * e restituisce { cover(): Promise, uncover(): Promise }. */
   const anim = (n, kf, o) => n.animate(kf, Object.assign({ fill: 'both' }, o));
-  const all = (a) => Promise.all(a.map((x) => x.finished)).catch(() => {});
+  const all = (a) => a.filter(Boolean);
 
   // linee di velocità: barre sottili di carta e di tinta che attraversano tutto lo schermo più veloci delle lastre,
   // sopra di esse, e spariscono; danno il senso dello spostamento a coperture fatte di sole superfici piene
@@ -22332,7 +22416,7 @@ window.LOS_BUILD = "8af3630a1f197ef7638508848bc36527a19ae975cf84b93f90d5a4a0cbf4
     const off = span + sl, fly = speed(g, W, H, P, RI(7, 11));
     blades.forEach((b, i) => { b.__i = b.__twin ? b.__twin.__i : blades.length - i; });
     return {
-      cover: () => (fly(), all(blades.map((b) => anim(b, [{ transform: 'translateX(' + -off + 'px)' }, { transform: 'translateX(0)' }], { duration: 300, delay: b.__i * 26 + R(0, 14), easing: E.io })))),
+      cover: () => fly().concat(blades.map((b) => anim(b, [{ transform: 'translateX(' + -off + 'px)' }, { transform: 'translateX(0)' }], { duration: 300, delay: b.__i * 26 + R(0, 14), easing: E.io }))),
       uncover: () => all(blades.map((b) => anim(b, [{ transform: 'translateX(0)' }, { transform: 'translateX(' + off + 'px)' }], { duration: 360, delay: (blades.length - b.__i) * 18 + R(0, 12), easing: E.in, composite: 'replace' }))),
     };
   }
@@ -22382,7 +22466,7 @@ window.LOS_BUILD = "8af3630a1f197ef7638508848bc36527a19ae975cf84b93f90d5a4a0cbf4
     }
     const off = W + 160, fly = speed(g, W, H, P, RI(6, 9));
     return {
-      cover: () => (fly(), all(strips.map((s) => anim(s, [{ transform: 'translateX(' + -s.__side * off + 'px)' }, { transform: 'translateX(0)' }], { duration: 290, delay: s.__i * 24 + R(0, 16), easing: E.io })))),
+      cover: () => fly().concat(strips.map((s) => anim(s, [{ transform: 'translateX(' + -s.__side * off + 'px)' }, { transform: 'translateX(0)' }], { duration: 290, delay: s.__i * 24 + R(0, 16), easing: E.io }))),
       uncover: () => all(strips.map((s) => anim(s, [{ transform: 'translateX(0)' }, { transform: 'translateX(' + s.__side * off + 'px)' }], { duration: 340, delay: (n - 1 - s.__i) * 20 + R(0, 14), easing: E.in }))),
     };
   }
@@ -22468,15 +22552,131 @@ window.LOS_BUILD = "8af3630a1f197ef7638508848bc36527a19ae975cf84b93f90d5a4a0cbf4
     };
   }
 
-  const FAMILIES = { lame, schegge, sipario, esplosione, retino, titoli };
-  // la sezione d'arrivo ha una famiglia di casa; ogni tanto si cambia, ma mai la stessa due volte di fila
-  const HOME = { home: ['titoli', 'lame'], cast: ['sipario', 'retino'], arena: ['schegge', 'titoli'], diretta: ['lame', 'retino'], esito: ['esplosione', 'schegge'] };
+  /* ---------- le tre famiglie «di firma»: ognuna appartiene a una sola destinazione ---------- */
+
+  // in onda (Diretta): due saracinesche nere si chiudono dall'alto e dal basso come un ciak, sulla giunta si accende
+  // una fascia nella tinta con le righe del monitor e le barre colore; si riapre come un televisore che si accende
+  function onair(g, W, H, dir, P, defs) {
+    const m = 60, s = H * R(0.035, 0.07) * dir, cy = H * R(0.46, 0.54), th = Math.max(90, H * R(0.26, 0.34));
+    const top = el('polygon', { points: pts([[-m, -m], [W + m, -m], [W + m, cy - s + 2], [-m, cy + s + 2]]), fill: P.void }, g);
+    const bot = el('polygon', { points: pts([[-m, cy + s - 2], [W + m, cy - s - 2], [W + m, H + m], [-m, H + m]]), fill: P.void }, g);
+    const id = 'lxo' + Date.now(), pat = el('pattern', { id, width: 6, height: 6, patternUnits: 'userSpaceOnUse' }, defs);
+    el('rect', { x: 0, y: 0, width: 6, height: 2.4, fill: P.void }, pat);
+    const band = el('g', {}, g); band.style.transformOrigin = (W / 2).toFixed(0) + 'px ' + cy.toFixed(0) + 'px';
+    const bp = pts([[-m, cy + s - th / 2], [W + m, cy - s - th / 2], [W + m, cy - s + th / 2], [-m, cy + s + th / 2]]);
+    el('polygon', { points: bp, fill: P.key }, band);
+    el('polygon', { points: bp, fill: 'url(#' + id + ')', opacity: 0.16 }, band);
+    el('polygon', { points: pts([[-m, cy + s - th / 2], [W + m, cy - s - th / 2], [W + m, cy - s - th / 2 + 7], [-m, cy + s - th / 2 + 7]]), fill: P.paper }, band);
+    // le barre colore lungo il bordo basso della fascia
+    const cols = [P.paper, P.light, P.key, P.deep, P.paper, P.light, P.void, P.key], bw = (W + m * 2) / cols.length, bars = [];
+    cols.forEach((c, i) => {
+      const x0 = -m + i * bw, y0 = cy + s - (2 * s * (x0 + m)) / (W + m * 2) + th / 2, y1 = cy + s - (2 * s * (x0 + bw + m)) / (W + m * 2) + th / 2;
+      const b = el('polygon', { points: pts([[x0, y0 - 16], [x0 + bw + 1, y1 - 16], [x0 + bw + 1, y1], [x0, y0]]), fill: c }, band);
+      b.style.transformOrigin = x0.toFixed(0) + 'px ' + y0.toFixed(0) + 'px'; b.__i = dir > 0 ? i : cols.length - 1 - i; bars.push(b);
+    });
+    const line = el('polygon', { points: pts([[-m, cy + s - 3], [W + m, cy - s - 3], [W + m, cy - s + 3], [-m, cy + s + 3]]), fill: P.paper, opacity: 0 }, g);
+    line.style.transformOrigin = (W / 2).toFixed(0) + 'px ' + cy.toFixed(0) + 'px';
+    const fly = speed(g, W, H, P, RI(4, 6)), K = H * 0.62 + m;
+    return {
+      cover: () => fly().concat([
+        anim(top, [{ transform: 'translateY(' + -K + 'px)' }, { transform: 'translateY(0)' }], { duration: 210, easing: E.io }),
+        anim(bot, [{ transform: 'translateY(' + K + 'px)' }, { transform: 'translateY(0)' }], { duration: 210, delay: 24, easing: E.io }),
+        anim(band, [{ transform: 'scaleY(0)' }, { transform: 'scaleY(1)' }], { duration: 200, delay: 170, easing: E.kick }),
+      ], bars.map((b) => anim(b, [{ transform: 'scaleX(0)' }, { transform: 'scaleX(1)' }], { duration: 120, delay: 240 + b.__i * 16, easing: E.out }))),
+      uncover: () => [
+        anim(band, [{ transform: 'scaleY(1)' }, { transform: 'scaleY(0)' }], { duration: 150, easing: E.in }),
+        anim(line, [{ opacity: 1, transform: 'scaleX(1)' }, { opacity: 1, transform: 'scaleX(1)', offset: 0.45 }, { opacity: 0, transform: 'scaleX(0)' }], { duration: 300, delay: 90, easing: E.out }),
+        anim(top, [{ transform: 'translateY(0)' }, { transform: 'translateY(' + -K + 'px)' }], { duration: 250, delay: 110, easing: E.in }),
+        anim(bot, [{ transform: 'translateY(0)' }, { transform: 'translateY(' + K + 'px)' }], { duration: 250, delay: 110, easing: E.in }),
+      ],
+    };
+  }
+
+  // verdetto (Esito): due metà, una nera e una nella tinta, si chiudono lungo una diagonale come una sentenza;
+  // all'impatto un lampo di carta sulla giunta, poi le due metà si separano
+  function verdetto(g, W, H, dir, P, defs) {
+    const a = rad(R(-30, -18) * dir), ux = Math.cos(a), uy = Math.sin(a), nx = -uy, ny = ux, L = Math.hypot(W, H) * 1.3, cx = W / 2, cy = H / 2;
+    const dots = halftone(defs, 'lxv' + Date.now(), P.void, RI(9, 12), R(1.8, 2.6), R(15, 50));
+    const half = (s, fill) => pts([[cx - ux * L - nx * 3 * s, cy - uy * L - ny * 3 * s], [cx + ux * L - nx * 3 * s, cy + uy * L - ny * 3 * s], [cx + ux * L + nx * L * s, cy + uy * L + ny * L * s], [cx - ux * L + nx * L * s, cy - uy * L + ny * L * s]]);
+    const A = el('g', {}, g), B = el('g', {}, g);
+    el('polygon', { points: half(-1), fill: P.void }, A);
+    el('polygon', { points: half(1), fill: P.key }, B);
+    el('polygon', { points: half(1), fill: dots, opacity: 0.3 }, B);
+    // un filo di carta sul bordo di ciascuna metà: la giunta si legge anche a metà corsa
+    const rim = (s, par) => el('polygon', { points: pts([[cx - ux * L, cy - uy * L], [cx + ux * L, cy + uy * L], [cx + ux * L + nx * 9 * s, cy + uy * L + ny * 9 * s], [cx - ux * L + nx * 9 * s, cy - uy * L + ny * 9 * s]]), fill: P.paper }, par);
+    rim(-1, A); rim(1, B);
+    const flash = el('line', { x1: cx - ux * L, y1: cy - uy * L, x2: cx + ux * L, y2: cy + uy * L, stroke: P.paper, 'stroke-width': 26, opacity: 0 }, g);
+    const K = Math.hypot(W, H) * 0.62, tr = (k) => 'translate(' + (nx * k).toFixed(0) + 'px,' + (ny * k).toFixed(0) + 'px)';
+    return {
+      cover: () => [
+        anim(A, [{ transform: tr(-K) }, { transform: tr(0) }], { duration: 230, easing: 'cubic-bezier(.6,0,.9,.4)' }),
+        anim(B, [{ transform: tr(K) }, { transform: tr(0) }], { duration: 230, delay: 20, easing: 'cubic-bezier(.6,0,.9,.4)' }),
+        anim(flash, [{ opacity: 0, strokeWidth: 40 }, { opacity: 1, strokeWidth: 30, offset: 0.2 }, { opacity: 0, strokeWidth: 0 }], { duration: 230, delay: 225, easing: E.out }),
+        // il contraccolpo: tutto il piano rimbalza di qualche pixel lungo la diagonale
+        anim(g, [{ translate: '0 0' }, { translate: (ux * 10).toFixed(1) + 'px ' + (uy * 10).toFixed(1) + 'px' }, { translate: (-ux * 6).toFixed(1) + 'px ' + (-uy * 6).toFixed(1) + 'px' }, { translate: '0 0' }], { duration: 150, delay: 250, easing: 'steps(3, end)', fill: 'none' }),
+      ],
+      uncover: () => [
+        anim(A, [{ transform: tr(0) }, { transform: tr(-K * 1.25) }], { duration: 300, easing: E.in }),
+        anim(B, [{ transform: tr(0) }, { transform: tr(K * 1.25) }], { duration: 300, delay: 26, easing: E.in }),
+      ],
+    };
+  }
+
+  // lustro (Trofei): un ventaglio di raggi si apre dal basso come dietro una coppa, un riflesso di carta
+  // attraversa tutto lo schermo e restano accese alcune scintille
+  function lustro(g, W, H, dir, P, defs) {
+    const ox = W * R(0.42, 0.58), oy = H * 1.14, far = Math.max(Math.hypot(ox, oy), Math.hypot(W - ox, oy)) * 1.08;
+    const n = RI(10, 14), a0 = -8, a1 = 188, fills = [P.key, P.void, P.deep, P.void], rays = [];
+    const dots = halftone(defs, 'lxl' + Date.now(), P.key, RI(9, 12), R(1.6, 2.4), R(20, 50));
+    for (let i = 0; i < n; i++) {
+      const t0 = rad(a0 + ((a1 - a0) * i) / n - 0.7), t1 = rad(a0 + ((a1 - a0) * (i + 1)) / n + 0.7), fill = fills[i % fills.length];
+      const poly = pts([[ox, oy], [ox + Math.cos(t0) * far, oy - Math.sin(t0) * far], [ox + Math.cos(t1) * far, oy - Math.sin(t1) * far]]);
+      const k = dir > 0 ? n - 1 - i : i; // il ventaglio si apre nel verso della navigazione
+      [el('polygon', { points: poly, fill }, g)].concat(fill === P.void && i % 2 ? [el('polygon', { points: poly, fill: dots, opacity: 0.45 }, g)] : []).forEach((r) => { r.style.transformOrigin = ox.toFixed(0) + 'px ' + oy.toFixed(0) + 'px'; r.__i = k; rays.push(r); });
+    }
+    // il riflesso: una lama di carta inclinata, con un filo più sottile accanto
+    const sw = Math.max(70, W * 0.13), sl = H * 0.42, shine = el('g', { opacity: 0.92 }, g);
+    el('polygon', { points: pts([[-sw + sl, -40], [sl, -40], [-sl, H + 40], [-sw - sl, H + 40]]), fill: P.paper }, shine);
+    el('polygon', { points: pts([[-sw * 1.5 + sl, -40], [-sw * 1.32 + sl, -40], [-sw * 1.32 - sl, H + 40], [-sw * 1.5 - sl, H + 40]]), fill: P.light }, shine);
+    shine.style.opacity = 0;
+    // le scintille: stelle a quattro punte di carta e di luce
+    const stars = [];
+    for (let i = 0; i < RI(7, 10); i++) {
+      const x = R(0.06, 0.94) * W, y = R(0.08, 0.86) * H, r = R(14, 40) * Math.max(0.7, Math.min(1.4, W / 900)), q = r * 0.2;
+      const st = el('polygon', { points: pts([[x, y - r], [x + q, y - q], [x + r, y], [x + q, y + q], [x, y + r], [x - q, y + q], [x - r, y], [x - q, y - q]]), fill: i % 3 ? P.paper : P.light }, g);
+      st.style.transformOrigin = x.toFixed(0) + 'px ' + y.toFixed(0) + 'px'; st.style.opacity = 0; st.__x = x / W; stars.push(st);
+    }
+    const sx = (W + sw * 2 + sl * 2);
+    return {
+      cover: () => rays.map((r) => anim(r, [{ transform: 'rotate(' + -dir * 24 + 'deg) scale(0)' }, { transform: 'rotate(0) scale(1)' }], { duration: 190, delay: r.__i * 8 + R(0, 8), easing: E.out })).concat(
+        [anim(shine, [{ transform: 'translateX(' + (dir > 0 ? -sl : sx) + 'px)', opacity: 0.92 }, { transform: 'translateX(' + (dir > 0 ? sx : -sl) + 'px)', opacity: 0.92 }], { duration: 300, delay: 150, easing: 'cubic-bezier(.5,0,.3,1)', fill: 'none' })],
+        stars.map((st) => anim(st, [{ transform: 'scale(0) rotate(-40deg)', opacity: 1 }, { transform: 'scale(1) rotate(0)', opacity: 1 }], { duration: 170, delay: 200 + (dir > 0 ? st.__x : 1 - st.__x) * 210, easing: E.kick }))),
+      uncover: () => stars.map((st) => anim(st, [{ transform: 'scale(1) rotate(0)', opacity: 1 }, { transform: 'scale(0) rotate(50deg)', opacity: 1 }], { duration: 150, delay: R(0, 70), easing: E.in })).concat(
+        rays.map((r) => anim(r, [{ transform: 'rotate(0) scale(1)' }, { transform: 'rotate(' + dir * 16 + 'deg) scale(0)' }], { duration: 250, delay: 40 + (n - 1 - r.__i) * 12 + R(0, 8), easing: E.in }))),
+    };
+  }
+
+  const FAMILIES = { lame, schegge, sipario, esplosione, retino, titoli, onair, verdetto, lustro };
+  // la sezione d'arrivo ha una famiglia di casa. Diretta, Esito e Trofei hanno uno stacco di firma, sempre quello;
+  // le altre sezioni ogni tanto cambiano, ma mai la stessa famiglia due volte di fila
+  const HOME = { home: ['titoli', 'lame'], cast: ['sipario', 'retino'], arena: ['schegge', 'lame'], diretta: ['onair'], esito: ['verdetto'], trofei: ['lustro'] };
+  const SIGN = { onair: 150, verdetto: 150, lustro: 190 }; // millisecondi di coda dopo la copertura
+  const COMMON = ['lame', 'schegge', 'sipario', 'retino', 'titoli', 'esplosione'];
   function choose(view) {
     if (G.LOS_REGIA && FAMILIES[G.LOS_REGIA.force]) return (lastFamily = G.LOS_REGIA.force); // solo per provare
     const pref = HOME[view] || ['lame'];
-    let f = Math.random() < 0.55 ? pref[0] : pick(pref.concat(Object.keys(FAMILIES)));
-    if (f === lastFamily) f = pref.find((x) => x !== lastFamily) || Object.keys(FAMILIES).find((x) => x !== lastFamily);
+    if (pref.length === 1) return (lastFamily = pref[0]);
+    let f = Math.random() < 0.7 ? pref[0] : pick(pref.concat(COMMON));
+    if (f === lastFamily) f = pref.find((x) => x !== lastFamily) || COMMON.find((x) => x !== lastFamily);
     lastFamily = f; return f;
+  }
+  // stringe (o allunga) un gruppo di animazioni perché finisca in `total` millisecondi: ogni famiglia tiene
+  // il suo ritmo interno, ma tutte stanno nella stessa griglia dei tempi
+  function fit(list, total) {
+    let end = 0;
+    list.forEach((a) => { try { end = Math.max(end, a.effect.getComputedTiming().endTime); } catch (e) { /* niente */ } });
+    if (end > 0 && Math.abs(end - total) > 8) list.forEach((a) => { try { a.playbackRate = end / total; } catch (e) { /* niente */ } });
+    return list;
   }
 
   /* ---------- il cartello: lastra di carta, lettere una per una ---------- */
@@ -22484,7 +22684,8 @@ window.LOS_BUILD = "8af3630a1f197ef7638508848bc36527a19ae975cf84b93f90d5a4a0cbf4
     const cap = document.createElement('div'); cap.className = 'lx-cap lx-' + fam;
     const word = (opt.label || '').trim(); if (!word) return null;
     const sub = LABEL_SUB[view] || '';
-    cap.innerHTML = '<i class="lx-slab"></i><b class="lx-word"></b>' + (sub ? '<small class="lx-sub"></small>' : '');
+    // la Diretta ha in più la spia «in onda»
+    cap.innerHTML = (fam === 'onair' ? '<em class="lx-live"><i></i>In onda</em>' : '') + '<i class="lx-slab"></i><b class="lx-word"></b>' + (sub ? '<small class="lx-sub"></small>' : '');
     const w = cap.querySelector('.lx-word');
     [...word].forEach((ch) => { const s = document.createElement('span'); s.textContent = ch === ' ' ? ' ' : ch; w.appendChild(s); });
     if (sub) cap.querySelector('.lx-sub').textContent = sub;
@@ -22492,7 +22693,8 @@ window.LOS_BUILD = "8af3630a1f197ef7638508848bc36527a19ae975cf84b93f90d5a4a0cbf4
     cap.style.setProperty('--rot', rot.toFixed(1) + 'deg');
     cap.style.setProperty('--lx-key', P.key);
     // la posizione cambia con la famiglia: il testo sta dove la geometria lascia spazio
-    const place = { lame: [dir > 0 ? 34 : 66, 58], schegge: [50, 50], sipario: [dir > 0 ? 60 : 40, 42], esplosione: [50, 50] }[fam] || [50, 50];
+    const place = { lame: [dir > 0 ? 34 : 66, 58], schegge: [50, 50], sipario: [dir > 0 ? 60 : 40, 42], esplosione: [50, 50], lustro: [50, 44] }[fam] || [50, 50];
+    if (fam === 'onair') cap.style.setProperty('--rot', (R(-3.5, -2) * dir).toFixed(1) + 'deg');
     cap.style.left = place[0] + '%'; cap.style.top = place[1] + '%';
     host.appendChild(cap);
     // il cartello resta sempre dentro lo schermo: le parole lunghe si stringono, poi si sposta il centro
@@ -22503,20 +22705,34 @@ window.LOS_BUILD = "8af3630a1f197ef7638508848bc36527a19ae975cf84b93f90d5a4a0cbf4
     if (r.left < pad) cap.style.left = 'calc(' + place[0] + '% + ' + (pad - r.left).toFixed(0) + 'px)';
     else if (r.right > W - pad) cap.style.left = 'calc(' + place[0] + '% - ' + (r.right - W + pad).toFixed(0) + 'px)';
     const letters = [...w.children];
-    const slab = cap.querySelector('.lx-slab'), subEl = cap.querySelector('.lx-sub');
-    const inA = [
-      anim(slab, [{ transform: 'scaleX(0)' }, { transform: 'scaleX(1)' }], { duration: 200, delay: 40, easing: E.out }),
-      ...letters.map((s, i) => anim(s, [{ transform: 'translateY(-.55em) rotate(' + R(-24, 24) + 'deg) scale(1.5)', opacity: 0 }, { opacity: 1, offset: 0.35 }, { transform: 'none', opacity: 1 }], { duration: 240, delay: 90 + i * 22 + R(0, 10), easing: E.kick })),
-    ];
-    if (subEl) inA.push(anim(subEl, [{ transform: 'translateX(' + -dir * 24 + 'px)', opacity: 0 }, { transform: 'none', opacity: 1 }], { duration: 240, delay: 160 + letters.length * 22, easing: E.out }));
+    const slab = cap.querySelector('.lx-slab'), subEl = cap.querySelector('.lx-sub'), live = cap.querySelector('.lx-live');
+    let inA;
+    if (fam === 'verdetto') {
+      // la sentenza cade tutta insieme, come un timbro: niente lettere una per una
+      inA = [
+        anim(cap, [{ scale: '2.4', opacity: 0, easing: 'cubic-bezier(.55,0,1,.45)' }, { scale: '.94', opacity: 1, offset: 0.62, easing: E.out }, { scale: '1', opacity: 1 }], { duration: 230, delay: 150 }),
+        anim(slab, [{ transform: 'scaleX(1)' }, { transform: 'scaleX(1)' }], { duration: 10 }),
+      ];
+    } else {
+      inA = [
+        anim(slab, [{ transform: 'scaleX(0)' }, { transform: 'scaleX(1)' }], { duration: 170, delay: 20, easing: E.out }),
+        ...letters.map((s, i) => anim(s, [{ transform: 'translateY(-.55em) rotate(' + R(-24, 24) + 'deg) scale(1.5)', opacity: 0 }, { opacity: 1, offset: 0.35 }, { transform: 'none', opacity: 1 }], { duration: 200, delay: 60 + i * 15 + R(0, 8), easing: E.kick })),
+      ];
+    }
+    if (subEl) inA.push(anim(subEl, [{ transform: 'translateX(' + -dir * 24 + 'px)', opacity: 0 }, { transform: 'none', opacity: 1 }], { duration: 180, delay: 110 + Math.min(letters.length, 10) * 12, easing: E.out }));
+    if (live) {
+      inA.push(anim(live, [{ transform: 'translateX(' + -dir * 30 + 'px) skewX(-12deg)', opacity: 0 }, { transform: 'skewX(-12deg)', opacity: 1 }], { duration: 160, delay: 40, easing: E.out }));
+      anim(live.firstChild, [{ opacity: 1 }, { opacity: 0.15 }, { opacity: 1 }], { duration: 260, iterations: 4, easing: 'steps(2, end)', fill: 'none' });
+    }
     return {
       el: cap,
-      shown: all(inA),
-      out: () => all([
-        ...letters.map((s, i) => anim(s, [{ transform: 'none', opacity: 1 }, { transform: 'translateX(' + dir * 0.6 + 'em) skewX(-20deg)', opacity: 0 }], { duration: 150, delay: i * 9, easing: E.in })),
-        anim(slab, [{ transform: 'scaleX(1)' }, { transform: 'scaleX(0)', transformOrigin: dir > 0 ? '100% 50%' : '0 50%' }], { duration: 200, delay: 60, easing: E.in }),
-        ...(subEl ? [anim(subEl, [{ opacity: 1 }, { opacity: 0 }], { duration: 120, easing: E.in })] : []),
-      ]),
+      shown: inA,
+      out: () => [
+        ...letters.map((s, i) => anim(s, [{ transform: 'none', opacity: 1 }, { transform: 'translateX(' + dir * 0.6 + 'em) skewX(-20deg)', opacity: 0 }], { duration: 130, delay: Math.min(i * 7, 70), easing: E.in })),
+        anim(slab, [{ transform: 'scaleX(1)' }, { transform: 'scaleX(0)', transformOrigin: dir > 0 ? '100% 50%' : '0 50%' }], { duration: 170, delay: 40, easing: E.in }),
+        ...(subEl ? [anim(subEl, [{ opacity: 1 }, { opacity: 0 }], { duration: 110, easing: E.in })] : []),
+        ...(live ? [anim(live, [{ opacity: 1 }, { opacity: 0 }], { duration: 110, easing: E.in })] : []),
+      ],
     };
   }
 
@@ -22540,11 +22756,11 @@ window.LOS_BUILD = "8af3630a1f197ef7638508848bc36527a19ae975cf84b93f90d5a4a0cbf4
     host.appendChild(st);
     // accanto al cartello, sopra l'angolo destro (o sotto, se sopra non c'è posto), sempre dentro lo schermo
     let cx = W * 0.5, cy = H * 0.26;
-    if (capEl) { const r = capEl.getBoundingClientRect(); cx = r.right - S * 0.12; cy = r.top > S * 0.95 ? r.top - S * 0.58 : r.bottom + S * 0.6; }
+    if (capEl) { const r = capEl.getBoundingClientRect(); cx = r.right - S * 0.12; cy = r.top > S * 1.02 ? r.top - S * 0.66 : r.bottom + S * 0.66; }
     const pad = 10 + S / 2;
     st.style.left = Math.min(W - pad, Math.max(pad, cx)).toFixed(0) + 'px'; st.style.top = Math.min(H - pad, Math.max(pad, cy)).toFixed(0) + 'px';
     const body = st.querySelector('.lx-st-body'), mis = st.querySelector('.lx-st-mis'), fx = st.querySelector('.lx-st-fx'), rib = st.querySelector('.lx-st-name');
-    const T0 = 110, DUR = 300, IMP = T0 + DUR * 0.6;
+    const T0 = 20, DUR = 230, IMP = T0 + DUR * 0.6;
     const sh = Math.max(5, Math.round(S * 0.03)), pressed = 'drop-shadow(' + sh + 'px ' + Math.round(sh * 1.15) + 'px 0 #0a0a0c)';
     const fall = anim(body, [
       { transform: 'rotate(calc(var(--srot) - 28deg)) scale(2.5)', opacity: 0, filter: 'drop-shadow(26px 34px 16px rgb(0 0 0 / .55))', easing: 'cubic-bezier(.55,0,1,.45)' },
@@ -22556,26 +22772,29 @@ window.LOS_BUILD = "8af3630a1f197ef7638508848bc36527a19ae975cf84b93f90d5a4a0cbf4
     anim(mis, [{ translate: '0 0' }, { translate: '0 0', offset: 0.6 }, { translate: slip + 'px -' + slip + 'px' }], { duration: DUR, delay: T0, easing: E.out });
     // l'impatto: due onde e gli schizzi, nelle unità della lastra (raggio 50)
     const wave = (color, w, delay, dur) => { const c = el('circle', { cx: 0, cy: 0, r: 51, fill: 'none', stroke: color, 'stroke-width': w }, fx); anim(c, [{ transform: 'scale(.94)', opacity: 0, strokeWidth: w }, { opacity: 1, offset: 0.06 }, { transform: 'scale(1.9)', opacity: 0, strokeWidth: 0.6 }], { duration: dur, delay, easing: E.out }); };
-    wave(P.paper, 5, IMP, 460); wave(P.key, 8, IMP + 60, 540);
+    wave(P.paper, 5, IMP, 300); wave(P.key, 8, IMP + 40, 340);
     for (let i = 0; i < 24; i++) {
       const a = R(0, Math.PI * 2), d = R(54, 96), r = i < 6 ? R(3, 4.6) : R(0.9, 2.6), dot = el('ellipse', { cx: 0, cy: 0, rx: (r * R(1.2, 2.2)).toFixed(1), ry: r.toFixed(1), fill: Math.random() < 0.62 ? P.void : P.key }, fx);
       const deg = ((a * 180) / Math.PI).toFixed(0);
-      anim(dot, [{ transform: 'translate(' + (Math.cos(a) * 44).toFixed(1) + 'px,' + (Math.sin(a) * 44).toFixed(1) + 'px) rotate(' + deg + 'deg) scale(0)' }, { transform: 'translate(' + (Math.cos(a) * d).toFixed(1) + 'px,' + (Math.sin(a) * d).toFixed(1) + 'px) rotate(' + deg + 'deg) scale(1)' }], { duration: R(200, 300), delay: IMP + R(0, 30), easing: E.out });
+      anim(dot, [{ transform: 'translate(' + (Math.cos(a) * 44).toFixed(1) + 'px,' + (Math.sin(a) * 44).toFixed(1) + 'px) rotate(' + deg + 'deg) scale(0)' }, { transform: 'translate(' + (Math.cos(a) * d).toFixed(1) + 'px,' + (Math.sin(a) * d).toFixed(1) + 'px) rotate(' + deg + 'deg) scale(1)' }], { duration: R(150, 220), delay: IMP + R(0, 24), easing: E.out });
     }
-    host.animate([{ translate: '0 0' }, { translate: '-7px 5px' }, { translate: '6px -4px' }, { translate: '-3px 2px' }, { translate: '0 0' }], { duration: 220, delay: IMP, easing: 'steps(4, end)' });
-    if (rib) anim(rib, [{ clipPath: 'inset(0 100% 0 0)', letterSpacing: '.5em' }, { clipPath: 'inset(0 0 0 0)', letterSpacing: '.18em' }], { duration: 280, delay: IMP + 50, easing: E.out });
+    host.animate([{ translate: '0 0' }, { translate: '-7px 5px' }, { translate: '6px -4px' }, { translate: '-3px 2px' }, { translate: '0 0' }], { duration: 180, delay: IMP, easing: 'steps(4, end)' });
+    if (rib) anim(rib, [{ clipPath: 'inset(0 100% 0 0)', letterSpacing: '.5em' }, { clipPath: 'inset(0 0 0 0)', letterSpacing: '.18em' }], { duration: 190, delay: IMP + 30, easing: E.out });
     sfx('stamp', { at: IMP });
     return {
-      landed: fall.finished.catch(() => {}),
-      out: () => all([
-        anim(body, [{ transform: 'rotate(var(--srot)) scale(1)', opacity: 1 }, { transform: 'rotate(calc(var(--srot) + 7deg)) scale(1.14)', opacity: 0 }], { duration: 210, easing: E.in }),
-        anim(fx, [{ opacity: 1 }, { opacity: 0 }], { duration: 160, easing: E.in }),
-      ]),
+      landed: fall,
+      out: () => [
+        anim(body, [{ transform: 'rotate(var(--srot)) scale(1)', opacity: 1 }, { transform: 'rotate(calc(var(--srot) + 7deg)) scale(1.14)', opacity: 0 }], { duration: 170, easing: E.in }),
+        anim(fx, [{ opacity: 1 }, { opacity: 0 }], { duration: 130, easing: E.in }),
+      ],
     };
   }
 
-  /* ---------- la pagina nuova entra a strati ---------- */
-  const ENTER = '.pagehead > div > p, h2, .card, .poster-card, .facts > *, .cta, .lead, .kicker, .hh-board, .broadcast, .winhero, .podium, .block, .award, .steps-hint, .arena-grid > *, .rules > *, .dock';
+  /* ---------- la pagina nuova entra a strati ----------
+   * I blocchi visibili entrano uno dopo l'altro dal lato della navigazione mentre la copertura se ne va. Si muovono
+   * solo `translate` e `opacity` (proprietà indipendenti: le inclinazioni dei blocchi restano le loro), l'opacità è
+   * piena a un terzo della corsa e i ritardi hanno un tetto: a stacco finito il testo si legge già tutto. */
+  const ENTER = '.pagehead > div > p, h2, .card, .poster-card, .facts > *, .cta, .lead, .kicker, .hh-board, .broadcast, .winhero, .podium, .block, .award, .steps-hint, .arena-grid > *, .rules > *, .dock, .bc-tabs';
   function enter(view, dir) {
     const sec = document.getElementById('v-' + view); if (!sec) return;
     const vh = G.innerHeight, list = [];
@@ -22586,63 +22805,102 @@ window.LOS_BUILD = "8af3630a1f197ef7638508848bc36527a19ae975cf84b93f90d5a4a0cbf4
       list.push(n);
     });
     list.sort((a, b) => { const ra = a.getBoundingClientRect(), rb = b.getBoundingClientRect(); return ra.top - rb.top || ra.left - rb.left; });
+    const far = Math.min(84, Math.max(40, G.innerWidth * 0.07));
     list.slice(0, 18).forEach((n, i) => {
-      n.animate([{ translate: dir * 56 + 'px 0', opacity: 0 }, { translate: '0 0', opacity: 1 }], { duration: 460, delay: 40 + i * 36, easing: E.out, fill: 'backwards' });
+      const y = i % 2 ? 10 : -6;
+      n.animate([{ translate: (dir * far).toFixed(0) + 'px ' + y + 'px', opacity: 0 }, { opacity: 1, offset: 0.34 }, { translate: '0 0', opacity: 1 }], { duration: 360, delay: 20 + Math.min(i, 9) * 24, easing: E.out, fill: 'backwards' });
     });
   }
 
-  /* ---------- il nuovo stacco ---------- */
-  let layer = null;
+  /* ---------- il nuovo stacco ----------
+   * Griglia dei tempi (ms): copertura 0→COVER, cambio pagina a COVER (il punto di mezzo), cartello fermo per HOLD,
+   * uscita in UNCOVER; in tutto 660 ms (710 con il timbro dell'arena). La regia va a tempo con i timer, non con la fine delle animazioni:
+   * così `swap` viene chiamata sempre, una volta sola e presto, anche quando la scheda o il pannello sono nascosti
+   * e le animazioni restano ferme al primo fotogramma. In quel caso (documento nascosto, oppure nessun fotogramma
+   * entro FROZEN ms) lo stacco si chiude subito: la pagina cambia e la copertura viene tolta. */
+  const COVER = 210, HOLD = 170, HOLD_SEAL = 220, UNCOVER = 280, FROZEN = 150;
+  let layer = null, cut = 0, finish = null;
   function wipe(swap, opt) {
     opt = opt || {};
     const body = document.body;
     const to = viewOf(G.location && G.location.hash), from = lastView;
     lastView = to;
-    if (AN.reduced || busy || !body || typeof body.animate !== 'function') { swap(); return; }
-    busy = true;
     const dir = ORDER.indexOf(to) >= ORDER.indexOf(from) ? 1 : -1;
-    const W = G.innerWidth, H = G.innerHeight, P = palette(opt.hue); P.label = opt.label;
-    if (!layer || !layer.isConnected) { layer = document.createElement('div'); layer.className = 'lx'; layer.setAttribute('aria-hidden', 'true'); body.appendChild(layer); }
-    layer.innerHTML = ''; layer.hidden = false;
-    const svg = el('svg', { width: W, height: H, viewBox: '0 0 ' + W + ' ' + H, class: 'lx-svg' });
-    const defs = el('defs', {}, svg), g = el('g', {}, svg);
-    layer.appendChild(svg);
-    const fam = choose(to);
-    const recent = lastPointer && Date.now() - lastPointer.t < 1200 ? lastPointer : null;
-    const shape = FAMILIES[fam](g, W, H, dir, P, defs, recent);
-    // lo specchio per la direzione: le lame e il sipario arrivano dal lato giusto
-    if (dir < 0 && (fam === 'lame')) g.setAttribute('transform', 'translate(' + W + ',0) scale(-1,1)');
-    // il sipario non è mai dritto: qualche grado d'inclinazione, ingrandito quanto basta a coprire gli angoli
-    if (fam === 'sipario' || fam === 'titoli') g.setAttribute('transform', 'translate(' + W / 2 + ' ' + H / 2 + ') rotate(' + (R(3, 7) * -dir).toFixed(1) + ') scale(1.22) translate(' + -W / 2 + ' ' + -H / 2 + ')');
-    // il sigillo dell'arena: un timbro vero accanto al cartello (vedi stamp)
-    const FX = (G.LOS_ASSETS && G.LOS_ASSETS.fx) || {}, sealUrl = opt.arena && FX.sigilli && FX.sigilli[opt.arena];
-    const canSeal = !!(sealUrl && (/^data:/.test(sealUrl) || /^https?:$/.test(G.location.protocol)));
-    let seal = null;
     let swapped = false;
     const doSwap = () => { if (swapped) return; swapped = true; try { swap(); } catch (e) { setTimeout(() => { throw e; }); } };
-    sfx('cut');
-    let cap = null;
-    const t0 = performance.now();
-    shape.cover()
-      .then(() => {
-        cap = caption(layer, opt, to, fam, P, dir);
-        if (canSeal) seal = stamp(layer, sealUrl, P, opt, cap && cap.el);
-        else sfx('stamp', { at: 80 });
-        doSwap();
-        emit('los:cover', { view: to, dir, hue: P.hue });
-        return Promise.all([cap ? cap.shown : null, seal ? seal.landed : null, new Promise((r) => setTimeout(r, 140))]);
-      })
-      // con il timbro il cartello resta fermo un po' di più: il tempo di leggere nome e sigillo
-      .then(() => new Promise((r) => setTimeout(r, opt.hold || (seal ? 420 : 110))))
-      .then(() => {
-        const outs = [cap ? cap.out() : null];
-        if (seal) outs.push(seal.out());
-        enter(to, dir);
-        emit('los:enter', { view: to, dir });
-        return Promise.all(outs.concat([new Promise((r) => setTimeout(r, 70)).then(() => shape.uncover())]));
-      })
-      .catch(() => {})
-      .then(() => { doSwap(); layer.hidden = true; layer.innerHTML = ''; busy = false; if (performance.now() - t0 > 4000) lastFamily = null; });
+    // niente movimento, pagina nascosta, uno stacco già in corso: la pagina cambia subito
+    if (AN.reduced || busy || !body || typeof body.animate !== 'function' || document.hidden) {
+      doSwap();
+      emit('los:cover', { view: to, dir, hue: opt.hue, still: true }); emit('los:enter', { view: to, dir, still: true });
+      return;
+    }
+    busy = true;
+    const my = ++cut, timers = [];
+    const later = (ms, fn) => { const id = setTimeout(() => { if (my === cut && busy) fn(); }, ms); timers.push(id); return id; };
+    let stage = 0, cap = null, seal = null, shape = null, fam = null, P = null;
+    // se nel frattempo si è cambiata ancora sezione (stacco saltato perché questo era in corso), vale quella di adesso
+    const here = () => viewOf(G.location && G.location.hash);
+    const mid = (still) => { if (stage >= 1) return; stage = 1; doSwap(); emit('los:cover', { view: here(), dir, hue: P ? P.hue : opt.hue, still: !!still }); };
+    const open = () => {
+      mid(); if (stage >= 2) return; stage = 2;
+      try {
+        if (cap) cap.out(); if (seal) seal.out();
+        enter(here(), dir);
+        fit(shape.uncover(), UNCOVER);
+      } catch (e) { /* solo decorazione: la chiusura arriva comunque dal timer */ }
+      emit('los:enter', { view: here(), dir });
+    };
+    const end = (still) => {
+      if (stage >= 3) return;
+      mid(still); if (stage < 2) emit('los:enter', { view: here(), dir, still: !!still });
+      stage = 3; timers.forEach(clearTimeout); document.removeEventListener('visibilitychange', onVis);
+      if (layer) { layer.hidden = true; layer.innerHTML = ''; }
+      busy = false; finish = null;
+    };
+    finish = end;
+    const onVis = () => { if (document.hidden) end(true); };
+    // con il timbro il cartello resta fermo un po' di più: il tempo di leggere nome e sigillo
+    const FX = (G.LOS_ASSETS && G.LOS_ASSETS.fx) || {}, sealUrl = opt.arena && FX.sigilli && FX.sigilli[opt.arena];
+    const canSeal = !!(sealUrl && (/^data:/.test(sealUrl) || /^https?:$/.test(G.location.protocol)));
+    const hold = (canSeal ? HOLD_SEAL : HOLD) + (opt.hold || 0);
+    // i timer partono prima di disegnare: nessun errore nel disegno può fermare il cambio di pagina
+    // LOS_REGIA.hold ('cover' oppure 'open') ferma lo stacco a quel punto per poterlo guardare: solo per provare; LOS_REGIA.done() lo chiude
+    const stop = G.LOS_REGIA && G.LOS_REGIA.hold;
+    later(COVER, () => mid());
+    if (stop !== 'cover') later(COVER + hold, open);
+    if (!stop) later(COVER + hold + UNCOVER + 40, () => end());
+    document.addEventListener('visibilitychange', onVis);
+    // la sentinella dei fotogrammi: se entro FROZEN ms non ne arriva nessuno, le animazioni sono ferme
+    let framed = false;
+    try { requestAnimationFrame(() => { framed = true; }); } catch (e) { /* niente */ }
+    if (!stop) later(FROZEN, () => { if (!framed) end(true); });
+    try {
+      const W = G.innerWidth, H = G.innerHeight; P = palette(opt.hue); P.label = opt.label;
+      if (!layer || !layer.isConnected) { layer = document.createElement('div'); layer.className = 'lx'; layer.setAttribute('aria-hidden', 'true'); body.appendChild(layer); }
+      layer.innerHTML = ''; layer.hidden = false;
+      const svg = el('svg', { width: W, height: H, viewBox: '0 0 ' + W + ' ' + H, class: 'lx-svg' });
+      const defs = el('defs', {}, svg), g = el('g', {}, svg);
+      layer.appendChild(svg);
+      fam = choose(to);
+      const recent = lastPointer && Date.now() - lastPointer.t < 1200 ? lastPointer : null;
+      shape = FAMILIES[fam](g, W, H, dir, P, defs, recent);
+      // lo specchio per la direzione: le lame arrivano dal lato giusto
+      if (dir < 0 && (fam === 'lame')) g.setAttribute('transform', 'translate(' + W + ',0) scale(-1,1)');
+      // il sipario non è mai dritto: qualche grado d'inclinazione, ingrandito quanto basta a coprire gli angoli
+      if (fam === 'sipario' || fam === 'titoli') g.setAttribute('transform', 'translate(' + W / 2 + ' ' + H / 2 + ') rotate(' + (R(3, 7) * -dir).toFixed(1) + ') scale(1.22) translate(' + -W / 2 + ' ' + -H / 2 + ')');
+      sfx('cut');
+      // le firme hanno una coda (fascia, lampo, scintille) che cade a pagina già coperta
+      fit(shape.cover(), COVER + (SIGN[fam] || 0));
+      // il cartello parte mentre le lastre stanno ancora arrivando: a copertura chiusa si legge già
+      later(90, () => {
+        try {
+          cap = caption(layer, opt, to, fam, P, dir);
+          if (cap) fit(cap.shown, fam === 'verdetto' ? 260 : 230);
+          // il sigillo dell'arena: un timbro vero accanto al cartello (vedi stamp)
+          if (canSeal) seal = stamp(layer, sealUrl, P, opt, cap && cap.el); else sfx('stamp', { at: 120 });
+        } catch (e) { /* solo decorazione */ }
+      });
+    } catch (e) { end(true); setTimeout(() => { throw e; }); }
   }
   AN.wipe = wipe;
 
@@ -22662,7 +22920,7 @@ window.LOS_BUILD = "8af3630a1f197ef7638508848bc36527a19ae975cf84b93f90d5a4a0cbf4
     return r;
   };
 
-  G.LOS_REGIA = { wipe, families: Object.keys(FAMILIES), E };
+  G.LOS_REGIA = { wipe, families: Object.keys(FAMILIES), E, done: () => { if (finish) finish(true); } };
 })(typeof window !== 'undefined' ? window : globalThis);
 
 ;
@@ -22692,7 +22950,7 @@ window.LOS_BUILD = "8af3630a1f197ef7638508848bc36527a19ae975cf84b93f90d5a4a0cbf4
   const h = (tag, cls, html) => { const n = document.createElement(tag); if (cls) n.className = cls; if (html != null) n.innerHTML = html; return n; };
   const esc = (s) => String(s == null ? '' : s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
   const anim = (n, kf, o) => n.animate(kf, Object.assign({ fill: 'both' }, o));
-  const ORDER = ['home', 'cast', 'arena', 'diretta', 'esito'];
+  const ORDER = ['home', 'cast', 'arena', 'diretta', 'esito', 'trofei'];
   const viewOf = (x) => { const v = (x || '').replace(/^#/, ''); return ORDER.includes(v) ? v : 'home'; };
   // un bordo strappato come clip-path: diverso a ogni cartello
   function torn(top, bot, amp) {
@@ -22707,7 +22965,7 @@ window.LOS_BUILD = "8af3630a1f197ef7638508848bc36527a19ae975cf84b93f90d5a4a0cbf4
   }
 
   /* ================= FONDALE VIVO ================= */
-  const WORD = { home: 'Last One Standing', cast: 'Concorrenti', arena: 'Arena', diretta: 'In diretta', esito: 'Esito' };
+  const WORD = { home: 'Last One Standing', cast: 'Concorrenti', arena: 'Arena', diretta: 'In diretta', esito: 'Esito', trofei: 'Trofei' };
   let stage = null;
   function buildStage() {
     stage = h('div', null, '<i class="pl-shard"></i><i class="pl-shard pl-s2"></i><div class="pl-band pl-b1"><span></span></div><div class="pl-band pl-b2"><span></span></div><b class="pl-num"></b>');
@@ -22727,7 +22985,7 @@ window.LOS_BUILD = "8af3630a1f197ef7638508848bc36527a19ae975cf84b93f90d5a4a0cbf4
     const word = (WORD[view] || WORD.home).toUpperCase(), line = (word + ' • ').repeat(view === 'home' ? 4 : 8);
     stage.querySelectorAll('.pl-band span').forEach((s) => { s.textContent = line + line; });
     const num = stage.querySelector('.pl-num'), n = ORDER.indexOf(view);
-    num.textContent = n > 0 ? String(n) : '';
+    num.textContent = n > 0 && n < 5 ? String(n) : ''; // i Trofei non sono un passo della partita
     stage.dataset.view = view;
     if (animate && !reduced()) {
       anim(num, [{ transform: 'translate(30%, 20%) rotate(-8deg) scale(1.4)', opacity: 0 }, { transform: 'translate(0,0) rotate(-8deg) scale(1)', opacity: 1 }], { duration: 700, easing: E.out, fill: 'backwards' });
@@ -23115,8 +23373,9 @@ window.LOS_BUILD = "8af3630a1f197ef7638508848bc36527a19ae975cf84b93f90d5a4a0cbf4
   };
 
   /* ================= AVVIO ================= */
-  document.addEventListener('los:cover', (e) => setStage(e.detail.view, true));
-  document.addEventListener('los:enter', (e) => headIn(e.detail.view, e.detail.dir));
+  // `still`: lo stacco è stato saltato (pagina nascosta, animazioni ferme): niente ingressi che nascondono il testo in attesa di un fotogramma
+  document.addEventListener('los:cover', (e) => setStage(e.detail.view, !e.detail.still));
+  document.addEventListener('los:enter', (e) => { if (!e.detail.still) headIn(e.detail.view, e.detail.dir); });
   G.addEventListener('hashchange', () => { if (reduced()) setStage(viewOf(G.location.hash), false); });
   function start() {
     buildStage(); watchKills();
@@ -23435,10 +23694,12 @@ window.LOS_BUILD = "8af3630a1f197ef7638508848bc36527a19ae975cf84b93f90d5a4a0cbf4
     }
 
     if (go) {
-      play(num, [{ transform: 'translateX(-40%)', opacity: 0 }, { transform: 'none', opacity: 1 }], { duration: 240, easing: E.out });
-      play(title, [{ opacity: 0, transform: 'translateX(-16px)' }, { opacity: 1, transform: 'none' }], { duration: 240, delay: 40, easing: E.out });
-      play(tag, [{ opacity: 0, transform: 'translateX(-14px)' }, { opacity: 1, transform: 'none' }], { duration: 260, delay: 90, easing: E.out });
-      play(q('.ar-stats'), [{ opacity: 0, transform: 'translateY(10px)' }, { opacity: 1, transform: 'none' }], { duration: 260, delay: 130, easing: E.out });
+      // il numero cade come un timbro, il nome si scopre da sinistra, le targhe salgono una dopo l'altra
+      // (solo translate / scale / rotate / opacity: le inclinazioni proprie degli elementi restano)
+      play(num, [{ translate: '-30% 0', scale: '1.5', rotate: '-8deg', opacity: 0 }, { opacity: 1, offset: 0.4 }, { translate: '0 0', scale: '1', rotate: '0deg', opacity: 1 }], { duration: 300, easing: E.kick });
+      play(title, [{ opacity: 0, translate: '-26px 0', clipPath: 'inset(0 100% 0 0)' }, { opacity: 1, offset: 0.3 }, { opacity: 1, translate: '0 0', clipPath: 'inset(0 -8% 0 0)' }], { duration: 280, delay: 40, easing: E.out });
+      play(tag, [{ opacity: 0, translate: '-18px 0' }, { opacity: 1, translate: '0 0' }], { duration: 260, delay: 100, easing: E.out });
+      [...q('.ar-stats').children].forEach((s, k) => play(s, [{ opacity: 0, translate: '0 14px' }, { opacity: 1, offset: 0.5 }, { opacity: 1, translate: '0 0' }], { duration: 260, delay: 130 + k * 34, easing: E.out }));
       // rete di sicurezza: se le animazioni non arrivano in fondo (scheda in secondo piano), lo stato finale si impone lo stesso
       tidy = setTimeout(() => { if (my === gen) { halt(); boxes().forEach(settle); } }, 900);
     }
@@ -24562,6 +24823,176 @@ window.LOS_BUILD = "8af3630a1f197ef7638508848bc36527a19ae975cf84b93f90d5a4a0cbf4
     setInterval(() => scan(document), 1500);
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start); else start();
+})(typeof window !== 'undefined' ? window : globalThis);
+
+;
+/* Last One Standing — pelle · stacchi secondari (src/skin/95-stacchi.js).
+ * Le transizioni «minori», tutte nella lingua degli stacchi di sezione e tutte senza toccare ui.js:
+ *  - dialoghi: all'apertura il contenuto entra a strati (classe .st-opening); alla chiusura, che il browser fa in un
+ *    colpo, una lastra vuota con la sagoma del dialogo se ne va di taglio e il velo si ritira;
+ *  - notifiche (#toast): entrano di taglio da sinistra, escono a destra (una copia che se ne va);
+ *  - Diretta: a ogni cambio di fase una lama attraversa il banner nel verso della navigazione, il titolo e le righe
+ *    rientrano anche quando si torna indietro; al cambio di filtro o di ordine le righe risalgono a cascata;
+ *  - schede della festa e vista dei Concorrenti (griglia / squadre): il contenuto entra dal lato verso cui ci si sposta.
+ * È tutta decorazione: osserva il DOM che ui.js già produce, non intercetta i comandi e non blocca mai l'input
+ * (gli elementi aggiunti hanno pointer-events: none e si tolgono da soli con un timer, anche se le animazioni restano
+ * ferme perché la pagina è nascosta). Con il movimento ridotto non parte niente. Stili in 95-stacchi.css. */
+(function (G) {
+  'use strict';
+  if (typeof document === 'undefined') return;
+  const D = document, root = D.documentElement;
+  const reduced = () => !!(G.LOS_ANIM && G.LOS_ANIM.reduced) || root.hasAttribute('data-reduced-motion') || !!(G.matchMedia && G.matchMedia('(prefers-reduced-motion: reduce)').matches);
+  const still = () => reduced() || D.hidden;
+  const E = Object.assign({ out: 'cubic-bezier(.16,1,.3,1)', in: 'cubic-bezier(.7,0,.84,0)', io: 'cubic-bezier(.76,0,.24,1)', kick: 'cubic-bezier(.34,1.56,.64,1)' }, (G.LOS_REGIA && G.LOS_REGIA.E) || {});
+  const safe = (fn) => function () { try { return fn.apply(this, arguments); } catch (e) { /* solo decorazione */ } };
+  const play = (n, kf, o) => { try { return n.animate(kf, o); } catch (e) { return null; } };
+  const make = (cls) => { const n = D.createElement('div'); n.className = cls; n.setAttribute('aria-hidden', 'true'); return n; };
+  const gone = (n, ms) => setTimeout(() => { try { n.remove(); } catch (e) { /* già tolto */ } }, ms);
+  const fresh = (t, ms) => Date.now() - t < (ms || 450);
+  // una classe che accende una regia del CSS e si spegne da sola
+  function flag(n, cls, ms) {
+    n.classList.remove(cls); void n.offsetWidth; n.classList.add(cls);
+    clearTimeout(n['__' + cls]); n['__' + cls] = setTimeout(() => n.classList.remove(cls), ms);
+  }
+  // lo stacco di sezione è in corso: le transizioni minori aspettano il prossimo giro
+  const cutting = () => { const lx = D.querySelector('body > .lx'); return !!(lx && !lx.hidden); };
+
+  /* ================= DIALOGHI ================= */
+  const FULL = 'polygon(0 0, calc(100% - 22px) 0, 100% 22px, 100% 100%, 22px 100%, 0 calc(100% - 22px))';
+  const seen = new WeakMap();
+  // la sagoma si misura finché il dialogo è ancora aperto: dopo `close` non ha più misure
+  const measure = safe((d) => {
+    if (!d || !d.open || d.tagName !== 'DIALOG') return;
+    const r = d.getBoundingClientRect(), dh = d.querySelector('.dh');
+    seen.set(d, { x: r.left, y: r.top, w: r.width, h: r.height, dh: dh ? dh.offsetHeight : 0, t: Date.now() });
+  });
+  const leave = safe((d) => {
+    const m = seen.get(d); seen.delete(d);
+    if (!m || !fresh(m.t, 400) || !m.w || still() || D.querySelector('dialog[open]')) return;
+    const drawer = d.classList.contains('drawer');
+    const veil = make('st-veil'), g = make('st-ghost ' + (drawer ? 'st-g-drawer' : 'st-g-modal'));
+    g.style.left = m.x + 'px'; g.style.top = m.y + 'px'; g.style.width = m.w + 'px'; g.style.height = m.h + 'px';
+    g.style.setProperty('--dh', m.dh + 'px');
+    D.body.append(veil, g);
+    play(veil, [{ opacity: 1 }, { opacity: 0 }], { duration: 230, easing: 'ease-out', fill: 'forwards' });
+    if (drawer) play(g, [{ transform: 'none' }, { transform: 'translateX(108%) skewX(-8deg)' }], { duration: 230, easing: E.in, fill: 'forwards' });
+    else play(g, [{ transform: 'none', clipPath: FULL }, { transform: 'translateX(40px) skewX(-6deg)', clipPath: 'polygon(116% 0, 116% 0, 116% 22px, 100% 100%, 100% 100%, 100% calc(100% - 22px))' }], { duration: 210, easing: E.in, fill: 'forwards' });
+    gone(veil, 300); gone(g, 300);
+  });
+  // `close()` resta quella del browser, con gli stessi argomenti e lo stesso risultato: prima si prende la misura,
+  // subito dopo parte la lastra d'uscita (l'evento `close` arriva più tardi, e serve solo per il tasto Esc)
+  const proto = G.HTMLDialogElement && G.HTMLDialogElement.prototype;
+  if (proto && typeof proto.close === 'function' && !proto.close.__st) {
+    const close0 = proto.close;
+    const closeMeasured = function () { measure(this); const r = close0.apply(this, arguments); if (!this.open) leave(this); return r; };
+    closeMeasured.__st = true; proto.close = closeMeasured;
+  }
+  D.addEventListener('cancel', (e) => measure(e.target), true); // tasto Esc
+  D.addEventListener('close', (e) => { if (e.target && e.target.tagName === 'DIALOG') leave(e.target); }, true);
+  const opened = safe((d) => {
+    if (!d.open || still() || !d.classList.contains('modal')) return; // i cassetti (scheda, profilo) hanno già la loro regia
+    flag(d, 'st-opening', 600);
+  });
+
+  /* ================= NOTIFICHE ================= */
+  const TOAST = 'polygon(10px 0, 100% 0, calc(100% - 10px) 100%, 0 100%)';
+  let toastText = '';
+  const toast = safe((el) => {
+    if (el.hidden) {
+      // esce: una copia identica se ne va di lato (l'originale è già nascosto e resta com'è)
+      if (!toastText || still()) { toastText = ''; return; }
+      toastText = '';
+      const g = el.cloneNode(true); g.removeAttribute('id'); g.removeAttribute('role'); g.hidden = false; g.setAttribute('aria-hidden', 'true'); g.inert = true; g.classList.add('st-out');
+      D.body.appendChild(g);
+      play(g, [{ translate: '0 0', opacity: 1, clipPath: TOAST }, { translate: '34px 0', opacity: 1, clipPath: 'polygon(100% 0, 100% 0, calc(100% - 10px) 100%, calc(100% - 10px) 100%)' }], { duration: 190, easing: E.in, fill: 'forwards' });
+      gone(g, 240);
+      return;
+    }
+    const text = el.textContent; if (text === toastText) return; toastText = text;
+    if (still()) return;
+    // entra: al posto della dissolvenza di serie, un taglio da sinistra con un piccolo contraccolpo
+    el.getAnimations().forEach((a) => a.cancel());
+    play(el, [{ translate: '-34px 0', opacity: 0, clipPath: 'polygon(10px 0, 10px 0, 0 100%, 0 100%)' }, { opacity: 1, offset: 0.3 }, { translate: '5px 0', clipPath: TOAST, offset: 0.72 }, { translate: '0 0', opacity: 1, clipPath: TOAST }], { duration: 300, easing: E.out });
+  });
+
+  /* ================= DIRETTA: FASE E FILTRI ================= */
+  let lastPhase = null, readAt = 0;
+  D.addEventListener('click', (e) => { const t = e.target; if (t && t.closest && t.closest('[data-evf], #orderSeg button')) readAt = Date.now(); }, true);
+  D.addEventListener('change', (e) => { const t = e.target; if (t && t.closest && t.closest('#followOnly')) readAt = Date.now(); }, true);
+  const rowsOf = (feed, max) => {
+    const vh = G.innerHeight, out = [];
+    for (const n of feed.children) { const r = n.getBoundingClientRect(); if (r.bottom < 0) continue; if (r.top > vh || out.length >= max) break; out.push(n); }
+    return out;
+  };
+  function phaseCut(dir) {
+    const bc = D.querySelector('#v-diretta .broadcast'), feed = D.getElementById('phBody');
+    if (bc) {
+      bc.querySelectorAll(':scope > .st-ph').forEach((x) => x.remove());
+      const box = make('st-ph'); box.innerHTML = '<i></i><i></i><i></i>'; bc.appendChild(box);
+      const w = bc.offsetWidth || 800, sk = ' skewX(' + -18 * dir + 'deg)';
+      [...box.children].forEach((b, k) => {
+        const lag = k * 0.16 * w, from = dir > 0 ? -0.5 * w - lag : 1.22 * w + lag, to = dir > 0 ? 1.25 * w : -0.6 * w;
+        play(b, [{ transform: 'translateX(' + from.toFixed(0) + 'px)' + sk }, { transform: 'translateX(' + to.toFixed(0) + 'px)' + sk }], { duration: 330 + k * 40, easing: 'cubic-bezier(.5,0,.25,1)', fill: 'both' });
+      });
+      gone(box, 520);
+      const kind = D.getElementById('bcKind'), intro = D.getElementById('phIntro'), title = D.getElementById('phTitle');
+      [kind, intro].forEach((n, k) => { if (n && n.textContent) play(n, [{ translate: dir * 26 + 'px 0', opacity: 0 }, { opacity: 1, offset: 0.4 }, { translate: '0 0', opacity: 1 }], { duration: 280, delay: 90 + k * 70, easing: E.out, fill: 'backwards' }); });
+      // andando avanti il titolo ha già le sue lettere (kinetic); tornando indietro rientra di lato
+      if (dir < 0 && title && !title.querySelector('.kc')) play(title, [{ translate: '-34px 0', opacity: 0 }, { opacity: 1, offset: 0.4 }, { translate: '0 0', opacity: 1 }], { duration: 300, delay: 110, easing: E.out, fill: 'backwards' });
+    }
+    const cur = D.querySelector('#timeline .tph.cur');
+    if (cur) play(cur, [{ scale: '1.45' }, { scale: '1' }], { duration: 280, easing: E.kick });
+    // tornando indietro le righe non hanno la cascata di serie: rientrano da sinistra, in fretta
+    if (dir < 0 && feed) rowsOf(feed, 9).forEach((n, k) => { if (!n.classList.contains('in')) play(n, [{ translate: '-30px 0', opacity: 0 }, { opacity: 1, offset: 0.4 }, { translate: '0 0', opacity: 1 }], { duration: 260, delay: 60 + k * 24, easing: E.out, fill: 'backwards' }); });
+  }
+  function readSwap() {
+    const feed = D.getElementById('phBody'); if (!feed) return;
+    rowsOf(feed, 12).forEach((n, k) => play(n, [{ translate: '0 14px', opacity: 0 }, { opacity: 1, offset: 0.45 }, { translate: '0 0', opacity: 1 }], { duration: 230, delay: k * 18, easing: E.out, fill: 'backwards' }));
+    const chip = D.querySelector('#rbChips [aria-pressed="true"]');
+    if (chip) play(chip, [{ scale: '.9' }, { scale: '1.1', offset: 0.5 }, { scale: '1' }], { duration: 260, easing: E.out });
+  }
+  const phase = safe(() => {
+    const p = D.getElementById('bcPhase'), sec = D.getElementById('v-diretta'); if (!p || !sec) return;
+    const m = p.textContent.match(/(\d+)/), n = m ? +m[1] : null, was = lastPhase;
+    lastPhase = n;
+    if (n == null || sec.hidden || still() || cutting()) return;
+    if (was != null && n !== was) phaseCut(n > was ? 1 : -1);
+    else if (fresh(readAt)) { readAt = 0; readSwap(); }
+  });
+
+  /* ================= SCHEDE E VISTE ================= */
+  let festaAt = 0, festaDir = 1, viewAt = 0, viewDir = 1;
+  D.addEventListener('click', (e) => {
+    const t = e.target; if (!t || !t.closest) return;
+    const f = t.closest('.fs-tabs button');
+    if (f && f.getAttribute('aria-selected') !== 'true') { const all = [...f.parentNode.children]; festaDir = all.indexOf(f) >= all.findIndex((b) => b.getAttribute('aria-selected') === 'true') ? 1 : -1; festaAt = Date.now(); }
+    const v = t.closest('#viewSeg button');
+    if (v && v.getAttribute('aria-pressed') !== 'true') { const all = [...v.parentNode.children]; viewDir = all.indexOf(v) >= all.findIndex((b) => b.getAttribute('aria-pressed') === 'true') ? 1 : -1; viewAt = Date.now(); }
+  }, true);
+  const festa = safe((body) => {
+    if (!fresh(festaAt) || still()) return; festaAt = 0;
+    body.style.setProperty('--st-dir', String(festaDir)); flag(body, 'st-swap', 480);
+  });
+  const cast = safe((list) => {
+    if (!fresh(viewAt) || still() || cutting()) return; viewAt = 0;
+    // le schede hanno già la loro cascata: qui si sposta solo il piano, dal lato verso cui si è mosso il selettore
+    list.style.setProperty('--st-dir', String(viewDir)); flag(list, 'st-swap', 480);
+  });
+
+  /* ================= AVVIO ================= */
+  const start = safe(() => {
+    if (typeof MutationObserver === 'undefined') return;
+    D.querySelectorAll('dialog').forEach((d) => new MutationObserver(() => opened(d)).observe(d, { attributes: true, attributeFilter: ['open'] }));
+    const t = D.getElementById('toast');
+    if (t) new MutationObserver(() => toast(t)).observe(t, { attributes: true, attributeFilter: ['hidden'], childList: true, characterData: true, subtree: true });
+    const ph = D.getElementById('bcPhase');
+    if (ph) { new MutationObserver(phase).observe(ph, { childList: true, characterData: true, subtree: true }); const m = ph.textContent.match(/(\d+)/); lastPhase = m ? +m[1] : null; }
+    const fb = D.getElementById('festaBody');
+    if (fb) new MutationObserver(() => festa(fb)).observe(fb, { childList: true });
+    const cl = D.getElementById('castList');
+    if (cl) new MutationObserver(() => cast(cl)).observe(cl, { childList: true });
+  });
+  if (D.readyState === 'loading') D.addEventListener('DOMContentLoaded', start); else start();
 })(typeof window !== 'undefined' ? window : globalThis);
 
 ;
@@ -25901,6 +26332,8 @@ window.LOS_BUILD = "8af3630a1f197ef7638508848bc36527a19ae975cf84b93f90d5a4a0cbf4
     });
   }
   const aperto = () => !!open;
+  // chiude il cartello aperto, se c'è (es. l'host ha smesso di aspettare la risposta)
+  const chiudi = () => { if (open) open.close(null); };
 
   /* ================= stato della partita giocata ================= */
   function nuovo(pre) {
@@ -25983,17 +26416,18 @@ window.LOS_BUILD = "8af3630a1f197ef7638508848bc36527a19ae975cf84b93f90d5a4a0cbf4
     const b = pick(rest), c = pick(rest.filter((x) => x !== b));
     if (b && c) {
       const rb = rischio(SIM, i, b), rc = rischio(SIM, i, c), pb = rb / (rb + rc);
-      out.push({ tipo: 'prima', a: b, b: c, q: quota(pb * 0.92), testo: (soft ? 'Esce prima ' : 'Cade prima ') + BY[b].name + ' di ' + BY[c].name });
+      out.push({ tipo: 'prima', a: b, b: c, q: quota(pb), testo: (soft ? 'Esce prima ' : 'Cade prima ') + BY[b].name + ' di ' + BY[c].name });
     }
     // 3. il giorno: tradimenti o sangue
     const seenDays = Math.max(1, P[i].day);
-    const betrays = P.slice(0, k).reduce((s, ph) => s + ph.events.filter((e) => e.cat === 'betray').length, 0);
-    if (rng() < 0.5 && betrays > 0) {
-      const pt = clamp(betrays / seenDays, 0.15, 0.8);
+    // la probabilità di un tradimento si stima dai giorni (non dai tradimenti): due nello stesso giorno contano una volta
+    const giorniTradimento = new Set(P.slice(0, k).filter((ph) => ph.events.some((e) => e.cat === 'betray')).map((ph) => ph.day)).size;
+    if (rng() < 0.5 && giorniTradimento > 0) {
+      const pt = clamp(giorniTradimento / seenDays * 0.6, 0.08, 0.6);
       out.push({ tipo: 'tradimento', giorno: day, q: quota(pt), testo: 'Oggi qualcuno tradisce un alleato' });
     } else {
       const exp = tasso(SIM, i) * A.length, n = Math.max(1, Math.round(exp));
-      out.push({ tipo: 'sangue', n, giorno: day, q: quota(exp >= n ? 0.55 : 0.42), testo: 'Almeno ' + n + (soft ? (n === 1 ? ' eliminazione' : ' eliminazioni') : (n === 1 ? ' morto' : ' morti')) + ' oggi' });
+      out.push({ tipo: 'sangue', n, giorno: day, q: quota(exp >= n ? 0.58 : 0.46), testo: 'Almeno ' + n + (soft ? (n === 1 ? ' eliminazione' : ' eliminazioni') : (n === 1 ? ' morto' : ' morti')) + ' oggi' });
     }
     return out;
   }
@@ -26208,7 +26642,7 @@ window.LOS_BUILD = "8af3630a1f197ef7638508848bc36527a19ae975cf84b93f90d5a4a0cbf4
       return { p, punti, kills, win, campione: p.campione && by[p.campione] };
     }).sort((a, b) => b.punti - a.punti);
   }
-  G.LOS_PARTITA = { festaSana, punteggi, COLORI, chiedi, gioca, tipoProva, bonusProva, REGIA, mano, votoRegia, aperto, nuovo, sano, profilo, salvaProfilo, chiudiPartita, proposte, risolvi, prezzo, rischio, quota, nuovoGiorno, vivi, vit, DONI, INTERVISTA, ORDINI, RITMI, START };
+  G.LOS_PARTITA = { chiudi, festaSana, punteggi, COLORI, chiedi, gioca, tipoProva, bonusProva, REGIA, mano, votoRegia, aperto, nuovo, sano, profilo, salvaProfilo, chiudiPartita, proposte, risolvi, prezzo, rischio, quota, nuovoGiorno, vivi, vit, DONI, INTERVISTA, ORDINI, RITMI, START };
 })(typeof window !== 'undefined' ? window : globalThis);
 
 ;
@@ -26351,12 +26785,12 @@ window.LOS_BUILD = "8af3630a1f197ef7638508848bc36527a19ae975cf84b93f90d5a4a0cbf4
     { id: 'dieci', cat: 'Partite', nome: 'Abbonato', desc: 'Arriva all’esito di 10 partite.', ok: (c, p) => p.partite >= 10 },
     { id: 'giramondo', cat: 'Partite', nome: 'Giramondo', desc: 'Gioca in tutte le arene.', ok: (c, p) => c.arene && (p.arene || []).length >= c.arene },
     { id: 'lampo', cat: 'Partite', nome: 'Fulmine', desc: 'Una partita che finisce in 3 giorni o meno.', ok: (c) => c.SIM.days <= 3 },
-    { id: 'maratona', cat: 'Partite', nome: 'Maratona', desc: 'Una partita che dura 12 giorni o più.', ok: (c) => c.SIM.days >= 12 },
-    { id: 'bagno', cat: 'Partite', nome: 'Bagno di sangue', desc: 'Almeno 10 eliminazioni nel primo giorno.', ok: (c) => c.morti1 >= 10 },
-    { id: 'perbene', cat: 'Partite', nome: 'Gente per bene', desc: 'Una partita senza nessun tradimento.', ok: (c) => !(c.SIM.stats.betrayals > 0) && c.SIM.tributes.length >= 8 },
+    { id: 'maratona', cat: 'Partite', nome: 'Maratona', desc: 'Una partita che dura 9 giorni o più.', ok: (c) => c.SIM.days >= 9 },
+    { id: 'bagno', cat: 'Partite', nome: 'Bagno di sangue', desc: 'Metà del cast fuori già nel primo giorno.', ok: (c) => c.SIM.tributes.length >= 8 && c.morti1 >= Math.ceil(c.SIM.tributes.length / 2) },
+    { id: 'perbene', cat: 'Partite', nome: 'Gente per bene', desc: 'Una partita con almeno 16 concorrenti e nessun tradimento.', ok: (c) => !(c.SIM.stats.betrayals > 0) && c.SIM.tributes.length >= 16 },
     { id: 'serpente', cat: 'Partite', nome: 'Serpente', desc: 'Vince chi ha tradito un alleato.', ok: (c) => c.W.some((t) => t.traitor || t.betrayals > 0) },
     { id: 'maniPulite', cat: 'Partite', nome: 'Mani pulite', desc: 'Vince chi non ha eliminato nessuno.', ok: (c) => c.W.some((t) => !t.kills) },
-    { id: 'amoreVince', cat: 'Partite', nome: 'Amore vincente', desc: 'Una coppia arriva in fondo insieme.', ok: (c) => (c.SIM.stats.stories || []).some((s) => s.k === 'amore' && s.note === 'insieme' && c.SIM.winners.includes(s.a) && c.SIM.winners.includes(s.b)) },
+    { id: 'amoreVince', cat: 'Partite', nome: 'Amore vincente', desc: 'Vince qualcuno innamorato, e la sua metà arriva sul podio.', ok: (c) => (c.SIM.stats.stories || []).some((s) => s.k === 'amore' && (c.SIM.winners.includes(s.a) || c.SIM.winners.includes(s.b)) && (c.SIM.tributes.find((t) => t.id === (c.SIM.winners.includes(s.a) ? s.b : s.a)) || {}).rank <= 3) },
     // mentore
     { id: 'maestro', cat: 'Mentore', nome: 'Maestro', desc: 'Il tuo allievo vince la partita.', ok: (c) => c.mVince },
     { id: 'podio', cat: 'Mentore', nome: 'Sul podio', desc: 'Il tuo allievo arriva tra i primi tre.', ok: (c) => c.m && c.m.rank <= 3 },
@@ -26929,7 +27363,7 @@ window.LOS_BUILD = "8af3630a1f197ef7638508848bc36527a19ae975cf84b93f90d5a4a0cbf4
       es.onerror = () => { if (closed) return; es.close(); setTimeout(listen, Math.min(8000, 800 * ++retry)); };
     }
     listen();
-    const write = (method, path, val) => fetch(root + '/' + path + '.json', { method, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(val) }).then((r) => { if (!r.ok) throw new Error('Il server ha risposto ' + r.status); });
+    const write = (method, path, val) => fetch((path ? root + '/' + path : root) + '.json', { method, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(val) }).then((r) => { if (!r.ok) throw new Error('Il server ha risposto ' + r.status); });
     return {
       set: (p, v) => { tree = applica(tree, p, v); emit(); return write(v == null ? 'DELETE' : 'PUT', p, v == null ? undefined : v).catch((e) => { if (G.LOS_FESTA && G.LOS_FESTA.onerror) G.LOS_FESTA.onerror(e); }); },
       patch: (p, v) => { tree = applica(tree, p, v, true); emit(); return write('PATCH', p, v).catch((e) => { if (G.LOS_FESTA && G.LOS_FESTA.onerror) G.LOS_FESTA.onerror(e); }); },
@@ -26954,7 +27388,7 @@ window.LOS_BUILD = "8af3630a1f197ef7638508848bc36527a19ae975cf84b93f90d5a4a0cbf4
       const end = (v) => { if (done) return; done = true; if (off) off(); clearTimeout(t); room.set('richieste/' + rid, null); room.set('risposte/' + rid, null); resolve(v); };
       const t = setTimeout(() => end(null), ms || 30000);
       off = room.on((tree) => { const r = tree.risposte && tree.risposte[rid]; if (r) end(r.value === undefined || r.value === '__salta__' ? null : r); });
-      room.set('richieste/' + rid, { gid, card, scade: Date.now() + (ms || 30000) });
+      room.set('richieste/' + rid, { gid, card, durata: ms || 30000 });
     });
   }
 
@@ -27369,7 +27803,7 @@ window.LOS_BUILD = "8af3630a1f197ef7638508848bc36527a19ae975cf84b93f90d5a4a0cbf4
           const custom = d.run.cfg.custom == null ? [] : normalizeCustoms(d.run.cfg.custom);
           if (d.run.replayId != null && !validId(d.run.replayId)) throw new Error('Riferimento alla partita non valido.');
           const initialRelations = L.normalizeInitialRelations(d.run.cfg.initialRelations, cast);
-          if (cast.length >= 2) next.run = Object.assign({}, d.run, { cfg: Object.assign({}, d.run.cfg, { cast, custom, initialRelations }) }, typeof PT !== 'undefined' && PT ? { gioco: PT.sano(d.run.gioco) } : {});
+          if (cast.length >= 2) next.run = Object.assign({}, d.run, { cfg: Object.assign({}, d.run.cfg, { cast, custom, initialRelations }) }, typeof PT !== 'undefined' && PT ? { gioco: PT.sano(d.run.gioco) } : {}, { ospite: undefined });
         } catch (e) { warnings.push('La partita salvata contiene dati non validi e non è stata ripresa.'); }
       }
       Object.assign(S, next);
@@ -28696,7 +29130,7 @@ window.LOS_BUILD = "8af3630a1f197ef7638508848bc36527a19ae975cf84b93f90d5a4a0cbf4
     if (RUNNER) RUNNER.cancel(); stopPlay(); simulationBusy(true);
     let result;
     try { result = RUNNER ? await RUNNER.simulate(cfg) : L.simulate(cfg); }
-    catch (e) { if (generation === runGeneration && e.name !== 'AbortError') toast('Simulazione non riuscita: ' + e.message); return false; }
+    catch (e) { runSim.festa = null; runSim.pre = null; runSim.condivisa = false; if (generation === runGeneration && e.name !== 'AbortError') toast('Simulazione non riuscita: ' + e.message); return false; }
     finally { if (generation === runGeneration) simulationBusy(false); }
     if (generation !== runGeneration) return false;
     SIM = result;
@@ -29000,6 +29434,8 @@ window.LOS_BUILD = "8af3630a1f197ef7638508848bc36527a19ae975cf84b93f90d5a4a0cbf4
     g.chiesto[key] = 1; save();
     if (g.festa) { if (dawn) await festaDay(k); return; }
     const timer = playing ? 20 : 0, soft = !!resultTheme(SIM).soft, i = k - 1;
+    // ogni alba gli sponsor versano qualcosa: 10 crediti, 5 in più se il tuo allievo è ancora in gara
+    if (dawn) { const inc = 10 + (g.mentore && P[i].snap.alive.includes(g.mentore) ? 5 : 0); g.crediti += inc; renderHud(); }
     let changed = false;
     // chi alleni è caduto: all'alba se ne sceglie un altro, così la partita resta tua fino alla fine
     if (dawn && g.mentore && !P[i].snap.alive.includes(g.mentore) && P[i].snap.alive.length > 2) {
@@ -29471,7 +29907,7 @@ window.LOS_BUILD = "8af3630a1f197ef7638508848bc36527a19ae975cf84b93f90d5a4a0cbf4
     $('#festaBody').innerHTML = h;
   }
   function leanCfg(cfg) { return Object.assign({}, cfg, { cast: cfg.cast.map((t) => Object.assign({}, t, { img: '' })) }); }
-  function leaveRoom() { if (FS.off) FS.off(); if (FS.room) FS.room.close(); Object.assign(FS, { room: null, role: null, code: null, gid: null, off: null, stato: null, pubblicato: '' }); FS.risposte = new Set(); document.body.classList.remove('fs-ospite'); }
+  function leaveRoom() { if (FS.off) FS.off(); if (FS.room) { if (FS.role === 'host') FS.room.set('', null); else FS.room.set('ingressi/' + FS.gid, null); FS.room.close(); } Object.assign(FS, { room: null, role: null, code: null, gid: null, off: null, stato: null, pubblicato: '' }); FS.risposte = new Set(); document.body.classList.remove('fs-ospite'); }
   $('#festaDlg').addEventListener('click', async (e) => {
     const tab = e.target.closest('[data-fs]'); if (tab) { FS.tab = tab.dataset.fs; renderFesta(); return; }
     if (e.target.closest('[data-fs-add]')) { FS.giocatori.push(fsPlayer(FS.giocatori.length)); renderFesta(); return; }
@@ -29498,7 +29934,8 @@ window.LOS_BUILD = "8af3630a1f197ef7638508848bc36527a19ae975cf84b93f90d5a4a0cbf4
   function startFesta() {
     const remote = FS.role === 'host' ? Object.entries(FS.room.get().ingressi || {}).filter(([, x]) => x.campione).map(([gid, x]) => ({ id: 'o' + gid, nome: x.nome, campione: x.campione, remoto: gid })) : [];
     const locals = FS.giocatori.filter((p) => p.campione);
-    const all = locals.concat(remote);
+    const seenC = new Set();
+    const all = locals.concat(remote).map((p) => { if (seenC.has(p.campione)) return Object.assign({}, p, { campione: null }); seenC.add(p.campione); return p; });
     if (all.length < (FS.role === 'host' ? 1 : 2)) { $('#festaMsg').textContent = FS.role === 'host' ? 'Serve almeno un giocatore con un campione.' : 'Servono almeno due giocatori, ognuno con un campione.'; return; }
     if (S.cast.length < 2) { $('#festaMsg').textContent = 'Servono almeno 2 concorrenti nel cast.'; return; }
     S.cast.forEach((t, i) => { if (!t.name.trim()) t.name = 'Concorrente ' + (i + 1); });
@@ -29560,10 +29997,13 @@ window.LOS_BUILD = "8af3630a1f197ef7638508848bc36527a19ae975cf84b93f90d5a4a0cbf4
   async function festaDay(k) {
     const P = SIM.phases, g = S.run.gioco, i = k - 1, soft = !!resultTheme(SIM).soft;
     let changed = false;
+    // l'entrata dell'alba, per ciascuno: 10 crediti, 5 in più se il campione è in gara
+    g.festa.giocatori.forEach((p) => { p.crediti += 10 + (p.campione && P[i].snap.alive.includes(p.campione) ? 5 : 0); });
+    renderHud();
     for (const p of g.festa.giocatori) {
       const alive = P[i].snap.alive;
-      if (p.campione && !alive.includes(p.campione)) {
-        p.caduti = (p.caduti || []).concat([p.campione]);
+      if (!p.campione || !alive.includes(p.campione)) {
+        if (p.campione) p.caduti = (p.caduti || []).concat([p.campione]);
         const taken = new Set(g.festa.giocatori.map((x) => x.campione).filter(Boolean));
         const free = alive.filter((id) => !taken.has(id));
         p.campione = null;
@@ -29615,12 +30055,15 @@ window.LOS_BUILD = "8af3630a1f197ef7638508848bc36527a19ae975cf84b93f90d5a4a0cbf4
     if (tree.meta && tree.meta.build && window.LOS_BUILD && tree.meta.build !== window.LOS_BUILD && !FS.avvisato) { FS.avvisato = true; toast('Attenzione: l’host usa un’altra versione del gioco, la partita potrebbe non coincidere.'); }
     // le domande per me
     Object.entries(tree.richieste || {}).forEach(([rid, r]) => {
-      if (!r || r.gid !== FS.gid || FS.risposte.has(rid) || (r.scade && r.scade < Date.now())) return;
-      FS.risposte.add(rid);
-      const card = Object.assign({}, r.card, { timer: undefined });
+      if (!r || r.gid !== FS.gid || FS.risposte.has(rid)) return;
+      FS.risposte.add(rid); FS.aperta = rid;
+      // il tempo lo decide l'host come durata (gli orologi dei dispositivi possono non coincidere)
+      const card = Object.assign({}, r.card, { timer: Math.max(5, Math.round((r.durata || 30000) / 1000) - 4) });
       (card.gioco ? PT.gioca(card.gioco, card).then((s) => ({ value: s == null ? '__salta__' : s })) : PT.chiedi(card).then((x) => (x ? { value: x.value, stake: x.stake == null ? 0 : x.stake } : { value: '__salta__' })))
-        .then((res) => FS.room && FS.room.set('risposte/' + rid, res));
+        .then((res) => { if (FS.aperta === rid) FS.aperta = null; if (FS.room && (FS.room.get().richieste || {})[rid]) FS.room.set('risposte/' + rid, res); });
     });
+    // l'host ha smesso di aspettare: il cartello rimasto aperto si chiude
+    if (FS.aperta && !(tree.richieste || {})[FS.aperta]) { FS.aperta = null; PT.chiudi(); }
     if (!st || !cfg || guestBusy) return;
     guestBusy = true;
     try {

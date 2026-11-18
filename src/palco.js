@@ -24,7 +24,7 @@
   const h = (tag, cls, html) => { const n = document.createElement(tag); if (cls) n.className = cls; if (html != null) n.innerHTML = html; return n; };
   const esc = (s) => String(s == null ? '' : s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
   const anim = (n, kf, o) => n.animate(kf, Object.assign({ fill: 'both' }, o));
-  const ORDER = ['home', 'cast', 'arena', 'diretta', 'esito'];
+  const ORDER = ['home', 'cast', 'arena', 'diretta', 'esito', 'trofei'];
   const viewOf = (x) => { const v = (x || '').replace(/^#/, ''); return ORDER.includes(v) ? v : 'home'; };
   // un bordo strappato come clip-path: diverso a ogni cartello
   function torn(top, bot, amp) {
@@ -39,7 +39,7 @@
   }
 
   /* ================= FONDALE VIVO ================= */
-  const WORD = { home: 'Last One Standing', cast: 'Concorrenti', arena: 'Arena', diretta: 'In diretta', esito: 'Esito' };
+  const WORD = { home: 'Last One Standing', cast: 'Concorrenti', arena: 'Arena', diretta: 'In diretta', esito: 'Esito', trofei: 'Trofei' };
   let stage = null;
   function buildStage() {
     stage = h('div', null, '<i class="pl-shard"></i><i class="pl-shard pl-s2"></i><div class="pl-band pl-b1"><span></span></div><div class="pl-band pl-b2"><span></span></div><b class="pl-num"></b>');
@@ -59,7 +59,7 @@
     const word = (WORD[view] || WORD.home).toUpperCase(), line = (word + ' • ').repeat(view === 'home' ? 4 : 8);
     stage.querySelectorAll('.pl-band span').forEach((s) => { s.textContent = line + line; });
     const num = stage.querySelector('.pl-num'), n = ORDER.indexOf(view);
-    num.textContent = n > 0 ? String(n) : '';
+    num.textContent = n > 0 && n < 5 ? String(n) : ''; // i Trofei non sono un passo della partita
     stage.dataset.view = view;
     if (animate && !reduced()) {
       anim(num, [{ transform: 'translate(30%, 20%) rotate(-8deg) scale(1.4)', opacity: 0 }, { transform: 'translate(0,0) rotate(-8deg) scale(1)', opacity: 1 }], { duration: 700, easing: E.out, fill: 'backwards' });
@@ -447,8 +447,9 @@
   };
 
   /* ================= AVVIO ================= */
-  document.addEventListener('los:cover', (e) => setStage(e.detail.view, true));
-  document.addEventListener('los:enter', (e) => headIn(e.detail.view, e.detail.dir));
+  // `still`: lo stacco è stato saltato (pagina nascosta, animazioni ferme): niente ingressi che nascondono il testo in attesa di un fotogramma
+  document.addEventListener('los:cover', (e) => setStage(e.detail.view, !e.detail.still));
+  document.addEventListener('los:enter', (e) => { if (!e.detail.still) headIn(e.detail.view, e.detail.dir); });
   G.addEventListener('hashchange', () => { if (reduced()) setStage(viewOf(G.location.hash), false); });
   function start() {
     buildStage(); watchKills();
