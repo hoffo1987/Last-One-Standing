@@ -64,7 +64,10 @@
       es.onerror = () => { if (closed) return; es.close(); setTimeout(listen, Math.min(8000, 800 * ++retry)); };
     }
     listen();
-    const write = (method, path, val) => fetch((path ? root + '/' + path : root) + '.json', { method, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(val) }).then((r) => { if (!r.ok) throw new Error('Il server ha risposto ' + r.status); });
+    // ogni scrittura riprova fino a tre volte: una rete ballerina non deve far perdere una risposta
+    const write = (method, path, val, tent) => fetch((path ? root + '/' + path : root) + '.json', { method, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(val) })
+      .then((r) => { if (!r.ok) throw new Error('Il server ha risposto ' + r.status); })
+      .catch((e) => { const n = (tent || 0) + 1; if (n >= 3 || /\b4\d\d\b/.test(e.message)) throw e; return new Promise((res) => setTimeout(res, 400 * n * n)).then(() => write(method, path, val, n)); });
     return {
       set: (p, v) => { tree = applica(tree, p, v); emit(); return write(v == null ? 'DELETE' : 'PUT', p, v == null ? undefined : v).catch((e) => { if (G.LOS_FESTA && G.LOS_FESTA.onerror) G.LOS_FESTA.onerror(e); }); },
       patch: (p, v) => { tree = applica(tree, p, v, true); emit(); return write('PATCH', p, v).catch((e) => { if (G.LOS_FESTA && G.LOS_FESTA.onerror) G.LOS_FESTA.onerror(e); }); },
@@ -81,17 +84,50 @@
     return firebase(u, code);
   }
 
-  // una richiesta a un ospite e l'attesa della risposta (o del tempo scaduto)
-  function chiediA(room, gid, card, ms) {
+  // una richiesta a un ospite e l'attesa della risposta (o del tempo scaduto); ctl.annulla() smette di aspettare
+  function chiediA(room, gid, card, ms, ctl) {
     const rid = nuovoId('r');
     return new Promise((resolve) => {
       let done = false, off = null;
       const end = (v) => { if (done) return; done = true; if (off) off(); clearTimeout(t); room.set('richieste/' + rid, null); room.set('risposte/' + rid, null); resolve(v); };
+      if (ctl) ctl.annulla = () => end(null);
       const t = setTimeout(() => end(null), ms || 30000);
       off = room.on((tree) => { const r = tree.risposte && tree.risposte[rid]; if (r) end(r.value === undefined || r.value === '__salta__' ? null : r); });
       room.set('richieste/' + rid, { gid, card, durata: ms || 30000 });
     });
   }
 
-  G.LOS_FESTA = { codice, nuovoId, server, setServer, serverValido, okCodice, stanza, chiediA, onerror: null };
+  /* ---------- la sessione: chi ricarica la pagina rientra da solo nella sua stanza ---------- */
+  const SESS = 'los-festa-sessione';
+  const salvaSessione = (s) => { try { G.localStorage.setItem(SESS, JSON.stringify(s)); } catch (e) { /* niente */ } };
+  const leggiSessione = () => { try { const s = JSON.parse(G.localStorage.getItem(SESS) || 'null'); return s && okCodice(s.code) && (s.role === 'host' || s.role === 'guest') ? s : null; } catch (e) { return null; } };
+  const cancellaSessione = () => { try { G.localStorage.removeItem(SESS); } catch (e) { /* niente */ } };
+
+  /* ---------- il battito: l'ospite dice «ci sono» ogni pochi secondi (un contatore, non l'ora: gli orologi differiscono) ---------- */
+  function battito(room, gid) {
+    let n = 0;
+    const beat = () => room.patch('ingressi/' + gid, { battito: ++n });
+    beat(); const t = setInterval(beat, 6000);
+    return () => clearInterval(t);
+  }
+
+  /* ---------- le foto dei concorrenti in rete: ridotte a una miniatura leggera ---------- */
+  function riduci(src, lato) {
+    lato = lato || 224;
+    return new Promise((resolve) => {
+      if (!src || !/^data:image\//.test(src)) return resolve('');
+      const im = new Image();
+      im.onload = () => {
+        try {
+          const s = Math.min(1, lato / Math.max(im.naturalWidth, im.naturalHeight)), w = Math.max(1, Math.round(im.naturalWidth * s)), h = Math.max(1, Math.round(im.naturalHeight * s));
+          const c = document.createElement('canvas'); c.width = w; c.height = h; c.getContext('2d').drawImage(im, 0, 0, w, h);
+          let out = c.toDataURL('image/webp', 0.82); if (!/^data:image\/webp/.test(out)) out = c.toDataURL('image/jpeg', 0.84);
+          resolve(out.length < 200000 ? out : '');
+        } catch (e) { resolve(''); }
+      };
+      im.onerror = () => resolve(''); im.src = src;
+    });
+  }
+
+  G.LOS_FESTA = { codice, nuovoId, server, setServer, serverValido, okCodice, stanza, chiediA, salvaSessione, leggiSessione, cancellaSessione, battito, riduci, onerror: null };
 })(typeof window !== 'undefined' ? window : globalThis);

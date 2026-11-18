@@ -1934,9 +1934,10 @@
   function chatHTML(i) {
     const ph = SIM.phases[i], g = S.run && S.run.gioco, day = ph.day;
     const msgs = TC.chat(SIM, i, tcCtx());
-    const voted = g && g.voti && g.voti['d' + day];
+    const guest = !!(S.run && S.run.ospite && FS.stato);
+    const voted = guest ? (FS.votati || {})['d' + day] : g && g.voti && g.voti['d' + day];
     const poll = TC.sondaggio(SIM, i, g && g.voti && g.voti.tot);
-    const canVote = g && !voted && atEdge() && i < SIM.phases.length - 1 && ph.snap.alive.length > 2;
+    const canVote = (g || guest) && !voted && (guest || atEdge()) && i < SIM.phases.length - 1 && ph.snap.alive.length > 2;
     return '<section class="aud-poll"><h4>Il preferito del pubblico <span>Giorno ' + day + '</span></h4><ol>' + poll.map((x) => '<li class="' + (voted === x.id ? 'mine' : '') + '">' + avHTML(BY[x.id]) + '<span class="ap-name">' + esc(BY[x.id].name) + '</span><i class="ap-bar"><b style="width:' + x.pct + '%"></b></i><em>' + x.pct + '%</em>' +
       (canVote ? '<button type="button" class="btn sm ap-vote" data-vote="' + esc(x.id) + '">Vota</button>' : voted === x.id ? '<span class="ap-mine">Il tuo voto</span>' : '') + '</li>').join('') + '</ol>' +
       (canVote ? '<p class="help">Un voto al giorno: dà un po’ di fama, e la fama attira gli sponsor.</p>' : '') + '</section>' +
@@ -1958,13 +1959,20 @@
 
   /* =============== LA PARTITA GIOCATA: crediti, mentore, puntate, doni =============== */
   const himHer = (t) => (t.gender === 'F' ? 'lei' : t.gender === 'N' ? 'ləi' : 'lui');
+  // l'ospite vede le sue puntate aperte (pubblicate dall'host)
+  function myBetsHTML() {
+    if (!(S.run && S.run.ospite && FS.stato)) return '';
+    const me = (FS.stato.giocatori || []).find((p) => p.remoto === FS.gid); if (!me) return '';
+    const open = (FS.stato.puntate || []).filter((b) => b.chi === me.id && !b.esito);
+    return '<div class="pt-bets fs-mybets"><small>Le tue puntate</small>' + (open.length ? open.map((b) => '<span class="pt-bet"><b>' + esc(b.testo) + '</b><em>' + b.posta + ' × ' + b.q + '</em></span>').join('') : '<span class="pt-none">Nessuna</span>') + '</div>';
+  }
   function renderHud() {
     const h = $('#ptHud'), gb = $('#giftBtn'), g = S.run && S.run.gioco;
     const fest = g && g.festa ? g.festa.giocatori : (S.run && S.run.ospite && FS.stato ? FS.stato.giocatori : null);
     if (PT && SIM && fest) {
       const alive = SIM.phases[Math.min(S.run.phase || 0, SIM.phases.length - 1)].snap.alive;
       h.hidden = false; gb.hidden = false; h.dataset.run = String(S.run.cfg.seed);
-      h.innerHTML = '<div class="pt-festa"><small>Modalità festa' + (FS.code ? ' · stanza ' + esc(FS.code) : '') + '</small><ol>' + fest.map((p) => { const c = p.campione && BY[p.campione]; return '<li class="pf-pl' + (S.run.ospite && p.remoto === FS.gid ? ' me' : '') + '" style="--pc:' + esc(p.colore || '#888') + '"><b class="pf-nm">' + esc(p.nome) + '</b>' + (c ? avHTML(c, { dead: !alive.includes(c.id) }) + '<span class="pf-ch">' + esc(c.name) + '</span>' : '<span class="pf-ch">senza campione</span>') + '<em>' + p.crediti + ' cr</em></li>'; }).join('') + '</ol></div>';
+      h.innerHTML = '<div class="pt-festa"><small>Modalità festa' + (FS.code ? ' · stanza ' + esc(FS.code) : '') + '</small><ol>' + fest.map((p) => { const c = p.campione && BY[p.campione]; return '<li class="pf-pl' + (S.run.ospite && p.remoto === FS.gid ? ' me' : '') + (p.remoto && (FS.role === 'host' ? !online(p.remoto) : p.online === false) ? ' off' : '') + '" style="--pc:' + esc(p.colore || '#888') + '"><b class="pf-nm">' + esc(p.nome) + '</b>' + (c ? avHTML(c, { dead: !alive.includes(c.id) }) + '<span class="pf-ch">' + esc(c.name) + '</span>' : '<span class="pf-ch">senza campione</span>') + '<em>' + p.crediti + ' cr</em></li>'; }).join('') + '</ol>' + myBetsHTML() + '</div>';
       return;
     }
     if (!PT || !SIM || !g) { h.hidden = true; gb.hidden = true; return; }
@@ -2172,7 +2180,7 @@
   }
   // mappa dei legami: filtri per tipo ed evidenziazione al passaggio
   $('#sideBody').addEventListener('click', (e) => {
-    const vote = e.target.closest('[data-vote]'); if (vote && SIM) { voteFor(vote.dataset.vote); return; }
+    const vote = e.target.closest('[data-vote]'); if (vote && SIM) { if (S.run && S.run.ospite) guestVote(vote.dataset.vote); else voteFor(vote.dataset.vote); return; }
     const zone=e.target.closest('[data-map-zone]');
     if(zone&&SIM){mapSelection=zone.dataset.mapZone==='all'?null:+zone.dataset.mapZone;renderSide(S.run.phase);$('#sideBody').scrollTop=0;$('#sideBody .map-node[data-map-zone="'+mapSelection+'"]')?.focus({preventScroll:true});return;}
     const event=e.target.closest('[data-map-event]');
@@ -2458,7 +2466,7 @@
     const ivs = iv(winner, SIM.winners.length > 1 ? 'Tra chi ha vinto' : 'Chi ha vinto') + (second && second.id !== winner ? iv(second.id, theme.soft ? 'L’ultimo a uscire' : 'L’ultimo a cadere') : '');
     const ed = S.run.cfg.edizione || 1;
     const fest = g && g.festa ? g.festa : S.run.ospite && FS.stato ? { giocatori: FS.stato.giocatori || [] } : null;
-    const festaH = fest && fest.giocatori.length ? (() => { const sc = PT.punteggi(SIM, fest); return '<section class="block card fs-rank"><h2>La classifica della festa</h2><ol>' + sc.map((x, k) => '<li class="' + (k === 0 ? 'top' : '') + '" style="--pc:' + esc(x.p.colore || '#888') + '"><span class="fr-pos">' + (k + 1) + '</span><b class="fr-nm">' + esc(x.p.nome) + '</b>' + (x.campione ? avHTML(x.campione, { dead: !x.campione.alive }) + '<span class="fr-ch">' + esc(x.campione.name) + (x.win ? ' · vince' : ' · ' + x.campione.rank + 'º') + '</span>' : '<span class="fr-ch">senza campione</span>') + '<em class="fr-pt">' + x.punti + '<small> punti</small></em></li>').join('') + '</ol><p class="help">Punti: piazzamento del campione (10 per posizione guadagnata), 5 per eliminazione, 1 ogni 10 crediti, 50 se vince.</p></section>'; })() : '';
+    const festaH = fest && fest.giocatori.length ? (() => { const sc = PT.punteggi(SIM, fest); return '<section class="block card fs-rank"><h2>La classifica della festa</h2><ol>' + sc.map((x, k) => '<li class="' + (k === 0 ? 'top' : '') + (S.run && S.run.ospite && x.p.remoto === FS.gid ? ' me' : '') + '" style="--pc:' + esc(x.p.colore || '#888') + '"><span class="fr-pos">' + (k + 1) + '</span><b class="fr-nm">' + esc(x.p.nome) + '</b>' + (x.campione ? avHTML(x.campione, { dead: !x.campione.alive }) + '<span class="fr-ch">' + esc(x.campione.name) + (x.win ? ' · vince' : ' · ' + x.campione.rank + 'º') + '</span>' : '<span class="fr-ch">senza campione</span>') + '<em class="fr-pt">' + x.punti + '<small> punti</small></em></li>').join('') + '</ol><p class="help">Punti: piazzamento del campione (10 per posizione guadagnata), 5 per eliminazione, 1 ogni 10 crediti, 50 se vince.</p></section>'; })() : '';
     return festaH + (nuovi.length ? '<section class="block card tr-new"><h2>Trofei sbloccati <span>' + nuovi.length + '</span></h2><ul class="trlist">' + nuovi.map((t) => trophyHTML(t, true)).join('') + '</ul><button class="btn sm" type="button" data-bacheca="trofei">Tutti i trofei</button></section>' : '') +
       (ivs ? '<section class="block card ivbox"><h2>Le interviste</h2>' + ivs + '</section>' : '') +
       postcardsHTML() +
@@ -2491,7 +2499,7 @@
       const ing = Object.entries(FS.room.get().ingressi || {});
       h = '<div class="fs-room"><span>Codice della stanza</span><b class="fs-code">' + esc(FS.code) + '</b><small>Gli amici aprono il gioco, scelgono «Online» → «Entra» e scrivono questo codice.</small></div>' +
         '<h3 class="fs-h">Giocatori su questo dispositivo</h3>' + playersHTML() +
-        '<h3 class="fs-h">Amici collegati <span>' + ing.length + '</span></h3>' + (ing.length ? '<ul class="fs-guests">' + ing.map(([gid, x]) => '<li><b>' + esc(x.nome) + '</b> · ' + (x.campione && S.cast.find((t) => t.id === x.campione) ? esc(S.cast.find((t) => t.id === x.campione).name) : '<em>sta scegliendo…</em>') + '</li>').join('') + '</ul>' : '<p class="help">Nessuno ancora: aspetta che entrino.</p>') +
+        '<h3 class="fs-h">Amici collegati <span>' + ing.length + '</span></h3>' + (ing.length ? '<ul class="fs-guests">' + ing.map(([gid, x]) => '<li class="' + (online(gid) ? 'on' : 'off') + '"><b>' + esc(x.nome) + '</b> · ' + (x.campione && S.cast.find((t) => t.id === x.campione) ? esc(S.cast.find((t) => t.id === x.campione).name) : '<em>sta scegliendo…</em>') + '</li>').join('') + '</ul>' : '<p class="help">Nessuno ancora: aspetta che entrino.</p>') +
         '<div class="row"><button type="button" class="btn primary lg" data-fs-start>Inizia la festa</button><button type="button" class="btn" data-fs-leave>Chiudi la stanza</button></div>';
     } else if (FS.role === 'guest') {
       const cfg = FS.room.get().cfg, me = (FS.room.get().ingressi || {})[FS.gid] || {};
@@ -2509,17 +2517,17 @@
     $('#festaBody').innerHTML = h;
   }
   function leanCfg(cfg) { return Object.assign({}, cfg, { cast: cfg.cast.map((t) => Object.assign({}, t, { img: '' })) }); }
-  function leaveRoom() { if (FS.off) FS.off(); if (FS.room) { if (FS.role === 'host') FS.room.set('', null); else FS.room.set('ingressi/' + FS.gid, null); FS.room.close(); } Object.assign(FS, { room: null, role: null, code: null, gid: null, off: null, stato: null, pubblicato: '' }); FS.risposte = new Set(); document.body.classList.remove('fs-ospite'); }
+  function leaveRoom() { if (FS.stopBeat) FS.stopBeat(); FS.stopBeat = null; if (FE) FE.cancellaSessione(); FS.attese && FS.attese.forEach((w) => w.ctl.annulla && w.ctl.annulla()); if (FS.off) FS.off(); if (FS.room) { if (FS.role === 'host') FS.room.set('', null); else FS.room.set('ingressi/' + FS.gid, null); FS.room.close(); } Object.assign(FS, { room: null, role: null, code: null, gid: null, off: null, stato: null, pubblicato: '' }); FS.risposte = new Set(); document.body.classList.remove('fs-ospite'); }
   $('#festaDlg').addEventListener('click', async (e) => {
     const tab = e.target.closest('[data-fs]'); if (tab) { FS.tab = tab.dataset.fs; renderFesta(); return; }
     if (e.target.closest('[data-fs-add]')) { FS.giocatori.push(fsPlayer(FS.giocatori.length)); renderFesta(); return; }
     const del = e.target.closest('[data-fs-del]'); if (del) { FS.giocatori.splice(+del.dataset.fsDel, 1); renderFesta(); return; }
     if (e.target.closest('[data-fs-server]')) { const u = $('#fsServer').value.trim(); if (u && !FE.serverValido(u)) { $('#festaMsg').textContent = 'Indirizzo non valido: deve essere un Realtime Database di Firebase (https://…firebasedatabase.app).'; return; } FE.setServer(u); $('#festaMsg').textContent = u ? 'Server salvato.' : 'Server rimosso.'; renderFesta(); return; }
-    if (e.target.closest('[data-fs-create]')) { try { FS.code = FE.codice(); FS.room = FE.stanza(FS.code, 'host'); FS.role = 'host'; FS.room.set('meta', { build: window.LOS_BUILD || '', creata: Date.now() }); FS.room.set('cfg', leanCfg(currentConfiguration())); FS.off = FS.room.on(() => { if ($('#festaDlg').open && FS.role === 'host') renderFestaSoft(); hostInbox(); }); renderFesta(); } catch (x) { $('#festaMsg').textContent = x.message; } return; }
+    if (e.target.closest('[data-fs-create]')) { try { FS.code = FE.codice(); FS.room = FE.stanza(FS.code, 'host'); FS.role = 'host'; FS.room.set('meta', { build: window.LOS_BUILD || '', creata: Date.now() }); FS.room.set('cfg', leanCfg(currentConfiguration())); FS.off = FS.room.on((tree) => { if ($('#festaDlg').open && FS.role === 'host') renderFestaSoft(); hostInbox(tree); }); FE.salvaSessione({ code: FS.code, role: 'host' }); uploadImages(S.cast); renderFesta(); } catch (x) { $('#festaMsg').textContent = x.message; } return; }
     if (e.target.closest('[data-fs-join]')) {
       const code = $('#fsCode').value.trim().toUpperCase(), nome = $('#fsName').value.trim() || 'Ospite';
       if (!FE.okCodice(code)) { $('#festaMsg').textContent = 'Il codice è di quattro lettere.'; return; }
-      try { FS.code = code; FS.room = FE.stanza(code, 'guest'); FS.role = 'guest'; FS.gid = FE.nuovoId('g'); FS.ultimo = nome; FS.room.set('ingressi/' + FS.gid, { nome, campione: '' }); FS.off = FS.room.on(guestSync); document.body.classList.add('fs-ospite'); renderFesta(); $('#festaMsg').textContent = 'Sei dentro. Scegli il tuo campione.'; } catch (x) { $('#festaMsg').textContent = x.message; }
+      try { FS.code = code; FS.room = FE.stanza(code, 'guest'); FS.role = 'guest'; FS.gid = FE.nuovoId('g'); FS.ultimo = nome; FS.room.set('ingressi/' + FS.gid, { nome, campione: '' }); FS.off = FS.room.on(guestSync); FS.stopBeat = FE.battito(FS.room, FS.gid); FE.salvaSessione({ code, role: 'guest', gid: FS.gid, nome }); document.body.classList.add('fs-ospite'); renderFesta(); $('#festaMsg').textContent = 'Sei dentro. Scegli il tuo campione.'; } catch (x) { $('#festaMsg').textContent = x.message; }
       return;
     }
     if (e.target.closest('[data-fs-leave]')) { leaveRoom(); renderFesta(); return; }
@@ -2528,11 +2536,40 @@
   $('#festaDlg').addEventListener('change', (e) => {
     const n = e.target.closest('[data-fs-nome]'); if (n) { FS.giocatori[+n.dataset.fsNome].nome = n.value.trim().slice(0, 24) || 'Giocatore'; return; }
     const c = e.target.closest('[data-fs-camp]'); if (c) { FS.giocatori[+c.dataset.fsCamp].campione = c.value || null; renderFesta(); return; }
-    const m = e.target.closest('[data-fs-mycamp]'); if (m && FS.room) { FS.room.patch('ingressi/' + FS.gid, { campione: m.value }); }
+    const m = e.target.closest('[data-fs-mycamp]'); if (m && FS.room) { FS.room.patch('ingressi/' + FS.gid, { campione: m.value }); const ss = FE.leggiSessione(); if (ss) FE.salvaSessione(Object.assign(ss, { campione: m.value })); }
   });
   // l'elenco degli ospiti si aggiorna senza rubare il fuoco a chi sta scrivendo
   function renderFestaSoft() { if (!$('#festaDlg').contains(document.activeElement) || document.activeElement.tagName === 'BUTTON') renderFesta(); }
   $('#btnFesta').addEventListener('click', openFesta);
+  // chi gioca: la partita in corso, oppure (prima della partita) i giocatori appena preparati
+  const fsPlayers = () => (S.run && S.run.gioco && S.run.gioco.festa ? S.run.gioco.festa.giocatori : FS.pronti || []);
+  // la presenza degli ospiti: l'host guarda quando è cambiato il battito, col proprio orologio
+  FS.visti = {};
+  function trackPresence(tree) {
+    Object.entries(tree.ingressi || {}).forEach(([gid, x]) => { const v = FS.visti[gid]; if (!v || v.b !== x.battito) FS.visti[gid] = { b: x.battito, t: Date.now() }; });
+  }
+  const online = (gid) => !!(FS.visti[gid] && Date.now() - FS.visti[gid].t < 20000);
+  // le foto dei concorrenti: ridotte e caricate una volta, così tutti vedono gli stessi volti
+  FS.foto = {};
+  async function uploadImages(cast) {
+    if (FS.role !== 'host' || !FS.room) return;
+    for (const t of cast) {
+      if (!t.img || FS.foto[t.id] === t.img.length) continue;
+      FS.foto[t.id] = t.img.length;
+      const small = await FE.riduci(t.img);
+      if (small && FS.room) FS.room.set('immagini/' + t.id, small);
+    }
+  }
+  // l'ospite applica le foto arrivate: alla partita, al cast dell'anteprima e alla schermata visibile
+  function applyImages(tree) {
+    const imgs = tree.immagini || {}, keys = Object.keys(imgs); if (!keys.length || !SIM) return;
+    let changed = false;
+    SIM.tributes.forEach((t) => { if (imgs[t.id] && t.img !== imgs[t.id]) { t.img = imgs[t.id]; changed = true; } });
+    if (S.run && S.run.cfg) S.run.cfg.cast.forEach((t) => { if (imgs[t.id]) t.img = imgs[t.id]; });
+    if (!changed) return;
+    if (curView === 'diretta') renderLive(true); else if (curView === 'esito') renderResults(); else renderHud();
+  }
+
   function startFesta() {
     const remote = FS.role === 'host' ? Object.entries(FS.room.get().ingressi || {}).filter(([, x]) => x.campione).map(([gid, x]) => ({ id: 'o' + gid, nome: x.nome, campione: x.campione, remoto: gid })) : [];
     const locals = FS.giocatori.filter((p) => p.campione);
@@ -2543,44 +2580,89 @@
     S.cast.forEach((t, i) => { if (!t.name.trim()) t.name = 'Concorrente ' + (i + 1); });
     S.settings.seed = newSeed();
     const cfg = currentConfiguration();
-    runSim.festa = PT.festaSana({ giocatori: all.map((p, i) => Object.assign({ crediti: PT.START, colore: PT.COLORI[i % PT.COLORI.length] }, p)), stanza: FS.code });
-    if (FS.role === 'host') { FS.room.set('cfg', leanCfg(cfg)); FS.room.set('richieste', null); FS.room.set('risposte', null); FS.room.set('azioni', null); FS.rev = 0; FS.pubblicato = ''; }
+    const festa = PT.festaSana({ giocatori: all.map((p, i) => Object.assign({ crediti: PT.START, colore: PT.COLORI[i % PT.COLORI.length] }, p)), stanza: FS.code });
+    if (FS.role === 'host') { FS.room.set('cfg', leanCfg(cfg)); FS.room.set('stato', null); FS.room.set('richieste', null); FS.room.set('risposte', null); FS.room.set('azioni', null); FS.rev = 0; FS.pubblicato = ''; uploadImages(cfg.cast); }
     $('#festaDlg').close();
-    runSim(cfg);
+    festaPregame(festa, cfg).then(() => { runSim.festa = festa; runSim.pre = null; FS.pronti = null; runSim(cfg); });
   }
-  // l'host pubblica lo stato a ogni fase: fase, interventi, giocatori (crediti e campioni)
+  // prima dei giochi, per ciascuno (gli ospiti in parallelo): una domanda d'intervista e il primo ordine al campione
+  async function festaPregame(festa, cfg) {
+    FS.pronti = festa.giocatori;
+    const BYc = Object.fromEntries(cfg.cast.map((t) => [t.id, t])), eff = [], first = [];
+    async function turn(p, k) {
+      const t = BYc[p.campione]; if (!t) return;
+      const Q = PT.INTERVISTA[k % PT.INTERVISTA.length];
+      const r = await askPlayer(p, { kicker: 'Intervista', title: Q.q, faces: avHTML(t), text: '<b>' + esc(t.name) + '</b> risponde come decidi tu.', cls: 'sc-interview', options: Q.a.map(([label, v, sub]) => ({ value: v, label: '«' + label + '»', sub })), timer: 25, skip: 'Salta' });
+      if (r && r.value && r.value !== 'legame') eff.push({ chi: t.id, effetti: [r.value] });
+      else if (r && r.value === 'legame') { const mates = cfg.cast.filter((x) => x.id !== t.id && x.team === t.team), u = (mates[0] || cfg.cast.find((x) => x.id !== t.id)); if (u) eff.push({ chi: t.id, effetti: ['legame:' + u.id] }); }
+      const o = await askPlayer(p, { kicker: 'Al via', title: 'Il primo consiglio a ' + t.name, faces: avHTML(t), text: 'Cosa deve fare appena suona il segnale?', cls: 'sc-mentor', options: [['nasconditi', 'Scappa subito', 'Lontano dalla mischia'], ['caccia', 'Prendi un’arma', 'Lotta per il bottino'], ['alleati', 'Trova un alleato', 'Insieme si resiste'], ['provviste', 'Arraffa le provviste', 'Cibo e zaino, poi via']].map(([value, label, sub]) => ({ value, label, sub })), timer: 25, skip: 'Lascia decidere' });
+      if (o && PT.ORDINI.some((x) => x.v === o.value)) first.push({ fase: 0, tipo: 'ordine', chi: t.id, cosa: o.value });
+    }
+    const locals = festa.giocatori.filter((p) => !p.remoto), remotes = festa.giocatori.filter((p) => p.remoto);
+    await Promise.all([(async () => { for (let k = 0; k < locals.length; k++) await turn(locals[k], k); })(), ...remotes.map((p, k) => turn(p, locals.length + k))]);
+    if (eff.length) cfg.interviste = eff;
+    if (first.length) cfg.interventi = first;
+    lastLocal = null;
+  }
+  // l'host pubblica lo stato: fase, interventi, giocatori (crediti, campioni, presenza) e le puntate di ciascuno
   function publishState(esito) {
     if (FS.role !== 'host' || !FS.room || !SIM || !S.run || !S.run.gioco || !S.run.gioco.festa) return;
-    const st = { fase: S.run.phase || 0, interventi: S.run.cfg.interventi || [], giocatori: S.run.gioco.festa.giocatori, esito: !!esito, seme: S.run.cfg.seed };
+    const g = S.run.gioco;
+    const st = { fase: S.run.phase || 0, interventi: S.run.cfg.interventi || [], giocatori: g.festa.giocatori.map((p) => Object.assign({}, p, { online: !p.remoto || online(p.remoto) })), esito: !!esito || curView === 'esito', seme: S.run.cfg.seed,
+      puntate: g.puntate.filter((b) => b.chi).map((b) => ({ id: b.id, chi: b.chi, testo: b.testo, posta: b.posta, q: b.q, esito: b.esito || '', vincita: b.vincita || 0 })) };
     const sig = JSON.stringify(st); if (sig === FS.pubblicato) return; FS.pubblicato = sig;
     FS.room.set('stato', Object.assign(st, { rev: ++FS.rev }));
   }
-  // le azioni spontanee degli ospiti (i doni): si applicano prima della fase successiva
+  // le azioni spontanee degli ospiti (doni e voti): si applicano prima della fase successiva
   let inboxBusy = false;
-  function hostInbox() { /* le azioni si raccolgono in next(), qui basta tenerle in coda */ }
+  function hostInbox(tree) { trackPresence(tree); renderWaiting(); }
   async function processActions() {
     if (FS.role !== 'host' || !FS.room || inboxBusy || !S.run || !S.run.gioco || !S.run.gioco.festa) return;
     const az = Object.entries(FS.room.get().azioni || {}); if (!az.length) return;
     inboxBusy = true;
     try {
-      const g = S.run.gioco, i = S.run.phase || 0, k = i + 1, alive = SIM.phases[i].snap.alive; let changed = false;
+      const g = S.run.gioco, i = S.run.phase || 0, k = i + 1, alive = SIM.phases[i].snap.alive, day = SIM.phases[i].day; let changed = false;
       for (const [aid, a] of az) {
         FS.room.set('azioni/' + aid, null);
-        const p = g.festa.giocatori.find((x) => x.remoto === a.gid), dono = PT.DONI.find((x) => x.k === a.cosa);
-        if (!p || !dono || !alive.includes(a.chi) || k >= SIM.phases.length) continue;
+        const p = g.festa.giocatori.find((x) => x.remoto === a.gid);
+        if (!p || !a || !alive.includes(a.chi) || k >= SIM.phases.length) continue;
+        if (a.tipo === 'voto') {
+          const key = 'd' + day + ':' + p.id; if (g.voti[key]) continue;
+          g.voti[key] = a.chi; S.run.cfg.interventi = (S.run.cfg.interventi || []).concat([{ fase: k, tipo: 'fama', chi: a.chi, cosa: '' }]); changed = true;
+          continue;
+        }
+        const dono = PT.DONI.find((x) => x.k === a.cosa); if (!dono || g.doni[k + ':' + p.id]) continue;
         const cost = PT.prezzo(SIM, i, a.chi, dono); if (cost > p.crediti) continue;
         S.run.cfg.interventi = (S.run.cfg.interventi || []).concat([{ fase: k, tipo: 'dono', chi: a.chi, cosa: a.cosa }]); p.crediti -= cost; changed = true;
         g.doni[k + ':' + p.id] = { chi: a.chi, cosa: a.cosa, costo: cost, da: p.id };
         toast(p.nome + ' manda un dono a ' + BY[a.chi].name + '.');
       }
       if (changed) await resimulate();
+      publishState();
     } finally { inboxBusy = false; }
   }
-  // una domanda a un giocatore: online va sul suo dispositivo, in locale si passa il telefono
+  // chi stiamo aspettando: un pannello sull'host con il conto alla rovescia e «Salta»
+  FS.attese = new Map();
+  function renderWaiting() {
+    let box = $('#fsWait');
+    if (!FS.attese.size) { if (box) box.hidden = true; return; }
+    if (!box) { box = document.createElement('div'); box.id = 'fsWait'; box.className = 'fs-wait'; box.setAttribute('role', 'status'); document.body.appendChild(box); box.addEventListener('click', (e) => { const b = e.target.closest('[data-fs-skip]'); if (b) { const w = FS.attese.get(b.dataset.fsSkip); if (w && w.ctl.annulla) w.ctl.annulla(); } }); }
+    box.hidden = false;
+    box.innerHTML = '<span class="fw-k">In attesa</span>' + [...FS.attese.entries()].map(([key, w]) => { const left = Math.max(0, Math.ceil((w.fine - Date.now()) / 1000)); return '<span class="fw-p' + (online(w.gid) ? '' : ' off') + '" style="--pc:' + esc(w.colore || '#888') + '"><b>' + esc(w.nome) + '</b><em>' + esc(w.cosa) + ' · ' + left + ' s</em><button type="button" data-fs-skip="' + esc(key) + '">Salta</button></span>'; }).join('');
+  }
+  setInterval(() => { if (FS.attese.size) renderWaiting(); }, 1000);
+  // una domanda a un giocatore: online va sul suo dispositivo (se è collegato), in locale si passa il telefono
   let lastLocal = null;
+  async function askRemote(p, card, ms, cosa) {
+    if (!online(p.remoto)) { if (!FS.avvisati) FS.avvisati = new Set(); if (!FS.avvisati.has(p.remoto)) { FS.avvisati.add(p.remoto); toast(p.nome + ' non è collegato: il suo campione fa da sé.'); } return null; }
+    if (FS.avvisati) FS.avvisati.delete(p.remoto);
+    const ctl = {}, key = FE.nuovoId('w');
+    FS.attese.set(key, { nome: p.nome, gid: p.remoto, colore: p.colore, cosa, ctl, fine: Date.now() + ms }); renderWaiting();
+    try { return await FE.chiediA(FS.room, p.remoto, card, ms, ctl); } finally { FS.attese.delete(key); renderWaiting(); }
+  }
   async function askPlayer(p, opts) {
-    if (p.remoto && FS.room) { const r = await FE.chiediA(FS.room, p.remoto, Object.assign({}, opts, { kicker: p.nome + ' · ' + (opts.kicker || '') }), ((opts.timer || 25) + 8) * 1000); return r; }
-    const locals = S.run.gioco.festa.giocatori.filter((x) => !x.remoto);
+    if (p.remoto && FS.room) return askRemote(p, Object.assign({}, opts, { kicker: p.nome + ' · ' + (opts.kicker || '') }), ((opts.timer || 25) + 8) * 1000, opts.kicker || 'scelta');
+    const locals = fsPlayers().filter((x) => !x.remoto);
     if (locals.length > 1 && lastLocal !== p.id) {
       const ok = await PT.chiedi({ kicker: 'Modalità festa', title: 'Passa il telefono a ' + p.nome, text: 'Tocca a ' + esc(p.nome) + '. Gli altri non guardano!', cls: 'sc-pass', options: [{ value: 1, label: 'Sono ' + p.nome + ', vai' }], skip: 'Salta il turno' });
       if (!ok) return null;
@@ -2589,33 +2671,40 @@
     return PT.chiedi(Object.assign({}, opts, { kicker: p.nome + ' · ' + (opts.kicker || '') }));
   }
   async function askGame(p, tipo, opts) {
-    if (p.remoto && FS.room) { const r = await FE.chiediA(FS.room, p.remoto, Object.assign({ gioco: tipo }, opts), 45000); return r && typeof r.value === 'number' ? r.value : null; }
-    const locals = S.run.gioco.festa.giocatori.filter((x) => !x.remoto);
+    if (p.remoto && FS.room) { const r = await askRemote(p, Object.assign({ gioco: tipo }, opts), 45000, 'prova'); return r && typeof r.value === 'number' ? r.value : null; }
+    const locals = fsPlayers().filter((x) => !x.remoto);
     if (locals.length > 1 && lastLocal !== p.id) { const ok = await PT.chiedi({ kicker: 'Modalità festa', title: 'Passa il telefono a ' + p.nome, text: 'Il campione di ' + esc(p.nome) + ' affronta una prova.', cls: 'sc-pass', options: [{ value: 1, label: 'Sono ' + p.nome + ', vai' }], skip: 'Salta' }); if (!ok) return null; }
     lastLocal = p.id;
     return PT.gioca(tipo, opts);
   }
-  // l'alba della festa: per ciascuno, nell'ordine, il nuovo campione (se serve), l'ordine e la puntata
+  // i giocatori sul dispositivo dell'host uno dopo l'altro, gli ospiti tutti insieme
+  async function forPlayers(list, fn) {
+    const locals = list.filter((p) => !p.remoto), remotes = list.filter((p) => p.remoto && FS.room);
+    const others = list.filter((p) => p.remoto && !FS.room);
+    await Promise.all([(async () => { for (const p of locals.concat(others)) await fn(p); })(), ...remotes.map((p) => fn(p))]);
+  }
+  // l'alba della festa: per ciascuno il nuovo campione (se serve), l'ordine e la puntata
   async function festaDay(k) {
     const P = SIM.phases, g = S.run.gioco, i = k - 1, soft = !!resultTheme(SIM).soft;
     let changed = false;
     // l'entrata dell'alba, per ciascuno: 10 crediti, 5 in più se il campione è in gara
     g.festa.giocatori.forEach((p) => { p.crediti += 10 + (p.campione && P[i].snap.alive.includes(p.campione) ? 5 : 0); });
-    renderHud();
-    for (const p of g.festa.giocatori) {
+    renderHud(); publishState();
+    await forPlayers(g.festa.giocatori, async (p) => {
       const alive = P[i].snap.alive;
       if (!p.campione || !alive.includes(p.campione)) {
         if (p.campione) p.caduti = (p.caduti || []).concat([p.campione]);
-        const taken = new Set(g.festa.giocatori.map((x) => x.campione).filter(Boolean));
-        const free = alive.filter((id) => !taken.has(id));
         p.campione = null;
+        const taken = () => new Set(g.festa.giocatori.map((x) => x.campione).filter(Boolean));
+        const free = alive.filter((id) => !taken().has(id));
         if (free.length) {
           const r = await askPlayer(p, { kicker: 'Giorno ' + P[k].day + ' · nuovo campione', title: 'Il tuo campione è fuori. Chi scegli?', grid: true, cls: 'sc-pick', options: free.map((id) => ({ value: id, html: avHTML(BY[id]) + '<b class="sc-l">' + esc(BY[id].name) + '</b><small class="sc-s">Salute ' + PT.vit(SIM, i, id)[0] + '</small>' })), skip: 'Nessuno' });
-          p.campione = r && free.includes(r.value) ? r.value : null;
+          // due ospiti possono scegliere nello stesso momento: vince chi arriva prima
+          p.campione = r && free.includes(r.value) && !taken().has(r.value) ? r.value : null;
         }
-        save(); renderHud();
+        save(); renderHud(); publishState();
       }
-      if (!p.campione) continue;
+      if (!p.campione) return;
       const t = BY[p.campione];
       const o = await askPlayer(p, { kicker: 'Giorno ' + P[k].day + ' · ordine', title: 'Cosa deve fare ' + t.name + ' oggi?', faces: avHTML(t), text: moodHTML(t, i), cls: 'sc-mentor', options: PT.ORDINI.map((x) => ({ value: x.v, label: x.label, sub: x.sub })), timer: 25, skip: 'Lascia decidere' });
       if (o && PT.ORDINI.some((x) => x.v === o.value)) { S.run.cfg.interventi = (S.run.cfg.interventi || []).concat([{ fase: k, tipo: 'ordine', chi: t.id, cosa: o.value }]); g.ordini.push({ fase: k, cosa: o.value, da: p.id }); changed = true; }
@@ -2624,37 +2713,42 @@
         if (offers.length) {
           const b = await askPlayer(p, { kicker: 'Giorno ' + P[k].day + ' · puntata', title: 'Su cosa scommetti?', options: offers.map((x, j) => ({ value: j, label: x.testo, cost: '×' + x.q })), stake: [10, 25, 50].filter((v) => v <= p.crediti), credits: p.crediti, cls: 'sc-bets', timer: 25, skip: 'Non punto' });
           const stake = b && +b.stake;
-          if (b && offers[b.value] && stake && stake <= p.crediti) { g.puntate.push(Object.assign({ id: 'b' + k + '-' + g.puntate.length, posta: stake, esito: null, aperta: k, chi: p.id }, offers[b.value])); p.crediti -= stake; }
+          if (b && offers[b.value] && stake && stake <= p.crediti) { g.puntate.push(Object.assign({ id: 'b' + k + '-' + p.id + '-' + g.puntate.length, posta: stake, esito: null, aperta: k, chi: p.id }, offers[b.value])); p.crediti -= stake; }
         }
       }
-      save(); renderHud();
-    }
+      save(); renderHud(); publishState();
+    });
     if (changed && !await resimulate()) S.run.cfg.interventi = (S.run.cfg.interventi || []).filter((x) => x.fase !== k || x.tipo !== 'ordine');
     save(); renderHud(); publishState();
   }
   async function festaTest(k) {
-    const g = S.run.gioco, P = SIM.phases;
-    for (const p of g.festa.giocatori) {
-      if (!p.campione || g.chiesto['p' + k + p.id]) continue;
-      const ev = P[k].events.find((e) => e.test && (e.test.who ? e.test.who === p.campione : e.ids[0] === p.campione)); if (!ev) continue;
+    const g = S.run.gioco, P = SIM.phases, add = [];
+    await forPlayers(g.festa.giocatori, async (p) => {
+      if (!p.campione || g.chiesto['p' + k + p.id]) return;
+      const ev = P[k].events.find((e) => e.test && (e.test.who ? e.test.who === p.campione : e.ids[0] === p.campione)); if (!ev) return;
       g.chiesto['p' + k + p.id] = 1;
       const t = BY[p.campione], tipo = PT.tipoProva(ev.test.attr), an = ATTRN[ev.test.attr] || ev.test.attr;
       const score = await askGame(p, tipo, { kicker: p.nome + ' · prova di ' + an, title: { tempismo: 'Questione di riflessi', sequenza: 'Questione di testa', via: 'Questione di istinto' }[tipo], faces: avHTML(t), text: esc(t.name) + ' affronta una prova di <b>' + esc(an) + '</b>.' });
-      if (score == null) continue;
-      const v = PT.bonusProva(score); if (!v) continue;
-      const before = S.run.cfg.interventi || [];
-      S.run.cfg.interventi = before.concat([{ fase: k, tipo: 'prova', chi: t.id, cosa: String(v) }]);
-      if (!await resimulate()) S.run.cfg.interventi = before;
-    }
+      if (score == null) return;
+      const v = PT.bonusProva(score); if (v) add.push({ fase: k, tipo: 'prova', chi: t.id, cosa: String(v) });
+    });
+    if (!add.length) return;
+    const before = S.run.cfg.interventi || [];
+    S.run.cfg.interventi = before.concat(add);
+    if (!await resimulate()) S.run.cfg.interventi = before;
+    publishState();
   }
   // l'ospite: segue la stanza, ricalcola la partita da sé, risponde alle domande che gli arrivano
   let guestBusy = false;
   async function guestSync(tree) {
     if (FS.role !== 'guest') return;
     if ($('#festaDlg').open) renderFestaSoft();
+    // la stanza è sparita: l'host l'ha chiusa
+    if (FS.visto && !tree.cfg && !tree.meta) { toast('L’host ha chiuso la stanza.'); leaveRoom(); return; }
+    if (tree.cfg) FS.visto = true;
     const st = tree.stato, cfg = tree.cfg;
     FS.stato = st || null;
-    if (tree.meta && tree.meta.build && window.LOS_BUILD && tree.meta.build !== window.LOS_BUILD && !FS.avvisato) { FS.avvisato = true; toast('Attenzione: l’host usa un’altra versione del gioco, la partita potrebbe non coincidere.'); }
+    if (tree.meta && tree.meta.build && window.LOS_BUILD && tree.meta.build !== window.LOS_BUILD && !FS.avvisato) { FS.avvisato = true; toast('Attenzione: l’host usa un’altra versione del gioco: ricaricate tutti la pagina.'); }
     // le domande per me
     Object.entries(tree.richieste || {}).forEach(([rid, r]) => {
       if (!r || r.gid !== FS.gid || FS.risposte.has(rid)) return;
@@ -2666,12 +2760,15 @@
     });
     // l'host ha smesso di aspettare: il cartello rimasto aperto si chiude
     if (FS.aperta && !(tree.richieste || {})[FS.aperta]) { FS.aperta = null; PT.chiudi(); }
-    if (!st || !cfg || guestBusy) return;
+    if (!st || !cfg) return;
+    // un aggiornamento arrivato mentre si ricalcola non si perde: si rifà il giro con l'ultimo stato
+    if (guestBusy) { FS.sporco = true; return; }
     guestBusy = true;
     try {
       const inter = (x) => JSON.stringify(x || []);
       if (!SIM || !S.run || !S.run.ospite || S.run.ospite.code !== FS.code || S.run.cfg.seed !== st.seme) {
-        const c = Object.assign({}, cfg, { cast: normalizeCast(cfg.cast), custom: normalizeCustoms(cfg.custom || []), interventi: st.interventi || [] });
+        const imgs = tree.immagini || {};
+        const c = Object.assign({}, cfg, { cast: normalizeCast(cfg.cast.map((t) => Object.assign({}, t, { img: imgs[t.id] || '' }))), custom: normalizeCustoms(cfg.custom || []), interventi: st.interventi || [] });
         runSim.condivisa = true; runSim.pre = null;
         if (!await runSim(c)) return;
         S.run.ospite = { code: FS.code, gid: FS.gid }; save();
@@ -2680,10 +2777,21 @@
         S.run.cfg.interventi = st.interventi || [];
         await resimulate();
       }
+      applyImages(tree);
+      guestBets(st);
       if (st.esito) { if (location.hash !== '#esito') location.hash = '#esito'; else renderResults(); }
       else if ((S.run.phase || 0) !== st.fase) { S.run.phase = Math.min(st.fase, SIM.phases.length - 1); renderLive(false); }
       else renderHud();
-    } finally { guestBusy = false; }
+    } catch (e) { /* un errore di sincronizzazione non deve fermare l'ospite: si riprova al prossimo aggiornamento */ }
+    finally { guestBusy = false; if (FS.sporco && FS.room) { FS.sporco = false; setTimeout(() => FS.room && guestSync(FS.room.get()), 0); } }
+  }
+  // le mie puntate: quando l'host le chiude, l'esito si annuncia anche qui
+  FS.esitiVisti = {};
+  function guestBets(st) {
+    const me = (st.giocatori || []).find((p) => p.remoto === FS.gid); if (!me) return;
+    const done = (st.puntate || []).filter((b) => b.chi === me.id && b.esito && !FS.esitiVisti[b.id]);
+    done.forEach((b) => { FS.esitiVisti[b.id] = 1; });
+    if (done.length) announceBets(done);
   }
   async function guestGift() {
     if (!FS.room || !SIM || !FS.stato) return;
@@ -2694,8 +2802,35 @@
     const t = BY[who.value], price = (x) => PT.prezzo(SIM, i, who.value, x);
     const d = await PT.chiedi({ kicker: 'Sponsor · ' + t.name, title: 'Che cosa mandi?', faces: avHTML(t), cls: 'sc-gift', options: PT.DONI.map((x) => ({ value: x.k, label: x.label, sub: x.sub, cost: price(x) + ' cr', disabled: price(x) > me.crediti })), skip: 'Annulla' });
     if (!d) return;
-    FS.room.set('azioni/' + FE.nuovoId('a'), { gid: FS.gid, chi: who.value, cosa: d.value });
+    FS.room.set('azioni/' + FE.nuovoId('a'), { gid: FS.gid, tipo: 'dono', chi: who.value, cosa: d.value });
     toast('Richiesta inviata: il dono parte alla prossima fase.');
+    if (window.LOS_PARTITA_FX && window.LOS_PARTITA_FX.gift) try { window.LOS_PARTITA_FX.gift(t, d.value, $('#giftBtn')); } catch (e) { /* solo grafica */ }
+  }
+  // il voto dell'ospite passa dall'host, come i doni
+  function guestVote(id) {
+    if (!FS.room || !SIM || !FS.stato) return;
+    const day = SIM.phases[S.run.phase || 0].day; FS.votati = FS.votati || {};
+    if (FS.votati['d' + day]) return;
+    FS.votati['d' + day] = id;
+    FS.room.set('azioni/' + FE.nuovoId('a'), { gid: FS.gid, tipo: 'voto', chi: id });
+    toast('Voto inviato: ' + BY[id].name + ' guadagna fama alla prossima fase.'); renderSide(S.run.phase);
+  }
+  // chi ricarica la pagina rientra da solo nella sua stanza
+  function resumeFesta() {
+    const s = FE && FE.leggiSessione(); if (!s || !FE.server() || FS.room) return;
+    try {
+      if (s.role === 'guest') {
+        Object.assign(FS, { code: s.code, room: FE.stanza(s.code, 'guest'), role: 'guest', gid: s.gid, ultimo: s.nome });
+        FS.room.patch('ingressi/' + FS.gid, { nome: s.nome || 'Ospite', campione: s.campione || '' });
+        FS.off = FS.room.on(guestSync); FS.stopBeat = FE.battito(FS.room, FS.gid); document.body.classList.add('fs-ospite');
+        toast('Rientro nella stanza ' + s.code + '…');
+      } else if (S.run && S.run.gioco && S.run.gioco.festa && S.run.gioco.festa.stanza === s.code) {
+        Object.assign(FS, { code: s.code, room: FE.stanza(s.code, 'host'), role: 'host' });
+        FS.off = FS.room.on((tree) => { if ($('#festaDlg').open && FS.role === 'host') renderFestaSoft(); hostInbox(tree); });
+        FS.pubblicato = ''; setTimeout(() => publishState(), 600);
+        toast('Stanza ' + s.code + ' di nuovo aperta.');
+      } else FE.cancellaSessione();
+    } catch (e) { FE.cancellaSessione(); }
   }
 
   /* ---------- cartoline e link della partita ---------- */
@@ -3062,6 +3197,7 @@
     updateCounts();
     if (/^#vedi=/.test(location.hash)) { await openShared(location.hash.slice(6)); return; }
     if (!await restoreRun()) return;
+    resumeFesta();
     if (hot && typeof hot.phase === 'number' && S.run) S.run.phase = hot.phase;
     updateCounts();
     route();
