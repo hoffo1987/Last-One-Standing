@@ -60,3 +60,11 @@
   .ivbox .iv > .av { --s: 52px; }
   .album { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
+
+/* ---------- la pagina dei trofei (prima era una finestra) e le immagini dei trofei ---------- */
+#v-trofei .bc-tabs { margin-top: 0; }
+.bacheca-page { padding-bottom: 40px; }
+.tr-ic { display: grid; place-items: center; overflow: hidden; }
+.tr-ic img { width: 100%; height: 100%; object-fit: contain; display: block; }
+.tr.on .tr-ic img { filter: none; }
+.tr:not(.on) .tr-ic img { opacity: .45; filter: grayscale(1); }

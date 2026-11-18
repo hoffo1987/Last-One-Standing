@@ -566,7 +566,7 @@
   });
 
   /* ---------------- navigazione ---------------- */
-  const VIEWS = ['home', 'cast', 'arena', 'diretta', 'esito'];
+  const VIEWS = ['home', 'cast', 'arena', 'diretta', 'esito', 'trofei'];
   let curView = '';
   function radioFocus(group) {
     if (!group) return;
@@ -603,11 +603,12 @@
     if (v === 'arena') renderArena();
     if (v === 'diretta') renderLive(true);
     if (v === 'esito') renderResults();
+    if (v === 'trofei') renderBacheca();
     if (changed) { window.scrollTo({ top: 0, behavior: 'auto' }); const sec = $('#v-' + v); sec.classList.remove('view-enter'); void sec.offsetWidth; sec.classList.add('view-enter'); const title = $('h1, h2', sec) || sec; title.tabIndex = -1; title.focus({ preventScroll: true }); }
   }
   // cambiare sezione è uno stacco: tre lastre in diagonale coprono la pagina nei colori dell'arena di arrivo,
   // il contenuto cambia mentre è coperto, poi le lastre escono dall'altra parte
-  const VIEW_LABEL = { home: 'Last One Standing', cast: 'Concorrenti', arena: 'Arena', diretta: 'Diretta', esito: 'Esito' };
+  const VIEW_LABEL = { home: 'Last One Standing', cast: 'Concorrenti', arena: 'Arena', diretta: 'Diretta', esito: 'Esito', trofei: 'Trofei' };
   window.addEventListener('hashchange', () => {
     let v = (location.hash || '').slice(1); if (!VIEWS.includes(v)) v = 'home';
     if (v === curView) { route(); return; }
@@ -2440,9 +2441,10 @@
     if (nuovi.length) { S.run.trofeiNuovi = (S.run.trofeiNuovi || []).concat(nuovi.map((t) => t.id)); save(); }
     return (S.run.trofeiNuovi || []).map((id) => BC.TROFEI.find((t) => t.id === id)).filter(Boolean);
   }
+  const trophyImg = (id) => { const T = (ART.assets.fx || {}).trofei || {}; return T[id] || T.coppa || ''; };
   function trophyHTML(t, on, when) {
     const hidden = t.segreto && !on;
-    return '<li class="tr' + (on ? ' on' : '') + (hidden ? ' secret' : '') + '" data-tr="' + esc(t.id) + '" data-cat="' + esc(t.cat) + '"><span class="tr-ic" aria-hidden="true"></span><span class="tr-tx"><b>' + (hidden ? 'Trofeo segreto' : esc(t.nome)) + '</b><small>' + (hidden ? 'Si scopre giocando.' : esc(t.desc)) + '</small>' +
+    return '<li class="tr' + (on ? ' on' : '') + (hidden ? ' secret' : '') + '" data-tr="' + esc(t.id) + '" data-cat="' + esc(t.cat) + '"><span class="tr-ic" aria-hidden="true">' + (trophyImg(t.id) && !hidden ? '<img src="' + esc(trophyImg(t.id)) + '" alt="" loading="lazy">' : '') + '</span><span class="tr-tx"><b>' + (hidden ? 'Trofeo segreto' : esc(t.nome)) + '</b><small>' + (hidden ? 'Si scopre giocando.' : esc(t.desc)) + '</small>' +
       (on && when ? '<em>' + new Date(when).toLocaleDateString('it-IT') + '</em>' : '') + '</span>' + (on && CT ? '<button type="button" class="tr-share" data-cart="trofeo" data-id="' + esc(t.id) + '" aria-label="Cartolina del trofeo ' + esc(t.nome) + '">Condividi</button>' : '') + '</li>';
   }
   function resultsExtraHTML(nuovi) {
@@ -2745,12 +2747,12 @@
   let bcTab = 'trofei';
   function openBacheca(tab) {
     if (!BC || !PT) return;
-    bcTab = tab || bcTab; stopPlay(); renderBacheca();
-    const d = $('#bachecaDlg'); if (!d.open) d.showModal();
+    bcTab = tab || bcTab; stopPlay();
+    if (location.hash === '#trofei') renderBacheca(); else location.hash = '#trofei';
   }
   function renderBacheca() {
     const p = PT.profilo(), tro = p.trofei || {}, album = Object.values(p.album || {});
-    $$('#bachecaDlg [data-bc]').forEach((b) => b.setAttribute('aria-selected', String(b.dataset.bc === bcTab)));
+    $$('#v-trofei [data-bc]').forEach((b) => b.setAttribute('aria-selected', String(b.dataset.bc === bcTab)));
     let h = '';
     if (bcTab === 'trofei') {
       const n = BC.TROFEI.filter((t) => tro[t.id]).length, cats = [...new Set(BC.TROFEI.map((t) => t.cat))];
@@ -2769,7 +2771,7 @@
     }
     $('#bachecaBody').innerHTML = h;
   }
-  $('#bachecaDlg').addEventListener('click', (e) => {
+  $('#v-trofei').addEventListener('click', (e) => {
     const tab = e.target.closest('[data-bc]'); if (tab) { bcTab = tab.dataset.bc; renderBacheca(); return; }
     const add = e.target.closest('[data-album-add]'); if (!add) return;
     const x = (PT.profilo().album || {})[add.dataset.albumAdd]; if (!x || S.cast.some((t) => t.id === x.id)) return;

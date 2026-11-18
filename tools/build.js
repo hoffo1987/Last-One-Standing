@@ -40,7 +40,7 @@ function assetsFor(uri) {
   // Il «look»: forme, impatto, mezzitoni e fasce sugli occhi sono piccoli e vanno ovunque; fondali delle arene,
   // volti e vincitori a figura intera sono grandi e restano esterni nella sola versione web (come l'atlante).
   const web = uri === linked;
-  const fx = { pennellate: [], sigilli: {}, grana: null, forme: {}, impatto: null, mezzitoni: null, occhi: {}, fondali: {}, volti: {}, vincitori: {} };
+  const fx = { pennellate: [], sigilli: {}, grana: null, forme: {}, impatto: null, mezzitoni: null, occhi: {}, fondali: {}, volti: {}, vincitori: {}, trofei: {}, foil: null };
   if (fs.existsSync(path.join(A, 'fx'))) fs.readdirSync(path.join(A, 'fx')).sort().forEach((f) => {
     const u = () => uri('fx/' + f, 'image/webp'); let m;
     if (/^pennellata-\d+\.webp$/.test(f)) fx.pennellate.push(u());
@@ -50,6 +50,8 @@ function assetsFor(uri) {
     else if (f === 'impatto.webp') fx.impatto = u();
     else if (f === 'mezzitoni.webp') fx.mezzitoni = u();
     else if ((m = f.match(/^occhi-([mfn]-\d+)\.webp$/))) fx.occhi[m[1]] = u();
+    else if ((m = f.match(/^trofeo-([\w-]+)\.webp$/))) fx.trofei[m[1]] = u();
+    else if (f === 'foil-oro.webp') fx.foil = u();
     else if (web && (m = f.match(/^fondale-([\w-]+)\.webp$/))) fx.fondali[m[1]] = u();
     else if (web && (m = f.match(/^volto-([mfn]-\d+)\.webp$/))) fx.volti[m[1]] = u();
   });

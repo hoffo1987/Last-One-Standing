@@ -21,6 +21,7 @@
       <a href="#diretta" data-tab="diretta"><span class="num">3</span><span class="lbl">Diretta</span><span class="livedot" id="liveDot" hidden></span></a>
       <a href="#esito" data-tab="esito"><span class="num">4</span><span class="lbl">Esito</span></a>
     </nav>
+    <a class="iconbtn" id="trofeiBtn" href="#trofei" aria-label="Trofei e album" title="Trofei"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 4h10v5a5 5 0 0 1-10 0z"/><path d="M7 6H4v1.5A3.5 3.5 0 0 0 7.5 11M17 6h3v1.5A3.5 3.5 0 0 1 16.5 11M12 14v4M8.5 20h7"/></svg></a>
     <button class="iconbtn" id="musicBtn" type="button" aria-pressed="true" aria-label="Accendi o spegni la musica di sottofondo" title="Musica" hidden>
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18V6l10-2v12"/><circle cx="6.5" cy="18" r="2.5"/><circle cx="16.5" cy="16" r="2.5"/><path class="off" d="M3 3l18 18"/></svg>
     </button>
@@ -283,11 +284,18 @@
     <div id="resEmpty" class="emptystate" hidden><h2>Ancora nessun esito</h2><p>L'esito appare quando una partita è stata simulata.</p><div class="row center"><a class="btn primary" href="#arena">Vai all'arena</a></div></div>
     <div id="resBody" hidden></div>
   </section>
+
+  <!-- TROFEI -->
+  <section class="view wrap" id="v-trofei" hidden aria-labelledby="h-trofei">
+    <div class="pagehead"><div class="eyebrow">La tua bacheca</div><h1 id="h-trofei">Trofei</h1><p>Gli obiettivi sbloccati partita dopo partita, l’album dei concorrenti e i tuoi record. Tutto resta su questo dispositivo.</p></div>
+    <div class="bc-tabs" role="tablist" aria-label="Bacheca"><button type="button" role="tab" data-bc="trofei" aria-selected="true">Trofei</button><button type="button" role="tab" data-bc="album" aria-selected="false">Album</button><button type="button" role="tab" data-bc="record" aria-selected="false">Record</button></div>
+    <div id="bachecaBody" class="bacheca-page" role="tabpanel"></div>
+  </section>
 </main>
 <footer class="foot">
   <div class="wrap footin">
     <div class="footbrand"><span id="footLogo" aria-hidden="true"></span><div><b>Last One Standing</b><span>Simulatore di arena in italiano. Le partite restano nel tuo browser.</span></div></div>
-    <nav class="footnav" aria-label="Collegamenti"><a href="#home">Inizio</a><a href="#cast">Concorrenti</a><a href="#arena">Arena</a><a href="#diretta">Diretta</a><a href="#esito">Esito</a></nav>
+    <nav class="footnav" aria-label="Collegamenti"><a href="#home">Inizio</a><a href="#cast">Concorrenti</a><a href="#arena">Arena</a><a href="#diretta">Diretta</a><a href="#esito">Esito</a><a href="#trofei">Trofei</a></nav>
   </div>
 </footer>
 
@@ -348,13 +356,6 @@
       <div class="row"><button class="btn" type="button" id="archiveImport">Importa replay</button><button class="btn" type="button" id="archiveCopy">Copia JSON</button><button class="btn" type="button" id="archiveDownload">Scarica JSON</button></div>
     </details>
     <p id="archiveMsg" class="help" role="status"></p>
-  </div>
-</dialog>
-<dialog id="bachecaDlg" class="modal tool-dialog" aria-labelledby="h-bacheca">
-  <div class="db bacheca-dialog">
-    <div class="row between"><h2 id="h-bacheca">La tua bacheca</h2><button class="iconbtn" type="button" data-close aria-label="Chiudi la bacheca">✕</button></div>
-    <div class="bc-tabs" role="tablist" aria-label="Bacheca"><button type="button" role="tab" data-bc="trofei" aria-selected="true">Trofei</button><button type="button" role="tab" data-bc="album" aria-selected="false">Album</button><button type="button" role="tab" data-bc="record" aria-selected="false">Record</button></div>
-    <div id="bachecaBody" role="tabpanel"></div>
   </div>
 </dialog>
 <dialog id="cartolinaDlg" class="modal tool-dialog" aria-labelledby="h-cartolina">
