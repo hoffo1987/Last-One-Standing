@@ -86,7 +86,7 @@
 
   /* ================= stato della partita giocata ================= */
   function nuovo(pre) {
-    return { v: 1, inizio: Date.now(), crediti: START, mentore: (pre && pre.mentore) || null, puntate: [], doni: {}, chiesto: {}, ordini: [], allievi: [], log: [] };
+    return { v: 1, inizio: Date.now(), crediti: START, mentore: (pre && pre.mentore) || null, puntate: [], doni: {}, chiesto: {}, ordini: [], allievi: [], regia: [], voti: {}, log: [] };
   }
   function sano(g) {
     if (!g || typeof g !== 'object') return nuovo();
@@ -99,6 +99,9 @@
     n.chiesto = g.chiesto && typeof g.chiesto === 'object' ? g.chiesto : {};
     n.ordini = Array.isArray(g.ordini) ? g.ordini.slice(-200) : [];
     n.allievi = Array.isArray(g.allievi) ? g.allievi.filter((x) => typeof x === 'string').slice(-50) : [];
+    n.regia = Array.isArray(g.regia) ? g.regia.filter((x) => x && typeof x.k === 'string').slice(-30) : [];
+    n.voti = g.voti && typeof g.voti === 'object' ? g.voti : {};
+    n.prove = Array.isArray(g.prove) ? g.prove.slice(-100) : [];
     n.log = Array.isArray(g.log) ? g.log.slice(-100) : [];
     return n;
   }
@@ -232,5 +235,134 @@
     { v: 'provviste', label: 'Fai provviste', sub: 'Cibo e acqua prima di tutto' },
   ];
 
-  G.LOS_PARTITA = { chiedi, aperto, nuovo, sano, profilo, salvaProfilo, chiudiPartita, proposte, risolvi, prezzo, rischio, quota, nuovoGiorno, vivi, vit, DONI, INTERVISTA, ORDINI, RITMI, START };
+  /* ================= le carte del Regista ================= */
+  const REGIA = [
+    { k: 'tempesta', label: 'Tempesta', sub: 'Maltempo su tutta l’arena: più pericoli per tutti', soft: 'Giornata storta per tutti' },
+    { k: 'banchetto', label: 'Banchetto', sub: 'Un festino oggi: chi ha fame esce allo scoperto' },
+    { k: 'disastro', label: 'Pulsante rosso', sub: 'Un disastro colpisce l’arena oggi', soft: 'Un imprevisto colpisce oggi' },
+    { k: 'buio', label: 'Buio totale', sub: 'Stanotte non si vede niente: notte più letale', soft: 'Stanotte chi si muove rischia' },
+    { k: 'bestie', label: 'Gabbie aperte', sub: 'Stanotte i predatori attaccano chi è solo', soft: 'Stanotte chi è solo è più esposto' },
+    { k: 'rifornimenti', label: 'Rifornimenti', sub: 'Casse per tutti: una giornata più calma' },
+  ];
+  // la mano del giorno: tre carte non ancora giocate, scelte dal seme (stessa partita, stessa mano)
+  function mano(SIM, k, g) {
+    const P = SIM.phases, day = P[k].day, used = new Set((g.regia || []).map((x) => x.k));
+    const feastDone = P.slice(0, k).some((p) => p.kind === 'f'), alive = P[k - 1].snap.alive.length;
+    const ok = REGIA.filter((c) => !used.has(c.k) && !(c.k === 'banchetto' && (feastDone || alive < 4)) && !(c.k === 'disastro' && day < 2));
+    let h = 2166136261; for (const c of SIM.seed + '|mano|' + day) h = Math.imul(h ^ c.charCodeAt(0), 16777619);
+    const r = () => ((h = Math.imul(h ^ (h >>> 15), 2246822507) + 0x9e3779b9 | 0) >>> 0) / 4294967296;
+    const deck = ok.slice(); for (let i = deck.length - 1; i > 0; i--) { const j = Math.floor(r() * (i + 1)); [deck[i], deck[j]] = [deck[j], deck[i]]; }
+    return deck.slice(0, 3);
+  }
+  // il voto della regia: spettacolo (colpi grossi), ritmo (giorni con eliminazioni), colpi di scena
+  function votoRegia(SIM) {
+    const st = SIM.stats || {}, P = SIM.phases, days = Math.max(1, SIM.days);
+    const kills = P.reduce((s, p) => s + (p.kind === 'fallen' ? 0 : p.events.reduce((a, e) => a + (e.cat === 'kill' ? e.deaths.length : 0), 0)), 0);
+    const byDay = {}; P.forEach((p) => { if (p.kind !== 'fallen') byDay[p.day] = (byDay[p.day] || 0) + p.events.reduce((a, e) => a + e.deaths.length, 0); });
+    const dd = Object.keys(byDay).length || 1, busy = Object.values(byDay).filter((n) => n > 0).length;
+    const twists = (st.betrayals || 0) + (st.revenges || 0) + (st.tough || 0) + (st.mentorSaves || 0) + (st.couples || 0);
+    const spettacolo = clamp(Math.round(40 + kills * 4 + (st.sponsors || 0) * 3), 0, 100);
+    const ritmo = clamp(Math.round((busy / dd) * 100), 0, 100);
+    const sorprese = clamp(Math.round(30 + twists * 9), 0, 100);
+    const tot = Math.round(spettacolo * 0.35 + ritmo * 0.35 + sorprese * 0.3);
+    const giudizio = tot >= 85 ? 'Capolavoro: il pubblico chiede il bis.' : tot >= 70 ? 'Grande televisione.' : tot >= 55 ? 'Una buona puntata, con qualche calo.' : tot >= 40 ? 'Il pubblico ha cambiato canale un paio di volte.' : 'Noia mortale: la rete ti richiama domani.';
+    return { tot, spettacolo, ritmo, sorprese, giudizio, carte: (st.regia || []).length, giorni: days };
+  }
+
+  /* ================= le prove giocabili (minigiochi) =================
+   * gioca(tipo, { kicker, title, text, faces }) → Promise<punteggio 0..1 | null (lascia fare)>.
+   * tempismo: ferma l'ago nella fascia (tre colpi); sequenza: ripeti le frecce; via: scegli la porta giusta dagli indizi. */
+  const ARROWS = [['ArrowLeft', '←'], ['ArrowUp', '↑'], ['ArrowRight', '→'], ['ArrowDown', '↓']];
+  const tipoProva = (attr) => (['agi', 'for', 'cor', 'res'].includes(attr) ? 'tempismo' : ['int', 'furt', 'emp', 'car'].includes(attr) ? 'sequenza' : 'via');
+  function gioca(tipo, o) {
+    if (open) open.close(null);
+    return new Promise((resolve) => {
+      const root = document.createElement('div');
+      root.className = 'sc sc-game sc-g-' + tipo;
+      root.setAttribute('role', 'dialog'); root.setAttribute('aria-modal', 'true'); root.setAttribute('aria-labelledby', 'scT');
+      root.innerHTML = '<div class="sc-back"></div><div class="sc-card" tabindex="-1"><div class="sc-head">' + (o.kicker ? '<span class="sc-k">' + esc(o.kicker) + '</span>' : '') +
+        '<h2 class="sc-t" id="scT">' + esc(o.title || '') + '</h2>' + (o.text ? '<p class="sc-x">' + o.text + '</p>' : '') + '</div>' + (o.faces ? '<div class="sc-faces">' + o.faces + '</div>' : '') +
+        '<div class="mg" aria-live="polite"></div><div class="sc-foot"><span class="mg-score" aria-live="polite"></span><button type="button" class="sc-skip">Lascia fare</button></div></div>';
+      document.body.appendChild(root); document.documentElement.classList.add('sc-on');
+      const box = root.querySelector('.mg'), scoreEl = root.querySelector('.mg-score');
+      let done = false, raf = 0, timers = [];
+      const later = (fn, ms) => timers.push(setTimeout(fn, ms));
+      function close(v) {
+        if (done) return; done = true; cancelAnimationFrame(raf); timers.forEach(clearTimeout);
+        document.removeEventListener('keydown', onKey, true);
+        root.classList.add('sc-out'); setTimeout(() => { root.remove(); if (!document.querySelector('.sc')) document.documentElement.classList.remove('sc-on'); }, 260);
+        open = null; resolve(v);
+      }
+      // a fine gioco il risultato resta un attimo a schermo, poi il cartello si chiude da solo
+      function finish(score, label) {
+        root.classList.add(score >= 0.8 ? 'mg-great' : score >= 0.5 ? 'mg-good' : score >= 0.25 ? 'mg-meh' : 'mg-bad');
+        scoreEl.innerHTML = '<b>' + esc(label) + '</b>';
+        if (G.LOS_PARTITA_FX && G.LOS_PARTITA_FX.game) try { G.LOS_PARTITA_FX.game(root, score); } catch (e) { /* solo grafica */ }
+        later(() => close(score), 1100);
+      }
+      const verdict = (s) => (s >= 0.8 ? 'Perfetto!' : s >= 0.5 ? 'Bene' : s >= 0.25 ? 'Così così' : 'Male');
+      let onKeyGame = null;
+      function onKey(e) {
+        e.stopPropagation();
+        if (e.key === 'Escape') { e.preventDefault(); close(null); return; }
+        if (onKeyGame) onKeyGame(e);
+      }
+      document.addEventListener('keydown', onKey, true);
+      root.querySelector('.sc-skip').addEventListener('click', () => close(null));
+
+      if (tipo === 'tempismo') {
+        // un ago che va e viene; la fascia buona si restringe a ogni colpo
+        const rounds = [0.2, 0.15, 0.11], hits = []; let r = 0, t0 = performance.now(), zone = null;
+        box.innerHTML = '<div class="mg-bar"><i class="mg-zone"></i><i class="mg-needle"></i></div><div class="mg-row"><span class="mg-round"></span><button type="button" class="mg-go">Ferma!</button></div><p class="mg-hint">Premi <kbd>Spazio</kbd> o il pulsante quando l’ago è nella fascia.</p>';
+        const zEl = box.querySelector('.mg-zone'), nEl = box.querySelector('.mg-needle'), rEl = box.querySelector('.mg-round');
+        const setRound = () => { const w = rounds[r]; const c = 0.2 + Math.random() * 0.6; zone = [c - w / 2, c + w / 2]; zEl.style.left = (zone[0] * 100) + '%'; zEl.style.width = (w * 100) + '%'; rEl.textContent = 'Colpo ' + (r + 1) + ' di 3'; t0 = performance.now(); };
+        const pos = (now) => { const per = 1500 - r * 250, x = ((now - t0) % per) / per; return x < 0.5 ? x * 2 : 2 - x * 2; };
+        const tick = (now) => { nEl.style.left = (pos(now) * 100) + '%'; raf = requestAnimationFrame(tick); };
+        const stop = () => {
+          if (r >= rounds.length) return;
+          const p = pos(performance.now()), c = (zone[0] + zone[1]) / 2, w = zone[1] - zone[0];
+          const s = p >= zone[0] && p <= zone[1] ? 1 : Math.max(0, 1 - (Math.abs(p - c) - w / 2) / 0.12) * 0.5;
+          hits.push(s); box.classList.remove('mg-hit', 'mg-miss'); void box.offsetWidth; box.classList.add(s >= 1 ? 'mg-hit' : 'mg-miss');
+          r++; if (r < rounds.length) setRound(); else { cancelAnimationFrame(raf); const sc = hits.reduce((a, b) => a + b, 0) / hits.length; finish(sc, verdict(sc)); }
+        };
+        setRound(); raf = requestAnimationFrame(tick);
+        box.querySelector('.mg-go').addEventListener('click', stop);
+        onKeyGame = (e) => { if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); stop(); } };
+        requestAnimationFrame(() => box.querySelector('.mg-go').focus({ preventScroll: true }));
+      } else if (tipo === 'sequenza') {
+        // si guarda la sequenza, poi si ripete
+        const N = 5, seq = Array.from({ length: N }, () => Math.floor(Math.random() * 4)); let got = 0, mistakes = 0, ready = false;
+        box.innerHTML = '<div class="mg-seq" aria-hidden="true">' + seq.map(() => '<i class="mg-cell"></i>').join('') + '</div><div class="mg-pad" role="group" aria-label="Frecce">' + ARROWS.map(([k, s], n) => '<button type="button" data-a="' + n + '" disabled aria-label="' + k.replace('Arrow', 'Freccia ') + '">' + s + '</button>').join('') + '</div><p class="mg-hint">Memorizza la sequenza, poi ripetila con le frecce.</p>';
+        const cells = [...box.querySelectorAll('.mg-cell')], pad = [...box.querySelectorAll('.mg-pad button')];
+        seq.forEach((a, k) => later(() => { cells.forEach((c) => c.classList.remove('on')); cells[k].textContent = ARROWS[a][1]; cells[k].classList.add('on'); }, 350 + k * 650));
+        later(() => { cells.forEach((c) => { c.textContent = '?'; c.classList.remove('on'); }); ready = true; pad.forEach((b) => (b.disabled = false)); pad[0].focus({ preventScroll: true }); root.classList.add('mg-ready'); }, 350 + N * 650 + 250);
+        const press = (a) => {
+          if (!ready || got >= N) return;
+          const ok = a === seq[got]; cells[got].textContent = ARROWS[a][1]; cells[got].classList.add(ok ? 'ok' : 'ko');
+          if (!ok) mistakes++; got++;
+          if (got >= N || mistakes >= 2) { ready = false; const sc = Math.max(0, (seq.filter((x, k) => k < got && cells[k].classList.contains('ok')).length) / N); finish(sc, verdict(sc)); }
+        };
+        box.querySelector('.mg-pad').addEventListener('click', (e) => { const b = e.target.closest('[data-a]'); if (b) press(+b.dataset.a); });
+        onKeyGame = (e) => { const n = ARROWS.findIndex(([k]) => k === e.key); if (n >= 0) { e.preventDefault(); press(n); } };
+      } else {
+        // tre vie, due indizi: ognuno ne esclude una
+        const doors = ['Sinistra', 'Centro', 'Destra'], safe = Math.floor(Math.random() * 3), bad = [0, 1, 2].filter((x) => x !== safe);
+        const CLUES = [(d) => (d === 'Centro' ? 'Dal centro' : 'Da ' + d.toLowerCase()) + ' arriva odore di fumo.', (d) => 'Verso ' + (d === 'Centro' ? 'il centro' : d.toLowerCase()) + ' si sentono passi pesanti.', (d) => 'Le tracce ' + (d === 'Centro' ? 'al centro' : 'a ' + d.toLowerCase()) + ' portano dritte a una tana.', (d) => 'Il terreno ' + (d === 'Centro' ? 'al centro' : 'a ' + d.toLowerCase()) + ' scricchiola come una trappola.'];
+        const cl = CLUES.slice().sort(() => Math.random() - 0.5);
+        box.innerHTML = '<ul class="mg-clues">' + bad.map((b, n) => '<li>' + esc(cl[n](doors[b])) + '</li>').join('') + '</ul><div class="mg-doors" role="group" aria-label="Vie">' + doors.map((d, n) => '<button type="button" data-d="' + n + '"><span>' + (n + 1) + '</span>' + d + '</button>').join('') + '</div><p class="mg-hint">Leggi gli indizi e scegli la via sicura. Hai <b class="mg-sec">12</b> secondi.</p>';
+        let left = 12; const secEl = box.querySelector('.mg-sec');
+        const iv = setInterval(() => { left--; if (secEl) secEl.textContent = left; if (left <= 0) { clearInterval(iv); choose(-1); } }, 1000); timers.push(iv);
+        const choose = (n) => { if (done || root.classList.contains('mg-chosen')) return; clearInterval(iv); root.classList.add('mg-chosen'); box.querySelectorAll('[data-d]').forEach((b) => { b.disabled = true; if (+b.dataset.d === safe) b.classList.add('ok'); else if (+b.dataset.d === n) b.classList.add('ko'); }); const sc = n === safe ? 1 : 0; finish(sc, n < 0 ? 'Tempo scaduto' : sc ? 'Via giusta!' : 'Via sbagliata'); };
+        box.querySelector('.mg-doors').addEventListener('click', (e) => { const b = e.target.closest('[data-d]'); if (b) choose(+b.dataset.d); });
+        onKeyGame = (e) => { const n = parseInt(e.key, 10); if (n >= 1 && n <= 3) { e.preventDefault(); choose(n - 1); } };
+        requestAnimationFrame(() => box.querySelector('[data-d]').focus({ preventScroll: true }));
+      }
+      open = { close };
+      if (G.LOS_PARTITA_FX && G.LOS_PARTITA_FX.card) try { G.LOS_PARTITA_FX.card(root, Object.assign({ game: tipo }, o)); } catch (e) { /* solo grafica */ }
+    });
+  }
+  // dal punteggio al bonus sul tiro: da −2 a +4
+  const bonusProva = (s) => (s >= 0.8 ? 4 : s >= 0.5 ? 2 : s >= 0.25 ? 0 : -2);
+
+  G.LOS_PARTITA = { chiedi, gioca, tipoProva, bonusProva, REGIA, mano, votoRegia, aperto, nuovo, sano, profilo, salvaProfilo, chiudiPartita, proposte, risolvi, prezzo, rischio, quota, nuovoGiorno, vivi, vit, DONI, INTERVISTA, ORDINI, RITMI, START };
 })(typeof window !== 'undefined' ? window : globalThis);

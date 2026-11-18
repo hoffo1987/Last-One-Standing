@@ -26,6 +26,17 @@ for (const th of D.themes) {
     assert(evs.some((e) => e.mentor === 'caccia' && e.ids[0] === who), th.id + ': manca l’ordine');
     // stesso input, stesso risultato
     assert.strictEqual(strip(LOS.simulate(Object.assign({}, base, { interventi })).phases), strip(B.phases), th.id + ': non deterministico');
+    // le carte del Regista, il voto del pubblico e la prova giocata: stesso patto sul passato
+    const dawn = A.phases.findIndex((p, j) => j >= k && p.kind === 'd' && p.day > A.phases[k - 1].day);
+    if (dawn > 0 && i === 0) {
+      for (const card of ['tempesta', 'banchetto', 'disastro', 'buio', 'bestie', 'rifornimenti']) {
+        const Rg = LOS.simulate(Object.assign({}, base, { interventi: [{ fase: dawn, tipo: 'evento', chi: '', cosa: card }, { fase: dawn, tipo: 'fama', chi: who, cosa: '' }, { fase: dawn, tipo: 'prova', chi: who, cosa: '4' }] }));
+        assert(LOS_REPLAY.validate(Rg), th.id + ': partita con la carta ' + card + ' non archiviabile');
+        for (let p = 0; p < dawn; p++) assert.strictEqual(strip(Rg.phases[p]), strip(A.phases[p]), th.id + ': la carta ' + card + ' ha cambiato la fase ' + p);
+        assert(Rg.phases[dawn].events.some((e) => e.regia === card), th.id + ': manca l’annuncio della carta ' + card);
+        if (card === 'banchetto' && Rg.phases[dawn + 1] && Rg.phases[dawn].snap.alive.length >= 4 && ['n', 'f', 'dis'].includes(Rg.phases[dawn + 1].kind) && Rg.phases[dawn].day === Rg.phases[dawn + 1].day && !A.phases.some((p) => p.kind === 'f' && p.day < Rg.phases[dawn].day)) assert.strictEqual(Rg.phases[dawn + 1].kind, 'f', th.id + ': il banchetto non parte');
+      }
+    }
     // interviste: valgono dall'inizio e non rompono nulla
     const C = LOS.simulate(Object.assign({}, base, { interviste: [{ chi: cast[0].id, effetti: ['fama', 'morale', 'legame:' + cast[1].id] }] }));
     assert(LOS_REPLAY.validate(C), th.id + ': partita con interviste non archiviabile');

@@ -5343,6 +5343,96 @@ body:has(#editDlg[open]) #v-cast > :not(.dock) { translate: -34px 0; }
    e se ne vedeva solo la cima (capelli, fronte). Il ritaglio sugli occhi lo calcola src/skin/05-occhi.js */
 .av.es-strip > img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
 
+/* ================= PELLE · PARTITA GIOCATA, FASE 2 (base) =================
+ * Struttura e leggibilità per telecronaca (#ptCast), pubblico (scheda «Pubblico»: .aud-poll, .aud-chat),
+ * minigiochi delle prove (.sc-game, .mg-*), segnalini sulla mappa (.mn-pins), doni dalla mappa e dalla scheda,
+ * voto della regia nell'Esito (.ps-regia). Caricato prima di 60/61: la regia visiva sta lì. */
+
+/* ---------- telecronaca ---------- */
+.pt-cast { display: grid; gap: 6px; margin: 0 0 14px; padding: 10px 16px 12px; background: var(--panel-solid, var(--panel)); box-shadow: inset 5px 0 0 var(--ink); }
+.pt-cast .pc-on { justify-self: start; font: 800 10.5px / 1 var(--f-body); letter-spacing: .2em; text-transform: uppercase; color: var(--key); }
+.pc-line { margin: 0; display: grid; grid-template-columns: 74px minmax(0, 1fr); gap: 10px; align-items: baseline; font-size: 15px; line-height: 1.4; }
+.pc-who { font: italic 900 14px / 1.2 var(--f-display); text-transform: uppercase; }
+.pc-e .pc-who { color: var(--key); }
+.pc-say b { font-weight: 800; }
+
+/* ---------- pubblico: sondaggio e chat ---------- */
+.aud-poll h4, .aud-chat h4 { display: flex; justify-content: space-between; align-items: baseline; margin: 0 0 10px; font: italic 900 16px / 1.1 var(--f-display); text-transform: uppercase; }
+.aud-poll h4 span, .aud-chat h4 span { font: 800 10.5px / 1 var(--f-body); letter-spacing: .16em; color: color-mix(in srgb, var(--ink) 65%, transparent); }
+.aud-poll ol { list-style: none; margin: 0 0 8px; padding: 0; display: grid; gap: 8px; }
+.aud-poll li { display: grid; grid-template-columns: 34px minmax(0, 1fr) auto auto; grid-template-rows: auto auto; column-gap: 10px; align-items: center; }
+.aud-poll li .av { --s: 34px; grid-row: 1 / 3; }
+.aud-poll .ap-name { font-weight: 800; font-size: 14px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.aud-poll .ap-bar { grid-column: 2; grid-row: 2; height: 6px; background: color-mix(in srgb, var(--ink) 12%, transparent); }
+.aud-poll .ap-bar b { display: block; height: 100%; background: var(--key); }
+.aud-poll em { grid-column: 3; grid-row: 1 / 3; font: italic 900 18px / 1 var(--f-display); font-style: italic; }
+.aud-poll .ap-vote, .aud-poll .ap-mine { grid-column: 4; grid-row: 1 / 3; }
+.aud-poll .ap-mine { font: 800 10.5px / 1 var(--f-body); letter-spacing: .12em; text-transform: uppercase; color: var(--key); }
+.aud-poll li.mine .ap-name { color: var(--key); }
+.aud-chat { margin-top: 18px; }
+.aud-chat ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+.aud-chat li { font-size: 14px; line-height: 1.35; padding: 6px 10px; background: color-mix(in srgb, var(--ink) 6%, transparent); }
+.aud-chat li > b:first-child { color: var(--key); font-weight: 800; margin-right: 4px; }
+.aud-chat li.sad { box-shadow: inset 3px 0 0 var(--c-kill); }
+.aud-chat li.hype, .aud-chat li.fav { box-shadow: inset 3px 0 0 var(--key); }
+
+/* ---------- minigiochi ---------- */
+.mg { display: grid; gap: 14px; margin: 4px 0 6px; }
+.mg-hint { margin: 0; font-size: 13px; color: color-mix(in srgb, var(--ink) 72%, transparent); }
+.mg-bar { position: relative; height: 44px; background: color-mix(in srgb, var(--ink) 10%, transparent); overflow: hidden; }
+.mg-zone { position: absolute; top: 0; bottom: 0; background: var(--key); opacity: .85; }
+.mg-needle { position: absolute; top: -4px; bottom: -4px; width: 4px; margin-left: -2px; background: var(--ink); }
+.mg-row { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+.mg-round { font: 800 12px / 1 var(--f-body); letter-spacing: .14em; text-transform: uppercase; }
+.mg-go { padding: 12px 26px; border: 0; background: var(--key); color: var(--key-ink); font: italic 900 18px / 1 var(--f-display); text-transform: uppercase; cursor: pointer; }
+.mg-seq { display: flex; gap: 8px; justify-content: center; }
+.mg-cell { width: 48px; height: 56px; display: grid; place-items: center; background: color-mix(in srgb, var(--ink) 10%, transparent); font: 900 26px / 1 var(--f-display); font-style: normal; }
+.mg-cell.on { background: var(--ink); color: var(--bg); }
+.mg-cell.ok { background: var(--key); color: var(--key-ink); }
+.mg-cell.ko { background: var(--c-kill); color: #fff; }
+.mg-pad { display: grid; grid-template-columns: repeat(4, 56px); gap: 8px; justify-content: center; }
+.mg-pad button { height: 52px; border: 2px solid color-mix(in srgb, var(--ink) 25%, transparent); background: transparent; color: var(--ink); font: 900 24px / 1 var(--f-display); cursor: pointer; }
+.mg-pad button:not(:disabled):hover, .mg-pad button:focus-visible { background: var(--ink); color: var(--bg); outline: none; }
+.mg-pad button:disabled { opacity: .35; }
+.mg-clues { margin: 0; padding-left: 18px; display: grid; gap: 6px; font-size: 15px; }
+.mg-doors { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.mg-doors button { display: grid; gap: 6px; justify-items: center; padding: 18px 8px; border: 2px solid color-mix(in srgb, var(--ink) 25%, transparent); background: transparent; color: var(--ink); font: italic 900 16px / 1 var(--f-display); text-transform: uppercase; cursor: pointer; }
+.mg-doors button span { font-size: 12px; opacity: .7; }
+.mg-doors button:not(:disabled):hover, .mg-doors button:focus-visible { background: var(--ink); color: var(--bg); outline: none; }
+.mg-doors button.ok { background: var(--key); color: var(--key-ink); border-color: var(--key); }
+.mg-doors button.ko { background: var(--c-kill); color: #fff; border-color: var(--c-kill); }
+.mg-score b { font: italic 900 20px / 1 var(--f-display); text-transform: uppercase; }
+.sc.mg-great .mg-score b, .sc.mg-good .mg-score b { color: var(--key); }
+.sc.mg-bad .mg-score b { color: var(--c-kill); }
+
+/* ---------- mappa: segnalini e doni ---------- */
+.map-node .mn-pins { position: absolute; left: 50%; top: 100%; translate: -50% 14px; display: flex; gap: 2px; pointer-events: none; }
+.mn-pin { min-width: 20px; padding: 2px 4px; font: 800 9.5px / 1.2 var(--f-body); font-style: normal; text-align: center; background: var(--ink); color: var(--bg); }
+.mn-pin.pin-men { background: var(--key); color: var(--key-ink); }
+.mn-pin.pin-gift { background: var(--paper); color: var(--void); box-shadow: inset 0 0 0 2px var(--key); }
+.zc-gift, .pf-gift { font-size: 12px; }
+.zc-face .zc-gift { display: block; margin-top: 4px; padding: 3px 8px; border: 0; background: var(--key); color: var(--key-ink); font: 800 11px / 1 var(--f-body); letter-spacing: .08em; text-transform: uppercase; cursor: pointer; }
+
+/* ---------- esito: regia e prove ---------- */
+.ps-regia { margin-top: 16px; padding: 14px 16px; background: color-mix(in srgb, var(--ink) 6%, transparent); }
+.ps-regia h3 { margin: 0 0 6px; font: italic 900 18px / 1 var(--f-display); text-transform: uppercase; display: flex; align-items: baseline; gap: 8px; }
+.ps-regia h3 b { font-size: 34px; color: var(--key); }
+.ps-regia h3 small { font-size: 13px; opacity: .7; }
+.ps-rbars { display: grid; gap: 6px; margin: 10px 0; }
+.ps-rb { display: grid; grid-template-columns: 120px minmax(0, 1fr) 34px; gap: 10px; align-items: center; font-size: 13px; }
+.ps-rb em { font-style: normal; font-weight: 800; text-transform: uppercase; letter-spacing: .08em; font-size: 11px; }
+.ps-rb i { height: 8px; background: color-mix(in srgb, var(--ink) 12%, transparent); }
+.ps-rb i b { display: block; height: 100%; background: var(--key); }
+.ps-rb strong { font: italic 900 16px / 1 var(--f-display); text-align: right; }
+.ps-tests { margin: 12px 0 0; }
+
+@media (max-width: 600px) {
+  .pc-line { grid-template-columns: 1fr; gap: 2px; }
+  .mg-pad { grid-template-columns: repeat(4, 1fr); }
+  .mg-cell { width: 40px; height: 48px; }
+  .ps-rb { grid-template-columns: 96px minmax(0, 1fr) 30px; }
+}
+
 /* ================= PELLE · LA PARTITA GIOCATA =================
  * Il cartello delle scelte (.sc), la barra del giocatore nella Diretta (#ptHud), il pulsante del dono (#giftBtn),
  * i timbri delle puntate e il lancio del dono (creati da 61-partita.js), i segni sugli eventi causati dal giocatore
@@ -6125,11 +6215,12 @@ dialog[open]::backdrop { animation: cmVeil .3s ease both; }
       </div>
       <div id="phaseAnnouncement" class="sr-only" role="status" aria-live="polite" aria-atomic="true"></div>
       <div class="pt-hud" id="ptHud" hidden aria-live="polite"></div>
+      <div class="pt-cast" id="ptCast" hidden></div>
       <div class="livegrid">
         <div class="livefeed" id="phBody" role="region" aria-labelledby="phTitle"></div>
         <aside class="sidepanel card">
           <div class="stabs" role="tablist" aria-label="Pannello laterale">
-            <button role="tab" type="button" id="side-tab-map" aria-controls="sideBody" aria-selected="true" data-s="map">Mappa</button><button role="tab" type="button" id="side-tab-fallen" aria-controls="sideBody" aria-selected="false" tabindex="-1" data-s="fallen">Caduti</button><button role="tab" type="button" id="side-tab-alive" aria-controls="sideBody" aria-selected="false" tabindex="-1" data-s="alive">In gara</button><button role="tab" type="button" id="side-tab-allies" aria-controls="sideBody" aria-selected="false" tabindex="-1" data-s="allies">Legami</button>
+            <button role="tab" type="button" id="side-tab-map" aria-controls="sideBody" aria-selected="true" data-s="map">Mappa</button><button role="tab" type="button" id="side-tab-fallen" aria-controls="sideBody" aria-selected="false" tabindex="-1" data-s="fallen">Caduti</button><button role="tab" type="button" id="side-tab-alive" aria-controls="sideBody" aria-selected="false" tabindex="-1" data-s="alive">In gara</button><button role="tab" type="button" id="side-tab-allies" aria-controls="sideBody" aria-selected="false" tabindex="-1" data-s="allies">Legami</button><button role="tab" type="button" id="side-tab-chat" aria-controls="sideBody" aria-selected="false" tabindex="-1" data-s="chat">Pubblico</button>
           </div>
           <div class="sbody" id="sideBody" role="tabpanel" aria-labelledby="side-tab-map" tabindex="0"></div>
         </aside>
@@ -17054,6 +17145,7 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
       if (attr === 'for' && hasItem(t, 'arma')) bonus += 1;
       const tb = wx('tb', null); if (tb && tb[attr]) bonus += tb[attr];
       if (t.planPh >= phases.length - 3) bonus += 1;
+      if (t.provaBonus && t.provaBonus.ph === phases.length) bonus += t.provaBonus.v;
       // gli oggetti adatti a quella prova: ogni variante ha i suoi bonus (e qualche malus), al massimo +3 in tutto
       const inv = t.inv || [], ipr = typeof itemProps === 'function' ? itemProps : () => ({});
       const gearBonus = Math.max(-2, Math.min(3, inv.reduce((s2, it) => s2 + ((ipr(it).prova || {})[attr] || 0), 0)));
@@ -17859,7 +17951,7 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
       if (noDeathStreak >= 3) p *= 1.7;
       if (alive().length <= 4) p *= 1.25;
       if (kind === 'n') p *= MOD.night;
-      p *= wx('lethal', 1);
+      p *= wx('lethal', 1) * regiaLethal(kind);
       return Math.min(0.9, Math.max(0.03, p));
     }
 
@@ -17909,7 +18001,7 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
      * della prima fase calcolata con indice >= fase: tutto ciò che viene prima resta identico, perché il motore
      * è deterministico e nessun intervento tocca i numeri casuali prima del suo turno. */
     const INTERVENTI = (Array.isArray(cfg.interventi) ? cfg.interventi : []).slice(0, 400)
-      .filter((x) => x && typeof x === 'object' && Number.isInteger(x.fase) && x.fase >= 0 && typeof x.chi === 'string' && (x.tipo === 'dono' || x.tipo === 'ordine'))
+      .filter((x) => x && typeof x === 'object' && Number.isInteger(x.fase) && x.fase >= 0 && typeof x.chi === 'string' && ['dono', 'ordine', 'evento', 'fama', 'prova'].includes(x.tipo))
       .map((x, k) => ({ fase: x.fase, tipo: x.tipo, chi: x.chi, cosa: String(x.cosa || ''), k })).sort((a, b) => a.fase - b.fase || a.k - b.k);
     let intNext = 0;
     const DONI = ['cibo', 'med', 'arma', 'armatura', 'attrezzo', 'amuleto', 'mappa'];
@@ -17956,14 +18048,49 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
         events.push(intEvent(P, n + ' legge il messaggio del mentore, che vorrebbe vederl' + (P.gender === 'F' ? 'a' : P.gender === 'N' ? 'ə' : 'o') + ' ' + (cosa === 'nasconditi' ? 'restare al riparo' : ORD[cosa]) + ', e fa di testa sua.', { cat: 'hurt', whyTxt: 'Fa di testa sua', mentor: cosa, obeys: false }));
       }
     }
+    /* le carte del Regista: valgono per il giorno in cui vengono giocate */
+    const RG = { day: -1, k: '' };
+    const rgOn = (k) => RG.day === day && RG.k === k;
+    let forceFeast = -1, forceDis = -1;
+    const REGIA_TXT = {
+      tempesta: ['Cambio di programma.', 'La regia scatena il maltempo sull’arena: oggi sarà dura per tutti.'],
+      banchetto: ['Annuncio della regia.', 'Oggi c’è un banchetto: chi ha fame dovrà uscire allo scoperto.'],
+      disastro: ['La regia preme il pulsante rosso.', 'Qualcosa sta per succedere, e nessuno è al sicuro.'],
+      buio: ['La regia spegne le luci.', 'Stanotte non si vedrà niente: chi si muove, rischia.'],
+      bestie: ['La regia apre le gabbie.', 'Stanotte i predatori avranno fame.'],
+      rifornimenti: ['Pioggia di rifornimenti.', 'Casse ovunque: oggi si respira un po’.'],
+    };
+    const REGIA_SOFT = { bestie: ['La regia cambia le regole.', 'Stanotte chi resta da solo è più esposto.'], disastro: ['La regia prepara un imprevisto.', 'Oggi qualcosa andrà storto per qualcuno.'] };
+    function applyRegia(k, events, irng) {
+      const tx = (theme.soft && REGIA_SOFT[k]) || REGIA_TXT[k]; if (!tx) return;
+      RG.day = day; RG.k = k;
+      if (k === 'banchetto') forceFeast = day;
+      if (k === 'disastro') forceDis = day;
+      if (k === 'tempesta') {
+        const bad = (R.meteo || []).filter((m) => m.fx && ((m.fx.lethal || 1) > 1 || (m.fx.beast || 1) > 1 || (m.fx.food || 1) > 1));
+        if (bad.length) { W = irng.pick(bad); stats.meteo.push({ day, n: W.n, regia: true }); }
+      }
+      if (k === 'rifornimenti') alive().forEach((t) => { if (irng.chance(0.4)) { const it = mkItem(t.hp < 60 ? 'med' : 'cibo', null, 'sponsor'); if (addItem(t, it)) { t.items++; stats.items++; } } });
+      stats.regia = (stats.regia || []).concat([{ day, k }]);
+      const html = '<b>' + esc(tx[0]) + '</b> ' + esc(tx[1]) + (k === 'tempesta' && W.n ? ' <b>' + esc(W.n) + '.</b>' : '');
+      events.push({ html, plain: html.replace(/<[^>]+>/g, ''), ids: [], deaths: [], lethal: false, note: true, regia: k });
+    }
+    const regiaLethal = (kind) => (RG.day !== day ? 1 : RG.k === 'tempesta' ? 1.2 : RG.k === 'buio' && kind === 'n' ? 1.6 : RG.k === 'rifornimenti' ? 0.7 : 1);
     function applyInterventions(events) {
       const idx = phases.length;
       while (intNext < INTERVENTI.length && INTERVENTI[intNext].fase <= idx) {
-        const x = INTERVENTI[intNext++], P = byId[x.chi];
-        if (!P || !P.alive) continue;
+        const x = INTERVENTI[intNext++];
         // numeri casuali propri: l'esito di un intervento non sposta quelli del motore
         const irng = makeRng(seed + '|int|' + x.k + '|' + idx);
-        if (x.tipo === 'dono') applyDono(P, x.cosa, events, irng); else applyOrdine(P, x.cosa, events, irng);
+        if (x.tipo === 'evento') { applyRegia(x.cosa, events, irng); continue; }
+        const P = byId[x.chi];
+        if (!P || !P.alive) continue;
+        if (x.tipo === 'dono') applyDono(P, x.cosa, events, irng);
+        else if (x.tipo === 'ordine') applyOrdine(P, x.cosa, events, irng);
+        // il voto del pubblico: un po' di fama e di morale, che attira gli sponsor
+        else if (x.tipo === 'fama') { P.fame += 1; P.mo += 5; stats.votes = (stats.votes || 0) + 1; }
+        // la prova giocata: il risultato del minigioco pesa sul tiro di questa fase
+        else if (x.tipo === 'prova') { const v = Math.max(-3, Math.min(4, parseInt(x.cosa, 10) || 0)); P.provaBonus = { ph: idx, v }; }
       }
     }
 
@@ -18187,7 +18314,7 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
       rng.shuffle(alive()).forEach((t) => {
         if (attacks >= 2 || !LEX.mostro) return;
         const alone = !buddies(t).length;
-        const p = 0.035 * MOD.beast * wx('beast', 1) * ZP[t.zone][1] * (alone ? 1.6 * (MOD.nightAlone ? 1 + MOD.nightAlone * 0.5 : 1) : 0.45) * (t.en < 30 ? 1.5 : 1) * (hasTrait(t, 'furtivo') ? 0.6 : 1) * Math.sqrt(diff);
+        const p = 0.035 * MOD.beast * wx('beast', 1) * (rgOn('bestie') ? 2.5 : rgOn('buio') ? 1.3 : 1) * ZP[t.zone][1] * (alone ? 1.6 * (MOD.nightAlone ? 1 + MOD.nightAlone * 0.5 : 1) : 0.45) * (t.en < 30 ? 1.5 : 1) * (hasTrait(t, 'furtivo') ? 0.6 : 1) * Math.sqrt(diff);
         if (!rng.chance(p)) return;
         attacks++; stats.beasts++;
         const guarded = alive().some((x) => x.guard === t.id && x.zone === t.zone);
@@ -19384,10 +19511,10 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
       runPhase('d', pools.d, theme.phase.d + ' ' + day, introOf('d'));
       if (isEnded() || lateEnd()) break;
       const a = alive().length;
-      if (!feastDone && day >= 3 && a >= 4 && (rng.chance(0.35) || day >= 6)) {
+      if (!feastDone && a >= 4 && (forceFeast === day || day >= 3 && (rng.chance(0.35) || day >= 6))) {
         feastDone = true;
         runPhase('f', pools.f, theme.phase.f, introOf('f'));
-      } else if (day >= 2 && pools.disasters.length && day - lastDisaster > 1 && rng.chance(0.32 * Math.min(1.5, diff))) {
+      } else if (pools.disasters.length && (forceDis === day && pools.disasters.some(d=>!d.zones||d.zones.some(z=>!closed.has(z)&&alive().some(t=>t.zone===z))) || day >= 2 && day - lastDisaster > 1 && rng.chance(0.32 * Math.min(1.5, diff)))) {
         const eligible=pools.disasters.filter(d=>!d.zones||d.zones.some(z=>!closed.has(z)&&alive().some(t=>t.zone===z)));
         let opts = eligible.filter((d) => !usedDisasters.has(d.n));
         if (!opts.length) { usedDisasters.clear(); opts = eligible; }
@@ -19515,7 +19642,7 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
 </script>
 <script>window.LOS_ASSETS = {"logo":"img/logo.f2d5175789.webp","icona":"img/icona.8b02ddeb49.webp","favicon":"img/favicon.86774dc7cf.png","panoramica":"img/panoramica.66c4c27255.webp","sagome":["img/sagome-cappuccio.e8876ba986.webp","img/sagome-esploratore.9a99fd13f8.webp","img/sagome-viaggiatore.5e36435604.webp"],"arene":{"classico":"img/arene-classico.c2887324d1.webp","cyberpunk":"img/arene-cyberpunk.713b4c77ea.webp","fantasy":"img/arene-fantasy.ee494a9322.webp","horror":"img/arene-horror.76225517ca.webp","liceo":"img/arene-liceo.c591ac5f32.webp","royale":"img/arene-royale.46515caf90.webp","scifi":"img/arene-scifi.bc9d8e04eb.webp","ufficio":"img/arene-ufficio.a2e36d4f7f.webp","wasteland":"img/arene-wasteland.734ed966b2.webp","zombie":"img/arene-zombie.11476cf1ca.webp"},"atlas":{"classico":{"armi":{"arco":"img/arene-classico-armi-arco.57fa716aa9.webp","ascia":"img/arene-classico-armi-ascia.f48629747b.webp","coltello-da-campo":"img/arene-classico-armi-coltello-da-campo.3393de240f.webp","coltello":"img/arene-classico-armi-coltello.a0134af05c.webp","falce-corta":"img/arene-classico-armi-falce-corta.3131158a9f.webp","fionda":"img/arene-classico-armi-fionda.48c8c32c43.webp","lancia-da-caccia":"img/arene-classico-armi-lancia-da-caccia.6f2be560ec.webp","lancia":"img/arene-classico-armi-lancia.115909650b.webp","machete":"img/arene-classico-armi-machete.e1c9ef25d7.webp","mazza-corta":"img/arene-classico-armi-mazza-corta.e1092f0628.webp","mazza":"img/arene-classico-armi-mazza.1fddf37b46.webp","pugnale-da-cintura":"img/arene-classico-armi-pugnale-da-cintura.0bedc8a501.webp","pugnale":"img/arene-classico-armi-pugnale.fda9dbf38a.webp","scure-da-legna":"img/arene-classico-armi-scure-da-legna.837c5d1f78.webp","spada-corta":"img/arene-classico-armi-spada-corta.952e6b7f6a.webp","tridente":"img/arene-classico-armi-tridente.2fcb3547d9.webp"},"luoghi":{"altopiano":"img/arene-classico-luoghi-altopiano.36a37512d3.webp","bosco":"img/arene-classico-luoghi-bosco.2e9163544b.webp","cornucopia":"img/arene-classico-luoghi-cornucopia.393b2dabe1.webp","fiume":"img/arene-classico-luoghi-fiume.22b335a914.webp","paludi":"img/arene-classico-luoghi-paludi.77cf115eb4.webp","rovine":"img/arene-classico-luoghi-rovine.9ea4f70ca9.webp"},"pericoli":{"branco-di-lupi-mutanti":"img/arene-classico-pericoli-branco-di-lupi-mutanti.d786a62875.webp","orso-affamato":"img/arene-classico-pericoli-orso-affamato.e4f38a9892.webp","sciame-di-vespe-velenose":"img/arene-classico-pericoli-sciame-di-vespe-velenose.5adb2c7b8d.webp","serpente-gigante":"img/arene-classico-pericoli-serpente-gigante.b17e7f3d91.webp"}},"cyberpunk":{"armi":{"coltello-vibrante-in-ceramica":"img/arene-cyberpunk-armi-coltello-vibrante-in-ceramica.6bbcd0e9e4.webp","fucile-a-pompa-da-strada":"img/arene-cyberpunk-armi-fucile-a-pompa-da-strada.dbd0de34e1.webp","fucile-a-pompa-elettromagnetico":"img/arene-cyberpunk-armi-fucile-a-pompa-elettromagnetico.0555418cd0.webp","katana-termica":"img/arene-cyberpunk-armi-katana-termica.f1ff597173.webp","mazza-a-impulsi":"img/arene-cyberpunk-armi-mazza-a-impulsi.22d841ed1d.webp","mazza-da-baseball-chiodata":"img/arene-cyberpunk-armi-mazza-da-baseball-chiodata.db2996f744.webp","mitra-compatto":"img/arene-cyberpunk-armi-mitra-compatto.eaa3815798.webp","pistola-a-rotaia-artigianale":"img/arene-cyberpunk-armi-pistola-a-rotaia-artigianale.f9e83bda89.webp","pistola-smart":"img/arene-cyberpunk-armi-pistola-smart.2aa922ba8c.webp","sparachiodi-riprogrammato":"img/arene-cyberpunk-armi-sparachiodi-riprogrammato.70f6190cb0.webp","taser-da-buttafuori":"img/arene-cyberpunk-armi-taser-da-buttafuori.60b58b451d.webp","tirapugni-elettrificato":"img/arene-cyberpunk-armi-tirapugni-elettrificato.1ce19bab37.webp","ventaglio-da-combattimento-in-titanio":"img/arene-cyberpunk-armi-ventaglio-da-combattimento-in-titanio.f3b7bb5a10.webp"},"luoghi":{"clinica-del-ripperdoc":"img/arene-cyberpunk-luoghi-clinica-del-ripperdoc.8ef0cb941b.webp","club-della-braindance":"img/arene-cyberpunk-luoghi-club-della-braindance.7765542e70.webp","megablocco":"img/arene-cyberpunk-luoghi-megablocco.28b72e6ecf.webp","mercato-di-kabuki":"img/arene-cyberpunk-luoghi-mercato-di-kabuki.d5c8ab7b96.webp","nodo-dati-corporativo":"img/arene-cyberpunk-luoghi-nodo-dati-corporativo.56ca3e1335.webp","officina-dei-maelstrom":"img/arene-cyberpunk-luoghi-officina-dei-maelstrom.d69285cf21.webp","piazza-della-torre":"img/arene-cyberpunk-luoghi-piazza-della-torre.1e400212c8.webp"},"pericoli":{"banda-di-scav":"img/arene-cyberpunk-pericoli-banda-di-scav.f1a2b2ccc4.webp","gang-di-cromati":"img/arene-cyberpunk-pericoli-gang-di-cromati.74e5576e23.webp","sciame-di-droni-di-pattuglia":"img/arene-cyberpunk-pericoli-sciame-di-droni-di-pattuglia.6fb4b17ad9.webp","squadra-di-sicurezza-corporativa":"img/arene-cyberpunk-pericoli-squadra-di-sicurezza-corporativa.6195a3b15d.webp"}},"fantasy":{"armi":{"arco-elfico":"img/arene-fantasy-armi-arco-elfico.8012f9136d.webp","ascia-nanica":"img/arene-fantasy-armi-ascia-nanica.6913fdf008.webp","balestra":"img/arene-fantasy-armi-balestra.7767becc83.webp","bastone-magico":"img/arene-fantasy-armi-bastone-magico.0781aee860.webp","daga-dei-giuramenti":"img/arene-fantasy-armi-daga-dei-giuramenti.3b6d4b398c.webp","falcetto-dargento":"img/arene-fantasy-armi-falcetto-dargento.1ce0e4e163.webp","lancia-incantata":"img/arene-fantasy-armi-lancia-incantata.7371199824.webp","lancia-silvana":"img/arene-fantasy-armi-lancia-silvana.08fbc01ede.webp","martello-da-guerra":"img/arene-fantasy-armi-martello-da-guerra.4eb03f4db7.webp","martello-nanico":"img/arene-fantasy-armi-martello-nanico.82ad6b9b14.webp","mazza-di-quercia":"img/arene-fantasy-armi-mazza-di-quercia.0f6a8345a9.webp","pugnale-avvelenato":"img/arene-fantasy-armi-pugnale-avvelenato.aba554d177.webp","spada-da-viaggio":"img/arene-fantasy-armi-spada-da-viaggio.a7bdcab5f4.webp","spada-runica":"img/arene-fantasy-armi-spada-runica.ec4012c6cf.webp"},"luoghi":{"altare-delle-armi":"img/arene-fantasy-luoghi-altare-delle-armi.db06de44c1.webp","foresta-elfica":"img/arene-fantasy-luoghi-foresta-elfica.0448fcfbd3.webp","lago-nebbioso":"img/arene-fantasy-luoghi-lago-nebbioso.f19abc7c81.webp","miniere":"img/arene-fantasy-luoghi-miniere.5baa916ec9.webp","palude-stregata":"img/arene-fantasy-luoghi-palude-stregata.6a0b2af4a7.webp","picco-del-drago":"img/arene-fantasy-luoghi-picco-del-drago.06bdfd84b1.webp","torre-in-rovina":"img/arene-fantasy-luoghi-torre-in-rovina.ac716863c7.webp"},"pericoli":{"branco-di-lupi-mannari":"img/arene-fantasy-pericoli-branco-di-lupi-mannari.1c9124ceee.webp","spettro-errante":"img/arene-fantasy-pericoli-spettro-errante.056074bc23.webp","troll-di-caverna":"img/arene-fantasy-pericoli-troll-di-caverna.31aa2444f0.webp","viverna":"img/arene-fantasy-pericoli-viverna.577b91a819.webp"}},"horror":{"armi":{"ascia":"img/arene-horror-armi-ascia.f6793c220e.webp","attizzatoio":"img/arene-horror-armi-attizzatoio.12b9bf75af.webp","bastone-da-passeggio":"img/arene-horror-armi-bastone-da-passeggio.1a636ce4ab.webp","candelabro-dargento":"img/arene-horror-armi-candelabro-dargento.7d962054de.webp","coltello-dargento":"img/arene-horror-armi-coltello-dargento.73a6bb81ea.webp","crocifisso-appuntito":"img/arene-horror-armi-crocifisso-appuntito.203b41a170.webp","daga-da-cerimonia":"img/arene-horror-armi-daga-da-cerimonia.a597e15c53.webp","falce":"img/arene-horror-armi-falce.6513df8fa2.webp","fucile-da-caccia":"img/arene-horror-armi-fucile-da-caccia.169dc367e1.webp","pugnale-depoca":"img/arene-horror-armi-pugnale-depoca.f148afd005.webp","pugnale-rituale":"img/arene-horror-armi-pugnale-rituale.944cb9056c.webp","scure-da-legna":"img/arene-horror-armi-scure-da-legna.a11379a412.webp"},"luoghi":{"biblioteca":"img/arene-horror-luoghi-biblioteca.00d6ab97f4.webp","cantina":"img/arene-horror-luoghi-cantina.a196828c1d.webp","cappella":"img/arene-horror-luoghi-cappella.a51e505028.webp","cimitero":"img/arene-horror-luoghi-cimitero.7a441de089.webp","salone":"img/arene-horror-luoghi-salone.37f10c88c7.webp","serra":"img/arene-horror-luoghi-serra.b3d91121d4.webp","soffitta":"img/arene-horror-luoghi-soffitta.466d40cea3.webp"},"pericoli":{"bambola-posseduta":"img/arene-horror-pericoli-bambola-posseduta.7064eef1d7.webp","entita-senza-volto":"img/arene-horror-pericoli-entita-senza-volto.2c28467bdd.webp","spettro-urlante":"img/arene-horror-pericoli-spettro-urlante.25fa554e05.webp","stormo-di-corvi":"img/arene-horror-pericoli-stormo-di-corvi.fe5c85d7ae.webp"}},"liceo":{"armi":{"compito-copiato":"img/arene-liceo-armi-compito-copiato.c9ade27d61.webp","dossier-delle-revisioni":"img/arene-liceo-armi-dossier-delle-revisioni.77676a0f5f.webp","elenco-delle-correzioni":"img/arene-liceo-armi-elenco-delle-correzioni.04be1154c8.webp","fascicolo-di-risposte-motivate":"img/arene-liceo-armi-fascicolo-di-risposte-motivate.c29995b581.webp","foto-imbarazzante":"img/arene-liceo-armi-foto-imbarazzante.ff7d3ef284.webp","gossip-esplosivo":"img/arene-liceo-armi-gossip-esplosivo.552b1e6236.webp","pallone-da-dodgeball":"img/arene-liceo-armi-pallone-da-dodgeball.60a2576785.webp","profilo-falso":"img/arene-liceo-armi-profilo-falso.d1dac05a2b.webp","prospetto-dei-contributi":"img/arene-liceo-armi-prospetto-dei-contributi.0c121fd79a.webp","quaderno-delle-verifiche":"img/arene-liceo-armi-quaderno-delle-verifiche.7d8b07341a.webp","registro-rubato":"img/arene-liceo-armi-registro-rubato.67eb4b9eff.webp","riepilogo-delle-fonti":"img/arene-liceo-armi-riepilogo-delle-fonti.3c889a0ed5.webp"},"luoghi":{"aula-magna":"img/arene-liceo-luoghi-aula-magna.0478e35c5c.webp","aule":"img/arene-liceo-luoghi-aule.b3142d07cc.webp","biblioteca":"img/arene-liceo-luoghi-biblioteca.1ae806ae58.webp","cortile":"img/arene-liceo-luoghi-cortile.51bf433337.webp","laboratorio-di-chimica":"img/arene-liceo-luoghi-laboratorio-di-chimica.eba1434683.webp","mensa":"img/arene-liceo-luoghi-mensa.67bcbc7e37.webp","palestra":"img/arene-liceo-luoghi-palestra.8ecb872849.webp"},"pericoli":{"bidello-di-turno":"img/arene-liceo-pericoli-bidello-di-turno.191c43a8bd.webp","ispezione-a-sorpresa":"img/arene-liceo-pericoli-ispezione-a-sorpresa.bef087d9b9.webp","preside":"img/arene-liceo-pericoli-preside.033f6c9aae.webp","professoressa-di-matematica":"img/arene-liceo-pericoli-professoressa-di-matematica.6cb65c6a3f.webp"}},"royale":{"armi":{"balestra":"img/arene-royale-armi-balestra.64563b6cea.webp","carabina-compatta":"img/arene-royale-armi-carabina-compatta.a0fa150fbe.webp","coltello-da-combattimento":"img/arene-royale-armi-coltello-da-combattimento.74a64bca77.webp","coltello-tattico":"img/arene-royale-armi-coltello-tattico.8e9cb56197.webp","fucile-a-pompa":"img/arene-royale-armi-fucile-a-pompa.3d7fc7d83c.webp","fucile-da-cecchino":"img/arene-royale-armi-fucile-da-cecchino.fc3c4f19f1.webp","fucile-dassalto":"img/arene-royale-armi-fucile-dassalto.b91ccb0ec8.webp","granata":"img/arene-royale-armi-granata.fd9c359b27.webp","lancia-da-sopravvivenza":"img/arene-royale-armi-lancia-da-sopravvivenza.8a39c1a5e5.webp","manganello":"img/arene-royale-armi-manganello.dc6284893b.webp","mitraglietta":"img/arene-royale-armi-mitraglietta.6dcc3246e6.webp","pistola-da-segnalazione-modificata":"img/arene-royale-armi-pistola-da-segnalazione-modificata.1c7f899ca7.webp","pistola":"img/arene-royale-armi-pistola.acae268814.webp","scure-da-campo":"img/arene-royale-armi-scure-da-campo.6a5b0becd5.webp"},"luoghi":{"aeroporto":"img/arene-royale-luoghi-aeroporto.81e8ce98d4.webp","base-militare":"img/arene-royale-luoghi-base-militare.67f3a7de9d.webp","centrale-elettrica":"img/arene-royale-luoghi-centrale-elettrica.05ee57458a.webp","fattoria":"img/arene-royale-luoghi-fattoria.7c780dda87.webp","foresta":"img/arene-royale-luoghi-foresta.03b47644d0.webp","villaggio-costiero":"img/arene-royale-luoghi-villaggio-costiero.568519eb7c.webp"},"pericoli":{"cane-da-guardia-addestrato":"img/arene-royale-pericoli-cane-da-guardia-addestrato.c7853a67a0.webp","drone-armato":"img/arene-royale-pericoli-drone-armato.30d0b73e01.webp","elicottero-da-caccia":"img/arene-royale-pericoli-elicottero-da-caccia.8c68e62346.webp"}},"scifi":{"armi":{"bastone-a-impulsi":"img/arene-scifi-armi-bastone-a-impulsi.4e17e074e7.webp","cannone-a-rotaia-portatile":"img/arene-scifi-armi-cannone-a-rotaia-portatile.9a59b97d98.webp","frusta-monofilamento":"img/arene-scifi-armi-frusta-monofilamento.5ee8081aa9.webp","fucile-al-plasma":"img/arene-scifi-armi-fucile-al-plasma.ea2384a239.webp","granata-emp":"img/arene-scifi-armi-granata-emp.04cfd31203.webp","lama-di-servizio":"img/arene-scifi-armi-lama-di-servizio.a47d434464.webp","lama-vibrante":"img/arene-scifi-armi-lama-vibrante.02b0f47ff8.webp","lancia-da-abbordaggio":"img/arene-scifi-armi-lancia-da-abbordaggio.cf167e52ff.webp","perforatore-portatile":"img/arene-scifi-armi-perforatore-portatile.aa7e92ecab.webp","pistola-a-scarica":"img/arene-scifi-armi-pistola-a-scarica.33b3e5929e.webp","pistola-laser":"img/arene-scifi-armi-pistola-laser.aed4bbf3ed.webp","taglierino-ceramico":"img/arene-scifi-armi-taglierino-ceramico.b45d524836.webp","taser-a-impulsi":"img/arene-scifi-armi-taser-a-impulsi.360e29e1d5.webp"},"luoghi":{"condotti-di-servizio":"img/arene-scifi-luoghi-condotti-di-servizio.6817134b5e.webp","hangar":"img/arene-scifi-luoghi-hangar.6de551833b.webp","moduli-abitativi":"img/arene-scifi-luoghi-moduli-abitativi.9f5bb96d39.webp","ponte-di-comando":"img/arene-scifi-luoghi-ponte-di-comando.3e9ffd005a.webp","reattore":"img/arene-scifi-luoghi-reattore.d10a335006.webp","serra-idroponica":"img/arene-scifi-luoghi-serra-idroponica.b6f4407853.webp"},"pericoli":{"androide-da-combattimento":"img/arene-scifi-pericoli-androide-da-combattimento.1a3d3eb38e.webp","creatura-aliena-dai-tentacoli":"img/arene-scifi-pericoli-creatura-aliena-dai-tentacoli.b6b314ddd9.webp","drone-di-sicurezza-impazzito":"img/arene-scifi-pericoli-drone-di-sicurezza-impazzito.c8a9c6f9e3.webp","sciame-di-nanobot":"img/arene-scifi-pericoli-sciame-di-nanobot.d43296f047.webp"}},"ufficio":{"armi":{"badge-clonato-del-capo":"img/arene-ufficio-armi-badge-clonato-del-capo.be9f7381fe.webp","dossier-dei-risultati":"img/arene-ufficio-armi-dossier-dei-risultati.1888e2f671.webp","elenco-dei-contributi":"img/arene-ufficio-armi-elenco-dei-contributi.3de4fbe5bf.webp","fascicolo-delle-fonti":"img/arene-ufficio-armi-fascicolo-delle-fonti.02df27dfbf.webp","foglio-excel-con-le-prove":"img/arene-ufficio-armi-foglio-excel-con-le-prove.944f6ec708.webp","mail-in-copia-a-tutti":"img/arene-ufficio-armi-mail-in-copia-a-tutti.1d4304df14.webp","nota-spese-gonfiata":"img/arene-ufficio-armi-nota-spese-gonfiata.d2683cca4c.webp","presentazione-rubata":"img/arene-ufficio-armi-presentazione-rubata.815dc5c8b4.webp","prospetto-delle-metriche":"img/arene-ufficio-armi-prospetto-delle-metriche.356da1d2d9.webp","registro-delle-revisioni":"img/arene-ufficio-armi-registro-delle-revisioni.509eab44df.webp","report-pieno-di-errori-altrui":"img/arene-ufficio-armi-report-pieno-di-errori-altrui.c01c0ef897.webp","riepilogo-delle-approvazioni":"img/arene-ufficio-armi-riepilogo-delle-approvazioni.9394dadd6b.webp"},"luoghi":{"cucina":"img/arene-ufficio-luoghi-cucina.d968f8861d.webp","open-space":"img/arene-ufficio-luoghi-open-space.b6b7990c99.webp","parcheggio":"img/arene-ufficio-luoghi-parcheggio.d593f2ed83.webp","sala-riunioni":"img/arene-ufficio-luoghi-sala-riunioni.f92c4030a9.webp","sala-stampanti":"img/arene-ufficio-luoghi-sala-stampanti.1727f50082.webp","ufficio-del-direttore":"img/arene-ufficio-luoghi-ufficio-del-direttore.bb3b6cabab.webp"},"pericoli":{"consulente-esterno":"img/arene-ufficio-pericoli-consulente-esterno.ce6e200c3f.webp","direttore-generale":"img/arene-ufficio-pericoli-direttore-generale.da2eb1f708.webp","riorganizzazione-aziendale":"img/arene-ufficio-pericoli-riorganizzazione-aziendale.1fd57b76b3.webp","ufficio-risorse-umane":"img/arene-ufficio-pericoli-ufficio-risorse-umane.8392df7518.webp"}},"wasteland":{"armi":{"balestra-artigianale":"img/arene-wasteland-armi-balestra-artigianale.e09826852f.webp","catena":"img/arene-wasteland-armi-catena.866183d584.webp","coltello-da-strada":"img/arene-wasteland-armi-coltello-da-strada.1083c4429d.webp","fucile-arrugginito":"img/arene-wasteland-armi-fucile-arrugginito.797601f16e.webp","lama-di-recupero":"img/arene-wasteland-armi-lama-di-recupero.1ad13cfc78.webp","lancia-di-ferraglia":"img/arene-wasteland-armi-lancia-di-ferraglia.99d9f41307.webp","lancia-ricavata-da-un-tubo":"img/arene-wasteland-armi-lancia-ricavata-da-un-tubo.53b934e449.webp","lanciachiodi":"img/arene-wasteland-armi-lanciachiodi.e4f51e42e2.webp","mannaia":"img/arene-wasteland-armi-mannaia.518ae9c11c.webp","martello-da-officina":"img/arene-wasteland-armi-martello-da-officina.851055795e.webp","mazza-di-tubi":"img/arene-wasteland-armi-mazza-di-tubi.91babe82ac.webp","molotov":"img/arene-wasteland-armi-molotov.303d6fa315.webp","scure-da-demolizione":"img/arene-wasteland-armi-scure-da-demolizione.066ea5e066.webp"},"luoghi":{"autostrada-spezzata":"img/arene-wasteland-luoghi-autostrada-spezzata.19a72a0b97.webp","citta-fantasma":"img/arene-wasteland-luoghi-citta-fantasma.fe22bb72b2.webp","cratere":"img/arene-wasteland-luoghi-cratere.04de7ca40a.webp","deposito":"img/arene-wasteland-luoghi-deposito.f98aa31220.webp","diga":"img/arene-wasteland-luoghi-diga.3be9abe15a.webp","discarica":"img/arene-wasteland-luoghi-discarica.b8783ad9c6.webp","raffineria":"img/arene-wasteland-luoghi-raffineria.081e2d2ad6.webp"},"pericoli":{"banda-di-predoni":"img/arene-wasteland-pericoli-banda-di-predoni.1dfcfd1628.webp","branco-di-cani-mutati":"img/arene-wasteland-pericoli-branco-di-cani-mutati.442fabfc39.webp","scorpione-gigante":"img/arene-wasteland-pericoli-scorpione-gigante.2dd8911367.webp","verme-delle-sabbie":"img/arene-wasteland-pericoli-verme-delle-sabbie.a0d445beeb.webp"}},"zombie":{"armi":{"accetta-da-soccorso":"img/arene-zombie-armi-accetta-da-soccorso.6d36eb13ac.webp","accetta":"img/arene-zombie-armi-accetta.0eed163720.webp","balestra":"img/arene-zombie-armi-balestra.d705131d17.webp","coltello-da-campeggio":"img/arene-zombie-armi-coltello-da-campeggio.2abab58e78.webp","fucile-a-pompa":"img/arene-zombie-armi-fucile-a-pompa.b00b1d6a70.webp","katana":"img/arene-zombie-armi-katana.f631ad392f.webp","machete-da-potatura":"img/arene-zombie-armi-machete-da-potatura.94a93108a1.webp","martello-da-carpentiere":"img/arene-zombie-armi-martello-da-carpentiere.021e8a80f2.webp","mazza-chiodata":"img/arene-zombie-armi-mazza-chiodata.b4e11dcadb.webp","mazza-da-lavoro":"img/arene-zombie-armi-mazza-da-lavoro.c36a90108f.webp","motosega":"img/arene-zombie-armi-motosega.f74e603615.webp","piede-di-porco":"img/arene-zombie-armi-piede-di-porco.c185a97e0d.webp","pistola":"img/arene-zombie-armi-pistola.6d30022ca6.webp"},"luoghi":{"centro-commerciale":"img/arene-zombie-luoghi-centro-commerciale.333f4699d5.webp","metropolitana":"img/arene-zombie-luoghi-metropolitana.878a263605.webp","ospedale":"img/arene-zombie-luoghi-ospedale.f25de413a4.webp","periferia":"img/arene-zombie-luoghi-periferia.e28a7d70c7.webp","piazza":"img/arene-zombie-luoghi-piazza.b6ed86b3ad.webp","scuola":"img/arene-zombie-luoghi-scuola.153ddbaa75.webp","stazione-di-polizia":"img/arene-zombie-luoghi-stazione-di-polizia.157f7a17f5.webp"},"pericoli":{"cane-infetto":"img/arene-zombie-pericoli-cane-infetto.fdff913d6f.webp","gigante-mutato":"img/arene-zombie-pericoli-gigante-mutato.91fad36b70.webp","infetto-corridore":"img/arene-zombie-pericoli-infetto-corridore.61f48faafd.webp","orda-di-zombi":"img/arene-zombie-pericoli-orda-di-zombi.e0fc6d1b56.webp"}}},"fx":{"pennellate":["img/fx-pennellata-1.5527b3e9bd.webp","img/fx-pennellata-2.8526d34dcf.webp","img/fx-pennellata-3.a7f3e74ff3.webp","img/fx-pennellata-4.fe1f612999.webp"],"sigilli":{"classico":"img/fx-sigillo-classico.b781c63b8d.webp","cyberpunk":"img/fx-sigillo-cyberpunk.134a7f507c.webp","fantasy":"img/fx-sigillo-fantasy.d854d9ac19.webp","horror":"img/fx-sigillo-horror.54149e6a7e.webp","liceo":"img/fx-sigillo-liceo.7f1566a7a8.webp","royale":"img/fx-sigillo-royale.bedbb77f68.webp","scifi":"img/fx-sigillo-scifi.6c50b79280.webp","ufficio":"img/fx-sigillo-ufficio.fcbbcc051a.webp","wasteland":"img/fx-sigillo-wasteland.86f44d1714.webp","zombie":"img/fx-sigillo-zombie.44ac2a6473.webp"},"grana":"img/fx-grana.c1e72fd2da.webp","forme":{"fascia":"img/fx-forma-fascia.8a2f8ab92d.webp","freccia":"img/fx-forma-freccia.4e8039be8f.webp","fulmine":"img/fx-forma-fulmine.c9a15d227c.webp","stella":"img/fx-forma-stella.e773ba5dda.webp","strappo":"img/fx-forma-strappo.0e6a41d0d9.webp"},"impatto":"img/fx-impatto.fd13ac9554.webp","mezzitoni":"img/fx-mezzitoni.f9ef4df053.webp","occhi":{"f-1":"img/fx-occhi-f-1.3779df529a.webp","f-2":"img/fx-occhi-f-2.2f47e4535b.webp","f-3":"img/fx-occhi-f-3.8b10fc4b00.webp","f-4":"img/fx-occhi-f-4.08132e01f9.webp","m-1":"img/fx-occhi-m-1.fd94d5b0eb.webp","m-2":"img/fx-occhi-m-2.c7b9661e6b.webp","m-3":"img/fx-occhi-m-3.91ff950ae4.webp","m-4":"img/fx-occhi-m-4.d0a0e73220.webp","m-5":"img/fx-occhi-m-5.f4c19f2141.webp","n-1":"img/fx-occhi-n-1.21fc3b7adf.webp"},"fondali":{"classico":"img/fx-fondale-classico.8a3fc35342.webp","cyberpunk":"img/fx-fondale-cyberpunk.283c80cc1e.webp","fantasy":"img/fx-fondale-fantasy.0ca9b3f315.webp","horror":"img/fx-fondale-horror.4ba1241b63.webp","liceo":"img/fx-fondale-liceo.fb428a57f7.webp","royale":"img/fx-fondale-royale.aac1246425.webp","scifi":"img/fx-fondale-scifi.27ee2ce8cc.webp","ufficio":"img/fx-fondale-ufficio.780789ce70.webp","wasteland":"img/fx-fondale-wasteland.02311ed21d.webp","zombie":"img/fx-fondale-zombie.83b8d35716.webp"},"volti":{"f-1":"img/fx-volto-f-1.96d62771c1.webp","f-2":"img/fx-volto-f-2.79d3485864.webp","f-3":"img/fx-volto-f-3.aeb7664a4e.webp","f-4":"img/fx-volto-f-4.2f2c864354.webp","m-1":"img/fx-volto-m-1.f8b83b073e.webp","m-2":"img/fx-volto-m-2.b9eb346a31.webp","m-3":"img/fx-volto-m-3.5311549074.webp","m-4":"img/fx-volto-m-4.10b102bdb0.webp","m-5":"img/fx-volto-m-5.63e5c91778.webp","n-1":"img/fx-volto-n-1.02cf4d1c97.webp"},"vincitori":{"f-1":"img/vincitori-vincitore-f-1.10b1ec0d22.webp","f-2":"img/vincitori-vincitore-f-2.03d8a3a92a.webp","f-3":"img/vincitori-vincitore-f-3.bc0adcd66a.webp","m-1":"img/vincitori-vincitore-m-1.c597436dca.webp","m-2":"img/vincitori-vincitore-m-2.9c8b48e9f8.webp","n-1":"img/vincitori-vincitore-n-1.1539fc78b2.webp"},"occhiY":{"m-1":0.53,"m-2":0.6,"m-3":0.43,"m-4":0.39,"m-5":0.575,"f-1":0.52,"f-2":0.49,"f-3":0.41,"f-4":0.46,"n-1":0.55}},"audio":{"sfx":{"heavy":"img/audio-colpo.6c66fc3384.mp3","battle":"img/audio-scontro.171fdeb377.mp3","click":"img/audio-ui-click.75370fe5e2.wav","hover":"img/audio-ui-hover.39a84fb194.wav","tick":"img/audio-ui-tick.16c581af00.wav","jazz":"img/audio-vittoria.6a3763dedf.mp3"},"music":"img/audio-musica-dark-hour.53788a2c76.mp3"}};
 ;
-window.LOS_BUILD = "10052e5ad4760ab51b22ba9e67c3bd2b250a5659c0a28678fa4fc550a306ecc3";
+window.LOS_BUILD = "8da0036b41654a2997a0024c85f429b379291326971a2fb4d3782665ec140ede";
 ;
 /* Last One Standing — grafica vettoriale: logo, icone delle arene, illustrazioni.
  * Tutto è SVG generato in codice: nessuna immagine esterna. */
@@ -23285,6 +23412,8 @@ window.LOS_BUILD = "10052e5ad4760ab51b22ba9e67c3bd2b250a5659c0a28678fa4fc550a306
       const touch = selected == null || a === selected || b === selected;
       return '<path class="route' + (touch ? '' : ' faded') + '" d="' + curve(points[a], points[b], bendFor(Math.min(a, b), Math.max(a, b)) * (a < b ? 1 : -1)) + '" style="stroke-width:' + Math.min(6, 1.6 + n * 0.8).toFixed(1) + '" marker-end="url(#mv-arrow)"/>';
     }).join('');
+    // i segnalini della partita giocata: l'allievo, i seguiti, chi ha appena ricevuto un dono
+    const pinsOf = (i) => { const ps = (extra.pins || []).filter((x) => x.zone === i); return ps.length ? '<span class="mn-pins">' + ps.slice(0, 4).map((x) => '<i class="mn-pin ' + esc(x.cls) + '" title="' + esc(x.label) + '">' + esc(x.short) + '</i>').join('') + '</span>' : ''; };
     const nodes = zones.map((z, i) => {
       const n = counts[i] || 0, size = Math.round(40 + Math.min(n, 10) * 3), d = lv(z.danger ?? 1);
       const deaths = (extra.deaths || []).filter((x) => x.zone === i).length, traps = (extra.traps || []).filter((x) => x.zone === i).length;
@@ -23292,7 +23421,7 @@ window.LOS_BUILD = "10052e5ad4760ab51b22ba9e67c3bd2b250a5659c0a28678fa4fc550a306
         (traps ? '<i class="mb mb-trap" title="' + plural(traps, 'trappola', 'trappole') + '">' + ICON.trap + '</i>' : '') + ((extra.affected || []).includes(i) ? '<i class="mb mb-dis" title="Area del disastro">' + ICON.bolt + '</i>' : '');
       const label = esc(cap(bare(z.name))) + ': ' + plural(n, 'presente', 'presenti') + (closed.has(i) ? ', zona chiusa' : '') + (deaths ? ', ' + deaths + ' fuori in questa fase' : '');
       return '<button type="button" class="map-node d' + d + (closed.has(i) ? ' shut' : '') + (selected === i ? ' selected' : '') + (selected != null && selected !== i ? ' faded' : '') + (n ? '' : ' empty') + '" style="left:' + (points[i][0] / 3.6).toFixed(2) + '%;top:' + (points[i][1] / 3).toFixed(2) + '%;--s:' + size + 'px" data-map-zone="' + i + '" aria-pressed="' + (selected === i) + '" aria-label="' + label + '">' +
-        '<span class="mn-disc"><b>' + n + '</b>' + (badges ? '<span class="mn-badges">' + badges + '</span>' : '') + '</span><span class="mn-name">' + esc(cap(bare(z.name))) + '</span></button>';
+        '<span class="mn-disc"><b>' + n + '</b>' + (badges ? '<span class="mn-badges">' + badges + '</span>' : '') + '</span><span class="mn-name">' + esc(cap(bare(z.name))) + '</span>' + pinsOf(i) + '</button>';
     }).join('');
     return '<div class="arena-graph" role="group" aria-label="Mappa delle zone: ogni cerchio è una zona con il numero di presenti; le linee sono i passaggi, tratteggiate se chiusi; le frecce colorate sono gli spostamenti di questa fase">' +
       '<svg viewBox="0 0 360 300" aria-hidden="true"><defs><marker id="mv-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerUnits="userSpaceOnUse" markerWidth="9" markerHeight="9" orient="auto"><path d="M0 0 L10 5 L0 10 z" class="mv-arrow"/></marker></defs>' + lines + routes + '</svg>' + nodes + '</div>';
@@ -23333,7 +23462,7 @@ window.LOS_BUILD = "10052e5ad4760ab51b22ba9e67c3bd2b250a5659c0a28678fa4fc550a306
       return '<article class="zcard' + (closed.has(z.id) ? ' closed' : '') + (fallen.length ? ' hot' : '') + '">' +
         '<header class="zc-head">' + (pic ? '<span class="zc-pic">' + pic + '</span>' : '') + '<span class="zc-title"><span class="zc-num">' + (z.id + 1) + '</span><h4>' + zname(z.id) + '</h4></span></header>' +
         '<div class="zc-in">' + (z.description ? '<p class="zc-desc">' + esc(z.description) + '</p>' : '') + (tags ? '<div class="ztags2">' + tags + '</div>' : '') + meters(z, true) +
-        '<section class="zc-sec"><h5>Presenti a fine fase <span>' + here.length + '</span></h5>' + (here.length ? '<div class="zc-faces">' + here.map((id) => '<span class="zc-face">' + face(id) + '<span>' + esc(name(id)) + '</span></span>').join('') + '</div>' : '<p class="help">Nessun concorrente presente a fine fase.</p>') + '</section>' +
+        '<section class="zc-sec"><h5>Presenti a fine fase <span>' + here.length + '</span></h5>' + (here.length ? '<div class="zc-faces">' + here.map((id) => '<span class="zc-face">' + face(id) + '<span>' + esc(name(id)) + '</span>' + (options.giftable && options.giftable(id) ? '<button type="button" class="zc-gift" data-gift="' + esc(id) + '">Dono</button>' : '') + '</span>').join('') + '</div>' : '<p class="help">Nessun concorrente presente a fine fase.</p>') + '</section>' +
         (fallen.length ? '<section class="zc-sec zc-out"><h5>' + (soft ? 'Usciti dai giochi qui' : 'Morti qui') + ' <span>' + fallen.length + '</span></h5><p>' + fallen.map((d) => person(d.id)).join(', ') + '</p></section>' : '') +
         (tz.length ? '<section class="zc-sec"><h5>' + (soft ? (tz.length === 1 ? 'Tranello ancora attivo' : 'Tranelli ancora attivi') : (tz.length === 1 ? 'Trappola ancora attiva' : 'Trappole ancora attive')) + ' <span>' + tz.length + '</span></h5><ul class="zc-traps">' + tz.map((t) => '<li>' + esc(t.name) + ' <span class="help">di</span> ' + person(t.owner) + '</li>').join('') + '</ul></section>' : '') +
         (lz ? '<p class="zc-loot">Bottino rimasto: <b>' + plural(lz.count, 'oggetto', 'oggetti') + '</b></p>' : '') +
@@ -23353,7 +23482,7 @@ window.LOS_BUILD = "10052e5ad4760ab51b22ba9e67c3bd2b250a5659c0a28678fa4fc550a306
       (selected != null ? '<button class="btn sm mv-all" type="button" data-map-zone="all"><span aria-hidden="true">←</span> Tutte le zone</button>' : '') + '</div>';
     const legend = spatial ? '<p class="mv-legend"><span><i class="lg-node"></i>presenti</span><span><i class="lg-route"></i>spostamenti</span><span><i class="lg-shut"></i>passaggio chiuso</span><span><i class="lg-ring"></i>anello: pericolo</span></p>' : '<p class="help mv-note">Replay storico: sono disponibili le posizioni salvate a fine fase. Percorsi e luoghi dei singoli eventi non erano registrati.</p>';
     return '<div class="map-view">' + head +
-      (spatial ? graph(zones, closed, zones.map((z) => present(z.id).length), selected, { moves, deaths, traps, affected: phase.affectedZones || [] }) : '') + legend +
+      (spatial ? graph(zones, closed, zones.map((z) => present(z.id).length), selected, { moves, deaths, traps, affected: phase.affectedZones || [], pins: (options.pins || []).filter((x) => x.zone != null) }) : '') + legend +
       (selected != null ? card(zones[selected]) : list()) + travel + history + '</div>';
   }
   G.LOS_MAP_VIEW = { render, graph }; if (typeof module === 'object' && module.exports) module.exports = G.LOS_MAP_VIEW;
@@ -24112,7 +24241,7 @@ window.LOS_BUILD = "10052e5ad4760ab51b22ba9e67c3bd2b250a5659c0a28678fa4fc550a306
 
   /* ================= stato della partita giocata ================= */
   function nuovo(pre) {
-    return { v: 1, inizio: Date.now(), crediti: START, mentore: (pre && pre.mentore) || null, puntate: [], doni: {}, chiesto: {}, ordini: [], allievi: [], log: [] };
+    return { v: 1, inizio: Date.now(), crediti: START, mentore: (pre && pre.mentore) || null, puntate: [], doni: {}, chiesto: {}, ordini: [], allievi: [], regia: [], voti: {}, log: [] };
   }
   function sano(g) {
     if (!g || typeof g !== 'object') return nuovo();
@@ -24125,6 +24254,9 @@ window.LOS_BUILD = "10052e5ad4760ab51b22ba9e67c3bd2b250a5659c0a28678fa4fc550a306
     n.chiesto = g.chiesto && typeof g.chiesto === 'object' ? g.chiesto : {};
     n.ordini = Array.isArray(g.ordini) ? g.ordini.slice(-200) : [];
     n.allievi = Array.isArray(g.allievi) ? g.allievi.filter((x) => typeof x === 'string').slice(-50) : [];
+    n.regia = Array.isArray(g.regia) ? g.regia.filter((x) => x && typeof x.k === 'string').slice(-30) : [];
+    n.voti = g.voti && typeof g.voti === 'object' ? g.voti : {};
+    n.prove = Array.isArray(g.prove) ? g.prove.slice(-100) : [];
     n.log = Array.isArray(g.log) ? g.log.slice(-100) : [];
     return n;
   }
@@ -24258,7 +24390,252 @@ window.LOS_BUILD = "10052e5ad4760ab51b22ba9e67c3bd2b250a5659c0a28678fa4fc550a306
     { v: 'provviste', label: 'Fai provviste', sub: 'Cibo e acqua prima di tutto' },
   ];
 
-  G.LOS_PARTITA = { chiedi, aperto, nuovo, sano, profilo, salvaProfilo, chiudiPartita, proposte, risolvi, prezzo, rischio, quota, nuovoGiorno, vivi, vit, DONI, INTERVISTA, ORDINI, RITMI, START };
+  /* ================= le carte del Regista ================= */
+  const REGIA = [
+    { k: 'tempesta', label: 'Tempesta', sub: 'Maltempo su tutta l’arena: più pericoli per tutti', soft: 'Giornata storta per tutti' },
+    { k: 'banchetto', label: 'Banchetto', sub: 'Un festino oggi: chi ha fame esce allo scoperto' },
+    { k: 'disastro', label: 'Pulsante rosso', sub: 'Un disastro colpisce l’arena oggi', soft: 'Un imprevisto colpisce oggi' },
+    { k: 'buio', label: 'Buio totale', sub: 'Stanotte non si vede niente: notte più letale', soft: 'Stanotte chi si muove rischia' },
+    { k: 'bestie', label: 'Gabbie aperte', sub: 'Stanotte i predatori attaccano chi è solo', soft: 'Stanotte chi è solo è più esposto' },
+    { k: 'rifornimenti', label: 'Rifornimenti', sub: 'Casse per tutti: una giornata più calma' },
+  ];
+  // la mano del giorno: tre carte non ancora giocate, scelte dal seme (stessa partita, stessa mano)
+  function mano(SIM, k, g) {
+    const P = SIM.phases, day = P[k].day, used = new Set((g.regia || []).map((x) => x.k));
+    const feastDone = P.slice(0, k).some((p) => p.kind === 'f'), alive = P[k - 1].snap.alive.length;
+    const ok = REGIA.filter((c) => !used.has(c.k) && !(c.k === 'banchetto' && (feastDone || alive < 4)) && !(c.k === 'disastro' && day < 2));
+    let h = 2166136261; for (const c of SIM.seed + '|mano|' + day) h = Math.imul(h ^ c.charCodeAt(0), 16777619);
+    const r = () => ((h = Math.imul(h ^ (h >>> 15), 2246822507) + 0x9e3779b9 | 0) >>> 0) / 4294967296;
+    const deck = ok.slice(); for (let i = deck.length - 1; i > 0; i--) { const j = Math.floor(r() * (i + 1)); [deck[i], deck[j]] = [deck[j], deck[i]]; }
+    return deck.slice(0, 3);
+  }
+  // il voto della regia: spettacolo (colpi grossi), ritmo (giorni con eliminazioni), colpi di scena
+  function votoRegia(SIM) {
+    const st = SIM.stats || {}, P = SIM.phases, days = Math.max(1, SIM.days);
+    const kills = P.reduce((s, p) => s + (p.kind === 'fallen' ? 0 : p.events.reduce((a, e) => a + (e.cat === 'kill' ? e.deaths.length : 0), 0)), 0);
+    const byDay = {}; P.forEach((p) => { if (p.kind !== 'fallen') byDay[p.day] = (byDay[p.day] || 0) + p.events.reduce((a, e) => a + e.deaths.length, 0); });
+    const dd = Object.keys(byDay).length || 1, busy = Object.values(byDay).filter((n) => n > 0).length;
+    const twists = (st.betrayals || 0) + (st.revenges || 0) + (st.tough || 0) + (st.mentorSaves || 0) + (st.couples || 0);
+    const spettacolo = clamp(Math.round(40 + kills * 4 + (st.sponsors || 0) * 3), 0, 100);
+    const ritmo = clamp(Math.round((busy / dd) * 100), 0, 100);
+    const sorprese = clamp(Math.round(30 + twists * 9), 0, 100);
+    const tot = Math.round(spettacolo * 0.35 + ritmo * 0.35 + sorprese * 0.3);
+    const giudizio = tot >= 85 ? 'Capolavoro: il pubblico chiede il bis.' : tot >= 70 ? 'Grande televisione.' : tot >= 55 ? 'Una buona puntata, con qualche calo.' : tot >= 40 ? 'Il pubblico ha cambiato canale un paio di volte.' : 'Noia mortale: la rete ti richiama domani.';
+    return { tot, spettacolo, ritmo, sorprese, giudizio, carte: (st.regia || []).length, giorni: days };
+  }
+
+  /* ================= le prove giocabili (minigiochi) =================
+   * gioca(tipo, { kicker, title, text, faces }) → Promise<punteggio 0..1 | null (lascia fare)>.
+   * tempismo: ferma l'ago nella fascia (tre colpi); sequenza: ripeti le frecce; via: scegli la porta giusta dagli indizi. */
+  const ARROWS = [['ArrowLeft', '←'], ['ArrowUp', '↑'], ['ArrowRight', '→'], ['ArrowDown', '↓']];
+  const tipoProva = (attr) => (['agi', 'for', 'cor', 'res'].includes(attr) ? 'tempismo' : ['int', 'furt', 'emp', 'car'].includes(attr) ? 'sequenza' : 'via');
+  function gioca(tipo, o) {
+    if (open) open.close(null);
+    return new Promise((resolve) => {
+      const root = document.createElement('div');
+      root.className = 'sc sc-game sc-g-' + tipo;
+      root.setAttribute('role', 'dialog'); root.setAttribute('aria-modal', 'true'); root.setAttribute('aria-labelledby', 'scT');
+      root.innerHTML = '<div class="sc-back"></div><div class="sc-card" tabindex="-1"><div class="sc-head">' + (o.kicker ? '<span class="sc-k">' + esc(o.kicker) + '</span>' : '') +
+        '<h2 class="sc-t" id="scT">' + esc(o.title || '') + '</h2>' + (o.text ? '<p class="sc-x">' + o.text + '</p>' : '') + '</div>' + (o.faces ? '<div class="sc-faces">' + o.faces + '</div>' : '') +
+        '<div class="mg" aria-live="polite"></div><div class="sc-foot"><span class="mg-score" aria-live="polite"></span><button type="button" class="sc-skip">Lascia fare</button></div></div>';
+      document.body.appendChild(root); document.documentElement.classList.add('sc-on');
+      const box = root.querySelector('.mg'), scoreEl = root.querySelector('.mg-score');
+      let done = false, raf = 0, timers = [];
+      const later = (fn, ms) => timers.push(setTimeout(fn, ms));
+      function close(v) {
+        if (done) return; done = true; cancelAnimationFrame(raf); timers.forEach(clearTimeout);
+        document.removeEventListener('keydown', onKey, true);
+        root.classList.add('sc-out'); setTimeout(() => { root.remove(); if (!document.querySelector('.sc')) document.documentElement.classList.remove('sc-on'); }, 260);
+        open = null; resolve(v);
+      }
+      // a fine gioco il risultato resta un attimo a schermo, poi il cartello si chiude da solo
+      function finish(score, label) {
+        root.classList.add(score >= 0.8 ? 'mg-great' : score >= 0.5 ? 'mg-good' : score >= 0.25 ? 'mg-meh' : 'mg-bad');
+        scoreEl.innerHTML = '<b>' + esc(label) + '</b>';
+        if (G.LOS_PARTITA_FX && G.LOS_PARTITA_FX.game) try { G.LOS_PARTITA_FX.game(root, score); } catch (e) { /* solo grafica */ }
+        later(() => close(score), 1100);
+      }
+      const verdict = (s) => (s >= 0.8 ? 'Perfetto!' : s >= 0.5 ? 'Bene' : s >= 0.25 ? 'Così così' : 'Male');
+      let onKeyGame = null;
+      function onKey(e) {
+        e.stopPropagation();
+        if (e.key === 'Escape') { e.preventDefault(); close(null); return; }
+        if (onKeyGame) onKeyGame(e);
+      }
+      document.addEventListener('keydown', onKey, true);
+      root.querySelector('.sc-skip').addEventListener('click', () => close(null));
+
+      if (tipo === 'tempismo') {
+        // un ago che va e viene; la fascia buona si restringe a ogni colpo
+        const rounds = [0.2, 0.15, 0.11], hits = []; let r = 0, t0 = performance.now(), zone = null;
+        box.innerHTML = '<div class="mg-bar"><i class="mg-zone"></i><i class="mg-needle"></i></div><div class="mg-row"><span class="mg-round"></span><button type="button" class="mg-go">Ferma!</button></div><p class="mg-hint">Premi <kbd>Spazio</kbd> o il pulsante quando l’ago è nella fascia.</p>';
+        const zEl = box.querySelector('.mg-zone'), nEl = box.querySelector('.mg-needle'), rEl = box.querySelector('.mg-round');
+        const setRound = () => { const w = rounds[r]; const c = 0.2 + Math.random() * 0.6; zone = [c - w / 2, c + w / 2]; zEl.style.left = (zone[0] * 100) + '%'; zEl.style.width = (w * 100) + '%'; rEl.textContent = 'Colpo ' + (r + 1) + ' di 3'; t0 = performance.now(); };
+        const pos = (now) => { const per = 1500 - r * 250, x = ((now - t0) % per) / per; return x < 0.5 ? x * 2 : 2 - x * 2; };
+        const tick = (now) => { nEl.style.left = (pos(now) * 100) + '%'; raf = requestAnimationFrame(tick); };
+        const stop = () => {
+          if (r >= rounds.length) return;
+          const p = pos(performance.now()), c = (zone[0] + zone[1]) / 2, w = zone[1] - zone[0];
+          const s = p >= zone[0] && p <= zone[1] ? 1 : Math.max(0, 1 - (Math.abs(p - c) - w / 2) / 0.12) * 0.5;
+          hits.push(s); box.classList.remove('mg-hit', 'mg-miss'); void box.offsetWidth; box.classList.add(s >= 1 ? 'mg-hit' : 'mg-miss');
+          r++; if (r < rounds.length) setRound(); else { cancelAnimationFrame(raf); const sc = hits.reduce((a, b) => a + b, 0) / hits.length; finish(sc, verdict(sc)); }
+        };
+        setRound(); raf = requestAnimationFrame(tick);
+        box.querySelector('.mg-go').addEventListener('click', stop);
+        onKeyGame = (e) => { if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); stop(); } };
+        requestAnimationFrame(() => box.querySelector('.mg-go').focus({ preventScroll: true }));
+      } else if (tipo === 'sequenza') {
+        // si guarda la sequenza, poi si ripete
+        const N = 5, seq = Array.from({ length: N }, () => Math.floor(Math.random() * 4)); let got = 0, mistakes = 0, ready = false;
+        box.innerHTML = '<div class="mg-seq" aria-hidden="true">' + seq.map(() => '<i class="mg-cell"></i>').join('') + '</div><div class="mg-pad" role="group" aria-label="Frecce">' + ARROWS.map(([k, s], n) => '<button type="button" data-a="' + n + '" disabled aria-label="' + k.replace('Arrow', 'Freccia ') + '">' + s + '</button>').join('') + '</div><p class="mg-hint">Memorizza la sequenza, poi ripetila con le frecce.</p>';
+        const cells = [...box.querySelectorAll('.mg-cell')], pad = [...box.querySelectorAll('.mg-pad button')];
+        seq.forEach((a, k) => later(() => { cells.forEach((c) => c.classList.remove('on')); cells[k].textContent = ARROWS[a][1]; cells[k].classList.add('on'); }, 350 + k * 650));
+        later(() => { cells.forEach((c) => { c.textContent = '?'; c.classList.remove('on'); }); ready = true; pad.forEach((b) => (b.disabled = false)); pad[0].focus({ preventScroll: true }); root.classList.add('mg-ready'); }, 350 + N * 650 + 250);
+        const press = (a) => {
+          if (!ready || got >= N) return;
+          const ok = a === seq[got]; cells[got].textContent = ARROWS[a][1]; cells[got].classList.add(ok ? 'ok' : 'ko');
+          if (!ok) mistakes++; got++;
+          if (got >= N || mistakes >= 2) { ready = false; const sc = Math.max(0, (seq.filter((x, k) => k < got && cells[k].classList.contains('ok')).length) / N); finish(sc, verdict(sc)); }
+        };
+        box.querySelector('.mg-pad').addEventListener('click', (e) => { const b = e.target.closest('[data-a]'); if (b) press(+b.dataset.a); });
+        onKeyGame = (e) => { const n = ARROWS.findIndex(([k]) => k === e.key); if (n >= 0) { e.preventDefault(); press(n); } };
+      } else {
+        // tre vie, due indizi: ognuno ne esclude una
+        const doors = ['Sinistra', 'Centro', 'Destra'], safe = Math.floor(Math.random() * 3), bad = [0, 1, 2].filter((x) => x !== safe);
+        const CLUES = [(d) => (d === 'Centro' ? 'Dal centro' : 'Da ' + d.toLowerCase()) + ' arriva odore di fumo.', (d) => 'Verso ' + (d === 'Centro' ? 'il centro' : d.toLowerCase()) + ' si sentono passi pesanti.', (d) => 'Le tracce ' + (d === 'Centro' ? 'al centro' : 'a ' + d.toLowerCase()) + ' portano dritte a una tana.', (d) => 'Il terreno ' + (d === 'Centro' ? 'al centro' : 'a ' + d.toLowerCase()) + ' scricchiola come una trappola.'];
+        const cl = CLUES.slice().sort(() => Math.random() - 0.5);
+        box.innerHTML = '<ul class="mg-clues">' + bad.map((b, n) => '<li>' + esc(cl[n](doors[b])) + '</li>').join('') + '</ul><div class="mg-doors" role="group" aria-label="Vie">' + doors.map((d, n) => '<button type="button" data-d="' + n + '"><span>' + (n + 1) + '</span>' + d + '</button>').join('') + '</div><p class="mg-hint">Leggi gli indizi e scegli la via sicura. Hai <b class="mg-sec">12</b> secondi.</p>';
+        let left = 12; const secEl = box.querySelector('.mg-sec');
+        const iv = setInterval(() => { left--; if (secEl) secEl.textContent = left; if (left <= 0) { clearInterval(iv); choose(-1); } }, 1000); timers.push(iv);
+        const choose = (n) => { if (done || root.classList.contains('mg-chosen')) return; clearInterval(iv); root.classList.add('mg-chosen'); box.querySelectorAll('[data-d]').forEach((b) => { b.disabled = true; if (+b.dataset.d === safe) b.classList.add('ok'); else if (+b.dataset.d === n) b.classList.add('ko'); }); const sc = n === safe ? 1 : 0; finish(sc, n < 0 ? 'Tempo scaduto' : sc ? 'Via giusta!' : 'Via sbagliata'); };
+        box.querySelector('.mg-doors').addEventListener('click', (e) => { const b = e.target.closest('[data-d]'); if (b) choose(+b.dataset.d); });
+        onKeyGame = (e) => { const n = parseInt(e.key, 10); if (n >= 1 && n <= 3) { e.preventDefault(); choose(n - 1); } };
+        requestAnimationFrame(() => box.querySelector('[data-d]').focus({ preventScroll: true }));
+      }
+      open = { close };
+      if (G.LOS_PARTITA_FX && G.LOS_PARTITA_FX.card) try { G.LOS_PARTITA_FX.card(root, Object.assign({ game: tipo }, o)); } catch (e) { /* solo grafica */ }
+    });
+  }
+  // dal punteggio al bonus sul tiro: da −2 a +4
+  const bonusProva = (s) => (s >= 0.8 ? 4 : s >= 0.5 ? 2 : s >= 0.25 ? 0 : -2);
+
+  G.LOS_PARTITA = { chiedi, gioca, tipoProva, bonusProva, REGIA, mano, votoRegia, aperto, nuovo, sano, profilo, salvaProfilo, chiudiPartita, proposte, risolvi, prezzo, rischio, quota, nuovoGiorno, vivi, vit, DONI, INTERVISTA, ORDINI, RITMI, START };
+})(typeof window !== 'undefined' ? window : globalThis);
+
+;
+/* Last One Standing — telecronaca e pubblico (src/telecronaca.js).
+ * Due voci commentano ogni fase della Diretta (Ettore, telecronista che si infiamma; Bianca, opinionista che non perdona)
+ * e una chat del pubblico reagisce ai fatti veri: morti, tradimenti, doni, ordini del mentore, carte del Regista.
+ * Tutto si ricava dalla fase già calcolata (nessun futuro) e da un seme: stessa partita, stesse battute. */
+(function (G) {
+  'use strict';
+  const esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  function rngOf(seed) { let h = 2166136261; for (const c of String(seed)) h = Math.imul(h ^ c.charCodeAt(0), 16777619); return () => ((h = Math.imul(h ^ (h >>> 13), 1597334677) + 0x6d2b79f5 | 0) >>> 0) / 4294967296; }
+  const pickWith = (r) => (arr) => arr[Math.floor(r() * arr.length)];
+  const suf = (t) => (t && t.gender === 'F' ? 'a' : t && t.gender === 'N' ? 'ə' : 'o');
+  const lui = (t) => (t && t.gender === 'F' ? 'lei' : t && t.gender === 'N' ? 'ləi' : 'lui');
+  const nm = (t) => '<b>' + esc(t ? t.name : '') + '</b>';
+
+  const VOCI = { e: 'Ettore', b: 'Bianca' };
+  const NICK = ['lupo_grigio', 'marti.v', 'zeta_99', 'kira', 'il_profeta', 'tommy', 'gabri_sss', 'nonna_rosa', 'darkangel', 'fede', 'ste_88', 'luce', 'pippo', 'giuly', 'ale.x', 'mister_b', 'sofi', 'nik', 'cassandra', 'vale_rossi',
+    'bruno', 'occhio_di_falco', 'chiara', 'max', 'il_tifoso', 'ely', 'dani', 'gattonero', 'mattia', 'ire', 'polpetta', 'leo', 'sara.b', 'scommettitore', 'mirko', 'anto', 'la_regina', 'nico', 'ross', 'tizio_a_caso'];
+
+  /* ---------- che cosa è successo nella fase: i fatti in ordine di peso ---------- */
+  function fatti(SIM, i, ctx) {
+    const ph = SIM.phases[i], P = SIM.phases, BY = ctx.BY, soft = !!ctx.soft, out = [];
+    const evs = ph.events.filter((e) => !e.note), notes = ph.events.filter((e) => e.note);
+    const deaths = ph.kind === 'fallen' ? [] : evs.flatMap((e) => e.deaths);
+    const m = ctx.mentore && BY[ctx.mentore];
+    if (m && deaths.includes(m.id)) out.push({ k: 'menMorto', t: m, w: 10 });
+    notes.filter((e) => e.regia).forEach((e) => out.push({ k: 'regia', card: e.regia, w: 9 }));
+    evs.filter((e) => e.dono).forEach((e) => out.push({ k: 'dono', t: BY[e.ids[0]], w: 8 }));
+    evs.filter((e) => e.mentor).forEach((e) => out.push({ k: e.obeys ? 'ordineOk' : 'ordineKo', t: BY[e.ids[0]], w: 7 }));
+    const killers = {}; evs.forEach((e) => { if (e.cat === 'kill' && e.deaths.length) { const k = e.ids.find((id) => !e.deaths.includes(id)); if (k) killers[k] = (killers[k] || 0) + e.deaths.length; } });
+    Object.entries(killers).filter(([, n]) => n >= 2).forEach(([id, n]) => out.push({ k: 'serie', t: BY[id], n, w: 7 }));
+    if (deaths.length >= 3) out.push({ k: 'strage', n: deaths.length, w: 6 });
+    evs.filter((e) => e.cat === 'betray').slice(0, 1).forEach((e) => out.push({ k: 'tradimento', t: BY[e.ids[0]], u: BY[e.ids[1]], w: 6 }));
+    evs.filter((e) => e.cat === 'love').slice(0, 1).forEach((e) => out.push({ k: 'amore', t: BY[e.ids[0]], u: BY[e.ids[1]], w: 4 }));
+    evs.filter((e) => e.test && e.ids[0] === ctx.mentore).forEach((e) => out.push({ k: e.test.pass ? 'provaOk' : 'provaKo', t: BY[e.ids[0]], w: 6 }));
+    if (deaths.length === 1 && !out.some((f) => f.k === 'menMorto')) out.push({ k: 'morto', t: BY[deaths[0]], w: 3 });
+    const alive = ph.snap.alive.length;
+    if (alive <= 3 && alive > 1 && ph.kind !== 'fallen') out.push({ k: 'ultimi', n: alive, w: 5 });
+    if (!deaths.length && ph.kind !== 'fallen' && ph.kind !== 'b') out.push({ k: 'calma', w: 1 });
+    if (ph.kind === 'fallen') out.push({ k: 'caduti', n: ph.deaths ? ph.deaths.length : 0, w: 2 });
+    if (i === 0) out.push({ k: 'via', n: SIM.tributes.length, w: 8 });
+    return out.sort((a, b) => b.w - a.w);
+  }
+
+  /* ---------- le due voci ---------- */
+  const CARTA = { tempesta: 'il maltempo', banchetto: 'il banchetto', disastro: 'il pulsante rosso', buio: 'il buio totale', bestie: 'le gabbie aperte', rifornimenti: 'la pioggia di rifornimenti' };
+  function battute(f, ctx, pick) {
+    const soft = !!ctx.soft, t = f.t, u = f.u, fuori = soft ? 'fuori dai giochi' : 'fuori';
+    switch (f.k) {
+      case 'via': return [pick(['Signore e signori, si comincia! ' + f.n + ' concorrenti, una sola via d’uscita.', 'Buonasera e benvenuti! ' + f.n + ' concorrenti, e il segnale sta per suonare!']), pick(['Scommetto che metà non arriva a stasera.', 'Guardateli bene: tra poco ne resteranno molti meno.'])];
+      case 'menMorto': return [pick(['Nooo! ' + nm(t) + ' è ' + fuori + '! Il suo mentore starà urlando davanti allo schermo!', 'Incredibile! Cade ' + nm(t) + ', l’allievo del nostro mentore!']), pick(['Il mentore farà meglio a scegliersi un nuovo cavallo.', 'Consigli sbagliati o sfortuna? Io un’idea ce l’ho.'])];
+      case 'regia': return [pick(['La regia vuole spettacolo: arriva ' + (CARTA[f.card] || 'una sorpresa') + '!', 'Colpo di scena dalla cabina di regia: ' + (CARTA[f.card] || 'una sorpresa') + '!']), pick(['Finalmente qualcuno che sa fare televisione.', 'Crudele. Mi piace.', 'Vediamo chi ha le spalle abbastanza larghe.'])];
+      case 'dono': return [pick(['Un dono dal pubblico per ' + nm(t) + '! Qualcuno a casa crede in ' + lui(t) + '!', 'Paracadute in arrivo! ' + nm(t) + ' ha appena trovato un amico là fuori.']), pick(['Soldi spesi bene? Lo vedremo stanotte.', 'Commovente. E molto, molto costoso.'])];
+      case 'ordineOk': return [pick([nm(t) + ' ascolta il suo mentore! Che disciplina!', 'Ordine ricevuto ed eseguito: ' + nm(t) + ' si fida.']), pick(['Obbedire è facile. Sopravvivere un po’ meno.', 'Vediamo se il consiglio era buono.'])];
+      case 'ordineKo': return [pick([nm(t) + ' fa di testa sua! Il mentore è avvisato!', 'Ribellione! ' + nm(t) + ' ignora il consiglio!']), pick(['Ha ragione. Io non mi fiderei di nessuno, figuriamoci di un mentore.', 'Testard' + suf(t) + '. O geniale. Lo sapremo presto.'])];
+      case 'serie': return [pick(['Che serie per ' + nm(t) + '! ' + f.n + ' avversari ' + fuori + ' in una sola fase!', nm(t) + ' è una furia: ' + f.n + ' in un colpo solo!']), pick(['Qualcuno fermi ' + nm(t) + '. Anzi no, continuate.', 'Adesso ha un bersaglio sulla schiena grande come una casa.'])];
+      case 'strage': return [pick([f.n + ' ' + fuori + ' in una fase sola! Non ho parole!', 'Una carneficina, amici: ' + f.n + ' in un colpo!'].map((x) => soft ? x.replace('Una carneficina', 'Un terremoto') : x)), pick(['Finalmente un po’ di ritmo.', 'Il pubblico si sveglia di colpo.'])];
+      case 'tradimento': return [pick(['Tradimento! ' + nm(t) + ' pugnala alle spalle ' + nm(u) + '!', nm(t) + ' tradisce ' + nm(u) + '! Chi l’avrebbe mai detto?'].map((x) => soft ? x.replace('pugnala alle spalle', 'volta le spalle a') : x)), pick(['Io l’avevo detto: mai fidarsi di chi sorride troppo.', 'Le alleanze qui durano quanto un gelato al sole.'])];
+      case 'amore': return [pick(['Nasce qualcosa tra ' + nm(t) + ' e ' + nm(u) + '! Il pubblico va in visibilio!', 'Cuori nell’arena: ' + nm(t) + ' e ' + nm(u) + '!']), pick(['Romantico. Finirà malissimo.', 'Gli sponsor adorano le coppie. Io adoro quando litigano.'])];
+      case 'provaOk': return [pick([nm(t) + ' supera la prova! Che riflessi!', 'Prova superata da ' + nm(t) + '! Il mentore può respirare!']), pick(['Fortuna del principiante.', 'Va bene, ammetto: è stat' + suf(t) + ' brav' + suf(t) + '.'])];
+      case 'provaKo': return [pick(['Niente da fare per ' + nm(t) + ', la prova va storta!', nm(t) + ' sbaglia la prova! Che peccato!']), pick(['Errori così si pagano, qui dentro.', 'Il mentore dovrebbe allenarl' + suf(t) + ' di più.'])];
+      case 'morto': return [pick(['Cade ' + nm(t) + '. Un minuto di silenzio… ma solo uno.', nm(t) + ' esce di scena.']), pick(['Nessuno se ne ricorderà tra due giorni.', 'Era nell’aria.', 'Peccato: mi stava quasi simpatic' + suf(t) + '.'])];
+      case 'ultimi': return [pick(['Siamo agli ultimi ' + f.n + '! Il cuore batte forte!', 'Restano solo in ' + f.n + '! Ci siamo quasi!']), pick(['Adesso si fa sul serio.', 'Ora vediamo chi ha davvero fame.'])];
+      case 'caduti': return [f.n ? pick(['Il bilancio della giornata: ' + f.n + ' volti che non rivedremo.', 'Ecco chi ci ha lasciato oggi: ' + f.n + '.']) : 'Nessun volto nel cielo, stanotte.', pick(['Domani se ne aggiungeranno altri.', 'Il cielo è sempre più affollato.'])];
+      default: return [pick(['Calma apparente, amici… ma è proprio adesso che succede qualcosa.', 'Momento tranquillo nell’arena. Troppo tranquillo.']), pick(['Zero eliminazioni. Il pubblico sbadiglia.', 'Qualcuno svegli i concorrenti, per favore.', 'La regia starà già preparando qualcosa.'])];
+    }
+  }
+  function commento(SIM, i, ctx) {
+    const pick = pickWith(rngOf(SIM.seed + '|tc|' + i)), F = fatti(SIM, i, ctx);
+    const f = F[0] || { k: 'calma' }, [a, b] = battute(f, ctx, pick);
+    return [{ voce: 'e', nome: VOCI.e, html: a }, { voce: 'b', nome: VOCI.b, html: b }];
+  }
+
+  /* ---------- la chat del pubblico ---------- */
+  function favorito(SIM, i) {
+    const ph = SIM.phases[i]; let best = null, bv = -1;
+    ph.snap.alive.forEach((id) => { const v = ((ph.snap.rel[id] || {}).f || 0) * 3 + (ph.snap.kills[id] || 0); if (v > bv) { bv = v; best = id; } });
+    return best;
+  }
+  function chat(SIM, i, ctx) {
+    const r = rngOf(SIM.seed + '|chat|' + i), pick = pickWith(r), BY = ctx.BY, soft = !!ctx.soft;
+    const ph = SIM.phases[i], F = fatti(SIM, i, ctx), out = [], fav = favorito(SIM, i);
+    const say = (txt, cls) => out.push({ user: pick(NICK), html: txt, cls: cls || '' });
+    F.slice(0, 4).forEach((f) => {
+      const t = f.t, n = t ? nm(t) : '';
+      if (f.k === 'menMorto' || f.k === 'morto') { say(pick(['NOOO ' + n, 'F per ' + n, 'no vabbè ' + n + ' no', 'ciao ' + n + ', eri il mio preferito']), 'sad'); say(pick(['lo sapevo', 'chi l’ha visto arrivare?', 'mi sono perso qualcosa? chi è uscito?'])); }
+      else if (f.k === 'dono') say(pick(['chi ha mandato il pacco a ' + n + '? genio', 'GRANDE chi ha regalato a ' + n, 'ma perché a ' + n + ' e non al mio preferito']), 'gift');
+      else if (f.k === 'ordineKo') say(pick([n + ' ribelle, mi piace', 'ahahah ' + n + ' ignora il mentore', 'il mentore piange']));
+      else if (f.k === 'ordineOk') say(pick(['bravo il mentore', n + ' obbediente', 'strategia!!']));
+      else if (f.k === 'serie') say(pick([n + ' è una MACCHINA', 'qualcuno fermi ' + n, n + ' mvp']), 'hype');
+      else if (f.k === 'tradimento') say(pick(['TRADITORE', 'nooo l’alleanza', 'lo sapevo che ' + n + ' era viscid' + suf(t)]), 'hype');
+      else if (f.k === 'amore') say(pick(['shippo fortissimo', 'coppia dell’anno', 'aww']), 'love');
+      else if (f.k === 'regia') say(pick(['la regia oggi è cattiva', 'chi ha deciso ' + (CARTA[f.card] || 'questo') + '???', 'eccoli, i colpi di scena']), 'hype');
+      else if (f.k === 'strage') say(pick(['che FASE', 'ma stanno cadendo come mosche', 'adrenalina pura']), 'hype');
+      else if (f.k === 'ultimi') say(pick(['finale vicino!!', 'chi vince secondo voi?', 'sto tremando']), 'hype');
+      else if (f.k === 'calma') say(pick(['ma succede qualcosa?', 'zzz', 'pausa merenda', 'questa è la quiete prima della tempesta']));
+      else if (f.k === 'provaOk') say(pick(['che riflessi ' + n, 'prova SUPERATA', 'clutch']), 'hype');
+      else if (f.k === 'provaKo') say(pick(['noooo la prova', 'ci voleva più concentrazione']));
+    });
+    if (fav && BY[fav]) say(pick(['forza ' + nm(BY[fav]) + '!!', nm(BY[fav]) + ' vince, lo dico io', 'team ' + nm(BY[fav])]), 'fav');
+    if (ctx.mentore && ph.snap.alive.includes(ctx.mentore) && r() < 0.6) say(pick(['chi segue ' + nm(BY[ctx.mentore]) + '?', nm(BY[ctx.mentore]) + ' sottovalutat' + suf(BY[ctx.mentore]), 'occhio a ' + nm(BY[ctx.mentore])]));
+    if (r() < 0.5) say(pick(['ho puntato tutto, sto sudando', 'saluti da Bari', 'prima volta che guardo, bellissimo', 'chi c’è dalla prima puntata?', soft ? 'questo posto è assurdo' : 'quest’arena è un incubo']));
+    return out.slice(0, 7);
+  }
+
+  /* ---------- il sondaggio: chi è il preferito del pubblico ---------- */
+  function sondaggio(SIM, i, votes) {
+    const ph = SIM.phases[i], r = rngOf(SIM.seed + '|poll|' + ph.day);
+    const ids = ph.snap.alive.slice().sort((a, b) => ((ph.snap.rel[b] || {}).f || 0) - ((ph.snap.rel[a] || {}).f || 0) || (ph.snap.kills[b] || 0) - (ph.snap.kills[a] || 0)).slice(0, 4);
+    const w = ids.map((id) => Math.pow(((ph.snap.rel[id] || {}).f || 0) + 1.5, 1.4) * (0.75 + r() * 0.5) + (votes && votes[id] ? 0.6 * votes[id] : 0));
+    const tot = w.reduce((s, x) => s + x, 0) || 1;
+    return ids.map((id, k) => ({ id, pct: Math.round((w[k] / tot) * 100) }));
+  }
+
+  G.LOS_TELECRONACA = { commento, chat, sondaggio, favorito, fatti };
 })(typeof window !== 'undefined' ? window : globalThis);
 
 ;
@@ -26177,8 +26554,44 @@ window.LOS_BUILD = "10052e5ad4760ab51b22ba9e67c3bd2b250a5659c0a28678fa4fc550a306
     $$('#speedSeg button').forEach((b) => b.setAttribute('aria-pressed', b.dataset.v === S.settings.speed));
     syncPlay();
     if (PT && S.run.gioco) { const closed = PT.risolvi(SIM, i, S.run.gioco); renderHud(); if (closed.length) announceBets(closed); }
+    renderCast(i);
     save();
   }
+  /* =============== TELECRONACA E PUBBLICO =============== */
+  const TC = window.LOS_TELECRONACA;
+  const tcCtx = () => ({ BY, soft: !!resultTheme(SIM).soft, mentore: S.run && S.run.gioco ? S.run.gioco.mentore : null });
+  function renderCast(i) {
+    const box = $('#ptCast'); if (!box) return;
+    if (!TC || !SIM) { box.hidden = true; return; }
+    const lines = TC.commento(SIM, i, tcCtx());
+    box.hidden = false;
+    box.innerHTML = '<span class="pc-on" aria-hidden="true">In onda</span>' + lines.map((l) => '<p class="pc-line pc-' + l.voce + '"><b class="pc-who">' + esc(l.nome) + '</b><span class="pc-say">' + l.html + '</span></p>').join('');
+  }
+  function chatHTML(i) {
+    const ph = SIM.phases[i], g = S.run && S.run.gioco, day = ph.day;
+    const msgs = TC.chat(SIM, i, tcCtx());
+    const voted = g && g.voti && g.voti['d' + day];
+    const poll = TC.sondaggio(SIM, i, g && g.voti && g.voti.tot);
+    const canVote = g && !voted && atEdge() && i < SIM.phases.length - 1 && ph.snap.alive.length > 2;
+    return '<section class="aud-poll"><h4>Il preferito del pubblico <span>Giorno ' + day + '</span></h4><ol>' + poll.map((x) => '<li class="' + (voted === x.id ? 'mine' : '') + '">' + avHTML(BY[x.id]) + '<span class="ap-name">' + esc(BY[x.id].name) + '</span><i class="ap-bar"><b style="width:' + x.pct + '%"></b></i><em>' + x.pct + '%</em>' +
+      (canVote ? '<button type="button" class="btn sm ap-vote" data-vote="' + esc(x.id) + '">Vota</button>' : voted === x.id ? '<span class="ap-mine">Il tuo voto</span>' : '') + '</li>').join('') + '</ol>' +
+      (canVote ? '<p class="help">Un voto al giorno: dà un po’ di fama, e la fama attira gli sponsor.</p>' : '') + '</section>' +
+      '<section class="aud-chat" aria-label="Chat del pubblico"><h4>Chat <span>dal vivo</span></h4><ul>' + msgs.map((m) => '<li class="' + m.cls + '"><b>' + esc(m.user) + '</b> ' + m.html + '</li>').join('') + '</ul></section>';
+  }
+  async function voteFor(id) {
+    const g = S.run && S.run.gioco; if (!g || !SIM || gate) return;
+    const i = S.run.phase || 0, k = i + 1, day = SIM.phases[i].day;
+    if (g.voti['d' + day] || !atEdge() || k >= SIM.phases.length) return;
+    gate = true; stopPlay();
+    try {
+      const before = S.run.cfg.interventi || [];
+      S.run.cfg.interventi = before.concat([{ fase: k, tipo: 'fama', chi: id, cosa: '' }]);
+      if (!await resimulate()) { S.run.cfg.interventi = before; return; }
+      g.voti['d' + day] = id; g.voti.tot = Object.assign({}, g.voti.tot, { [id]: ((g.voti.tot || {})[id] || 0) + 1 }); save();
+      toast('Voto registrato: ' + BY[id].name + ' guadagna fama.'); renderSide(S.run.phase);
+    } finally { gate = false; }
+  }
+
   /* =============== LA PARTITA GIOCATA: crediti, mentore, puntate, doni =============== */
   const himHer = (t) => (t.gender === 'F' ? 'lei' : t.gender === 'N' ? 'ləi' : 'lui');
   function renderHud() {
@@ -26219,14 +26632,37 @@ window.LOS_BUILD = "10052e5ad4760ab51b22ba9e67c3bd2b250a5659c0a28678fa4fc550a306
     return 'Salute <b>' + v[0] + '</b> · Energia <b>' + v[1] + '</b> · Morale <b>' + v[2] + '</b> · Cibo <b>' + v[3] + '</b>' + (inv.length ? '<br>Ha con sé: ' + inv.slice(0, 4).map(esc).join(', ') : '');
   }
   // prima di mostrare la fase k: all'alba l'ordine del mentore e le puntate (col ritmo «regista» anche al tramonto)
+  // prima di ogni fase nuova: le scelte dell'alba (e del tramonto), poi l'eventuale prova giocata
   async function beforePhase(k) {
-    const P = SIM.phases, g = S.run.gioco, rit = S.settings.ritmo;
+    const P = SIM.phases, rit = S.settings.ritmo;
     if (!P[k] || rit === 'spettatore' || k <= (S.run.seen || 0)) return;
+    if (playTimer) { clearTimeout(playTimer); playTimer = null; }
+    await dayDecisions(k);
+    await playableTest(k);
+  }
+  // la prova giocata: se nella prossima fase l'allievo affronta una prova, la si gioca con un minigioco
+  async function playableTest(k) {
+    const g = S.run.gioco, P = SIM.phases;
+    if (!P[k] || !g.mentore || g.chiesto['p' + k]) return;
+    const ev = P[k].events.find((e) => e.test && e.ids[0] === g.mentore);
+    if (!ev) return;
+    g.chiesto['p' + k] = 1; save();
+    const t = BY[g.mentore], tipo = PT.tipoProva(ev.test.attr), an = ATTRN[ev.test.attr] || ev.test.attr;
+    const titles = { tempismo: 'Questione di riflessi', sequenza: 'Questione di testa', via: 'Questione di istinto' };
+    const score = await PT.gioca(tipo, { kicker: 'Prova di ' + an + ' · ' + t.name, title: titles[tipo], faces: avHTML(t), text: esc(t.name) + ' sta per affrontare una prova di <b>' + esc(an) + '</b>. Aiutal' + (t.gender === 'F' ? 'a' : t.gender === 'N' ? 'ə' : 'o') + ' tu.' });
+    if (score == null) return;
+    const v = PT.bonusProva(score), before = S.run.cfg.interventi || [];
+    if (!v) return;
+    S.run.cfg.interventi = before.concat([{ fase: k, tipo: 'prova', chi: t.id, cosa: String(v) }]);
+    if (!await resimulate()) { S.run.cfg.interventi = before; return; }
+    g.prove = (g.prove || []).concat([{ fase: k, punteggio: Math.round(score * 100), bonus: v }]); save();
+  }
+  async function dayDecisions(k) {
+    const P = SIM.phases, g = S.run.gioco, rit = S.settings.ritmo;
     const dawn = PT.nuovoGiorno(P, k), dusk = rit === 'regista' && P[k].kind === 'n' && P[k - 1].kind !== 'n';
     const key = (dawn ? 'g' : 'n') + P[k].day;
     if (!(dawn || dusk) || g.chiesto[key]) return;
     g.chiesto[key] = 1; save();
-    if (playTimer) { clearTimeout(playTimer); playTimer = null; }
     const timer = playing ? 20 : 0, soft = !!resultTheme(SIM).soft, i = k - 1;
     let changed = false;
     // chi alleni è caduto: all'alba se ne sceglie un altro, così la partita resta tua fino alla fine
@@ -26248,12 +26684,21 @@ window.LOS_BUILD = "10052e5ad4760ab51b22ba9e67c3bd2b250a5659c0a28678fa4fc550a306
         options: offers.map((b, j) => ({ value: j, label: b.testo, cost: '×' + b.q })), stake: [10, 25, 50].filter((v) => v <= g.crediti), credits: g.crediti, timer, skip: 'Non punto' });
       if (r && r.stake && r.stake <= g.crediti) { g.puntate.push(Object.assign({ id: 'b' + k + '-' + g.puntate.length, posta: r.stake, esito: null, aperta: k }, offers[r.value])); g.crediti -= r.stake; }
     }
-    if (changed && !await resimulate()) { S.run.cfg.interventi = (S.run.cfg.interventi || []).filter((x) => x.fase !== k || x.tipo !== 'ordine'); g.ordini = g.ordini.filter((x) => x.fase !== k); }
+    // la regia: col ritmo «Regista», all'alba una mano di tre carte (ognuna si gioca una volta sola)
+    if (dawn && rit === 'regista') {
+      const hand = PT.mano(SIM, k, g);
+      if (hand.length) {
+        const r = await PT.chiedi({ kicker: 'Giorno ' + P[k].day + ' · la regia', title: 'Come movimenti la giornata?', text: 'Ogni carta si gioca una volta sola. Il pubblico giudicherà la tua regia alla fine.', cls: 'sc-regia',
+          options: hand.map((c) => ({ value: c.k, label: c.label, sub: (soft && c.soft) || c.sub })), timer, skip: 'Nessun intervento' });
+        if (r) { S.run.cfg.interventi = (S.run.cfg.interventi || []).concat([{ fase: k, tipo: 'evento', chi: '', cosa: r.value }]); g.regia = (g.regia || []).concat([{ k: r.value, fase: k, day: P[k].day }]); changed = true; }
+      }
+    }
+    if (changed && !await resimulate()) { S.run.cfg.interventi = (S.run.cfg.interventi || []).filter((x) => x.fase !== k || (x.tipo !== 'ordine' && x.tipo !== 'evento')); g.ordini = g.ordini.filter((x) => x.fase !== k); g.regia = (g.regia || []).filter((x) => x.fase !== k); }
     // l'ordine eseguito o ignorato si legge nella fase stessa: si annota per il riepilogo finale
     if (changed && SIM.phases[k]) { const ev = SIM.phases[k].events.find((e) => e.mentor && e.ids[0] === g.mentore); const o = g.ordini.find((x) => x.fase === k); if (ev && o) o.obeys = !!ev.obeys; }
     save(); renderHud();
   }
-  async function giftFlow() {
+  async function giftFlow(preId) {
     if (!PT || !SIM || !S.run.gioco || gate) return;
     const i = S.run.phase || 0, k = i + 1, P = SIM.phases, g = S.run.gioco;
     if (k >= P.length) return toast('La partita è finita: niente più doni.');
@@ -26262,7 +26707,7 @@ window.LOS_BUILD = "10052e5ad4760ab51b22ba9e67c3bd2b250a5659c0a28678fa4fc550a306
     stopPlay(); gate = true;
     try {
       const A = P[i].snap.alive;
-      const who = await PT.chiedi({ kicker: 'Sponsor', title: 'A chi mandi un dono?', text: 'Crediti disponibili: <b>' + g.crediti + '</b>. I favoriti costano di più.', grid: true, cls: 'sc-pick',
+      const who = typeof preId === 'string' && A.includes(preId) ? { value: preId } : await PT.chiedi({ kicker: 'Sponsor', title: 'A chi mandi un dono?', text: 'Crediti disponibili: <b>' + g.crediti + '</b>. I favoriti costano di più.', grid: true, cls: 'sc-pick',
         options: A.map((id) => ({ value: id, html: avHTML(BY[id]) + '<b class="sc-l">' + esc(BY[id].name) + '</b><small class="sc-s">Salute ' + PT.vit(SIM, i, id)[0] + '</small>' })), skip: 'Annulla' });
       if (!who) return;
       const t = BY[who.value], price = (x) => PT.prezzo(SIM, i, who.value, x);
@@ -26277,8 +26722,19 @@ window.LOS_BUILD = "10052e5ad4760ab51b22ba9e67c3bd2b250a5659c0a28678fa4fc550a306
       if (window.LOS_PARTITA_FX && window.LOS_PARTITA_FX.gift) try { window.LOS_PARTITA_FX.gift(t, d.value, $('#giftBtn')); } catch (e) { /* solo grafica */ }
     } finally { gate = false; }
   }
-  $('#giftBtn').addEventListener('click', giftFlow);
+  $('#giftBtn').addEventListener('click', () => giftFlow());
+  // «Manda un dono» da qualunque punto (mappa, scheda del concorrente): porta dritto alla scelta del dono
+  document.addEventListener('click', (e) => { const b = e.target.closest('[data-gift]'); if (!b || !SIM) return; e.preventDefault(); const d = $('#profDlg'); if (d && d.open) d.close(); giftFlow(b.dataset.gift); });
   $('#ptHud').addEventListener('click', (e) => { const b = e.target.closest('[data-prof]'); if (b && SIM) openProfile(b.dataset.prof); });
+  // i segnalini sulla mappa: l'allievo, i concorrenti seguiti, chi riceve il tuo dono in questa fase
+  function mapPins(i) {
+    const ph = SIM.phases[i], g = S.run && S.run.gioco, out = [], seen = new Set();
+    const add = (id, cls, label) => { if (!id || seen.has(id + cls) || !ph.snap.alive.includes(id) || ph.snap.zones[id] == null) return; seen.add(id + cls); out.push({ id, zone: ph.snap.zones[id], cls, label, short: initials(BY[id].name) }); };
+    if (g && g.mentore) add(g.mentore, 'pin-men', 'Il tuo allievo: ' + BY[g.mentore].name);
+    if (g && g.doni[i]) add(g.doni[i].chi, 'pin-gift', 'Ha ricevuto il tuo dono: ' + BY[g.doni[i].chi].name);
+    (S.followed || []).forEach((id) => add(id, 'pin-fol', 'Seguito: ' + (BY[id] ? BY[id].name : '')));
+    return out;
+  }
   function renderSide(i) {
     const theme = resultTheme(SIM), ph = SIM.phases[i], soft = !!theme.soft;
     $$('.stabs button').forEach((b) => { const active = b.dataset.s === sideTab; b.setAttribute('aria-selected', active); b.tabIndex = active ? 0 : -1; });
@@ -26287,7 +26743,9 @@ window.LOS_BUILD = "10052e5ad4760ab51b22ba9e67c3bd2b250a5659c0a28678fa4fc550a306
     const aliveSet = new Set(ph.snap.alive);
     let h = '';
     if (sideTab === 'map') {
-      h=window.LOS_MAP_VIEW.render(SIM,i,{theme,properties:arenaOf(theme.id).zones,selected:mapSelection,avatar:t=>avHTML(t,{btn:true}),zonePic:z=>window.LOS_ATLAS?window.LOS_ATLAS.pic(theme.id,'luoghi',z.name,theme.hue,{index:z.id}):''});
+      h=window.LOS_MAP_VIEW.render(SIM,i,{pins:mapPins(i),giftable:(id)=>!!(PT&&S.run.gioco&&atEdge()&&i<SIM.phases.length-1&&!S.run.gioco.doni[i+1]&&ph.snap.alive.includes(id)),theme,properties:arenaOf(theme.id).zones,selected:mapSelection,avatar:t=>avHTML(t,{btn:true}),zonePic:z=>window.LOS_ATLAS?window.LOS_ATLAS.pic(theme.id,'luoghi',z.name,theme.hue,{index:z.id}):''});
+    } else if (sideTab === 'chat') {
+      h = TC ? chatHTML(i) : '';
     } else if (sideTab === 'fallen') {
       const dead = SIM.tributes.filter((t) => !t.alive && t.deathPhase <= i).sort((a, b) => b.order - a.order);
       h = dead.length ? '<div class="plist">' + dead.map((t) => '<button type="button" class="prow" data-prof="' + esc(t.id) + '">' + avHTML(t, { dead: true }) + '<span style="min-width:0"><span class="pn">' + esc(t.name) + '</span><span class="ps">' + (t.killerIds.length ? 'per mano di ' + esc(t.killerIds.map((k) => BY[k].name).join(', ')) + (causeTxt(t, theme) ? ' · ' + causeTxt(t, theme) : '') : causeTxt(t, theme) ? 'per ' + causeTxt(t, theme) : 'vittima dell\'arena') + '</span></span><span class="pk">' + esc(whenLabel(theme, t.deathPhase, t.deathDay)) + '</span></button>').join('') + '</div>' : '<p class="help">Ancora nessuno.</p>';
@@ -26330,6 +26788,7 @@ window.LOS_BUILD = "10052e5ad4760ab51b22ba9e67c3bd2b250a5659c0a28678fa4fc550a306
   }
   // mappa dei legami: filtri per tipo ed evidenziazione al passaggio
   $('#sideBody').addEventListener('click', (e) => {
+    const vote = e.target.closest('[data-vote]'); if (vote && SIM) { voteFor(vote.dataset.vote); return; }
     const zone=e.target.closest('[data-map-zone]');
     if(zone&&SIM){mapSelection=zone.dataset.mapZone==='all'?null:+zone.dataset.mapZone;renderSide(S.run.phase);$('#sideBody').scrollTop=0;$('#sideBody .map-node[data-map-zone="'+mapSelection+'"]')?.focus({preventScroll:true});return;}
     const event=e.target.closest('[data-map-event]');
@@ -26455,7 +26914,7 @@ window.LOS_BUILD = "10052e5ad4760ab51b22ba9e67c3bd2b250a5659c0a28678fa4fc550a306
           '<div class="pf-id"><span class="pf-status">' + esc(status) + (dead ? ' · ' + esc(outShort.toLowerCase()) : '') + (atRes && t.rank ? ' · ' + t.rank + '° posto' : '') + '</span>' +
             '<p class="pf-team"><i></i>Squadra ' + t.team + '</p>' +
             '<div class="pf-tchips">' + (traits.length ? traits.map((x) => '<span class="chip" title="' + esc(x.desc || '') + '">' + esc(x.name) + '</span>').join('') : '<span class="chip dim">Nessun tratto</span>') + '</div>' +
-            '<div id="profFollow" class="pf-actions"></div></div></section>' +
+            '<div id="profFollow" class="pf-actions"></div>' + (typeof PT !== 'undefined' && PT && S.run && S.run.gioco && atEdge() && S.run.phase < SIM.phases.length - 1 && SIM.phases[S.run.phase].snap.alive.includes(t.id) && !S.run.gioco.doni[S.run.phase + 1] ? '<button type="button" class="btn sm pf-gift" data-gift="' + esc(t.id) + '">Manda un dono</button>' : '') + '</div></section>' +
         '<div class="pf-kpis">' + tile(kills, soft ? 'eliminazioni' : 'uccisioni', kills ? 'hot' : '') + tile(hist.length, 'eventi vissuti') + (dead ? tile(esc(outShort), 'uscita', 'txt') : tile(ally.length, ally.length === 1 ? 'alleato in gara' : 'alleati in gara')) + tile(tests ? passed + '<small>/' + tests + '</small>' : '–', 'prove riuscite') + '</div>' +
         panel('now', nowPanel) + panel('bonds', bondsPanel) + panel('story', storyPanel) + panel('self', selfPanel) +
       '</div>';
@@ -26595,7 +27054,7 @@ window.LOS_BUILD = "10052e5ad4760ab51b22ba9e67c3bd2b250a5659c0a28678fa4fc550a306
     const g = S.run && S.run.gioco; if (!PT || !g || !SIM) return '';
     const pts = g.puntate, won = pts.filter((b) => b.esito === 'vinta'), lost = pts.filter((b) => b.esito === 'persa');
     const doni = Object.values(g.doni), ord = g.ordini, m = g.mentore && BY[g.mentore];
-    if (!pts.length && !doni.length && !ord.length && !m) return '';
+    if (!pts.length && !doni.length && !ord.length && !m && !(g.regia || []).length && !(g.prove || []).length) return '';
     const p = PT.chiudiPartita(S.run, SIM) || PT.profilo();
     const fate = m ? (SIM.winners.includes(m.id) ? 'ha vinto' : 'è arrivat' + (m.gender === 'F' ? 'a' : m.gender === 'N' ? 'ə' : 'o') + ' ' + m.rank + 'º') : '';
     const best = won.slice().sort((a, b) => (b.vincita - b.posta) - (a.vincita - a.posta))[0];
@@ -26603,6 +27062,10 @@ window.LOS_BUILD = "10052e5ad4760ab51b22ba9e67c3bd2b250a5659c0a28678fa4fc550a306
     return '<section class="block card ps-sum" id="playerSummary"><h2>La tua partita</h2>' +
       (m ? '<div class="ps-men">' + avHTML(m, { dead: !m.alive }) + '<p><small>Il tuo concorrente</small><b>' + esc(m.name) + '</b> ' + esc(fate) + (ord.length ? ' · ha seguito ' + ord.filter((o) => o.obeys).length + (ord.length === 1 ? ' ordine su 1' : ' ordini su ' + ord.length) : '') + '</p></div>' : '') +
       '<div class="ps-stats">' + stat(g.crediti, 'Crediti finali') + stat(won.length + '/' + (won.length + lost.length), 'Puntate vinte') + stat(doni.length, doni.length === 1 ? 'Dono mandato' : 'Doni mandati') + stat(p.record, 'Il tuo record') + '</div>' +
+      ((g.prove || []).length ? '<p class="ps-tests">Prove giocate: <b>' + g.prove.length + '</b> · ' + g.prove.filter((x) => x.bonus > 0).length + ' con un vantaggio per il tuo allievo.</p>' : '') +
+      ((g.regia || []).length ? (() => { const v = PT.votoRegia(SIM); return '<div class="ps-regia"><h3>Il voto della regia <b>' + v.tot + '</b><small>/100</small></h3><p>' + esc(v.giudizio) + '</p><div class="ps-rbars">' +
+        [['Spettacolo', v.spettacolo], ['Ritmo', v.ritmo], ['Colpi di scena', v.sorprese]].map(([l, n]) => '<span class="ps-rb"><em>' + l + '</em><i><b style="width:' + n + '%"></b></i><strong>' + n + '</strong></span>').join('') +
+        '</div><p class="help">Carte giocate: ' + g.regia.map((x) => esc((PT.REGIA.find((c) => c.k === x.k) || {}).label || x.k) + ' (giorno ' + x.day + ')').join(', ') + '.</p></div>'; })() : '') +
       (best ? '<p class="ps-best">Colpo migliore: «' + esc(best.testo) + '» · ' + best.posta + ' × ' + best.q + ' = <b>+' + best.vincita + '</b></p>' : '') +
       '<p class="help">Partite giocate: ' + p.partite + ' · puntate vinte in tutto: ' + p.vinte + ' su ' + p.puntate + '.</p></section>';
   }

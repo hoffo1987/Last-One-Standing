@@ -705,6 +705,7 @@
       if (attr === 'for' && hasItem(t, 'arma')) bonus += 1;
       const tb = wx('tb', null); if (tb && tb[attr]) bonus += tb[attr];
       if (t.planPh >= phases.length - 3) bonus += 1;
+      if (t.provaBonus && t.provaBonus.ph === phases.length) bonus += t.provaBonus.v;
       // gli oggetti adatti a quella prova: ogni variante ha i suoi bonus (e qualche malus), al massimo +3 in tutto
       const inv = t.inv || [], ipr = typeof itemProps === 'function' ? itemProps : () => ({});
       const gearBonus = Math.max(-2, Math.min(3, inv.reduce((s2, it) => s2 + ((ipr(it).prova || {})[attr] || 0), 0)));
@@ -1510,7 +1511,7 @@
       if (noDeathStreak >= 3) p *= 1.7;
       if (alive().length <= 4) p *= 1.25;
       if (kind === 'n') p *= MOD.night;
-      p *= wx('lethal', 1);
+      p *= wx('lethal', 1) * regiaLethal(kind);
       return Math.min(0.9, Math.max(0.03, p));
     }
 
@@ -1560,7 +1561,7 @@
      * della prima fase calcolata con indice >= fase: tutto ciò che viene prima resta identico, perché il motore
      * è deterministico e nessun intervento tocca i numeri casuali prima del suo turno. */
     const INTERVENTI = (Array.isArray(cfg.interventi) ? cfg.interventi : []).slice(0, 400)
-      .filter((x) => x && typeof x === 'object' && Number.isInteger(x.fase) && x.fase >= 0 && typeof x.chi === 'string' && (x.tipo === 'dono' || x.tipo === 'ordine'))
+      .filter((x) => x && typeof x === 'object' && Number.isInteger(x.fase) && x.fase >= 0 && typeof x.chi === 'string' && ['dono', 'ordine', 'evento', 'fama', 'prova'].includes(x.tipo))
       .map((x, k) => ({ fase: x.fase, tipo: x.tipo, chi: x.chi, cosa: String(x.cosa || ''), k })).sort((a, b) => a.fase - b.fase || a.k - b.k);
     let intNext = 0;
     const DONI = ['cibo', 'med', 'arma', 'armatura', 'attrezzo', 'amuleto', 'mappa'];
@@ -1607,14 +1608,49 @@
         events.push(intEvent(P, n + ' legge il messaggio del mentore, che vorrebbe vederl' + (P.gender === 'F' ? 'a' : P.gender === 'N' ? 'ə' : 'o') + ' ' + (cosa === 'nasconditi' ? 'restare al riparo' : ORD[cosa]) + ', e fa di testa sua.', { cat: 'hurt', whyTxt: 'Fa di testa sua', mentor: cosa, obeys: false }));
       }
     }
+    /* le carte del Regista: valgono per il giorno in cui vengono giocate */
+    const RG = { day: -1, k: '' };
+    const rgOn = (k) => RG.day === day && RG.k === k;
+    let forceFeast = -1, forceDis = -1;
+    const REGIA_TXT = {
+      tempesta: ['Cambio di programma.', 'La regia scatena il maltempo sull’arena: oggi sarà dura per tutti.'],
+      banchetto: ['Annuncio della regia.', 'Oggi c’è un banchetto: chi ha fame dovrà uscire allo scoperto.'],
+      disastro: ['La regia preme il pulsante rosso.', 'Qualcosa sta per succedere, e nessuno è al sicuro.'],
+      buio: ['La regia spegne le luci.', 'Stanotte non si vedrà niente: chi si muove, rischia.'],
+      bestie: ['La regia apre le gabbie.', 'Stanotte i predatori avranno fame.'],
+      rifornimenti: ['Pioggia di rifornimenti.', 'Casse ovunque: oggi si respira un po’.'],
+    };
+    const REGIA_SOFT = { bestie: ['La regia cambia le regole.', 'Stanotte chi resta da solo è più esposto.'], disastro: ['La regia prepara un imprevisto.', 'Oggi qualcosa andrà storto per qualcuno.'] };
+    function applyRegia(k, events, irng) {
+      const tx = (theme.soft && REGIA_SOFT[k]) || REGIA_TXT[k]; if (!tx) return;
+      RG.day = day; RG.k = k;
+      if (k === 'banchetto') forceFeast = day;
+      if (k === 'disastro') forceDis = day;
+      if (k === 'tempesta') {
+        const bad = (R.meteo || []).filter((m) => m.fx && ((m.fx.lethal || 1) > 1 || (m.fx.beast || 1) > 1 || (m.fx.food || 1) > 1));
+        if (bad.length) { W = irng.pick(bad); stats.meteo.push({ day, n: W.n, regia: true }); }
+      }
+      if (k === 'rifornimenti') alive().forEach((t) => { if (irng.chance(0.4)) { const it = mkItem(t.hp < 60 ? 'med' : 'cibo', null, 'sponsor'); if (addItem(t, it)) { t.items++; stats.items++; } } });
+      stats.regia = (stats.regia || []).concat([{ day, k }]);
+      const html = '<b>' + esc(tx[0]) + '</b> ' + esc(tx[1]) + (k === 'tempesta' && W.n ? ' <b>' + esc(W.n) + '.</b>' : '');
+      events.push({ html, plain: html.replace(/<[^>]+>/g, ''), ids: [], deaths: [], lethal: false, note: true, regia: k });
+    }
+    const regiaLethal = (kind) => (RG.day !== day ? 1 : RG.k === 'tempesta' ? 1.2 : RG.k === 'buio' && kind === 'n' ? 1.6 : RG.k === 'rifornimenti' ? 0.7 : 1);
     function applyInterventions(events) {
       const idx = phases.length;
       while (intNext < INTERVENTI.length && INTERVENTI[intNext].fase <= idx) {
-        const x = INTERVENTI[intNext++], P = byId[x.chi];
-        if (!P || !P.alive) continue;
+        const x = INTERVENTI[intNext++];
         // numeri casuali propri: l'esito di un intervento non sposta quelli del motore
         const irng = makeRng(seed + '|int|' + x.k + '|' + idx);
-        if (x.tipo === 'dono') applyDono(P, x.cosa, events, irng); else applyOrdine(P, x.cosa, events, irng);
+        if (x.tipo === 'evento') { applyRegia(x.cosa, events, irng); continue; }
+        const P = byId[x.chi];
+        if (!P || !P.alive) continue;
+        if (x.tipo === 'dono') applyDono(P, x.cosa, events, irng);
+        else if (x.tipo === 'ordine') applyOrdine(P, x.cosa, events, irng);
+        // il voto del pubblico: un po' di fama e di morale, che attira gli sponsor
+        else if (x.tipo === 'fama') { P.fame += 1; P.mo += 5; stats.votes = (stats.votes || 0) + 1; }
+        // la prova giocata: il risultato del minigioco pesa sul tiro di questa fase
+        else if (x.tipo === 'prova') { const v = Math.max(-3, Math.min(4, parseInt(x.cosa, 10) || 0)); P.provaBonus = { ph: idx, v }; }
       }
     }
 
@@ -1838,7 +1874,7 @@
       rng.shuffle(alive()).forEach((t) => {
         if (attacks >= 2 || !LEX.mostro) return;
         const alone = !buddies(t).length;
-        const p = 0.035 * MOD.beast * wx('beast', 1) * ZP[t.zone][1] * (alone ? 1.6 * (MOD.nightAlone ? 1 + MOD.nightAlone * 0.5 : 1) : 0.45) * (t.en < 30 ? 1.5 : 1) * (hasTrait(t, 'furtivo') ? 0.6 : 1) * Math.sqrt(diff);
+        const p = 0.035 * MOD.beast * wx('beast', 1) * (rgOn('bestie') ? 2.5 : rgOn('buio') ? 1.3 : 1) * ZP[t.zone][1] * (alone ? 1.6 * (MOD.nightAlone ? 1 + MOD.nightAlone * 0.5 : 1) : 0.45) * (t.en < 30 ? 1.5 : 1) * (hasTrait(t, 'furtivo') ? 0.6 : 1) * Math.sqrt(diff);
         if (!rng.chance(p)) return;
         attacks++; stats.beasts++;
         const guarded = alive().some((x) => x.guard === t.id && x.zone === t.zone);
@@ -3035,10 +3071,10 @@
       runPhase('d', pools.d, theme.phase.d + ' ' + day, introOf('d'));
       if (isEnded() || lateEnd()) break;
       const a = alive().length;
-      if (!feastDone && day >= 3 && a >= 4 && (rng.chance(0.35) || day >= 6)) {
+      if (!feastDone && a >= 4 && (forceFeast === day || day >= 3 && (rng.chance(0.35) || day >= 6))) {
         feastDone = true;
         runPhase('f', pools.f, theme.phase.f, introOf('f'));
-      } else if (day >= 2 && pools.disasters.length && day - lastDisaster > 1 && rng.chance(0.32 * Math.min(1.5, diff))) {
+      } else if (pools.disasters.length && (forceDis === day && pools.disasters.some(d=>!d.zones||d.zones.some(z=>!closed.has(z)&&alive().some(t=>t.zone===z))) || day >= 2 && day - lastDisaster > 1 && rng.chance(0.32 * Math.min(1.5, diff)))) {
         const eligible=pools.disasters.filter(d=>!d.zones||d.zones.some(z=>!closed.has(z)&&alive().some(t=>t.zone===z)));
         let opts = eligible.filter((d) => !usedDisasters.has(d.n));
         if (!opts.length) { usedDisasters.clear(); opts = eligible; }

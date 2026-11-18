@@ -52,6 +52,8 @@
       const touch = selected == null || a === selected || b === selected;
       return '<path class="route' + (touch ? '' : ' faded') + '" d="' + curve(points[a], points[b], bendFor(Math.min(a, b), Math.max(a, b)) * (a < b ? 1 : -1)) + '" style="stroke-width:' + Math.min(6, 1.6 + n * 0.8).toFixed(1) + '" marker-end="url(#mv-arrow)"/>';
     }).join('');
+    // i segnalini della partita giocata: l'allievo, i seguiti, chi ha appena ricevuto un dono
+    const pinsOf = (i) => { const ps = (extra.pins || []).filter((x) => x.zone === i); return ps.length ? '<span class="mn-pins">' + ps.slice(0, 4).map((x) => '<i class="mn-pin ' + esc(x.cls) + '" title="' + esc(x.label) + '">' + esc(x.short) + '</i>').join('') + '</span>' : ''; };
     const nodes = zones.map((z, i) => {
       const n = counts[i] || 0, size = Math.round(40 + Math.min(n, 10) * 3), d = lv(z.danger ?? 1);
       const deaths = (extra.deaths || []).filter((x) => x.zone === i).length, traps = (extra.traps || []).filter((x) => x.zone === i).length;
@@ -59,7 +61,7 @@
         (traps ? '<i class="mb mb-trap" title="' + plural(traps, 'trappola', 'trappole') + '">' + ICON.trap + '</i>' : '') + ((extra.affected || []).includes(i) ? '<i class="mb mb-dis" title="Area del disastro">' + ICON.bolt + '</i>' : '');
       const label = esc(cap(bare(z.name))) + ': ' + plural(n, 'presente', 'presenti') + (closed.has(i) ? ', zona chiusa' : '') + (deaths ? ', ' + deaths + ' fuori in questa fase' : '');
       return '<button type="button" class="map-node d' + d + (closed.has(i) ? ' shut' : '') + (selected === i ? ' selected' : '') + (selected != null && selected !== i ? ' faded' : '') + (n ? '' : ' empty') + '" style="left:' + (points[i][0] / 3.6).toFixed(2) + '%;top:' + (points[i][1] / 3).toFixed(2) + '%;--s:' + size + 'px" data-map-zone="' + i + '" aria-pressed="' + (selected === i) + '" aria-label="' + label + '">' +
-        '<span class="mn-disc"><b>' + n + '</b>' + (badges ? '<span class="mn-badges">' + badges + '</span>' : '') + '</span><span class="mn-name">' + esc(cap(bare(z.name))) + '</span></button>';
+        '<span class="mn-disc"><b>' + n + '</b>' + (badges ? '<span class="mn-badges">' + badges + '</span>' : '') + '</span><span class="mn-name">' + esc(cap(bare(z.name))) + '</span>' + pinsOf(i) + '</button>';
     }).join('');
     return '<div class="arena-graph" role="group" aria-label="Mappa delle zone: ogni cerchio è una zona con il numero di presenti; le linee sono i passaggi, tratteggiate se chiusi; le frecce colorate sono gli spostamenti di questa fase">' +
       '<svg viewBox="0 0 360 300" aria-hidden="true"><defs><marker id="mv-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerUnits="userSpaceOnUse" markerWidth="9" markerHeight="9" orient="auto"><path d="M0 0 L10 5 L0 10 z" class="mv-arrow"/></marker></defs>' + lines + routes + '</svg>' + nodes + '</div>';
@@ -100,7 +102,7 @@
       return '<article class="zcard' + (closed.has(z.id) ? ' closed' : '') + (fallen.length ? ' hot' : '') + '">' +
         '<header class="zc-head">' + (pic ? '<span class="zc-pic">' + pic + '</span>' : '') + '<span class="zc-title"><span class="zc-num">' + (z.id + 1) + '</span><h4>' + zname(z.id) + '</h4></span></header>' +
         '<div class="zc-in">' + (z.description ? '<p class="zc-desc">' + esc(z.description) + '</p>' : '') + (tags ? '<div class="ztags2">' + tags + '</div>' : '') + meters(z, true) +
-        '<section class="zc-sec"><h5>Presenti a fine fase <span>' + here.length + '</span></h5>' + (here.length ? '<div class="zc-faces">' + here.map((id) => '<span class="zc-face">' + face(id) + '<span>' + esc(name(id)) + '</span></span>').join('') + '</div>' : '<p class="help">Nessun concorrente presente a fine fase.</p>') + '</section>' +
+        '<section class="zc-sec"><h5>Presenti a fine fase <span>' + here.length + '</span></h5>' + (here.length ? '<div class="zc-faces">' + here.map((id) => '<span class="zc-face">' + face(id) + '<span>' + esc(name(id)) + '</span>' + (options.giftable && options.giftable(id) ? '<button type="button" class="zc-gift" data-gift="' + esc(id) + '">Dono</button>' : '') + '</span>').join('') + '</div>' : '<p class="help">Nessun concorrente presente a fine fase.</p>') + '</section>' +
         (fallen.length ? '<section class="zc-sec zc-out"><h5>' + (soft ? 'Usciti dai giochi qui' : 'Morti qui') + ' <span>' + fallen.length + '</span></h5><p>' + fallen.map((d) => person(d.id)).join(', ') + '</p></section>' : '') +
         (tz.length ? '<section class="zc-sec"><h5>' + (soft ? (tz.length === 1 ? 'Tranello ancora attivo' : 'Tranelli ancora attivi') : (tz.length === 1 ? 'Trappola ancora attiva' : 'Trappole ancora attive')) + ' <span>' + tz.length + '</span></h5><ul class="zc-traps">' + tz.map((t) => '<li>' + esc(t.name) + ' <span class="help">di</span> ' + person(t.owner) + '</li>').join('') + '</ul></section>' : '') +
         (lz ? '<p class="zc-loot">Bottino rimasto: <b>' + plural(lz.count, 'oggetto', 'oggetti') + '</b></p>' : '') +
@@ -120,7 +122,7 @@
       (selected != null ? '<button class="btn sm mv-all" type="button" data-map-zone="all"><span aria-hidden="true">←</span> Tutte le zone</button>' : '') + '</div>';
     const legend = spatial ? '<p class="mv-legend"><span><i class="lg-node"></i>presenti</span><span><i class="lg-route"></i>spostamenti</span><span><i class="lg-shut"></i>passaggio chiuso</span><span><i class="lg-ring"></i>anello: pericolo</span></p>' : '<p class="help mv-note">Replay storico: sono disponibili le posizioni salvate a fine fase. Percorsi e luoghi dei singoli eventi non erano registrati.</p>';
     return '<div class="map-view">' + head +
-      (spatial ? graph(zones, closed, zones.map((z) => present(z.id).length), selected, { moves, deaths, traps, affected: phase.affectedZones || [] }) : '') + legend +
+      (spatial ? graph(zones, closed, zones.map((z) => present(z.id).length), selected, { moves, deaths, traps, affected: phase.affectedZones || [], pins: (options.pins || []).filter((x) => x.zone != null) }) : '') + legend +
       (selected != null ? card(zones[selected]) : list()) + travel + history + '</div>';
   }
   G.LOS_MAP_VIEW = { render, graph }; if (typeof module === 'object' && module.exports) module.exports = G.LOS_MAP_VIEW;

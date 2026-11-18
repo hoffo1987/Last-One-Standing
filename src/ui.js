@@ -1913,8 +1913,44 @@
     $$('#speedSeg button').forEach((b) => b.setAttribute('aria-pressed', b.dataset.v === S.settings.speed));
     syncPlay();
     if (PT && S.run.gioco) { const closed = PT.risolvi(SIM, i, S.run.gioco); renderHud(); if (closed.length) announceBets(closed); }
+    renderCast(i);
     save();
   }
+  /* =============== TELECRONACA E PUBBLICO =============== */
+  const TC = window.LOS_TELECRONACA;
+  const tcCtx = () => ({ BY, soft: !!resultTheme(SIM).soft, mentore: S.run && S.run.gioco ? S.run.gioco.mentore : null });
+  function renderCast(i) {
+    const box = $('#ptCast'); if (!box) return;
+    if (!TC || !SIM) { box.hidden = true; return; }
+    const lines = TC.commento(SIM, i, tcCtx());
+    box.hidden = false;
+    box.innerHTML = '<span class="pc-on" aria-hidden="true">In onda</span>' + lines.map((l) => '<p class="pc-line pc-' + l.voce + '"><b class="pc-who">' + esc(l.nome) + '</b><span class="pc-say">' + l.html + '</span></p>').join('');
+  }
+  function chatHTML(i) {
+    const ph = SIM.phases[i], g = S.run && S.run.gioco, day = ph.day;
+    const msgs = TC.chat(SIM, i, tcCtx());
+    const voted = g && g.voti && g.voti['d' + day];
+    const poll = TC.sondaggio(SIM, i, g && g.voti && g.voti.tot);
+    const canVote = g && !voted && atEdge() && i < SIM.phases.length - 1 && ph.snap.alive.length > 2;
+    return '<section class="aud-poll"><h4>Il preferito del pubblico <span>Giorno ' + day + '</span></h4><ol>' + poll.map((x) => '<li class="' + (voted === x.id ? 'mine' : '') + '">' + avHTML(BY[x.id]) + '<span class="ap-name">' + esc(BY[x.id].name) + '</span><i class="ap-bar"><b style="width:' + x.pct + '%"></b></i><em>' + x.pct + '%</em>' +
+      (canVote ? '<button type="button" class="btn sm ap-vote" data-vote="' + esc(x.id) + '">Vota</button>' : voted === x.id ? '<span class="ap-mine">Il tuo voto</span>' : '') + '</li>').join('') + '</ol>' +
+      (canVote ? '<p class="help">Un voto al giorno: dà un po’ di fama, e la fama attira gli sponsor.</p>' : '') + '</section>' +
+      '<section class="aud-chat" aria-label="Chat del pubblico"><h4>Chat <span>dal vivo</span></h4><ul>' + msgs.map((m) => '<li class="' + m.cls + '"><b>' + esc(m.user) + '</b> ' + m.html + '</li>').join('') + '</ul></section>';
+  }
+  async function voteFor(id) {
+    const g = S.run && S.run.gioco; if (!g || !SIM || gate) return;
+    const i = S.run.phase || 0, k = i + 1, day = SIM.phases[i].day;
+    if (g.voti['d' + day] || !atEdge() || k >= SIM.phases.length) return;
+    gate = true; stopPlay();
+    try {
+      const before = S.run.cfg.interventi || [];
+      S.run.cfg.interventi = before.concat([{ fase: k, tipo: 'fama', chi: id, cosa: '' }]);
+      if (!await resimulate()) { S.run.cfg.interventi = before; return; }
+      g.voti['d' + day] = id; g.voti.tot = Object.assign({}, g.voti.tot, { [id]: ((g.voti.tot || {})[id] || 0) + 1 }); save();
+      toast('Voto registrato: ' + BY[id].name + ' guadagna fama.'); renderSide(S.run.phase);
+    } finally { gate = false; }
+  }
+
   /* =============== LA PARTITA GIOCATA: crediti, mentore, puntate, doni =============== */
   const himHer = (t) => (t.gender === 'F' ? 'lei' : t.gender === 'N' ? 'ləi' : 'lui');
   function renderHud() {
@@ -1955,14 +1991,37 @@
     return 'Salute <b>' + v[0] + '</b> · Energia <b>' + v[1] + '</b> · Morale <b>' + v[2] + '</b> · Cibo <b>' + v[3] + '</b>' + (inv.length ? '<br>Ha con sé: ' + inv.slice(0, 4).map(esc).join(', ') : '');
   }
   // prima di mostrare la fase k: all'alba l'ordine del mentore e le puntate (col ritmo «regista» anche al tramonto)
+  // prima di ogni fase nuova: le scelte dell'alba (e del tramonto), poi l'eventuale prova giocata
   async function beforePhase(k) {
-    const P = SIM.phases, g = S.run.gioco, rit = S.settings.ritmo;
+    const P = SIM.phases, rit = S.settings.ritmo;
     if (!P[k] || rit === 'spettatore' || k <= (S.run.seen || 0)) return;
+    if (playTimer) { clearTimeout(playTimer); playTimer = null; }
+    await dayDecisions(k);
+    await playableTest(k);
+  }
+  // la prova giocata: se nella prossima fase l'allievo affronta una prova, la si gioca con un minigioco
+  async function playableTest(k) {
+    const g = S.run.gioco, P = SIM.phases;
+    if (!P[k] || !g.mentore || g.chiesto['p' + k]) return;
+    const ev = P[k].events.find((e) => e.test && e.ids[0] === g.mentore);
+    if (!ev) return;
+    g.chiesto['p' + k] = 1; save();
+    const t = BY[g.mentore], tipo = PT.tipoProva(ev.test.attr), an = ATTRN[ev.test.attr] || ev.test.attr;
+    const titles = { tempismo: 'Questione di riflessi', sequenza: 'Questione di testa', via: 'Questione di istinto' };
+    const score = await PT.gioca(tipo, { kicker: 'Prova di ' + an + ' · ' + t.name, title: titles[tipo], faces: avHTML(t), text: esc(t.name) + ' sta per affrontare una prova di <b>' + esc(an) + '</b>. Aiutal' + (t.gender === 'F' ? 'a' : t.gender === 'N' ? 'ə' : 'o') + ' tu.' });
+    if (score == null) return;
+    const v = PT.bonusProva(score), before = S.run.cfg.interventi || [];
+    if (!v) return;
+    S.run.cfg.interventi = before.concat([{ fase: k, tipo: 'prova', chi: t.id, cosa: String(v) }]);
+    if (!await resimulate()) { S.run.cfg.interventi = before; return; }
+    g.prove = (g.prove || []).concat([{ fase: k, punteggio: Math.round(score * 100), bonus: v }]); save();
+  }
+  async function dayDecisions(k) {
+    const P = SIM.phases, g = S.run.gioco, rit = S.settings.ritmo;
     const dawn = PT.nuovoGiorno(P, k), dusk = rit === 'regista' && P[k].kind === 'n' && P[k - 1].kind !== 'n';
     const key = (dawn ? 'g' : 'n') + P[k].day;
     if (!(dawn || dusk) || g.chiesto[key]) return;
     g.chiesto[key] = 1; save();
-    if (playTimer) { clearTimeout(playTimer); playTimer = null; }
     const timer = playing ? 20 : 0, soft = !!resultTheme(SIM).soft, i = k - 1;
     let changed = false;
     // chi alleni è caduto: all'alba se ne sceglie un altro, così la partita resta tua fino alla fine
@@ -1984,12 +2043,21 @@
         options: offers.map((b, j) => ({ value: j, label: b.testo, cost: '×' + b.q })), stake: [10, 25, 50].filter((v) => v <= g.crediti), credits: g.crediti, timer, skip: 'Non punto' });
       if (r && r.stake && r.stake <= g.crediti) { g.puntate.push(Object.assign({ id: 'b' + k + '-' + g.puntate.length, posta: r.stake, esito: null, aperta: k }, offers[r.value])); g.crediti -= r.stake; }
     }
-    if (changed && !await resimulate()) { S.run.cfg.interventi = (S.run.cfg.interventi || []).filter((x) => x.fase !== k || x.tipo !== 'ordine'); g.ordini = g.ordini.filter((x) => x.fase !== k); }
+    // la regia: col ritmo «Regista», all'alba una mano di tre carte (ognuna si gioca una volta sola)
+    if (dawn && rit === 'regista') {
+      const hand = PT.mano(SIM, k, g);
+      if (hand.length) {
+        const r = await PT.chiedi({ kicker: 'Giorno ' + P[k].day + ' · la regia', title: 'Come movimenti la giornata?', text: 'Ogni carta si gioca una volta sola. Il pubblico giudicherà la tua regia alla fine.', cls: 'sc-regia',
+          options: hand.map((c) => ({ value: c.k, label: c.label, sub: (soft && c.soft) || c.sub })), timer, skip: 'Nessun intervento' });
+        if (r) { S.run.cfg.interventi = (S.run.cfg.interventi || []).concat([{ fase: k, tipo: 'evento', chi: '', cosa: r.value }]); g.regia = (g.regia || []).concat([{ k: r.value, fase: k, day: P[k].day }]); changed = true; }
+      }
+    }
+    if (changed && !await resimulate()) { S.run.cfg.interventi = (S.run.cfg.interventi || []).filter((x) => x.fase !== k || (x.tipo !== 'ordine' && x.tipo !== 'evento')); g.ordini = g.ordini.filter((x) => x.fase !== k); g.regia = (g.regia || []).filter((x) => x.fase !== k); }
     // l'ordine eseguito o ignorato si legge nella fase stessa: si annota per il riepilogo finale
     if (changed && SIM.phases[k]) { const ev = SIM.phases[k].events.find((e) => e.mentor && e.ids[0] === g.mentore); const o = g.ordini.find((x) => x.fase === k); if (ev && o) o.obeys = !!ev.obeys; }
     save(); renderHud();
   }
-  async function giftFlow() {
+  async function giftFlow(preId) {
     if (!PT || !SIM || !S.run.gioco || gate) return;
     const i = S.run.phase || 0, k = i + 1, P = SIM.phases, g = S.run.gioco;
     if (k >= P.length) return toast('La partita è finita: niente più doni.');
@@ -1998,7 +2066,7 @@
     stopPlay(); gate = true;
     try {
       const A = P[i].snap.alive;
-      const who = await PT.chiedi({ kicker: 'Sponsor', title: 'A chi mandi un dono?', text: 'Crediti disponibili: <b>' + g.crediti + '</b>. I favoriti costano di più.', grid: true, cls: 'sc-pick',
+      const who = typeof preId === 'string' && A.includes(preId) ? { value: preId } : await PT.chiedi({ kicker: 'Sponsor', title: 'A chi mandi un dono?', text: 'Crediti disponibili: <b>' + g.crediti + '</b>. I favoriti costano di più.', grid: true, cls: 'sc-pick',
         options: A.map((id) => ({ value: id, html: avHTML(BY[id]) + '<b class="sc-l">' + esc(BY[id].name) + '</b><small class="sc-s">Salute ' + PT.vit(SIM, i, id)[0] + '</small>' })), skip: 'Annulla' });
       if (!who) return;
       const t = BY[who.value], price = (x) => PT.prezzo(SIM, i, who.value, x);
@@ -2013,8 +2081,19 @@
       if (window.LOS_PARTITA_FX && window.LOS_PARTITA_FX.gift) try { window.LOS_PARTITA_FX.gift(t, d.value, $('#giftBtn')); } catch (e) { /* solo grafica */ }
     } finally { gate = false; }
   }
-  $('#giftBtn').addEventListener('click', giftFlow);
+  $('#giftBtn').addEventListener('click', () => giftFlow());
+  // «Manda un dono» da qualunque punto (mappa, scheda del concorrente): porta dritto alla scelta del dono
+  document.addEventListener('click', (e) => { const b = e.target.closest('[data-gift]'); if (!b || !SIM) return; e.preventDefault(); const d = $('#profDlg'); if (d && d.open) d.close(); giftFlow(b.dataset.gift); });
   $('#ptHud').addEventListener('click', (e) => { const b = e.target.closest('[data-prof]'); if (b && SIM) openProfile(b.dataset.prof); });
+  // i segnalini sulla mappa: l'allievo, i concorrenti seguiti, chi riceve il tuo dono in questa fase
+  function mapPins(i) {
+    const ph = SIM.phases[i], g = S.run && S.run.gioco, out = [], seen = new Set();
+    const add = (id, cls, label) => { if (!id || seen.has(id + cls) || !ph.snap.alive.includes(id) || ph.snap.zones[id] == null) return; seen.add(id + cls); out.push({ id, zone: ph.snap.zones[id], cls, label, short: initials(BY[id].name) }); };
+    if (g && g.mentore) add(g.mentore, 'pin-men', 'Il tuo allievo: ' + BY[g.mentore].name);
+    if (g && g.doni[i]) add(g.doni[i].chi, 'pin-gift', 'Ha ricevuto il tuo dono: ' + BY[g.doni[i].chi].name);
+    (S.followed || []).forEach((id) => add(id, 'pin-fol', 'Seguito: ' + (BY[id] ? BY[id].name : '')));
+    return out;
+  }
   function renderSide(i) {
     const theme = resultTheme(SIM), ph = SIM.phases[i], soft = !!theme.soft;
     $$('.stabs button').forEach((b) => { const active = b.dataset.s === sideTab; b.setAttribute('aria-selected', active); b.tabIndex = active ? 0 : -1; });
@@ -2023,7 +2102,9 @@
     const aliveSet = new Set(ph.snap.alive);
     let h = '';
     if (sideTab === 'map') {
-      h=window.LOS_MAP_VIEW.render(SIM,i,{theme,properties:arenaOf(theme.id).zones,selected:mapSelection,avatar:t=>avHTML(t,{btn:true}),zonePic:z=>window.LOS_ATLAS?window.LOS_ATLAS.pic(theme.id,'luoghi',z.name,theme.hue,{index:z.id}):''});
+      h=window.LOS_MAP_VIEW.render(SIM,i,{pins:mapPins(i),giftable:(id)=>!!(PT&&S.run.gioco&&atEdge()&&i<SIM.phases.length-1&&!S.run.gioco.doni[i+1]&&ph.snap.alive.includes(id)),theme,properties:arenaOf(theme.id).zones,selected:mapSelection,avatar:t=>avHTML(t,{btn:true}),zonePic:z=>window.LOS_ATLAS?window.LOS_ATLAS.pic(theme.id,'luoghi',z.name,theme.hue,{index:z.id}):''});
+    } else if (sideTab === 'chat') {
+      h = TC ? chatHTML(i) : '';
     } else if (sideTab === 'fallen') {
       const dead = SIM.tributes.filter((t) => !t.alive && t.deathPhase <= i).sort((a, b) => b.order - a.order);
       h = dead.length ? '<div class="plist">' + dead.map((t) => '<button type="button" class="prow" data-prof="' + esc(t.id) + '">' + avHTML(t, { dead: true }) + '<span style="min-width:0"><span class="pn">' + esc(t.name) + '</span><span class="ps">' + (t.killerIds.length ? 'per mano di ' + esc(t.killerIds.map((k) => BY[k].name).join(', ')) + (causeTxt(t, theme) ? ' · ' + causeTxt(t, theme) : '') : causeTxt(t, theme) ? 'per ' + causeTxt(t, theme) : 'vittima dell\'arena') + '</span></span><span class="pk">' + esc(whenLabel(theme, t.deathPhase, t.deathDay)) + '</span></button>').join('') + '</div>' : '<p class="help">Ancora nessuno.</p>';
@@ -2066,6 +2147,7 @@
   }
   // mappa dei legami: filtri per tipo ed evidenziazione al passaggio
   $('#sideBody').addEventListener('click', (e) => {
+    const vote = e.target.closest('[data-vote]'); if (vote && SIM) { voteFor(vote.dataset.vote); return; }
     const zone=e.target.closest('[data-map-zone]');
     if(zone&&SIM){mapSelection=zone.dataset.mapZone==='all'?null:+zone.dataset.mapZone;renderSide(S.run.phase);$('#sideBody').scrollTop=0;$('#sideBody .map-node[data-map-zone="'+mapSelection+'"]')?.focus({preventScroll:true});return;}
     const event=e.target.closest('[data-map-event]');
@@ -2191,7 +2273,7 @@
           '<div class="pf-id"><span class="pf-status">' + esc(status) + (dead ? ' · ' + esc(outShort.toLowerCase()) : '') + (atRes && t.rank ? ' · ' + t.rank + '° posto' : '') + '</span>' +
             '<p class="pf-team"><i></i>Squadra ' + t.team + '</p>' +
             '<div class="pf-tchips">' + (traits.length ? traits.map((x) => '<span class="chip" title="' + esc(x.desc || '') + '">' + esc(x.name) + '</span>').join('') : '<span class="chip dim">Nessun tratto</span>') + '</div>' +
-            '<div id="profFollow" class="pf-actions"></div></div></section>' +
+            '<div id="profFollow" class="pf-actions"></div>' + (typeof PT !== 'undefined' && PT && S.run && S.run.gioco && atEdge() && S.run.phase < SIM.phases.length - 1 && SIM.phases[S.run.phase].snap.alive.includes(t.id) && !S.run.gioco.doni[S.run.phase + 1] ? '<button type="button" class="btn sm pf-gift" data-gift="' + esc(t.id) + '">Manda un dono</button>' : '') + '</div></section>' +
         '<div class="pf-kpis">' + tile(kills, soft ? 'eliminazioni' : 'uccisioni', kills ? 'hot' : '') + tile(hist.length, 'eventi vissuti') + (dead ? tile(esc(outShort), 'uscita', 'txt') : tile(ally.length, ally.length === 1 ? 'alleato in gara' : 'alleati in gara')) + tile(tests ? passed + '<small>/' + tests + '</small>' : '–', 'prove riuscite') + '</div>' +
         panel('now', nowPanel) + panel('bonds', bondsPanel) + panel('story', storyPanel) + panel('self', selfPanel) +
       '</div>';
@@ -2331,7 +2413,7 @@
     const g = S.run && S.run.gioco; if (!PT || !g || !SIM) return '';
     const pts = g.puntate, won = pts.filter((b) => b.esito === 'vinta'), lost = pts.filter((b) => b.esito === 'persa');
     const doni = Object.values(g.doni), ord = g.ordini, m = g.mentore && BY[g.mentore];
-    if (!pts.length && !doni.length && !ord.length && !m) return '';
+    if (!pts.length && !doni.length && !ord.length && !m && !(g.regia || []).length && !(g.prove || []).length) return '';
     const p = PT.chiudiPartita(S.run, SIM) || PT.profilo();
     const fate = m ? (SIM.winners.includes(m.id) ? 'ha vinto' : 'è arrivat' + (m.gender === 'F' ? 'a' : m.gender === 'N' ? 'ə' : 'o') + ' ' + m.rank + 'º') : '';
     const best = won.slice().sort((a, b) => (b.vincita - b.posta) - (a.vincita - a.posta))[0];
@@ -2339,6 +2421,10 @@
     return '<section class="block card ps-sum" id="playerSummary"><h2>La tua partita</h2>' +
       (m ? '<div class="ps-men">' + avHTML(m, { dead: !m.alive }) + '<p><small>Il tuo concorrente</small><b>' + esc(m.name) + '</b> ' + esc(fate) + (ord.length ? ' · ha seguito ' + ord.filter((o) => o.obeys).length + (ord.length === 1 ? ' ordine su 1' : ' ordini su ' + ord.length) : '') + '</p></div>' : '') +
       '<div class="ps-stats">' + stat(g.crediti, 'Crediti finali') + stat(won.length + '/' + (won.length + lost.length), 'Puntate vinte') + stat(doni.length, doni.length === 1 ? 'Dono mandato' : 'Doni mandati') + stat(p.record, 'Il tuo record') + '</div>' +
+      ((g.prove || []).length ? '<p class="ps-tests">Prove giocate: <b>' + g.prove.length + '</b> · ' + g.prove.filter((x) => x.bonus > 0).length + ' con un vantaggio per il tuo allievo.</p>' : '') +
+      ((g.regia || []).length ? (() => { const v = PT.votoRegia(SIM); return '<div class="ps-regia"><h3>Il voto della regia <b>' + v.tot + '</b><small>/100</small></h3><p>' + esc(v.giudizio) + '</p><div class="ps-rbars">' +
+        [['Spettacolo', v.spettacolo], ['Ritmo', v.ritmo], ['Colpi di scena', v.sorprese]].map(([l, n]) => '<span class="ps-rb"><em>' + l + '</em><i><b style="width:' + n + '%"></b></i><strong>' + n + '</strong></span>').join('') +
+        '</div><p class="help">Carte giocate: ' + g.regia.map((x) => esc((PT.REGIA.find((c) => c.k === x.k) || {}).label || x.k) + ' (giorno ' + x.day + ')').join(', ') + '.</p></div>'; })() : '') +
       (best ? '<p class="ps-best">Colpo migliore: «' + esc(best.testo) + '» · ' + best.posta + ' × ' + best.q + ' = <b>+' + best.vincita + '</b></p>' : '') +
       '<p class="help">Partite giocate: ' + p.partite + ' · puntate vinte in tutto: ' + p.vinte + ' su ' + p.puntate + '.</p></section>';
   }
