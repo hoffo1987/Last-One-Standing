@@ -24,6 +24,7 @@
     return new Promise((resolve) => {
       const root = document.createElement('div');
       root.className = 'sc' + (o.cls ? ' ' + o.cls : '');
+      if (o.pc) { root.style.setProperty('--pc', o.pc); root.classList.add('sc-player'); }
       root.setAttribute('role', 'dialog'); root.setAttribute('aria-modal', 'true'); root.setAttribute('aria-labelledby', 'scT');
       const opts = o.options || [];
       const stake = Array.isArray(o.stake) && o.stake.length ? o.stake : null;
@@ -287,6 +288,7 @@
     return new Promise((resolve) => {
       const root = document.createElement('div');
       root.className = 'sc sc-game sc-g-' + tipo;
+      if (o.pc) { root.style.setProperty('--pc', o.pc); root.classList.add('sc-player'); }
       root.setAttribute('role', 'dialog'); root.setAttribute('aria-modal', 'true'); root.setAttribute('aria-labelledby', 'scT');
       root.innerHTML = '<div class="sc-back"></div><div class="sc-card" tabindex="-1"><div class="sc-head">' + (o.kicker ? '<span class="sc-k">' + esc(o.kicker) + '</span>' : '') +
         '<h2 class="sc-t" id="scT">' + esc(o.title || '') + '</h2>' + (o.text ? '<p class="sc-x">' + o.text + '</p>' : '') + '</div>' + (o.faces ? '<div class="sc-faces">' + o.faces + '</div>' : '') +

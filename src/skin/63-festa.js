@@ -7,7 +7,11 @@
  * - nel tabellone della Diretta (#ptHud .pt-festa) chi ha più crediti è segnato in testa, il conto che cambia
  *   scatta e i campioni senza foto ricevono la fascia sugli occhi di riserva;
  * - nell'Esito la classifica della festa (.fs-rank) si rivela dall'ultimo al primo quando arriva sullo schermo,
- *   e i punti contano.
+ *   e i punti contano;
+ * - nella festa online: sull'host il vassoio «In attesa» (#fsWait, riscritto ogni secondo da ui.js) riceve i secondi
+ *   grandi e il filo del tempo che si accorcia, sta sopra i comandi e diventa una fascia in cima quando è aperto un
+ *   cartello; nella sala chi ha scelto ha la targhetta del campione; nei cartelli il nome del giocatore
+ *   («Nome · Intervista») passa su una targa nel suo colore.
  * Solo decorazione: ogni passo è protetto, niente blocca i comandi, le classi si tolgono da sole. Con il movimento
  * ridotto non si muove niente. Gli stili sono in 63-festa.css. */
 (function (G) {
@@ -32,7 +36,7 @@
   }
 
   /* ---------- 1 · la sala d'attesa ---------- */
-  let ultimoCodice = '', vista = '', quanti = { p: 0, g: 0 };
+  let ultimoCodice = '', vista = '', quanti = { p: 0, g: 0 }, pronti = new Set();
   function sala(body) {
     // il codice: quattro tessere (le lettere restano testo, una per una)
     const code = body.querySelector('.fs-code');
@@ -54,6 +58,16 @@
       if (P.length > quanti.p && quanti.p > 0) { P[P.length - 1].classList.add('fs-new'); sfx('move'); }
       if (Gs.length > quanti.g) { Gs[Gs.length - 1].classList.add('fs-new'); sfx('confirm'); }
     }
+    // chi ha scelto: il nome del campione va su una targhetta; se ha scelto adesso, la targhetta scatta
+    const adesso = new Set();
+    Gs.forEach((li) => {
+      const t = li.lastChild; if (li.querySelector('em, .fs-champ') || !t || t.nodeType !== 3) return;
+      const m = /^(\s*·\s*)(\S.*)$/.exec(t.nodeValue); if (!m) return;
+      const nome = ((li.querySelector('b') || {}).textContent || '').trim();
+      t.nodeValue = m[1]; li.appendChild(h('span', 'fs-champ', m[2])); li.classList.add('fs-ready'); adesso.add(nome);
+      if (ora === vista && !pronti.has(nome) && !reduced()) { li.classList.add('fs-pop'); sfx('stamp'); }
+    });
+    pronti = adesso;
     vista = ora; quanti = { p: P.length, g: Gs.length };
   }
   function watchSala() {
@@ -161,10 +175,106 @@
     if (!reduced()) scatta(fr, 'ct-ready', 700);
   }
 
-  function boot() { safe(watchSala); safe(watchHud); safe(watchEsito); }
+  /* ---------- 6 · online: il vassoio «In attesa» sull'host ---------- */
+  // ui.js riscrive il vassoio ogni secondo: a ogni riscrittura si rimettono le decorazioni, riprendendo dal punto giusto
+  const attese = new Map(); let aperto = 0;
+  // quanto posto prendono in basso le barre fisse (comandi della diretta, barra dell'arena, schede del telefono) sotto il vassoio
+  function fondo(r) {
+    const vh = G.innerHeight; let b = 0;
+    doc.querySelectorAll('.playerin, .dock, .steps').forEach((el) => {
+      const q = el.getBoundingClientRect();
+      if (!q.height || q.top < vh * 0.45 || q.bottom < vh - 150 || q.right <= r.left || q.left >= r.right) return;
+      b = Math.max(b, vh - q.top);
+    });
+    return Math.round(b);
+  }
+  function attesa(box) {
+    const on = !box.hidden && !!box.querySelector('.fw-p');
+    const sc = on && !!doc.querySelector('body > .sc');
+    root.classList.toggle('fw-on', on); root.classList.toggle('fw-sc', sc);
+    if (!on || sc) { root.classList.remove('fw-giu'); root.style.removeProperty('--fw-top'); box.classList.remove('fw-su'); box.style.removeProperty('--fw-b'); }
+    if (!on) { attese.clear(); aperto = 0; root.style.removeProperty('--fw-h'); return; }
+    const ora = Date.now(); if (!aperto) aperto = ora;
+    const vive = new Set();
+    box.querySelectorAll('.fw-p').forEach((p) => {
+      const btn = p.querySelector('[data-fs-skip]'), em = p.querySelector('em'); if (!btn || !em) return;
+      const key = btn.dataset.fsSkip; vive.add(key);
+      if (em.querySelector('.fw-s')) return;
+      const m = /^(.*) · (\d+) s$/.exec(em.textContent); if (!m) return;
+      const left = +m[2]; let v = attese.get(key);
+      // il testo dice i secondi interi che restano: la fine vera sta tra (N − 1) e N secondi da adesso
+      if (!v) { v = { t0: ora, fine: ora + left * 1000, tot: Math.max(1, left) }; attese.set(key, v); }
+      v.fine = clamp(v.fine, ora + (left - 1) * 1000, ora + left * 1000);
+      const resta = clamp(v.fine - ora, 0, v.tot * 1000);
+      em.textContent = '';
+      const s = h('span', 'fw-s', String(left)); s.appendChild(h('small', '', 's'));
+      em.append(h('span', 'fw-w', m[1]), ' ', s);
+      const bar = h('i', 'fw-bar'), filo = h('i'); bar.setAttribute('aria-hidden', 'true');
+      filo.style.setProperty('--a', (resta / (v.tot * 1000)).toFixed(4)); filo.style.setProperty('--t', Math.max(1, Math.round(resta)) + 'ms');
+      bar.appendChild(filo); p.appendChild(bar);
+      if (left <= 5) p.classList.add('fw-hot');
+      // chi arriva a vassoio già aperto entra di lato; una riscrittura a metà riprende l'entrata dove era
+      const da = ora - v.t0;
+      if (v.t0 - aperto > 450 && da < 360 && !reduced()) { p.classList.add('fw-new'); p.style.setProperty('--d', -da + 'ms'); }
+    });
+    attese.forEach((v, k) => { if (!vive.has(k)) attese.delete(k); });
+    // la fascia in cima: il cartello scende della sua altezza
+    if (sc) { root.style.setProperty('--fw-h', box.offsetHeight + 'px'); return; }
+    root.style.removeProperty('--fw-h');
+    // in basso, sopra i comandi; se lì coprirebbe il tabellone della festa, sale sotto l'intestazione
+    const vh = G.innerHeight, r = box.getBoundingClientRect(), b = fondo(r), gap = G.innerWidth <= 600 ? 8 : 12;
+    const hud = doc.getElementById('ptHud'), q = hud && !hud.hidden ? hud.getBoundingClientRect() : null;
+    const copre = (su, giu) => !!q && q.height > 0 && q.bottom > su - 6 && q.top < giu + 6 && q.right > r.left && q.left < r.right;
+    const top = doc.querySelector('.top'), testa = Math.round(top ? Math.max(0, top.getBoundingClientRect().bottom) : 0);
+    const su = copre(vh - b - gap - r.height, vh - b - gap) && !copre(testa + gap, testa + gap + r.height);
+    box.style.setProperty('--fw-b', b + 'px'); box.style.setProperty('--fw-t', testa + 'px');
+    box.classList.toggle('fw-su', su); root.classList.toggle('fw-giu', !su);
+    if (su) root.style.removeProperty('--fw-top'); else root.style.setProperty('--fw-top', Math.round(b + gap + r.height) + 'px');
+  }
+  function watchAttesa() {
+    const body = doc.body; if (!body || body.__fw) return; body.__fw = true;
+    let box = null;
+    const guarda = () => {
+      const b = doc.getElementById('fsWait');
+      if (b && b !== box) { box = b; new MutationObserver(() => safe(() => attesa(box))).observe(box, { childList: true, attributes: true, attributeFilter: ['hidden'] }); }
+      if (box) safe(() => attesa(box));
+    };
+    // il vassoio nasce più tardi, attaccato al body; e un cartello che si apre o si chiude lo sposta
+    new MutationObserver(guarda).observe(body, { childList: true });
+    // scorrendo, il tabellone può finire sotto il vassoio: si rimisura (una volta per fotogramma)
+    let attesaFoto = false;
+    const rimisura = () => { if (!box || attesaFoto || !root.classList.contains('fw-on')) return; attesaFoto = true; requestAnimationFrame(() => { attesaFoto = false; safe(() => attesa(box)); }); };
+    G.addEventListener('scroll', rimisura, { capture: true, passive: true }); G.addEventListener('resize', rimisura);
+    guarda();
+  }
+
+  /* ---------- 7 · il cartello di un giocatore: il nome su una targa nel suo colore ---------- */
+  // l'occhiello è «Nome · Intervista»: vale solo se il nome è di un giocatore della festa (tabellone, sala, sessione dell'ospite)
+  function chi(el) {
+    if (!el || el.classList.contains('sc-pass')) return;
+    const k = el.querySelector('.sc-k'); if (!k || k.firstElementChild) return;
+    const txt = k.textContent, i = txt.indexOf(' · '); if (i < 1) return;
+    const nome = txt.slice(0, i).trim(), resto = txt.slice(i + 3); if (!nome) return;
+    const nm = (li) => ((li.querySelector('.pf-nm') || {}).textContent || '').trim();
+    const hud = doc.getElementById('ptHud'), vivo = hud && !hud.hidden && hud.offsetParent !== null;
+    const riga = hud && [...hud.querySelectorAll('.pf-pl')].find((li) => nm(li) === nome);
+    const campo = [...doc.querySelectorAll('#festaBody .fs-players input[data-fs-nome]')].find((x) => x.value.trim() === nome), posto = campo && campo.closest('li');
+    const ospite = doc.body.classList.contains('fs-ospite'), ss = ospite && G.LOS_FESTA && G.LOS_FESTA.leggiSessione ? G.LOS_FESTA.leggiSessione() : null;
+    const mia = ospite && hud && hud.querySelector('.pf-pl.me');
+    let pc = '';
+    if (vivo && riga) pc = riga.style.getPropertyValue('--pc');
+    else if (posto) pc = posto.style.getPropertyValue('--pc');
+    else if (riga && !ospite) pc = riga.style.getPropertyValue('--pc');
+    else if (!(ospite && ((ss && ss.nome === nome) || (mia && nm(mia) === nome)))) return;
+    k.textContent = ''; k.append(h('b', 'sc-who', nome), h('span', '', resto)); k.classList.add('sc-k-pl');
+    pc = (pc || '').trim();
+    if (pc) { el.style.setProperty('--pc', pc); el.classList.add('sc-pl'); }
+  }
+
+  function boot() { safe(watchSala); safe(watchHud); safe(watchEsito); safe(watchAttesa); }
   if (doc.readyState === 'loading') doc.addEventListener('DOMContentLoaded', boot); else boot();
   // i ganci: card si allunga (quello di 61-partita.js resta e viene prima), postcard è nuovo
   const FX = G.LOS_PARTITA_FX = G.LOS_PARTITA_FX || {}, prima = FX.card;
-  FX.card = function (el, o) { if (prima) safe(() => prima.call(FX, el, o)); safe(watchHud); safe(() => passa(el)); };
+  FX.card = function (el, o) { if (prima) safe(() => prima.call(FX, el, o)); safe(watchHud); safe(() => passa(el)); safe(() => chi(el)); };
   FX.postcard = function (dlg, kind) { safe(() => cartolina(dlg, kind)); };
 })(typeof window !== 'undefined' ? window : globalThis);

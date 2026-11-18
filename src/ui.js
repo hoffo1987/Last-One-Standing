@@ -2646,9 +2646,9 @@
   function renderWaiting() {
     let box = $('#fsWait');
     if (!FS.attese.size) { if (box) box.hidden = true; return; }
-    if (!box) { box = document.createElement('div'); box.id = 'fsWait'; box.className = 'fs-wait'; box.setAttribute('role', 'status'); document.body.appendChild(box); box.addEventListener('click', (e) => { const b = e.target.closest('[data-fs-skip]'); if (b) { const w = FS.attese.get(b.dataset.fsSkip); if (w && w.ctl.annulla) w.ctl.annulla(); } }); }
+    if (!box) { box = document.createElement('div'); box.id = 'fsWait'; box.className = 'fs-wait'; box.setAttribute('aria-live', 'off'); box.setAttribute('aria-label', 'Giocatori in attesa'); document.body.appendChild(box); box.addEventListener('click', (e) => { const b = e.target.closest('[data-fs-skip]'); if (b) { const w = FS.attese.get(b.dataset.fsSkip); if (w && w.ctl.annulla) w.ctl.annulla(); } }); }
     box.hidden = false;
-    box.innerHTML = '<span class="fw-k">In attesa</span>' + [...FS.attese.entries()].map(([key, w]) => { const left = Math.max(0, Math.ceil((w.fine - Date.now()) / 1000)); return '<span class="fw-p' + (online(w.gid) ? '' : ' off') + '" style="--pc:' + esc(w.colore || '#888') + '"><b>' + esc(w.nome) + '</b><em>' + esc(w.cosa) + ' · ' + left + ' s</em><button type="button" data-fs-skip="' + esc(key) + '">Salta</button></span>'; }).join('');
+    box.innerHTML = '<span class="fw-k">In attesa</span>' + [...FS.attese.entries()].map(([key, w]) => { const left = Math.max(0, Math.ceil((w.fine - Date.now()) / 1000)); return '<span class="fw-p' + (online(w.gid) ? '' : ' off') + '" data-left="' + Math.max(0, w.fine - Date.now()) + '" data-tot="' + w.tot + '" style="--pc:' + esc(w.colore || '#888') + '"><b>' + esc(w.nome) + '</b><em>' + esc(w.cosa) + ' · ' + left + ' s</em><button type="button" data-fs-skip="' + esc(key) + '">Salta</button></span>'; }).join('');
   }
   setInterval(() => { if (FS.attese.size) renderWaiting(); }, 1000);
   // una domanda a un giocatore: online va sul suo dispositivo (se è collegato), in locale si passa il telefono
@@ -2657,21 +2657,21 @@
     if (!online(p.remoto)) { if (!FS.avvisati) FS.avvisati = new Set(); if (!FS.avvisati.has(p.remoto)) { FS.avvisati.add(p.remoto); toast(p.nome + ' non è collegato: il suo campione fa da sé.'); } return null; }
     if (FS.avvisati) FS.avvisati.delete(p.remoto);
     const ctl = {}, key = FE.nuovoId('w');
-    FS.attese.set(key, { nome: p.nome, gid: p.remoto, colore: p.colore, cosa, ctl, fine: Date.now() + ms }); renderWaiting();
+    FS.attese.set(key, { nome: p.nome, gid: p.remoto, colore: p.colore, cosa, ctl, fine: Date.now() + ms, tot: ms }); renderWaiting();
     try { return await FE.chiediA(FS.room, p.remoto, card, ms, ctl); } finally { FS.attese.delete(key); renderWaiting(); }
   }
   async function askPlayer(p, opts) {
-    if (p.remoto && FS.room) return askRemote(p, Object.assign({}, opts, { kicker: p.nome + ' · ' + (opts.kicker || '') }), ((opts.timer || 25) + 8) * 1000, opts.kicker || 'scelta');
+    if (p.remoto && FS.room) return askRemote(p, Object.assign({}, opts, { pc: p.colore, kicker: p.nome + ' · ' + (opts.kicker || '') }), ((opts.timer || 25) + 8) * 1000, opts.kicker || 'scelta');
     const locals = fsPlayers().filter((x) => !x.remoto);
     if (locals.length > 1 && lastLocal !== p.id) {
       const ok = await PT.chiedi({ kicker: 'Modalità festa', title: 'Passa il telefono a ' + p.nome, text: 'Tocca a ' + esc(p.nome) + '. Gli altri non guardano!', cls: 'sc-pass', options: [{ value: 1, label: 'Sono ' + p.nome + ', vai' }], skip: 'Salta il turno' });
       if (!ok) return null;
     }
     lastLocal = p.id;
-    return PT.chiedi(Object.assign({}, opts, { kicker: p.nome + ' · ' + (opts.kicker || '') }));
+    return PT.chiedi(Object.assign({}, opts, { pc: p.colore, kicker: p.nome + ' · ' + (opts.kicker || '') }));
   }
   async function askGame(p, tipo, opts) {
-    if (p.remoto && FS.room) { const r = await askRemote(p, Object.assign({ gioco: tipo }, opts), 45000, 'prova'); return r && typeof r.value === 'number' ? r.value : null; }
+    if (p.remoto && FS.room) { const r = await askRemote(p, Object.assign({ gioco: tipo, pc: p.colore }, opts), 45000, 'prova'); return r && typeof r.value === 'number' ? r.value : null; }
     const locals = fsPlayers().filter((x) => !x.remoto);
     if (locals.length > 1 && lastLocal !== p.id) { const ok = await PT.chiedi({ kicker: 'Modalità festa', title: 'Passa il telefono a ' + p.nome, text: 'Il campione di ' + esc(p.nome) + ' affronta una prova.', cls: 'sc-pass', options: [{ value: 1, label: 'Sono ' + p.nome + ', vai' }], skip: 'Salta' }); if (!ok) return null; }
     lastLocal = p.id;
@@ -2753,6 +2753,7 @@
     Object.entries(tree.richieste || {}).forEach(([rid, r]) => {
       if (!r || r.gid !== FS.gid || FS.risposte.has(rid)) return;
       FS.risposte.add(rid); FS.aperta = rid;
+      if ($('#festaDlg').open) $('#festaDlg').close();
       // il tempo lo decide l'host come durata (gli orologi dei dispositivi possono non coincidere)
       const card = Object.assign({}, r.card, { timer: Math.max(5, Math.round((r.durata || 30000) / 1000) - 4) });
       (card.gioco ? PT.gioca(card.gioco, card).then((s) => ({ value: s == null ? '__salta__' : s })) : PT.chiedi(card).then((x) => (x ? { value: x.value, stake: x.stake == null ? 0 : x.stake } : { value: '__salta__' })))
@@ -2947,6 +2948,7 @@
       '<p class="help">Partite giocate: ' + p.partite + ' · puntate vinte in tutto: ' + p.vinte + ' su ' + p.puntate + '.</p></section>';
   }
   function renderResults() {
+    if (typeof FS !== 'undefined' && FS.role === 'host') publishState(true);
     $('#resEmpty').hidden = !!SIM; $('#resBody').hidden = !SIM;
     if (!SIM) return;
     const theme = resultTheme(SIM), soft = !!theme.soft, st = SIM.stats;
