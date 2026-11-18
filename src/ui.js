@@ -1,7 +1,7 @@
 /* Last One Standing — interfaccia */
 (function () {
   'use strict';
-  const D = window.LOS_DATA, L = window.LOS, ART = window.LOS_ART, AN = window.LOS_ANIM, REPLAY = window.LOS_REPLAY, RUNNER = window.LOS_SIMULATOR;
+  const D = window.LOS_DATA, L = window.LOS, ART = window.LOS_ART, AN = window.LOS_ANIM, REPLAY = window.LOS_REPLAY, RUNNER = window.LOS_SIMULATOR, PT = window.LOS_PARTITA;
   const $ = (s, r = document) => r.querySelector(s);
   const $$ = (s, r = document) => [...r.querySelectorAll(s)];
   const esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -323,7 +323,7 @@
   /* ---------------- stato ---------------- */
   const S = {
     cast: [],
-    settings: { theme: 'classico', difficulty: 'normale', seed: '', maxDays: 20, teamsAllied: true, teamWin: false, speed: 'normale', teamSize: 2, view: 'grid', adult: false, hideFuture: true, adaptivePlay: true, reduceMotion: false, followOnly: false, read: { density: 'comoda', size: 'normale', order: 'storia', echo: true, place: true, why: true, context: false, faces: true } },
+    settings: { theme: 'classico', difficulty: 'normale', seed: '', maxDays: 20, teamsAllied: true, teamWin: false, speed: 'normale', teamSize: 2, view: 'grid', adult: false, hideFuture: true, adaptivePlay: true, reduceMotion: false, followOnly: false, ritmo: 'giocatore', read: { density: 'comoda', size: 'normale', order: 'storia', echo: true, place: true, why: true, context: false, faces: true } },
     initialRelations: [], followed: [], seasons: [],
     custom: [],
     run: null,
@@ -405,7 +405,7 @@
           const custom = d.run.cfg.custom == null ? [] : normalizeCustoms(d.run.cfg.custom);
           if (d.run.replayId != null && !validId(d.run.replayId)) throw new Error('Riferimento alla partita non valido.');
           const initialRelations = L.normalizeInitialRelations(d.run.cfg.initialRelations, cast);
-          if (cast.length >= 2) next.run = Object.assign({}, d.run, { cfg: Object.assign({}, d.run.cfg, { cast, custom, initialRelations }) });
+          if (cast.length >= 2) next.run = Object.assign({}, d.run, { cfg: Object.assign({}, d.run.cfg, { cast, custom, initialRelations }) }, typeof PT !== 'undefined' && PT ? { gioco: PT.sano(d.run.gioco) } : {});
         } catch (e) { warnings.push('La partita salvata contiene dati non validi e non è stata ripresa.'); }
       }
       Object.assign(S, next);
@@ -438,6 +438,7 @@
     if ([1, 2, 3, 4].includes(+x.teamSize)) st.teamSize = +x.teamSize;
     if (x.view === 'grid' || x.view === 'team') st.view = x.view;
     ['teamsAllied', 'teamWin', 'adult', 'hideFuture', 'adaptivePlay', 'reduceMotion', 'followOnly'].forEach((k) => { if (typeof x[k] === 'boolean') st[k] = x[k]; });
+    if (['spettatore', 'giocatore', 'regista'].includes(x.ritmo)) st.ritmo = x.ritmo;
     st.read = readPrefs(record(x.read) ? Object.assign({}, st.read, x.read) : st.read);
     return st;
   }
@@ -1393,6 +1394,7 @@
     $('#maxDays').value = S.settings.maxDays; $('#maxDaysOut').textContent = S.settings.maxDays; rangeFill($('#maxDays'));
     $('#seed').value = S.settings.seed;
     $('#teamsAllied').checked = !!S.settings.teamsAllied; $('#teamWin').checked = !!S.settings.teamWin;
+    renderRitmo();
     renderAdult();
     renderPreview(); renderCustomForm(); renderCustomList(); renderStartSum();
     requestAnimationFrame(() => centerPoster($('#themeList [aria-checked="true"]'), false));
@@ -1640,6 +1642,9 @@
   $('#seed').addEventListener('input', (e) => { S.settings.seed = e.target.value.slice(0, 60); save(); });
   $('#seedNew').addEventListener('click', () => { S.settings.seed = newSeed(); $('#seed').value = S.settings.seed; save(); });
   $('#teamsAllied').addEventListener('change', (e) => { S.settings.teamsAllied = e.target.checked; save(); });
+  const RITMO_HELP = { spettatore: 'Guardi e basta: nessuna pausa, solo i doni quando vuoi tu.', giocatore: 'Alleni un concorrente: ogni mattina un ordine e una puntata, più i doni quando vuoi.', regista: 'Come Giocatore, con le puntate anche al tramonto.' };
+  function renderRitmo() { const r = S.settings.ritmo || 'giocatore'; $$('#ritmoSeg button').forEach((b) => { b.setAttribute('aria-checked', String(b.dataset.v === r)); b.setAttribute('aria-pressed', String(b.dataset.v === r)); }); $('#ritmoHelp').textContent = RITMO_HELP[r] || ''; if (!PT) $('#ritmoSeg').closest('.field').hidden = true; }
+  $('#ritmoSeg').addEventListener('click', (e) => { const b = e.target.closest('button'); if (!b) return; S.settings.ritmo = b.dataset.v; save(); renderRitmo(); });
   function renderAdult() {
     const t = THEMES[S.settings.theme], pt = COUNTS.perTheme[t.id];
     $('#adult').checked = !!S.settings.adult && !t.noAdult; $('#adultConfirm').hidden = true;
@@ -1731,7 +1736,9 @@
     if (generation !== runGeneration) return false;
     SIM = result;
     BY = Object.fromEntries(SIM.tributes.map((t) => [t.id, t]));
-    S.run = { cfg, phase: 0, seen: 0 }; lastRendered = -1;
+    S.run = { cfg, phase: 0, seen: 0, gioco: PT ? PT.nuovo(runSim.pre) : null }; runSim.pre = null; lastRendered = -1;
+    if (S.run.gioco && runSim.firstOrder && S.run.gioco.mentore) { const g = S.run.gioco, ev = SIM.phases[0].events.find((e) => e.mentor && e.ids[0] === g.mentore); g.ordini.push({ fase: 0, cosa: runSim.firstOrder, obeys: !!(ev && ev.obeys) }); }
+    runSim.firstOrder = null;
     const run = S.run, stored = persistRun(run, SIM);
     if (typeof studio !== 'undefined' && studio) studio.recordResult(cfg, SIM, run.replayId, stored);
     save();
@@ -1742,7 +1749,32 @@
     if (S.cast.length < 2) { toast('Servono almeno 2 concorrenti.'); location.hash = '#cast'; return; }
     S.cast.forEach((t, i) => { if (!t.name.trim()) t.name = 'Concorrente ' + (i + 1); });
     S.settings.seed = seed || S.settings.seed || newSeed();
-    runSim(currentConfiguration());
+    const cfg = currentConfiguration();
+    preGame(cfg).then((pre) => { if (pre === false) return; if (pre) { runSim.pre = pre; if (pre.interviste.length) cfg.interviste = pre.interviste; } runSim(cfg); });
+  }
+  /* ---------- prima dei giochi: il concorrente da allenare e la sua intervista ---------- */
+  async function preGame(cfg) {
+    if (!PT || S.settings.ritmo === 'spettatore') return null;
+    const cast = cfg.cast;
+    const m = await PT.chiedi({ kicker: 'Prima dei giochi', title: 'Chi vuoi allenare?', text: 'Sarai il suo mentore: ogni mattina potrai dargli un ordine, e le puntate partiranno da lui.', grid: true, cls: 'sc-pick',
+      options: cast.map((t) => ({ value: t.id, html: avHTML(t) + '<b class="sc-l">' + esc(t.name) + '</b><small class="sc-s">Squadra ' + t.team + '</small>' })), skip: 'Nessuno, guardo e basta' });
+    if (!m) return { mentore: null, interviste: [] };
+    const t = cast.find((x) => x.id === m.value), eff = [];
+    for (let k = 0; k < PT.INTERVISTA.length; k++) {
+      const Q = PT.INTERVISTA[k];
+      const r = await PT.chiedi({ kicker: 'Intervista · ' + (k + 1) + ' di ' + PT.INTERVISTA.length, title: Q.q, faces: avHTML(t), text: '<b>' + esc(t.name) + '</b> risponde come decidi tu.', cls: 'sc-interview',
+        options: Q.a.map(([label, v, sub]) => ({ value: v, label: '«' + label + '»', sub })), skip: 'Salta l’intervista' });
+      if (!r) break;
+      if (r.value === 'legame') {
+        const mates = cast.filter((x) => x.id !== t.id && x.team === t.team), pool = mates.length ? mates : cast.filter((x) => x.id !== t.id);
+        const u = pool[(cfg.seed.length + k) % pool.length]; if (u) eff.push('legame:' + u.id);
+      } else if (!eff.includes(r.value)) eff.push(r.value);
+    }
+    // il primo ordine vale già per l'apertura: chi alleni non deve cadere prima che tu possa fare qualcosa
+    const go0 = await PT.chiedi({ kicker: 'Al via', title: 'Il primo consiglio a ' + t.name, faces: avHTML(t), text: 'L’apertura è il momento più pericoloso. Cosa deve fare appena suona il segnale?', cls: 'sc-mentor',
+      options: [['nasconditi', 'Scappa subito', 'Lontano dalla mischia'], ['caccia', 'Prendi un’arma', 'Lotta per il bottino'], ['alleati', 'Trova un alleato', 'Insieme si resiste'], ['provviste', 'Arraffa le provviste', 'Cibo e zaino, poi via']].map(([value, label, sub]) => ({ value, label, sub })), skip: 'Lascia decidere a ' + himHer(t) });
+    if (go0) { cfg.interventi = [{ fase: 0, tipo: 'ordine', chi: t.id, cosa: go0.value }]; runSim.firstOrder = go0.value; }
+    return { mentore: t.id, interviste: eff.length ? [{ chi: t.id, effetti: eff }] : [] };
   }
   function currentConfiguration() { return { cast: JSON.parse(JSON.stringify(S.cast)), theme: S.settings.theme, difficulty: S.settings.difficulty, seed: S.settings.seed || newSeed(), maxDays: S.settings.maxDays, teamsAllied: S.settings.teamsAllied, teamWin: S.settings.teamWin, custom: JSON.parse(JSON.stringify(S.custom)), adult: !!S.settings.adult, initialRelations: L.normalizeInitialRelations(S.initialRelations, S.cast) }; }
   $('#btnStart').addEventListener('click', () => startRun());
@@ -1880,8 +1912,109 @@
     $('#nextLbl').textContent = last ? 'Esito' : 'Avanti';
     $$('#speedSeg button').forEach((b) => b.setAttribute('aria-pressed', b.dataset.v === S.settings.speed));
     syncPlay();
+    if (PT && S.run.gioco) { const closed = PT.risolvi(SIM, i, S.run.gioco); renderHud(); if (closed.length) announceBets(closed); }
     save();
   }
+  /* =============== LA PARTITA GIOCATA: crediti, mentore, puntate, doni =============== */
+  const himHer = (t) => (t.gender === 'F' ? 'lei' : t.gender === 'N' ? 'ləi' : 'lui');
+  function renderHud() {
+    const h = $('#ptHud'), gb = $('#giftBtn'), g = S.run && S.run.gioco;
+    if (!PT || !SIM || !g) { h.hidden = true; gb.hidden = true; return; }
+    gb.hidden = false; h.hidden = false;
+    const i = Math.min(S.run.phase || 0, SIM.phases.length - 1), alive = SIM.phases[i].snap.alive;
+    const m = g.mentore && BY[g.mentore], mAlive = m && alive.includes(m.id);
+    const open = g.puntate.filter((b) => !b.esito);
+    h.innerHTML = '<div class="pt-cr"><span>Crediti</span><b>' + g.crediti + '</b></div>' +
+      (m ? '<button type="button" class="pt-men' + (mAlive ? '' : ' dead') + '" data-prof="' + esc(m.id) + '">' + avHTML(m, { dead: !mAlive }) + '<span><small>' + (mAlive ? 'Il tuo concorrente' : 'Il tuo concorrente è fuori') + '</small><b>' + esc(m.name) + '</b></span></button>' : '') +
+      '<div class="pt-bets"><small>Puntate aperte</small>' + (open.length ? open.map((b) => '<span class="pt-bet"><b>' + esc(b.testo) + '</b><em>' + b.posta + ' × ' + b.q + '</em></span>').join('') : '<span class="pt-none">Nessuna</span>') + '</div>';
+  }
+  function announceBets(list) {
+    list.forEach((b, k) => setTimeout(() => {
+      const msg = b.esito === 'vinta' ? 'Puntata vinta: «' + b.testo + '» · +' + b.vincita + ' crediti' : b.esito === 'nulla' ? 'Puntata annullata, posta restituita: «' + b.testo + '»' : 'Puntata persa: «' + b.testo + '» · −' + b.posta;
+      toast(msg);
+      if (window.LOS_PARTITA_FX && window.LOS_PARTITA_FX.bet) try { window.LOS_PARTITA_FX.bet(b, $('#ptHud')); } catch (e) { /* solo grafica */ }
+    }, k * 1600));
+  }
+  // rilancia la partita con gli interventi: il passato resta uguale, la Diretta riprende dalla stessa fase
+  async function resimulate() {
+    const run = S.run, generation = runGeneration;
+    $('#ptHud').classList.add('busy');
+    let r;
+    try { r = RUNNER ? await RUNNER.simulate(run.cfg) : L.simulate(run.cfg); }
+    catch (e) { if (e.name !== 'AbortError') toast('L’intervento non è riuscito: ' + e.message); return false; }
+    finally { $('#ptHud').classList.remove('busy'); }
+    if (S.run !== run || generation !== runGeneration) return false;
+    SIM = r; BY = Object.fromEntries(SIM.tributes.map((t) => [t.id, t]));
+    // l'archivio non sovrascrive mai una partita: finché si gioca si ricostruisce da seme + interventi, all'Esito si archivia la versione finale
+    run.replayId = null; run.replaySaved = false; run.interattiva = true; save();
+    return true;
+  }
+  const atEdge = () => S.run && (S.run.phase || 0) >= (S.run.seen || 0);
+  function moodHTML(t, i) {
+    const v = PT.vit(SIM, i, t.id), inv = (SIM.phases[i].snap.inv[t.id] || []).map((x) => x.n);
+    return 'Salute <b>' + v[0] + '</b> · Energia <b>' + v[1] + '</b> · Morale <b>' + v[2] + '</b> · Cibo <b>' + v[3] + '</b>' + (inv.length ? '<br>Ha con sé: ' + inv.slice(0, 4).map(esc).join(', ') : '');
+  }
+  // prima di mostrare la fase k: all'alba l'ordine del mentore e le puntate (col ritmo «regista» anche al tramonto)
+  async function beforePhase(k) {
+    const P = SIM.phases, g = S.run.gioco, rit = S.settings.ritmo;
+    if (!P[k] || rit === 'spettatore' || k <= (S.run.seen || 0)) return;
+    const dawn = PT.nuovoGiorno(P, k), dusk = rit === 'regista' && P[k].kind === 'n' && P[k - 1].kind !== 'n';
+    const key = (dawn ? 'g' : 'n') + P[k].day;
+    if (!(dawn || dusk) || g.chiesto[key]) return;
+    g.chiesto[key] = 1; save();
+    if (playTimer) { clearTimeout(playTimer); playTimer = null; }
+    const timer = playing ? 20 : 0, soft = !!resultTheme(SIM).soft, i = k - 1;
+    let changed = false;
+    // chi alleni è caduto: all'alba se ne sceglie un altro, così la partita resta tua fino alla fine
+    if (dawn && g.mentore && !P[i].snap.alive.includes(g.mentore) && P[i].snap.alive.length > 2) {
+      const fallen = BY[g.mentore];
+      const r = await PT.chiedi({ kicker: 'Giorno ' + P[k].day + ' · nuovo allievo', title: 'Chi alleni adesso?', text: esc(fallen.name) + ' è fuori dai giochi. Scegli chi seguire da qui in avanti.', grid: true, cls: 'sc-pick', timer,
+        options: P[i].snap.alive.map((id) => ({ value: id, html: avHTML(BY[id]) + '<b class="sc-l">' + esc(BY[id].name) + '</b><small class="sc-s">Salute ' + PT.vit(SIM, i, id)[0] + '</small>' })), skip: 'Nessuno, guardo e basta' });
+      g.mentore = r ? r.value : null; g.allievi = (g.allievi || []).concat([fallen.id]); save(); renderHud();
+    }
+    if (dawn && g.mentore && P[i].snap.alive.includes(g.mentore)) {
+      const t = BY[g.mentore];
+      const r = await PT.chiedi({ kicker: 'Giorno ' + P[k].day + ' · il mentore', title: 'Cosa deve fare ' + t.name + ' oggi?', faces: avHTML(t), text: moodHTML(t, i), cls: 'sc-mentor',
+        options: PT.ORDINI.map((o) => ({ value: o.v, label: o.label, sub: o.sub })), timer, skip: 'Lascia decidere a ' + himHer(t) });
+      if (r) { S.run.cfg.interventi = (S.run.cfg.interventi || []).concat([{ fase: k, tipo: 'ordine', chi: t.id, cosa: r.value }]); g.ordini.push({ fase: k, cosa: r.value }); changed = true; }
+    }
+    const offers = g.crediti >= 10 ? PT.proposte(SIM, k, g, BY, S.followed, soft) : [];
+    if (offers.length) {
+      const r = await PT.chiedi({ kicker: (dawn ? 'Giorno ' + P[k].day : 'Stanotte') + ' · puntate', title: 'Su cosa scommetti?', text: 'Vinci la posta per la quota. La puntata si chiude quando l’esito si vede in diretta.', cls: 'sc-bets',
+        options: offers.map((b, j) => ({ value: j, label: b.testo, cost: '×' + b.q })), stake: [10, 25, 50].filter((v) => v <= g.crediti), credits: g.crediti, timer, skip: 'Non punto' });
+      if (r && r.stake && r.stake <= g.crediti) { g.puntate.push(Object.assign({ id: 'b' + k + '-' + g.puntate.length, posta: r.stake, esito: null, aperta: k }, offers[r.value])); g.crediti -= r.stake; }
+    }
+    if (changed && !await resimulate()) { S.run.cfg.interventi = (S.run.cfg.interventi || []).filter((x) => x.fase !== k || x.tipo !== 'ordine'); g.ordini = g.ordini.filter((x) => x.fase !== k); }
+    // l'ordine eseguito o ignorato si legge nella fase stessa: si annota per il riepilogo finale
+    if (changed && SIM.phases[k]) { const ev = SIM.phases[k].events.find((e) => e.mentor && e.ids[0] === g.mentore); const o = g.ordini.find((x) => x.fase === k); if (ev && o) o.obeys = !!ev.obeys; }
+    save(); renderHud();
+  }
+  async function giftFlow() {
+    if (!PT || !SIM || !S.run.gioco || gate) return;
+    const i = S.run.phase || 0, k = i + 1, P = SIM.phases, g = S.run.gioco;
+    if (k >= P.length) return toast('La partita è finita: niente più doni.');
+    if (!atEdge()) return toast('Puoi mandare doni solo dalla fase più recente.');
+    if (g.doni[k]) return toast('Hai già mandato un dono per la prossima fase.');
+    stopPlay(); gate = true;
+    try {
+      const A = P[i].snap.alive;
+      const who = await PT.chiedi({ kicker: 'Sponsor', title: 'A chi mandi un dono?', text: 'Crediti disponibili: <b>' + g.crediti + '</b>. I favoriti costano di più.', grid: true, cls: 'sc-pick',
+        options: A.map((id) => ({ value: id, html: avHTML(BY[id]) + '<b class="sc-l">' + esc(BY[id].name) + '</b><small class="sc-s">Salute ' + PT.vit(SIM, i, id)[0] + '</small>' })), skip: 'Annulla' });
+      if (!who) return;
+      const t = BY[who.value], price = (x) => PT.prezzo(SIM, i, who.value, x);
+      const d = await PT.chiedi({ kicker: 'Sponsor · ' + t.name, title: 'Che cosa mandi?', faces: avHTML(t), text: moodHTML(t, i) + '<br>Arriverà nella prossima fase. Crediti: <b>' + g.crediti + '</b>', cls: 'sc-gift',
+        options: PT.DONI.map((x) => ({ value: x.k, label: x.label, sub: x.sub, cost: price(x) + ' cr', disabled: price(x) > g.crediti })), skip: 'Annulla' });
+      if (!d) return;
+      const cost = price(PT.DONI.find((x) => x.k === d.value)), before = S.run.cfg.interventi || [];
+      S.run.cfg.interventi = before.concat([{ fase: k, tipo: 'dono', chi: who.value, cosa: d.value }]);
+      if (!await resimulate()) { S.run.cfg.interventi = before; return; }
+      g.crediti -= cost; g.doni[k] = { chi: who.value, cosa: d.value, costo: cost }; save(); renderHud();
+      toast('Dono in viaggio per ' + t.name + ': arriva nella prossima fase.');
+      if (window.LOS_PARTITA_FX && window.LOS_PARTITA_FX.gift) try { window.LOS_PARTITA_FX.gift(t, d.value, $('#giftBtn')); } catch (e) { /* solo grafica */ }
+    } finally { gate = false; }
+  }
+  $('#giftBtn').addEventListener('click', giftFlow);
+  $('#ptHud').addEventListener('click', (e) => { const b = e.target.closest('[data-prof]'); if (b && SIM) openProfile(b.dataset.prof); });
   function renderSide(i) {
     const theme = resultTheme(SIM), ph = SIM.phases[i], soft = !!theme.soft;
     $$('.stabs button').forEach((b) => { const active = b.dataset.s === sideTab; b.setAttribute('aria-selected', active); b.tabIndex = active ? 0 : -1; });
@@ -1959,10 +2092,12 @@
   $('#sideBody').addEventListener('mouseleave', () => netFocus(null));
   $('#sideBody').addEventListener('keydown', (e) => { const g = e.target.closest('.net .node'); if (g && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); g.dispatchEvent(new MouseEvent('click', { bubbles: true })); } });
   $('.stabs').addEventListener('click', (e) => { const b = e.target.closest('button'); if (!b || !SIM) return; sideTab = b.dataset.s; renderSide(S.run.phase); });
-  function go(k) { if (!SIM) return; S.run.phase = Math.max(0, Math.min(SIM.phases.length - 1, k)); renderLive(false); if (playing) schedulePlay(); }
-  function next() {
-    if (!SIM) return;
+  function go(k) { if (!SIM || (S.run.gioco && PT.aperto())) return; S.run.phase = Math.max(0, Math.min(SIM.phases.length - 1, k)); renderLive(false); if (playing) schedulePlay(); }
+  let gate = false;
+  async function next() {
+    if (!SIM || gate) return;
     if (S.run.phase >= SIM.phases.length - 1) { stopPlay(); location.hash = '#esito'; return; }
+    if (S.run.gioco && PT) { gate = true; try { await beforePhase(S.run.phase + 1); } finally { gate = false; } if (!SIM) return; }
     go(S.run.phase + 1);
     if (S.run.phase >= SIM.phases.length - 1) stopPlay();
     if (window.scrollY > 300 && !playTimer) $('.broadcast').scrollIntoView({ behavior: AN.reduced ? 'auto' : 'smooth' });
@@ -1981,7 +2116,7 @@
     playTimer = setTimeout(() => { playTimer = null; if (playing) next(); }, phaseReadDelay(SIM.phases[S.run.phase], S.settings.speed, S.settings.adaptivePlay));
   }
   function startPlay() { stopPlay(); if (!SIM || document.hidden || S.run.phase >= SIM.phases.length - 1) return; playing = true; schedulePlay(); syncPlay(); }
-  $('#nextBtn').addEventListener('click', () => { stopPlay(); next(); });
+  $('#nextBtn').addEventListener('click', () => { if (gate) return; stopPlay(); next(); });
   $('#prevBtn').addEventListener('click', () => { stopPlay(); lastRendered = -2; go(S.run.phase - 1); });
   $('#playBtn').addEventListener('click', () => { if (!SIM) return; if (playing) return stopPlay(); if (S.run.phase >= SIM.phases.length - 1) go(0); startPlay(); next(); });
   $('#speedSeg').addEventListener('click', (e) => { const b = e.target.closest('button'); if (!b) return; S.settings.speed = b.dataset.v; save(); $$('#speedSeg button').forEach((x) => x.setAttribute('aria-pressed', x === b)); if (playing) startPlay(); });
@@ -2191,6 +2326,22 @@
     items.push([st.events, 'Eventi']);
     return '<div class="kstats">' + items.map(([v, l]) => '<div class="kstat"><b>' + v + '</b><span>' + l + '</span></div>').join('') + '</div>';
   }
+  // il riepilogo del giocatore: crediti, puntate, doni, il destino del concorrente allenato
+  function playerSummaryHTML() {
+    const g = S.run && S.run.gioco; if (!PT || !g || !SIM) return '';
+    const pts = g.puntate, won = pts.filter((b) => b.esito === 'vinta'), lost = pts.filter((b) => b.esito === 'persa');
+    const doni = Object.values(g.doni), ord = g.ordini, m = g.mentore && BY[g.mentore];
+    if (!pts.length && !doni.length && !ord.length && !m) return '';
+    const p = PT.chiudiPartita(S.run, SIM) || PT.profilo();
+    const fate = m ? (SIM.winners.includes(m.id) ? 'ha vinto' : 'è arrivat' + (m.gender === 'F' ? 'a' : m.gender === 'N' ? 'ə' : 'o') + ' ' + m.rank + 'º') : '';
+    const best = won.slice().sort((a, b) => (b.vincita - b.posta) - (a.vincita - a.posta))[0];
+    const stat = (v, l) => '<div class="ps-st"><b>' + v + '</b><span>' + l + '</span></div>';
+    return '<section class="block card ps-sum" id="playerSummary"><h2>La tua partita</h2>' +
+      (m ? '<div class="ps-men">' + avHTML(m, { dead: !m.alive }) + '<p><small>Il tuo concorrente</small><b>' + esc(m.name) + '</b> ' + esc(fate) + (ord.length ? ' · ha seguito ' + ord.filter((o) => o.obeys).length + ' ordini su ' + ord.length : '') + '</p></div>' : '') +
+      '<div class="ps-stats">' + stat(g.crediti, 'Crediti finali') + stat(won.length + '/' + (won.length + lost.length), 'Puntate vinte') + stat(doni.length, doni.length === 1 ? 'Dono mandato' : 'Doni mandati') + stat(p.record, 'Il tuo record') + '</div>' +
+      (best ? '<p class="ps-best">Colpo migliore: «' + esc(best.testo) + '» · ' + best.posta + ' × ' + best.q + ' = <b>+' + best.vincita + '</b></p>' : '') +
+      '<p class="help">Partite giocate: ' + p.partite + ' · puntate vinte in tutto: ' + p.vinte + ' su ' + p.puntate + '.</p></section>';
+  }
   function renderResults() {
     $('#resEmpty').hidden = !!SIM; $('#resBody').hidden = !SIM;
     if (!SIM) return;
@@ -2281,6 +2432,7 @@
 
     $('#resBody').innerHTML = hero +
       '<div class="resactions"><button class="btn" type="button" id="rArchive">Archivio partite</button><button class="btn primary lg" type="button" id="rAgain">Rigioca con un nuovo seme</button><button class="btn" type="button" id="rCopy">Copia il riepilogo</button><a class="btn" href="#diretta">Rivedi la diretta</a><a class="btn" href="#cast">Nuova partita</a><span class="help mono">seme ' + esc(SIM.seed) + '</span></div>' +
+      playerSummaryHTML() +
       '<div class="resgrid"><div>' +
         (podium ? '<section class="block card"><h2>Il podio</h2>' + podium + '</section>' : '') +
         '<section class="block card"><h2>I premi della partita</h2>' + awardsH + '</section>' +
@@ -2291,9 +2443,10 @@
         '<section class="block card"><h2>' + (soft ? 'Chi ha eliminato di più' : 'Chi ha ucciso di più') + '</h2><div class="bars">' + kbars + '</div></section>' +
         '<section class="block card posterbox"><h2>Locandina</h2><img id="posterImg" alt="Locandina della partita"><p class="help" style="margin-top:8px">Tieni premuto sull\'immagine, o clic destro, per salvarla.</p></section>' +
       '</div></div>';
-    $('#rAgain').addEventListener('click', () => { const cfg = Object.assign({}, S.run.cfg, { seed: newSeed() }); delete cfg.seasonId; runSim(cfg); });
+    $('#rAgain').addEventListener('click', () => { const cfg = Object.assign({}, S.run.cfg, { seed: newSeed() }); delete cfg.seasonId; delete cfg.interventi; delete cfg.interviste; runSim(cfg); });
     $('#rArchive').addEventListener('click', openArchive);
     $('#rCopy').addEventListener('click', () => copyText(summaryText(), 'Riepilogo copiato negli appunti.'));
+    if (S.run && S.run.interattiva && !S.run.replayId) persistRun(S.run, SIM);
     if (typeof studio !== 'undefined' && studio) studio.renderResults();
     drawPoster().then((url) => { const im = $('#posterImg'); if (im && url) im.src = url; });
     const wh = $('#resBody .winhero');
@@ -2397,11 +2550,11 @@
         } else {
           // I salvataggi precedenti contengono soltanto le regole: si migrano una volta.
           restored = RUNNER ? await RUNNER.simulate(run.cfg) : L.simulate(run.cfg);
-          load.warning = [load.warning, 'La partita precedente è stata ricostruita con la versione attuale e salvata per le prossime riaperture.'].filter(Boolean).join(' ');
+          if (!run.interattiva) load.warning = [load.warning, 'La partita precedente è stata ricostruita con la versione attuale e salvata per le prossime riaperture.'].filter(Boolean).join(' ');
         }
         if (generation !== runGeneration || S.run !== run) return false;
         SIM = restored; BY = Object.fromEntries(SIM.tributes.map((t) => [t.id, t]));
-        if (!run.replayId) {
+        if (!run.replayId && !run.interattiva) {
           const stored = await persistRun(run, SIM);
           if (!stored) load.warning = 'La partita precedente è stata ricostruita, ma non è stato possibile salvarla. Mantieni aperta questa pagina per continuare.';
         } else run.replaySaved = true;

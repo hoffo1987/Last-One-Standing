@@ -1,0 +1,97 @@
+/* ================= PELLE · LA PARTITA GIOCATA (base) =================
+ * Schermate di base per il cartello delle scelte (.sc), la barra del giocatore nella Diretta (#ptHud),
+ * il pulsante del dono (#giftBtn), le impostazioni del ritmo e il riepilogo nell'Esito (.ps-sum).
+ * Qui solo struttura e leggibilità con i gettoni del sito: la regia visiva e le animazioni stanno in 61-partita-*. */
+
+/* ---------- il cartello delle scelte ---------- */
+.sc { position: fixed; inset: 0; z-index: 90; display: grid; place-items: center; padding: 16px; }
+.sc-back { position: absolute; inset: 0; background: hsl(0 0% 0% / .66); }
+.sc-card { position: relative; width: min(640px, 100%); max-height: calc(100dvh - 32px); overflow: auto; overscroll-behavior: contain;
+  background: var(--panel-solid, var(--panel)); color: var(--ink); box-shadow: inset 6px 0 0 var(--key), 8px 8px 0 var(--key); padding: 22px 24px 18px 30px; outline: none; }
+.sc.sc-pick .sc-card { width: min(920px, 100%); }
+.sc-head { display: grid; gap: 6px; margin-bottom: 14px; }
+.sc-k { font: 800 11px / 1 var(--f-body); letter-spacing: .22em; text-transform: uppercase; color: var(--key); }
+.sc-t { margin: 0; font: italic 900 clamp(24px, 4vw, 38px) / 1 var(--f-display); font-stretch: 116%; text-transform: uppercase; letter-spacing: -.01em; }
+.sc-x { margin: 0; font-size: 15px; line-height: 1.45; color: color-mix(in srgb, var(--ink) 78%, transparent); }
+.sc-x b { color: var(--ink); }
+.sc-faces { display: flex; gap: 8px; margin-bottom: 14px; }
+.sc-faces .av { --s: 76px; }
+.sc-opts { display: grid; gap: 8px; }
+.sc-opt { position: relative; display: grid; grid-template-columns: auto minmax(0, 1fr) auto; grid-template-rows: auto auto; column-gap: 12px; align-items: center; text-align: left;
+  width: 100%; padding: 12px 16px; border: 2px solid color-mix(in srgb, var(--ink) 22%, transparent); background: transparent; color: var(--ink); font: inherit; cursor: pointer; }
+.sc-opt .sc-n { grid-row: 1 / 3; width: 28px; height: 28px; display: grid; place-items: center; background: var(--ink); color: var(--bg); font: italic 900 15px / 1 var(--f-display); }
+.sc-opt .sc-l { grid-column: 2; font: italic 900 17px / 1.15 var(--f-display); text-transform: uppercase; letter-spacing: .01em; }
+.sc-opt .sc-s { grid-column: 2; font-size: 13px; color: color-mix(in srgb, var(--ink) 70%, transparent); }
+.sc-opt .sc-cost { grid-column: 3; grid-row: 1 / 3; font: italic 900 18px / 1 var(--f-display); font-style: italic; color: var(--key); }
+.sc-opt:hover:not(:disabled), .sc-opt:focus-visible { background: var(--ink); color: var(--bg); border-color: var(--ink); outline: none; }
+.sc-opt:hover:not(:disabled) .sc-s, .sc-opt:focus-visible .sc-s { color: inherit; opacity: .8; }
+.sc-opt:hover:not(:disabled) .sc-n, .sc-opt:focus-visible .sc-n { background: var(--key); color: var(--key-ink); }
+.sc-opt:disabled { opacity: .38; cursor: not-allowed; }
+.sc-opt.is-picked { background: var(--key); color: var(--key-ink); border-color: var(--key); }
+/* scelta tra volti: una griglia di tessere */
+.sc-grid { grid-template-columns: repeat(auto-fill, minmax(118px, 1fr)); }
+.sc-grid .sc-opt { grid-template-columns: 1fr; grid-template-rows: auto auto auto; justify-items: center; text-align: center; gap: 6px; padding: 10px 6px 9px; }
+.sc-grid .sc-opt .av { --s: 64px; }
+.sc-grid .sc-opt .sc-l, .sc-grid .sc-opt .sc-s { grid-column: 1; font-size: 13px; }
+.sc-grid .sc-opt .sc-l { font-size: 14px; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+/* la posta */
+.sc-stake { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 14px; }
+.sc-stake > span:first-child { font: 800 11px / 1 var(--f-body); letter-spacing: .2em; text-transform: uppercase; color: color-mix(in srgb, var(--ink) 70%, transparent); margin-right: 4px; }
+.sc-stake button { min-width: 54px; padding: 7px 12px; border: 2px solid color-mix(in srgb, var(--ink) 22%, transparent); background: transparent; color: var(--ink); font: italic 900 16px / 1 var(--f-display); cursor: pointer; }
+.sc-stake button[aria-pressed="true"] { background: var(--key); color: var(--key-ink); border-color: var(--key); }
+.sc-stake button:disabled { opacity: .35; cursor: not-allowed; }
+.sc-wallet { margin-left: auto; font-size: 13px; }
+.sc-foot { display: flex; align-items: center; justify-content: space-between; gap: 14px; margin-top: 16px; }
+.sc-skip { border: 0; background: none; color: var(--ink); font: 800 12.5px / 1 var(--f-body); letter-spacing: .12em; text-transform: uppercase; padding: 8px 2px; box-shadow: inset 0 -2px 0 color-mix(in srgb, var(--ink) 30%, transparent); cursor: pointer; }
+.sc-skip:hover, .sc-skip:focus-visible { box-shadow: inset 0 -3px 0 var(--key); outline: none; }
+.sc-timer { flex: 1; height: 4px; background: color-mix(in srgb, var(--ink) 14%, transparent); overflow: hidden; }
+.sc-timer i { display: block; height: 100%; background: var(--key); transform-origin: 0 50%; animation: scTimer var(--sc-t, 20s) linear both; }
+.sc.sc-hold .sc-timer { visibility: hidden; }
+@keyframes scTimer { from { transform: scaleX(1); } to { transform: scaleX(0); } }
+.sc.sc-out { pointer-events: none; }
+html.sc-on { overflow: hidden; }
+
+/* ---------- la barra del giocatore nella Diretta ---------- */
+.pt-hud { display: flex; flex-wrap: wrap; align-items: stretch; gap: 10px 18px; margin: 0 0 14px; padding: 10px 16px; background: var(--panel-solid, var(--panel)); box-shadow: inset 5px 0 0 var(--key); }
+.pt-hud.busy { opacity: .6; }
+.pt-cr { display: grid; align-content: center; gap: 2px; }
+.pt-cr span, .pt-bets small, .pt-men small { font: 800 10.5px / 1 var(--f-body); letter-spacing: .18em; text-transform: uppercase; color: color-mix(in srgb, var(--ink) 68%, transparent); }
+.pt-cr b { font: italic 900 30px / .9 var(--f-display); font-stretch: 116%; color: var(--key); }
+.pt-men { display: flex; align-items: center; gap: 10px; border: 0; background: none; color: var(--ink); padding: 0; text-align: left; cursor: pointer; font: inherit; }
+.pt-men .av { --s: 40px; }
+.pt-men b { display: block; font: italic 900 17px / 1.1 var(--f-display); text-transform: uppercase; }
+.pt-men.dead b { text-decoration: line-through; opacity: .7; }
+.pt-bets { flex: 1 1 260px; display: flex; flex-wrap: wrap; align-items: center; gap: 6px 8px; }
+.pt-bets small { flex-basis: 100%; }
+.pt-bet { display: inline-flex; align-items: baseline; gap: 8px; padding: 4px 10px; background: color-mix(in srgb, var(--ink) 8%, transparent); box-shadow: inset 3px 0 0 var(--key); font-size: 13px; }
+.pt-bet em { font-style: normal; font-weight: 800; color: var(--key); white-space: nowrap; }
+.pt-none { font-size: 13px; opacity: .7; }
+.pt-gift { display: inline-flex; align-items: center; gap: 6px; }
+.pt-gift svg { width: 16px; height: 16px; }
+
+/* ---------- impostazioni ---------- */
+#ritmoSeg { display: flex; flex-wrap: wrap; }
+#ritmoSeg button { flex: 1 1 0; }
+
+/* ---------- riepilogo nell'Esito ---------- */
+.ps-sum { margin-bottom: 18px; }
+.ps-men { display: flex; align-items: center; gap: 14px; margin-bottom: 14px; }
+.ps-men .av { --s: 64px; }
+.ps-men p { margin: 0; font-size: 15px; }
+.ps-men small { display: block; font: 800 11px / 1 var(--f-body); letter-spacing: .18em; text-transform: uppercase; color: color-mix(in srgb, var(--ink) 68%, transparent); margin-bottom: 4px; }
+.ps-men b { font: italic 900 22px / 1 var(--f-display); text-transform: uppercase; }
+.ps-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 10px; }
+.ps-st { display: grid; gap: 4px; padding: 10px 12px; background: color-mix(in srgb, var(--ink) 7%, transparent); }
+.ps-st b { font: italic 900 30px / .9 var(--f-display); color: var(--key); }
+.ps-st span { font-size: 12px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; }
+.ps-best { margin: 12px 0 4px; }
+
+@media (max-width: 600px) {
+  .sc { padding: 8px; align-items: end; }
+  .sc-card { padding: 18px 16px 14px 20px; max-height: calc(100dvh - 16px); }
+  .sc-grid { grid-template-columns: repeat(auto-fill, minmax(96px, 1fr)); }
+  .sc-grid .sc-opt .av { --s: 52px; }
+  .pt-hud { padding: 8px 12px; gap: 8px 14px; }
+  .pt-cr b { font-size: 24px; }
+}
+@media (prefers-reduced-motion: reduce) { .sc-timer i { animation-duration: 0s; } }

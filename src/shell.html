@@ -173,6 +173,7 @@
         <h2 id="h-rules">Regole della partita</h2>
         <div class="field"><span>Difficoltà</span><div class="diffs" id="diffSeg" role="radiogroup" aria-label="Difficoltà" aria-describedby="difficultyHelp"></div><p class="help" id="difficultyHelp">Regola soprattutto la frequenza delle eliminazioni e dei disastri. Le caratteristiche del cast continuano a contare.</p></div>
         <label class="field" for="maxDays"><span class="fhead">Durata massima <em class="fcount"><b id="maxDaysOut"></b> giorni</em></span><input type="range" id="maxDays" min="5" max="40" step="1"><span class="rangeends" aria-hidden="true"><span>Breve</span><span>Lunga</span></span><small class="help">Allo scadere scatta lo scontro finale.</small></label>
+        <div class="field"><span>Ritmo della partita</span><div class="seg" id="ritmoSeg" role="radiogroup" aria-label="Ritmo della partita" aria-describedby="ritmoHelp"><button type="button" role="radio" data-v="spettatore">Spettatore</button><button type="button" role="radio" data-v="giocatore">Giocatore</button><button type="button" role="radio" data-v="regista">Regista</button></div><p class="help" id="ritmoHelp"></p></div>
         <label class="switch" for="teamsAllied"><input type="checkbox" id="teamsAllied" role="switch"><span class="sw" aria-hidden="true"></span><span>Compagni di squadra alleati<small>Chi è nella stessa squadra comincia in alleanza. Le alleanze possono cambiare durante la partita; la squadra rimane la stessa.</small></span></label>
         <label class="switch" for="teamWin"><input type="checkbox" id="teamWin" role="switch"><span class="sw" aria-hidden="true"></span><span>Vittoria di squadra<small>La partita termina quando restano solo membri della stessa squadra, anche se le alleanze sono cambiate. Con una sola squadra termina subito.</small></span></label>
         <div class="adultbox" id="adultBox">
@@ -252,6 +253,7 @@
         </div>
       </div>
       <div id="phaseAnnouncement" class="sr-only" role="status" aria-live="polite" aria-atomic="true"></div>
+      <div class="pt-hud" id="ptHud" hidden aria-live="polite"></div>
       <div class="livegrid">
         <div class="livefeed" id="phBody" role="region" aria-labelledby="phTitle"></div>
         <aside class="sidepanel card">
@@ -267,6 +269,7 @@
           <button class="pbtn play" id="playBtn" type="button" aria-label="Riproduci"><svg viewBox="0 0 24 24" aria-hidden="true" id="playIcon"><path d="M8 5v14l11-7z" fill="currentColor"/></svg></button>
           <button class="pbtn next" id="nextBtn" type="button"><span id="nextLbl">Avanti</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8.5 5 15.5 12l-7 7" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
           <div class="seg sm" id="speedSeg" role="group" aria-label="Velocità"><button type="button" data-v="lenta">1×</button><button type="button" data-v="normale">2×</button><button type="button" data-v="veloce">4×</button></div>
+          <button class="btn sm pt-gift" id="giftBtn" type="button" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 11h16v9H4zM3 7h18v4H3zM12 7v13M12 7c-1.5-3-5-3-5-1s3 1 5 1zm0 0c1.5-3 5-3 5-1s-3 1-5 1z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg><span>Dono</span></button>
           <a class="btn ghost sm skip" href="#esito">Salta all'esito</a>
         </div>
       </div>

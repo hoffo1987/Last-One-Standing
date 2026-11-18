@@ -690,7 +690,8 @@
       (t.st.disperato != null ? 1 : 0) - (meterBad(t) ? 1.5 : 0) + (t.mo >= 80 ? 1 : 0) + (t.st.lutto != null ? 1.5 : 0) + traitSum(t, 'c') + Math.min(3, t.kills * 0.5) + 0.15 * keyBonus(t);
     // sopravvivenza: resistenza, salute, energie, morale, indicatore e caratteristiche chiave dell'arena, riparo della zona
     const survival = (t) => 0.4 * t.attr.res + 0.3 * t.attr.fort + 0.2 * t.attr.agi + 0.3 * t.attr.sop + 0.1 * t.attr.cor + traitSum(t, 's') - 1.2 * statusCount(t) +
-      (hasItem(t, 'amuleto') ? 2 : 0) + (t.hp - 70) / 15 + (t.en - 60) / 40 + (t.mo - 50) / 50 - t.pr / 40 + 0.3 * keyBonus(t) + (ZP[t.zone][2] - 0.5);
+      (hasItem(t, 'amuleto') ? 2 : 0) + (t.hp - 70) / 15 + (t.en - 60) / 40 + (t.mo - 50) / 50 - t.pr / 40 + 0.3 * keyBonus(t) + (ZP[t.zone][2] - 0.5) +
+      (t.goal && t.goal.mentor ? (t.goal.k === 'nascondersi' ? 5 : 2.5) : 0);
     // prova di abilità: caratteristica + dado + fortuna + tratti − condizioni
     function rollTest(t, attr, dc) {
       const base = t.attr[attr] != null ? t.attr[attr] : 5;
@@ -1336,6 +1337,14 @@
           const e = fmt(ACT('armorSave'), [v], { i: arm.name, ip: possessive(arm) }); if (e) out.push(Object.assign(e, { cls: 'twist' }));
           return;
         }
+        // il consiglio del mentore: chi segue un ordine del giocatore a volte si sottrae all'ultimo istante
+        const mg = v.goal && v.goal.mentor ? ({ nascondersi: 0.6, reclutare: 0.35, cibo: 0.3, caccia: 0.25 })[v.goal.k] || 0 : 0;
+        if (mg && v.alive && alive().length > 2 && rng.chance(mg)) {
+          saved.add(i); v.hp = Math.max(18, v.hp - 16); syncSt(v); stats.mentorSaves = (stats.mentorSaves || 0) + 1;
+          const h = nameTag(v) + (v.goal.k === 'nascondersi' ? ' segue il consiglio del mentore, resta coperto e all’ultimo istante si sottrae al colpo.' : ' ricorda le parole del mentore e all’ultimo istante si salva.');
+          out.push({ html: h, plain: h.replace(/<[^>]+>/g, ''), cls: 'twist' });
+          return;
+        }
         // la tempra: chi è in forma e resistente a volte sopravvive al colpo, ma ridotto malissimo
         const tough = 0.03 + (v.attr.res - 5) * 0.022 + (v.attr.fort - 5) * 0.01 + (hasTrait(v, 'sopravvissuto') ? 0.08 : 0) + (v.mo >= 80 ? 0.03 : 0);
         if (v.alive && v.hp >= 60 && alive().length > 2 && rng.chance(Math.max(0, tough))) {
@@ -1544,6 +1553,69 @@
         if (addItem(P, it)) { P.items++; stats.items++; if (need === 'cibo' && P.food < 45) eat(P); const e = fmt(ACT('sponsorBonus'), [P], { i: it.name }); if (e) r.echo = (r.echo || []).concat([Object.assign(e, { cls: 'good' })]).slice(0, 3); }
       }
       ORIGIN = null; syncSt(P);
+    }
+
+    /* ---------- interventi del giocatore (doni, ordini del mentore) ----------
+     * Arrivano in cfg.interventi, ognuno legato all'indice della fase da cui vale. Si applicano all'inizio
+     * della prima fase calcolata con indice >= fase: tutto ciò che viene prima resta identico, perché il motore
+     * è deterministico e nessun intervento tocca i numeri casuali prima del suo turno. */
+    const INTERVENTI = (Array.isArray(cfg.interventi) ? cfg.interventi : []).slice(0, 400)
+      .filter((x) => x && typeof x === 'object' && Number.isInteger(x.fase) && x.fase >= 0 && typeof x.chi === 'string' && (x.tipo === 'dono' || x.tipo === 'ordine'))
+      .map((x, k) => ({ fase: x.fase, tipo: x.tipo, chi: x.chi, cosa: String(x.cosa || ''), k })).sort((a, b) => a.fase - b.fase || a.k - b.k);
+    let intNext = 0;
+    const DONI = ['cibo', 'med', 'arma', 'armatura', 'attrezzo', 'amuleto', 'mappa'];
+    const ORDINI = { nasconditi: 'nascondersi', caccia: 'caccia', alleati: 'reclutare', provviste: 'cibo' };
+    const intEvent = (P, html, o) => Object.assign({ html, plain: html.replace(/<[^>]+>/g, ''), ids: [P.id], deaths: [], lethal: false, origin: 'sys', cat: 'none', why: 'giocatore', echo: [] }, geo ? { place: geo.locate([P]) } : {}, o);
+    function applyDono(P, cosa, events, irng) {
+      const type = DONI.includes(cosa) ? cosa : 'cibo';
+      const it = mkItem(type, type === 'cibo' ? irng.pick(LEX.cibo || ['delle provviste']) : null, 'sponsor');
+      const ok = addItem(P, it);
+      if (ok) { P.items++; stats.items++; if (type === 'cibo') eat(P); }
+      P.mo += ok ? 10 : 14; P.fame += 1;
+      stats.sponsors++; stats.doni = (stats.doni || 0) + 1;
+      const n = nameTag(P), i = esc(it.name);
+      const lines = theme.soft
+        ? ['Arriva un pacco con il nome di ' + n + ' scritto sopra: dentro c’è ' + i + '.', 'Qualcuno là fuori tifa per ' + n + ': un regalo con ' + i + ' compare all’improvviso.']
+        : ['Un paracadute scende dal cielo e si posa accanto a ' + n + ': dentro c’è ' + i + '.', 'Un fischio, poi un pacco ai piedi di ' + n + '. Qualcuno là fuori ha pagato per ' + i + '.', 'Il pubblico ha scelto ' + n + ': dall’alto cade un dono con ' + i + '.'];
+      const tail = ok ? '' : ' Non serve davvero, ma il gesto rincuora.';
+      events.push(intEvent(P, irng.pick(lines) + tail, { cat: 'item', whyTxt: 'Dono del pubblico', sponsor: true, dono: type }));
+      syncSt(P);
+    }
+    function applyOrdine(P, cosa, events, irng) {
+      const k = ORDINI[cosa]; if (!k) return;
+      // l'obbedienza dipende dal carattere e dalla fiducia costruita con gli ordini andati bene
+      P.mentor = P.mentor || { fid: 0 };
+      let p = 0.78 + P.mentor.fid * 0.04 + (P.attr.int - 5) * 0.015;
+      if (hasTrait(P, 'impulsivo')) p -= 0.2; if (hasTrait(P, 'folle')) p -= 0.3; if (hasTrait(P, 'paranoico')) p -= 0.1; if (hasTrait(P, 'leale')) p += 0.1;
+      if (cosa === 'caccia' && (hasTrait(P, 'pacifista') || hasTrait(P, 'codardo'))) p -= 0.25;
+      if (cosa === 'alleati' && hasTrait(P, 'solitario')) p -= 0.25;
+      if (cosa === 'nasconditi' && (hasTrait(P, 'spietato') || hasTrait(P, 'bruto'))) p -= 0.2;
+      const obeys = irng.chance(Math.max(0.15, Math.min(0.95, p)));
+      const n = nameTag(P);
+      const gx = P.gender === 'F' ? 'a' : P.gender === 'N' ? 'ə' : 'o';
+      const ORD = { nasconditi: 'restare nascost' + gx, caccia: 'andare a caccia', alleati: 'cercare alleati', provviste: 'fare provviste' };
+      if (obeys) {
+        let tg = null;
+        if (k === 'caccia') tg = alive().filter((x) => x !== P && canFight(P, x) && !isAlly(P, x)).sort((a, b) => combat(a) - combat(b))[0] || null;
+        P.goal = { k, tg: tg ? tg.id : null, ph: phases.length, mentor: true };
+        P.mentor.fid = Math.min(5, P.mentor.fid + 1); P.mo += 4;
+        const th = { nascondersi: 'Il consiglio è chiaro: oggi non mi faccio vedere.', caccia: 'Il mentore vuole che vada a caccia. Va bene.', reclutare: 'Da soli non si va lontano: oggi cerco qualcuno di cui fidarmi.', cibo: 'Prima di tutto la pancia piena: oggi penso alle provviste.' }[k];
+        P.thought = esc(th);
+        events.push(intEvent(P, n + ' riceve il messaggio del mentore e decide di ' + ORD[cosa] + (tg ? ': nel mirino c’è ' + nameTag(tg) : '') + '.', { whyTxt: 'Ordine del mentore', mentor: cosa, obeys: true }));
+      } else {
+        P.mentor.fid = Math.max(-3, P.mentor.fid - 1);
+        events.push(intEvent(P, n + ' legge il messaggio del mentore, che vorrebbe vederl' + (P.gender === 'F' ? 'a' : P.gender === 'N' ? 'ə' : 'o') + ' ' + (cosa === 'nasconditi' ? 'restare al riparo' : ORD[cosa]) + ', e fa di testa sua.', { cat: 'hurt', whyTxt: 'Ordine ignorato', mentor: cosa, obeys: false }));
+      }
+    }
+    function applyInterventions(events) {
+      const idx = phases.length;
+      while (intNext < INTERVENTI.length && INTERVENTI[intNext].fase <= idx) {
+        const x = INTERVENTI[intNext++], P = byId[x.chi];
+        if (!P || !P.alive) continue;
+        // numeri casuali propri: l'esito di un intervento non sposta quelli del motore
+        const irng = makeRng(seed + '|int|' + x.k + '|' + idx);
+        if (x.tipo === 'dono') applyDono(P, x.cosa, events, irng); else applyOrdine(P, x.cosa, events, irng);
+      }
     }
 
     /* ---------- ecosistema: conseguenze automatiche ---------- */
@@ -2670,6 +2742,7 @@
         if (kind === 'n' && theme.id === 'liceo') intro='Le lezioni sono finite: chi resta a scuola si sposta tra le aule, riprende fiato e scrive sulla chat di classe.';
       }
       tickStatus();
+      applyInterventions(events);
       if (kind === 'd') moveByGoals();
       maybeDissolve(events);
       revealIntrigue(events);
@@ -2682,6 +2755,7 @@
         let done = false;
         let pL = lethalProb(kind);
         if (kind === 'dis') pL *= (hasItem(P, 'mappa') ? 0.35 : 1) * Math.max(0.5, 1.25 - P.attr.sop / 20);
+        if (P.goal && P.goal.mentor) pL *= P.goal.k === 'caccia' ? 1.7 : P.goal.k === 'nascondersi' ? 0.45 : 1;
         // valori costanti finché P non ha un evento: calcolati una volta sola
         CTX = null;
         const nAlive = alive().length;
@@ -2937,6 +3011,19 @@
       if (type === 'coppia') { a.partner = b.id; b.partner = a.id; addAff(a, b, 70); tweak(a, b, { f: 45, t: 70, k: 60 }); tweak(b, a, { f: 45, t: 70, k: 60 }); remember(a, b, 'love'); remember(b, a, 'love'); stats.couples++; }
       if (type === 'fiducia') { tweak(a, b, { f: 60, k: 40 }); remember(a, b, 'initialTrust'); }
       if (type === 'attrazione') { tweak(a, b, { t: 75, k: 30 }); a.crush = b.id; remember(a, b, 'initialCrush'); }
+    });
+    // interviste prima dei giochi: piccoli vantaggi scelti dal giocatore per i concorrenti intervistati
+    (Array.isArray(cfg.interviste) ? cfg.interviste : []).slice(0, 64).forEach((iv) => {
+      const t = iv && byId[iv.chi]; if (!t || !Array.isArray(iv.effetti)) return;
+      iv.effetti.slice(0, 6).forEach((e) => {
+        if (e === 'fama') t.fame += 1;
+        else if (e === 'morale') t.mo = clamp(t.mo + 10, 0, 100);
+        else if (e === 'coraggio') t.attr.cor = Math.min(10, t.attr.cor + 1);
+        else if (e === 'astuzia') t.attr.int = Math.min(10, t.attr.int + 1);
+        else if (e === 'scorte') t.food = clamp(t.food + 20, 0, 100);
+        else if (typeof e === 'string' && e.startsWith('legame:') && byId[e.slice(7)] && byId[e.slice(7)] !== t) { const u = byId[e.slice(7)]; addAff(t, u, 25); tweak(t, u, { f: 30, k: 30 }); }
+      });
+      t.intervistato = true;
     });
     let feastDone = false, lastDisaster = -9;
     const usedDisasters = new Set();

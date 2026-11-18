@@ -5343,6 +5343,104 @@ body:has(#editDlg[open]) #v-cast > :not(.dock) { translate: -34px 0; }
    e se ne vedeva solo la cima (capelli, fronte). Il ritaglio sugli occhi lo calcola src/skin/05-occhi.js */
 .av.es-strip > img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
 
+/* ================= PELLE · LA PARTITA GIOCATA (base) =================
+ * Schermate di base per il cartello delle scelte (.sc), la barra del giocatore nella Diretta (#ptHud),
+ * il pulsante del dono (#giftBtn), le impostazioni del ritmo e il riepilogo nell'Esito (.ps-sum).
+ * Qui solo struttura e leggibilità con i gettoni del sito: la regia visiva e le animazioni stanno in 61-partita-*. */
+
+/* ---------- il cartello delle scelte ---------- */
+.sc { position: fixed; inset: 0; z-index: 90; display: grid; place-items: center; padding: 16px; }
+.sc-back { position: absolute; inset: 0; background: hsl(0 0% 0% / .66); }
+.sc-card { position: relative; width: min(640px, 100%); max-height: calc(100dvh - 32px); overflow: auto; overscroll-behavior: contain;
+  background: var(--panel-solid, var(--panel)); color: var(--ink); box-shadow: inset 6px 0 0 var(--key), 8px 8px 0 var(--key); padding: 22px 24px 18px 30px; outline: none; }
+.sc.sc-pick .sc-card { width: min(920px, 100%); }
+.sc-head { display: grid; gap: 6px; margin-bottom: 14px; }
+.sc-k { font: 800 11px / 1 var(--f-body); letter-spacing: .22em; text-transform: uppercase; color: var(--key); }
+.sc-t { margin: 0; font: italic 900 clamp(24px, 4vw, 38px) / 1 var(--f-display); font-stretch: 116%; text-transform: uppercase; letter-spacing: -.01em; }
+.sc-x { margin: 0; font-size: 15px; line-height: 1.45; color: color-mix(in srgb, var(--ink) 78%, transparent); }
+.sc-x b { color: var(--ink); }
+.sc-faces { display: flex; gap: 8px; margin-bottom: 14px; }
+.sc-faces .av { --s: 76px; }
+.sc-opts { display: grid; gap: 8px; }
+.sc-opt { position: relative; display: grid; grid-template-columns: auto minmax(0, 1fr) auto; grid-template-rows: auto auto; column-gap: 12px; align-items: center; text-align: left;
+  width: 100%; padding: 12px 16px; border: 2px solid color-mix(in srgb, var(--ink) 22%, transparent); background: transparent; color: var(--ink); font: inherit; cursor: pointer; }
+.sc-opt .sc-n { grid-row: 1 / 3; width: 28px; height: 28px; display: grid; place-items: center; background: var(--ink); color: var(--bg); font: italic 900 15px / 1 var(--f-display); }
+.sc-opt .sc-l { grid-column: 2; font: italic 900 17px / 1.15 var(--f-display); text-transform: uppercase; letter-spacing: .01em; }
+.sc-opt .sc-s { grid-column: 2; font-size: 13px; color: color-mix(in srgb, var(--ink) 70%, transparent); }
+.sc-opt .sc-cost { grid-column: 3; grid-row: 1 / 3; font: italic 900 18px / 1 var(--f-display); font-style: italic; color: var(--key); }
+.sc-opt:hover:not(:disabled), .sc-opt:focus-visible { background: var(--ink); color: var(--bg); border-color: var(--ink); outline: none; }
+.sc-opt:hover:not(:disabled) .sc-s, .sc-opt:focus-visible .sc-s { color: inherit; opacity: .8; }
+.sc-opt:hover:not(:disabled) .sc-n, .sc-opt:focus-visible .sc-n { background: var(--key); color: var(--key-ink); }
+.sc-opt:disabled { opacity: .38; cursor: not-allowed; }
+.sc-opt.is-picked { background: var(--key); color: var(--key-ink); border-color: var(--key); }
+/* scelta tra volti: una griglia di tessere */
+.sc-grid { grid-template-columns: repeat(auto-fill, minmax(118px, 1fr)); }
+.sc-grid .sc-opt { grid-template-columns: 1fr; grid-template-rows: auto auto auto; justify-items: center; text-align: center; gap: 6px; padding: 10px 6px 9px; }
+.sc-grid .sc-opt .av { --s: 64px; }
+.sc-grid .sc-opt .sc-l, .sc-grid .sc-opt .sc-s { grid-column: 1; font-size: 13px; }
+.sc-grid .sc-opt .sc-l { font-size: 14px; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+/* la posta */
+.sc-stake { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 14px; }
+.sc-stake > span:first-child { font: 800 11px / 1 var(--f-body); letter-spacing: .2em; text-transform: uppercase; color: color-mix(in srgb, var(--ink) 70%, transparent); margin-right: 4px; }
+.sc-stake button { min-width: 54px; padding: 7px 12px; border: 2px solid color-mix(in srgb, var(--ink) 22%, transparent); background: transparent; color: var(--ink); font: italic 900 16px / 1 var(--f-display); cursor: pointer; }
+.sc-stake button[aria-pressed="true"] { background: var(--key); color: var(--key-ink); border-color: var(--key); }
+.sc-stake button:disabled { opacity: .35; cursor: not-allowed; }
+.sc-wallet { margin-left: auto; font-size: 13px; }
+.sc-foot { display: flex; align-items: center; justify-content: space-between; gap: 14px; margin-top: 16px; }
+.sc-skip { border: 0; background: none; color: var(--ink); font: 800 12.5px / 1 var(--f-body); letter-spacing: .12em; text-transform: uppercase; padding: 8px 2px; box-shadow: inset 0 -2px 0 color-mix(in srgb, var(--ink) 30%, transparent); cursor: pointer; }
+.sc-skip:hover, .sc-skip:focus-visible { box-shadow: inset 0 -3px 0 var(--key); outline: none; }
+.sc-timer { flex: 1; height: 4px; background: color-mix(in srgb, var(--ink) 14%, transparent); overflow: hidden; }
+.sc-timer i { display: block; height: 100%; background: var(--key); transform-origin: 0 50%; animation: scTimer var(--sc-t, 20s) linear both; }
+.sc.sc-hold .sc-timer { visibility: hidden; }
+@keyframes scTimer { from { transform: scaleX(1); } to { transform: scaleX(0); } }
+.sc.sc-out { pointer-events: none; }
+html.sc-on { overflow: hidden; }
+
+/* ---------- la barra del giocatore nella Diretta ---------- */
+.pt-hud { display: flex; flex-wrap: wrap; align-items: stretch; gap: 10px 18px; margin: 0 0 14px; padding: 10px 16px; background: var(--panel-solid, var(--panel)); box-shadow: inset 5px 0 0 var(--key); }
+.pt-hud.busy { opacity: .6; }
+.pt-cr { display: grid; align-content: center; gap: 2px; }
+.pt-cr span, .pt-bets small, .pt-men small { font: 800 10.5px / 1 var(--f-body); letter-spacing: .18em; text-transform: uppercase; color: color-mix(in srgb, var(--ink) 68%, transparent); }
+.pt-cr b { font: italic 900 30px / .9 var(--f-display); font-stretch: 116%; color: var(--key); }
+.pt-men { display: flex; align-items: center; gap: 10px; border: 0; background: none; color: var(--ink); padding: 0; text-align: left; cursor: pointer; font: inherit; }
+.pt-men .av { --s: 40px; }
+.pt-men b { display: block; font: italic 900 17px / 1.1 var(--f-display); text-transform: uppercase; }
+.pt-men.dead b { text-decoration: line-through; opacity: .7; }
+.pt-bets { flex: 1 1 260px; display: flex; flex-wrap: wrap; align-items: center; gap: 6px 8px; }
+.pt-bets small { flex-basis: 100%; }
+.pt-bet { display: inline-flex; align-items: baseline; gap: 8px; padding: 4px 10px; background: color-mix(in srgb, var(--ink) 8%, transparent); box-shadow: inset 3px 0 0 var(--key); font-size: 13px; }
+.pt-bet em { font-style: normal; font-weight: 800; color: var(--key); white-space: nowrap; }
+.pt-none { font-size: 13px; opacity: .7; }
+.pt-gift { display: inline-flex; align-items: center; gap: 6px; }
+.pt-gift svg { width: 16px; height: 16px; }
+
+/* ---------- impostazioni ---------- */
+#ritmoSeg { display: flex; flex-wrap: wrap; }
+#ritmoSeg button { flex: 1 1 0; }
+
+/* ---------- riepilogo nell'Esito ---------- */
+.ps-sum { margin-bottom: 18px; }
+.ps-men { display: flex; align-items: center; gap: 14px; margin-bottom: 14px; }
+.ps-men .av { --s: 64px; }
+.ps-men p { margin: 0; font-size: 15px; }
+.ps-men small { display: block; font: 800 11px / 1 var(--f-body); letter-spacing: .18em; text-transform: uppercase; color: color-mix(in srgb, var(--ink) 68%, transparent); margin-bottom: 4px; }
+.ps-men b { font: italic 900 22px / 1 var(--f-display); text-transform: uppercase; }
+.ps-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 10px; }
+.ps-st { display: grid; gap: 4px; padding: 10px 12px; background: color-mix(in srgb, var(--ink) 7%, transparent); }
+.ps-st b { font: italic 900 30px / .9 var(--f-display); color: var(--key); }
+.ps-st span { font-size: 12px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; }
+.ps-best { margin: 12px 0 4px; }
+
+@media (max-width: 600px) {
+  .sc { padding: 8px; align-items: end; }
+  .sc-card { padding: 18px 16px 14px 20px; max-height: calc(100dvh - 16px); }
+  .sc-grid { grid-template-columns: repeat(auto-fill, minmax(96px, 1fr)); }
+  .sc-grid .sc-opt .av { --s: 52px; }
+  .pt-hud { padding: 8px 12px; gap: 8px 14px; }
+  .pt-cr b { font-size: 24px; }
+}
+@media (prefers-reduced-motion: reduce) { .sc-timer i { animation-duration: 0s; } }
+
 /* ================= PELLE · COMUNI =================
  * Controlli, dialoghi, intestazione, piè di pagina, stati vuoti, notifiche: tutto ciò che si ripete in ogni sezione.
  * Regole dal brief (docs-dev/overhaul-brief.md): forme intenzionali, niente vetri sfocati, niente bordi grigi da 1 px
@@ -5626,6 +5724,7 @@ dialog[open]::backdrop { animation: cmVeil .3s ease both; }
         <h2 id="h-rules">Regole della partita</h2>
         <div class="field"><span>Difficoltà</span><div class="diffs" id="diffSeg" role="radiogroup" aria-label="Difficoltà" aria-describedby="difficultyHelp"></div><p class="help" id="difficultyHelp">Regola soprattutto la frequenza delle eliminazioni e dei disastri. Le caratteristiche del cast continuano a contare.</p></div>
         <label class="field" for="maxDays"><span class="fhead">Durata massima <em class="fcount"><b id="maxDaysOut"></b> giorni</em></span><input type="range" id="maxDays" min="5" max="40" step="1"><span class="rangeends" aria-hidden="true"><span>Breve</span><span>Lunga</span></span><small class="help">Allo scadere scatta lo scontro finale.</small></label>
+        <div class="field"><span>Ritmo della partita</span><div class="seg" id="ritmoSeg" role="radiogroup" aria-label="Ritmo della partita" aria-describedby="ritmoHelp"><button type="button" role="radio" data-v="spettatore">Spettatore</button><button type="button" role="radio" data-v="giocatore">Giocatore</button><button type="button" role="radio" data-v="regista">Regista</button></div><p class="help" id="ritmoHelp"></p></div>
         <label class="switch" for="teamsAllied"><input type="checkbox" id="teamsAllied" role="switch"><span class="sw" aria-hidden="true"></span><span>Compagni di squadra alleati<small>Chi è nella stessa squadra comincia in alleanza. Le alleanze possono cambiare durante la partita; la squadra rimane la stessa.</small></span></label>
         <label class="switch" for="teamWin"><input type="checkbox" id="teamWin" role="switch"><span class="sw" aria-hidden="true"></span><span>Vittoria di squadra<small>La partita termina quando restano solo membri della stessa squadra, anche se le alleanze sono cambiate. Con una sola squadra termina subito.</small></span></label>
         <div class="adultbox" id="adultBox">
@@ -5705,6 +5804,7 @@ dialog[open]::backdrop { animation: cmVeil .3s ease both; }
         </div>
       </div>
       <div id="phaseAnnouncement" class="sr-only" role="status" aria-live="polite" aria-atomic="true"></div>
+      <div class="pt-hud" id="ptHud" hidden aria-live="polite"></div>
       <div class="livegrid">
         <div class="livefeed" id="phBody" role="region" aria-labelledby="phTitle"></div>
         <aside class="sidepanel card">
@@ -5720,6 +5820,7 @@ dialog[open]::backdrop { animation: cmVeil .3s ease both; }
           <button class="pbtn play" id="playBtn" type="button" aria-label="Riproduci"><svg viewBox="0 0 24 24" aria-hidden="true" id="playIcon"><path d="M8 5v14l11-7z" fill="currentColor"/></svg></button>
           <button class="pbtn next" id="nextBtn" type="button"><span id="nextLbl">Avanti</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8.5 5 15.5 12l-7 7" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
           <div class="seg sm" id="speedSeg" role="group" aria-label="Velocità"><button type="button" data-v="lenta">1×</button><button type="button" data-v="normale">2×</button><button type="button" data-v="veloce">4×</button></div>
+          <button class="btn sm pt-gift" id="giftBtn" type="button" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 11h16v9H4zM3 7h18v4H3zM12 7v13M12 7c-1.5-3-5-3-5-1s3 1 5 1zm0 0c1.5-3 5-3 5-1s-3 1-5 1z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg><span>Dono</span></button>
           <a class="btn ghost sm skip" href="#esito">Salta all'esito</a>
         </div>
       </div>
@@ -16618,7 +16719,8 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
       (t.st.disperato != null ? 1 : 0) - (meterBad(t) ? 1.5 : 0) + (t.mo >= 80 ? 1 : 0) + (t.st.lutto != null ? 1.5 : 0) + traitSum(t, 'c') + Math.min(3, t.kills * 0.5) + 0.15 * keyBonus(t);
     // sopravvivenza: resistenza, salute, energie, morale, indicatore e caratteristiche chiave dell'arena, riparo della zona
     const survival = (t) => 0.4 * t.attr.res + 0.3 * t.attr.fort + 0.2 * t.attr.agi + 0.3 * t.attr.sop + 0.1 * t.attr.cor + traitSum(t, 's') - 1.2 * statusCount(t) +
-      (hasItem(t, 'amuleto') ? 2 : 0) + (t.hp - 70) / 15 + (t.en - 60) / 40 + (t.mo - 50) / 50 - t.pr / 40 + 0.3 * keyBonus(t) + (ZP[t.zone][2] - 0.5);
+      (hasItem(t, 'amuleto') ? 2 : 0) + (t.hp - 70) / 15 + (t.en - 60) / 40 + (t.mo - 50) / 50 - t.pr / 40 + 0.3 * keyBonus(t) + (ZP[t.zone][2] - 0.5) +
+      (t.goal && t.goal.mentor ? (t.goal.k === 'nascondersi' ? 5 : 2.5) : 0);
     // prova di abilità: caratteristica + dado + fortuna + tratti − condizioni
     function rollTest(t, attr, dc) {
       const base = t.attr[attr] != null ? t.attr[attr] : 5;
@@ -17264,6 +17366,14 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
           const e = fmt(ACT('armorSave'), [v], { i: arm.name, ip: possessive(arm) }); if (e) out.push(Object.assign(e, { cls: 'twist' }));
           return;
         }
+        // il consiglio del mentore: chi segue un ordine del giocatore a volte si sottrae all'ultimo istante
+        const mg = v.goal && v.goal.mentor ? ({ nascondersi: 0.6, reclutare: 0.35, cibo: 0.3, caccia: 0.25 })[v.goal.k] || 0 : 0;
+        if (mg && v.alive && alive().length > 2 && rng.chance(mg)) {
+          saved.add(i); v.hp = Math.max(18, v.hp - 16); syncSt(v); stats.mentorSaves = (stats.mentorSaves || 0) + 1;
+          const h = nameTag(v) + (v.goal.k === 'nascondersi' ? ' segue il consiglio del mentore, resta coperto e all’ultimo istante si sottrae al colpo.' : ' ricorda le parole del mentore e all’ultimo istante si salva.');
+          out.push({ html: h, plain: h.replace(/<[^>]+>/g, ''), cls: 'twist' });
+          return;
+        }
         // la tempra: chi è in forma e resistente a volte sopravvive al colpo, ma ridotto malissimo
         const tough = 0.03 + (v.attr.res - 5) * 0.022 + (v.attr.fort - 5) * 0.01 + (hasTrait(v, 'sopravvissuto') ? 0.08 : 0) + (v.mo >= 80 ? 0.03 : 0);
         if (v.alive && v.hp >= 60 && alive().length > 2 && rng.chance(Math.max(0, tough))) {
@@ -17472,6 +17582,69 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
         if (addItem(P, it)) { P.items++; stats.items++; if (need === 'cibo' && P.food < 45) eat(P); const e = fmt(ACT('sponsorBonus'), [P], { i: it.name }); if (e) r.echo = (r.echo || []).concat([Object.assign(e, { cls: 'good' })]).slice(0, 3); }
       }
       ORIGIN = null; syncSt(P);
+    }
+
+    /* ---------- interventi del giocatore (doni, ordini del mentore) ----------
+     * Arrivano in cfg.interventi, ognuno legato all'indice della fase da cui vale. Si applicano all'inizio
+     * della prima fase calcolata con indice >= fase: tutto ciò che viene prima resta identico, perché il motore
+     * è deterministico e nessun intervento tocca i numeri casuali prima del suo turno. */
+    const INTERVENTI = (Array.isArray(cfg.interventi) ? cfg.interventi : []).slice(0, 400)
+      .filter((x) => x && typeof x === 'object' && Number.isInteger(x.fase) && x.fase >= 0 && typeof x.chi === 'string' && (x.tipo === 'dono' || x.tipo === 'ordine'))
+      .map((x, k) => ({ fase: x.fase, tipo: x.tipo, chi: x.chi, cosa: String(x.cosa || ''), k })).sort((a, b) => a.fase - b.fase || a.k - b.k);
+    let intNext = 0;
+    const DONI = ['cibo', 'med', 'arma', 'armatura', 'attrezzo', 'amuleto', 'mappa'];
+    const ORDINI = { nasconditi: 'nascondersi', caccia: 'caccia', alleati: 'reclutare', provviste: 'cibo' };
+    const intEvent = (P, html, o) => Object.assign({ html, plain: html.replace(/<[^>]+>/g, ''), ids: [P.id], deaths: [], lethal: false, origin: 'sys', cat: 'none', why: 'giocatore', echo: [] }, geo ? { place: geo.locate([P]) } : {}, o);
+    function applyDono(P, cosa, events, irng) {
+      const type = DONI.includes(cosa) ? cosa : 'cibo';
+      const it = mkItem(type, type === 'cibo' ? irng.pick(LEX.cibo || ['delle provviste']) : null, 'sponsor');
+      const ok = addItem(P, it);
+      if (ok) { P.items++; stats.items++; if (type === 'cibo') eat(P); }
+      P.mo += ok ? 10 : 14; P.fame += 1;
+      stats.sponsors++; stats.doni = (stats.doni || 0) + 1;
+      const n = nameTag(P), i = esc(it.name);
+      const lines = theme.soft
+        ? ['Arriva un pacco con il nome di ' + n + ' scritto sopra: dentro c’è ' + i + '.', 'Qualcuno là fuori tifa per ' + n + ': un regalo con ' + i + ' compare all’improvviso.']
+        : ['Un paracadute scende dal cielo e si posa accanto a ' + n + ': dentro c’è ' + i + '.', 'Un fischio, poi un pacco ai piedi di ' + n + '. Qualcuno là fuori ha pagato per ' + i + '.', 'Il pubblico ha scelto ' + n + ': dall’alto cade un dono con ' + i + '.'];
+      const tail = ok ? '' : ' Non serve davvero, ma il gesto rincuora.';
+      events.push(intEvent(P, irng.pick(lines) + tail, { cat: 'item', whyTxt: 'Dono del pubblico', sponsor: true, dono: type }));
+      syncSt(P);
+    }
+    function applyOrdine(P, cosa, events, irng) {
+      const k = ORDINI[cosa]; if (!k) return;
+      // l'obbedienza dipende dal carattere e dalla fiducia costruita con gli ordini andati bene
+      P.mentor = P.mentor || { fid: 0 };
+      let p = 0.78 + P.mentor.fid * 0.04 + (P.attr.int - 5) * 0.015;
+      if (hasTrait(P, 'impulsivo')) p -= 0.2; if (hasTrait(P, 'folle')) p -= 0.3; if (hasTrait(P, 'paranoico')) p -= 0.1; if (hasTrait(P, 'leale')) p += 0.1;
+      if (cosa === 'caccia' && (hasTrait(P, 'pacifista') || hasTrait(P, 'codardo'))) p -= 0.25;
+      if (cosa === 'alleati' && hasTrait(P, 'solitario')) p -= 0.25;
+      if (cosa === 'nasconditi' && (hasTrait(P, 'spietato') || hasTrait(P, 'bruto'))) p -= 0.2;
+      const obeys = irng.chance(Math.max(0.15, Math.min(0.95, p)));
+      const n = nameTag(P);
+      const gx = P.gender === 'F' ? 'a' : P.gender === 'N' ? 'ə' : 'o';
+      const ORD = { nasconditi: 'restare nascost' + gx, caccia: 'andare a caccia', alleati: 'cercare alleati', provviste: 'fare provviste' };
+      if (obeys) {
+        let tg = null;
+        if (k === 'caccia') tg = alive().filter((x) => x !== P && canFight(P, x) && !isAlly(P, x)).sort((a, b) => combat(a) - combat(b))[0] || null;
+        P.goal = { k, tg: tg ? tg.id : null, ph: phases.length, mentor: true };
+        P.mentor.fid = Math.min(5, P.mentor.fid + 1); P.mo += 4;
+        const th = { nascondersi: 'Il consiglio è chiaro: oggi non mi faccio vedere.', caccia: 'Il mentore vuole che vada a caccia. Va bene.', reclutare: 'Da soli non si va lontano: oggi cerco qualcuno di cui fidarmi.', cibo: 'Prima di tutto la pancia piena: oggi penso alle provviste.' }[k];
+        P.thought = esc(th);
+        events.push(intEvent(P, n + ' riceve il messaggio del mentore e decide di ' + ORD[cosa] + (tg ? ': nel mirino c’è ' + nameTag(tg) : '') + '.', { whyTxt: 'Ordine del mentore', mentor: cosa, obeys: true }));
+      } else {
+        P.mentor.fid = Math.max(-3, P.mentor.fid - 1);
+        events.push(intEvent(P, n + ' legge il messaggio del mentore, che vorrebbe vederl' + (P.gender === 'F' ? 'a' : P.gender === 'N' ? 'ə' : 'o') + ' ' + (cosa === 'nasconditi' ? 'restare al riparo' : ORD[cosa]) + ', e fa di testa sua.', { cat: 'hurt', whyTxt: 'Ordine ignorato', mentor: cosa, obeys: false }));
+      }
+    }
+    function applyInterventions(events) {
+      const idx = phases.length;
+      while (intNext < INTERVENTI.length && INTERVENTI[intNext].fase <= idx) {
+        const x = INTERVENTI[intNext++], P = byId[x.chi];
+        if (!P || !P.alive) continue;
+        // numeri casuali propri: l'esito di un intervento non sposta quelli del motore
+        const irng = makeRng(seed + '|int|' + x.k + '|' + idx);
+        if (x.tipo === 'dono') applyDono(P, x.cosa, events, irng); else applyOrdine(P, x.cosa, events, irng);
+      }
     }
 
     /* ---------- ecosistema: conseguenze automatiche ---------- */
@@ -18598,6 +18771,7 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
         if (kind === 'n' && theme.id === 'liceo') intro='Le lezioni sono finite: chi resta a scuola si sposta tra le aule, riprende fiato e scrive sulla chat di classe.';
       }
       tickStatus();
+      applyInterventions(events);
       if (kind === 'd') moveByGoals();
       maybeDissolve(events);
       revealIntrigue(events);
@@ -18610,6 +18784,7 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
         let done = false;
         let pL = lethalProb(kind);
         if (kind === 'dis') pL *= (hasItem(P, 'mappa') ? 0.35 : 1) * Math.max(0.5, 1.25 - P.attr.sop / 20);
+        if (P.goal && P.goal.mentor) pL *= P.goal.k === 'caccia' ? 1.7 : P.goal.k === 'nascondersi' ? 0.45 : 1;
         // valori costanti finché P non ha un evento: calcolati una volta sola
         CTX = null;
         const nAlive = alive().length;
@@ -18866,6 +19041,19 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
       if (type === 'fiducia') { tweak(a, b, { f: 60, k: 40 }); remember(a, b, 'initialTrust'); }
       if (type === 'attrazione') { tweak(a, b, { t: 75, k: 30 }); a.crush = b.id; remember(a, b, 'initialCrush'); }
     });
+    // interviste prima dei giochi: piccoli vantaggi scelti dal giocatore per i concorrenti intervistati
+    (Array.isArray(cfg.interviste) ? cfg.interviste : []).slice(0, 64).forEach((iv) => {
+      const t = iv && byId[iv.chi]; if (!t || !Array.isArray(iv.effetti)) return;
+      iv.effetti.slice(0, 6).forEach((e) => {
+        if (e === 'fama') t.fame += 1;
+        else if (e === 'morale') t.mo = clamp(t.mo + 10, 0, 100);
+        else if (e === 'coraggio') t.attr.cor = Math.min(10, t.attr.cor + 1);
+        else if (e === 'astuzia') t.attr.int = Math.min(10, t.attr.int + 1);
+        else if (e === 'scorte') t.food = clamp(t.food + 20, 0, 100);
+        else if (typeof e === 'string' && e.startsWith('legame:') && byId[e.slice(7)] && byId[e.slice(7)] !== t) { const u = byId[e.slice(7)]; addAff(t, u, 25); tweak(t, u, { f: 30, k: 30 }); }
+      });
+      t.intervistato = true;
+    });
     let feastDone = false, lastDisaster = -9;
     const usedDisasters = new Set();
     while (true) {
@@ -19007,7 +19195,7 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
 </script>
 <script>window.LOS_ASSETS = {"logo":"img/logo.f2d5175789.webp","icona":"img/icona.8b02ddeb49.webp","favicon":"img/favicon.86774dc7cf.png","panoramica":"img/panoramica.66c4c27255.webp","sagome":["img/sagome-cappuccio.e8876ba986.webp","img/sagome-esploratore.9a99fd13f8.webp","img/sagome-viaggiatore.5e36435604.webp"],"arene":{"classico":"img/arene-classico.c2887324d1.webp","cyberpunk":"img/arene-cyberpunk.713b4c77ea.webp","fantasy":"img/arene-fantasy.ee494a9322.webp","horror":"img/arene-horror.76225517ca.webp","liceo":"img/arene-liceo.c591ac5f32.webp","royale":"img/arene-royale.46515caf90.webp","scifi":"img/arene-scifi.bc9d8e04eb.webp","ufficio":"img/arene-ufficio.a2e36d4f7f.webp","wasteland":"img/arene-wasteland.734ed966b2.webp","zombie":"img/arene-zombie.11476cf1ca.webp"},"atlas":{"classico":{"armi":{"arco":"img/arene-classico-armi-arco.57fa716aa9.webp","ascia":"img/arene-classico-armi-ascia.f48629747b.webp","coltello-da-campo":"img/arene-classico-armi-coltello-da-campo.3393de240f.webp","coltello":"img/arene-classico-armi-coltello.a0134af05c.webp","falce-corta":"img/arene-classico-armi-falce-corta.3131158a9f.webp","fionda":"img/arene-classico-armi-fionda.48c8c32c43.webp","lancia-da-caccia":"img/arene-classico-armi-lancia-da-caccia.6f2be560ec.webp","lancia":"img/arene-classico-armi-lancia.115909650b.webp","machete":"img/arene-classico-armi-machete.e1c9ef25d7.webp","mazza-corta":"img/arene-classico-armi-mazza-corta.e1092f0628.webp","mazza":"img/arene-classico-armi-mazza.1fddf37b46.webp","pugnale-da-cintura":"img/arene-classico-armi-pugnale-da-cintura.0bedc8a501.webp","pugnale":"img/arene-classico-armi-pugnale.fda9dbf38a.webp","scure-da-legna":"img/arene-classico-armi-scure-da-legna.837c5d1f78.webp","spada-corta":"img/arene-classico-armi-spada-corta.952e6b7f6a.webp","tridente":"img/arene-classico-armi-tridente.2fcb3547d9.webp"},"luoghi":{"altopiano":"img/arene-classico-luoghi-altopiano.36a37512d3.webp","bosco":"img/arene-classico-luoghi-bosco.2e9163544b.webp","cornucopia":"img/arene-classico-luoghi-cornucopia.393b2dabe1.webp","fiume":"img/arene-classico-luoghi-fiume.22b335a914.webp","paludi":"img/arene-classico-luoghi-paludi.77cf115eb4.webp","rovine":"img/arene-classico-luoghi-rovine.9ea4f70ca9.webp"},"pericoli":{"branco-di-lupi-mutanti":"img/arene-classico-pericoli-branco-di-lupi-mutanti.d786a62875.webp","orso-affamato":"img/arene-classico-pericoli-orso-affamato.e4f38a9892.webp","sciame-di-vespe-velenose":"img/arene-classico-pericoli-sciame-di-vespe-velenose.5adb2c7b8d.webp","serpente-gigante":"img/arene-classico-pericoli-serpente-gigante.b17e7f3d91.webp"}},"cyberpunk":{"armi":{"coltello-vibrante-in-ceramica":"img/arene-cyberpunk-armi-coltello-vibrante-in-ceramica.6bbcd0e9e4.webp","fucile-a-pompa-da-strada":"img/arene-cyberpunk-armi-fucile-a-pompa-da-strada.dbd0de34e1.webp","fucile-a-pompa-elettromagnetico":"img/arene-cyberpunk-armi-fucile-a-pompa-elettromagnetico.0555418cd0.webp","katana-termica":"img/arene-cyberpunk-armi-katana-termica.f1ff597173.webp","mazza-a-impulsi":"img/arene-cyberpunk-armi-mazza-a-impulsi.22d841ed1d.webp","mazza-da-baseball-chiodata":"img/arene-cyberpunk-armi-mazza-da-baseball-chiodata.db2996f744.webp","mitra-compatto":"img/arene-cyberpunk-armi-mitra-compatto.eaa3815798.webp","pistola-a-rotaia-artigianale":"img/arene-cyberpunk-armi-pistola-a-rotaia-artigianale.f9e83bda89.webp","pistola-smart":"img/arene-cyberpunk-armi-pistola-smart.2aa922ba8c.webp","sparachiodi-riprogrammato":"img/arene-cyberpunk-armi-sparachiodi-riprogrammato.70f6190cb0.webp","taser-da-buttafuori":"img/arene-cyberpunk-armi-taser-da-buttafuori.60b58b451d.webp","tirapugni-elettrificato":"img/arene-cyberpunk-armi-tirapugni-elettrificato.1ce19bab37.webp","ventaglio-da-combattimento-in-titanio":"img/arene-cyberpunk-armi-ventaglio-da-combattimento-in-titanio.f3b7bb5a10.webp"},"luoghi":{"clinica-del-ripperdoc":"img/arene-cyberpunk-luoghi-clinica-del-ripperdoc.8ef0cb941b.webp","club-della-braindance":"img/arene-cyberpunk-luoghi-club-della-braindance.7765542e70.webp","megablocco":"img/arene-cyberpunk-luoghi-megablocco.28b72e6ecf.webp","mercato-di-kabuki":"img/arene-cyberpunk-luoghi-mercato-di-kabuki.d5c8ab7b96.webp","nodo-dati-corporativo":"img/arene-cyberpunk-luoghi-nodo-dati-corporativo.56ca3e1335.webp","officina-dei-maelstrom":"img/arene-cyberpunk-luoghi-officina-dei-maelstrom.d69285cf21.webp","piazza-della-torre":"img/arene-cyberpunk-luoghi-piazza-della-torre.1e400212c8.webp"},"pericoli":{"banda-di-scav":"img/arene-cyberpunk-pericoli-banda-di-scav.f1a2b2ccc4.webp","gang-di-cromati":"img/arene-cyberpunk-pericoli-gang-di-cromati.74e5576e23.webp","sciame-di-droni-di-pattuglia":"img/arene-cyberpunk-pericoli-sciame-di-droni-di-pattuglia.6fb4b17ad9.webp","squadra-di-sicurezza-corporativa":"img/arene-cyberpunk-pericoli-squadra-di-sicurezza-corporativa.6195a3b15d.webp"}},"fantasy":{"armi":{"arco-elfico":"img/arene-fantasy-armi-arco-elfico.8012f9136d.webp","ascia-nanica":"img/arene-fantasy-armi-ascia-nanica.6913fdf008.webp","balestra":"img/arene-fantasy-armi-balestra.7767becc83.webp","bastone-magico":"img/arene-fantasy-armi-bastone-magico.0781aee860.webp","daga-dei-giuramenti":"img/arene-fantasy-armi-daga-dei-giuramenti.3b6d4b398c.webp","falcetto-dargento":"img/arene-fantasy-armi-falcetto-dargento.1ce0e4e163.webp","lancia-incantata":"img/arene-fantasy-armi-lancia-incantata.7371199824.webp","lancia-silvana":"img/arene-fantasy-armi-lancia-silvana.08fbc01ede.webp","martello-da-guerra":"img/arene-fantasy-armi-martello-da-guerra.4eb03f4db7.webp","martello-nanico":"img/arene-fantasy-armi-martello-nanico.82ad6b9b14.webp","mazza-di-quercia":"img/arene-fantasy-armi-mazza-di-quercia.0f6a8345a9.webp","pugnale-avvelenato":"img/arene-fantasy-armi-pugnale-avvelenato.aba554d177.webp","spada-da-viaggio":"img/arene-fantasy-armi-spada-da-viaggio.a7bdcab5f4.webp","spada-runica":"img/arene-fantasy-armi-spada-runica.ec4012c6cf.webp"},"luoghi":{"altare-delle-armi":"img/arene-fantasy-luoghi-altare-delle-armi.db06de44c1.webp","foresta-elfica":"img/arene-fantasy-luoghi-foresta-elfica.0448fcfbd3.webp","lago-nebbioso":"img/arene-fantasy-luoghi-lago-nebbioso.f19abc7c81.webp","miniere":"img/arene-fantasy-luoghi-miniere.5baa916ec9.webp","palude-stregata":"img/arene-fantasy-luoghi-palude-stregata.6a0b2af4a7.webp","picco-del-drago":"img/arene-fantasy-luoghi-picco-del-drago.06bdfd84b1.webp","torre-in-rovina":"img/arene-fantasy-luoghi-torre-in-rovina.ac716863c7.webp"},"pericoli":{"branco-di-lupi-mannari":"img/arene-fantasy-pericoli-branco-di-lupi-mannari.1c9124ceee.webp","spettro-errante":"img/arene-fantasy-pericoli-spettro-errante.056074bc23.webp","troll-di-caverna":"img/arene-fantasy-pericoli-troll-di-caverna.31aa2444f0.webp","viverna":"img/arene-fantasy-pericoli-viverna.577b91a819.webp"}},"horror":{"armi":{"ascia":"img/arene-horror-armi-ascia.f6793c220e.webp","attizzatoio":"img/arene-horror-armi-attizzatoio.12b9bf75af.webp","bastone-da-passeggio":"img/arene-horror-armi-bastone-da-passeggio.1a636ce4ab.webp","candelabro-dargento":"img/arene-horror-armi-candelabro-dargento.7d962054de.webp","coltello-dargento":"img/arene-horror-armi-coltello-dargento.73a6bb81ea.webp","crocifisso-appuntito":"img/arene-horror-armi-crocifisso-appuntito.203b41a170.webp","daga-da-cerimonia":"img/arene-horror-armi-daga-da-cerimonia.a597e15c53.webp","falce":"img/arene-horror-armi-falce.6513df8fa2.webp","fucile-da-caccia":"img/arene-horror-armi-fucile-da-caccia.169dc367e1.webp","pugnale-depoca":"img/arene-horror-armi-pugnale-depoca.f148afd005.webp","pugnale-rituale":"img/arene-horror-armi-pugnale-rituale.944cb9056c.webp","scure-da-legna":"img/arene-horror-armi-scure-da-legna.a11379a412.webp"},"luoghi":{"biblioteca":"img/arene-horror-luoghi-biblioteca.00d6ab97f4.webp","cantina":"img/arene-horror-luoghi-cantina.a196828c1d.webp","cappella":"img/arene-horror-luoghi-cappella.a51e505028.webp","cimitero":"img/arene-horror-luoghi-cimitero.7a441de089.webp","salone":"img/arene-horror-luoghi-salone.37f10c88c7.webp","serra":"img/arene-horror-luoghi-serra.b3d91121d4.webp","soffitta":"img/arene-horror-luoghi-soffitta.466d40cea3.webp"},"pericoli":{"bambola-posseduta":"img/arene-horror-pericoli-bambola-posseduta.7064eef1d7.webp","entita-senza-volto":"img/arene-horror-pericoli-entita-senza-volto.2c28467bdd.webp","spettro-urlante":"img/arene-horror-pericoli-spettro-urlante.25fa554e05.webp","stormo-di-corvi":"img/arene-horror-pericoli-stormo-di-corvi.fe5c85d7ae.webp"}},"liceo":{"armi":{"compito-copiato":"img/arene-liceo-armi-compito-copiato.c9ade27d61.webp","dossier-delle-revisioni":"img/arene-liceo-armi-dossier-delle-revisioni.77676a0f5f.webp","elenco-delle-correzioni":"img/arene-liceo-armi-elenco-delle-correzioni.04be1154c8.webp","fascicolo-di-risposte-motivate":"img/arene-liceo-armi-fascicolo-di-risposte-motivate.c29995b581.webp","foto-imbarazzante":"img/arene-liceo-armi-foto-imbarazzante.ff7d3ef284.webp","gossip-esplosivo":"img/arene-liceo-armi-gossip-esplosivo.552b1e6236.webp","pallone-da-dodgeball":"img/arene-liceo-armi-pallone-da-dodgeball.60a2576785.webp","profilo-falso":"img/arene-liceo-armi-profilo-falso.d1dac05a2b.webp","prospetto-dei-contributi":"img/arene-liceo-armi-prospetto-dei-contributi.0c121fd79a.webp","quaderno-delle-verifiche":"img/arene-liceo-armi-quaderno-delle-verifiche.7d8b07341a.webp","registro-rubato":"img/arene-liceo-armi-registro-rubato.67eb4b9eff.webp","riepilogo-delle-fonti":"img/arene-liceo-armi-riepilogo-delle-fonti.3c889a0ed5.webp"},"luoghi":{"aula-magna":"img/arene-liceo-luoghi-aula-magna.0478e35c5c.webp","aule":"img/arene-liceo-luoghi-aule.b3142d07cc.webp","biblioteca":"img/arene-liceo-luoghi-biblioteca.1ae806ae58.webp","cortile":"img/arene-liceo-luoghi-cortile.51bf433337.webp","laboratorio-di-chimica":"img/arene-liceo-luoghi-laboratorio-di-chimica.eba1434683.webp","mensa":"img/arene-liceo-luoghi-mensa.67bcbc7e37.webp","palestra":"img/arene-liceo-luoghi-palestra.8ecb872849.webp"},"pericoli":{"bidello-di-turno":"img/arene-liceo-pericoli-bidello-di-turno.191c43a8bd.webp","ispezione-a-sorpresa":"img/arene-liceo-pericoli-ispezione-a-sorpresa.bef087d9b9.webp","preside":"img/arene-liceo-pericoli-preside.033f6c9aae.webp","professoressa-di-matematica":"img/arene-liceo-pericoli-professoressa-di-matematica.6cb65c6a3f.webp"}},"royale":{"armi":{"balestra":"img/arene-royale-armi-balestra.64563b6cea.webp","carabina-compatta":"img/arene-royale-armi-carabina-compatta.a0fa150fbe.webp","coltello-da-combattimento":"img/arene-royale-armi-coltello-da-combattimento.74a64bca77.webp","coltello-tattico":"img/arene-royale-armi-coltello-tattico.8e9cb56197.webp","fucile-a-pompa":"img/arene-royale-armi-fucile-a-pompa.3d7fc7d83c.webp","fucile-da-cecchino":"img/arene-royale-armi-fucile-da-cecchino.fc3c4f19f1.webp","fucile-dassalto":"img/arene-royale-armi-fucile-dassalto.b91ccb0ec8.webp","granata":"img/arene-royale-armi-granata.fd9c359b27.webp","lancia-da-sopravvivenza":"img/arene-royale-armi-lancia-da-sopravvivenza.8a39c1a5e5.webp","manganello":"img/arene-royale-armi-manganello.dc6284893b.webp","mitraglietta":"img/arene-royale-armi-mitraglietta.6dcc3246e6.webp","pistola-da-segnalazione-modificata":"img/arene-royale-armi-pistola-da-segnalazione-modificata.1c7f899ca7.webp","pistola":"img/arene-royale-armi-pistola.acae268814.webp","scure-da-campo":"img/arene-royale-armi-scure-da-campo.6a5b0becd5.webp"},"luoghi":{"aeroporto":"img/arene-royale-luoghi-aeroporto.81e8ce98d4.webp","base-militare":"img/arene-royale-luoghi-base-militare.67f3a7de9d.webp","centrale-elettrica":"img/arene-royale-luoghi-centrale-elettrica.05ee57458a.webp","fattoria":"img/arene-royale-luoghi-fattoria.7c780dda87.webp","foresta":"img/arene-royale-luoghi-foresta.03b47644d0.webp","villaggio-costiero":"img/arene-royale-luoghi-villaggio-costiero.568519eb7c.webp"},"pericoli":{"cane-da-guardia-addestrato":"img/arene-royale-pericoli-cane-da-guardia-addestrato.c7853a67a0.webp","drone-armato":"img/arene-royale-pericoli-drone-armato.30d0b73e01.webp","elicottero-da-caccia":"img/arene-royale-pericoli-elicottero-da-caccia.8c68e62346.webp"}},"scifi":{"armi":{"bastone-a-impulsi":"img/arene-scifi-armi-bastone-a-impulsi.4e17e074e7.webp","cannone-a-rotaia-portatile":"img/arene-scifi-armi-cannone-a-rotaia-portatile.9a59b97d98.webp","frusta-monofilamento":"img/arene-scifi-armi-frusta-monofilamento.5ee8081aa9.webp","fucile-al-plasma":"img/arene-scifi-armi-fucile-al-plasma.ea2384a239.webp","granata-emp":"img/arene-scifi-armi-granata-emp.04cfd31203.webp","lama-di-servizio":"img/arene-scifi-armi-lama-di-servizio.a47d434464.webp","lama-vibrante":"img/arene-scifi-armi-lama-vibrante.02b0f47ff8.webp","lancia-da-abbordaggio":"img/arene-scifi-armi-lancia-da-abbordaggio.cf167e52ff.webp","perforatore-portatile":"img/arene-scifi-armi-perforatore-portatile.aa7e92ecab.webp","pistola-a-scarica":"img/arene-scifi-armi-pistola-a-scarica.33b3e5929e.webp","pistola-laser":"img/arene-scifi-armi-pistola-laser.aed4bbf3ed.webp","taglierino-ceramico":"img/arene-scifi-armi-taglierino-ceramico.b45d524836.webp","taser-a-impulsi":"img/arene-scifi-armi-taser-a-impulsi.360e29e1d5.webp"},"luoghi":{"condotti-di-servizio":"img/arene-scifi-luoghi-condotti-di-servizio.6817134b5e.webp","hangar":"img/arene-scifi-luoghi-hangar.6de551833b.webp","moduli-abitativi":"img/arene-scifi-luoghi-moduli-abitativi.9f5bb96d39.webp","ponte-di-comando":"img/arene-scifi-luoghi-ponte-di-comando.3e9ffd005a.webp","reattore":"img/arene-scifi-luoghi-reattore.d10a335006.webp","serra-idroponica":"img/arene-scifi-luoghi-serra-idroponica.b6f4407853.webp"},"pericoli":{"androide-da-combattimento":"img/arene-scifi-pericoli-androide-da-combattimento.1a3d3eb38e.webp","creatura-aliena-dai-tentacoli":"img/arene-scifi-pericoli-creatura-aliena-dai-tentacoli.b6b314ddd9.webp","drone-di-sicurezza-impazzito":"img/arene-scifi-pericoli-drone-di-sicurezza-impazzito.c8a9c6f9e3.webp","sciame-di-nanobot":"img/arene-scifi-pericoli-sciame-di-nanobot.d43296f047.webp"}},"ufficio":{"armi":{"badge-clonato-del-capo":"img/arene-ufficio-armi-badge-clonato-del-capo.be9f7381fe.webp","dossier-dei-risultati":"img/arene-ufficio-armi-dossier-dei-risultati.1888e2f671.webp","elenco-dei-contributi":"img/arene-ufficio-armi-elenco-dei-contributi.3de4fbe5bf.webp","fascicolo-delle-fonti":"img/arene-ufficio-armi-fascicolo-delle-fonti.02df27dfbf.webp","foglio-excel-con-le-prove":"img/arene-ufficio-armi-foglio-excel-con-le-prove.944f6ec708.webp","mail-in-copia-a-tutti":"img/arene-ufficio-armi-mail-in-copia-a-tutti.1d4304df14.webp","nota-spese-gonfiata":"img/arene-ufficio-armi-nota-spese-gonfiata.d2683cca4c.webp","presentazione-rubata":"img/arene-ufficio-armi-presentazione-rubata.815dc5c8b4.webp","prospetto-delle-metriche":"img/arene-ufficio-armi-prospetto-delle-metriche.356da1d2d9.webp","registro-delle-revisioni":"img/arene-ufficio-armi-registro-delle-revisioni.509eab44df.webp","report-pieno-di-errori-altrui":"img/arene-ufficio-armi-report-pieno-di-errori-altrui.c01c0ef897.webp","riepilogo-delle-approvazioni":"img/arene-ufficio-armi-riepilogo-delle-approvazioni.9394dadd6b.webp"},"luoghi":{"cucina":"img/arene-ufficio-luoghi-cucina.d968f8861d.webp","open-space":"img/arene-ufficio-luoghi-open-space.b6b7990c99.webp","parcheggio":"img/arene-ufficio-luoghi-parcheggio.d593f2ed83.webp","sala-riunioni":"img/arene-ufficio-luoghi-sala-riunioni.f92c4030a9.webp","sala-stampanti":"img/arene-ufficio-luoghi-sala-stampanti.1727f50082.webp","ufficio-del-direttore":"img/arene-ufficio-luoghi-ufficio-del-direttore.bb3b6cabab.webp"},"pericoli":{"consulente-esterno":"img/arene-ufficio-pericoli-consulente-esterno.ce6e200c3f.webp","direttore-generale":"img/arene-ufficio-pericoli-direttore-generale.da2eb1f708.webp","riorganizzazione-aziendale":"img/arene-ufficio-pericoli-riorganizzazione-aziendale.1fd57b76b3.webp","ufficio-risorse-umane":"img/arene-ufficio-pericoli-ufficio-risorse-umane.8392df7518.webp"}},"wasteland":{"armi":{"balestra-artigianale":"img/arene-wasteland-armi-balestra-artigianale.e09826852f.webp","catena":"img/arene-wasteland-armi-catena.866183d584.webp","coltello-da-strada":"img/arene-wasteland-armi-coltello-da-strada.1083c4429d.webp","fucile-arrugginito":"img/arene-wasteland-armi-fucile-arrugginito.797601f16e.webp","lama-di-recupero":"img/arene-wasteland-armi-lama-di-recupero.1ad13cfc78.webp","lancia-di-ferraglia":"img/arene-wasteland-armi-lancia-di-ferraglia.99d9f41307.webp","lancia-ricavata-da-un-tubo":"img/arene-wasteland-armi-lancia-ricavata-da-un-tubo.53b934e449.webp","lanciachiodi":"img/arene-wasteland-armi-lanciachiodi.e4f51e42e2.webp","mannaia":"img/arene-wasteland-armi-mannaia.518ae9c11c.webp","martello-da-officina":"img/arene-wasteland-armi-martello-da-officina.851055795e.webp","mazza-di-tubi":"img/arene-wasteland-armi-mazza-di-tubi.91babe82ac.webp","molotov":"img/arene-wasteland-armi-molotov.303d6fa315.webp","scure-da-demolizione":"img/arene-wasteland-armi-scure-da-demolizione.066ea5e066.webp"},"luoghi":{"autostrada-spezzata":"img/arene-wasteland-luoghi-autostrada-spezzata.19a72a0b97.webp","citta-fantasma":"img/arene-wasteland-luoghi-citta-fantasma.fe22bb72b2.webp","cratere":"img/arene-wasteland-luoghi-cratere.04de7ca40a.webp","deposito":"img/arene-wasteland-luoghi-deposito.f98aa31220.webp","diga":"img/arene-wasteland-luoghi-diga.3be9abe15a.webp","discarica":"img/arene-wasteland-luoghi-discarica.b8783ad9c6.webp","raffineria":"img/arene-wasteland-luoghi-raffineria.081e2d2ad6.webp"},"pericoli":{"banda-di-predoni":"img/arene-wasteland-pericoli-banda-di-predoni.1dfcfd1628.webp","branco-di-cani-mutati":"img/arene-wasteland-pericoli-branco-di-cani-mutati.442fabfc39.webp","scorpione-gigante":"img/arene-wasteland-pericoli-scorpione-gigante.2dd8911367.webp","verme-delle-sabbie":"img/arene-wasteland-pericoli-verme-delle-sabbie.a0d445beeb.webp"}},"zombie":{"armi":{"accetta-da-soccorso":"img/arene-zombie-armi-accetta-da-soccorso.6d36eb13ac.webp","accetta":"img/arene-zombie-armi-accetta.0eed163720.webp","balestra":"img/arene-zombie-armi-balestra.d705131d17.webp","coltello-da-campeggio":"img/arene-zombie-armi-coltello-da-campeggio.2abab58e78.webp","fucile-a-pompa":"img/arene-zombie-armi-fucile-a-pompa.b00b1d6a70.webp","katana":"img/arene-zombie-armi-katana.f631ad392f.webp","machete-da-potatura":"img/arene-zombie-armi-machete-da-potatura.94a93108a1.webp","martello-da-carpentiere":"img/arene-zombie-armi-martello-da-carpentiere.021e8a80f2.webp","mazza-chiodata":"img/arene-zombie-armi-mazza-chiodata.b4e11dcadb.webp","mazza-da-lavoro":"img/arene-zombie-armi-mazza-da-lavoro.c36a90108f.webp","motosega":"img/arene-zombie-armi-motosega.f74e603615.webp","piede-di-porco":"img/arene-zombie-armi-piede-di-porco.c185a97e0d.webp","pistola":"img/arene-zombie-armi-pistola.6d30022ca6.webp"},"luoghi":{"centro-commerciale":"img/arene-zombie-luoghi-centro-commerciale.333f4699d5.webp","metropolitana":"img/arene-zombie-luoghi-metropolitana.878a263605.webp","ospedale":"img/arene-zombie-luoghi-ospedale.f25de413a4.webp","periferia":"img/arene-zombie-luoghi-periferia.e28a7d70c7.webp","piazza":"img/arene-zombie-luoghi-piazza.b6ed86b3ad.webp","scuola":"img/arene-zombie-luoghi-scuola.153ddbaa75.webp","stazione-di-polizia":"img/arene-zombie-luoghi-stazione-di-polizia.157f7a17f5.webp"},"pericoli":{"cane-infetto":"img/arene-zombie-pericoli-cane-infetto.fdff913d6f.webp","gigante-mutato":"img/arene-zombie-pericoli-gigante-mutato.91fad36b70.webp","infetto-corridore":"img/arene-zombie-pericoli-infetto-corridore.61f48faafd.webp","orda-di-zombi":"img/arene-zombie-pericoli-orda-di-zombi.e0fc6d1b56.webp"}}},"fx":{"pennellate":["img/fx-pennellata-1.5527b3e9bd.webp","img/fx-pennellata-2.8526d34dcf.webp","img/fx-pennellata-3.a7f3e74ff3.webp","img/fx-pennellata-4.fe1f612999.webp"],"sigilli":{"classico":"img/fx-sigillo-classico.b781c63b8d.webp","cyberpunk":"img/fx-sigillo-cyberpunk.134a7f507c.webp","fantasy":"img/fx-sigillo-fantasy.d854d9ac19.webp","horror":"img/fx-sigillo-horror.54149e6a7e.webp","liceo":"img/fx-sigillo-liceo.7f1566a7a8.webp","royale":"img/fx-sigillo-royale.bedbb77f68.webp","scifi":"img/fx-sigillo-scifi.6c50b79280.webp","ufficio":"img/fx-sigillo-ufficio.fcbbcc051a.webp","wasteland":"img/fx-sigillo-wasteland.86f44d1714.webp","zombie":"img/fx-sigillo-zombie.44ac2a6473.webp"},"grana":"img/fx-grana.c1e72fd2da.webp","forme":{"fascia":"img/fx-forma-fascia.8a2f8ab92d.webp","freccia":"img/fx-forma-freccia.4e8039be8f.webp","fulmine":"img/fx-forma-fulmine.c9a15d227c.webp","stella":"img/fx-forma-stella.e773ba5dda.webp","strappo":"img/fx-forma-strappo.0e6a41d0d9.webp"},"impatto":"img/fx-impatto.fd13ac9554.webp","mezzitoni":"img/fx-mezzitoni.f9ef4df053.webp","occhi":{"f-1":"img/fx-occhi-f-1.3779df529a.webp","f-2":"img/fx-occhi-f-2.2f47e4535b.webp","f-3":"img/fx-occhi-f-3.8b10fc4b00.webp","f-4":"img/fx-occhi-f-4.08132e01f9.webp","m-1":"img/fx-occhi-m-1.fd94d5b0eb.webp","m-2":"img/fx-occhi-m-2.c7b9661e6b.webp","m-3":"img/fx-occhi-m-3.91ff950ae4.webp","m-4":"img/fx-occhi-m-4.d0a0e73220.webp","m-5":"img/fx-occhi-m-5.f4c19f2141.webp","n-1":"img/fx-occhi-n-1.21fc3b7adf.webp"},"fondali":{"classico":"img/fx-fondale-classico.8a3fc35342.webp","cyberpunk":"img/fx-fondale-cyberpunk.283c80cc1e.webp","fantasy":"img/fx-fondale-fantasy.0ca9b3f315.webp","horror":"img/fx-fondale-horror.4ba1241b63.webp","liceo":"img/fx-fondale-liceo.fb428a57f7.webp","royale":"img/fx-fondale-royale.aac1246425.webp","scifi":"img/fx-fondale-scifi.27ee2ce8cc.webp","ufficio":"img/fx-fondale-ufficio.780789ce70.webp","wasteland":"img/fx-fondale-wasteland.02311ed21d.webp","zombie":"img/fx-fondale-zombie.83b8d35716.webp"},"volti":{"f-1":"img/fx-volto-f-1.96d62771c1.webp","f-2":"img/fx-volto-f-2.79d3485864.webp","f-3":"img/fx-volto-f-3.aeb7664a4e.webp","f-4":"img/fx-volto-f-4.2f2c864354.webp","m-1":"img/fx-volto-m-1.f8b83b073e.webp","m-2":"img/fx-volto-m-2.b9eb346a31.webp","m-3":"img/fx-volto-m-3.5311549074.webp","m-4":"img/fx-volto-m-4.10b102bdb0.webp","m-5":"img/fx-volto-m-5.63e5c91778.webp","n-1":"img/fx-volto-n-1.02cf4d1c97.webp"},"vincitori":{"f-1":"img/vincitori-vincitore-f-1.10b1ec0d22.webp","f-2":"img/vincitori-vincitore-f-2.03d8a3a92a.webp","f-3":"img/vincitori-vincitore-f-3.bc0adcd66a.webp","m-1":"img/vincitori-vincitore-m-1.c597436dca.webp","m-2":"img/vincitori-vincitore-m-2.9c8b48e9f8.webp","n-1":"img/vincitori-vincitore-n-1.1539fc78b2.webp"},"occhiY":{"m-1":0.53,"m-2":0.6,"m-3":0.43,"m-4":0.39,"m-5":0.575,"f-1":0.52,"f-2":0.49,"f-3":0.41,"f-4":0.46,"n-1":0.55}},"audio":{"sfx":{"heavy":"img/audio-colpo.6c66fc3384.mp3","battle":"img/audio-scontro.171fdeb377.mp3","click":"img/audio-ui-click.75370fe5e2.wav","hover":"img/audio-ui-hover.39a84fb194.wav","tick":"img/audio-ui-tick.16c581af00.wav","jazz":"img/audio-vittoria.6a3763dedf.mp3"},"music":"img/audio-musica-dark-hour.53788a2c76.mp3"}};
 ;
-window.LOS_BUILD = "962f7c2265662f54654930381e0d9de628e81889ad46f9d1e0dea7e76b4ad081";
+window.LOS_BUILD = "999234739685206cc84ac0f3bb5d3d68911d033f95b4f0f316fe8b6d7f92db56";
 ;
 /* Last One Standing — grafica vettoriale: logo, icone delle arene, illustrazioni.
  * Tutto è SVG generato in codice: nessuna immagine esterna. */
@@ -23282,10 +23470,248 @@ window.LOS_BUILD = "962f7c2265662f54654930381e0d9de628e81889ad46f9d1e0dea7e76b4a
 })(typeof window !== 'undefined' ? window : globalThis);
 
 ;
+/* Last One Standing — la partita giocata (src/partita.js).
+ * Tutto ciò che il giocatore fa durante la Diretta: crediti, puntate live, doni degli sponsor, ordini del mentore,
+ * interviste prima dei giochi, e il «cartello» che ferma la riproduzione per chiedere una scelta.
+ * Logica e schermate di base; la regia visiva sta in src/skin/60-partita.css (+ js).
+ * Le scelte che cambiano la storia diventano interventi in cfg.interventi: ui.js rilancia la simulazione
+ * con lo stesso seme (il passato non cambia, vedi tools/test-interventi.js). */
+(function (G) {
+  'use strict';
+  if (typeof document === 'undefined') return;
+
+  const esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
+  const R1 = (x) => Math.round(x * 10) / 10;
+  const RITMI = ['spettatore', 'giocatore', 'regista'];
+  const START = 100;
+  const PROFILE_KEY = 'los-profilo-v1';
+
+  /* ================= il cartello delle scelte =================
+   * chiedi({ kicker, title, text, faces, options:[{ value, label, sub, cost, html, disabled }], grid, stake:[..], timer, skip })
+   * → Promise<{ value, stake } | null>. null = «lascia fare» (anche allo scadere del tempo). */
+  let open = null;
+  function chiedi(o) {
+    if (open) open.close(null);
+    return new Promise((resolve) => {
+      const root = document.createElement('div');
+      root.className = 'sc' + (o.cls ? ' ' + o.cls : '');
+      root.setAttribute('role', 'dialog'); root.setAttribute('aria-modal', 'true'); root.setAttribute('aria-labelledby', 'scT');
+      const opts = o.options || [];
+      const stake = Array.isArray(o.stake) && o.stake.length ? o.stake : null;
+      let stakeV = stake ? (o.stakeDefault != null && stake.includes(o.stakeDefault) ? o.stakeDefault : stake[0]) : null;
+      root.innerHTML = '<div class="sc-back"></div><div class="sc-card" tabindex="-1">' +
+        '<div class="sc-head">' + (o.kicker ? '<span class="sc-k">' + esc(o.kicker) + '</span>' : '') + '<h2 class="sc-t" id="scT">' + esc(o.title || '') + '</h2>' + (o.text ? '<p class="sc-x">' + o.text + '</p>' : '') + '</div>' +
+        (o.faces ? '<div class="sc-faces">' + o.faces + '</div>' : '') +
+        '<div class="sc-opts' + (o.grid ? ' sc-grid' : '') + '" role="group" aria-label="' + esc(o.title || 'Scelte') + '">' + opts.map((x, k) =>
+          '<button type="button" class="sc-opt" data-k="' + k + '"' + (x.disabled ? ' disabled' : '') + '>' +
+          (k < 9 && !o.grid ? '<span class="sc-n" aria-hidden="true">' + (k + 1) + '</span>' : '') +
+          (x.html || '<b class="sc-l">' + esc(x.label) + '</b>' + (x.sub ? '<small class="sc-s">' + esc(x.sub) + '</small>' : '')) +
+          (x.cost != null ? '<em class="sc-cost">' + esc(x.cost) + '</em>' : '') + '</button>').join('') + '</div>' +
+        (stake ? '<div class="sc-stake" role="group" aria-label="Posta"><span>Posta</span>' + stake.map((v) => '<button type="button" data-s="' + v + '" aria-pressed="' + (v === stakeV) + '"' + (o.credits != null && v > o.credits ? ' disabled' : '') + '>' + v + '</button>').join('') + (o.credits != null ? '<span class="sc-wallet">Crediti: <b>' + o.credits + '</b></span>' : '') + '</div>' : '') +
+        '<div class="sc-foot">' + (o.timer ? '<span class="sc-timer" aria-hidden="true"><i style="--sc-t:' + o.timer + 's"></i></span>' : '<span></span>') +
+        '<button type="button" class="sc-skip">' + esc(o.skip || 'Lascia fare') + '</button></div></div>';
+      document.body.appendChild(root);
+      document.documentElement.classList.add('sc-on');
+      const prevFocus = document.activeElement;
+      let timer = 0, done = false;
+      function close(v) {
+        if (done) return; done = true; clearTimeout(timer);
+        document.removeEventListener('keydown', onKey, true);
+        root.classList.add('sc-out');
+        const kill = () => { root.remove(); if (!document.querySelector('.sc')) document.documentElement.classList.remove('sc-on'); };
+        // la grafica può animare l'uscita: la classe resta un attimo, poi il cartello sparisce comunque
+        setTimeout(kill, o.outMs != null ? o.outMs : 260);
+        if (prevFocus && prevFocus.focus) try { prevFocus.focus({ preventScroll: true }); } catch (e) { /* niente */ }
+        open = null;
+        resolve(v);
+      }
+      function pick(k) { const x = opts[k]; if (!x || x.disabled) return; root.querySelectorAll('.sc-opt')[k].classList.add('is-picked'); close({ value: x.value, stake: stakeV }); }
+      function onKey(e) {
+        e.stopPropagation();
+        if (e.key === 'Escape') { e.preventDefault(); close(null); return; }
+        const n = parseInt(e.key, 10);
+        if (!o.grid && n >= 1 && n <= opts.length && !e.ctrlKey && !e.metaKey && !e.altKey) { e.preventDefault(); pick(n - 1); return; }
+        if (e.key === 'Tab') {
+          const f = [...root.querySelectorAll('button:not([disabled])')]; if (!f.length) return;
+          const i = f.indexOf(document.activeElement);
+          if (e.shiftKey && i <= 0) { e.preventDefault(); f[f.length - 1].focus(); } else if (!e.shiftKey && i === f.length - 1) { e.preventDefault(); f[0].focus(); }
+        }
+        e.stopPropagation();
+      }
+      document.addEventListener('keydown', onKey, true);
+      root.addEventListener('click', (e) => {
+        const b = e.target.closest('.sc-opt'); if (b) return pick(+b.dataset.k);
+        const s = e.target.closest('[data-s]'); if (s && !s.disabled) { stakeV = +s.dataset.s; root.querySelectorAll('[data-s]').forEach((x) => x.setAttribute('aria-pressed', String(x === s))); return; }
+        if (e.target.closest('.sc-skip')) close(null);
+      });
+      if (o.timer) timer = setTimeout(() => close(null), o.timer * 1000);
+      // un tocco sul cartello ferma il timer: chi sta scegliendo non deve essere messo fretta
+      if (o.timer) root.addEventListener('pointerdown', () => { clearTimeout(timer); root.classList.add('sc-hold'); }, { once: true });
+      const first = root.querySelector('.sc-opt:not([disabled])');
+      requestAnimationFrame(() => (first || root.querySelector('.sc-card')).focus({ preventScroll: true }));
+      open = { close };
+      if (G.LOS_PARTITA_FX && G.LOS_PARTITA_FX.card) try { G.LOS_PARTITA_FX.card(root, o); } catch (e) { /* solo grafica */ }
+    });
+  }
+  const aperto = () => !!open;
+
+  /* ================= stato della partita giocata ================= */
+  function nuovo(pre) {
+    return { v: 1, inizio: Date.now(), crediti: START, mentore: (pre && pre.mentore) || null, puntate: [], doni: {}, chiesto: {}, ordini: [], allievi: [], log: [] };
+  }
+  function sano(g) {
+    if (!g || typeof g !== 'object') return nuovo();
+    const n = nuovo();
+    n.inizio = Number.isFinite(g.inizio) ? g.inizio : 0;
+    n.crediti = Number.isFinite(g.crediti) ? clamp(Math.round(g.crediti), 0, 1e6) : START;
+    n.mentore = typeof g.mentore === 'string' ? g.mentore : null;
+    n.puntate = Array.isArray(g.puntate) ? g.puntate.filter((p) => p && typeof p === 'object').slice(-200) : [];
+    n.doni = g.doni && typeof g.doni === 'object' ? g.doni : {};
+    n.chiesto = g.chiesto && typeof g.chiesto === 'object' ? g.chiesto : {};
+    n.ordini = Array.isArray(g.ordini) ? g.ordini.slice(-200) : [];
+    n.allievi = Array.isArray(g.allievi) ? g.allievi.filter((x) => typeof x === 'string').slice(-50) : [];
+    n.log = Array.isArray(g.log) ? g.log.slice(-100) : [];
+    return n;
+  }
+
+  /* ================= profilo del giocatore (tra le partite) ================= */
+  function profilo() {
+    let p = {};
+    try { p = JSON.parse(G.localStorage.getItem(PROFILE_KEY) || '{}') || {}; } catch (e) { p = {}; }
+    return Object.assign({ v: 1, partite: 0, crediti: 0, record: 0, puntate: 0, vinte: 0, doni: 0, ordini: 0, seguiti: 0, mentoriVincenti: 0, chiuse: [] }, p);
+  }
+  function salvaProfilo(p) { try { G.localStorage.setItem(PROFILE_KEY, JSON.stringify(p)); } catch (e) { /* memoria piena */ } }
+  // a fine partita, una volta sola per partita (chiave: id della partita salvata o seme)
+  function chiudiPartita(run, SIM) {
+    const g = run && run.gioco; if (!g || !SIM) return null;
+    const key = String(g.inizio || run.replayId || run.cfg.seed); const p = profilo();
+    if (p.chiuse.includes(key)) return p;
+    const pts = g.puntate.filter((x) => x.esito === 'vinta' || x.esito === 'persa');
+    p.partite++; p.crediti += g.crediti; p.record = Math.max(p.record, g.crediti);
+    p.puntate += pts.length; p.vinte += pts.filter((x) => x.esito === 'vinta').length;
+    p.doni += Object.values(g.doni).length; p.ordini += g.ordini.length; p.seguiti += g.ordini.filter((x) => x.obeys).length;
+    if (g.mentore && SIM.winners.includes(g.mentore)) p.mentoriVincenti++;
+    p.chiuse = p.chiuse.concat([key]).slice(-60);
+    salvaProfilo(p); return p;
+  }
+
+  /* ================= letture della partita ================= */
+  const vivi = (SIM, i) => (SIM.phases[i] ? SIM.phases[i].snap.alive : []);
+  const vit = (SIM, i, id) => ((SIM.phases[i] && SIM.phases[i].snap.vit[id]) || [100, 90, 55, 70, -1]);
+  // un giorno nuovo comincia quando cambia il numero del giorno (le fasi «caduti» chiudono il giorno prima)
+  const nuovoGiorno = (P, k) => k > 0 && P[k] && P[k].kind !== 'fallen' && P[k].day !== P[k - 1].day;
+  // ritmo di morte osservato fin qui: eliminazioni per concorrente vivo per giorno
+  function tasso(SIM, i) {
+    const P = SIM.phases, tot = SIM.tributes.length, alive = vivi(SIM, i).length, d = Math.max(1, P[i].day);
+    const dead = tot - alive;
+    return clamp(dead / Math.max(1, (tot + alive) / 2) / d, 0.05, 0.6);
+  }
+  function rischio(SIM, i, id) {
+    const v = vit(SIM, i, id), inv = (SIM.phases[i].snap.inv[id] || []).map((x) => x.t);
+    let r = tasso(SIM, i) * (v[0] < 40 ? 2 : v[0] < 65 ? 1.35 : 0.85) * (v[3] < 25 ? 1.3 : 1) * (inv.includes('arma') ? 0.8 : 1.12) * (inv.includes('med') ? 0.9 : 1);
+    return clamp(r, 0.04, 0.85);
+  }
+  const quota = (p) => R1(clamp(0.9 / clamp(p, 0.05, 0.95), 1.1, 9));
+
+  /* ================= puntate live ================= */
+  // tre proposte costruite sullo stato reale all'inizio del giorno (fase k), mai su ciò che il motore sa del futuro
+  function proposte(SIM, k, g, BY, followed, soft) {
+    const P = SIM.phases, i = k - 1, day = P[k].day, A = vivi(SIM, i);
+    if (A.length < 3) return [];
+    const rng = (() => { let h = 2166136261; for (const c of SIM.seed + '|bet|' + k) h = Math.imul(h ^ c.charCodeAt(0), 16777619); return () => ((h = Math.imul(h ^ (h >>> 13), 1597334677)) >>> 0) / 4294967296; })();
+    const pick = (arr) => arr[Math.floor(rng() * arr.length)];
+    const out = [], used = new Set();
+    // 1. sopravvivenza: il mentore o un seguito, se vivo; altrimenti qualcuno a rischio medio
+    const pref = [g.mentore, ...(followed || [])].filter((id) => id && A.includes(id));
+    const a = pref[0] || A.slice().sort((x, y) => Math.abs(rischio(SIM, i, x) - 0.3) - Math.abs(rischio(SIM, i, y) - 0.3))[0];
+    used.add(a);
+    const pa = 1 - rischio(SIM, i, a);
+    out.push({ tipo: 'vive', a, giorno: day, q: quota(pa), testo: BY[a].name + ' arriva viv' + (BY[a].gender === 'F' ? 'a' : BY[a].gender === 'N' ? 'ə' : 'o') + ' a domani' });
+    // 2. chi cade prima tra due
+    const rest = A.filter((x) => !used.has(x));
+    const b = pick(rest), c = pick(rest.filter((x) => x !== b));
+    if (b && c) {
+      const rb = rischio(SIM, i, b), rc = rischio(SIM, i, c), pb = rb / (rb + rc);
+      out.push({ tipo: 'prima', a: b, b: c, q: quota(pb * 0.92), testo: (soft ? 'Esce prima ' : 'Cade prima ') + BY[b].name + ' di ' + BY[c].name });
+    }
+    // 3. il giorno: tradimenti o sangue
+    const seenDays = Math.max(1, P[i].day);
+    const betrays = P.slice(0, k).reduce((s, ph) => s + ph.events.filter((e) => e.cat === 'betray').length, 0);
+    if (rng() < 0.5 && betrays > 0) {
+      const pt = clamp(betrays / seenDays, 0.15, 0.8);
+      out.push({ tipo: 'tradimento', giorno: day, q: quota(pt), testo: 'Oggi qualcuno tradisce un alleato' });
+    } else {
+      const exp = tasso(SIM, i) * A.length, n = Math.max(1, Math.round(exp));
+      out.push({ tipo: 'sangue', n, giorno: day, q: quota(exp >= n ? 0.55 : 0.42), testo: 'Almeno ' + n + (soft ? (n === 1 ? ' eliminazione' : ' eliminazioni') : (n === 1 ? ' morto' : ' morti')) + ' oggi' });
+    }
+    return out;
+  }
+  // una puntata si chiude quando chi guarda arriva al punto in cui l'esito si vede
+  function risolvi(SIM, i, g) {
+    const P = SIM.phases, last = i >= P.length - 1, by = Object.fromEntries(SIM.tributes.map((t) => [t.id, t])), out = [];
+    const dayOver = (d) => last || (P[i].day > d) || (P[i].kind === 'fallen' && P[i].day >= d);
+    g.puntate.forEach((b) => {
+      if (b.esito) return;
+      let esito = null;
+      if (b.tipo === 'vive') { const t = by[b.a]; if (t && !t.alive && t.deathPhase <= i && t.deathDay <= b.giorno) esito = 'persa'; else if (dayOver(b.giorno)) esito = 'vinta'; }
+      else if (b.tipo === 'prima') {
+        const ta = by[b.a], tb = by[b.b];
+        const da = ta && !ta.alive && ta.deathPhase <= i ? ta.deathPhase : Infinity, db = tb && !tb.alive && tb.deathPhase <= i ? tb.deathPhase : Infinity;
+        if (da < db) esito = 'vinta'; else if (db < da) esito = 'persa'; else if (da !== Infinity) esito = 'nulla'; else if (last) esito = 'nulla';
+      } else if (b.tipo === 'tradimento' || b.tipo === 'sangue') {
+        const evs = P.slice(0, i + 1).filter((ph) => ph.day === b.giorno && ph.kind !== 'fallen').flatMap((ph) => ph.events);
+        const hit = b.tipo === 'tradimento' ? evs.some((e) => e.cat === 'betray') : evs.reduce((s, e) => s + e.deaths.length, 0) >= b.n;
+        if (hit) esito = 'vinta'; else if (dayOver(b.giorno)) esito = 'persa';
+      }
+      if (!esito) return;
+      b.esito = esito; b.fase = i;
+      b.vincita = esito === 'vinta' ? Math.round(b.posta * b.q) : esito === 'nulla' ? b.posta : 0;
+      g.crediti += b.vincita;
+      out.push(b);
+    });
+    return out;
+  }
+
+  /* ================= doni ================= */
+  const DONI = [
+    { k: 'cibo', label: 'Provviste', sub: 'Sfama subito', base: 12 },
+    { k: 'med', label: 'Medicine', sub: 'Cura le ferite', base: 22 },
+    { k: 'arma', label: 'Un’arma', sub: 'Vince più scontri', base: 30 },
+    { k: 'armatura', label: 'Protezione', sub: 'Assorbe i colpi', base: 26 },
+    { k: 'attrezzo', label: 'Attrezzi', sub: 'Trappole e difesa', base: 16 },
+    { k: 'mappa', label: 'Una mappa', sub: 'Sfugge ai disastri', base: 18 },
+    { k: 'amuleto', label: 'Portafortuna', sub: 'Una seconda possibilità', base: 34 },
+  ];
+  // i favoriti costano di più: fama e salute fanno salire il prezzo
+  function prezzo(SIM, i, id, dono) {
+    const rel = SIM.phases[i].snap.rel[id] || {}, v = vit(SIM, i, id), A = vivi(SIM, i).length;
+    const fav = (rel.f || 0) * 3 + (v[0] > 75 ? 6 : 0) + (A <= 4 ? 10 : A <= 8 ? 5 : 0);
+    return Math.round(dono.base + fav);
+  }
+
+  /* ================= interviste ================= */
+  const INTERVISTA = [
+    { q: 'Qual è la tua strategia?', a: [['Colpire per primo', 'coraggio', '+1 Coraggio'], ['Restare nell’ombra', 'astuzia', '+1 Intelligenza'], ['Fare squadra', 'legame', 'Un legame con un altro concorrente']] },
+    { q: 'Cosa ti porti da casa?', a: [['Tutto il cibo che riesco', 'scorte', 'Più scorte all’inizio'], ['Un sorriso per le telecamere', 'fama', '+1 Fama: attira gli sponsor'], ['Il ricordo di chi mi aspetta', 'morale', 'Morale più alto']] },
+    { q: 'Un messaggio per il pubblico?', a: [['Votate per me!', 'fama', '+1 Fama'], ['Tornerò a casa', 'morale', 'Morale più alto'], ['Non ho paura di nessuno', 'coraggio', '+1 Coraggio']] },
+  ];
+
+  const ORDINI = [
+    { v: 'nasconditi', label: 'Nasconditi', sub: 'Evita gli scontri, resta al riparo' },
+    { v: 'caccia', label: 'Vai a caccia', sub: 'Cerca il bersaglio più debole' },
+    { v: 'alleati', label: 'Cerca alleati', sub: 'Da soli non si va lontano' },
+    { v: 'provviste', label: 'Fai provviste', sub: 'Cibo e acqua prima di tutto' },
+  ];
+
+  G.LOS_PARTITA = { chiedi, aperto, nuovo, sano, profilo, salvaProfilo, chiudiPartita, proposte, risolvi, prezzo, rischio, quota, nuovoGiorno, vivi, vit, DONI, INTERVISTA, ORDINI, RITMI, START };
+})(typeof window !== 'undefined' ? window : globalThis);
+
+;
 /* Last One Standing — interfaccia */
 (function () {
   'use strict';
-  const D = window.LOS_DATA, L = window.LOS, ART = window.LOS_ART, AN = window.LOS_ANIM, REPLAY = window.LOS_REPLAY, RUNNER = window.LOS_SIMULATOR;
+  const D = window.LOS_DATA, L = window.LOS, ART = window.LOS_ART, AN = window.LOS_ANIM, REPLAY = window.LOS_REPLAY, RUNNER = window.LOS_SIMULATOR, PT = window.LOS_PARTITA;
   const $ = (s, r = document) => r.querySelector(s);
   const $$ = (s, r = document) => [...r.querySelectorAll(s)];
   const esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -23607,7 +24033,7 @@ window.LOS_BUILD = "962f7c2265662f54654930381e0d9de628e81889ad46f9d1e0dea7e76b4a
   /* ---------------- stato ---------------- */
   const S = {
     cast: [],
-    settings: { theme: 'classico', difficulty: 'normale', seed: '', maxDays: 20, teamsAllied: true, teamWin: false, speed: 'normale', teamSize: 2, view: 'grid', adult: false, hideFuture: true, adaptivePlay: true, reduceMotion: false, followOnly: false, read: { density: 'comoda', size: 'normale', order: 'storia', echo: true, place: true, why: true, context: false, faces: true } },
+    settings: { theme: 'classico', difficulty: 'normale', seed: '', maxDays: 20, teamsAllied: true, teamWin: false, speed: 'normale', teamSize: 2, view: 'grid', adult: false, hideFuture: true, adaptivePlay: true, reduceMotion: false, followOnly: false, ritmo: 'giocatore', read: { density: 'comoda', size: 'normale', order: 'storia', echo: true, place: true, why: true, context: false, faces: true } },
     initialRelations: [], followed: [], seasons: [],
     custom: [],
     run: null,
@@ -23689,7 +24115,7 @@ window.LOS_BUILD = "962f7c2265662f54654930381e0d9de628e81889ad46f9d1e0dea7e76b4a
           const custom = d.run.cfg.custom == null ? [] : normalizeCustoms(d.run.cfg.custom);
           if (d.run.replayId != null && !validId(d.run.replayId)) throw new Error('Riferimento alla partita non valido.');
           const initialRelations = L.normalizeInitialRelations(d.run.cfg.initialRelations, cast);
-          if (cast.length >= 2) next.run = Object.assign({}, d.run, { cfg: Object.assign({}, d.run.cfg, { cast, custom, initialRelations }) });
+          if (cast.length >= 2) next.run = Object.assign({}, d.run, { cfg: Object.assign({}, d.run.cfg, { cast, custom, initialRelations }) }, typeof PT !== 'undefined' && PT ? { gioco: PT.sano(d.run.gioco) } : {});
         } catch (e) { warnings.push('La partita salvata contiene dati non validi e non è stata ripresa.'); }
       }
       Object.assign(S, next);
@@ -23722,6 +24148,7 @@ window.LOS_BUILD = "962f7c2265662f54654930381e0d9de628e81889ad46f9d1e0dea7e76b4a
     if ([1, 2, 3, 4].includes(+x.teamSize)) st.teamSize = +x.teamSize;
     if (x.view === 'grid' || x.view === 'team') st.view = x.view;
     ['teamsAllied', 'teamWin', 'adult', 'hideFuture', 'adaptivePlay', 'reduceMotion', 'followOnly'].forEach((k) => { if (typeof x[k] === 'boolean') st[k] = x[k]; });
+    if (['spettatore', 'giocatore', 'regista'].includes(x.ritmo)) st.ritmo = x.ritmo;
     st.read = readPrefs(record(x.read) ? Object.assign({}, st.read, x.read) : st.read);
     return st;
   }
@@ -24677,6 +25104,7 @@ window.LOS_BUILD = "962f7c2265662f54654930381e0d9de628e81889ad46f9d1e0dea7e76b4a
     $('#maxDays').value = S.settings.maxDays; $('#maxDaysOut').textContent = S.settings.maxDays; rangeFill($('#maxDays'));
     $('#seed').value = S.settings.seed;
     $('#teamsAllied').checked = !!S.settings.teamsAllied; $('#teamWin').checked = !!S.settings.teamWin;
+    renderRitmo();
     renderAdult();
     renderPreview(); renderCustomForm(); renderCustomList(); renderStartSum();
     requestAnimationFrame(() => centerPoster($('#themeList [aria-checked="true"]'), false));
@@ -24924,6 +25352,9 @@ window.LOS_BUILD = "962f7c2265662f54654930381e0d9de628e81889ad46f9d1e0dea7e76b4a
   $('#seed').addEventListener('input', (e) => { S.settings.seed = e.target.value.slice(0, 60); save(); });
   $('#seedNew').addEventListener('click', () => { S.settings.seed = newSeed(); $('#seed').value = S.settings.seed; save(); });
   $('#teamsAllied').addEventListener('change', (e) => { S.settings.teamsAllied = e.target.checked; save(); });
+  const RITMO_HELP = { spettatore: 'Guardi e basta: nessuna pausa, solo i doni quando vuoi tu.', giocatore: 'Alleni un concorrente: ogni mattina un ordine e una puntata, più i doni quando vuoi.', regista: 'Come Giocatore, con le puntate anche al tramonto.' };
+  function renderRitmo() { const r = S.settings.ritmo || 'giocatore'; $$('#ritmoSeg button').forEach((b) => { b.setAttribute('aria-checked', String(b.dataset.v === r)); b.setAttribute('aria-pressed', String(b.dataset.v === r)); }); $('#ritmoHelp').textContent = RITMO_HELP[r] || ''; if (!PT) $('#ritmoSeg').closest('.field').hidden = true; }
+  $('#ritmoSeg').addEventListener('click', (e) => { const b = e.target.closest('button'); if (!b) return; S.settings.ritmo = b.dataset.v; save(); renderRitmo(); });
   function renderAdult() {
     const t = THEMES[S.settings.theme], pt = COUNTS.perTheme[t.id];
     $('#adult').checked = !!S.settings.adult && !t.noAdult; $('#adultConfirm').hidden = true;
@@ -25015,7 +25446,9 @@ window.LOS_BUILD = "962f7c2265662f54654930381e0d9de628e81889ad46f9d1e0dea7e76b4a
     if (generation !== runGeneration) return false;
     SIM = result;
     BY = Object.fromEntries(SIM.tributes.map((t) => [t.id, t]));
-    S.run = { cfg, phase: 0, seen: 0 }; lastRendered = -1;
+    S.run = { cfg, phase: 0, seen: 0, gioco: PT ? PT.nuovo(runSim.pre) : null }; runSim.pre = null; lastRendered = -1;
+    if (S.run.gioco && runSim.firstOrder && S.run.gioco.mentore) { const g = S.run.gioco, ev = SIM.phases[0].events.find((e) => e.mentor && e.ids[0] === g.mentore); g.ordini.push({ fase: 0, cosa: runSim.firstOrder, obeys: !!(ev && ev.obeys) }); }
+    runSim.firstOrder = null;
     const run = S.run, stored = persistRun(run, SIM);
     if (typeof studio !== 'undefined' && studio) studio.recordResult(cfg, SIM, run.replayId, stored);
     save();
@@ -25026,7 +25459,32 @@ window.LOS_BUILD = "962f7c2265662f54654930381e0d9de628e81889ad46f9d1e0dea7e76b4a
     if (S.cast.length < 2) { toast('Servono almeno 2 concorrenti.'); location.hash = '#cast'; return; }
     S.cast.forEach((t, i) => { if (!t.name.trim()) t.name = 'Concorrente ' + (i + 1); });
     S.settings.seed = seed || S.settings.seed || newSeed();
-    runSim(currentConfiguration());
+    const cfg = currentConfiguration();
+    preGame(cfg).then((pre) => { if (pre === false) return; if (pre) { runSim.pre = pre; if (pre.interviste.length) cfg.interviste = pre.interviste; } runSim(cfg); });
+  }
+  /* ---------- prima dei giochi: il concorrente da allenare e la sua intervista ---------- */
+  async function preGame(cfg) {
+    if (!PT || S.settings.ritmo === 'spettatore') return null;
+    const cast = cfg.cast;
+    const m = await PT.chiedi({ kicker: 'Prima dei giochi', title: 'Chi vuoi allenare?', text: 'Sarai il suo mentore: ogni mattina potrai dargli un ordine, e le puntate partiranno da lui.', grid: true, cls: 'sc-pick',
+      options: cast.map((t) => ({ value: t.id, html: avHTML(t) + '<b class="sc-l">' + esc(t.name) + '</b><small class="sc-s">Squadra ' + t.team + '</small>' })), skip: 'Nessuno, guardo e basta' });
+    if (!m) return { mentore: null, interviste: [] };
+    const t = cast.find((x) => x.id === m.value), eff = [];
+    for (let k = 0; k < PT.INTERVISTA.length; k++) {
+      const Q = PT.INTERVISTA[k];
+      const r = await PT.chiedi({ kicker: 'Intervista · ' + (k + 1) + ' di ' + PT.INTERVISTA.length, title: Q.q, faces: avHTML(t), text: '<b>' + esc(t.name) + '</b> risponde come decidi tu.', cls: 'sc-interview',
+        options: Q.a.map(([label, v, sub]) => ({ value: v, label: '«' + label + '»', sub })), skip: 'Salta l’intervista' });
+      if (!r) break;
+      if (r.value === 'legame') {
+        const mates = cast.filter((x) => x.id !== t.id && x.team === t.team), pool = mates.length ? mates : cast.filter((x) => x.id !== t.id);
+        const u = pool[(cfg.seed.length + k) % pool.length]; if (u) eff.push('legame:' + u.id);
+      } else if (!eff.includes(r.value)) eff.push(r.value);
+    }
+    // il primo ordine vale già per l'apertura: chi alleni non deve cadere prima che tu possa fare qualcosa
+    const go0 = await PT.chiedi({ kicker: 'Al via', title: 'Il primo consiglio a ' + t.name, faces: avHTML(t), text: 'L’apertura è il momento più pericoloso. Cosa deve fare appena suona il segnale?', cls: 'sc-mentor',
+      options: [['nasconditi', 'Scappa subito', 'Lontano dalla mischia'], ['caccia', 'Prendi un’arma', 'Lotta per il bottino'], ['alleati', 'Trova un alleato', 'Insieme si resiste'], ['provviste', 'Arraffa le provviste', 'Cibo e zaino, poi via']].map(([value, label, sub]) => ({ value, label, sub })), skip: 'Lascia decidere a ' + himHer(t) });
+    if (go0) { cfg.interventi = [{ fase: 0, tipo: 'ordine', chi: t.id, cosa: go0.value }]; runSim.firstOrder = go0.value; }
+    return { mentore: t.id, interviste: eff.length ? [{ chi: t.id, effetti: eff }] : [] };
   }
   function currentConfiguration() { return { cast: JSON.parse(JSON.stringify(S.cast)), theme: S.settings.theme, difficulty: S.settings.difficulty, seed: S.settings.seed || newSeed(), maxDays: S.settings.maxDays, teamsAllied: S.settings.teamsAllied, teamWin: S.settings.teamWin, custom: JSON.parse(JSON.stringify(S.custom)), adult: !!S.settings.adult, initialRelations: L.normalizeInitialRelations(S.initialRelations, S.cast) }; }
   $('#btnStart').addEventListener('click', () => startRun());
@@ -25164,8 +25622,109 @@ window.LOS_BUILD = "962f7c2265662f54654930381e0d9de628e81889ad46f9d1e0dea7e76b4a
     $('#nextLbl').textContent = last ? 'Esito' : 'Avanti';
     $$('#speedSeg button').forEach((b) => b.setAttribute('aria-pressed', b.dataset.v === S.settings.speed));
     syncPlay();
+    if (PT && S.run.gioco) { const closed = PT.risolvi(SIM, i, S.run.gioco); renderHud(); if (closed.length) announceBets(closed); }
     save();
   }
+  /* =============== LA PARTITA GIOCATA: crediti, mentore, puntate, doni =============== */
+  const himHer = (t) => (t.gender === 'F' ? 'lei' : t.gender === 'N' ? 'ləi' : 'lui');
+  function renderHud() {
+    const h = $('#ptHud'), gb = $('#giftBtn'), g = S.run && S.run.gioco;
+    if (!PT || !SIM || !g) { h.hidden = true; gb.hidden = true; return; }
+    gb.hidden = false; h.hidden = false;
+    const i = Math.min(S.run.phase || 0, SIM.phases.length - 1), alive = SIM.phases[i].snap.alive;
+    const m = g.mentore && BY[g.mentore], mAlive = m && alive.includes(m.id);
+    const open = g.puntate.filter((b) => !b.esito);
+    h.innerHTML = '<div class="pt-cr"><span>Crediti</span><b>' + g.crediti + '</b></div>' +
+      (m ? '<button type="button" class="pt-men' + (mAlive ? '' : ' dead') + '" data-prof="' + esc(m.id) + '">' + avHTML(m, { dead: !mAlive }) + '<span><small>' + (mAlive ? 'Il tuo concorrente' : 'Il tuo concorrente è fuori') + '</small><b>' + esc(m.name) + '</b></span></button>' : '') +
+      '<div class="pt-bets"><small>Puntate aperte</small>' + (open.length ? open.map((b) => '<span class="pt-bet"><b>' + esc(b.testo) + '</b><em>' + b.posta + ' × ' + b.q + '</em></span>').join('') : '<span class="pt-none">Nessuna</span>') + '</div>';
+  }
+  function announceBets(list) {
+    list.forEach((b, k) => setTimeout(() => {
+      const msg = b.esito === 'vinta' ? 'Puntata vinta: «' + b.testo + '» · +' + b.vincita + ' crediti' : b.esito === 'nulla' ? 'Puntata annullata, posta restituita: «' + b.testo + '»' : 'Puntata persa: «' + b.testo + '» · −' + b.posta;
+      toast(msg);
+      if (window.LOS_PARTITA_FX && window.LOS_PARTITA_FX.bet) try { window.LOS_PARTITA_FX.bet(b, $('#ptHud')); } catch (e) { /* solo grafica */ }
+    }, k * 1600));
+  }
+  // rilancia la partita con gli interventi: il passato resta uguale, la Diretta riprende dalla stessa fase
+  async function resimulate() {
+    const run = S.run, generation = runGeneration;
+    $('#ptHud').classList.add('busy');
+    let r;
+    try { r = RUNNER ? await RUNNER.simulate(run.cfg) : L.simulate(run.cfg); }
+    catch (e) { if (e.name !== 'AbortError') toast('L’intervento non è riuscito: ' + e.message); return false; }
+    finally { $('#ptHud').classList.remove('busy'); }
+    if (S.run !== run || generation !== runGeneration) return false;
+    SIM = r; BY = Object.fromEntries(SIM.tributes.map((t) => [t.id, t]));
+    // l'archivio non sovrascrive mai una partita: finché si gioca si ricostruisce da seme + interventi, all'Esito si archivia la versione finale
+    run.replayId = null; run.replaySaved = false; run.interattiva = true; save();
+    return true;
+  }
+  const atEdge = () => S.run && (S.run.phase || 0) >= (S.run.seen || 0);
+  function moodHTML(t, i) {
+    const v = PT.vit(SIM, i, t.id), inv = (SIM.phases[i].snap.inv[t.id] || []).map((x) => x.n);
+    return 'Salute <b>' + v[0] + '</b> · Energia <b>' + v[1] + '</b> · Morale <b>' + v[2] + '</b> · Cibo <b>' + v[3] + '</b>' + (inv.length ? '<br>Ha con sé: ' + inv.slice(0, 4).map(esc).join(', ') : '');
+  }
+  // prima di mostrare la fase k: all'alba l'ordine del mentore e le puntate (col ritmo «regista» anche al tramonto)
+  async function beforePhase(k) {
+    const P = SIM.phases, g = S.run.gioco, rit = S.settings.ritmo;
+    if (!P[k] || rit === 'spettatore' || k <= (S.run.seen || 0)) return;
+    const dawn = PT.nuovoGiorno(P, k), dusk = rit === 'regista' && P[k].kind === 'n' && P[k - 1].kind !== 'n';
+    const key = (dawn ? 'g' : 'n') + P[k].day;
+    if (!(dawn || dusk) || g.chiesto[key]) return;
+    g.chiesto[key] = 1; save();
+    if (playTimer) { clearTimeout(playTimer); playTimer = null; }
+    const timer = playing ? 20 : 0, soft = !!resultTheme(SIM).soft, i = k - 1;
+    let changed = false;
+    // chi alleni è caduto: all'alba se ne sceglie un altro, così la partita resta tua fino alla fine
+    if (dawn && g.mentore && !P[i].snap.alive.includes(g.mentore) && P[i].snap.alive.length > 2) {
+      const fallen = BY[g.mentore];
+      const r = await PT.chiedi({ kicker: 'Giorno ' + P[k].day + ' · nuovo allievo', title: 'Chi alleni adesso?', text: esc(fallen.name) + ' è fuori dai giochi. Scegli chi seguire da qui in avanti.', grid: true, cls: 'sc-pick', timer,
+        options: P[i].snap.alive.map((id) => ({ value: id, html: avHTML(BY[id]) + '<b class="sc-l">' + esc(BY[id].name) + '</b><small class="sc-s">Salute ' + PT.vit(SIM, i, id)[0] + '</small>' })), skip: 'Nessuno, guardo e basta' });
+      g.mentore = r ? r.value : null; g.allievi = (g.allievi || []).concat([fallen.id]); save(); renderHud();
+    }
+    if (dawn && g.mentore && P[i].snap.alive.includes(g.mentore)) {
+      const t = BY[g.mentore];
+      const r = await PT.chiedi({ kicker: 'Giorno ' + P[k].day + ' · il mentore', title: 'Cosa deve fare ' + t.name + ' oggi?', faces: avHTML(t), text: moodHTML(t, i), cls: 'sc-mentor',
+        options: PT.ORDINI.map((o) => ({ value: o.v, label: o.label, sub: o.sub })), timer, skip: 'Lascia decidere a ' + himHer(t) });
+      if (r) { S.run.cfg.interventi = (S.run.cfg.interventi || []).concat([{ fase: k, tipo: 'ordine', chi: t.id, cosa: r.value }]); g.ordini.push({ fase: k, cosa: r.value }); changed = true; }
+    }
+    const offers = g.crediti >= 10 ? PT.proposte(SIM, k, g, BY, S.followed, soft) : [];
+    if (offers.length) {
+      const r = await PT.chiedi({ kicker: (dawn ? 'Giorno ' + P[k].day : 'Stanotte') + ' · puntate', title: 'Su cosa scommetti?', text: 'Vinci la posta per la quota. La puntata si chiude quando l’esito si vede in diretta.', cls: 'sc-bets',
+        options: offers.map((b, j) => ({ value: j, label: b.testo, cost: '×' + b.q })), stake: [10, 25, 50].filter((v) => v <= g.crediti), credits: g.crediti, timer, skip: 'Non punto' });
+      if (r && r.stake && r.stake <= g.crediti) { g.puntate.push(Object.assign({ id: 'b' + k + '-' + g.puntate.length, posta: r.stake, esito: null, aperta: k }, offers[r.value])); g.crediti -= r.stake; }
+    }
+    if (changed && !await resimulate()) { S.run.cfg.interventi = (S.run.cfg.interventi || []).filter((x) => x.fase !== k || x.tipo !== 'ordine'); g.ordini = g.ordini.filter((x) => x.fase !== k); }
+    // l'ordine eseguito o ignorato si legge nella fase stessa: si annota per il riepilogo finale
+    if (changed && SIM.phases[k]) { const ev = SIM.phases[k].events.find((e) => e.mentor && e.ids[0] === g.mentore); const o = g.ordini.find((x) => x.fase === k); if (ev && o) o.obeys = !!ev.obeys; }
+    save(); renderHud();
+  }
+  async function giftFlow() {
+    if (!PT || !SIM || !S.run.gioco || gate) return;
+    const i = S.run.phase || 0, k = i + 1, P = SIM.phases, g = S.run.gioco;
+    if (k >= P.length) return toast('La partita è finita: niente più doni.');
+    if (!atEdge()) return toast('Puoi mandare doni solo dalla fase più recente.');
+    if (g.doni[k]) return toast('Hai già mandato un dono per la prossima fase.');
+    stopPlay(); gate = true;
+    try {
+      const A = P[i].snap.alive;
+      const who = await PT.chiedi({ kicker: 'Sponsor', title: 'A chi mandi un dono?', text: 'Crediti disponibili: <b>' + g.crediti + '</b>. I favoriti costano di più.', grid: true, cls: 'sc-pick',
+        options: A.map((id) => ({ value: id, html: avHTML(BY[id]) + '<b class="sc-l">' + esc(BY[id].name) + '</b><small class="sc-s">Salute ' + PT.vit(SIM, i, id)[0] + '</small>' })), skip: 'Annulla' });
+      if (!who) return;
+      const t = BY[who.value], price = (x) => PT.prezzo(SIM, i, who.value, x);
+      const d = await PT.chiedi({ kicker: 'Sponsor · ' + t.name, title: 'Che cosa mandi?', faces: avHTML(t), text: moodHTML(t, i) + '<br>Arriverà nella prossima fase. Crediti: <b>' + g.crediti + '</b>', cls: 'sc-gift',
+        options: PT.DONI.map((x) => ({ value: x.k, label: x.label, sub: x.sub, cost: price(x) + ' cr', disabled: price(x) > g.crediti })), skip: 'Annulla' });
+      if (!d) return;
+      const cost = price(PT.DONI.find((x) => x.k === d.value)), before = S.run.cfg.interventi || [];
+      S.run.cfg.interventi = before.concat([{ fase: k, tipo: 'dono', chi: who.value, cosa: d.value }]);
+      if (!await resimulate()) { S.run.cfg.interventi = before; return; }
+      g.crediti -= cost; g.doni[k] = { chi: who.value, cosa: d.value, costo: cost }; save(); renderHud();
+      toast('Dono in viaggio per ' + t.name + ': arriva nella prossima fase.');
+      if (window.LOS_PARTITA_FX && window.LOS_PARTITA_FX.gift) try { window.LOS_PARTITA_FX.gift(t, d.value, $('#giftBtn')); } catch (e) { /* solo grafica */ }
+    } finally { gate = false; }
+  }
+  $('#giftBtn').addEventListener('click', giftFlow);
+  $('#ptHud').addEventListener('click', (e) => { const b = e.target.closest('[data-prof]'); if (b && SIM) openProfile(b.dataset.prof); });
   function renderSide(i) {
     const theme = resultTheme(SIM), ph = SIM.phases[i], soft = !!theme.soft;
     $$('.stabs button').forEach((b) => { const active = b.dataset.s === sideTab; b.setAttribute('aria-selected', active); b.tabIndex = active ? 0 : -1; });
@@ -25243,10 +25802,12 @@ window.LOS_BUILD = "962f7c2265662f54654930381e0d9de628e81889ad46f9d1e0dea7e76b4a
   $('#sideBody').addEventListener('mouseleave', () => netFocus(null));
   $('#sideBody').addEventListener('keydown', (e) => { const g = e.target.closest('.net .node'); if (g && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); g.dispatchEvent(new MouseEvent('click', { bubbles: true })); } });
   $('.stabs').addEventListener('click', (e) => { const b = e.target.closest('button'); if (!b || !SIM) return; sideTab = b.dataset.s; renderSide(S.run.phase); });
-  function go(k) { if (!SIM) return; S.run.phase = Math.max(0, Math.min(SIM.phases.length - 1, k)); renderLive(false); if (playing) schedulePlay(); }
-  function next() {
-    if (!SIM) return;
+  function go(k) { if (!SIM || (S.run.gioco && PT.aperto())) return; S.run.phase = Math.max(0, Math.min(SIM.phases.length - 1, k)); renderLive(false); if (playing) schedulePlay(); }
+  let gate = false;
+  async function next() {
+    if (!SIM || gate) return;
     if (S.run.phase >= SIM.phases.length - 1) { stopPlay(); location.hash = '#esito'; return; }
+    if (S.run.gioco && PT) { gate = true; try { await beforePhase(S.run.phase + 1); } finally { gate = false; } if (!SIM) return; }
     go(S.run.phase + 1);
     if (S.run.phase >= SIM.phases.length - 1) stopPlay();
     if (window.scrollY > 300 && !playTimer) $('.broadcast').scrollIntoView({ behavior: AN.reduced ? 'auto' : 'smooth' });
@@ -25265,7 +25826,7 @@ window.LOS_BUILD = "962f7c2265662f54654930381e0d9de628e81889ad46f9d1e0dea7e76b4a
     playTimer = setTimeout(() => { playTimer = null; if (playing) next(); }, phaseReadDelay(SIM.phases[S.run.phase], S.settings.speed, S.settings.adaptivePlay));
   }
   function startPlay() { stopPlay(); if (!SIM || document.hidden || S.run.phase >= SIM.phases.length - 1) return; playing = true; schedulePlay(); syncPlay(); }
-  $('#nextBtn').addEventListener('click', () => { stopPlay(); next(); });
+  $('#nextBtn').addEventListener('click', () => { if (gate) return; stopPlay(); next(); });
   $('#prevBtn').addEventListener('click', () => { stopPlay(); lastRendered = -2; go(S.run.phase - 1); });
   $('#playBtn').addEventListener('click', () => { if (!SIM) return; if (playing) return stopPlay(); if (S.run.phase >= SIM.phases.length - 1) go(0); startPlay(); next(); });
   $('#speedSeg').addEventListener('click', (e) => { const b = e.target.closest('button'); if (!b) return; S.settings.speed = b.dataset.v; save(); $$('#speedSeg button').forEach((x) => x.setAttribute('aria-pressed', x === b)); if (playing) startPlay(); });
@@ -25475,6 +26036,22 @@ window.LOS_BUILD = "962f7c2265662f54654930381e0d9de628e81889ad46f9d1e0dea7e76b4a
     items.push([st.events, 'Eventi']);
     return '<div class="kstats">' + items.map(([v, l]) => '<div class="kstat"><b>' + v + '</b><span>' + l + '</span></div>').join('') + '</div>';
   }
+  // il riepilogo del giocatore: crediti, puntate, doni, il destino del concorrente allenato
+  function playerSummaryHTML() {
+    const g = S.run && S.run.gioco; if (!PT || !g || !SIM) return '';
+    const pts = g.puntate, won = pts.filter((b) => b.esito === 'vinta'), lost = pts.filter((b) => b.esito === 'persa');
+    const doni = Object.values(g.doni), ord = g.ordini, m = g.mentore && BY[g.mentore];
+    if (!pts.length && !doni.length && !ord.length && !m) return '';
+    const p = PT.chiudiPartita(S.run, SIM) || PT.profilo();
+    const fate = m ? (SIM.winners.includes(m.id) ? 'ha vinto' : 'è arrivat' + (m.gender === 'F' ? 'a' : m.gender === 'N' ? 'ə' : 'o') + ' ' + m.rank + 'º') : '';
+    const best = won.slice().sort((a, b) => (b.vincita - b.posta) - (a.vincita - a.posta))[0];
+    const stat = (v, l) => '<div class="ps-st"><b>' + v + '</b><span>' + l + '</span></div>';
+    return '<section class="block card ps-sum" id="playerSummary"><h2>La tua partita</h2>' +
+      (m ? '<div class="ps-men">' + avHTML(m, { dead: !m.alive }) + '<p><small>Il tuo concorrente</small><b>' + esc(m.name) + '</b> ' + esc(fate) + (ord.length ? ' · ha seguito ' + ord.filter((o) => o.obeys).length + ' ordini su ' + ord.length : '') + '</p></div>' : '') +
+      '<div class="ps-stats">' + stat(g.crediti, 'Crediti finali') + stat(won.length + '/' + (won.length + lost.length), 'Puntate vinte') + stat(doni.length, doni.length === 1 ? 'Dono mandato' : 'Doni mandati') + stat(p.record, 'Il tuo record') + '</div>' +
+      (best ? '<p class="ps-best">Colpo migliore: «' + esc(best.testo) + '» · ' + best.posta + ' × ' + best.q + ' = <b>+' + best.vincita + '</b></p>' : '') +
+      '<p class="help">Partite giocate: ' + p.partite + ' · puntate vinte in tutto: ' + p.vinte + ' su ' + p.puntate + '.</p></section>';
+  }
   function renderResults() {
     $('#resEmpty').hidden = !!SIM; $('#resBody').hidden = !SIM;
     if (!SIM) return;
@@ -25565,6 +26142,7 @@ window.LOS_BUILD = "962f7c2265662f54654930381e0d9de628e81889ad46f9d1e0dea7e76b4a
 
     $('#resBody').innerHTML = hero +
       '<div class="resactions"><button class="btn" type="button" id="rArchive">Archivio partite</button><button class="btn primary lg" type="button" id="rAgain">Rigioca con un nuovo seme</button><button class="btn" type="button" id="rCopy">Copia il riepilogo</button><a class="btn" href="#diretta">Rivedi la diretta</a><a class="btn" href="#cast">Nuova partita</a><span class="help mono">seme ' + esc(SIM.seed) + '</span></div>' +
+      playerSummaryHTML() +
       '<div class="resgrid"><div>' +
         (podium ? '<section class="block card"><h2>Il podio</h2>' + podium + '</section>' : '') +
         '<section class="block card"><h2>I premi della partita</h2>' + awardsH + '</section>' +
@@ -25575,9 +26153,10 @@ window.LOS_BUILD = "962f7c2265662f54654930381e0d9de628e81889ad46f9d1e0dea7e76b4a
         '<section class="block card"><h2>' + (soft ? 'Chi ha eliminato di più' : 'Chi ha ucciso di più') + '</h2><div class="bars">' + kbars + '</div></section>' +
         '<section class="block card posterbox"><h2>Locandina</h2><img id="posterImg" alt="Locandina della partita"><p class="help" style="margin-top:8px">Tieni premuto sull\'immagine, o clic destro, per salvarla.</p></section>' +
       '</div></div>';
-    $('#rAgain').addEventListener('click', () => { const cfg = Object.assign({}, S.run.cfg, { seed: newSeed() }); delete cfg.seasonId; runSim(cfg); });
+    $('#rAgain').addEventListener('click', () => { const cfg = Object.assign({}, S.run.cfg, { seed: newSeed() }); delete cfg.seasonId; delete cfg.interventi; delete cfg.interviste; runSim(cfg); });
     $('#rArchive').addEventListener('click', openArchive);
     $('#rCopy').addEventListener('click', () => copyText(summaryText(), 'Riepilogo copiato negli appunti.'));
+    if (S.run && S.run.interattiva && !S.run.replayId) persistRun(S.run, SIM);
     if (typeof studio !== 'undefined' && studio) studio.renderResults();
     drawPoster().then((url) => { const im = $('#posterImg'); if (im && url) im.src = url; });
     const wh = $('#resBody .winhero');
@@ -25681,11 +26260,11 @@ window.LOS_BUILD = "962f7c2265662f54654930381e0d9de628e81889ad46f9d1e0dea7e76b4a
         } else {
           // I salvataggi precedenti contengono soltanto le regole: si migrano una volta.
           restored = RUNNER ? await RUNNER.simulate(run.cfg) : L.simulate(run.cfg);
-          load.warning = [load.warning, 'La partita precedente è stata ricostruita con la versione attuale e salvata per le prossime riaperture.'].filter(Boolean).join(' ');
+          if (!run.interattiva) load.warning = [load.warning, 'La partita precedente è stata ricostruita con la versione attuale e salvata per le prossime riaperture.'].filter(Boolean).join(' ');
         }
         if (generation !== runGeneration || S.run !== run) return false;
         SIM = restored; BY = Object.fromEntries(SIM.tributes.map((t) => [t.id, t]));
-        if (!run.replayId) {
+        if (!run.replayId && !run.interattiva) {
           const stored = await persistRun(run, SIM);
           if (!stored) load.warning = 'La partita precedente è stata ricostruita, ma non è stato possibile salvarla. Mantieni aperta questa pagina per continuare.';
         } else run.replaySaved = true;

@@ -75,7 +75,7 @@ const engineScripts = ['data-core.js', 'data-themes.js', ...content, 'engine-sys
 const skinDir = path.join(__dirname, '..', 'src', 'skin');
 const skin = (ext) => (fs.existsSync(skinDir) ? fs.readdirSync(skinDir).filter((f) => f.endsWith(ext)).sort().map((f) => 'skin/' + f) : []);
 const skinCss = skin('.css'), skinJs = skin('.js');
-const appScripts = ['art.js', 'atlas.js', 'anim.js', 'look.js', 'regia.js', 'palco.js', ...skinJs, 'simulator.js', 'replay.js', 'experiments.js', 'map-view.js', 'studio.js', 'photo-search.js', 'ui.js'];
+const appScripts = ['art.js', 'atlas.js', 'anim.js', 'look.js', 'regia.js', 'palco.js', ...skinJs, 'simulator.js', 'replay.js', 'experiments.js', 'map-view.js', 'studio.js', 'photo-search.js', 'partita.js', 'ui.js'];
 const scripts = [...engineScripts, ...appScripts];
 // Impronta dei sorgenti, indipendente dai fine riga del checkout e dagli output generati.
 const buildHash = require('crypto').createHash('sha256');
