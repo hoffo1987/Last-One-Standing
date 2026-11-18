@@ -3,10 +3,11 @@
  * nell'Esito ci sono trofei appena sbloccati. Per ogni trofeo passa uno stacco «Trofeo sbloccato» (in coda, non
  * blocca niente, se ne va da solo, un clic lo salta) e sulla riga corrispondente cade il timbro «Nuovo».
  * In più, senza toccare ui.js:
- * - ogni distintivo (.tr-ic) riceve il disegno della sua categoria (i segreti un punto di domanda);
- * - nella finestra della bacheca il contenuto entra a cascata solo quando si cambia scheda (non quando la scheda
- *   si ridisegna per un clic), il conto dei trofei ha la sua barra, ogni categoria il suo «2/10», le carte
- *   dell'album si inclinano verso il puntatore e chi non ha una foto riceve il volto di riserva;
+ * - la lamina d'oro e la coppa diventano proprietà CSS (--fx-foil, --fx-coppa) per le carte leggendarie, il trofeo
+ *   «Leggenda» e la testata della pagina; se le immagini mancano restano le sfumature;
+ * - nella pagina «Trofei» (#v-trofei) il contenuto entra a cascata solo quando si cambia scheda o si arriva sulla
+ *   pagina (non quando la scheda si ridisegna per un clic), il conto dei trofei ha la sua barra, ogni categoria il
+ *   suo «2/10», le carte dell'album si inclinano verso il puntatore e chi non ha una foto riceve il volto di riserva;
  * - nell'Esito le interviste entrano (lampo sul ritratto, nuvolette a cascata) quando arrivano sullo schermo;
  * - il pulsante in home mostra quanti trofei ci sono.
  * Solo decorazione: ogni passo è protetto, tutto è aria-hidden e si toglie da solo. Con il movimento ridotto
@@ -23,29 +24,16 @@
   const fine = () => !!(G.matchMedia && G.matchMedia('(hover: hover) and (pointer: fine)').matches);
   const trofei = () => (G.LOS_BACHECA && G.LOS_BACHECA.TROFEI) || [];
 
-  /* ---------- i distintivi: un disegno per categoria (pieni, su 24×24, nel colore del testo) ---------- */
-  const ICONE = {
-    partite: '<path d="M5 2h3v20H5zM9 3h11l-3 4.5 3 4.5H9z"/>',
-    mentore: '<path d="M12 3a4.5 4.5 0 1 1 0 9 4.5 4.5 0 0 1 0-9zM3 22c0-5.5 4-8.5 9-8.5s9 3 9 8.5z"/>',
-    puntate: '<path fill-rule="evenodd" d="M12 1l11 11-11 11L1 12zm0 6.5L7.5 12l4.5 4.5 4.5-4.5z"/>',
-    doni: '<path d="M2 8h20v4.5H2zM4 14h7v8H4zM13 14h7v8h-7zM12 7.5C8.5 7.5 6 6 7 3.5s4.2-1.2 5 2.7c.8-3.9 4-5.2 5-2.7s-1.5 4-5 4z"/>',
-    regia: '<path d="M2 10h20v11H2zM2 8.5l1-4L21.5 1l.9 3.4z"/>',
-    prove: '<path d="M14 1L4 14h6.5L9 23l11-14h-6.5z"/>',
-    pubblico: '<path fill-rule="evenodd" d="M12 4.5c7 0 11 7.5 11 7.5s-4 7.5-11 7.5S1 12 1 12s4-7.5 11-7.5zm0 3.3a4.2 4.2 0 1 0 0 8.4 4.2 4.2 0 0 0 0-8.4z"/>',
-    rivincite: '<path d="M2 4.5L4.5 2 22 19.5 19.5 22zM19.5 2L22 4.5 4.5 22 2 19.5z"/><path d="M2 2h7L2 9zM22 2h-7l7 7z"/>',
-    album: '<path d="M3 7h11v15H3z"/><path d="M8 2h13v15h-5V5H8z"/>',
-    segreto: '<text x="12" y="20" text-anchor="middle">?</text>',
-    stella: '<path d="M12 1l3.2 7.2 7.8.8-5.8 5.3 1.6 7.7L12 18.1 5.2 22l1.6-7.7L1 9l7.8-.8z"/>',
-  };
-  const slug = (c) => String(c || '').toLowerCase().replace(/[^a-z]/g, '');
-  const iconFor = (t, secret) => (secret ? 'segreto' : (t && ICONE[slug(t.cat)] ? slug(t.cat) : 'stella'));
-  const svg = (k) => '<svg viewBox="0 0 24 24" aria-hidden="true">' + ICONE[k] + '</svg>';
-  function badge(li) {
-    const ic = li.querySelector('.tr-ic'); if (!ic || ic.firstChild) return;
-    const t = trofei().find((x) => x.id === li.dataset.tr);
-    ic.innerHTML = svg(iconFor(t, li.classList.contains('secret')));
+  /* ---------- le immagini: l'emblema di ogni trofeo, la coppa e la lamina d'oro ---------- */
+  // l'emblema lo mette già ui.js nelle righe; qui serve per lo stacco. La coppa e la lamina vanno in CSS
+  const FXA = () => (G.LOS_ASSETS && G.LOS_ASSETS.fx) || {};
+  const emblema = (id) => { const T = FXA().trofei || {}; return T[id] || T.coppa || ''; };
+  const cssUrl = (u) => 'url("' + String(u).replace(/["\\\n]/g, '') + '")';
+  function assets() {
+    const fx = FXA(), T = fx.trofei || {};
+    if (fx.foil) root.style.setProperty('--fx-foil', cssUrl(fx.foil));
+    if (T.coppa) { root.style.setProperty('--fx-coppa', cssUrl(T.coppa)); root.classList.add('fx-trofei'); }
   }
-  const dress = (el) => { if (el) el.querySelectorAll('.tr').forEach((li) => safe(() => badge(li))); };
   // chi non ha una foto riceve il volto di riserva (lo stesso che ha altrove), se c'è
   function face(av) {
     if (!av || av.querySelector('img') || av.classList.contains('has-volto')) return;
@@ -79,8 +67,9 @@
     const fermo = reduced(), tieni = v.n > 3 ? 2300 : 3000;
     const el = h('div', 'tr-cut'); el.setAttribute('aria-hidden', 'true');
     const card = h('div', 'tc-card');
-    const ic = h('span', 'tr-ic'); ic.innerHTML = svg(iconFor(v.t, false));
-    const tx = h('span', 'tc-tx'), k = h('em', 'tc-k', 'Trofeo sbloccato');
+    const ic = h('span', 'tr-ic' + (v.t.id === 'leggenda' ? ' oro' : '')), src = emblema(v.t.id);
+    if (src) { const im = h('img'); im.alt = ''; im.src = src; ic.appendChild(im); }
+    const tx = h('span', 'tc-tx'), k = h('em', 'tc-k', 'Trofeo sbloccato' + (v.t.cat ? ' · ' + v.t.cat : ''));
     if (v.n > 1) k.appendChild(h('i', '', (v.i + 1) + '/' + v.n));
     tx.appendChild(k); tx.appendChild(h('b', '', v.t.nome || 'Trofeo'));
     if (v.t.desc) tx.appendChild(h('small', '', v.t.desc));
@@ -110,12 +99,11 @@
     attivo = true; quandoLibero(() => safe(prossimo));
   }
 
-  /* ---------- 3 · la finestra della bacheca ---------- */
+  /* ---------- 3 · la pagina dei trofei ---------- */
   let scheda = null, swapT = 0;
   function bacheca(body) {
-    const dlg = doc.getElementById('bachecaDlg');
-    const sel = dlg && dlg.querySelector('[data-bc][aria-selected="true"]'), ora = sel ? sel.dataset.bc : '';
-    dress(body);
+    const view = doc.getElementById('v-trofei');
+    const sel = view && view.querySelector('[data-bc][aria-selected="true"]'), ora = sel ? sel.dataset.bc : '';
     body.querySelectorAll('.acard .av').forEach((av) => safe(() => face(av)));
     // il conto dei trofei: la barra di quanto manca
     const cnt = body.querySelector('.bc-count');
@@ -129,7 +117,7 @@
       const all = c.querySelectorAll('.tr').length, on = c.querySelectorAll('.tr.on').length;
       const s = h('span', 'bc-n' + (on === all ? ' full' : ''), on + '/' + all); s.setAttribute('aria-hidden', 'true'); t.appendChild(s);
     });
-    // la cascata solo se la scheda è cambiata (o la finestra si è appena aperta)
+    // la cascata solo se la scheda è cambiata (o si è appena arrivati sulla pagina)
     if (ora !== scheda && !reduced()) {
       body.querySelectorAll('.tr, .acard, .bc-rec > div').forEach((x, k) => x.style.setProperty('--k', Math.min(k, 16)));
       clearTimeout(swapT); body.classList.remove('bc-swap'); void body.offsetWidth; body.classList.add('bc-swap');
@@ -155,9 +143,17 @@
     body.addEventListener('pointerleave', reset);
   }
   function watchBacheca() {
-    const body = doc.getElementById('bachecaBody'), dlg = doc.getElementById('bachecaDlg'); if (!body || body.__bc) return; body.__bc = true;
+    const body = doc.getElementById('bachecaBody'), view = doc.getElementById('v-trofei'); if (!body || body.__bc) return; body.__bc = true;
     new MutationObserver(() => safe(() => bacheca(body))).observe(body, { childList: true });
-    if (dlg) dlg.addEventListener('close', () => { scheda = null; safe(homeCount); });
+    // arrivando sulla pagina lo scudo della testata scatta e la cascata riparte; andando via si dimentica la scheda
+    let qui = false, heroT = 0;
+    const rotta = () => {
+      const ora = G.location.hash === '#trofei';
+      if (ora && !qui && view && !reduced()) { clearTimeout(heroT); view.classList.remove('tf-in'); void view.offsetWidth; view.classList.add('tf-in'); heroT = setTimeout(() => view.classList.remove('tf-in'), 1000); }
+      if (!ora) scheda = null;
+      qui = ora;
+    };
+    G.addEventListener('hashchange', () => safe(rotta)); safe(rotta);
     safe(() => tilt(body));
     if (body.firstChild) safe(() => bacheca(body));
   }
@@ -191,7 +187,7 @@
   }
   function watchEsito() {
     const body = doc.getElementById('resBody'); if (!body || body.__bc) return; body.__bc = true;
-    const on = () => { dress(body.querySelector('.tr-new')); safe(() => interviste(body)); };
+    const on = () => { safe(() => interviste(body)); };
     new MutationObserver(() => safe(on)).observe(body, { childList: true });
     safe(on);
   }
@@ -206,7 +202,7 @@
   }
 
   function boot() {
-    safe(watchBacheca); safe(watchEsito);
+    safe(assets); safe(watchBacheca); safe(watchEsito);
     // ui.js e bacheca.js vengono dopo la pelle: il conto in home si scrive quando ci sono
     setTimeout(() => safe(homeCount), 0);
     G.addEventListener('hashchange', () => safe(homeCount));

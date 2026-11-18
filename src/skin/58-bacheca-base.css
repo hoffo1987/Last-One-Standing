@@ -1,5 +1,5 @@
 /* ================= PELLE · BACHECA, FASE 3 (base) =================
- * Struttura e leggibilità: trofei sbloccati e interviste nell'Esito, la rivincita, la finestra «La tua bacheca»
+ * Struttura e leggibilità: trofei sbloccati e interviste nell'Esito, la rivincita, la pagina «Trofei»
  * (trofei, album delle carte, record) e il pulsante in home. La regia visiva va nei file 6x. */
 
 /* ---------- trofei ---------- */
@@ -29,8 +29,7 @@
 .rematch p { max-width: 64ch; }
 .rematch .row { gap: 10px; flex-wrap: wrap; }
 
-/* ---------- la finestra della bacheca ---------- */
-#bachecaDlg { width: min(980px, 100%); }
+/* ---------- la bacheca: linguette, conto, album, record ---------- */
 .bc-tabs { display: flex; gap: 6px; margin: 10px 0 14px; flex-wrap: wrap; }
 .bc-tabs button { padding: 8px 16px; border: 2px solid color-mix(in srgb, var(--ink) 22%, transparent); background: transparent; color: var(--ink); font: italic 900 14px / 1 var(--f-display); text-transform: uppercase; cursor: pointer; }
 .bc-tabs button[aria-selected="true"] { background: var(--key); color: var(--key-ink); border-color: var(--key); }
@@ -64,7 +63,7 @@
 /* ---------- la pagina dei trofei (prima era una finestra) e le immagini dei trofei ---------- */
 #v-trofei .bc-tabs { margin-top: 0; }
 .bacheca-page { padding-bottom: 40px; }
-.tr-ic { display: grid; place-items: center; overflow: hidden; }
+.tr-ic { display: grid; place-items: center; }
 .tr-ic img { width: 100%; height: 100%; object-fit: contain; display: block; }
 .tr.on .tr-ic img { filter: none; }
 .tr:not(.on) .tr-ic img { opacity: .45; filter: grayscale(1); }

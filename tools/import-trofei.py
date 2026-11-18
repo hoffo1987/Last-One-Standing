@@ -22,13 +22,16 @@ def key_out(path):
     im.thumbnail((640, 640), Image.Resampling.LANCZOS)
     w, h = im.size
     src = im.load()
+    # il colore del fondo si legge dagli angoli (mediana), così il verde pieno sparisce del tutto
+    corners = [src[x, y] for x in (2, w // 2, w - 3) for y in (2, h - 3)] + [src[2, h // 2], src[w - 3, h // 2]]
+    bg = tuple(sorted(c[i] for c in corners)[len(corners) // 2] for i in range(3))
     out = Image.new('RGBA', (w, h))
     dst = out.load()
     for y in range(h):
         for x in range(w):
             r, g, b = src[x, y]
-            green = g - max(r, b)  # quanto è «verde chiave»
-            a = 255 if green < 40 else 0 if green > 110 else int(255 * (110 - green) / 70)
+            d = ((r - bg[0]) ** 2 + (g - bg[1]) ** 2 + (b - bg[2]) ** 2) ** 0.5
+            a = 0 if d < 70 else 255 if d > 150 else int(255 * (d - 70) / 80)
             v = 255 if (0.299 * r + 0.587 * g + 0.114 * b) > 140 else 0
             dst[x, y] = (v, v, v, a)
     box = out.getbbox()

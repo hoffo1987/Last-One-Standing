@@ -1,0 +1,337 @@
+/* ================= PELLE · FESTA E CARTOLINE, FASE 4 (regia) =================
+ * La sala d'attesa della festa (#festaDlg), il cartello «passa il telefono» (.sc.sc-pass), il tabellone dei
+ * giocatori nella Diretta (.pt-festa), l'ospite che segue l'host (body.fs-ospite), la classifica della festa
+ * nell'Esito (.fs-rank), le cartoline (.cards-share, #cartolinaDlg). La struttura sta in 57-festa-base.css; qui
+ * l'aspetto e il movimento, 63-festa.js aggiunge le decorazioni.
+ * Stesse regole di 60-partita.css: tinta, nero e carta; l'inversione al passaggio è istantanea (nessuna
+ * transizione su colore o sfondo del testo); il testo non sparisce mai (entra solo con transform, mai da
+ * opacity 0); al passaggio si muove soltanto l'elemento toccato. Il colore di ogni giocatore (--pc) sta sempre
+ * su una targa con il testo nero, mai sotto il testo chiaro. Il movimento ridotto è in fondo. */
+
+/* ---------- 0 · la testata delle due finestre: nera, tagliata in diagonale, come il cartello delle scelte ---------- */
+#festaDlg { width: min(840px, calc(100% - 24px)); }
+#cartolinaDlg { width: min(580px, calc(100% - 24px)); }
+#festaDlg .db, #cartolinaDlg .db { padding: 0 0 26px; gap: 0; }
+:is(.festa-dialog, .cartolina-dialog) > .row.between { position: relative; isolation: isolate; align-items: center; padding: 20px 20px 46px 26px; color: var(--paper); overflow: hidden; }
+:is(.festa-dialog, .cartolina-dialog) > .row.between::before, :is(.festa-dialog, .cartolina-dialog) > .row.between::after { content: ""; position: absolute; inset: 0; pointer-events: none; }
+:is(.festa-dialog, .cartolina-dialog) > .row.between::before { z-index: -2; background: var(--key); clip-path: polygon(0 0, 100% 0, 100% calc(100% - 22px), 0 100%); }
+:is(.festa-dialog, .cartolina-dialog) > .row.between::after { z-index: -1; background-color: var(--void); background-image: radial-gradient(circle, color-mix(in srgb, var(--key) 30%, transparent) 1.3px, transparent 1.7px); background-size: 14px 14px;
+  clip-path: polygon(0 0, 100% 0, 100% calc(100% - 29px), 0 calc(100% - 7px)); }
+#h-festa, #h-cartolina { margin: 0; font: italic 900 clamp(30px, 5.4vw, 52px) / .94 var(--f-display); font-stretch: 118%; letter-spacing: -.025em; text-transform: uppercase; color: var(--paper); text-shadow: .055em .055em 0 var(--key); }
+/* sopra il titolo della festa: la targhetta «in onda» (decorazione, vuota per i lettori di schermo dove si può) */
+#h-festa::before { content: "\25C6\00a0 Sala d\2019 attesa"; content: "\25C6\00a0 Sala d\2019 attesa" / ""; display: block; width: fit-content; margin: 0 0 9px; padding: 5px 15px 4px 9px; background: var(--key); color: var(--key-ink); font: italic 900 11.5px / 1 var(--f-display); font-stretch: 112%; letter-spacing: .14em; text-shadow: none;
+  clip-path: polygon(0 0, 100% 0, calc(100% - 7px) 100%, 0 100%); }
+:is(.festa-dialog, .cartolina-dialog) > .row.between .iconbtn { background: transparent; color: var(--paper); border-color: color-mix(in srgb, var(--paper) 45%, transparent); }
+@media (hover: hover) { :is(.festa-dialog, .cartolina-dialog) > .row.between .iconbtn:hover { background: var(--key); color: var(--key-ink); border-color: var(--key); } }
+:is(.festa-dialog, .cartolina-dialog) > .row.between .iconbtn:focus-visible { outline: 3px solid var(--key); outline-offset: 2px; }
+
+/* ---------- 1 · la sala d'attesa della festa ---------- */
+.festa-dialog > .help, #festaBody, #festaMsg { margin-inline: 26px; }
+.festa-dialog > .help { max-width: 62ch; margin-top: 2px; font-size: 15px; }
+/* le linguette: lastre inclinate; quella scelta prende la tinta di colpo */
+.fs-tabs { gap: 8px; margin: 16px 26px 18px 32px; }
+.fs-tabs button { position: relative; isolation: isolate; padding: 12px 22px 11px; border: 0; background: none; color: var(--ink); font: italic 900 15.5px / 1 var(--f-display); font-stretch: 110%; letter-spacing: .05em; outline: none; transition: none; -webkit-tap-highlight-color: transparent; }
+.fs-tabs button::before { content: ""; position: absolute; inset: 0; z-index: -1; background: color-mix(in srgb, var(--ink) 14%, var(--panel-solid, var(--panel))); transform: skewX(-12deg); }
+.fs-tabs button[aria-selected="true"] { background: none; border: 0; color: var(--key-ink); }
+.fs-tabs button[aria-selected="true"]::before { background: var(--key); box-shadow: 4px 4px 0 var(--hard); }
+@media (hover: hover) {
+  .fs-tabs button[aria-selected="false"]:hover { color: var(--bg); }
+  .fs-tabs button[aria-selected="false"]:hover::before { background: var(--ink); }
+}
+.fs-tabs button:focus-visible::before { outline: 3px solid var(--ink); outline-offset: 3px; }
+.fs-tabs button:active::before { transform: skewX(-12deg) scale(.95); }
+
+/* i giocatori: una riga per ciascuno, con la targa «P1» nel suo colore */
+.fs-players { counter-reset: fsp; gap: 9px; margin: 0 0 12px; padding: 0 6px 0 0; }
+.fs-players li { counter-increment: fsp; position: relative; isolation: isolate; grid-template-columns: 54px minmax(0, 1fr) minmax(0, 1.2fr) auto; gap: 10px; min-height: 58px; padding: 8px 22px 8px 0; background: none; box-shadow: none; }
+.fs-players li::before { content: ""; position: absolute; inset: 0; z-index: -1; background: color-mix(in srgb, var(--ink) 9%, transparent); clip-path: polygon(0 0, 100% 0, calc(100% - 12px) 100%, 0 100%); }
+.fs-players li::after { content: "P" counter(fsp); grid-area: 1 / 1; align-self: stretch; display: grid; place-items: center; margin: -8px 0; padding-right: 6px; background: var(--pc, var(--key)); color: #0a0a0c; font: italic 900 21px / 1 var(--f-display); font-stretch: 112%; letter-spacing: -.02em;
+  clip-path: polygon(0 0, 100% 0, calc(100% - 10px) 100%, 0 100%); }
+.fs-players li > input { grid-column: 2; grid-row: 1; font-weight: 800; }
+.fs-players li > select { grid-column: 3; grid-row: 1; }
+.fs-players li > .iconbtn { grid-column: 4; grid-row: 1; width: 36px; height: 36px; border-radius: 0; }
+@media (hover: hover) { .fs-players li > .iconbtn:hover { background: var(--ink); color: var(--bg); border-color: var(--ink); } }
+.fs-players li > .iconbtn:focus-visible, .fs-players :is(input, select):focus-visible { outline: 3px solid var(--key); outline-offset: 2px; }
+/* chi è appena arrivato: la riga entra di lato, la targa scatta (la classe la mette 63-festa.js) */
+.fs-players li.fs-new { animation: fsRow .34s var(--look-out) backwards; }
+.fs-players li.fs-new::after { animation: fsPlate .42s var(--ease-kick) .08s backwards; }
+@keyframes fsRow { from { transform: translateX(-26px) skewX(-10deg); } }
+@keyframes fsPlate { from { transform: scale(.4) rotate(-14deg); } }
+/* «aggiungi un giocatore»: un posto ancora vuoto, tratteggiato */
+.festa-dialog [data-fs-add] { width: calc(100% - 6px); justify-content: flex-start; gap: 12px; min-height: 48px; padding: 8px 18px; border: 2px dashed color-mix(in srgb, var(--ink) 42%, transparent); border-radius: 0; background: none; box-shadow: none; color: var(--ink); font: italic 900 14px / 1 var(--f-display); letter-spacing: .08em; text-transform: uppercase; }
+.festa-dialog [data-fs-add]::before { content: "+"; flex: none; width: 26px; height: 26px; display: grid; place-items: center; background: var(--ink); color: var(--bg); font: 900 20px / 1 var(--f-display); font-style: normal; }
+@media (hover: hover) {
+  .festa-dialog [data-fs-add]:hover { border-style: solid; border-color: var(--key); background: var(--key); color: var(--key-ink); }
+  .festa-dialog [data-fs-add]:hover::before { background: var(--key-ink); color: var(--key); }
+}
+.festa-dialog [data-fs-add]:focus-visible { outline: 3px solid var(--key); outline-offset: 3px; }
+#festaBody > .help { max-width: 60ch; margin: 14px 0 0; }
+#festaBody > .row { margin-top: 18px; gap: 12px 14px; align-items: center; flex-wrap: wrap; }
+/* «inizia la festa»: il pulsante grande con la freccia che spinge (::after è il riflesso di look.css) */
+.festa-dialog [data-fs-start] { padding: 15px 28px 14px; font: italic 900 20px / 1 var(--f-display); font-stretch: 112%; letter-spacing: .04em; text-transform: uppercase; box-shadow: 5px 5px 0 var(--hard); }
+.festa-dialog [data-fs-start]::before { content: "\00bb"; order: 2; display: inline-block; margin-left: -.1em; font-size: 1.15em; line-height: 1; animation: rmNudge .9s steps(2, jump-none) infinite; }
+.festa-dialog [data-fs-start]:focus-visible, .festa-dialog .row .btn:focus-visible { outline: 3px solid var(--ink); outline-offset: 4px; }
+
+/* la stanza: il tabellone con il codice, grande da leggersi dall'altra parte del tavolo */
+.fs-room { position: relative; isolation: isolate; gap: 10px; justify-items: center; margin: 0 6px 6px 0; padding: 26px 20px 22px; background: none; color: var(--paper); text-align: center; }
+.fs-room::before { content: ""; position: absolute; inset: 0; z-index: -2; background-color: var(--void); background-image: radial-gradient(circle, color-mix(in srgb, var(--key) 32%, transparent) 1.3px, transparent 1.7px); background-size: 14px 14px;
+  clip-path: polygon(0 0, calc(100% - 26px) 0, 100% 26px, 100% 100%, 26px 100%, 0 calc(100% - 26px)); }
+/* le lampadine del varietà: due file che si accendono a turno, in alto e in basso */
+.fs-room::after { content: ""; position: absolute; inset: 9px 34px; z-index: -1; pointer-events: none;
+  background: radial-gradient(circle, var(--key) 3px, transparent 3.6px) 0 0 / 28px 8px repeat-x, radial-gradient(circle, var(--paper) 3px, transparent 3.6px) 14px 0 / 28px 8px repeat-x,
+    radial-gradient(circle, var(--paper) 3px, transparent 3.6px) 0 100% / 28px 8px repeat-x, radial-gradient(circle, var(--key) 3px, transparent 3.6px) 14px 100% / 28px 8px repeat-x;
+  animation: fsBulbs 1.1s steps(2, jump-none) infinite; }
+@keyframes fsBulbs { to { background-position: 14px 0, 28px 0, 14px 100%, 28px 100%; } }
+.fs-room > span { padding: 6px 16px 5px 12px; background: var(--key); color: var(--key-ink); font: italic 900 12px / 1 var(--f-display); font-stretch: 112%; letter-spacing: .16em; opacity: 1; clip-path: polygon(0 0, 100% 0, calc(100% - 8px) 100%, 0 100%); }
+.fs-code { display: flex; justify-content: center; gap: .12em; max-width: 100%; font: italic 900 clamp(60px, 19vw, 124px) / .9 var(--f-display); font-stretch: 112%; letter-spacing: .1em; margin-right: -.1em; color: var(--paper); text-shadow: .05em .05em 0 var(--key); user-select: all; }
+/* 63-festa.js divide il codice in quattro tessere (il testo intero resta in aria-label) */
+.fs-code.fs-split { letter-spacing: 0; margin-right: 0; text-shadow: none; padding: 4px 8px 12px 0; }
+.fs-code .fs-l { display: grid; place-items: center; min-width: .92em; padding: .1em .06em .06em 0; background: var(--paper); color: var(--void); box-shadow: .07em .07em 0 var(--key); }
+.fs-code .fs-l:nth-child(even) { rotate: 2.5deg; } .fs-code .fs-l:nth-child(odd) { rotate: -2.5deg; }
+.fs-code.fs-pop .fs-l { animation: fsTile .44s var(--ease-kick) backwards; animation-delay: calc(var(--i, 0) * 90ms); }
+/* le tessere crescono dentro il loro posto: non coprono la targhetta sopra né la riga sotto */
+@keyframes fsTile { from { transform: scale(.5) rotate(-18deg); } }
+.fs-room small { max-width: 46ch; font-size: 14px; line-height: 1.4; opacity: 1; color: color-mix(in srgb, var(--paper) 88%, var(--void)); }
+/* i titoli delle sezioni: il rombo, il filo, il conto nella tinta */
+.fs-h { display: flex; align-items: center; gap: 10px; margin: 22px 0 11px; font: italic 900 19px / 1 var(--f-display); font-stretch: 112%; }
+.fs-h::before { content: ""; flex: none; width: 15px; height: 15px; background: var(--key); clip-path: polygon(5px 0, 100% 0, calc(100% - 5px) 100%, 0 100%); }
+.fs-h::after { content: ""; flex: 1 1 20px; order: 3; height: 3px; background: color-mix(in srgb, var(--ink) 16%, transparent); }
+.fs-h span { order: 2; padding: 4px 9px 3px; background: var(--key); color: var(--key-ink); font: italic 900 13px / 1 var(--f-display); font-variant-numeric: tabular-nums; }
+/* gli amici collegati: una targhetta per ciascuno; chi sta ancora scegliendo ha il rombo che lampeggia */
+.fs-guests { list-style: none; display: flex; flex-wrap: wrap; gap: 8px 10px; padding: 0; }
+.fs-guests li { position: relative; isolation: isolate; padding: 9px 20px 8px 16px; font-size: 14.5px; }
+.fs-guests li::before { content: ""; position: absolute; inset: 0; z-index: -1; background: linear-gradient(90deg, var(--key) 0 6px, color-mix(in srgb, var(--ink) 10%, transparent) 6px); clip-path: polygon(0 0, 100% 0, calc(100% - 9px) 100%, 0 100%); }
+.fs-guests li b { font: italic 900 15px / 1 var(--f-display); text-transform: uppercase; }
+.fs-guests li em { font-style: italic; }
+.fs-guests li em::before { content: ""; display: inline-block; width: 8px; height: 8px; margin-right: 6px; background: var(--key); clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%); animation: scOnAir 1.1s steps(2, jump-none) infinite; }
+.fs-guests li.fs-new { animation: fsRow .34s var(--look-out) backwards; }
+
+/* online: creare o entrare, due tessere affiancate */
+.fs-online { gap: 14px; padding-right: 6px; }
+.fs-online section { position: relative; isolation: isolate; gap: 12px; padding: 18px 22px 20px; }
+.fs-online section::before { content: ""; position: absolute; inset: 0; z-index: -1; background: linear-gradient(180deg, var(--key) 0 6px, color-mix(in srgb, var(--ink) 8%, transparent) 6px); clip-path: polygon(0 0, 100% 0, 100% calc(100% - 20px), calc(100% - 20px) 100%, 0 100%); }
+.fs-online .fs-h { margin: 4px 0 0; }
+.fs-online .help { margin: 0; }
+.fs-online .btn { justify-self: start; }
+.fs-online .btn:focus-visible, .fs-server .btn:focus-visible { outline: 3px solid var(--ink); outline-offset: 3px; }
+/* il codice si scrive grande, come sul tabellone */
+#fsCode { font: italic 900 30px / 1.1 var(--f-display); letter-spacing: .34em; text-align: center; text-indent: .34em; padding-block: 9px 7px; }
+#fsCode:focus-visible, #fsName:focus-visible, #fsServer:focus-visible, .festa-dialog select:focus-visible { outline: 3px solid var(--key); outline-offset: 2px; }
+/* il server: una fascia che si apre */
+.fs-server { margin: 18px 6px 0 0; }
+.fs-server summary { position: relative; isolation: isolate; display: flex; align-items: center; gap: 10px; padding: 12px 22px 11px 16px; list-style: none; font: italic 900 14px / 1.1 var(--f-display); letter-spacing: .06em; text-transform: uppercase; outline: none; }
+.fs-server summary::-webkit-details-marker { display: none; }
+.fs-server summary::before { content: ""; position: absolute; inset: 0; z-index: -1; background: color-mix(in srgb, var(--ink) 10%, transparent); clip-path: polygon(0 0, 100% 0, calc(100% - 10px) 100%, 0 100%); }
+.fs-server summary::after { content: "+"; order: -1; flex: none; width: 22px; height: 22px; display: grid; place-items: center; background: var(--key); color: var(--key-ink); font: 900 17px / 1 var(--f-display); font-style: normal; }
+.fs-server[open] summary::after { content: "\2212"; }
+@media (hover: hover) { .fs-server summary:hover { color: var(--bg); } .fs-server summary:hover::before { background: var(--ink); } }
+.fs-server summary:focus-visible { outline: 3px solid var(--key); outline-offset: 2px; }
+.fs-server > :not(summary) { margin: 12px 4px 0; }
+.fs-server > .help { max-width: 70ch; }
+/* gli avvisi della festa: una fascia nella tinta, solo quando c'è qualcosa da dire */
+#festaMsg { margin-top: 0; margin-bottom: 0; }
+#festaMsg:not(:empty) { margin-top: 16px; margin-right: 32px; padding: 11px 22px 10px 16px; background: var(--key); color: var(--key-ink); font-weight: 800; font-size: 14.5px; clip-path: polygon(0 0, 100% 0, calc(100% - 10px) 100%, 0 100%); }
+
+/* ---------- 2 · «passa il telefono»: lo stacco a tutto schermo ---------- */
+/* il velo è pieno, nel colore di chi tocca: chi aveva il telefono non lascia niente in vista */
+.sc.sc-pass { --pc: var(--key); padding: 0; place-items: center; }
+.sc.sc-pass .sc-back { background-color: var(--pc); background-image: radial-gradient(circle, hsl(0 0% 0% / .26) 1.6px, transparent 2px), linear-gradient(-24deg, transparent 0 22%, #0a0a0c 22% 76%, transparent 76%); background-size: 13px 13px, auto; }
+/* le lame passano e vanno via del tutto (su uno schermo alto e stretto quelle di 60-partita.css restano in un angolo) */
+.sc.sc-pass::before { background: var(--paper); animation-name: spBlade; transform: translateX(340vw) skewX(-24deg); }
+.sc.sc-pass::after { background: var(--pc); animation-name: spBlade; transform: translateX(340vw) skewX(-24deg); }
+@keyframes spBlade { from { transform: translateX(-60vw) skewX(-24deg); } to { transform: translateX(340vw) skewX(-24deg); } }
+.sc.sc-pass .sc-card { width: min(1060px, 100%); max-height: 100dvh; padding: clamp(16px, 4vh, 44px) clamp(16px, 4vw, 44px); background: none; box-shadow: none; color: var(--paper); justify-items: center; text-align: center; }
+.sc.sc-pass .sc-card::before, .sc.sc-pass .sc-card::after { content: none; }
+.sc.sc-pass .sc-head { grid-row: auto; justify-items: center; gap: 12px; padding: 0; overflow: visible; }
+.sc.sc-pass .sc-k { background: var(--paper); color: #0a0a0c; font-size: 13px; }
+/* senza 63-festa.js il titolo fa da solo; con la targa «Turno di» sopra, diventa il sottotitolo */
+.sc.sc-pass .sc-t { font-size: clamp(34px, 8.4vw, 92px); line-height: .92; text-shadow: .05em .05em 0 var(--pc); text-wrap: balance; overflow-wrap: anywhere; }
+.sc.sc-pass .sp-big ~ .sc-t { font-size: clamp(19px, 3vw, 30px); text-shadow: none; letter-spacing: .01em; }
+.sc.sc-pass .sc-x { font-size: clamp(15px, 2vw, 18px); color: var(--paper); }
+/* «Turno di» e il nome enorme: carta su nero, l'ombra nel colore del giocatore; dietro, il suo numero in contorno */
+.sp-big { position: relative; isolation: isolate; display: grid; justify-items: center; gap: 6px; margin: 6px 0 4px; max-width: 100%; }
+.sp-big::before { content: attr(data-pn); position: absolute; z-index: -1; left: 50%; top: 50%; translate: -50% -52%; font: italic 900 clamp(240px, 52vw, 560px) / .8 var(--f-display); font-stretch: 122%; letter-spacing: -.06em; color: transparent; -webkit-text-stroke: 3px color-mix(in srgb, var(--pc) 40%, transparent); pointer-events: none; white-space: nowrap; }
+.sp-k { padding: .34em 1.2em .28em .8em; background: var(--pc); color: #0a0a0c; font: italic 900 clamp(18px, 3.6vw, 34px) / 1 var(--f-display); font-stretch: 114%; letter-spacing: .16em; text-transform: uppercase; rotate: -4deg; clip-path: polygon(0 0, 100% 0, calc(100% - .5em) 100%, 0 100%);
+  animation: spKick .4s var(--ease-kick) calc(var(--sc-d, 0ms) + 120ms) backwards; }
+/* il nome sta sempre su una riga: la misura scende con la lunghezza (--n, la parola più lunga, lo scrive 63-festa.js) */
+.sp-n { max-width: 100%; padding: 0 .1em .04em 0; font: italic 900 min(clamp(54px, 15.5vw, 190px), calc((min(100vw, 1060px) - 2 * clamp(16px, 4vw, 44px)) / (var(--n, 7) * .86))) / .86 var(--f-display); font-stretch: 122%; letter-spacing: -.04em; text-transform: uppercase; color: var(--paper); text-shadow: .045em .045em 0 var(--pc); overflow-wrap: anywhere; rotate: -4deg;
+  animation: spSlam .5s var(--ease-kick) calc(var(--sc-d, 0ms) + 200ms) backwards; }
+@keyframes spKick { from { transform: translateX(-60px) skewX(-18deg); } }
+/* entra di lato: non passa sopra le righe vicine */
+@keyframes spSlam { from { transform: translateX(90px) skewX(-16deg); } }
+/* l'unica scelta: un pulsante enorme nel colore del giocatore */
+.sc.sc-pass .sc-opts { width: min(620px, 100%); margin: clamp(14px, 3vh, 30px) 0 0; }
+.sc.sc-pass .sc-opt { grid-template-columns: minmax(0, 1fr); min-height: 78px; padding: 16px 30px; color: #0a0a0c; text-align: center; }
+.sc.sc-pass .sc-opt::before { background: var(--pc); }
+.sc.sc-pass .sc-opt::after { background: var(--paper); opacity: 1; transform: translate(7px, 7px); }
+.sc.sc-pass .sc-opt .sc-n { display: none; }
+.sc.sc-pass .sc-opt .sc-l { grid-column: 1; font-size: clamp(22px, 4.6vw, 34px); }
+.sc.sc-pass .sc-opt .sc-l::after { content: "\00a0\00bb"; display: inline-block; animation: rmNudge .9s steps(2, jump-none) infinite; }
+@media (hover: hover) {
+  .sc.sc-pass .sc-opt:hover:not(:disabled) { color: #0a0a0c; }
+  .sc.sc-pass .sc-opt:hover:not(:disabled)::before { background: var(--paper); }
+  .sc.sc-pass .sc-opt:hover:not(:disabled)::after { background: var(--pc); }
+}
+/* il pulsante ha già il fuoco quando lo stacco si apre: resta nel colore del giocatore, con un anello di carta */
+.sc.sc-pass .sc-opt:focus-visible { color: #0a0a0c; outline: 3px solid var(--paper); outline-offset: 6px; }
+.sc.sc-pass .sc-opt:focus-visible::before { background: var(--pc); outline: 0; }
+.sc.sc-pass .sc-opt:focus-visible::after { background: var(--paper); transform: translate(7px, 7px); }
+.sc.sc-pass .sc-opt.is-picked, .sc.sc-pass .sc-opt.is-picked:hover, .sc.sc-pass .sc-opt.is-picked:focus-visible { color: #0a0a0c; }
+.sc.sc-pass .sc-opt.is-picked::before, .sc.sc-pass .sc-opt.is-picked:hover::before, .sc.sc-pass .sc-opt.is-picked:focus-visible::before { background: var(--paper); }
+.sc.sc-pass .sc-foot { width: min(620px, 100%); margin: 16px 0 0; justify-content: center; }
+.sc.sc-pass .sc-foot > span:empty { display: none; }
+.sc.sc-pass .sc-skip { margin: 0; color: var(--paper); box-shadow: inset 0 -2px 0 color-mix(in srgb, var(--paper) 50%, transparent); }
+@media (hover: hover) { .sc.sc-pass .sc-skip:hover { background: var(--paper); color: #0a0a0c; box-shadow: none; } }
+.sc.sc-pass .sc-skip:focus-visible { background: var(--paper); color: #0a0a0c; box-shadow: none; outline: 3px solid var(--pc); outline-offset: 2px; }
+
+/* ---------- 3 · il tabellone della festa nella Diretta ---------- */
+.pt-festa { gap: 9px; padding: 10px 0 13px 16px; min-width: 0; }
+.pt-festa > small { justify-self: start; display: flex; align-items: center; gap: 9px; padding: 5px 16px 4px 10px; background: var(--key); color: var(--key-ink); font: italic 900 11.5px / 1 var(--f-display); font-stretch: 112%; letter-spacing: .14em; clip-path: polygon(0 0, 100% 0, calc(100% - 7px) 100%, 0 100%); }
+.pt-festa > small::before { content: ""; width: 9px; height: 9px; background: var(--key-ink); clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%); animation: scOnAir 1.1s steps(2, jump-none) infinite; }
+.pt-festa ol { counter-reset: pf; display: grid; grid-template-columns: repeat(auto-fit, minmax(212px, 1fr)); gap: 8px 10px; }
+.pf-pl { counter-increment: pf; position: relative; isolation: isolate; grid-template-columns: 36px auto minmax(0, 1fr) auto; grid-template-rows: auto auto; column-gap: 9px; row-gap: 3px; min-width: 0; min-height: 52px; padding: 6px 18px 6px 0; background: none; box-shadow: none; color: var(--paper); }
+.pf-pl::before { content: ""; position: absolute; inset: 0; z-index: -1; background: color-mix(in srgb, var(--paper) 11%, transparent); clip-path: polygon(0 0, 100% 0, calc(100% - 9px) 100%, 0 100%); }
+/* la targa col numero del giocatore, nel suo colore */
+.pf-pl::after { content: counter(pf); grid-area: 1 / 1 / 3 / 2; align-self: stretch; display: grid; place-items: center; margin: -6px 0; padding-right: 5px; background: var(--pc); color: #0a0a0c; font: italic 900 21px / 1 var(--f-display); clip-path: polygon(0 0, 100% 0, calc(100% - 8px) 100%, 0 100%); }
+.pf-pl .pf-nm { grid-column: 2 / 4; grid-row: 1; align-self: end; font: italic 900 16px / 1.05 var(--f-display); font-stretch: 110%; letter-spacing: .005em; overflow-wrap: anywhere; }
+.pf-pl .av { grid-column: 2; grid-row: 2; --s: 24px; }
+.pf-pl .pf-ch { grid-column: 3; grid-row: 2; align-self: start; min-width: 0; font-size: 12.5px; line-height: 1.25; color: color-mix(in srgb, var(--paper) 86%, var(--void)); overflow-wrap: anywhere; }
+.pf-pl > .pf-nm + .pf-ch { grid-column: 2 / 4; }
+.pf-pl em { grid-column: 4; grid-row: 1 / 3; align-self: center; font: italic 900 22px / 1 var(--f-display); letter-spacing: -.01em; color: var(--paper); font-variant-numeric: tabular-nums; white-space: nowrap; }
+/* chi ha più crediti è in testa (la classe la mette 63-festa.js): il suo conto prende la tinta */
+.pf-pl.pf-top em { padding: 5px 9px 4px 7px; background: var(--key); color: var(--key-ink); clip-path: polygon(5px 0, 100% 0, calc(100% - 5px) 100%, 0 100%); }
+/* il campione caduto: il nome resta, barrato */
+.pf-pl:has(.av.dead) .pf-ch { text-decoration: line-through; text-decoration-thickness: 2px; text-decoration-color: var(--key); }
+/* l'ospite: la sua tessera ha il bordo nella tinta e la targhetta «Tu» */
+.pf-pl.me { outline: 0; }
+.pf-pl.me::before { background: color-mix(in srgb, var(--paper) 20%, transparent); box-shadow: inset 0 -4px 0 var(--key); }
+.pf-pl.me .pf-nm::after { content: "Tu"; margin-left: 8px; padding: 2px 7px 1px 5px; background: var(--paper); color: #0a0a0c; font: italic 900 10.5px / 1 var(--f-display); letter-spacing: .12em; vertical-align: 2px; }
+/* i crediti che cambiano: il conto scatta (63-festa.js) */
+.pf-pl.pf-bump em { animation: pfBump .36s var(--ease-kick); }
+@keyframes pfBump { from { transform: scale(.6) rotate(-6deg); } }
+
+/* l'ospite non guida: i comandi restano leggibili ma spenti, e una targhetta dice chi manda avanti */
+body.fs-ospite #v-diretta .player::before { content: "\25C6\00a0 Guida l\2019host"; display: block; width: fit-content; margin: 0 auto 6px; padding: 6px 16px 5px 11px; background: var(--key); color: var(--key-ink); font: italic 900 12px / 1 var(--f-display); font-stretch: 112%; letter-spacing: .14em; text-transform: uppercase;
+  clip-path: polygon(0 0, 100% 0, calc(100% - 7px) 100%, 0 100%); }
+body.fs-ospite #prevBtn, body.fs-ospite #playBtn, body.fs-ospite #nextBtn, body.fs-ospite #speedSeg { opacity: .5; filter: grayscale(1); }
+
+/* ---------- 4 · la classifica della festa nell'Esito: il podio ---------- */
+.fs-rank ol { counter-reset: fr; gap: 10px; max-width: 1040px; margin: 0 6px 16px 0; }
+.fs-rank li { position: relative; isolation: isolate; grid-template-columns: 62px minmax(0, 1.7fr) 46px minmax(0, 1fr) auto; gap: 14px; min-height: 68px; padding: 9px 30px 9px 0; background: none; box-shadow: none; }
+.fs-rank li::before { content: ""; position: absolute; inset: 0; z-index: -1; background: color-mix(in srgb, var(--ink) 9%, transparent); clip-path: polygon(0 0, 100% 0, calc(100% - 14px) 100%, 0 100%); }
+.fr-pos { align-self: stretch; display: grid; place-items: center; margin: -9px 0; padding-right: 8px; background: var(--pc); color: #0a0a0c; font: italic 900 34px / 1 var(--f-display); font-stretch: 112%; clip-path: polygon(0 0, 100% 0, calc(100% - 12px) 100%, 0 100%); }
+.fr-nm { font: italic 900 clamp(20px, 2.6vw, 28px) / 1 var(--f-display); font-stretch: 114%; letter-spacing: -.01em; overflow-wrap: anywhere; }
+.fs-rank .av { --s: 46px; border-radius: 0 !important; clip-path: polygon(14% 0, 100% 0, 86% 100%, 0 100%); }
+.fr-ch { font-size: 14.5px; line-height: 1.3; color: color-mix(in srgb, var(--ink) 84%, transparent); overflow-wrap: anywhere; }
+.fr-pt { display: flex; align-items: baseline; gap: 6px; font: italic 900 clamp(28px, 3.6vw, 40px) / 1 var(--f-display); font-stretch: 114%; letter-spacing: -.02em; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.fr-pt small { font: 800 11px / 1 var(--f-body); letter-spacing: .14em; text-transform: uppercase; }
+/* chi vince: la lastra nera, il nome enorme, la targa «Vince la festa» */
+.fs-rank li.top { min-height: 108px; margin-bottom: 6px; transform-origin: 0 50%; padding-block: 16px; color: var(--paper); background: none; }
+.fs-rank li.top::before { background-color: var(--void); background-image: radial-gradient(circle, color-mix(in srgb, var(--key) 34%, transparent) 1.3px, transparent 1.7px); background-size: 14px 14px; }
+.fs-rank li.top .fr-pos { margin: -16px 0; font-size: 58px; }
+.fs-rank li.top .fr-nm { font-size: clamp(30px, 4.2vw, 54px); line-height: .92; text-shadow: .05em .05em 0 var(--key); }
+.fs-rank li.top .fr-nm::before { content: "Vince la festa"; display: block; transform-origin: 0 100%; width: fit-content; margin: 0 0 8px; padding: 5px 13px 4px 8px; background: var(--key); color: var(--key-ink); font: italic 900 11.5px / 1 var(--f-display); font-stretch: 112%; letter-spacing: .14em; text-shadow: none; clip-path: polygon(0 0, 100% 0, calc(100% - 7px) 100%, 0 100%); }
+.fs-rank li.top .fr-ch { color: color-mix(in srgb, var(--paper) 88%, var(--void)); }
+.fs-rank li.top .fr-pt { color: var(--key); font-size: clamp(38px, 5.6vw, 64px); text-shadow: .04em .04em 0 var(--paper); }
+.fs-rank li.top .fr-pt small { color: var(--paper); text-shadow: none; }
+.fs-rank li.top .av { --s: 62px; }
+.fs-rank > .help { max-width: 70ch; }
+/* la rivelazione: dall'ultimo al primo, poi il timbro su chi vince (la classe la mette 63-festa.js) */
+.fs-rank.fr-go li { animation: frIn .4s var(--look-out) backwards; animation-delay: calc(var(--k, 0) * 150ms); }
+.fs-rank.fr-go li.top { animation-name: frTop; animation-duration: .56s; animation-timing-function: var(--ease-kick); }
+/* la targa cresce verso l'alto e verso destra: non passa mai sopra il nome */
+.fs-rank.fr-go li.top .fr-nm::before { animation: frTag .44s var(--ease-kick) calc(var(--k, 0) * 150ms + 320ms) backwards; }
+@keyframes frIn { from { transform: translateX(-46px) skewX(-10deg); } }
+@keyframes frTop { from { transform: scale(1.06) rotate(-1.2deg); } }
+@keyframes frTag { from { transform: scale(1.6) rotate(-9deg); } }
+
+/* ---------- 5 · le cartoline ---------- */
+/* nell'Esito: a destra un mazzetto di cartoline inclinate (decorazione) */
+#resBody .cards-share { position: relative; overflow: hidden; }
+#resBody .cards-share > * { position: relative; }
+#resBody .cards-share::after { content: ""; position: absolute; right: clamp(18px, 5vw, 70px); top: 50%; width: clamp(80px, 10vw, 128px); aspect-ratio: 4 / 5; margin-top: clamp(-80px, -6.25vw, -50px); pointer-events: none; rotate: 9deg;
+  background: linear-gradient(-24deg, transparent 0 46%, var(--key) 46% 60%, transparent 60%), radial-gradient(circle, color-mix(in srgb, var(--key) 60%, transparent) 1.4px, transparent 1.8px) 0 0 / 9px 9px, var(--void);
+  box-shadow: 0 0 0 4px var(--paper), -26px 12px 0 -4px var(--key), -26px 12px 0 0 var(--paper); }
+#resBody .cards-share .help { max-width: min(56ch, calc(100% - clamp(120px, 18vw, 220px))); font-size: 15px; }
+#resBody .cards-share .row { gap: 12px; align-items: center; padding-right: clamp(0px, 14vw, 190px); }
+/* il segno della cartolina davanti alle etichette */
+.cards-share [data-cart]::before, .acard .ac-share::before { content: ""; flex: none; width: 11px; height: 14px; border: 2px solid currentColor; box-shadow: inset 0 -5px 0 currentColor; rotate: -8deg; }
+.cards-share .btn:focus-visible { outline: 3px solid var(--key); outline-offset: 3px; }
+
+/* la finestra: la cartolina sta su un tavolo nero, un po' inclinata, con l'ombra piena */
+.cartolina-dialog > .ct-frame, .cartolina-dialog > .row:not(.between), #cartMsg { margin-inline: 26px; }
+.ct-frame { position: relative; isolation: isolate; justify-self: center; width: min(calc(100% - 52px), calc(min(58dvh, 620px) * .8)); height: auto; aspect-ratio: 4 / 5; margin-block: 8px 20px; padding: 0; background: none; }
+.ct-frame::before { content: ""; position: absolute; inset: -6px -14px -10px; z-index: -1; background-color: color-mix(in srgb, var(--ink) 10%, transparent); background-image: radial-gradient(circle, color-mix(in srgb, var(--key) 40%, transparent) 1.3px, transparent 1.7px); background-size: 12px 12px;
+  clip-path: polygon(0 0, 100% 0, calc(100% - 12px) 100%, 0 100%); }
+.ct-frame img { rotate: -1.6deg; box-shadow: 0 0 0 5px var(--paper), 13px 13px 0 3px var(--key); background: var(--void); }
+/* finché non c'è, il posto della cartolina è una lastra tratteggiata che scorre */
+.ct-frame img:not([src]) { box-shadow: 0 0 0 5px var(--paper); background: repeating-linear-gradient(-60deg, var(--void) 0 14px, color-mix(in srgb, var(--key) 55%, var(--void)) 14px 28px) 0 0 / 200% 100%; animation: ctWait 1.2s linear infinite; }
+@keyframes ctWait { to { background-position: -32.33px 0; } }
+/* pronta: cade sul tavolo (la classe la mette 63-festa.js) */
+.ct-frame.ct-ready img { animation: ctDrop .5s var(--ease-kick) backwards; }
+@keyframes ctDrop { from { transform: translateY(-34px) rotate(-9deg) scale(1.12); } }
+.cartolina-dialog > .row:not(.between) { gap: 12px; flex-wrap: wrap; align-items: center; }
+#cartShare { padding: 13px 24px 12px; font: italic 900 17px / 1 var(--f-display); font-stretch: 110%; letter-spacing: .05em; text-transform: uppercase; box-shadow: 4px 4px 0 var(--hard); }
+#cartShare:focus-visible, #cartLink:focus-visible { outline: 3px solid var(--ink); outline-offset: 3px; }
+#cartMsg { min-height: 1.5em; margin-top: 12px; margin-bottom: 0; font-weight: 700; }
+
+/* ---------- telefono ---------- */
+@media (max-width: 600px) {
+  #festaDlg, #cartolinaDlg { width: calc(100% - 12px); }
+  :is(.festa-dialog, .cartolina-dialog) > .row.between { padding: 16px 12px 42px 16px; }
+  .festa-dialog > .help, #festaBody, #festaMsg { margin-inline: 14px; }
+  .festa-dialog > .help { font-size: 14px; }
+  .fs-tabs { gap: 6px; margin: 14px 12px 16px 20px; }
+  .fs-tabs button { padding: 11px 13px 10px; font-size: 13px; letter-spacing: .02em; }
+  .fs-players { padding-right: 2px; }
+  .fs-players li { grid-template-columns: 44px minmax(0, 1fr) auto; gap: 8px; padding: 8px 16px 8px 0; }
+  .fs-players li::after { grid-area: 1 / 1 / 3 / 2; font-size: 18px; }
+  .fs-players li > select { grid-column: 2 / -1; grid-row: 2; }
+  .fs-players li > .iconbtn { grid-column: 3; }
+  .festa-dialog [data-fs-add] { width: calc(100% - 2px); }
+  .festa-dialog [data-fs-start] { padding: 14px 20px 13px; font-size: 18px; }
+  .fs-room { margin-right: 2px; padding: 24px 10px 20px; }
+  .fs-room::after { inset: 8px 26px; }
+  .fs-code { font-size: clamp(56px, 19vw, 76px); }
+  .fs-h { font-size: 17px; }
+  .fs-online { padding-right: 2px; }
+  .fs-online section { padding: 16px 16px 18px; }
+  .fs-server { margin-right: 2px; }
+  #festaMsg:not(:empty) { margin-right: 16px; }
+  .sp-big::before { -webkit-text-stroke-width: 2px; }
+  .sc.sc-pass .sc-card { width: 100%; max-height: 100dvh; padding-bottom: calc(16px + env(safe-area-inset-bottom, 0px)); box-shadow: none; }
+  .sc.sc-pass .sc-head { padding: 0; }
+  .sc.sc-pass .sc-opt { min-height: 68px; padding: 14px 18px; }
+  .pt-festa { padding: 9px 0 11px 10px; }
+  .pt-festa ol { grid-template-columns: minmax(0, 1fr); gap: 6px; }
+  .pf-pl { min-height: 46px; }
+  .fs-rank ol { margin-right: 2px; gap: 8px; }
+  .fs-rank li { grid-template-columns: 44px minmax(0, 1fr) auto; gap: 10px; padding-right: 20px; min-height: 60px; }
+  .fs-rank li .av { display: none; }
+  .fs-rank .fr-ch { display: block; grid-column: 2 / -1; grid-row: 2; font-size: 13px; }
+  .fs-rank li .fr-pos { grid-row: 1 / 3; font-size: 26px; }
+  .fr-nm { font-size: 19px; }
+  .fr-pt { flex-direction: column; align-items: flex-end; gap: 3px; font-size: 27px; }
+  .fr-pt small { font-size: 9.5px; }
+  .fs-rank li.top { min-height: 96px; }
+  .fs-rank li.top .fr-nm { font-size: 23px; }
+  .fs-rank li.top .fr-pt { font-size: 36px; }
+  .fs-rank li.top .fr-pos { font-size: 40px; }
+  #resBody .cards-share::after { right: 6px; top: 8px; margin-top: 0; width: 52px; box-shadow: 0 0 0 3px var(--paper), -14px 7px 0 -3px var(--key), -14px 7px 0 0 var(--paper); }
+  #resBody .cards-share .help { max-width: calc(100% - 84px); font-size: 14px; }
+  #resBody .cards-share .row { padding-right: 0; }
+  .cartolina-dialog > .ct-frame, .cartolina-dialog > .row:not(.between), #cartMsg { margin-inline: 16px; }
+  .ct-frame { width: min(calc(100% - 44px), calc(min(56dvh, 520px) * .8)); }
+  .ct-frame img { box-shadow: 0 0 0 4px var(--paper), 9px 9px 0 2px var(--key); }
+}
+
+/* ---------- movimento ridotto: niente si muove, gli stati sono immediati ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .fs-players li.fs-new, .fs-players li.fs-new::after, .fs-guests li.fs-new, .fs-guests li em::before, .festa-dialog [data-fs-start]::before, .fs-room::after, .fs-code.fs-pop .fs-l,
+  .sp-k, .sp-n, .sc.sc-pass .sc-opt .sc-l::after, .pt-festa > small::before, .pf-pl.pf-bump em, .fs-rank.fr-go li, .fs-rank.fr-go li.top .fr-nm::before, .ct-frame img:not([src]), .ct-frame.ct-ready img { animation: none !important; }
+  .fs-tabs button:active::before { transform: skewX(-12deg); }
+}
+[data-reduced-motion] :is(.fs-players li.fs-new, .fs-guests li.fs-new, .fs-code.fs-pop .fs-l, .sp-k, .sp-n, .pf-pl.pf-bump em, .fs-rank.fr-go li, .ct-frame img:not([src]), .ct-frame.ct-ready img),
+[data-reduced-motion] .fs-players li.fs-new::after, [data-reduced-motion] .fs-guests li em::before, [data-reduced-motion] .festa-dialog [data-fs-start]::before, [data-reduced-motion] .fs-room::after,
+[data-reduced-motion] .sc.sc-pass .sc-opt .sc-l::after, [data-reduced-motion] .pt-festa > small::before, [data-reduced-motion] .fs-rank.fr-go li.top .fr-nm::before { animation: none !important; }
+[data-reduced-motion] .fs-tabs button:active::before { transform: skewX(-12deg); }

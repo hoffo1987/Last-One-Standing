@@ -1,7 +1,7 @@
 /* ================= PELLE · LA BACHECA, FASE 3 (regia) =================
  * Trofei (.tr) e lo stacco «Trofeo sbloccato» (.tr-cut, creato da 62-bacheca.js), l'album delle carte (.acard),
- * la finestra «La tua bacheca» (#bachecaDlg), le interviste del dopo partita (.ivbox), la rivincita (.rematch)
- * e il pulsante in home (.hh-bacheca). La struttura sta in 58-bacheca-base.css; qui l'aspetto e il movimento.
+ * la pagina «Trofei» (#v-trofei: prima era una finestra), le interviste del dopo partita (.ivbox), la rivincita
+ * (.rematch) e il pulsante in home (.hh-bacheca). La struttura sta in 58-bacheca-base.css; qui l'aspetto e il movimento.
  * Stesse regole di 60-partita.css: tinta, nero e carta; l'inversione al passaggio è istantanea (nessuna
  * transizione su colore o sfondo del testo); il testo non sparisce mai (entra solo con transform, mai da
  * opacity 0); opacity e fondi si animano soltanto sugli strati decorativi; al
@@ -13,16 +13,31 @@
 .tr::before { content: ""; position: absolute; inset: 0; z-index: -1; background: repeating-linear-gradient(-60deg, var(--tr-slab) 0 7px, transparent 7px 13px); clip-path: polygon(10px 0, 100% 0, calc(100% - 10px) 100%, 0 100%); }
 .tr.on { box-shadow: none; }
 .tr.on::before { background: linear-gradient(90deg, var(--key) 0 15px, var(--tr-slab) 15px); }
-/* il distintivo: uno scudo a sei lati, bordo e interno sono due strati; il disegno della categoria lo mette 62-bacheca.js */
-.tr-ic { position: relative; width: var(--bz); height: var(--bz); display: grid; place-items: center; background: color-mix(in srgb, var(--ink) 34%, transparent); color: color-mix(in srgb, var(--ink) 62%, transparent);
+/* il distintivo: uno scudo a sei lati. Il bordo è lo span, l'interno è ::before, sopra sta l'emblema del trofeo
+   (un'immagine bianca con i contorni neri: sulla tinta quando è sbloccato, spenta quando non lo è) */
+.tr-ic { position: relative; grid-row: 1 / span 2; align-self: center; width: var(--bz); height: var(--bz); display: grid; place-items: center; background: color-mix(in srgb, var(--ink) 34%, transparent); color: color-mix(in srgb, var(--ink) 70%, transparent);
   clip-path: polygon(50% 0, 100% 22%, 100% 66%, 50% 100%, 0 66%, 0 22%); }
 .tr-ic::before { content: ""; position: absolute; inset: 3px; background: var(--panel-solid, var(--panel)); clip-path: inherit; }
-.tr-ic svg { position: relative; width: 48%; height: 48%; fill: currentColor; }
-.tr-ic svg text { font: italic 900 22px / 1 var(--f-display); }
-/* senza il disegno resta un rombo */
+/* l'emblema è più largo dello scudo: se il fondo dell'immagine non è del tutto trasparente il velo copre lo scudo
+   intero e non si vede un quadrato; lo scudo ritaglia */
+.tr-ic img { position: relative; width: 104%; height: 104%; max-width: none; object-fit: contain; }
+.tr:not(.on) .tr-ic img { opacity: .5; filter: grayscale(1); }
+/* senza immagine resta un rombo; i segreti hanno il punto di domanda */
 .tr-ic:empty::after { content: ""; position: relative; width: 32%; height: 32%; background: currentColor; clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%); }
-.tr.on .tr-ic { background: var(--key); color: var(--key); }
-.tr.on .tr-ic::before { background: var(--void); }
+.tr.secret .tr-ic:empty::after { content: "?"; width: auto; height: auto; background: none; clip-path: none; font: italic 900 calc(var(--bz) * .52) / 1 var(--f-display); }
+.tr.on .tr-ic { background: var(--void); color: var(--key-ink); }
+.tr.on .tr-ic::before { background: var(--key); }
+/* «Leggenda» è d'oro: la lamina (pallini d'oro su nero: «screen» lascia solo l'oro, sopra una sfumatura) se c'è
+   (--fx-foil lo scrive 62-bacheca.js), altrimenti la sola sfumatura */
+.tr.on[data-tr="leggenda"] .tr-ic::before, .tc-card .tr-ic.oro::before { background: var(--fx-foil, none) 50% 50% / 110px, linear-gradient(135deg, #b98422, #e9b84a 34%, #c9922e 62%, #f3cf6b); background-blend-mode: screen, normal; }
+/* «Condividi»: una targhetta inclinata sotto il testo */
+.tr-share { position: relative; isolation: isolate; grid-column: 2; grid-row: 2; justify-self: start; margin: 0 0 2px; padding: 6px 13px 5px 10px; border: 0; background: none; box-shadow: none; color: var(--ink); font: italic 900 11px / 1 var(--f-display); letter-spacing: .12em; text-transform: uppercase; cursor: pointer; outline: none; -webkit-tap-highlight-color: transparent; }
+.tr-share::before { content: ""; position: absolute; inset: 0; z-index: -1; background: color-mix(in srgb, var(--ink) 15%, transparent); clip-path: polygon(6px 0, 100% 0, calc(100% - 6px) 100%, 0 100%); }
+.tr-share::after { content: "\2197"; margin-left: .5em; font-style: normal; }
+@media (hover: hover) { .tr-share:hover { color: var(--key-ink); } .tr-share:hover::before { background: var(--key); } }
+.tr-share:focus-visible { color: var(--key-ink); outline: 3px solid var(--ink); outline-offset: 2px; }
+.tr-share:focus-visible::before { background: var(--key); }
+.tr-share:active::before { transform: scale(.94); }
 .tr-tx { gap: 3px; }
 .tr-tx b { font: italic 900 16px / 1.1 var(--f-display); font-stretch: 110%; letter-spacing: .005em; overflow-wrap: anywhere; }
 .tr-tx small { font-size: 12.5px; line-height: 1.32; color: color-mix(in srgb, var(--ink) 80%, transparent); }
@@ -41,7 +56,7 @@
 .tr-new .tr { --bz: 54px; min-height: 76px; }
 .tr-new .tr-tx b { font-size: 19px; }
 .tr-new .tr-tx small { font-size: 13.5px; }
-.tr-new .tr::after { content: "Nuovo"; align-self: center; padding: 6px 10px 5px; background: var(--key); color: var(--key-ink); font: italic 900 12px / 1 var(--f-display); letter-spacing: .14em; text-transform: uppercase; rotate: -7deg;
+.tr-new .tr::after { content: "Nuovo"; grid-column: 3; grid-row: 1 / span 2; align-self: center; padding: 6px 10px 5px; background: var(--key); color: var(--key-ink); font: italic 900 12px / 1 var(--f-display); letter-spacing: .14em; text-transform: uppercase; rotate: -7deg;
   clip-path: polygon(5px 0, 100% 0, calc(100% - 5px) 100%, 0 100%); }
 .tr-new .tr.tr-slam::after { animation: trSlam .44s var(--ease-kick) backwards; }
 .tr-new .tr.tr-slam .tr-ic { animation: trBadge .5s var(--ease-kick) backwards; }
@@ -58,8 +73,8 @@
   filter: drop-shadow(-7px 7px 0 var(--key)); animation: tcIn .44s var(--look-out) 90ms backwards; }
 .tc-card::before { content: ""; position: absolute; inset: 0; z-index: -1; background-color: var(--void); background-image: radial-gradient(circle, color-mix(in srgb, var(--key) 34%, transparent) 1.3px, transparent 1.7px); background-size: 13px 13px;
   clip-path: polygon(24px 0, 100% 0, 100% 100%, 0 100%); }
-.tc-card .tr-ic { --bz: 68px; background: var(--key); color: var(--key); animation: tcBadge .56s var(--ease-kick) .26s backwards; }
-.tc-card .tr-ic::before { inset: 4px; background: var(--void); }
+.tc-card .tr-ic { --bz: 68px; grid-row: auto; background: var(--paper); color: var(--key-ink); animation: tcBadge .56s var(--ease-kick) .26s backwards; }
+.tc-card .tr-ic::before { inset: 4px; background: var(--key); }
 .tc-tx { display: grid; gap: 5px; min-width: 0; }
 .tc-k { justify-self: start; display: flex; gap: 10px; align-items: center; padding: 5px 14px 4px 9px; background: var(--key); color: var(--key-ink); font: italic 900 11.5px / 1 var(--f-display); font-stretch: 112%; letter-spacing: .14em; text-transform: uppercase;
   clip-path: polygon(0 0, 100% 0, calc(100% - 7px) 100%, 0 100%); }
@@ -79,11 +94,11 @@
 .album { grid-template-columns: repeat(auto-fill, minmax(178px, 1fr)); gap: 20px 16px; padding: 10px 10px 12px 2px; }
 /* la cornice (::before) e il fondo (::after) sono strati; la carta è sempre scura, il colore dice la rarità */
 .acard { --rc: #b9b6ae; --rc-frame: linear-gradient(160deg, #cfccc4, #8f8c85); --rc-t: var(--paper);
-  position: relative; isolation: isolate; grid-template-rows: auto auto auto 1fr auto auto; justify-items: stretch; align-content: start; gap: 9px; padding: 11px 12px 14px; text-align: left; color: var(--paper); background: none; box-shadow: none;
+  position: relative; isolation: isolate; grid-template-rows: auto auto auto 1fr auto auto auto; justify-items: stretch; align-content: start; gap: 9px; padding: 11px 12px 14px; text-align: left; color: var(--paper); background: none; box-shadow: none;
   transition: transform .24s var(--ease-kick); }
 .acard.r-rara { --rc: #5db8f2; --rc-frame: linear-gradient(160deg, #8fd4ff, #2f86c9); --rc-t: #8fd4ff; box-shadow: none; }
 .acard.r-epica { --rc: #b784f5; --rc-frame: linear-gradient(160deg, #dcbcff, #8a4be0 55%, #c79bff); --rc-t: #d3adff; box-shadow: none; }
-.acard.r-leggendaria { --rc: #f0c453; --rc-frame: linear-gradient(135deg, #a8741a, #ffe08a 26%, #c9922e 48%, #fff0b8 66%, #b07c1e 86%, #ffe08a); --rc-t: #ffd978; box-shadow: none; }
+.acard.r-leggendaria { --rc: #f0c453; --rc-frame: var(--fx-foil, none) 0 0 / 170px, linear-gradient(135deg, #a8741a, #ffe08a 26%, #c9922e 48%, #fff0b8 66%, #b07c1e 86%, #ffe08a); --rc-t: #ffd978; box-shadow: none; }
 .acard::before, .acard::after { content: ""; position: absolute; pointer-events: none; }
 .acard::before { inset: 0; z-index: -2; background: var(--rc-frame); clip-path: polygon(0 0, calc(100% - 18px) 0, 100% 18px, 100% 100%, 18px 100%, 0 calc(100% - 18px)); }
 .acard::after { inset: 4px; z-index: -1; clip-path: polygon(0 0, calc(100% - 16px) 0, 100% 16px, 100% 100%, 16px 100%, 0 calc(100% - 16px));
@@ -108,30 +123,35 @@
 .ac-best { font: 800 10.5px / 1.2 var(--f-body); letter-spacing: .08em; text-transform: uppercase; color: color-mix(in srgb, var(--paper) 84%, #0a0a0c); }
 .ac-best::before { content: "\2605\00a0"; color: var(--rc-t); }
 .acard .btn { justify-self: center; width: calc(100% - 10px); margin-top: 2px; border: 2px solid var(--rc); background: var(--rc); color: #0a0a0c; font-style: italic; font-weight: 800; box-shadow: none; transition: transform .2s var(--ease-kick); }
+/* «Cartolina»: lo stesso pulsante, in contorno; sulla leggendaria la targa della rarità è di lamina */
+.acard .btn.ac-share { margin-top: 0; background: none; color: var(--rc-t); }
+.acard.r-leggendaria::before { background-blend-mode: screen, normal; }
+/* la cornice di lamina è più larga, così si vede */
+.acard.r-leggendaria::after { inset: 8px; clip-path: polygon(0 0, calc(100% - 13px) 0, 100% 13px, 100% 100%, 13px 100%, 0 calc(100% - 13px)); }
+.acard.r-leggendaria { padding: 15px 16px 18px; }
+.acard.r-leggendaria .ac-r { margin: -15px 0 0 -16px; }
+.acard.r-leggendaria .ac-r { background: var(--fx-foil, none) 0 0 / 120px, #d9a93c; background-blend-mode: screen, normal; }
 .acard .btn:disabled { background: none; border-style: dashed; border-color: color-mix(in srgb, var(--paper) 40%, transparent); color: color-mix(in srgb, var(--paper) 78%, #0a0a0c); opacity: 1; cursor: default; }
 .acard .btn:focus-visible { outline: 3px solid var(--paper); outline-offset: 2px; }
 @media (hover: hover) {
   /* solo la carta toccata: si alza e si inclina verso il puntatore (--tx e --ty li aggiorna 62-bacheca.js) */
   .acard:hover { z-index: 2; transform: perspective(900px) rotateY(calc(var(--tx, -.35) * 9deg)) rotateX(calc(var(--ty, .2) * -9deg)) translateY(-8px) scale(1.025); filter: drop-shadow(8px 10px 0 color-mix(in srgb, var(--rc) 55%, transparent)); }
-  .acard .btn:hover:not(:disabled) { background: var(--paper); border-color: var(--paper); color: #0a0a0c; }
+  .acard .btn:hover:not(:disabled), .acard .btn.ac-share:hover { background: var(--paper); border-color: var(--paper); color: #0a0a0c; }
 }
 .acard:focus-within { z-index: 2; transform: translateY(-6px); }
 
-/* ---------- 3 · la finestra della bacheca ---------- */
-#bachecaDlg { width: min(1060px, calc(100% - 24px)); }
-#bachecaDlg .db { padding: 0 0 28px; gap: 0; }
-/* la testata: nera, tagliata in diagonale, come il cartello delle scelte */
-.bacheca-dialog > .row.between { position: relative; isolation: isolate; align-items: center; padding: 20px 20px 46px 26px; color: var(--paper); overflow: hidden; }
-.bacheca-dialog > .row.between::before, .bacheca-dialog > .row.between::after { content: ""; position: absolute; inset: 0; pointer-events: none; }
-.bacheca-dialog > .row.between::before { z-index: -2; background: var(--key); clip-path: polygon(0 0, 100% 0, 100% calc(100% - 22px), 0 100%); }
-.bacheca-dialog > .row.between::after { z-index: -1; background-color: var(--void); background-image: radial-gradient(circle, color-mix(in srgb, var(--key) 30%, transparent) 1.3px, transparent 1.7px); background-size: 14px 14px;
-  clip-path: polygon(0 0, 100% 0, 100% calc(100% - 29px), 0 calc(100% - 7px)); }
-#h-bacheca { margin: 0; font: italic 900 clamp(30px, 5vw, 50px) / .94 var(--f-display); font-stretch: 118%; letter-spacing: -.025em; text-transform: uppercase; color: var(--paper); text-shadow: .055em .055em 0 var(--key); }
-.bacheca-dialog > .row.between .iconbtn { background: transparent; color: var(--paper); border-color: color-mix(in srgb, var(--paper) 45%, transparent); }
-@media (hover: hover) { .bacheca-dialog > .row.between .iconbtn:hover { background: var(--key); color: var(--key-ink); border-color: var(--key); } }
-.bacheca-dialog > .row.between .iconbtn:focus-visible { outline: 3px solid var(--key); outline-offset: 2px; }
+/* ---------- 3 · la pagina dei trofei ---------- */
+/* la testata è quella delle altre pagine (palco.css); in più, a destra, la coppa su uno scudo nella tinta
+   (--fx-coppa lo scrive 62-bacheca.js: senza immagine lo scudo non c'è) */
+#v-trofei .pagehead { position: relative; padding-right: clamp(96px, 24vw, 330px); }
+#v-trofei .pagehead p { max-width: 54ch; border-left: 5px solid var(--key); padding-left: 14px; }
+.fx-trofei #v-trofei .pagehead::before { content: ""; position: absolute; right: clamp(4px, 3vw, 44px); top: 50%; width: clamp(84px, 19vw, 250px); aspect-ratio: 1; margin-top: calc(clamp(84px, 19vw, 250px) / -2); pointer-events: none;
+  background: var(--fx-coppa) 50% 46% / 104% no-repeat, radial-gradient(circle, hsl(0 0% 0% / .2) 1.4px, transparent 1.8px) 0 0 / 11px 11px, var(--key);
+  clip-path: polygon(50% 0, 100% 22%, 100% 66%, 50% 100%, 0 66%, 0 22%); rotate: 9deg; }
+#v-trofei.tf-in .pagehead::before { animation: tfHero .56s var(--ease-kick) .12s backwards; }
+@keyframes tfHero { from { transform: scale(.3) rotate(-140deg); } 70% { transform: scale(1.1) rotate(6deg); } }
 /* le linguette: lastre inclinate a cavallo del taglio; quella scelta prende la tinta di colpo */
-.bc-tabs { position: relative; z-index: 1; gap: 8px; margin: -24px 26px 18px 30px; }
+.bc-tabs { position: relative; z-index: 1; gap: 8px; margin: 0 0 18px 8px; }
 .bc-tabs button { position: relative; isolation: isolate; padding: 12px 24px 11px; border: 0; background: none; color: var(--ink); font: italic 900 16px / 1 var(--f-display); font-stretch: 110%; letter-spacing: .05em; outline: none; transition: none; -webkit-tap-highlight-color: transparent; }
 .bc-tabs button::before { content: ""; position: absolute; inset: 0; z-index: -1; background: color-mix(in srgb, var(--ink) 14%, var(--panel-solid, var(--panel))); transform: skewX(-12deg); }
 .bc-tabs button[aria-selected="true"] { background: none; color: var(--key-ink); }
@@ -143,7 +163,18 @@
 .bc-tabs button:focus-visible::before { outline: 3px solid var(--ink); outline-offset: 3px; }
 .bc-tabs button:active::before { transform: skewX(-12deg) scale(.95); }
 @keyframes bcTab { from { transform: skewX(-12deg) scale(1.16, 1.3); } }
-#bachecaBody { padding: 0 26px; min-height: 240px; }
+#bachecaBody { padding: 0; min-height: 240px; }
+#v-trofei .bc-tabs { margin: 8px 0 22px 8px; }
+#v-trofei .trlist { grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 10px 14px; }
+#v-trofei .tr { --bz: 58px; min-height: 82px; }
+#v-trofei .tr-tx b { font-size: 17.5px; }
+#v-trofei .tr-tx small { font-size: 13.5px; }
+/* il conto: un tabellone nero con il numero enorme */
+#v-trofei .bc-count { position: relative; isolation: isolate; margin: 0 6px 10px 0; padding: 20px 40px 22px 26px; color: color-mix(in srgb, var(--paper) 88%, var(--void)); }
+#v-trofei .bc-count::before { content: ""; position: absolute; inset: 0; z-index: -1; background-color: var(--void); background-image: radial-gradient(circle, color-mix(in srgb, var(--key) 34%, transparent) 1.3px, transparent 1.7px); background-size: 14px 14px;
+  clip-path: polygon(0 0, 100% 0, calc(100% - 22px) 100%, 0 100%); }
+#v-trofei .bc-count b { text-shadow: .045em .045em 0 var(--paper); }
+#v-trofei .bc-bar { background: color-mix(in srgb, var(--paper) 20%, transparent); }
 #bachecaBody > .help { max-width: 60ch; font-size: 15px; }
 /* il conto grande; per i trofei 62-bacheca.js aggiunge la barra di quanto manca */
 .bc-count { display: flex; align-items: flex-end; flex-wrap: wrap; gap: 4px 14px; margin: 4px 0 6px; font: 800 12px / 1.2 var(--f-body); letter-spacing: .16em; text-transform: uppercase; color: color-mix(in srgb, var(--ink) 80%, transparent); }
@@ -273,11 +304,16 @@
   .ac-st b { font-size: 15px; }
   .ac-best { font-size: 9.5px; letter-spacing: .04em; }
   .acard .btn { width: 100%; padding-inline: 4px; font-size: 12.5px; }
-  #bachecaDlg { width: calc(100% - 12px); }
-  .bacheca-dialog > .row.between { padding: 16px 12px 42px 16px; }
-  .bc-tabs { gap: 6px; margin: -22px 12px 14px 18px; }
+  .bc-tabs { gap: 6px; }
   .bc-tabs button { padding: 11px 15px 10px; font-size: 14px; letter-spacing: .03em; }
-  #bachecaBody { padding: 0 14px; }
+  #v-trofei .bc-tabs { margin: 4px 0 16px 6px; }
+  #v-trofei .pagehead { padding-right: 96px; }
+  .fx-trofei #v-trofei .pagehead::before { top: 22px; margin-top: 0; right: 2px; }
+  #v-trofei .trlist { grid-template-columns: minmax(0, 1fr); }
+  #v-trofei .tr { --bz: 50px; min-height: 72px; }
+  #v-trofei .tr-tx b { font-size: 16.5px; }
+  #v-trofei .tr-tx small { font-size: 13px; }
+  #v-trofei .bc-count { padding: 16px 28px 18px 16px; margin-right: 2px; }
   .bc-cat h3 { font-size: 18px; margin-top: 20px; }
   .bc-rec { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
   .bc-rec div { min-height: 96px; padding: 12px 14px 11px 16px; }
@@ -299,15 +335,16 @@
 /* ---------- movimento ridotto: niente si muove, gli stati sono immediati ---------- */
 @media (prefers-reduced-motion: reduce) {
   .tr-cut::before, .tr-cut::after, .tc-bar { display: none; }
-  .tc-card, .tc-card .tr-ic, .tr-cut.out .tc-card, .tr-new .tr.tr-slam::after, .tr-new .tr.tr-slam .tr-ic, .acard.r-leggendaria::after, .bc-tabs button[aria-selected="true"]::before,
+  #v-trofei.tf-in .pagehead::before, .tc-card, .tc-card .tr-ic, .tr-cut.out .tc-card, .tr-new .tr.tr-slam::after, .tr-new .tr.tr-slam .tr-ic, .acard.r-leggendaria::after, .bc-tabs button[aria-selected="true"]::before,
   #bachecaBody.bc-swap .bc-count b, #bachecaBody.bc-swap .bc-bar b, #bachecaBody.bc-swap :is(.tr, .acard, .bc-rec > div), .iv-k::before, .iv.iv-go > .av::before, .iv.iv-go .iv-k, .iv.iv-go dd,
   #resBody .rematch::after, #rRematch::before, .rematch .row::after { animation: none !important; }
   .acard, .acard .btn, .rematch .btn { transition: none !important; }
+  .tr-share:active::before { transform: none; }
   .acard:hover, .acard:focus-within { transform: none; }
 }
 [data-reduced-motion] .tr-cut::before, [data-reduced-motion] .tr-cut::after, [data-reduced-motion] .tc-bar { display: none; }
 [data-reduced-motion] :is(.tc-card, .tc-card .tr-ic, .tr-cut.out .tc-card, .tr-new .tr.tr-slam .tr-ic, #bachecaBody.bc-swap .bc-count b, #bachecaBody.bc-swap .bc-bar b, #bachecaBody.bc-swap .tr, #bachecaBody.bc-swap .acard, #bachecaBody.bc-swap .bc-rec > div, .iv.iv-go .iv-k, .iv.iv-go dd),
-[data-reduced-motion] .tr-new .tr.tr-slam::after, [data-reduced-motion] .acard.r-leggendaria::after, [data-reduced-motion] .bc-tabs button[aria-selected="true"]::before, [data-reduced-motion] .iv-k::before, [data-reduced-motion] .iv.iv-go > .av::before,
+[data-reduced-motion] #v-trofei.tf-in .pagehead::before, [data-reduced-motion] .tr-new .tr.tr-slam::after, [data-reduced-motion] .acard.r-leggendaria::after, [data-reduced-motion] .bc-tabs button[aria-selected="true"]::before, [data-reduced-motion] .iv-k::before, [data-reduced-motion] .iv.iv-go > .av::before,
 [data-reduced-motion] #resBody .rematch::after, [data-reduced-motion] #rRematch::before, [data-reduced-motion] .rematch .row::after { animation: none !important; }
 [data-reduced-motion] :is(.acard, .acard .btn, .rematch .btn) { transition: none !important; }
 [data-reduced-motion] .acard:hover, [data-reduced-motion] .acard:focus-within { transform: none; }
