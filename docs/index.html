@@ -2864,6 +2864,11 @@ h3 { font-weight: 800; }
 .cutin .ci-eyes .ci-ini { font-family: var(--f-display); font-style: italic; font-weight: 900; font-stretch: 125%; font-size: clamp(48px, 9vw, 120px); line-height: 1; color: var(--key-ink); letter-spacing: .3em; }
 .cutin .ci-line { position: absolute; left: 0; right: 0; height: 4px; background: var(--key); }
 .cutin .ci-line.t { top: 0; } .cutin .ci-line.b { bottom: 0; }
+/* ornamenti del cut-in, dentro gli stessi 1,05 s della fascia: linee di velocità dietro gli occhi e un riflesso che li attraversa */
+.cutin .ci-band::before { content: ""; position: absolute; inset: 9% 0; z-index: 1; pointer-events: none; opacity: .5; background: repeating-linear-gradient(90deg, transparent 0 64px, hsl(0 0% 100% / .12) 64px 67px, transparent 67px 150px, color-mix(in srgb, var(--key) 40%, transparent) 150px 152px); animation: ciSpeed 1.05s linear both; }
+.cutin .ci-band::after { content: ""; position: absolute; inset: 9% 0; z-index: 2; pointer-events: none; background: linear-gradient(105deg, transparent 40%, hsl(0 0% 100% / .42) 49%, hsl(0 0% 100% / .1) 54%, transparent 62%) 0 0 / 100% 100% no-repeat; animation: ciGlint 1.05s var(--look-out) both; }
+@keyframes ciSpeed { from { transform: translateX(-8%); } to { transform: translateX(8%); } }
+@keyframes ciGlint { 0%, 22% { opacity: 1; transform: translateX(-70%); } 62% { opacity: 1; transform: translateX(70%); } 100% { opacity: 0; transform: translateX(70%); } }
 @keyframes ciFlash { 0% { opacity: .85; } 100% { opacity: 0; } }
 @keyframes ciBand { 0% { transform: skewY(-5deg) scaleX(0); } 14% { transform: skewY(-5deg) scaleX(1); } 78% { transform: skewY(-5deg) translateX(0); opacity: 1; } 100% { transform: skewY(-5deg) translateX(110%); opacity: 1; } }
 @keyframes ciDrift { from { transform: scale(1.12) translateX(-3%); } to { transform: scale(1.04) translateX(2%); } }
@@ -2977,6 +2982,49 @@ h3 { font-weight: 800; }
   padding: .5em 1em .46em 1.2em; clip-path: polygon(5% 0, 100% 0, 95% 100%, 0 100%); }
 .lx-st-fx { position: absolute; left: -50%; top: -50%; width: 200%; height: 200%; overflow: visible; }
 .lx-st-fx * { transform-box: fill-box; transform-origin: center; }
+/* ornamenti dello stacco (regia.js → ornaments): strati in più sopra la copertura e sotto il cartello.
+   Si muovono solo con transform e opacity, dentro i tempi della famiglia, e spariscono con .lx */
+.lx-svg .lx-x { will-change: transform, opacity; }
+.lx-grana { position: absolute; inset: 0; opacity: 0; background: #f7f5f0; -webkit-mask: var(--fx-grana) 0 0 / 384px 384px repeat; mask: var(--fx-grana) 0 0 / 384px 384px repeat; }
+.lx-ink { position: absolute; left: -10%; width: 120%; opacity: .94; transform: translateX(-135%); will-change: transform; -webkit-mask: center / 100% 100% no-repeat; mask: center / 100% 100% no-repeat; }
+.lx-tone { position: absolute; width: 92vmax; aspect-ratio: 1; opacity: 0; -webkit-mask: var(--fx-mezzitoni) center / cover no-repeat, radial-gradient(closest-side, #000 52%, transparent 100%); -webkit-mask-composite: source-in; mask: var(--fx-mezzitoni) center / cover no-repeat, radial-gradient(closest-side, #000 52%, transparent 100%); mask-composite: intersect; }
+.lx-splat { position: absolute; width: 78vmin; aspect-ratio: 1000 / 906; margin: -35.3vmin 0 0 -39vmin; opacity: 0; -webkit-mask: var(--fx-impatto) center / contain no-repeat; mask: var(--fx-impatto) center / contain no-repeat; }
+.lx-sweep { position: absolute; top: -20%; bottom: -20%; left: 0; width: 30%; transform: translateX(-130%) skewX(-18deg); will-change: transform;
+  background: linear-gradient(90deg, transparent, hsl(0 0% 100% / .2) 38%, hsl(0 0% 100% / .42) 50%, hsl(0 0% 100% / .2) 62%, transparent); }
+/* l'accento della destinazione: sta nel riquadro della lastra, sopra di lei e sotto le lettere; le misure sono in em del cartello */
+.lx-acc { position: absolute; left: -.42em; right: -.55em; top: .06em; height: 1.02em; font-size: 1em; pointer-events: none; }
+.lx-acc > *, .lx-foil { position: absolute; display: block; }
+/* Diretta: regia TV */
+.lx-live { left: .1em; bottom: calc(100% + .1em); display: flex !important; align-items: center; gap: .55em; padding: .5em .8em .46em .7em; background: #0a0a0c; color: #f7f5f0; outline: max(2px, .16em) solid #f7f5f0;
+  font: 800 max(10px, .115em) / 1 var(--f-body); letter-spacing: .24em; text-transform: uppercase; }
+.lx-dot { flex: none; width: .78em; height: .78em; border-radius: 50% !important; background: #e5484d; }
+.lx-bars { display: inline-flex; align-items: flex-end; gap: .18em; height: .95em; margin-left: .2em; }
+.lx-bars i { width: .22em; height: 100%; background: var(--lx-key); transform-origin: 50% 100%; }
+.lx-scan { left: 0; right: 0; top: 0; height: max(2px, .035em); background: #0a0a0c; opacity: 0; }
+/* Esito: verdetto */
+.lx-rule { left: -.16em; right: -.16em; height: .07em; background: #f7f5f0; box-shadow: .03em .03em 0 #0a0a0c; }
+.lx-rule.t { top: -.19em; transform-origin: 0 50%; }
+.lx-rule.b { bottom: -.19em; transform-origin: 100% 50%; }
+.lx-punch { left: -.36em; bottom: -.34em; width: .5em; height: .5em; background: #0a0a0c; clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%); }
+.lx-punch::after { content: ""; position: absolute; inset: 21%; background: var(--lx-key); clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%); }
+/* Trofei: riflesso d'oro e stelle */
+.lx-foilbox { inset: 0; overflow: hidden; clip-path: polygon(0 4%, 100% 0, 98.5% 100%, 1.2% 96%); }
+.lx-foil { top: -10%; bottom: -10%; left: 0; width: 34%; transform: translateX(-130%) skewX(-20deg); background: linear-gradient(90deg, transparent, hsl(44 96% 58% / .8) 34%, #fff 50%, hsl(44 96% 58% / .8) 66%, transparent); }
+.lx-star { width: .4em; height: .4em; margin: -.2em 0 0 -.2em; background: hsl(44 96% 60%); transform: scale(0); clip-path: polygon(50% 0, 60% 40%, 100% 50%, 60% 60%, 50% 100%, 40% 60%, 0 50%, 40% 40%); }
+.lx-star:nth-child(odd) { background: #f7f5f0; }
+/* Concorrenti: l'appello */
+.lx-slots { right: .3em; bottom: calc(100% + .09em); display: flex !important; gap: .08em; }
+.lx-slots i { width: .3em; height: .1em; background: #f7f5f0; box-shadow: .025em .025em 0 #0a0a0c; transform: skewX(-24deg) scaleX(0); transform-origin: 0 50%; }
+.lx-slots i:nth-child(3n) { background: #0a0a0c; box-shadow: .025em .025em 0 #f7f5f0; }
+/* Arena: il mirino */
+.lx-brk { width: .3em; height: .3em; border: 0 solid #f7f5f0; opacity: 0; filter: drop-shadow(.035em .035em 0 #0a0a0c); }
+.lx-brk.tl { left: -.2em; top: -.22em; border-width: .07em 0 0 .07em; }
+.lx-brk.tr { right: -.2em; top: -.22em; border-width: .07em .07em 0 0; }
+.lx-brk.bl { left: -.2em; bottom: -.22em; border-width: 0 0 .07em .07em; }
+.lx-brk.br { right: -.2em; bottom: -.22em; border-width: 0 .07em .07em 0; }
+/* Home: tre frecce */
+.lx-chev { right: .2em; bottom: calc(100% + .08em); display: flex !important; gap: .03em; }
+.lx-chev i { width: .2em; height: .3em; opacity: 0; background: #f7f5f0; clip-path: polygon(0 0, 45% 0, 100% 50%, 45% 100%, 0 100%, 55% 50%); }
 .stacco { display: none !important; }
 /* la pagina nuova entra con la regia di regia.js, non con la vecchia dissolvenza */
 .view-enter { animation: none; }
@@ -3214,6 +3262,45 @@ h2.sec { text-transform: uppercase; font-stretch: 114%; letter-spacing: -.02em; 
 @media (prefers-reduced-motion: reduce) { .pl-band span, .pagehead.pk-go h1::after, .poster-card[aria-checked="true"] .pcheck { animation: none; } .pb, .pf, .pk-spark { display: none; } }
 [data-reduced-motion] .pl-band span, [data-reduced-motion] .pagehead.pk-go h1::after, [data-reduced-motion] .poster-card[aria-checked="true"] .pcheck { animation: none; }
 [data-reduced-motion] .pb, [data-reduced-motion] .pf, [data-reduced-motion] .pk-spark { display: none; }
+/* ---------- ornamenti dei cartelli (palco.js → deco) ----------
+ * Strati in più dentro gli stessi tempi dei cartelli: fasce da cinema, mezzitoni, filetti, righello, riflessi, crepe,
+ * macchia d'impatto, pennellata lungo il taglio, raggi. Solo transform, opacity e clip-path su strati piccoli;
+ * spariscono con il cartello. Le maschere dipinte si accendono solo se ci sono (fx-forme, fx-pen). */
+.pb-bar { position: absolute; left: 0; right: 0; height: 7vh; background: var(--void); transform: scaleY(0); }
+.pb-bar.t { top: 0; transform-origin: 50% 0; box-shadow: 0 3px 0 var(--key); }
+.pb-bar.b { bottom: 0; transform-origin: 50% 100%; box-shadow: 0 -3px 0 var(--key); }
+.pb-kill .pb-bar.t { box-shadow: 0 3px 0 var(--kill); } .pb-kill .pb-bar.b { box-shadow: 0 -3px 0 var(--kill); }
+.pb-tone, .pb-splat, .pb-brush { display: none; position: absolute; pointer-events: none; opacity: 0; }
+/* i mezzitoni svaniscono verso i bordi (seconda maschera, come nell'esito): niente riquadro netto */
+.fx-forme .pb-tone { display: block; background: var(--key); -webkit-mask: var(--fx-mezzitoni) center / cover no-repeat, radial-gradient(closest-side, #000 52%, transparent 100%); -webkit-mask-composite: source-in; mask: var(--fx-mezzitoni) center / cover no-repeat, radial-gradient(closest-side, #000 52%, transparent 100%); mask-composite: intersect; }
+.pb-day .pb-tone { right: 8%; top: -14%; height: 128%; aspect-ratio: 1; }
+.pb-dis .pb-tone { left: 9%; top: -10%; height: 120%; aspect-ratio: 1; }
+.pb-fin .pb-tone { width: 62vmax; aspect-ratio: 1; }
+.pb-fin .pb-tone.a { left: -14vmax; top: -18vmax; } .pb-fin .pb-tone.b { right: -14vmax; bottom: -18vmax; transform: rotate(180deg); }
+.pb-kill .pb-tone { right: 12%; top: -12%; height: 124%; aspect-ratio: 1; background: var(--kill); }
+/* calendario */
+.pb-hair { position: absolute; left: 0; right: 0; height: 2px; background: var(--paper); opacity: .7; transform-origin: 0 50%; }
+.pb-hair.t { top: 5.5%; } .pb-hair.b { bottom: 4%; background: var(--key); transform-origin: 100% 50%; opacity: 1; }
+.pb-ticks { position: absolute; left: -20%; right: -20%; top: calc(50% + min(11.4vh, 9vw)); height: 12px; opacity: .6; background: repeating-linear-gradient(90deg, var(--paper) 0 2px, transparent 2px calc(var(--slot) / 8));
+  -webkit-mask-image: linear-gradient(90deg, transparent 10%, #000 34%, #000 66%, transparent 90%); mask-image: linear-gradient(90deg, transparent 10%, #000 34%, #000 66%, transparent 90%); }
+.pb-sel { overflow: hidden; }
+.pb-glint { position: absolute; top: 0; bottom: 0; left: 0; width: 30%; transform: translateX(-160%); background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--key) 70%, transparent) 50%, transparent); }
+/* disastro */
+.pb-crack { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; pointer-events: none; }
+.pb-crack polyline { fill: none; stroke: var(--paper); stroke-width: 1.6; stroke-linejoin: bevel; stroke-dasharray: 1; stroke-dashoffset: 1; opacity: .45; }
+.pb-crack polyline.c2 { stroke: var(--key); stroke-width: 3.2; opacity: .85; }
+.fx-forme .pb-splat { display: block; left: 50%; top: 50%; height: 124%; aspect-ratio: 1000 / 906; background: var(--key); transform: translate(-50%, -50%) scale(.2);
+  -webkit-mask: var(--fx-impatto) center / contain no-repeat; mask: var(--fx-impatto) center / contain no-repeat; }
+/* scontro finale */
+.pb-vs { position: absolute; left: 50%; top: 50%; width: 160vmax; height: 5px; background: var(--paper); box-shadow: 0 7px 0 var(--key); transform: translate(-50%, -50%) rotate(-6deg) scaleX(0); }
+.pb-burst { position: absolute; left: 50%; top: 50%; width: min(42vmin, 400px); aspect-ratio: 1; background: var(--key); transform: translate(-50%, -50%) scale(0); }
+.pb-row .pe::after { content: ""; position: absolute; inset: 0; background: linear-gradient(105deg, transparent 38%, hsl(0 0% 100% / .5) 48%, hsl(0 0% 100% / .1) 54%, transparent 62%) 160% 0 / 250% 100% no-repeat; mix-blend-mode: overlay; pointer-events: none; }
+/* eliminazione */
+.fx-pen .pb-brush { display: block; left: 50%; top: 50%; width: 150%; height: 40%; z-index: 2; background: linear-gradient(90deg, #8f1118, var(--kill) 62%); transform: translate(-50%, -50%) rotate(var(--ang));
+  -webkit-mask: var(--fx-pen4) center / 100% 100% no-repeat; mask: var(--fx-pen4) center / 100% 100% no-repeat; }
+.pb-rays { position: absolute; left: 50%; top: 50%; width: 175%; aspect-ratio: 1; transform: translate(-50%, -50%); overflow: visible; z-index: 2; pointer-events: none; }
+.pb-rays polygon { opacity: 0; }
+.pb-ul { position: absolute; left: 0; bottom: -9px; width: 58%; height: 5px; background: var(--key); transform: scaleX(0); transform-origin: 0 50%; }
 
 /* ================= PELLE · HOME =================
  * La home come schermata del titolo: una diagonale guida lo sguardo dal titolo all'azione principale,
@@ -4833,6 +4920,150 @@ body:has(#editDlg[open]) #v-cast > :not(.dock) { translate: -34px 0; }
 /* ---------- «In gara»: il numero delle uccisioni grande, l'unità piccola (markup aggiornato in ui.js) ---------- */
 #v-diretta .prow .pk { font: 800 11px / 1 var(--f-body); letter-spacing: .08em; text-transform: uppercase; }
 #v-diretta .prow .pk b { font: italic 900 22px / 1 var(--f-display); letter-spacing: -.02em; margin-right: 2px; }
+/* ---------- 8. MOMENTI DELLA PARTITA: strati in più dentro gli stessi tempi ----------
+ * 40-diretta.js aggiunge a ogni riga appena entrata uno strato .dx-fx (uccisione, morte, tradimento, dono, ordine del
+ * mentore, annuncio della regia) e lo toglie a effetto finito. Ogni pezzo parte e finisce dentro la finestra
+ * dell'effetto che la riga ha già: stesso ritardo (--d + …) e stessa durata, scritti accanto a ogni gruppo.
+ * A riposo non resta niente sopra il testo; si muovono solo transform, opacity e clip-path su strati piccoli. */
+#v-diretta .ev > .dx-fx { position: absolute; inset: 0; z-index: 2; pointer-events: none; overflow: hidden; }
+#v-diretta .ev > .dx-fx > * { position: absolute; display: block; opacity: 0; }
+
+/* uccisione · il taglio: --d + 200 ms per 550 ms · la scossa: --d + 300 ms per 320 ms · la macchia: --d + 260 ms per 500 ms.
+ * Una lama di carta attraversa la riga da destra, si ferma un istante e si assottiglia; dietro, la sua scia rossa.
+ * Sul colpo i volti si invertono per due scatti (solo il dorso, mai il testo), schegge e mezzitoni partono dal taglio. */
+#v-diretta .dx-fx-kill .k-line, #v-diretta .dx-fx-kill .k-ghost { left: -4%; right: -4%; top: 50%; --a: -4deg; transform-origin: 100% 50%; animation: dxCut .55s var(--look-out) both; animation-delay: calc(var(--d, 0ms) + 200ms); }
+#v-diretta .dx-fx-kill .k-line { height: 3px; margin-top: -1.5px; background: var(--dx-paper); box-shadow: 0 0 0 1px #e5484d, 0 0 12px 2px #e5484d; }
+#v-diretta .dx-fx-kill .k-ghost { height: 20px; margin-top: -10px; background: linear-gradient(90deg, transparent, hsl(358 75% 59% / .55) 35%, hsl(358 75% 59% / .55)); animation-name: dxCutGhost; }
+@keyframes dxCut { 0% { opacity: 1; transform: rotate(var(--a)) scaleX(0); } 42%, 70% { opacity: 1; transform: rotate(var(--a)) scaleX(1); } 100% { opacity: 0; transform: rotate(var(--a)) scaleX(1) scaleY(.2); } }
+@keyframes dxCutGhost { 0% { opacity: 0; transform: rotate(var(--a)) scaleX(0); } 55% { opacity: .85; transform: rotate(var(--a)) scaleX(1); } 100% { opacity: 0; transform: rotate(var(--a)) scaleX(1) scaleY(2.6); } }
+#v-diretta .dx-fx-kill .k-frame { left: 0; top: 0; bottom: 0; width: calc(var(--sp) + 5px); background: var(--dx-paper); mix-blend-mode: difference; clip-path: polygon(0 0, 100% 0, calc(100% - var(--k)) 100%, 0 100%);
+  animation: dxImpact .32s steps(2, end) both; animation-delay: calc(var(--d, 0ms) + 300ms); }
+@keyframes dxImpact { from { opacity: 1; } to { opacity: 0; } }
+#v-diretta .dx-fx-kill .k-tone { display: none; }
+.fx-forme #v-diretta .dx-fx-kill .k-tone { display: block; right: -34px; top: -70%; height: 240%; aspect-ratio: 1; background: #e5484d; -webkit-mask: var(--fx-mezzitoni) center / cover no-repeat, radial-gradient(closest-side, #000 52%, transparent 100%); -webkit-mask-composite: source-in; mask: var(--fx-mezzitoni) center / cover no-repeat, radial-gradient(closest-side, #000 52%, transparent 100%); mask-composite: intersect;
+  animation: dxTone .5s var(--look-out) both; animation-delay: calc(var(--d, 0ms) + 260ms); }
+@keyframes dxTone { 0% { opacity: 0; transform: translateX(30px) scale(.9); } 40% { opacity: .4; } 100% { opacity: 0; transform: translateX(0) scale(1); } }
+#v-diretta .dx-fx-kill .k-chip { left: calc(var(--sp) - 8px); width: 10px; height: 10px; background: var(--dx-paper); clip-path: polygon(0 0, 100% 40%, 30% 100%); animation: dxChip .5s var(--look-out) both; animation-delay: calc(var(--d, 0ms) + 260ms); }
+#v-diretta .dx-fx-kill .k-chip:nth-of-type(odd) { background: #e5484d; }
+@keyframes dxChip { 0% { opacity: 1; transform: translate(0, 0) rotate(0deg) scale(.4); } 70% { opacity: 1; } 100% { opacity: 0; transform: translate(var(--x), var(--y)) rotate(var(--r)) scale(1); } }
+/* chi cade arriva ancora a colori: sul colpo il colore si spegne e il taglio rosso si disegna sul volto (460 ms, poco più dell'entrata della riga) */
+#v-diretta .ev.in.fx-kill .avs .av.dead > * { animation: dxDrain .46s linear both; animation-delay: calc(var(--d, 0ms) + 300ms); }
+@keyframes dxDrain { from { filter: grayscale(0) contrast(1) brightness(1.12); } }
+#v-diretta .ev.in.fx-kill .avs .av.dead::after { animation: dxScar .46s var(--look-out) both; animation-delay: calc(var(--d, 0ms) + 300ms); }
+@keyframes dxScar { from { clip-path: inset(0 0 100% 0); } to { clip-path: inset(0 0 0 0); } }
+/* il primo nome della riga viene passato con l'evidenziatore, nel tempo del taglio: il colore del testo non cambia mai */
+#v-diretta .ev.in.fx-kill p > .nm:first-of-type { background: linear-gradient(color-mix(in srgb, var(--cc) 36%, transparent), color-mix(in srgb, var(--cc) 36%, transparent)) 0 0 / 0 100% no-repeat; animation: dxMark .55s var(--look-out) both; animation-delay: calc(var(--d, 0ms) + 200ms); }
+@keyframes dxMark { 0% { background-size: 0 100%; background-position: 0 0; } 45% { background-size: 100% 100%; background-position: 0 0; } 55% { background-size: 100% 100%; background-position: 100% 0; } 100% { background-size: 0 100%; background-position: 100% 0; } }
+
+/* morte · il velo: --d + 200 ms per 1,2 s · il volto che sprofonda: --d + 250 ms per 1 s.
+ * Una linea piatta attraversa lenta il piede della riga con un segnale in testa, una veneziana si chiude sul volto,
+ * qualche granello di cenere sale e si spegne insieme al volto. */
+#v-diretta .dx-fx-death .d-flat, #v-diretta .dx-fx-death .d-blip { left: 0; right: 0; bottom: 8px; height: 2px; animation: dxFlat 1.2s var(--look-out) both; animation-delay: calc(var(--d, 0ms) + 200ms); }
+#v-diretta .dx-fx-death .d-flat { background: var(--ink); transform-origin: 0 50%; }
+@keyframes dxFlat { 0% { opacity: .85; transform: scaleX(0); } 62% { opacity: .85; transform: scaleX(1); } 100% { opacity: 0; transform: scaleX(1); } }
+#v-diretta .dx-fx-death .d-blip { animation-name: dxBlip; }
+#v-diretta .dx-fx-death .d-blip::before { content: ""; position: absolute; left: -5px; top: -4px; width: 10px; height: 10px; background: var(--cc); clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%); }
+@keyframes dxBlip { 0% { opacity: 1; transform: translateX(0); } 62% { opacity: 1; transform: translateX(100%); } 100% { opacity: 0; transform: translateX(100%); } }
+#v-diretta .dx-fx-death .d-blind { left: 0; top: 0; bottom: 0; width: calc(var(--sp) + 5px); clip-path: polygon(0 0, 100% 0, calc(100% - var(--k)) 100%, 0 100%); background: repeating-linear-gradient(0deg, hsl(0 0% 4% / .8) 0 6px, transparent 6px 13px);
+  transform-origin: 50% 0; animation: dxBlind 1.2s var(--look-out) both; animation-delay: calc(var(--d, 0ms) + 200ms); }
+@keyframes dxBlind { 0% { opacity: 1; transform: scaleY(0); } 45% { opacity: 1; transform: scaleY(1); } 100% { opacity: 0; transform: scaleY(1); } }
+#v-diretta .dx-fx-death .d-ash { bottom: 34%; width: 6px; height: 6px; background: var(--dx-paper); animation: dxAsh 1s ease-out both; animation-delay: calc(var(--d, 0ms) + 250ms); }
+#v-diretta .dx-fx-death .d-ash:nth-of-type(2) { animation-duration: .9s; animation-delay: calc(var(--d, 0ms) + 350ms); }
+#v-diretta .dx-fx-death .d-ash:nth-of-type(3) { animation-duration: .8s; animation-delay: calc(var(--d, 0ms) + 450ms); }
+#v-diretta .dx-fx-death .d-ash:nth-of-type(4) { animation-duration: .7s; animation-delay: calc(var(--d, 0ms) + 550ms); }
+@keyframes dxAsh { 0% { opacity: 0; transform: translateY(0) rotate(0deg) scale(1); } 20% { opacity: .8; } 100% { opacity: 0; transform: translateY(var(--y)) rotate(var(--r)) scale(.3); } }
+
+/* tradimento · il testo che si spezza: --d + 220 ms per 600 ms. Uno strappo scende in mezzo ai volti, che si scostano
+ * (uno su, uno giù), restano così un istante e tornano al loro posto. */
+#v-diretta .dx-fx-betray .b-tear { left: calc(var(--sp) * .5 - 6px); top: -4%; height: 108%; width: 14px; background: var(--dx-paper); transform-origin: 50% 0;
+  clip-path: polygon(40% 0, 100% 0, 55% 14%, 90% 27%, 35% 41%, 80% 56%, 30% 70%, 75% 84%, 45% 100%, 0 100%, 30% 84%, 0 70%, 45% 56%, 0 41%, 50% 27%, 15% 14%);
+  animation: dxTear .6s var(--look-out) both; animation-delay: calc(var(--d, 0ms) + 220ms); }
+@keyframes dxTear { 0% { opacity: 1; transform: scaleY(0); } 35%, 70% { opacity: 1; transform: scaleY(1); } 100% { opacity: 0; transform: scaleY(1) scaleX(2.4); } }
+#v-diretta .dx-fx-betray .b-half { top: 0; bottom: 0; background: var(--cc); animation: dxHalfA .6s var(--look-out) both; animation-delay: calc(var(--d, 0ms) + 220ms); }
+#v-diretta .dx-fx-betray .b-half.a { left: 0; width: calc(var(--sp) * .5); }
+#v-diretta .dx-fx-betray .b-half.b { left: calc(var(--sp) * .5); width: calc(var(--sp) * .5 + 5px); animation-name: dxHalfB; }
+@keyframes dxHalfA { 0% { opacity: 0; transform: translateY(0); } 30% { opacity: .45; transform: translateY(-6px); } 100% { opacity: 0; transform: translateY(-6px); } }
+@keyframes dxHalfB { 0% { opacity: 0; transform: translateY(0); } 30% { opacity: .45; transform: translateY(6px); } 100% { opacity: 0; transform: translateY(6px); } }
+#v-diretta .ev.in.fx-betray .avs .av:nth-child(1) { animation: dxSplitA .6s var(--look-out) both; animation-delay: calc(var(--d, 0ms) + 220ms); }
+#v-diretta .ev.in.fx-betray .avs .av:nth-child(2) { animation: dxSplitB .6s var(--look-out) both; animation-delay: calc(var(--d, 0ms) + 220ms); }
+@keyframes dxSplitA { 30%, 70% { transform: translate(-3px, -5px) rotate(-1.5deg); } }
+@keyframes dxSplitB { 30%, 70% { transform: translate(4px, 5px) rotate(1.5deg); } }
+
+/* dono e sponsor · il riflesso: --d + 200 ms per 900 ms. Un cono di luce dall'alto, il pacco scende piano appeso al suo
+ * filo, tocca, si assesta; tre stelle si accendono una dopo l'altra e l'icona dell'evento cala al suo posto. */
+#v-diretta .dx-fx-gift .g-beam { left: 0; top: 0; bottom: 0; width: calc(var(--sp) + 46px); background: linear-gradient(180deg, hsl(48 100% 88% / .5), transparent 88%); clip-path: polygon(30% 0, 60% 0, 100% 100%, 0 100%);
+  animation: dxBeam .9s ease-out both; animation-delay: calc(var(--d, 0ms) + 200ms); }
+@keyframes dxBeam { 0% { opacity: 0; } 30% { opacity: 1; } 100% { opacity: 0; } }
+#v-diretta .dx-fx-gift .g-drop { left: calc(var(--sp) * .5 - 8px); top: 50%; width: 18px; height: 18px; margin-top: -9px; animation: dxDrop .9s cubic-bezier(.2, .9, .3, 1) both; animation-delay: calc(var(--d, 0ms) + 200ms); }
+#v-diretta .dx-fx-gift .g-drop::before { content: ""; position: absolute; inset: 0; background: var(--dx-paper); clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%); }
+#v-diretta .dx-fx-gift .g-drop::after { content: ""; position: absolute; left: 8px; bottom: 100%; width: 2px; height: 60px; background: linear-gradient(0deg, var(--dx-paper), transparent); }
+@keyframes dxDrop { 0% { opacity: 0; transform: translateY(-96px); } 18% { opacity: 1; } 62% { opacity: 1; transform: translateY(3px); } 78% { opacity: 1; transform: translateY(0); } 100% { opacity: 0; transform: translateY(0) scale(.6); } }
+#v-diretta .dx-fx-gift .g-star { width: 13px; height: 13px; background: var(--dx-paper); clip-path: polygon(50% 0, 60% 40%, 100% 50%, 60% 60%, 50% 100%, 40% 60%, 0 50%, 40% 40%); animation: dxStar .6s ease-out both; animation-delay: calc(var(--d, 0ms) + 500ms); }
+#v-diretta .dx-fx-gift .g-star:nth-of-type(2) { animation-duration: .5s; animation-delay: calc(var(--d, 0ms) + 600ms); }
+#v-diretta .dx-fx-gift .g-star:nth-of-type(3) { animation-duration: .42s; animation-delay: calc(var(--d, 0ms) + 680ms); }
+@keyframes dxStar { 0% { opacity: 0; transform: scale(0) rotate(-40deg); } 40% { opacity: 1; transform: scale(1.25) rotate(0deg); } 100% { opacity: 0; transform: scale(.5) rotate(30deg); } }
+#v-diretta .ev.in:is(.fx-sponsor, .ev-dono) .ev-mark { animation: dxMarkDrop .9s cubic-bezier(.2, .9, .3, 1) both; animation-delay: calc(var(--d, 0ms) + 200ms); }
+@keyframes dxMarkDrop { from { transform: translateY(-60px) rotate(-36deg); } }
+
+/* ordine del mentore · la targhetta: --d + 280 ms per 360 ms. Una carica corre lungo il bordo destro: se l'ordine è
+ * eseguito arriva in fondo insieme a una lama di tinta, se è ignorato si ferma a metà, esita e torna indietro. */
+#v-diretta .dx-fx-mentor .m-run { right: 0; top: 0; bottom: 0; width: 7px; background: var(--dx-paper); animation: dxRun .36s var(--look-out) both; animation-delay: calc(var(--d, 0ms) + 280ms); }
+@keyframes dxRun { from { opacity: 1; transform: translateY(-100%); } to { opacity: 1; transform: translateY(100%); } }
+#v-diretta .dx-fx-mentor.ko .m-run { animation-name: dxRunKo; }
+@keyframes dxRunKo { 0% { opacity: 1; transform: translateY(-100%); } 45% { opacity: 1; transform: translateY(-38%); } 60% { opacity: 1; transform: translateY(-46%); } 75% { opacity: 1; transform: translateY(-38%); } 100% { opacity: 1; transform: translateY(-100%); } }
+#v-diretta .dx-fx-mentor .m-band { top: 0; bottom: 0; right: 0; width: 34%; background: linear-gradient(100deg, transparent, color-mix(in srgb, var(--key) 34%, transparent) 50%, transparent); animation: dxBand .36s var(--look-out) both; animation-delay: calc(var(--d, 0ms) + 280ms); }
+#v-diretta .dx-fx-mentor.ko .m-band { display: none; }
+@keyframes dxBand { from { opacity: 1; transform: translateX(-230%) skewX(-14deg); } to { opacity: 1; transform: translateX(110%) skewX(-14deg); } }
+
+/* annuncio della regia · la targhetta: --d + 200 ms per 360 ms. Il ciak si chiude, una riga di tinta corre sotto la nota. */
+#v-diretta .dx-fx-regia .r-clap { left: 0; top: 0; width: 92px; height: 6px; background: repeating-linear-gradient(-55deg, var(--key) 0 8px, var(--dx-paper) 8px 16px); transform-origin: 0 50%; animation: dxClap .36s var(--ease-kick) both; animation-delay: calc(var(--d, 0ms) + 200ms); }
+@keyframes dxClap { 0% { opacity: 1; transform: rotate(18deg); } 55%, 80% { opacity: 1; transform: rotate(0deg); } 100% { opacity: 0; transform: rotate(0deg); } }
+#v-diretta .dx-fx-regia .r-run { left: 0; right: 0; bottom: 0; height: 2px; background: var(--key); transform-origin: 0 50%; animation: dxFlat .36s var(--look-out) both; animation-delay: calc(var(--d, 0ms) + 200ms); }
+
+/* ---------- 9. BILANCIO: i caduti ----------
+ * Ogni scheda entra in 700 ms con il suo ritardo (0, 120, 240, 360, 480 ms). Dentro quella finestra: il volto arriva
+ * a colori e si spegne, il taglio rosso si disegna, una lama di luce scende lungo la scheda. Il filetto del titolo si
+ * tende nei 450 ms in cui entra il pannello. */
+#v-diretta .memorial.rise .mem { position: relative; --md: 0s; }
+#v-diretta .memorial.rise .mem:nth-child(2) { --md: .12s; } #v-diretta .memorial.rise .mem:nth-child(3) { --md: .24s; }
+#v-diretta .memorial.rise .mem:nth-child(4) { --md: .36s; } #v-diretta .memorial.rise .mem:nth-child(n+5) { --md: .48s; }
+#v-diretta .memorial.rise .mem .av.dead > * { animation: dxDrain .7s linear both; animation-delay: var(--md); }
+#v-diretta .memorial.rise .mem .av.dead::after { animation: dxScarBar .7s var(--look-out) both; animation-delay: var(--md); }
+@keyframes dxScarBar { from { clip-path: inset(0 100% 0 0); } to { clip-path: inset(0 0 0 0); } }
+#v-diretta .memorial.rise .mem::after { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 34%; pointer-events: none; background: linear-gradient(180deg, transparent, hsl(0 0% 100% / .22) 60%, hsl(0 0% 100% / .46) 96%, transparent);
+  animation: dxMemSweep .7s var(--look-out) both; animation-delay: var(--md); }
+@keyframes dxMemSweep { from { transform: translateY(-110%); } to { transform: translateY(330%); } }
+#v-diretta .memorial.rise h2::after { transform-origin: 0 50%; animation: dxRule .45s var(--look-out) both; }
+@keyframes dxRule { from { transform: skewX(-30deg) scaleX(0); } }
+
+/* ---------- 10. CAMBIO DI FASE NELLA TESTATA ----------
+ * La parola di scenografia entra di taglio (600 ms, come le lettere del titolo) e, dietro titolo e contatore, passa un
+ * secondo strato con la stessa durata dell'effetto che la testata ha già: le veneziane del bilancio (800 ms), il
+ * controluce del finale (2 s, nel verso opposto al riflettore), il nastro di pericolo del disastro (700 ms),
+ * l'orizzonte del giorno (1,4 s). Sta sotto il testo: non lo copre mai. */
+#v-diretta .broadcast.fx-phase .bc-main::before { animation: dxWord .6s var(--look-out) both; }
+@keyframes dxWord { from { opacity: 0; transform: translateX(-48px) skewX(-8deg); } }
+#v-diretta .broadcast.fx-phase .bc-main::after { content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none; opacity: 0; }
+#v-diretta .broadcast.fx-phase[data-kind="fallen"] .bc-main::after { background: repeating-linear-gradient(0deg, hsl(0 0% 0% / .6) 0 5px, transparent 5px 16px); animation: dxFallen .8s ease-out; }
+@keyframes dxFallen { 0% { opacity: 0; transform: translateY(-30%); } 35% { opacity: 1; } 100% { opacity: 0; transform: translateY(0); } }
+#v-diretta .broadcast.fx-phase[data-kind="finale"] .bc-main::after { background: linear-gradient(100deg, transparent 38%, hsl(6 85% 65% / .4) 50%, transparent 62%); animation: dxFinale 2s ease-in-out; }
+@keyframes dxFinale { 0% { opacity: 1; transform: translateX(70%); } 100% { opacity: 0; transform: translateX(-70%); } }
+#v-diretta .broadcast.fx-phase[data-kind="dis"] .bc-main::after { inset: auto -10% 0 -10%; height: 10px; background: repeating-linear-gradient(-45deg, #f39a52 0 12px, transparent 12px 24px); animation: dxHazard .7s ease-out; }
+@keyframes dxHazard { 0% { opacity: 1; transform: translateX(-8%); } 70% { opacity: 1; } 100% { opacity: 0; transform: translateX(0); } }
+#v-diretta .broadcast.fx-phase[data-kind="d"] .bc-main::after { inset: auto 0 0 0; height: 3px; background: var(--key); transform-origin: 0 50%; animation: dxHorizon 1.4s ease-out; }
+@keyframes dxHorizon { 0% { opacity: 1; transform: translateY(0) scaleX(.15); } 100% { opacity: 0; transform: translateY(-110px) scaleX(1); } }
+
+/* movimento ridotto: nessuno strato in più, nessun movimento */
+@media (prefers-reduced-motion: reduce) {
+  #v-diretta .ev > .dx-fx { display: none; }
+  #v-diretta .ev.in.fx-kill .avs .av.dead > *, #v-diretta .ev.in.fx-kill .avs .av.dead::after, #v-diretta .ev.in.fx-kill p > .nm:first-of-type, #v-diretta .ev.in.fx-betray .avs .av, #v-diretta .ev.in .ev-mark,
+  #v-diretta .memorial.rise .mem .av.dead > *, #v-diretta .memorial.rise .mem .av.dead::after, #v-diretta .memorial.rise .mem::after, #v-diretta .memorial.rise h2::after, #v-diretta .broadcast.fx-phase .bc-main::before, #v-diretta .broadcast.fx-phase .bc-main::after { animation: none; }
+  #v-diretta .memorial.rise .mem::after { display: none; }
+}
+[data-reduced-motion] #v-diretta .ev > .dx-fx, [data-reduced-motion] #v-diretta .memorial.rise .mem::after { display: none; }
+[data-reduced-motion] #v-diretta :is(.ev.in.fx-kill .avs .av.dead > *, .ev.in.fx-kill p > .nm:first-of-type, .ev.in.fx-betray .avs .av, .ev.in .ev-mark, .memorial.rise .mem .av.dead > *) { animation: none; }
+[data-reduced-motion] #v-diretta .ev.in.fx-kill .avs .av.dead::after, [data-reduced-motion] #v-diretta .memorial.rise .mem .av.dead::after, [data-reduced-motion] #v-diretta .memorial.rise h2::after,
+[data-reduced-motion] #v-diretta .broadcast.fx-phase .bc-main::before, [data-reduced-motion] #v-diretta .broadcast.fx-phase .bc-main::after { animation: none; }
 
 /* ================= PELLE · ESITO =================
  * Tutto ciò che sta sotto la testata della vittoria (#resBody) e l'archivio partite (#archiveDlg).
@@ -20798,7 +21029,7 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
 </script>
 <script>window.LOS_ASSETS = {"logo":"img/logo.f2d5175789.webp","icona":"img/icona.8b02ddeb49.webp","favicon":"img/favicon.86774dc7cf.png","panoramica":"img/panoramica.66c4c27255.webp","sagome":["img/sagome-cappuccio.e8876ba986.webp","img/sagome-esploratore.9a99fd13f8.webp","img/sagome-viaggiatore.5e36435604.webp"],"arene":{"classico":"img/arene-classico.c2887324d1.webp","cyberpunk":"img/arene-cyberpunk.713b4c77ea.webp","fantasy":"img/arene-fantasy.ee494a9322.webp","horror":"img/arene-horror.76225517ca.webp","liceo":"img/arene-liceo.c591ac5f32.webp","royale":"img/arene-royale.46515caf90.webp","scifi":"img/arene-scifi.bc9d8e04eb.webp","ufficio":"img/arene-ufficio.a2e36d4f7f.webp","wasteland":"img/arene-wasteland.734ed966b2.webp","zombie":"img/arene-zombie.11476cf1ca.webp"},"atlas":{"classico":{"armi":{"arco":"img/arene-classico-armi-arco.57fa716aa9.webp","ascia":"img/arene-classico-armi-ascia.f48629747b.webp","coltello-da-campo":"img/arene-classico-armi-coltello-da-campo.3393de240f.webp","coltello":"img/arene-classico-armi-coltello.a0134af05c.webp","falce-corta":"img/arene-classico-armi-falce-corta.3131158a9f.webp","fionda":"img/arene-classico-armi-fionda.48c8c32c43.webp","lancia-da-caccia":"img/arene-classico-armi-lancia-da-caccia.6f2be560ec.webp","lancia":"img/arene-classico-armi-lancia.115909650b.webp","machete":"img/arene-classico-armi-machete.e1c9ef25d7.webp","mazza-corta":"img/arene-classico-armi-mazza-corta.e1092f0628.webp","mazza":"img/arene-classico-armi-mazza.1fddf37b46.webp","pugnale-da-cintura":"img/arene-classico-armi-pugnale-da-cintura.0bedc8a501.webp","pugnale":"img/arene-classico-armi-pugnale.fda9dbf38a.webp","scure-da-legna":"img/arene-classico-armi-scure-da-legna.837c5d1f78.webp","spada-corta":"img/arene-classico-armi-spada-corta.952e6b7f6a.webp","tridente":"img/arene-classico-armi-tridente.2fcb3547d9.webp"},"luoghi":{"altopiano":"img/arene-classico-luoghi-altopiano.36a37512d3.webp","bosco":"img/arene-classico-luoghi-bosco.2e9163544b.webp","cornucopia":"img/arene-classico-luoghi-cornucopia.393b2dabe1.webp","fiume":"img/arene-classico-luoghi-fiume.22b335a914.webp","paludi":"img/arene-classico-luoghi-paludi.77cf115eb4.webp","rovine":"img/arene-classico-luoghi-rovine.9ea4f70ca9.webp"},"pericoli":{"branco-di-lupi-mutanti":"img/arene-classico-pericoli-branco-di-lupi-mutanti.d786a62875.webp","orso-affamato":"img/arene-classico-pericoli-orso-affamato.e4f38a9892.webp","sciame-di-vespe-velenose":"img/arene-classico-pericoli-sciame-di-vespe-velenose.5adb2c7b8d.webp","serpente-gigante":"img/arene-classico-pericoli-serpente-gigante.b17e7f3d91.webp"}},"cyberpunk":{"armi":{"coltello-vibrante-in-ceramica":"img/arene-cyberpunk-armi-coltello-vibrante-in-ceramica.6bbcd0e9e4.webp","fucile-a-pompa-da-strada":"img/arene-cyberpunk-armi-fucile-a-pompa-da-strada.dbd0de34e1.webp","fucile-a-pompa-elettromagnetico":"img/arene-cyberpunk-armi-fucile-a-pompa-elettromagnetico.0555418cd0.webp","katana-termica":"img/arene-cyberpunk-armi-katana-termica.f1ff597173.webp","mazza-a-impulsi":"img/arene-cyberpunk-armi-mazza-a-impulsi.22d841ed1d.webp","mazza-da-baseball-chiodata":"img/arene-cyberpunk-armi-mazza-da-baseball-chiodata.db2996f744.webp","mitra-compatto":"img/arene-cyberpunk-armi-mitra-compatto.eaa3815798.webp","pistola-a-rotaia-artigianale":"img/arene-cyberpunk-armi-pistola-a-rotaia-artigianale.f9e83bda89.webp","pistola-smart":"img/arene-cyberpunk-armi-pistola-smart.2aa922ba8c.webp","sparachiodi-riprogrammato":"img/arene-cyberpunk-armi-sparachiodi-riprogrammato.70f6190cb0.webp","taser-da-buttafuori":"img/arene-cyberpunk-armi-taser-da-buttafuori.60b58b451d.webp","tirapugni-elettrificato":"img/arene-cyberpunk-armi-tirapugni-elettrificato.1ce19bab37.webp","ventaglio-da-combattimento-in-titanio":"img/arene-cyberpunk-armi-ventaglio-da-combattimento-in-titanio.f3b7bb5a10.webp"},"luoghi":{"clinica-del-ripperdoc":"img/arene-cyberpunk-luoghi-clinica-del-ripperdoc.8ef0cb941b.webp","club-della-braindance":"img/arene-cyberpunk-luoghi-club-della-braindance.7765542e70.webp","megablocco":"img/arene-cyberpunk-luoghi-megablocco.28b72e6ecf.webp","mercato-di-kabuki":"img/arene-cyberpunk-luoghi-mercato-di-kabuki.d5c8ab7b96.webp","nodo-dati-corporativo":"img/arene-cyberpunk-luoghi-nodo-dati-corporativo.56ca3e1335.webp","officina-dei-maelstrom":"img/arene-cyberpunk-luoghi-officina-dei-maelstrom.d69285cf21.webp","piazza-della-torre":"img/arene-cyberpunk-luoghi-piazza-della-torre.1e400212c8.webp"},"pericoli":{"banda-di-scav":"img/arene-cyberpunk-pericoli-banda-di-scav.f1a2b2ccc4.webp","gang-di-cromati":"img/arene-cyberpunk-pericoli-gang-di-cromati.74e5576e23.webp","sciame-di-droni-di-pattuglia":"img/arene-cyberpunk-pericoli-sciame-di-droni-di-pattuglia.6fb4b17ad9.webp","squadra-di-sicurezza-corporativa":"img/arene-cyberpunk-pericoli-squadra-di-sicurezza-corporativa.6195a3b15d.webp"}},"fantasy":{"armi":{"arco-elfico":"img/arene-fantasy-armi-arco-elfico.8012f9136d.webp","ascia-nanica":"img/arene-fantasy-armi-ascia-nanica.6913fdf008.webp","balestra":"img/arene-fantasy-armi-balestra.7767becc83.webp","bastone-magico":"img/arene-fantasy-armi-bastone-magico.0781aee860.webp","daga-dei-giuramenti":"img/arene-fantasy-armi-daga-dei-giuramenti.3b6d4b398c.webp","falcetto-dargento":"img/arene-fantasy-armi-falcetto-dargento.1ce0e4e163.webp","lancia-incantata":"img/arene-fantasy-armi-lancia-incantata.7371199824.webp","lancia-silvana":"img/arene-fantasy-armi-lancia-silvana.08fbc01ede.webp","martello-da-guerra":"img/arene-fantasy-armi-martello-da-guerra.4eb03f4db7.webp","martello-nanico":"img/arene-fantasy-armi-martello-nanico.82ad6b9b14.webp","mazza-di-quercia":"img/arene-fantasy-armi-mazza-di-quercia.0f6a8345a9.webp","pugnale-avvelenato":"img/arene-fantasy-armi-pugnale-avvelenato.aba554d177.webp","spada-da-viaggio":"img/arene-fantasy-armi-spada-da-viaggio.a7bdcab5f4.webp","spada-runica":"img/arene-fantasy-armi-spada-runica.ec4012c6cf.webp"},"luoghi":{"altare-delle-armi":"img/arene-fantasy-luoghi-altare-delle-armi.db06de44c1.webp","foresta-elfica":"img/arene-fantasy-luoghi-foresta-elfica.0448fcfbd3.webp","lago-nebbioso":"img/arene-fantasy-luoghi-lago-nebbioso.f19abc7c81.webp","miniere":"img/arene-fantasy-luoghi-miniere.5baa916ec9.webp","palude-stregata":"img/arene-fantasy-luoghi-palude-stregata.6a0b2af4a7.webp","picco-del-drago":"img/arene-fantasy-luoghi-picco-del-drago.06bdfd84b1.webp","torre-in-rovina":"img/arene-fantasy-luoghi-torre-in-rovina.ac716863c7.webp"},"pericoli":{"branco-di-lupi-mannari":"img/arene-fantasy-pericoli-branco-di-lupi-mannari.1c9124ceee.webp","spettro-errante":"img/arene-fantasy-pericoli-spettro-errante.056074bc23.webp","troll-di-caverna":"img/arene-fantasy-pericoli-troll-di-caverna.31aa2444f0.webp","viverna":"img/arene-fantasy-pericoli-viverna.577b91a819.webp"}},"horror":{"armi":{"ascia":"img/arene-horror-armi-ascia.f6793c220e.webp","attizzatoio":"img/arene-horror-armi-attizzatoio.12b9bf75af.webp","bastone-da-passeggio":"img/arene-horror-armi-bastone-da-passeggio.1a636ce4ab.webp","candelabro-dargento":"img/arene-horror-armi-candelabro-dargento.7d962054de.webp","coltello-dargento":"img/arene-horror-armi-coltello-dargento.73a6bb81ea.webp","crocifisso-appuntito":"img/arene-horror-armi-crocifisso-appuntito.203b41a170.webp","daga-da-cerimonia":"img/arene-horror-armi-daga-da-cerimonia.a597e15c53.webp","falce":"img/arene-horror-armi-falce.6513df8fa2.webp","fucile-da-caccia":"img/arene-horror-armi-fucile-da-caccia.169dc367e1.webp","pugnale-depoca":"img/arene-horror-armi-pugnale-depoca.f148afd005.webp","pugnale-rituale":"img/arene-horror-armi-pugnale-rituale.944cb9056c.webp","scure-da-legna":"img/arene-horror-armi-scure-da-legna.a11379a412.webp"},"luoghi":{"biblioteca":"img/arene-horror-luoghi-biblioteca.00d6ab97f4.webp","cantina":"img/arene-horror-luoghi-cantina.a196828c1d.webp","cappella":"img/arene-horror-luoghi-cappella.a51e505028.webp","cimitero":"img/arene-horror-luoghi-cimitero.7a441de089.webp","salone":"img/arene-horror-luoghi-salone.37f10c88c7.webp","serra":"img/arene-horror-luoghi-serra.b3d91121d4.webp","soffitta":"img/arene-horror-luoghi-soffitta.466d40cea3.webp"},"pericoli":{"bambola-posseduta":"img/arene-horror-pericoli-bambola-posseduta.7064eef1d7.webp","entita-senza-volto":"img/arene-horror-pericoli-entita-senza-volto.2c28467bdd.webp","spettro-urlante":"img/arene-horror-pericoli-spettro-urlante.25fa554e05.webp","stormo-di-corvi":"img/arene-horror-pericoli-stormo-di-corvi.fe5c85d7ae.webp"}},"liceo":{"armi":{"compito-copiato":"img/arene-liceo-armi-compito-copiato.c9ade27d61.webp","dossier-delle-revisioni":"img/arene-liceo-armi-dossier-delle-revisioni.77676a0f5f.webp","elenco-delle-correzioni":"img/arene-liceo-armi-elenco-delle-correzioni.04be1154c8.webp","fascicolo-di-risposte-motivate":"img/arene-liceo-armi-fascicolo-di-risposte-motivate.c29995b581.webp","foto-imbarazzante":"img/arene-liceo-armi-foto-imbarazzante.ff7d3ef284.webp","gossip-esplosivo":"img/arene-liceo-armi-gossip-esplosivo.552b1e6236.webp","pallone-da-dodgeball":"img/arene-liceo-armi-pallone-da-dodgeball.60a2576785.webp","profilo-falso":"img/arene-liceo-armi-profilo-falso.d1dac05a2b.webp","prospetto-dei-contributi":"img/arene-liceo-armi-prospetto-dei-contributi.0c121fd79a.webp","quaderno-delle-verifiche":"img/arene-liceo-armi-quaderno-delle-verifiche.7d8b07341a.webp","registro-rubato":"img/arene-liceo-armi-registro-rubato.67eb4b9eff.webp","riepilogo-delle-fonti":"img/arene-liceo-armi-riepilogo-delle-fonti.3c889a0ed5.webp"},"luoghi":{"aula-magna":"img/arene-liceo-luoghi-aula-magna.0478e35c5c.webp","aule":"img/arene-liceo-luoghi-aule.b3142d07cc.webp","biblioteca":"img/arene-liceo-luoghi-biblioteca.1ae806ae58.webp","cortile":"img/arene-liceo-luoghi-cortile.51bf433337.webp","laboratorio-di-chimica":"img/arene-liceo-luoghi-laboratorio-di-chimica.eba1434683.webp","mensa":"img/arene-liceo-luoghi-mensa.67bcbc7e37.webp","palestra":"img/arene-liceo-luoghi-palestra.8ecb872849.webp"},"pericoli":{"bidello-di-turno":"img/arene-liceo-pericoli-bidello-di-turno.191c43a8bd.webp","ispezione-a-sorpresa":"img/arene-liceo-pericoli-ispezione-a-sorpresa.bef087d9b9.webp","preside":"img/arene-liceo-pericoli-preside.033f6c9aae.webp","professoressa-di-matematica":"img/arene-liceo-pericoli-professoressa-di-matematica.6cb65c6a3f.webp"}},"royale":{"armi":{"balestra":"img/arene-royale-armi-balestra.64563b6cea.webp","carabina-compatta":"img/arene-royale-armi-carabina-compatta.a0fa150fbe.webp","coltello-da-combattimento":"img/arene-royale-armi-coltello-da-combattimento.74a64bca77.webp","coltello-tattico":"img/arene-royale-armi-coltello-tattico.8e9cb56197.webp","fucile-a-pompa":"img/arene-royale-armi-fucile-a-pompa.3d7fc7d83c.webp","fucile-da-cecchino":"img/arene-royale-armi-fucile-da-cecchino.fc3c4f19f1.webp","fucile-dassalto":"img/arene-royale-armi-fucile-dassalto.b91ccb0ec8.webp","granata":"img/arene-royale-armi-granata.fd9c359b27.webp","lancia-da-sopravvivenza":"img/arene-royale-armi-lancia-da-sopravvivenza.8a39c1a5e5.webp","manganello":"img/arene-royale-armi-manganello.dc6284893b.webp","mitraglietta":"img/arene-royale-armi-mitraglietta.6dcc3246e6.webp","pistola-da-segnalazione-modificata":"img/arene-royale-armi-pistola-da-segnalazione-modificata.1c7f899ca7.webp","pistola":"img/arene-royale-armi-pistola.acae268814.webp","scure-da-campo":"img/arene-royale-armi-scure-da-campo.6a5b0becd5.webp"},"luoghi":{"aeroporto":"img/arene-royale-luoghi-aeroporto.81e8ce98d4.webp","base-militare":"img/arene-royale-luoghi-base-militare.67f3a7de9d.webp","centrale-elettrica":"img/arene-royale-luoghi-centrale-elettrica.05ee57458a.webp","fattoria":"img/arene-royale-luoghi-fattoria.7c780dda87.webp","foresta":"img/arene-royale-luoghi-foresta.03b47644d0.webp","villaggio-costiero":"img/arene-royale-luoghi-villaggio-costiero.568519eb7c.webp"},"pericoli":{"cane-da-guardia-addestrato":"img/arene-royale-pericoli-cane-da-guardia-addestrato.c7853a67a0.webp","drone-armato":"img/arene-royale-pericoli-drone-armato.30d0b73e01.webp","elicottero-da-caccia":"img/arene-royale-pericoli-elicottero-da-caccia.8c68e62346.webp"}},"scifi":{"armi":{"bastone-a-impulsi":"img/arene-scifi-armi-bastone-a-impulsi.4e17e074e7.webp","cannone-a-rotaia-portatile":"img/arene-scifi-armi-cannone-a-rotaia-portatile.9a59b97d98.webp","frusta-monofilamento":"img/arene-scifi-armi-frusta-monofilamento.5ee8081aa9.webp","fucile-al-plasma":"img/arene-scifi-armi-fucile-al-plasma.ea2384a239.webp","granata-emp":"img/arene-scifi-armi-granata-emp.04cfd31203.webp","lama-di-servizio":"img/arene-scifi-armi-lama-di-servizio.a47d434464.webp","lama-vibrante":"img/arene-scifi-armi-lama-vibrante.02b0f47ff8.webp","lancia-da-abbordaggio":"img/arene-scifi-armi-lancia-da-abbordaggio.cf167e52ff.webp","perforatore-portatile":"img/arene-scifi-armi-perforatore-portatile.aa7e92ecab.webp","pistola-a-scarica":"img/arene-scifi-armi-pistola-a-scarica.33b3e5929e.webp","pistola-laser":"img/arene-scifi-armi-pistola-laser.aed4bbf3ed.webp","taglierino-ceramico":"img/arene-scifi-armi-taglierino-ceramico.b45d524836.webp","taser-a-impulsi":"img/arene-scifi-armi-taser-a-impulsi.360e29e1d5.webp"},"luoghi":{"condotti-di-servizio":"img/arene-scifi-luoghi-condotti-di-servizio.6817134b5e.webp","hangar":"img/arene-scifi-luoghi-hangar.6de551833b.webp","moduli-abitativi":"img/arene-scifi-luoghi-moduli-abitativi.9f5bb96d39.webp","ponte-di-comando":"img/arene-scifi-luoghi-ponte-di-comando.3e9ffd005a.webp","reattore":"img/arene-scifi-luoghi-reattore.d10a335006.webp","serra-idroponica":"img/arene-scifi-luoghi-serra-idroponica.b6f4407853.webp"},"pericoli":{"androide-da-combattimento":"img/arene-scifi-pericoli-androide-da-combattimento.1a3d3eb38e.webp","creatura-aliena-dai-tentacoli":"img/arene-scifi-pericoli-creatura-aliena-dai-tentacoli.b6b314ddd9.webp","drone-di-sicurezza-impazzito":"img/arene-scifi-pericoli-drone-di-sicurezza-impazzito.c8a9c6f9e3.webp","sciame-di-nanobot":"img/arene-scifi-pericoli-sciame-di-nanobot.d43296f047.webp"}},"ufficio":{"armi":{"badge-clonato-del-capo":"img/arene-ufficio-armi-badge-clonato-del-capo.be9f7381fe.webp","dossier-dei-risultati":"img/arene-ufficio-armi-dossier-dei-risultati.1888e2f671.webp","elenco-dei-contributi":"img/arene-ufficio-armi-elenco-dei-contributi.3de4fbe5bf.webp","fascicolo-delle-fonti":"img/arene-ufficio-armi-fascicolo-delle-fonti.02df27dfbf.webp","foglio-excel-con-le-prove":"img/arene-ufficio-armi-foglio-excel-con-le-prove.944f6ec708.webp","mail-in-copia-a-tutti":"img/arene-ufficio-armi-mail-in-copia-a-tutti.1d4304df14.webp","nota-spese-gonfiata":"img/arene-ufficio-armi-nota-spese-gonfiata.d2683cca4c.webp","presentazione-rubata":"img/arene-ufficio-armi-presentazione-rubata.815dc5c8b4.webp","prospetto-delle-metriche":"img/arene-ufficio-armi-prospetto-delle-metriche.356da1d2d9.webp","registro-delle-revisioni":"img/arene-ufficio-armi-registro-delle-revisioni.509eab44df.webp","report-pieno-di-errori-altrui":"img/arene-ufficio-armi-report-pieno-di-errori-altrui.c01c0ef897.webp","riepilogo-delle-approvazioni":"img/arene-ufficio-armi-riepilogo-delle-approvazioni.9394dadd6b.webp"},"luoghi":{"cucina":"img/arene-ufficio-luoghi-cucina.d968f8861d.webp","open-space":"img/arene-ufficio-luoghi-open-space.b6b7990c99.webp","parcheggio":"img/arene-ufficio-luoghi-parcheggio.d593f2ed83.webp","sala-riunioni":"img/arene-ufficio-luoghi-sala-riunioni.f92c4030a9.webp","sala-stampanti":"img/arene-ufficio-luoghi-sala-stampanti.1727f50082.webp","ufficio-del-direttore":"img/arene-ufficio-luoghi-ufficio-del-direttore.bb3b6cabab.webp"},"pericoli":{"consulente-esterno":"img/arene-ufficio-pericoli-consulente-esterno.ce6e200c3f.webp","direttore-generale":"img/arene-ufficio-pericoli-direttore-generale.da2eb1f708.webp","riorganizzazione-aziendale":"img/arene-ufficio-pericoli-riorganizzazione-aziendale.1fd57b76b3.webp","ufficio-risorse-umane":"img/arene-ufficio-pericoli-ufficio-risorse-umane.8392df7518.webp"}},"wasteland":{"armi":{"balestra-artigianale":"img/arene-wasteland-armi-balestra-artigianale.e09826852f.webp","catena":"img/arene-wasteland-armi-catena.866183d584.webp","coltello-da-strada":"img/arene-wasteland-armi-coltello-da-strada.1083c4429d.webp","fucile-arrugginito":"img/arene-wasteland-armi-fucile-arrugginito.797601f16e.webp","lama-di-recupero":"img/arene-wasteland-armi-lama-di-recupero.1ad13cfc78.webp","lancia-di-ferraglia":"img/arene-wasteland-armi-lancia-di-ferraglia.99d9f41307.webp","lancia-ricavata-da-un-tubo":"img/arene-wasteland-armi-lancia-ricavata-da-un-tubo.53b934e449.webp","lanciachiodi":"img/arene-wasteland-armi-lanciachiodi.e4f51e42e2.webp","mannaia":"img/arene-wasteland-armi-mannaia.518ae9c11c.webp","martello-da-officina":"img/arene-wasteland-armi-martello-da-officina.851055795e.webp","mazza-di-tubi":"img/arene-wasteland-armi-mazza-di-tubi.91babe82ac.webp","molotov":"img/arene-wasteland-armi-molotov.303d6fa315.webp","scure-da-demolizione":"img/arene-wasteland-armi-scure-da-demolizione.066ea5e066.webp"},"luoghi":{"autostrada-spezzata":"img/arene-wasteland-luoghi-autostrada-spezzata.19a72a0b97.webp","citta-fantasma":"img/arene-wasteland-luoghi-citta-fantasma.fe22bb72b2.webp","cratere":"img/arene-wasteland-luoghi-cratere.04de7ca40a.webp","deposito":"img/arene-wasteland-luoghi-deposito.f98aa31220.webp","diga":"img/arene-wasteland-luoghi-diga.3be9abe15a.webp","discarica":"img/arene-wasteland-luoghi-discarica.b8783ad9c6.webp","raffineria":"img/arene-wasteland-luoghi-raffineria.081e2d2ad6.webp"},"pericoli":{"banda-di-predoni":"img/arene-wasteland-pericoli-banda-di-predoni.1dfcfd1628.webp","branco-di-cani-mutati":"img/arene-wasteland-pericoli-branco-di-cani-mutati.442fabfc39.webp","scorpione-gigante":"img/arene-wasteland-pericoli-scorpione-gigante.2dd8911367.webp","verme-delle-sabbie":"img/arene-wasteland-pericoli-verme-delle-sabbie.a0d445beeb.webp"}},"zombie":{"armi":{"accetta-da-soccorso":"img/arene-zombie-armi-accetta-da-soccorso.6d36eb13ac.webp","accetta":"img/arene-zombie-armi-accetta.0eed163720.webp","balestra":"img/arene-zombie-armi-balestra.d705131d17.webp","coltello-da-campeggio":"img/arene-zombie-armi-coltello-da-campeggio.2abab58e78.webp","fucile-a-pompa":"img/arene-zombie-armi-fucile-a-pompa.b00b1d6a70.webp","katana":"img/arene-zombie-armi-katana.f631ad392f.webp","machete-da-potatura":"img/arene-zombie-armi-machete-da-potatura.94a93108a1.webp","martello-da-carpentiere":"img/arene-zombie-armi-martello-da-carpentiere.021e8a80f2.webp","mazza-chiodata":"img/arene-zombie-armi-mazza-chiodata.b4e11dcadb.webp","mazza-da-lavoro":"img/arene-zombie-armi-mazza-da-lavoro.c36a90108f.webp","motosega":"img/arene-zombie-armi-motosega.f74e603615.webp","piede-di-porco":"img/arene-zombie-armi-piede-di-porco.c185a97e0d.webp","pistola":"img/arene-zombie-armi-pistola.6d30022ca6.webp"},"luoghi":{"centro-commerciale":"img/arene-zombie-luoghi-centro-commerciale.333f4699d5.webp","metropolitana":"img/arene-zombie-luoghi-metropolitana.878a263605.webp","ospedale":"img/arene-zombie-luoghi-ospedale.f25de413a4.webp","periferia":"img/arene-zombie-luoghi-periferia.e28a7d70c7.webp","piazza":"img/arene-zombie-luoghi-piazza.b6ed86b3ad.webp","scuola":"img/arene-zombie-luoghi-scuola.153ddbaa75.webp","stazione-di-polizia":"img/arene-zombie-luoghi-stazione-di-polizia.157f7a17f5.webp"},"pericoli":{"cane-infetto":"img/arene-zombie-pericoli-cane-infetto.fdff913d6f.webp","gigante-mutato":"img/arene-zombie-pericoli-gigante-mutato.91fad36b70.webp","infetto-corridore":"img/arene-zombie-pericoli-infetto-corridore.61f48faafd.webp","orda-di-zombi":"img/arene-zombie-pericoli-orda-di-zombi.e0fc6d1b56.webp"}}},"fx":{"pennellate":["img/fx-pennellata-1.5527b3e9bd.webp","img/fx-pennellata-2.8526d34dcf.webp","img/fx-pennellata-3.a7f3e74ff3.webp","img/fx-pennellata-4.fe1f612999.webp"],"sigilli":{"classico":"img/fx-sigillo-classico.b781c63b8d.webp","cyberpunk":"img/fx-sigillo-cyberpunk.134a7f507c.webp","fantasy":"img/fx-sigillo-fantasy.d854d9ac19.webp","horror":"img/fx-sigillo-horror.54149e6a7e.webp","liceo":"img/fx-sigillo-liceo.7f1566a7a8.webp","royale":"img/fx-sigillo-royale.bedbb77f68.webp","scifi":"img/fx-sigillo-scifi.6c50b79280.webp","ufficio":"img/fx-sigillo-ufficio.fcbbcc051a.webp","wasteland":"img/fx-sigillo-wasteland.86f44d1714.webp","zombie":"img/fx-sigillo-zombie.44ac2a6473.webp"},"grana":"img/fx-grana.c1e72fd2da.webp","forme":{"fascia":"img/fx-forma-fascia.8a2f8ab92d.webp","freccia":"img/fx-forma-freccia.4e8039be8f.webp","fulmine":"img/fx-forma-fulmine.c9a15d227c.webp","stella":"img/fx-forma-stella.e773ba5dda.webp","strappo":"img/fx-forma-strappo.0e6a41d0d9.webp"},"impatto":"img/fx-impatto.fd13ac9554.webp","mezzitoni":"img/fx-mezzitoni.f9ef4df053.webp","occhi":{"f-1":"img/fx-occhi-f-1.3779df529a.webp","f-2":"img/fx-occhi-f-2.2f47e4535b.webp","f-3":"img/fx-occhi-f-3.8b10fc4b00.webp","f-4":"img/fx-occhi-f-4.08132e01f9.webp","m-1":"img/fx-occhi-m-1.fd94d5b0eb.webp","m-2":"img/fx-occhi-m-2.c7b9661e6b.webp","m-3":"img/fx-occhi-m-3.91ff950ae4.webp","m-4":"img/fx-occhi-m-4.d0a0e73220.webp","m-5":"img/fx-occhi-m-5.f4c19f2141.webp","n-1":"img/fx-occhi-n-1.21fc3b7adf.webp"},"fondali":{"classico":"img/fx-fondale-classico.8a3fc35342.webp","cyberpunk":"img/fx-fondale-cyberpunk.283c80cc1e.webp","fantasy":"img/fx-fondale-fantasy.0ca9b3f315.webp","horror":"img/fx-fondale-horror.4ba1241b63.webp","liceo":"img/fx-fondale-liceo.fb428a57f7.webp","royale":"img/fx-fondale-royale.aac1246425.webp","scifi":"img/fx-fondale-scifi.27ee2ce8cc.webp","ufficio":"img/fx-fondale-ufficio.780789ce70.webp","wasteland":"img/fx-fondale-wasteland.02311ed21d.webp","zombie":"img/fx-fondale-zombie.83b8d35716.webp"},"volti":{"f-1":"img/fx-volto-f-1.96d62771c1.webp","f-2":"img/fx-volto-f-2.79d3485864.webp","f-3":"img/fx-volto-f-3.aeb7664a4e.webp","f-4":"img/fx-volto-f-4.2f2c864354.webp","m-1":"img/fx-volto-m-1.f8b83b073e.webp","m-2":"img/fx-volto-m-2.b9eb346a31.webp","m-3":"img/fx-volto-m-3.5311549074.webp","m-4":"img/fx-volto-m-4.10b102bdb0.webp","m-5":"img/fx-volto-m-5.63e5c91778.webp","n-1":"img/fx-volto-n-1.02cf4d1c97.webp"},"vincitori":{"f-1":"img/vincitori-vincitore-f-1.10b1ec0d22.webp","f-2":"img/vincitori-vincitore-f-2.03d8a3a92a.webp","f-3":"img/vincitori-vincitore-f-3.bc0adcd66a.webp","m-1":"img/vincitori-vincitore-m-1.c597436dca.webp","m-2":"img/vincitori-vincitore-m-2.9c8b48e9f8.webp","n-1":"img/vincitori-vincitore-n-1.1539fc78b2.webp"},"trofei":{"allenamento":"img/fx-trofeo-allenamento.99cc64bc6b.webp","amorevince":"img/fx-trofeo-amorevince.2f8b4726ae.webp","angelo":"img/fx-trofeo-angelo.e69fb67f09.webp","bacheca":"img/fx-trofeo-bacheca.eb6e920eb1.webp","bagno":"img/fx-trofeo-bagno.80dd84a8fc.webp","banchetto":"img/fx-trofeo-banchetto.c9e4dc478f.webp","banco":"img/fx-trofeo-banco.7990a4d869.webp","canale":"img/fx-trofeo-canale.db02ec0604.webp","capolavoro":"img/fx-trofeo-capolavoro.1967b64f45.webp","carte":"img/fx-trofeo-carte.ef2b82c83e.webp","collezione":"img/fx-trofeo-collezione.b299a5115d.webp","colpogrosso":"img/fx-trofeo-colpogrosso.d7981b7466.webp","conti":"img/fx-trofeo-conti.e70bdb8cbc.webp","coppa":"img/fx-trofeo-coppa.a463810929.webp","dalnulla":"img/fx-trofeo-dalnulla.e42989a993.webp","disciplina":"img/fx-trofeo-disciplina.073557ff2d.webp","fiuto":"img/fx-trofeo-fiuto.1503d3eb4b.webp","giramondo":"img/fx-trofeo-giramondo.0ad02233a6.webp","guerra":"img/fx-trofeo-guerra.eaab7458ad.webp","lampo":"img/fx-trofeo-lampo.34cc1f2954.webp","leggenda":"img/fx-trofeo-leggenda.7d2bf44fc4.webp","maestro":"img/fx-trofeo-maestro.7110bddf3f.webp","manipulite":"img/fx-trofeo-manipulite.34ff575bb7.webp","maratona":"img/fx-trofeo-maratona.2e6b332ae3.webp","mecenate":"img/fx-trofeo-mecenate.67d27ec58b.webp","miracolo":"img/fx-trofeo-miracolo.34f7843bb2.webp","occhio":"img/fx-trofeo-occhio.c95fa91c17.webp","perbene":"img/fx-trofeo-perbene.024374594c.webp","podio":"img/fx-trofeo-podio.d86a25f609.webp","prima":"img/fx-trofeo-prima.3abea42a27.webp","riflessi":"img/fx-trofeo-riflessi.e80d5d2241.webp","saga":"img/fx-trofeo-saga.607283ecfd.webp","serpente":"img/fx-trofeo-serpente.23113bb8df.webp","sfortuna":"img/fx-trofeo-sfortuna.181e207de7.webp","sponsor":"img/fx-trofeo-sponsor.bf69eb2ed0.webp","testacalda":"img/fx-trofeo-testacalda.5494f4ae1f.webp","tifoso":"img/fx-trofeo-tifoso.ca26308e74.webp","tris":"img/fx-trofeo-tris.efd756f45f.webp","ultimoistante":"img/fx-trofeo-ultimoistante.498a128819.webp","verde":"img/fx-trofeo-verde.5e52fd4620.webp"},"foil":"img/fx-foil-oro.1d6a9a6327.webp","occhiY":{"m-1":0.53,"m-2":0.6,"m-3":0.43,"m-4":0.39,"m-5":0.575,"f-1":0.52,"f-2":0.49,"f-3":0.41,"f-4":0.46,"n-1":0.55}},"audio":{"sfx":{"heavy":"img/audio-colpo.6c66fc3384.mp3","battle":"img/audio-scontro.171fdeb377.mp3","click":"img/audio-ui-click.75370fe5e2.wav","hover":"img/audio-ui-hover.39a84fb194.wav","tick":"img/audio-ui-tick.16c581af00.wav","jazz":"img/audio-vittoria.6a3763dedf.mp3"},"music":"img/audio-musica-dark-hour.53788a2c76.mp3"}};
 ;
-window.LOS_BUILD = "cdb2ff78deb4343f33ed7049b0a02a69e0f38568060997c42cbb22a43c6fe0e5";
+window.LOS_BUILD = "18f0e60711319e7587636b4f4011b27914a3bb8c7de3f146ed7b1338cb1f52e7";
 ;
 /* Last One Standing — grafica vettoriale: logo, icone delle arene, illustrazioni.
  * Tutto è SVG generato in codice: nessuna immagine esterna. */
@@ -22312,18 +22543,26 @@ window.LOS_BUILD = "cdb2ff78deb4343f33ed7049b0a02a69e0f38568060997c42cbb22a43c6f
     return () => out.map(({ r, w }) => r.animate([{ transform: 'translateX(0)', opacity: 0.9 }, { transform: 'translateX(' + (W + w * 2).toFixed(0) + 'px)', opacity: 0.9 }], { duration: R(220, 360), delay: R(0, 260), easing: 'cubic-bezier(.5,0,.6,1)', fill: 'none' }));
   }
 
+  /* ---------- ornamenti ----------
+   * Strati in più sopra le coperture: fili di luce, contorni, onde, raggi, pennellate, mezzitoni, grana.
+   * Regola fissa: ogni ornamento parte e finisce dentro la finestra di tempo del pezzo che accompagna (stessa durata
+   * di base, ritardo mai oltre quello del pezzo), non entra nelle promesse e non aggiunge attese: i tempi dello
+   * stacco restano identici, cambia solo quanta roba si muove dentro. Tutto vive dentro .lx e sparisce con lui. */
+  const fit = (win, delay, dur) => { const d = Math.max(0, Math.min(delay, win - 60)); return { delay: d, duration: Math.max(60, Math.min(dur, win - d)) }; };
+  const deco = (fn) => { try { return fn(); } catch (e) { return null; } };
+
   function lame(g, W, H, dir, P, defs) {
     const ang = R(13, 23), sl = H * Math.tan(rad(ang)), span = W + sl * 2;
     const n = RI(4, 6), wts = Array.from({ length: n }, () => R(0.6, 1.4)), sum = wts.reduce((a, b) => a + b, 0);
     const dots = halftone(defs, 'lxh' + Date.now(), P.key, RI(9, 13), R(1.6, 2.6), R(20, 50));
     const fills = [P.void, P.key, P.void, P.deep, P.key, P.void];
-    let x = -sl; const blades = [];
+    let x = -sl; const blades = [], rims = [];
     for (let i = 0; i < n; i++) {
       const w = (span * wts[i]) / sum + 24, m = 40; // 24 px di sovrapposizione: il bordo strappato non lascia fessure
       const right = jag(x + w + sl, -m, x + w, H + m, i % 2 ? R(3, 9) : R(1, 3), R(18, 34));
       const poly = [[x + sl, -m]].concat(right, [[x - 2, H + m]]);
       const b = el('polygon', { points: pts(poly), fill: fills[(i + RI(0, 1)) % fills.length] }, g);
-      blades.push(b);
+      blades.push(b); rims.push({ b, xp: x + w });
       if (b.getAttribute('fill') === P.void && Math.random() < 0.7) { const o = el('polygon', { points: pts(poly), fill: dots, opacity: R(0.35, 0.6) }, g); blades.push(o); o.__twin = b; }
       // una lama sottile di carta sul bordo di qualche lastra
       if (Math.random() < 0.55) { const t = R(5, 12), xp = x + w; blades.push(el('polygon', { points: pts([[xp + sl - t, -m], [xp + sl, -m], [xp, H + m], [xp - t, H + m]]), fill: P.paper }, g)); }
@@ -22331,9 +22570,13 @@ window.LOS_BUILD = "cdb2ff78deb4343f33ed7049b0a02a69e0f38568060997c42cbb22a43c6f
     }
     const off = span + sl, fly = speed(g, W, H, P, RI(7, 11));
     blades.forEach((b, i) => { b.__i = b.__twin ? b.__twin.__i : blades.length - i; });
+    // ornamento: un filo di luce corre davanti al bordo di ogni lama, frena prima di lei e si spegne quando la lama arriva
+    const glints = rims.map(({ b, xp }, k) => { const t = R(2, 5), gap = R(14, 36); const l = el('polygon', { class: 'lx-x', points: pts([[xp + sl + gap, -40], [xp + sl + gap + t, -40], [xp + gap + t, H + 40], [xp + gap, H + 40]]), fill: k % 2 ? P.light : P.paper }, g); l.__b = b; return l; });
+    const glintIn = () => glints.forEach((l) => anim(l, [{ transform: 'translateX(' + -off + 'px)', opacity: 1 }, { opacity: 1, offset: 0.72 }, { transform: 'translateX(0)', opacity: 0 }], { duration: 300, delay: Math.max(0, l.__b.__i * 26 - 34), easing: E.out }));
+    const glintOut = () => glints.forEach((l) => anim(l, [{ transform: 'translateX(0)', opacity: 0 }, { opacity: 0.9, offset: 0.25 }, { transform: 'translateX(' + off + 'px)', opacity: 0.9 }], { duration: 360, delay: (blades.length - l.__b.__i) * 18, easing: E.in }));
     return {
-      cover: () => (fly(), all(blades.map((b) => anim(b, [{ transform: 'translateX(' + -off + 'px)' }, { transform: 'translateX(0)' }], { duration: 300, delay: b.__i * 26 + R(0, 14), easing: E.io })))),
-      uncover: () => all(blades.map((b) => anim(b, [{ transform: 'translateX(0)' }, { transform: 'translateX(' + off + 'px)' }], { duration: 360, delay: (blades.length - b.__i) * 18 + R(0, 12), easing: E.in, composite: 'replace' }))),
+      cover: () => (fly(), deco(glintIn), all(blades.map((b) => anim(b, [{ transform: 'translateX(' + -off + 'px)' }, { transform: 'translateX(0)' }], { duration: 300, delay: b.__i * 26 + R(0, 14), easing: E.io })))),
+      uncover: () => (deco(glintOut), all(blades.map((b) => anim(b, [{ transform: 'translateX(0)' }, { transform: 'translateX(' + off + 'px)' }], { duration: 360, delay: (blades.length - b.__i) * 18 + R(0, 12), easing: E.in, composite: 'replace' })))),
     };
   }
 
@@ -22359,16 +22602,26 @@ window.LOS_BUILD = "cdb2ff78deb4343f33ed7049b0a02a69e0f38568060997c42cbb22a43c6f
         if (fill === P.key && Math.random() < 0.3) { const o = el('polygon', { points: pts(t), fill: dots, opacity: 0.35 }, g); o.style.transformOrigin = s.style.transformOrigin; o.__d = s.__d; o.__v = s.__v; shards.push(o); }
       });
     }
+    // ornamenti: il contorno di qualche scheggia lampeggia mentre si chiude e vola via per primo quando si riapre;
+    // un'onda di carta parte dal punto d'origine e arriva al bordo insieme all'ultima scheggia
+    const maxD = shards.reduce((a, s) => Math.max(a, s.__d), 0);
+    const edges = shards.filter((s) => s.hasAttribute('stroke') && Math.random() < 0.3).map((s) => { const o = el('polygon', { class: 'lx-x', points: s.getAttribute('points'), fill: 'none', stroke: s.getAttribute('fill') === P.paper ? P.void : P.paper, 'stroke-width': 2.5, 'stroke-linejoin': 'round', opacity: 0 }, g); o.style.transformOrigin = s.style.transformOrigin; o.__d = s.__d; o.__v = s.__v; return o; });
+    const wave = el('circle', { class: 'lx-x', cx: ox.toFixed(1), cy: oy.toFixed(1), r: (far * Math.max(0.4, maxD)).toFixed(1), fill: 'none', stroke: P.paper, 'stroke-width': 7, opacity: 0 }, g); wave.style.transformOrigin = ox.toFixed(1) + 'px ' + oy.toFixed(1) + 'px';
+    const decoIn = () => {
+      edges.forEach((o) => anim(o, [{ transform: 'rotate(' + R(-50, 50) + 'deg) scale(0)', opacity: 0 }, { opacity: 1, offset: 0.5 }, { transform: 'rotate(0) scale(1)', opacity: 0 }], { duration: 250, delay: o.__d * 260, easing: E.out }));
+      anim(wave, [{ transform: 'scale(0)', opacity: 1, strokeWidth: 16 }, { opacity: 1, offset: 0.7 }, { transform: 'scale(1)', opacity: 0, strokeWidth: 2 }], { duration: Math.round(250 + maxD * 260), easing: E.out });
+    };
+    const decoOut = () => edges.forEach((o) => { const k = R(0.5, 0.9) * far; anim(o, [{ transform: 'translate(0,0) scale(1)', opacity: 0 }, { opacity: 0.9, offset: 0.2 }, { transform: 'translate(' + o.__v[0] * k + 'px,' + o.__v[1] * k + 'px) rotate(' + R(-40, 40) + 'deg) scale(1.15)', opacity: 0 }], { duration: 380, delay: o.__d * 160, easing: E.out }); });
     return {
-      cover: () => all(shards.map((s) => anim(s, [{ transform: 'rotate(' + R(-50, 50) + 'deg) scale(0)', opacity: 0 }, { opacity: 1, offset: 0.4 }, { transform: 'rotate(0) scale(1)', opacity: 1 }], { duration: 250, delay: s.__d * 260 + R(0, 30), easing: E.out }))),
-      uncover: () => all(shards.map((s) => { const k = R(0.25, 0.6) * far; return anim(s, [{ transform: 'translate(0,0) rotate(0) scale(1)', opacity: 1 }, { transform: 'translate(' + s.__v[0] * k + 'px,' + s.__v[1] * k + 'px) rotate(' + R(-90, 90) + 'deg) scale(' + R(0.3, 0.7) + ')', opacity: 0 }], { duration: 380, delay: s.__d * 160 + R(0, 40), easing: E.in }); })),
+      cover: () => (deco(decoIn), all(shards.map((s) => anim(s, [{ transform: 'rotate(' + R(-50, 50) + 'deg) scale(0)', opacity: 0 }, { opacity: 1, offset: 0.4 }, { transform: 'rotate(0) scale(1)', opacity: 1 }], { duration: 250, delay: s.__d * 260 + R(0, 30), easing: E.out })))),
+      uncover: () => (deco(decoOut), all(shards.map((s) => { const k = R(0.25, 0.6) * far; return anim(s, [{ transform: 'translate(0,0) rotate(0) scale(1)', opacity: 1 }, { transform: 'translate(' + s.__v[0] * k + 'px,' + s.__v[1] * k + 'px) rotate(' + R(-90, 90) + 'deg) scale(' + R(0.3, 0.7) + ')', opacity: 0 }], { duration: 380, delay: s.__d * 160 + R(0, 40), easing: E.in }); }))),
     };
   }
 
   function sipario(g, W, H, dir, P, defs) {
     const dots = halftone(defs, 'lxp' + Date.now(), P.key, RI(9, 12), R(1.6, 2.4), R(-30, 30));
     const n = RI(6, 9), wts = Array.from({ length: n }, () => R(0.5, 1.5)), sum = wts.reduce((a, b) => a + b, 0);
-    const tilt = R(6, 14), strips = [];
+    const tilt = R(6, 14), strips = [], seams = [];
     let y = -30;
     for (let i = 0; i < n; i++) {
       const h = ((H + 60) * wts[i]) / sum + 2, side = (i % 2 ? 1 : -1) * dir, sl = h * Math.tan(rad(tilt)) * (Math.random() < 0.5 ? 1 : -1);
@@ -22378,12 +22631,16 @@ window.LOS_BUILD = "cdb2ff78deb4343f33ed7049b0a02a69e0f38568060997c42cbb22a43c6f
       const s = el('polygon', { points: pts(poly), fill }, g); s.__side = side; s.__i = i; strips.push(s);
       if (fill !== P.key && Math.random() < 0.6) strips.push(Object.assign(el('polygon', { points: pts(poly), fill: dots, opacity: R(0.3, 0.55) }, g), { __side: side, __i: i }));
       if (Math.random() < 0.4) { const t = R(4, 8); strips.push(Object.assign(el('rect', { x: -60, y: y + h - t, width: W + 140, height: t, fill: P.paper }, g), { __side: side, __i: i })); }
+      // ornamento: un filo di luce sulla cucitura alta di ogni striscia, che arriva frenando prima della striscia
+      seams.push(Object.assign(el('rect', { class: 'lx-x', x: -60, y: (y - 1).toFixed(1), width: W + 140, height: R(1.5, 3).toFixed(1), fill: i % 2 ? P.light : P.paper }, g), { __side: side, __i: i }));
       y += h - 2;
     }
     const off = W + 160, fly = speed(g, W, H, P, RI(6, 9));
+    const seamIn = () => seams.forEach((s) => anim(s, [{ transform: 'translateX(' + -s.__side * off + 'px)' }, { transform: 'translateX(0)' }], { duration: 290, delay: s.__i * 24, easing: E.out }));
+    const seamOut = () => seams.forEach((s) => anim(s, [{ transform: 'translateX(0)' }, { transform: 'translateX(' + s.__side * off + 'px)' }], { duration: 340, delay: (n - 1 - s.__i) * 20, easing: E.in }));
     return {
-      cover: () => (fly(), all(strips.map((s) => anim(s, [{ transform: 'translateX(' + -s.__side * off + 'px)' }, { transform: 'translateX(0)' }], { duration: 290, delay: s.__i * 24 + R(0, 16), easing: E.io })))),
-      uncover: () => all(strips.map((s) => anim(s, [{ transform: 'translateX(0)' }, { transform: 'translateX(' + s.__side * off + 'px)' }], { duration: 340, delay: (n - 1 - s.__i) * 20 + R(0, 14), easing: E.in }))),
+      cover: () => (fly(), deco(seamIn), all(strips.map((s) => anim(s, [{ transform: 'translateX(' + -s.__side * off + 'px)' }, { transform: 'translateX(0)' }], { duration: 290, delay: s.__i * 24 + R(0, 16), easing: E.io })))),
+      uncover: () => (deco(seamOut), all(strips.map((s) => anim(s, [{ transform: 'translateX(0)' }, { transform: 'translateX(' + s.__side * off + 'px)' }], { duration: 340, delay: (n - 1 - s.__i) * 20 + R(0, 14), easing: E.in })))),
     };
   }
 
@@ -22399,8 +22656,17 @@ window.LOS_BUILD = "cdb2ff78deb4343f33ed7049b0a02a69e0f38568060997c42cbb22a43c6f
     const layers = [burst(far, far * 1.35, RI(14, 20), P.void), burst(far, far * 1.3, RI(16, 24), P.key), burst(far, far * 1.25, RI(18, 26), dots), burst(far * 0.3, far * 0.42, RI(10, 14), P.paper)];
     const ring = layers[3];
     let halves = null;
+    // ornamento: raggi sottili partono dal centro mentre lo scoppio si apre, e sono già spenti quando si ferma
+    const rays = [], nr = RI(10, 14), r0 = R(0, Math.PI * 2);
+    for (let i = 0; i < nr; i++) {
+      const a = r0 + (i / nr) * Math.PI * 2 + R(-0.12, 0.12), w = R(0.008, 0.02), L = far * R(0.7, 1.05);
+      const p = el('polygon', { class: 'lx-x', points: pts([[ox, oy], [ox + Math.cos(a - w) * L, oy + Math.sin(a - w) * L], [ox + Math.cos(a + w) * L, oy + Math.sin(a + w) * L]]), fill: i % 3 ? P.paper : P.light, opacity: 0 }, g);
+      p.style.transformOrigin = ox + 'px ' + oy + 'px'; rays.push(p);
+    }
+    const raysIn = () => rays.forEach((p, i) => anim(p, [{ transform: 'scale(.08)', opacity: 0 }, { opacity: 0.95, offset: 0.3 }, { transform: 'scale(1)', opacity: 0 }], { duration: 260, delay: (i % 3) * 55, easing: E.out }));
     return {
-      cover: () => all(layers.map((b, i) => anim(b, [{ transform: 'rotate(' + R(-40, -20) + 'deg) scale(0)' }, { transform: 'rotate(0) scale(1)' }], { duration: i === 3 ? 260 : 340, delay: i * 55, easing: E.out }))),
+      at: [ox, oy],
+      cover: () => (deco(raysIn), all(layers.map((b, i) => anim(b, [{ transform: 'rotate(' + R(-40, -20) + 'deg) scale(0)' }, { transform: 'rotate(0) scale(1)' }], { duration: i === 3 ? 260 : 340, delay: i * 55, easing: E.out })))),
       uncover: () => {
         // il colpo finale: un taglio diagonale, le due metà si separano
         ring.remove();
@@ -22416,6 +22682,13 @@ window.LOS_BUILD = "cdb2ff78deb4343f33ed7049b0a02a69e0f38568060997c42cbb22a43c6f
         layers.slice(0, 3).forEach((b) => b.remove());
         const flash = el('line', { x1: ox - Math.cos(a) * L, y1: oy - Math.sin(a) * L, x2: ox + Math.cos(a) * L, y2: oy + Math.sin(a) * L, stroke: P.paper, 'stroke-width': 10 }, g);
         const k = Math.max(W, H) * 0.9;
+        // ornamento: schegge di carta saltano via dal taglio, dentro i 420 ms delle due metà
+        deco(() => { for (let i = 0; i < 10; i++) {
+          const t = R(-0.5, 0.5) * Math.min(W, H) * 1.2, sx = ox + Math.cos(a) * t, sy = oy + Math.sin(a) * t, sd = i % 2 ? 1 : -1, r = R(5, 12), fl = R(60, 190);
+          const c = el('polygon', { class: 'lx-x', points: pts([[sx, sy - r], [sx + r * 0.45, sy], [sx, sy + r], [sx - r * 0.45, sy]]), fill: i % 3 ? P.paper : P.light }, g);
+          c.style.transformOrigin = sx.toFixed(1) + 'px ' + sy.toFixed(1) + 'px';
+          anim(c, [{ transform: 'translate(0,0) rotate(0) scale(.3)', opacity: 1 }, { opacity: 1, offset: 0.6 }, { transform: 'translate(' + (nx * sd * fl).toFixed(1) + 'px,' + (ny * sd * fl).toFixed(1) + 'px) rotate(' + R(-120, 120).toFixed(0) + 'deg) scale(1)', opacity: 0 }], { duration: 300, delay: 70 + (i % 4) * 12, easing: E.out });
+        } });
         return all([
           anim(flash, [{ opacity: 1, strokeWidth: 14 }, { opacity: 0, strokeWidth: 0 }], { duration: 220, easing: E.out }),
           anim(halves[0], [{ transform: 'translate(0,0)' }, { transform: 'translate(' + nx * k + 'px,' + ny * k + 'px)' }], { duration: 420, delay: 70, easing: E.in }),
@@ -22437,11 +22710,16 @@ window.LOS_BUILD = "cdb2ff78deb4343f33ed7049b0a02a69e0f38568060997c42cbb22a43c6f
       const cx = c * s + (r % 2 ? 0 : s / 2), cy = r * s * 0.9 + s * 0.45, t = ((cx / W - 0.5) * gx + (cy / H - 0.5) * gy) + 0.5;
       if (t > 0.18) dot(cx, cy, s * Math.min(0.46, 0.06 + 0.42 * t), P.void, ink);
     }
+    // ornamento: un'onda di carta corre dal punto d'origine davanti ai puntini che crescono, e torna indietro quando si ritirano
+    const maxD = base.reduce((a, c) => Math.max(a, c.__d), 0);
+    const wave = el('circle', { class: 'lx-x', cx: ox.toFixed(1), cy: oy.toFixed(1), r: (far * Math.max(0.4, maxD)).toFixed(1), fill: 'none', stroke: P.paper, 'stroke-width': 6, opacity: 0 }, g); wave.style.transformOrigin = ox.toFixed(1) + 'px ' + oy.toFixed(1) + 'px';
+    const waveIn = () => anim(wave, [{ transform: 'scale(0)', opacity: 1, strokeWidth: 18 }, { opacity: 1, offset: 0.75 }, { transform: 'scale(1)', opacity: 0, strokeWidth: 2 }], { duration: Math.round(300 + maxD * 300), easing: E.out });
+    const waveOut = () => anim(wave, [{ transform: 'scale(1)', opacity: 0, strokeWidth: 2 }, { opacity: 0.9, offset: 0.2 }, { transform: 'scale(0)', opacity: 0.9, strokeWidth: 14 }], { duration: 300, delay: 60, easing: E.in });
     return {
-      cover: () => all(base.map((c) => anim(c, [{ transform: 'scale(0)' }, { transform: 'scale(1)' }], { duration: 300, delay: c.__d * 300 + R(0, 20), easing: E.out }))
-        .concat(ink.map((c) => anim(c, [{ transform: 'scale(0)' }, { transform: 'scale(1)' }], { duration: 260, delay: 120 + c.__d * 300 + R(0, 20), easing: E.kick })))),
-      uncover: () => all(ink.map((c) => anim(c, [{ transform: 'scale(1)' }, { transform: 'scale(0)' }], { duration: 180, delay: (1 - c.__d) * 140, easing: E.in }))
-        .concat(base.map((c) => anim(c, [{ transform: 'scale(1)' }, { transform: 'scale(0)' }], { duration: 300, delay: 60 + (1 - c.__d) * 280 + R(0, 20), easing: E.in })))),
+      cover: () => (deco(waveIn), all(base.map((c) => anim(c, [{ transform: 'scale(0)' }, { transform: 'scale(1)' }], { duration: 300, delay: c.__d * 300 + R(0, 20), easing: E.out }))
+        .concat(ink.map((c) => anim(c, [{ transform: 'scale(0)' }, { transform: 'scale(1)' }], { duration: 260, delay: 120 + c.__d * 300 + R(0, 20), easing: E.kick }))))),
+      uncover: () => (deco(waveOut), all(ink.map((c) => anim(c, [{ transform: 'scale(1)' }, { transform: 'scale(0)' }], { duration: 180, delay: (1 - c.__d) * 140, easing: E.in }))
+        .concat(base.map((c) => anim(c, [{ transform: 'scale(1)' }, { transform: 'scale(0)' }], { duration: 300, delay: 60 + (1 - c.__d) * 280 + R(0, 20), easing: E.in }))))),
     };
   }
 
@@ -22455,6 +22733,9 @@ window.LOS_BUILD = "cdb2ff78deb4343f33ed7049b0a02a69e0f38568060997c42cbb22a43c6f
       t.style.fontFamily = "Archivo, 'Bricolage Grotesque', sans-serif"; t.style.fontStretch = '118%'; t.style.letterSpacing = '-.02em';
       t.textContent = word.repeat(Math.ceil((W * 1.7) / (fs * 0.62 * word.length)) + 1);
       if (i % 3 === 2) el('rect', { x: -W * 0.3, y: y + hh - 5, width: W * 1.6, height: 5, fill: P.paper }, row);
+      // ornamento: dietro il testo, un cursore attraversa la fascia nel verso opposto mentre la fascia entra (parallasse)
+      const cur = el('rect', { class: 'lx-x', x: (W * 0.43).toFixed(0), y: (y + hh * 0.1).toFixed(1), width: (W * R(0.1, 0.18)).toFixed(0), height: (hh * 0.8).toFixed(1), fill: dark ? P.paper : P.void, opacity: dark ? 0.13 : 0.2 });
+      row.insertBefore(cur, t); row.__c = cur;
       row.__side = side; row.__i = i; row.__t = t; rows.push(row);
     }
     const off = W * 1.7;
@@ -22462,6 +22743,7 @@ window.LOS_BUILD = "cdb2ff78deb4343f33ed7049b0a02a69e0f38568060997c42cbb22a43c6f
       cover: () => all(rows.map((r) => {
         // il testo continua a scorrere finché la fascia resta in scena
         r.__t.animate([{ transform: 'translateX(0)' }, { transform: 'translateX(' + -r.__side * 160 + 'px)' }], { duration: 1600, easing: 'linear', fill: 'both' });
+        deco(() => anim(r.__c, [{ transform: 'translateX(' + (r.__side * W * 0.85).toFixed(0) + 'px) skewX(-14deg)' }, { transform: 'translateX(' + (-r.__side * W * R(0.12, 0.3)).toFixed(0) + 'px) skewX(-14deg)' }], { duration: 320, delay: r.__i * 30, easing: E.out }));
         return anim(r, [{ transform: 'translateX(' + -r.__side * off + 'px)' }, { transform: 'translateX(0)' }], { duration: 320, delay: r.__i * 30 + R(0, 16), easing: E.io });
       })),
       uncover: () => all(rows.map((r) => anim(r, [{ transform: 'translateX(0)' }, { transform: 'translateX(' + r.__side * off + 'px)' }], { duration: 360, delay: (n - 1 - r.__i) * 24 + R(0, 14), easing: E.in }))),
@@ -22477,6 +22759,83 @@ window.LOS_BUILD = "cdb2ff78deb4343f33ed7049b0a02a69e0f38568060997c42cbb22a43c6f
     let f = Math.random() < 0.55 ? pref[0] : pick(pref.concat(Object.keys(FAMILIES)));
     if (f === lastFamily) f = pref.find((x) => x !== lastFamily) || Object.keys(FAMILIES).find((x) => x !== lastFamily);
     lastFamily = f; return f;
+  }
+
+  /* ---------- ornamenti a tutto schermo ----------
+   * Sopra la copertura e sotto il cartello: la grana della carta, una pennellata che attraversa (lame, sipario,
+   * titoli), una macchia d'impatto al centro dello scoppio, un angolo di mezzitoni (schegge, retino), una lama di luce
+   * mentre il cartello entra e un respiro del cartello durante la pausa. Le durate sono quelle di base della famiglia. */
+  const BASE = { lame: [300, 360], schegge: [250, 380], sipario: [290, 340], esplosione: [340, 420], retino: [300, 300], titoli: [320, 360] };
+  function ornaments(host, fam, dir, P, shape) {
+    const T = BASE[fam] || [290, 340], has = (c) => root.classList.contains(c);
+    const mk = (cls, css) => { const n = document.createElement('i'); n.className = cls; if (css) n.style.cssText = css; host.appendChild(n); return n; };
+    const grana = has('fx-grana') ? mk('lx-grana') : null;
+    let ink = null, tone = null, splat = null;
+    if (has('fx-pen') && (fam === 'lame' || fam === 'sipario' || fam === 'titoli')) { const k = RI(1, 4); ink = mk('lx-ink', 'top:' + R(6, 50).toFixed(0) + '%;height:' + R(28, 40).toFixed(0) + '%;-webkit-mask-image:var(--fx-pen' + k + ');mask-image:var(--fx-pen' + k + ')'); }
+    else if (has('fx-forme') && fam === 'esplosione' && shape && shape.at) splat = mk('lx-splat', 'left:' + shape.at[0].toFixed(0) + 'px;top:' + shape.at[1].toFixed(0) + 'px');
+    else if (has('fx-forme')) tone = mk('lx-tone', (dir > 0 ? 'right' : 'left') + ':-20vmax;' + (Math.random() < 0.5 ? 'top' : 'bottom') + ':-24vmax');
+    const pass = (n, color, dur, easing) => { n.style.background = color; anim(n, [{ transform: 'translateX(' + -dir * 135 + '%) scaleX(' + dir + ')' }, { transform: 'translateX(' + dir * 135 + '%) scaleX(' + dir + ')' }], { duration: dur, easing }); };
+    return {
+      cover() {
+        if (grana) anim(grana, [{ opacity: 0 }, { opacity: 0.2 }], { duration: T[0], easing: 'linear' });
+        if (ink) pass(ink, P.void, T[0], E.io);
+        if (splat) { splat.style.background = P.paper; anim(splat, [{ transform: 'scale(.15) rotate(-30deg)', opacity: 0 }, { opacity: 0.95, offset: 0.3 }, { transform: 'scale(1.6) rotate(8deg)', opacity: 0 }], { duration: T[0], easing: E.out }); }
+        if (tone) { tone.style.background = P.paper; anim(tone, [{ transform: 'translate(' + dir * 9 + '%, 0) scale(.9)', opacity: 0 }, { opacity: 0.55, offset: 0.5 }, { transform: 'translate(0, 0) scale(1)', opacity: 0.34 }], { duration: T[0], easing: E.out }); }
+      },
+      // mentre il cartello entra: una lama di luce attraversa la copertura, sotto il cartello, e finisce prima delle lettere
+      rest(capEl, tin) {
+        const s = document.createElement('i'); s.className = 'lx-sweep'; host.insertBefore(s, capEl || null);
+        anim(s, [{ transform: 'translateX(' + (dir > 0 ? -130 : 430) + '%) skewX(-18deg)' }, { transform: 'translateX(' + (dir > 0 ? 430 : -130) + '%) skewX(-18deg)' }], Object.assign(fit(tin, 30, 380), { easing: E.io }));
+      },
+      // la pausa: il cartello si assesta, per tutta e sola la durata della pausa
+      settle(capEl, hold) { if (capEl) capEl.animate([{ scale: '1.026' }, { scale: '1' }], { duration: hold, easing: E.out }); },
+      uncover() {
+        if (grana) anim(grana, [{ opacity: 0.2 }, { opacity: 0 }], { duration: T[1], easing: 'linear' });
+        if (ink) { ink.style.top = R(20, 62).toFixed(0) + '%'; ink.style.height = R(12, 18).toFixed(0) + '%'; pass(ink, P.paper, T[1], E.in); }
+        if (tone) anim(tone, [{ transform: 'translate(0, 0) scale(1)', opacity: 0.34 }, { transform: 'translate(' + -dir * 10 + '%, 0) scale(1.06)', opacity: 0 }], { duration: T[1], easing: E.in });
+      },
+    };
+  }
+
+  /* ---------- l'accento della destinazione ----------
+   * Stessa grammatica (carta, nero, tinta), un carattere per sezione: la Diretta è una regia TV (targhetta «In onda»,
+   * livelli audio, riga di scansione), l'Esito un verdetto (due filetti che si chiudono e un punzone), i Trofei un
+   * riflesso d'oro con le stelle, i Concorrenti un appello a caselle, l'Arena un mirino, la Home tre frecce.
+   * Entra dentro la finestra d'entrata delle lettere (tin) ed esce in 140 ms, meno dell'uscita più breve del cartello. */
+  const STAR_AT = [[-7, -42], [21, 112], [57, -50], [93, 100], [103, -18]];
+  const ACC = {
+    diretta: '<b class="lx-live"><i class="lx-dot"></i>In onda<span class="lx-bars"><i></i><i></i><i></i><i></i><i></i></span></b><i class="lx-scan"></i>',
+    esito: '<i class="lx-rule t"></i><i class="lx-rule b"></i><i class="lx-punch"></i>',
+    trofei: '<i class="lx-foilbox"><i class="lx-foil"></i></i>' + STAR_AT.map((p, i) => '<i class="lx-star" style="left:' + p[0] + '%;top:' + p[1] + '%;--k:' + (i % 2 ? 0.7 : 1) + '"></i>').join(''),
+    cast: '<i class="lx-slots">' + '<i></i>'.repeat(7) + '</i>',
+    arena: '<i class="lx-brk tl"></i><i class="lx-brk tr"></i><i class="lx-brk bl"></i><i class="lx-brk br"></i>',
+    home: '<i class="lx-chev"><i></i><i></i><i></i></i>',
+  };
+  function accent(cap, view, dir, tin) {
+    if (!ACC[view]) return null;
+    const a = document.createElement('i'); a.className = 'lx-acc lx-a-' + view; a.innerHTML = ACC[view];
+    cap.insertBefore(a, cap.querySelector('.lx-word'));
+    const q = (s) => [...a.querySelectorAll(s)], go = (n, kf, delay, dur, easing) => anim(n, kf, Object.assign(fit(tin, delay, dur), { easing: easing || E.out }));
+    if (view === 'diretta') {
+      q('.lx-live').forEach((n) => go(n, [{ clipPath: 'inset(-30% 105% -30% -5%)' }, { clipPath: 'inset(-30% -5% -30% -5%)' }], 110, 200));
+      q('.lx-dot').forEach((n) => go(n, [{ opacity: 0 }, { opacity: 1 }, { opacity: 0 }, { opacity: 1 }], 200, 220, 'steps(3, end)'));
+      q('.lx-bars i').forEach((n, i) => go(n, [{ transform: 'scaleY(.15)' }, { transform: 'scaleY(1)', offset: 0.45 }, { transform: 'scaleY(' + R(0.35, 0.9).toFixed(2) + ')' }], 170 + i * 28, 220));
+      q('.lx-scan').forEach((n) => go(n, [{ transform: 'translateY(0)', opacity: 0.45 }, { transform: 'translateY(.97em)', opacity: 0.45, offset: 0.9 }, { transform: 'translateY(.97em)', opacity: 0 }], 90, 300, 'linear'));
+    } else if (view === 'esito') {
+      q('.lx-rule').forEach((n, i) => go(n, [{ transform: 'scaleX(0)' }, { transform: 'scaleX(1)' }], 60 + i * 50, 220, E.io));
+      q('.lx-punch').forEach((n) => go(n, [{ transform: 'rotate(-90deg) scale(2.2)', opacity: 0 }, { opacity: 1, offset: 0.4 }, { transform: 'rotate(0deg) scale(1)', opacity: 1 }], 170, 240, E.kick));
+    } else if (view === 'trofei') {
+      q('.lx-foil').forEach((n) => go(n, [{ transform: 'translateX(-130%) skewX(-20deg)' }, { transform: 'translateX(330%) skewX(-20deg)' }], 110, 320, E.io));
+      q('.lx-star').forEach((n, i) => go(n, [{ transform: 'scale(0) rotate(-60deg)' }, { transform: 'scale(calc(var(--k) * 1.3)) rotate(0deg)', offset: 0.55 }, { transform: 'scale(var(--k)) rotate(12deg)' }], 110 + i * 42, 260));
+    } else if (view === 'cast') {
+      const s = q('.lx-slots i'); s.forEach((n, i) => go(n, [{ transform: 'skewX(-24deg) scaleX(0)' }, { transform: 'skewX(-24deg) scaleX(1)' }], 90 + (dir > 0 ? i : s.length - 1 - i) * 30, 150));
+    } else if (view === 'arena') {
+      const off = { tl: '-.3em -.3em', tr: '.3em -.3em', bl: '-.3em .3em', br: '.3em .3em' };
+      q('.lx-brk').forEach((n, i) => go(n, [{ translate: off[n.classList[1]], opacity: 0 }, { translate: '0 0', opacity: 1 }], 80 + i * 35, 220, E.kick));
+    } else if (view === 'home') {
+      q('.lx-chev i').forEach((n, i) => go(n, [{ translate: (-dir * 0.4).toFixed(1) + 'em 0', opacity: 0 }, { translate: '0 0', opacity: 1 }], 120 + i * 45, 170));
+    }
+    return { out: () => anim(a, [{ opacity: 1 }, { opacity: 0 }], { duration: 140, easing: E.in }) };
   }
 
   /* ---------- il cartello: lastra di carta, lettere una per una ---------- */
@@ -22509,14 +22868,17 @@ window.LOS_BUILD = "cdb2ff78deb4343f33ed7049b0a02a69e0f38568060997c42cbb22a43c6f
       ...letters.map((s, i) => anim(s, [{ transform: 'translateY(-.55em) rotate(' + R(-24, 24) + 'deg) scale(1.5)', opacity: 0 }, { opacity: 1, offset: 0.35 }, { transform: 'none', opacity: 1 }], { duration: 240, delay: 90 + i * 22 + R(0, 10), easing: E.kick })),
     ];
     if (subEl) inA.push(anim(subEl, [{ transform: 'translateX(' + -dir * 24 + 'px)', opacity: 0 }, { transform: 'none', opacity: 1 }], { duration: 240, delay: 160 + letters.length * 22, easing: E.out }));
+    // la finestra d'entrata garantita (l'ultima lettera, senza la parte casuale): gli ornamenti stanno qui dentro
+    const tin = 90 + Math.max(0, letters.length - 1) * 22 + 240;
+    const acc = deco(() => accent(cap, view, dir, tin));
     return {
-      el: cap,
+      el: cap, tin,
       shown: all(inA),
-      out: () => all([
+      out: () => (deco(() => acc && acc.out()), all([
         ...letters.map((s, i) => anim(s, [{ transform: 'none', opacity: 1 }, { transform: 'translateX(' + dir * 0.6 + 'em) skewX(-20deg)', opacity: 0 }], { duration: 150, delay: i * 9, easing: E.in })),
         anim(slab, [{ transform: 'scaleX(1)' }, { transform: 'scaleX(0)', transformOrigin: dir > 0 ? '100% 50%' : '0 50%' }], { duration: 200, delay: 60, easing: E.in }),
         ...(subEl ? [anim(subEl, [{ opacity: 1 }, { opacity: 0 }], { duration: 120, easing: E.in })] : []),
-      ]),
+      ])),
     };
   }
 
@@ -22611,6 +22973,7 @@ window.LOS_BUILD = "cdb2ff78deb4343f33ed7049b0a02a69e0f38568060997c42cbb22a43c6f
     const fam = choose(to);
     const recent = lastPointer && Date.now() - lastPointer.t < 1200 ? lastPointer : null;
     const shape = FAMILIES[fam](g, W, H, dir, P, defs, recent);
+    const orn = deco(() => ornaments(layer, fam, dir, P, shape)); // strati in più: nessuna attesa aggiunta
     // lo specchio per la direzione: le lame e il sipario arrivano dal lato giusto
     if (dir < 0 && (fam === 'lame')) g.setAttribute('transform', 'translate(' + W + ',0) scale(-1,1)');
     // il sipario non è mai dritto: qualche grado d'inclinazione, ingrandito quanto basta a coprire gli angoli
@@ -22626,9 +22989,11 @@ window.LOS_BUILD = "cdb2ff78deb4343f33ed7049b0a02a69e0f38568060997c42cbb22a43c6f
     const t0 = performance.now();
     // rete di sicurezza con i tempi di sempre: se le animazioni non arrivano in fondo, il cambio avviene lo stesso
     const guard = setTimeout(doSwap, 1400), clean = setTimeout(() => { doSwap(); layer.hidden = true; layer.innerHTML = ''; busy = false; }, 4500);
+    deco(() => orn && orn.cover());
     shape.cover()
       .then(() => {
         cap = caption(layer, opt, to, fam, P, dir);
+        deco(() => orn && cap && orn.rest(cap.el, cap.tin));
         if (canSeal) seal = stamp(layer, sealUrl, P, opt, cap && cap.el);
         else sfx('stamp', { at: 80 });
         doSwap();
@@ -22636,13 +23001,13 @@ window.LOS_BUILD = "cdb2ff78deb4343f33ed7049b0a02a69e0f38568060997c42cbb22a43c6f
         return Promise.all([cap ? cap.shown : null, seal ? seal.landed : null, new Promise((r) => setTimeout(r, 140))]);
       })
       // con il timbro il cartello resta fermo un po' di più: il tempo di leggere nome e sigillo
-      .then(() => new Promise((r) => setTimeout(r, opt.hold || (seal ? 420 : 110))))
+      .then(() => { const hold = opt.hold || (seal ? 420 : 110); deco(() => orn && cap && orn.settle(cap.el, hold)); return new Promise((r) => setTimeout(r, hold)); })
       .then(() => {
         const outs = [cap ? cap.out() : null];
         if (seal) outs.push(seal.out());
         enter(to, dir);
         emit('los:enter', { view: to, dir });
-        return Promise.all(outs.concat([new Promise((r) => setTimeout(r, 70)).then(() => shape.uncover())]));
+        return Promise.all(outs.concat([new Promise((r) => setTimeout(r, 70)).then(() => { deco(() => orn && orn.uncover()); return shape.uncover(); })]));
       })
       .catch(() => {})
       .then(() => { clearTimeout(guard); clearTimeout(clean); doSwap(); layer.hidden = true; layer.innerHTML = ''; busy = false; if (performance.now() - t0 > 4000) lastFamily = null; });
@@ -22695,6 +23060,9 @@ window.LOS_BUILD = "cdb2ff78deb4343f33ed7049b0a02a69e0f38568060997c42cbb22a43c6f
   const h = (tag, cls, html) => { const n = document.createElement(tag); if (cls) n.className = cls; if (html != null) n.innerHTML = html; return n; };
   const esc = (s) => String(s == null ? '' : s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
   const anim = (n, kf, o) => n.animate(kf, Object.assign({ fill: 'both' }, o));
+  // gli ornamenti sono solo decorazione: se uno fallisce, il cartello va avanti lo stesso. Non aggiungono attese:
+  // ogni strato in più usa durata e ritardo di un pezzo che c'è già, quindi i tempi dei cartelli restano identici
+  const deco = (fn) => { try { fn(); } catch (e) { /* solo decorazione */ } };
   const ORDER = ['home', 'cast', 'arena', 'diretta', 'esito', 'trofei'];
   const viewOf = (x) => { const v = (x || '').replace(/^#/, ''); return ORDER.includes(v) ? v : 'home'; };
   // un bordo strappato come clip-path: diverso a ogni cartello
@@ -22831,8 +23199,8 @@ window.LOS_BUILD = "cdb2ff78deb4343f33ed7049b0a02a69e0f38568060997c42cbb22a43c6f
   function dayBoard(unit, prev, next, sub) {
     const D = 1500, b = openBoard('pb-day', D);
     const nums = [prev - 1, prev, next, next + 1, next + 2].map((n) => (n > 0 ? n : ''));
-    b.innerHTML = '<i class="pb-veil"></i><div class="pb-band"><i class="pb-bg"></i><div class="pb-rail"><span>' + (esc(unit) + ' • ').repeat(24) + '</span></div>' +
-      '<i class="pb-sel"></i><div class="pb-strip">' + nums.map((n, i) => '<b class="' + (i === 1 ? 'o' : i === 2 ? 'n' : '') + '">' + n + '</b>').join('') + '</div>' +
+    b.innerHTML = '<i class="pb-veil"></i><div class="pb-band"><i class="pb-bg"></i><i class="pb-tone"></i><i class="pb-hair t"></i><i class="pb-hair b"></i><div class="pb-rail"><span>' + (esc(unit) + ' • ').repeat(24) + '</span></div>' +
+      '<i class="pb-ticks"></i><i class="pb-sel"><i class="pb-glint"></i></i><div class="pb-strip">' + nums.map((n, i) => '<b class="' + (i === 1 ? 'o' : i === 2 ? 'n' : '') + '">' + n + '</b>').join('') + '</div>' +
       '<div class="pb-cap"><span class="pb-k">' + esc(unit) + ' ' + next + '</span>' + (sub ? '<span class="pb-sub">' + esc(sub) + '</span>' : '') + '</div></div>';
     const band = b.querySelector('.pb-band'), strip = b.querySelector('.pb-strip'), sel = b.querySelector('.pb-sel'), o = strip.querySelector('.o'), n = strip.querySelector('.n'), cap = b.querySelector('.pb-cap');
     b.querySelector('.pb-bg').style.clipPath = torn(R(3, 8), R(92, 97), 2.2);
@@ -22848,13 +23216,21 @@ window.LOS_BUILD = "cdb2ff78deb4343f33ed7049b0a02a69e0f38568060997c42cbb22a43c6f
     anim(o, [{ opacity: 1, transform: 'scale(1.5)' }, { opacity: 0.32, transform: 'scale(1)' }], { duration: 460, delay: 300, easing: E.io });
     anim(n, [{ opacity: 0.32, transform: 'scale(1)' }, { opacity: 1, transform: 'scale(1.72)' }, { opacity: 1, transform: 'scale(1.5)' }], { duration: 560, delay: 300, easing: E.out });
     anim(cap, [{ opacity: 0, translate: '40px 0' }, { opacity: 1, translate: '0 0' }], { duration: 300, delay: 760, easing: E.out });
+    // ornamenti: due filetti si tendono con la fascia; il righello scorre più della striscia (parallasse) e i mezzitoni
+    // affiorano nello stesso tempo; quando il nuovo giorno si ferma, un riflesso attraversa il selettore
+    deco(() => {
+      b.querySelectorAll('.pb-hair').forEach((x, i) => anim(x, [{ transform: 'scaleX(0)' }, { transform: 'scaleX(1)' }], { duration: 260, easing: i ? E.out : E.io }));
+      anim(b.querySelector('.pb-ticks'), [{ transform: 'translateX(calc(var(--slot) * 1.7))' }, { transform: 'translateX(0)' }], { duration: 460, delay: 300, easing: E.io });
+      anim(b.querySelector('.pb-tone'), [{ opacity: 0, translate: '7% 0' }, { opacity: 0.5, translate: '0 0' }], { duration: 460, delay: 300, easing: E.out });
+      anim(b.querySelector('.pb-glint'), [{ transform: 'translateX(-160%)' }, { transform: 'translateX(440%)' }], { duration: 260, delay: 740, easing: E.io });
+    });
     sfx('cut'); sfx('stamp', { at: 740 });
   }
 
   // disastro: nastro di pericolo, titolo che cade, pagina che trema
   function disBoard(title) {
     const D = 1700, b = openBoard('pb-dis', D);
-    b.innerHTML = '<i class="pb-veil"></i><div class="pb-band"><i class="pb-tape t"></i><i class="pb-bg"></i><i class="pb-tape b"></i><div class="pb-cap"><span class="pb-k">Disastro</span><b class="pb-t"></b></div></div>';
+    b.innerHTML = '<i class="pb-veil"></i><div class="pb-band"><i class="pb-tape t"></i><i class="pb-bg"></i><i class="pb-tone"></i><svg class="pb-crack" aria-hidden="true"></svg><i class="pb-splat"></i><i class="pb-tape b"></i><div class="pb-cap"><span class="pb-k">Disastro</span><b class="pb-t"></b></div></div>';
     const band = b.querySelector('.pb-band'), t = b.querySelector('.pb-t');
     b.querySelector('.pb-bg').style.clipPath = torn(R(2, 6), R(94, 98), 2.6);
     band.style.setProperty('--tilt', R(2.5, 4.5).toFixed(1) + 'deg');
@@ -22864,6 +23240,22 @@ window.LOS_BUILD = "cdb2ff78deb4343f33ed7049b0a02a69e0f38568060997c42cbb22a43c6f
     anim(band, [{ transform: 'rotate(var(--tilt)) scaleY(1)', opacity: 1 }, { transform: 'rotate(var(--tilt)) scaleY(0)', opacity: 1 }], { duration: 200, delay: D - 210, easing: E.in, fill: 'forwards' });
     anim(b.querySelector('.pb-k'), [{ translate: '-60px 0', opacity: 0 }, { translate: '0 0', opacity: 1 }], { duration: 240, delay: 140, easing: E.out });
     [...t.children].forEach((s, i) => anim(s, [{ transform: 'translateY(-120%) rotate(' + R(-10, 10) + 'deg) scale(1.6)', opacity: 0 }, { opacity: 1, offset: 0.5 }, { transform: 'none', opacity: 1 }], { duration: 300, delay: 260 + i * 90, easing: E.kick }));
+    // ornamenti: una macchia d'impatto esplode dietro la prima parola e resta in filigrana; le crepe partono dal centro
+    // e arrivano ai bordi della fascia nello stesso tempo in cui la pagina trema (280 → 800 ms)
+    deco(() => {
+      const svg = b.querySelector('.pb-crack'), bw = band.offsetWidth || 1200, bh = band.offsetHeight || 400, cx = R(0.36, 0.64) * bw;
+      svg.setAttribute('viewBox', '0 0 ' + bw + ' ' + bh);
+      for (let i = 0; i < 5; i++) {
+        const up = i % 2 ? 1 : -1, pt = [[cx, bh / 2]]; let x = cx, y = bh / 2;
+        while (y > -8 && y < bh + 8) { x += R(-0.05, 0.05) * bw + (i - 2) * 0.016 * bw; y += up * R(0.08, 0.17) * bh; pt.push([x, y]); }
+        const p = document.createElementNS(NS, 'polyline');
+        p.setAttribute('points', pt.map((q) => q[0].toFixed(1) + ',' + q[1].toFixed(1)).join(' ')); p.setAttribute('pathLength', '1'); p.setAttribute('class', i % 3 ? 'c1' : 'c2');
+        svg.appendChild(p);
+        anim(p, [{ strokeDashoffset: 1 }, { strokeDashoffset: 0 }], { duration: 520 - i * 40, delay: 280 + i * 40, easing: E.out });
+      }
+      anim(b.querySelector('.pb-splat'), [{ transform: 'translate(-50%,-50%) scale(.2) rotate(-24deg)', opacity: 0 }, { opacity: 0.9, offset: 0.35 }, { transform: 'translate(-50%,-50%) scale(1) rotate(0deg)', opacity: 0.26 }], { duration: 300, delay: 260, easing: E.out });
+      anim(b.querySelector('.pb-tone'), [{ opacity: 0, translate: '-7% 0' }, { opacity: 0.4, translate: '0 0' }], { duration: 240, delay: 140, easing: E.out });
+    });
     const main = document.querySelector('main');
     if (main) main.animate([0, 1, 2, 3, 4, 5, 6].map((i) => ({ translate: (i === 6 ? 0 : R(-9, 9) * (1 - i / 7)).toFixed(1) + 'px ' + (i === 6 ? 0 : R(-6, 6) * (1 - i / 7)).toFixed(1) + 'px' })), { duration: 520, delay: 280, easing: 'steps(7, end)' });
     sfx('cut'); sfx('disaster', { at: 200 });
@@ -22872,7 +23264,7 @@ window.LOS_BUILD = "cdb2ff78deb4343f33ed7049b0a02a69e0f38568060997c42cbb22a43c6f
   // scontro finale: gli occhi di chi resta, da lati alterni
   function finBoard(avs) {
     const list = avs.slice(0, 6), D = 1900 + list.length * 60, b = openBoard('pb-fin', D);
-    b.innerHTML = '<i class="pb-veil"></i><div class="pb-rows"></div><div class="pb-head"><span class="pb-k">Scontro finale</span></div>';
+    b.innerHTML = '<i class="pb-veil"></i><i class="pb-tone a"></i><i class="pb-tone b"></i><i class="pb-bar t"></i><i class="pb-bar b"></i><div class="pb-rows"></div><i class="pb-vs"></i><i class="pb-burst"></i><div class="pb-head"><span class="pb-k">Scontro finale</span></div>';
     const rows = b.querySelector('.pb-rows');
     list.forEach((av, i) => {
       const row = h('div', 'pb-row ' + (i % 2 ? 'r' : 'l')), p = eyes(av);
@@ -22886,6 +23278,19 @@ window.LOS_BUILD = "cdb2ff78deb4343f33ed7049b0a02a69e0f38568060997c42cbb22a43c6f
     anim(b.querySelector('.pb-veil'), [{ opacity: 0 }, { opacity: 1, offset: 0.08 }, { opacity: 1, offset: 0.86 }, { opacity: 0 }], { duration: D });
     anim(head, [{ transform: 'translate(-50%,-50%) rotate(-6deg) scale(2.2)', opacity: 0 }, { transform: 'translate(-50%,-50%) rotate(-6deg) scale(1)', opacity: 1 }], { duration: 260, delay: 220 + list.length * 70, easing: E.kick });
     anim(head, [{ opacity: 1 }, { opacity: 0 }], { duration: 160, delay: D - 260, easing: E.in, fill: 'forwards' });
+    // ornamenti: due fasce nere da cinema e i mezzitoni agli angoli per tutta la durata; appena una riga si ferma un
+    // riflesso le attraversa gli occhi; con il titolo arrivano un taglio di carta e una stella, e con lui se ne vanno
+    deco(() => {
+      const hd = 220 + list.length * 70;
+      b.querySelectorAll('.pb-tone').forEach((x, i) => anim(x, [{ opacity: 0, translate: (i ? 5 : -5) + '% 0' }, { opacity: 0.4, offset: 0.08 }, { opacity: 0.4, offset: 0.86 }, { opacity: 0, translate: (i ? -3 : 3) + '% 0' }], { duration: D }));
+      b.querySelectorAll('.pb-bar').forEach((x) => { anim(x, [{ transform: 'scaleY(0)' }, { transform: 'scaleY(1)' }], { duration: 300, delay: 160, easing: E.out }); anim(x, [{ transform: 'scaleY(1)' }, { transform: 'scaleY(0)' }], { duration: 160, delay: D - 260, easing: E.in, fill: 'forwards' }); });
+      rows.querySelectorAll('.pe').forEach((p, i) => anim(p, [{ backgroundPosition: '160% 0' }, { backgroundPosition: '-60% 0' }], { duration: 300, delay: 460 + i * 70, easing: E.io, pseudoElement: '::after' }));
+      const burst = b.querySelector('.pb-burst'), vs = b.querySelector('.pb-vs');
+      burst.style.clipPath = star(RI(12, 18), R(0.5, 0.62));
+      anim(burst, [{ transform: 'translate(-50%,-50%) rotate(-50deg) scale(0)' }, { transform: 'translate(-50%,-50%) rotate(0deg) scale(1)' }], { duration: 260, delay: hd, easing: E.out });
+      anim(vs, [{ transform: 'translate(-50%,-50%) rotate(-6deg) scaleX(0)' }, { transform: 'translate(-50%,-50%) rotate(-6deg) scaleX(1)' }], { duration: 260, delay: hd, easing: E.io });
+      [burst, vs].forEach((x) => anim(x, [{ opacity: 1 }, { opacity: 0 }], { duration: 160, delay: D - 260, easing: E.in, fill: 'forwards' }));
+    });
     sfx('cut'); sfx('finale', { at: 120 }); sfx('stamp', { at: 240 + list.length * 70 });
   }
 
@@ -22905,7 +23310,7 @@ window.LOS_BUILD = "cdb2ff78deb4343f33ed7049b0a02a69e0f38568060997c42cbb22a43c6f
     lastKill = Date.now();
     const D = 1600, CUT = 520, b = openBoard('pb-kill' + (live.length ? '' : ' solo'), D);
     const label = ((row.querySelector('.cat') || {}).textContent || 'Fuori').trim();
-    b.innerHTML = '<i class="pb-veil"></i><div class="pb-band"><i class="pb-bg"></i><i class="pb-speed"></i><div class="pb-duel"></div><i class="pb-flash"></i></div>' +
+    b.innerHTML = '<i class="pb-veil"></i><i class="pb-bar t"></i><i class="pb-bar b"></i><div class="pb-band"><i class="pb-bg"></i><i class="pb-speed"></i><i class="pb-tone"></i><div class="pb-duel"></div><i class="pb-flash"></i></div>' +
       '<i class="pb-inksplat"></i><b class="pb-stamp">' + esc(label) + '</b>';
     const band = b.querySelector('.pb-band'), duel = b.querySelector('.pb-duel'), stamp = b.querySelector('.pb-stamp'), ink = b.querySelector('.pb-inksplat');
     b.querySelector('.pb-bg').style.clipPath = torn(R(4, 9), R(91, 96), 2.4);
@@ -22981,6 +23386,34 @@ window.LOS_BUILD = "cdb2ff78deb4343f33ed7049b0a02a69e0f38568060997c42cbb22a43c6f
     anim(halfB, [{ translate: '0 0', opacity: 1 }, { translate: '36px ' + (ph * 1.2).toFixed(0) + 'px', rotate: '7deg', opacity: 0 }], { duration: 340, delay: D - 360, easing: E.in, fill: 'forwards' });
     anim(stamp, [{ scale: '1', opacity: 1 }, { scale: '1.14', opacity: 0 }], { duration: 180, delay: D - 250, easing: E.in, fill: 'forwards' });
     anim(ink, [{ opacity: 1 }, { opacity: 0 }], { duration: 200, delay: D - 250, easing: E.in, fill: 'forwards' });
+    /* ornamenti, tutti dentro i tempi che ci sono già:
+     * - due fasce nere da cinema entrano ed escono con la fascia degli occhi (220 e 210 ms);
+     * - sul colpo (CUT, 300 ms come la lama): una pennellata rossa resta lungo il taglio, i raggi d'impatto partono dal
+     *   centro del pannello, i mezzitoni rossi affiorano dietro chi cade mentre le metà si separano;
+     * - il nome di chi colpisce si inverte di colpo nella tinta e una riga lo sottolinea (360 ms, come il suo gesto);
+     * - il fotogramma tenuto: tra la fine del colpo e la caduta delle metà la scena avanza appena, senza altri scatti. */
+    deco(() => {
+      b.querySelectorAll('.pb-bar').forEach((x) => { anim(x, [{ transform: 'scaleY(0)' }, { transform: 'scaleY(1)' }], { duration: 220, easing: E.io }); anim(x, [{ transform: 'scaleY(1)' }, { transform: 'scaleY(0)' }], { duration: 210, delay: D - 220, easing: E.in, fill: 'forwards' }); });
+      const brush = h('i', 'pb-brush'); brush.style.setProperty('--ang', slash.style.getPropertyValue('--ang')); split.insertBefore(brush, slash);
+      anim(brush, [{ clipPath: 'inset(0 0 0 100%)', opacity: 0.95 }, { clipPath: 'inset(0 0 0 0)', opacity: 0.95, offset: 0.45 }, { clipPath: 'inset(0 0 0 0)', opacity: 0.82 }], { duration: 300, delay: CUT, easing: E.out });
+      anim(brush, [{ opacity: 0.82 }, { opacity: 0 }], { duration: 240, delay: D - 380, easing: E.in, fill: 'forwards' });
+      const rays = document.createElementNS(NS, 'svg'); rays.setAttribute('class', 'pb-rays'); rays.setAttribute('viewBox', '-100 -100 200 200'); rays.setAttribute('aria-hidden', 'true'); split.appendChild(rays);
+      const nr = RI(12, 16), a0 = R(0, 360);
+      for (let i = 0; i < nr; i++) {
+        const p = document.createElementNS(NS, 'polygon'), w = R(1.2, 3.4), len = R(58, 98), a = (a0 + (i / nr) * 360 + R(-7, 7)).toFixed(0);
+        p.setAttribute('points', '16,' + (-w / 2).toFixed(1) + ' ' + len.toFixed(0) + ',0 16,' + (w / 2).toFixed(1)); p.setAttribute('fill', i % 3 ? '#f7f5f0' : KILL); rays.appendChild(p);
+        anim(p, [{ transform: 'rotate(' + a + 'deg) scale(.2)', opacity: 0 }, { opacity: 1, offset: 0.25 }, { transform: 'rotate(' + a + 'deg) scale(1.25)', opacity: 0 }], { duration: 300, delay: CUT, easing: E.out });
+      }
+      const tone = b.querySelector('.pb-tone');
+      anim(tone, [{ opacity: 0, scale: '.84' }, { opacity: 0.55, scale: '1' }], { duration: 240, delay: CUT + 40, easing: E.out });
+      anim(tone, [{ opacity: 0.55 }, { opacity: 0 }], { duration: 240, delay: D - 380, easing: E.in, fill: 'forwards' });
+      if (L) {
+        const nm = L.querySelector('.pb-name'), ul = h('i', 'pb-ul'); L.appendChild(ul);
+        if (nm) anim(nm, [{ background: 'var(--void)', color: 'var(--paper)' }, { background: 'var(--key)', color: 'var(--key-ink)' }], { duration: 1, delay: CUT + 30 });
+        anim(ul, [{ transform: 'scaleX(0)' }, { transform: 'scaleX(1)' }], { duration: 360, delay: CUT, easing: E.out });
+      }
+      anim(duel, [{ scale: '1' }, { scale: '1.016' }], { duration: (D - 380) - (CUT + 300), delay: CUT + 300, easing: 'linear' });
+    });
     sfx('slash', { at: CUT - 40 }); sfx('kill', { at: CUT + 30 }); sfx('stamp', { at: CUT + 300 });
   }
   function watchKills() {
@@ -23508,6 +23941,31 @@ window.LOS_BUILD = "cdb2ff78deb4343f33ed7049b0a02a69e0f38568060997c42cbb22a43c6f
     lastTab = now;
   });
 
+  /* i momenti della partita: a ogni riga appena entrata (.ev.in) si aggiunge uno strato di effetti, disegnato e
+   * temporizzato nel CSS (40-diretta.css, sezione 8) con lo stesso ritardo --d della riga. Non cambia il contenuto,
+   * non sposta niente, non aggiunge attese e si toglie da solo a effetto finito; con il movimento ridotto non viene nemmeno creato. */
+  const rnd = (a, b) => Math.round(a + Math.random() * (b - a));
+  const LAYERS = {
+    kill: () => '<i class="k-tone"></i><i class="k-ghost"></i><i class="k-line"></i><i class="k-frame"></i>' + [0, 1, 2, 3].map(() => '<b class="k-chip" style="top:' + rnd(22, 72) + '%;--x:' + rnd(22, 110) + 'px;--y:' + rnd(-44, 44) + 'px;--r:' + rnd(-170, 170) + 'deg"></b>').join(''),
+    death: () => '<i class="d-blind"></i><i class="d-flat"></i><i class="d-blip"></i>' + [0, 1, 2, 3].map((i) => '<b class="d-ash" style="left:' + rnd(8 + i * 22, 24 + i * 22) + 'px;--y:' + rnd(-70, -34) + 'px;--r:' + rnd(-120, 120) + 'deg"></b>').join(''),
+    betray: () => '<i class="b-half a"></i><i class="b-half b"></i><i class="b-tear"></i>',
+    gift: () => '<i class="g-beam"></i><i class="g-drop"></i>' + [[18, 22], [74, 58], [46, 12]].map((p) => '<b class="g-star" style="left:calc(var(--sp) * ' + (p[0] / 100) + ' + ' + rnd(-6, 26) + 'px);top:' + (p[1] + rnd(-6, 6)) + '%"></b>').join(''),
+    mentor: () => '<i class="m-band"></i><i class="m-run"></i>',
+    regia: () => '<i class="r-clap"></i><i class="r-run"></i>',
+  };
+  const kindOf = (r) => { const c = r.classList; return c.contains('ev-regia') ? 'regia' : c.contains('fx-kill') ? 'kill' : c.contains('fx-death') ? 'death' : c.contains('fx-betray') ? 'betray' : c.contains('fx-sponsor') || c.contains('ev-dono') ? 'gift' : c.contains('ev-mentor') ? 'mentor' : null; };
+  const moments = safe((rows) => {
+    if (reduced()) return;
+    rows.forEach((r) => {
+      if (!r.classList || !r.classList.contains('ev') || !r.classList.contains('in') || r.querySelector(':scope > .dx-fx')) return;
+      const k = kindOf(r); if (!k) return;
+      const fx = D.createElement('i'); fx.className = 'dx-fx dx-fx-' + k + (r.classList.contains('ev-ko') ? ' ko' : ''); fx.setAttribute('aria-hidden', 'true'); fx.innerHTML = LAYERS[k]();
+      r.appendChild(fx);
+      // nessun timer: lo strato si toglie da solo quando l'ultimo dei suoi pezzi ha finito
+      fx.addEventListener('animationend', () => { if (!fx.getAnimations({ subtree: true }).some((a) => a.playState !== 'finished')) fx.remove(); });
+    });
+  });
+
   const hints = safe(() => {
     const set = (id, t) => { const b = D.getElementById(id); if (b && !b.title) b.title = t; };
     set('prevBtn', 'Fase precedente (freccia sinistra)'); set('nextBtn', 'Avanti (freccia destra)'); set('playBtn', 'Riproduci o metti in pausa (barra spaziatrice)');
@@ -23518,6 +23976,8 @@ window.LOS_BUILD = "cdb2ff78deb4343f33ed7049b0a02a69e0f38568060997c42cbb22a43c6f
     if (typeof MutationObserver === 'undefined') return;
     if (ph) { new MutationObserver(progress).observe(ph, { childList: true, characterData: true, subtree: true }); progress(); }
     if (st) { new MutationObserver(tabs).observe(st, { attributes: true, subtree: true, attributeFilter: ['aria-selected'] }); tabs(); }
+    const feed = D.getElementById('phBody');
+    if (feed) new MutationObserver((ms) => { const rows = []; ms.forEach((m) => m.addedNodes.forEach((n) => { if (n.nodeType === 1 && n.parentNode === feed) rows.push(n); })); if (rows.length) moments(rows); }).observe(feed, { childList: true });
     hints();
   });
   if (D.readyState === 'loading') D.addEventListener('DOMContentLoaded', start); else start();

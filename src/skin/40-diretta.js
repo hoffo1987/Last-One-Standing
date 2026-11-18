@@ -30,6 +30,31 @@
     lastTab = now;
   });
 
+  /* i momenti della partita: a ogni riga appena entrata (.ev.in) si aggiunge uno strato di effetti, disegnato e
+   * temporizzato nel CSS (40-diretta.css, sezione 8) con lo stesso ritardo --d della riga. Non cambia il contenuto,
+   * non sposta niente, non aggiunge attese e si toglie da solo a effetto finito; con il movimento ridotto non viene nemmeno creato. */
+  const rnd = (a, b) => Math.round(a + Math.random() * (b - a));
+  const LAYERS = {
+    kill: () => '<i class="k-tone"></i><i class="k-ghost"></i><i class="k-line"></i><i class="k-frame"></i>' + [0, 1, 2, 3].map(() => '<b class="k-chip" style="top:' + rnd(22, 72) + '%;--x:' + rnd(22, 110) + 'px;--y:' + rnd(-44, 44) + 'px;--r:' + rnd(-170, 170) + 'deg"></b>').join(''),
+    death: () => '<i class="d-blind"></i><i class="d-flat"></i><i class="d-blip"></i>' + [0, 1, 2, 3].map((i) => '<b class="d-ash" style="left:' + rnd(8 + i * 22, 24 + i * 22) + 'px;--y:' + rnd(-70, -34) + 'px;--r:' + rnd(-120, 120) + 'deg"></b>').join(''),
+    betray: () => '<i class="b-half a"></i><i class="b-half b"></i><i class="b-tear"></i>',
+    gift: () => '<i class="g-beam"></i><i class="g-drop"></i>' + [[18, 22], [74, 58], [46, 12]].map((p) => '<b class="g-star" style="left:calc(var(--sp) * ' + (p[0] / 100) + ' + ' + rnd(-6, 26) + 'px);top:' + (p[1] + rnd(-6, 6)) + '%"></b>').join(''),
+    mentor: () => '<i class="m-band"></i><i class="m-run"></i>',
+    regia: () => '<i class="r-clap"></i><i class="r-run"></i>',
+  };
+  const kindOf = (r) => { const c = r.classList; return c.contains('ev-regia') ? 'regia' : c.contains('fx-kill') ? 'kill' : c.contains('fx-death') ? 'death' : c.contains('fx-betray') ? 'betray' : c.contains('fx-sponsor') || c.contains('ev-dono') ? 'gift' : c.contains('ev-mentor') ? 'mentor' : null; };
+  const moments = safe((rows) => {
+    if (reduced()) return;
+    rows.forEach((r) => {
+      if (!r.classList || !r.classList.contains('ev') || !r.classList.contains('in') || r.querySelector(':scope > .dx-fx')) return;
+      const k = kindOf(r); if (!k) return;
+      const fx = D.createElement('i'); fx.className = 'dx-fx dx-fx-' + k + (r.classList.contains('ev-ko') ? ' ko' : ''); fx.setAttribute('aria-hidden', 'true'); fx.innerHTML = LAYERS[k]();
+      r.appendChild(fx);
+      // nessun timer: lo strato si toglie da solo quando l'ultimo dei suoi pezzi ha finito
+      fx.addEventListener('animationend', () => { if (!fx.getAnimations({ subtree: true }).some((a) => a.playState !== 'finished')) fx.remove(); });
+    });
+  });
+
   const hints = safe(() => {
     const set = (id, t) => { const b = D.getElementById(id); if (b && !b.title) b.title = t; };
     set('prevBtn', 'Fase precedente (freccia sinistra)'); set('nextBtn', 'Avanti (freccia destra)'); set('playBtn', 'Riproduci o metti in pausa (barra spaziatrice)');
@@ -40,6 +65,8 @@
     if (typeof MutationObserver === 'undefined') return;
     if (ph) { new MutationObserver(progress).observe(ph, { childList: true, characterData: true, subtree: true }); progress(); }
     if (st) { new MutationObserver(tabs).observe(st, { attributes: true, subtree: true, attributeFilter: ['aria-selected'] }); tabs(); }
+    const feed = D.getElementById('phBody');
+    if (feed) new MutationObserver((ms) => { const rows = []; ms.forEach((m) => m.addedNodes.forEach((n) => { if (n.nodeType === 1 && n.parentNode === feed) rows.push(n); })); if (rows.length) moments(rows); }).observe(feed, { childList: true });
     hints();
   });
   if (D.readyState === 'loading') D.addEventListener('DOMContentLoaded', start); else start();

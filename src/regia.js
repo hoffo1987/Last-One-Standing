@@ -79,18 +79,26 @@
     return () => out.map(({ r, w }) => r.animate([{ transform: 'translateX(0)', opacity: 0.9 }, { transform: 'translateX(' + (W + w * 2).toFixed(0) + 'px)', opacity: 0.9 }], { duration: R(220, 360), delay: R(0, 260), easing: 'cubic-bezier(.5,0,.6,1)', fill: 'none' }));
   }
 
+  /* ---------- ornamenti ----------
+   * Strati in più sopra le coperture: fili di luce, contorni, onde, raggi, pennellate, mezzitoni, grana.
+   * Regola fissa: ogni ornamento parte e finisce dentro la finestra di tempo del pezzo che accompagna (stessa durata
+   * di base, ritardo mai oltre quello del pezzo), non entra nelle promesse e non aggiunge attese: i tempi dello
+   * stacco restano identici, cambia solo quanta roba si muove dentro. Tutto vive dentro .lx e sparisce con lui. */
+  const fit = (win, delay, dur) => { const d = Math.max(0, Math.min(delay, win - 60)); return { delay: d, duration: Math.max(60, Math.min(dur, win - d)) }; };
+  const deco = (fn) => { try { return fn(); } catch (e) { return null; } };
+
   function lame(g, W, H, dir, P, defs) {
     const ang = R(13, 23), sl = H * Math.tan(rad(ang)), span = W + sl * 2;
     const n = RI(4, 6), wts = Array.from({ length: n }, () => R(0.6, 1.4)), sum = wts.reduce((a, b) => a + b, 0);
     const dots = halftone(defs, 'lxh' + Date.now(), P.key, RI(9, 13), R(1.6, 2.6), R(20, 50));
     const fills = [P.void, P.key, P.void, P.deep, P.key, P.void];
-    let x = -sl; const blades = [];
+    let x = -sl; const blades = [], rims = [];
     for (let i = 0; i < n; i++) {
       const w = (span * wts[i]) / sum + 24, m = 40; // 24 px di sovrapposizione: il bordo strappato non lascia fessure
       const right = jag(x + w + sl, -m, x + w, H + m, i % 2 ? R(3, 9) : R(1, 3), R(18, 34));
       const poly = [[x + sl, -m]].concat(right, [[x - 2, H + m]]);
       const b = el('polygon', { points: pts(poly), fill: fills[(i + RI(0, 1)) % fills.length] }, g);
-      blades.push(b);
+      blades.push(b); rims.push({ b, xp: x + w });
       if (b.getAttribute('fill') === P.void && Math.random() < 0.7) { const o = el('polygon', { points: pts(poly), fill: dots, opacity: R(0.35, 0.6) }, g); blades.push(o); o.__twin = b; }
       // una lama sottile di carta sul bordo di qualche lastra
       if (Math.random() < 0.55) { const t = R(5, 12), xp = x + w; blades.push(el('polygon', { points: pts([[xp + sl - t, -m], [xp + sl, -m], [xp, H + m], [xp - t, H + m]]), fill: P.paper }, g)); }
@@ -98,9 +106,13 @@
     }
     const off = span + sl, fly = speed(g, W, H, P, RI(7, 11));
     blades.forEach((b, i) => { b.__i = b.__twin ? b.__twin.__i : blades.length - i; });
+    // ornamento: un filo di luce corre davanti al bordo di ogni lama, frena prima di lei e si spegne quando la lama arriva
+    const glints = rims.map(({ b, xp }, k) => { const t = R(2, 5), gap = R(14, 36); const l = el('polygon', { class: 'lx-x', points: pts([[xp + sl + gap, -40], [xp + sl + gap + t, -40], [xp + gap + t, H + 40], [xp + gap, H + 40]]), fill: k % 2 ? P.light : P.paper }, g); l.__b = b; return l; });
+    const glintIn = () => glints.forEach((l) => anim(l, [{ transform: 'translateX(' + -off + 'px)', opacity: 1 }, { opacity: 1, offset: 0.72 }, { transform: 'translateX(0)', opacity: 0 }], { duration: 300, delay: Math.max(0, l.__b.__i * 26 - 34), easing: E.out }));
+    const glintOut = () => glints.forEach((l) => anim(l, [{ transform: 'translateX(0)', opacity: 0 }, { opacity: 0.9, offset: 0.25 }, { transform: 'translateX(' + off + 'px)', opacity: 0.9 }], { duration: 360, delay: (blades.length - l.__b.__i) * 18, easing: E.in }));
     return {
-      cover: () => (fly(), all(blades.map((b) => anim(b, [{ transform: 'translateX(' + -off + 'px)' }, { transform: 'translateX(0)' }], { duration: 300, delay: b.__i * 26 + R(0, 14), easing: E.io })))),
-      uncover: () => all(blades.map((b) => anim(b, [{ transform: 'translateX(0)' }, { transform: 'translateX(' + off + 'px)' }], { duration: 360, delay: (blades.length - b.__i) * 18 + R(0, 12), easing: E.in, composite: 'replace' }))),
+      cover: () => (fly(), deco(glintIn), all(blades.map((b) => anim(b, [{ transform: 'translateX(' + -off + 'px)' }, { transform: 'translateX(0)' }], { duration: 300, delay: b.__i * 26 + R(0, 14), easing: E.io })))),
+      uncover: () => (deco(glintOut), all(blades.map((b) => anim(b, [{ transform: 'translateX(0)' }, { transform: 'translateX(' + off + 'px)' }], { duration: 360, delay: (blades.length - b.__i) * 18 + R(0, 12), easing: E.in, composite: 'replace' })))),
     };
   }
 
@@ -126,16 +138,26 @@
         if (fill === P.key && Math.random() < 0.3) { const o = el('polygon', { points: pts(t), fill: dots, opacity: 0.35 }, g); o.style.transformOrigin = s.style.transformOrigin; o.__d = s.__d; o.__v = s.__v; shards.push(o); }
       });
     }
+    // ornamenti: il contorno di qualche scheggia lampeggia mentre si chiude e vola via per primo quando si riapre;
+    // un'onda di carta parte dal punto d'origine e arriva al bordo insieme all'ultima scheggia
+    const maxD = shards.reduce((a, s) => Math.max(a, s.__d), 0);
+    const edges = shards.filter((s) => s.hasAttribute('stroke') && Math.random() < 0.3).map((s) => { const o = el('polygon', { class: 'lx-x', points: s.getAttribute('points'), fill: 'none', stroke: s.getAttribute('fill') === P.paper ? P.void : P.paper, 'stroke-width': 2.5, 'stroke-linejoin': 'round', opacity: 0 }, g); o.style.transformOrigin = s.style.transformOrigin; o.__d = s.__d; o.__v = s.__v; return o; });
+    const wave = el('circle', { class: 'lx-x', cx: ox.toFixed(1), cy: oy.toFixed(1), r: (far * Math.max(0.4, maxD)).toFixed(1), fill: 'none', stroke: P.paper, 'stroke-width': 7, opacity: 0 }, g); wave.style.transformOrigin = ox.toFixed(1) + 'px ' + oy.toFixed(1) + 'px';
+    const decoIn = () => {
+      edges.forEach((o) => anim(o, [{ transform: 'rotate(' + R(-50, 50) + 'deg) scale(0)', opacity: 0 }, { opacity: 1, offset: 0.5 }, { transform: 'rotate(0) scale(1)', opacity: 0 }], { duration: 250, delay: o.__d * 260, easing: E.out }));
+      anim(wave, [{ transform: 'scale(0)', opacity: 1, strokeWidth: 16 }, { opacity: 1, offset: 0.7 }, { transform: 'scale(1)', opacity: 0, strokeWidth: 2 }], { duration: Math.round(250 + maxD * 260), easing: E.out });
+    };
+    const decoOut = () => edges.forEach((o) => { const k = R(0.5, 0.9) * far; anim(o, [{ transform: 'translate(0,0) scale(1)', opacity: 0 }, { opacity: 0.9, offset: 0.2 }, { transform: 'translate(' + o.__v[0] * k + 'px,' + o.__v[1] * k + 'px) rotate(' + R(-40, 40) + 'deg) scale(1.15)', opacity: 0 }], { duration: 380, delay: o.__d * 160, easing: E.out }); });
     return {
-      cover: () => all(shards.map((s) => anim(s, [{ transform: 'rotate(' + R(-50, 50) + 'deg) scale(0)', opacity: 0 }, { opacity: 1, offset: 0.4 }, { transform: 'rotate(0) scale(1)', opacity: 1 }], { duration: 250, delay: s.__d * 260 + R(0, 30), easing: E.out }))),
-      uncover: () => all(shards.map((s) => { const k = R(0.25, 0.6) * far; return anim(s, [{ transform: 'translate(0,0) rotate(0) scale(1)', opacity: 1 }, { transform: 'translate(' + s.__v[0] * k + 'px,' + s.__v[1] * k + 'px) rotate(' + R(-90, 90) + 'deg) scale(' + R(0.3, 0.7) + ')', opacity: 0 }], { duration: 380, delay: s.__d * 160 + R(0, 40), easing: E.in }); })),
+      cover: () => (deco(decoIn), all(shards.map((s) => anim(s, [{ transform: 'rotate(' + R(-50, 50) + 'deg) scale(0)', opacity: 0 }, { opacity: 1, offset: 0.4 }, { transform: 'rotate(0) scale(1)', opacity: 1 }], { duration: 250, delay: s.__d * 260 + R(0, 30), easing: E.out })))),
+      uncover: () => (deco(decoOut), all(shards.map((s) => { const k = R(0.25, 0.6) * far; return anim(s, [{ transform: 'translate(0,0) rotate(0) scale(1)', opacity: 1 }, { transform: 'translate(' + s.__v[0] * k + 'px,' + s.__v[1] * k + 'px) rotate(' + R(-90, 90) + 'deg) scale(' + R(0.3, 0.7) + ')', opacity: 0 }], { duration: 380, delay: s.__d * 160 + R(0, 40), easing: E.in }); }))),
     };
   }
 
   function sipario(g, W, H, dir, P, defs) {
     const dots = halftone(defs, 'lxp' + Date.now(), P.key, RI(9, 12), R(1.6, 2.4), R(-30, 30));
     const n = RI(6, 9), wts = Array.from({ length: n }, () => R(0.5, 1.5)), sum = wts.reduce((a, b) => a + b, 0);
-    const tilt = R(6, 14), strips = [];
+    const tilt = R(6, 14), strips = [], seams = [];
     let y = -30;
     for (let i = 0; i < n; i++) {
       const h = ((H + 60) * wts[i]) / sum + 2, side = (i % 2 ? 1 : -1) * dir, sl = h * Math.tan(rad(tilt)) * (Math.random() < 0.5 ? 1 : -1);
@@ -145,12 +167,16 @@
       const s = el('polygon', { points: pts(poly), fill }, g); s.__side = side; s.__i = i; strips.push(s);
       if (fill !== P.key && Math.random() < 0.6) strips.push(Object.assign(el('polygon', { points: pts(poly), fill: dots, opacity: R(0.3, 0.55) }, g), { __side: side, __i: i }));
       if (Math.random() < 0.4) { const t = R(4, 8); strips.push(Object.assign(el('rect', { x: -60, y: y + h - t, width: W + 140, height: t, fill: P.paper }, g), { __side: side, __i: i })); }
+      // ornamento: un filo di luce sulla cucitura alta di ogni striscia, che arriva frenando prima della striscia
+      seams.push(Object.assign(el('rect', { class: 'lx-x', x: -60, y: (y - 1).toFixed(1), width: W + 140, height: R(1.5, 3).toFixed(1), fill: i % 2 ? P.light : P.paper }, g), { __side: side, __i: i }));
       y += h - 2;
     }
     const off = W + 160, fly = speed(g, W, H, P, RI(6, 9));
+    const seamIn = () => seams.forEach((s) => anim(s, [{ transform: 'translateX(' + -s.__side * off + 'px)' }, { transform: 'translateX(0)' }], { duration: 290, delay: s.__i * 24, easing: E.out }));
+    const seamOut = () => seams.forEach((s) => anim(s, [{ transform: 'translateX(0)' }, { transform: 'translateX(' + s.__side * off + 'px)' }], { duration: 340, delay: (n - 1 - s.__i) * 20, easing: E.in }));
     return {
-      cover: () => (fly(), all(strips.map((s) => anim(s, [{ transform: 'translateX(' + -s.__side * off + 'px)' }, { transform: 'translateX(0)' }], { duration: 290, delay: s.__i * 24 + R(0, 16), easing: E.io })))),
-      uncover: () => all(strips.map((s) => anim(s, [{ transform: 'translateX(0)' }, { transform: 'translateX(' + s.__side * off + 'px)' }], { duration: 340, delay: (n - 1 - s.__i) * 20 + R(0, 14), easing: E.in }))),
+      cover: () => (fly(), deco(seamIn), all(strips.map((s) => anim(s, [{ transform: 'translateX(' + -s.__side * off + 'px)' }, { transform: 'translateX(0)' }], { duration: 290, delay: s.__i * 24 + R(0, 16), easing: E.io })))),
+      uncover: () => (deco(seamOut), all(strips.map((s) => anim(s, [{ transform: 'translateX(0)' }, { transform: 'translateX(' + s.__side * off + 'px)' }], { duration: 340, delay: (n - 1 - s.__i) * 20 + R(0, 14), easing: E.in })))),
     };
   }
 
@@ -166,8 +192,17 @@
     const layers = [burst(far, far * 1.35, RI(14, 20), P.void), burst(far, far * 1.3, RI(16, 24), P.key), burst(far, far * 1.25, RI(18, 26), dots), burst(far * 0.3, far * 0.42, RI(10, 14), P.paper)];
     const ring = layers[3];
     let halves = null;
+    // ornamento: raggi sottili partono dal centro mentre lo scoppio si apre, e sono già spenti quando si ferma
+    const rays = [], nr = RI(10, 14), r0 = R(0, Math.PI * 2);
+    for (let i = 0; i < nr; i++) {
+      const a = r0 + (i / nr) * Math.PI * 2 + R(-0.12, 0.12), w = R(0.008, 0.02), L = far * R(0.7, 1.05);
+      const p = el('polygon', { class: 'lx-x', points: pts([[ox, oy], [ox + Math.cos(a - w) * L, oy + Math.sin(a - w) * L], [ox + Math.cos(a + w) * L, oy + Math.sin(a + w) * L]]), fill: i % 3 ? P.paper : P.light, opacity: 0 }, g);
+      p.style.transformOrigin = ox + 'px ' + oy + 'px'; rays.push(p);
+    }
+    const raysIn = () => rays.forEach((p, i) => anim(p, [{ transform: 'scale(.08)', opacity: 0 }, { opacity: 0.95, offset: 0.3 }, { transform: 'scale(1)', opacity: 0 }], { duration: 260, delay: (i % 3) * 55, easing: E.out }));
     return {
-      cover: () => all(layers.map((b, i) => anim(b, [{ transform: 'rotate(' + R(-40, -20) + 'deg) scale(0)' }, { transform: 'rotate(0) scale(1)' }], { duration: i === 3 ? 260 : 340, delay: i * 55, easing: E.out }))),
+      at: [ox, oy],
+      cover: () => (deco(raysIn), all(layers.map((b, i) => anim(b, [{ transform: 'rotate(' + R(-40, -20) + 'deg) scale(0)' }, { transform: 'rotate(0) scale(1)' }], { duration: i === 3 ? 260 : 340, delay: i * 55, easing: E.out })))),
       uncover: () => {
         // il colpo finale: un taglio diagonale, le due metà si separano
         ring.remove();
@@ -183,6 +218,13 @@
         layers.slice(0, 3).forEach((b) => b.remove());
         const flash = el('line', { x1: ox - Math.cos(a) * L, y1: oy - Math.sin(a) * L, x2: ox + Math.cos(a) * L, y2: oy + Math.sin(a) * L, stroke: P.paper, 'stroke-width': 10 }, g);
         const k = Math.max(W, H) * 0.9;
+        // ornamento: schegge di carta saltano via dal taglio, dentro i 420 ms delle due metà
+        deco(() => { for (let i = 0; i < 10; i++) {
+          const t = R(-0.5, 0.5) * Math.min(W, H) * 1.2, sx = ox + Math.cos(a) * t, sy = oy + Math.sin(a) * t, sd = i % 2 ? 1 : -1, r = R(5, 12), fl = R(60, 190);
+          const c = el('polygon', { class: 'lx-x', points: pts([[sx, sy - r], [sx + r * 0.45, sy], [sx, sy + r], [sx - r * 0.45, sy]]), fill: i % 3 ? P.paper : P.light }, g);
+          c.style.transformOrigin = sx.toFixed(1) + 'px ' + sy.toFixed(1) + 'px';
+          anim(c, [{ transform: 'translate(0,0) rotate(0) scale(.3)', opacity: 1 }, { opacity: 1, offset: 0.6 }, { transform: 'translate(' + (nx * sd * fl).toFixed(1) + 'px,' + (ny * sd * fl).toFixed(1) + 'px) rotate(' + R(-120, 120).toFixed(0) + 'deg) scale(1)', opacity: 0 }], { duration: 300, delay: 70 + (i % 4) * 12, easing: E.out });
+        } });
         return all([
           anim(flash, [{ opacity: 1, strokeWidth: 14 }, { opacity: 0, strokeWidth: 0 }], { duration: 220, easing: E.out }),
           anim(halves[0], [{ transform: 'translate(0,0)' }, { transform: 'translate(' + nx * k + 'px,' + ny * k + 'px)' }], { duration: 420, delay: 70, easing: E.in }),
@@ -204,11 +246,16 @@
       const cx = c * s + (r % 2 ? 0 : s / 2), cy = r * s * 0.9 + s * 0.45, t = ((cx / W - 0.5) * gx + (cy / H - 0.5) * gy) + 0.5;
       if (t > 0.18) dot(cx, cy, s * Math.min(0.46, 0.06 + 0.42 * t), P.void, ink);
     }
+    // ornamento: un'onda di carta corre dal punto d'origine davanti ai puntini che crescono, e torna indietro quando si ritirano
+    const maxD = base.reduce((a, c) => Math.max(a, c.__d), 0);
+    const wave = el('circle', { class: 'lx-x', cx: ox.toFixed(1), cy: oy.toFixed(1), r: (far * Math.max(0.4, maxD)).toFixed(1), fill: 'none', stroke: P.paper, 'stroke-width': 6, opacity: 0 }, g); wave.style.transformOrigin = ox.toFixed(1) + 'px ' + oy.toFixed(1) + 'px';
+    const waveIn = () => anim(wave, [{ transform: 'scale(0)', opacity: 1, strokeWidth: 18 }, { opacity: 1, offset: 0.75 }, { transform: 'scale(1)', opacity: 0, strokeWidth: 2 }], { duration: Math.round(300 + maxD * 300), easing: E.out });
+    const waveOut = () => anim(wave, [{ transform: 'scale(1)', opacity: 0, strokeWidth: 2 }, { opacity: 0.9, offset: 0.2 }, { transform: 'scale(0)', opacity: 0.9, strokeWidth: 14 }], { duration: 300, delay: 60, easing: E.in });
     return {
-      cover: () => all(base.map((c) => anim(c, [{ transform: 'scale(0)' }, { transform: 'scale(1)' }], { duration: 300, delay: c.__d * 300 + R(0, 20), easing: E.out }))
-        .concat(ink.map((c) => anim(c, [{ transform: 'scale(0)' }, { transform: 'scale(1)' }], { duration: 260, delay: 120 + c.__d * 300 + R(0, 20), easing: E.kick })))),
-      uncover: () => all(ink.map((c) => anim(c, [{ transform: 'scale(1)' }, { transform: 'scale(0)' }], { duration: 180, delay: (1 - c.__d) * 140, easing: E.in }))
-        .concat(base.map((c) => anim(c, [{ transform: 'scale(1)' }, { transform: 'scale(0)' }], { duration: 300, delay: 60 + (1 - c.__d) * 280 + R(0, 20), easing: E.in })))),
+      cover: () => (deco(waveIn), all(base.map((c) => anim(c, [{ transform: 'scale(0)' }, { transform: 'scale(1)' }], { duration: 300, delay: c.__d * 300 + R(0, 20), easing: E.out }))
+        .concat(ink.map((c) => anim(c, [{ transform: 'scale(0)' }, { transform: 'scale(1)' }], { duration: 260, delay: 120 + c.__d * 300 + R(0, 20), easing: E.kick }))))),
+      uncover: () => (deco(waveOut), all(ink.map((c) => anim(c, [{ transform: 'scale(1)' }, { transform: 'scale(0)' }], { duration: 180, delay: (1 - c.__d) * 140, easing: E.in }))
+        .concat(base.map((c) => anim(c, [{ transform: 'scale(1)' }, { transform: 'scale(0)' }], { duration: 300, delay: 60 + (1 - c.__d) * 280 + R(0, 20), easing: E.in }))))),
     };
   }
 
@@ -222,6 +269,9 @@
       t.style.fontFamily = "Archivo, 'Bricolage Grotesque', sans-serif"; t.style.fontStretch = '118%'; t.style.letterSpacing = '-.02em';
       t.textContent = word.repeat(Math.ceil((W * 1.7) / (fs * 0.62 * word.length)) + 1);
       if (i % 3 === 2) el('rect', { x: -W * 0.3, y: y + hh - 5, width: W * 1.6, height: 5, fill: P.paper }, row);
+      // ornamento: dietro il testo, un cursore attraversa la fascia nel verso opposto mentre la fascia entra (parallasse)
+      const cur = el('rect', { class: 'lx-x', x: (W * 0.43).toFixed(0), y: (y + hh * 0.1).toFixed(1), width: (W * R(0.1, 0.18)).toFixed(0), height: (hh * 0.8).toFixed(1), fill: dark ? P.paper : P.void, opacity: dark ? 0.13 : 0.2 });
+      row.insertBefore(cur, t); row.__c = cur;
       row.__side = side; row.__i = i; row.__t = t; rows.push(row);
     }
     const off = W * 1.7;
@@ -229,6 +279,7 @@
       cover: () => all(rows.map((r) => {
         // il testo continua a scorrere finché la fascia resta in scena
         r.__t.animate([{ transform: 'translateX(0)' }, { transform: 'translateX(' + -r.__side * 160 + 'px)' }], { duration: 1600, easing: 'linear', fill: 'both' });
+        deco(() => anim(r.__c, [{ transform: 'translateX(' + (r.__side * W * 0.85).toFixed(0) + 'px) skewX(-14deg)' }, { transform: 'translateX(' + (-r.__side * W * R(0.12, 0.3)).toFixed(0) + 'px) skewX(-14deg)' }], { duration: 320, delay: r.__i * 30, easing: E.out }));
         return anim(r, [{ transform: 'translateX(' + -r.__side * off + 'px)' }, { transform: 'translateX(0)' }], { duration: 320, delay: r.__i * 30 + R(0, 16), easing: E.io });
       })),
       uncover: () => all(rows.map((r) => anim(r, [{ transform: 'translateX(0)' }, { transform: 'translateX(' + r.__side * off + 'px)' }], { duration: 360, delay: (n - 1 - r.__i) * 24 + R(0, 14), easing: E.in }))),
@@ -244,6 +295,83 @@
     let f = Math.random() < 0.55 ? pref[0] : pick(pref.concat(Object.keys(FAMILIES)));
     if (f === lastFamily) f = pref.find((x) => x !== lastFamily) || Object.keys(FAMILIES).find((x) => x !== lastFamily);
     lastFamily = f; return f;
+  }
+
+  /* ---------- ornamenti a tutto schermo ----------
+   * Sopra la copertura e sotto il cartello: la grana della carta, una pennellata che attraversa (lame, sipario,
+   * titoli), una macchia d'impatto al centro dello scoppio, un angolo di mezzitoni (schegge, retino), una lama di luce
+   * mentre il cartello entra e un respiro del cartello durante la pausa. Le durate sono quelle di base della famiglia. */
+  const BASE = { lame: [300, 360], schegge: [250, 380], sipario: [290, 340], esplosione: [340, 420], retino: [300, 300], titoli: [320, 360] };
+  function ornaments(host, fam, dir, P, shape) {
+    const T = BASE[fam] || [290, 340], has = (c) => root.classList.contains(c);
+    const mk = (cls, css) => { const n = document.createElement('i'); n.className = cls; if (css) n.style.cssText = css; host.appendChild(n); return n; };
+    const grana = has('fx-grana') ? mk('lx-grana') : null;
+    let ink = null, tone = null, splat = null;
+    if (has('fx-pen') && (fam === 'lame' || fam === 'sipario' || fam === 'titoli')) { const k = RI(1, 4); ink = mk('lx-ink', 'top:' + R(6, 50).toFixed(0) + '%;height:' + R(28, 40).toFixed(0) + '%;-webkit-mask-image:var(--fx-pen' + k + ');mask-image:var(--fx-pen' + k + ')'); }
+    else if (has('fx-forme') && fam === 'esplosione' && shape && shape.at) splat = mk('lx-splat', 'left:' + shape.at[0].toFixed(0) + 'px;top:' + shape.at[1].toFixed(0) + 'px');
+    else if (has('fx-forme')) tone = mk('lx-tone', (dir > 0 ? 'right' : 'left') + ':-20vmax;' + (Math.random() < 0.5 ? 'top' : 'bottom') + ':-24vmax');
+    const pass = (n, color, dur, easing) => { n.style.background = color; anim(n, [{ transform: 'translateX(' + -dir * 135 + '%) scaleX(' + dir + ')' }, { transform: 'translateX(' + dir * 135 + '%) scaleX(' + dir + ')' }], { duration: dur, easing }); };
+    return {
+      cover() {
+        if (grana) anim(grana, [{ opacity: 0 }, { opacity: 0.2 }], { duration: T[0], easing: 'linear' });
+        if (ink) pass(ink, P.void, T[0], E.io);
+        if (splat) { splat.style.background = P.paper; anim(splat, [{ transform: 'scale(.15) rotate(-30deg)', opacity: 0 }, { opacity: 0.95, offset: 0.3 }, { transform: 'scale(1.6) rotate(8deg)', opacity: 0 }], { duration: T[0], easing: E.out }); }
+        if (tone) { tone.style.background = P.paper; anim(tone, [{ transform: 'translate(' + dir * 9 + '%, 0) scale(.9)', opacity: 0 }, { opacity: 0.55, offset: 0.5 }, { transform: 'translate(0, 0) scale(1)', opacity: 0.34 }], { duration: T[0], easing: E.out }); }
+      },
+      // mentre il cartello entra: una lama di luce attraversa la copertura, sotto il cartello, e finisce prima delle lettere
+      rest(capEl, tin) {
+        const s = document.createElement('i'); s.className = 'lx-sweep'; host.insertBefore(s, capEl || null);
+        anim(s, [{ transform: 'translateX(' + (dir > 0 ? -130 : 430) + '%) skewX(-18deg)' }, { transform: 'translateX(' + (dir > 0 ? 430 : -130) + '%) skewX(-18deg)' }], Object.assign(fit(tin, 30, 380), { easing: E.io }));
+      },
+      // la pausa: il cartello si assesta, per tutta e sola la durata della pausa
+      settle(capEl, hold) { if (capEl) capEl.animate([{ scale: '1.026' }, { scale: '1' }], { duration: hold, easing: E.out }); },
+      uncover() {
+        if (grana) anim(grana, [{ opacity: 0.2 }, { opacity: 0 }], { duration: T[1], easing: 'linear' });
+        if (ink) { ink.style.top = R(20, 62).toFixed(0) + '%'; ink.style.height = R(12, 18).toFixed(0) + '%'; pass(ink, P.paper, T[1], E.in); }
+        if (tone) anim(tone, [{ transform: 'translate(0, 0) scale(1)', opacity: 0.34 }, { transform: 'translate(' + -dir * 10 + '%, 0) scale(1.06)', opacity: 0 }], { duration: T[1], easing: E.in });
+      },
+    };
+  }
+
+  /* ---------- l'accento della destinazione ----------
+   * Stessa grammatica (carta, nero, tinta), un carattere per sezione: la Diretta è una regia TV (targhetta «In onda»,
+   * livelli audio, riga di scansione), l'Esito un verdetto (due filetti che si chiudono e un punzone), i Trofei un
+   * riflesso d'oro con le stelle, i Concorrenti un appello a caselle, l'Arena un mirino, la Home tre frecce.
+   * Entra dentro la finestra d'entrata delle lettere (tin) ed esce in 140 ms, meno dell'uscita più breve del cartello. */
+  const STAR_AT = [[-7, -42], [21, 112], [57, -50], [93, 100], [103, -18]];
+  const ACC = {
+    diretta: '<b class="lx-live"><i class="lx-dot"></i>In onda<span class="lx-bars"><i></i><i></i><i></i><i></i><i></i></span></b><i class="lx-scan"></i>',
+    esito: '<i class="lx-rule t"></i><i class="lx-rule b"></i><i class="lx-punch"></i>',
+    trofei: '<i class="lx-foilbox"><i class="lx-foil"></i></i>' + STAR_AT.map((p, i) => '<i class="lx-star" style="left:' + p[0] + '%;top:' + p[1] + '%;--k:' + (i % 2 ? 0.7 : 1) + '"></i>').join(''),
+    cast: '<i class="lx-slots">' + '<i></i>'.repeat(7) + '</i>',
+    arena: '<i class="lx-brk tl"></i><i class="lx-brk tr"></i><i class="lx-brk bl"></i><i class="lx-brk br"></i>',
+    home: '<i class="lx-chev"><i></i><i></i><i></i></i>',
+  };
+  function accent(cap, view, dir, tin) {
+    if (!ACC[view]) return null;
+    const a = document.createElement('i'); a.className = 'lx-acc lx-a-' + view; a.innerHTML = ACC[view];
+    cap.insertBefore(a, cap.querySelector('.lx-word'));
+    const q = (s) => [...a.querySelectorAll(s)], go = (n, kf, delay, dur, easing) => anim(n, kf, Object.assign(fit(tin, delay, dur), { easing: easing || E.out }));
+    if (view === 'diretta') {
+      q('.lx-live').forEach((n) => go(n, [{ clipPath: 'inset(-30% 105% -30% -5%)' }, { clipPath: 'inset(-30% -5% -30% -5%)' }], 110, 200));
+      q('.lx-dot').forEach((n) => go(n, [{ opacity: 0 }, { opacity: 1 }, { opacity: 0 }, { opacity: 1 }], 200, 220, 'steps(3, end)'));
+      q('.lx-bars i').forEach((n, i) => go(n, [{ transform: 'scaleY(.15)' }, { transform: 'scaleY(1)', offset: 0.45 }, { transform: 'scaleY(' + R(0.35, 0.9).toFixed(2) + ')' }], 170 + i * 28, 220));
+      q('.lx-scan').forEach((n) => go(n, [{ transform: 'translateY(0)', opacity: 0.45 }, { transform: 'translateY(.97em)', opacity: 0.45, offset: 0.9 }, { transform: 'translateY(.97em)', opacity: 0 }], 90, 300, 'linear'));
+    } else if (view === 'esito') {
+      q('.lx-rule').forEach((n, i) => go(n, [{ transform: 'scaleX(0)' }, { transform: 'scaleX(1)' }], 60 + i * 50, 220, E.io));
+      q('.lx-punch').forEach((n) => go(n, [{ transform: 'rotate(-90deg) scale(2.2)', opacity: 0 }, { opacity: 1, offset: 0.4 }, { transform: 'rotate(0deg) scale(1)', opacity: 1 }], 170, 240, E.kick));
+    } else if (view === 'trofei') {
+      q('.lx-foil').forEach((n) => go(n, [{ transform: 'translateX(-130%) skewX(-20deg)' }, { transform: 'translateX(330%) skewX(-20deg)' }], 110, 320, E.io));
+      q('.lx-star').forEach((n, i) => go(n, [{ transform: 'scale(0) rotate(-60deg)' }, { transform: 'scale(calc(var(--k) * 1.3)) rotate(0deg)', offset: 0.55 }, { transform: 'scale(var(--k)) rotate(12deg)' }], 110 + i * 42, 260));
+    } else if (view === 'cast') {
+      const s = q('.lx-slots i'); s.forEach((n, i) => go(n, [{ transform: 'skewX(-24deg) scaleX(0)' }, { transform: 'skewX(-24deg) scaleX(1)' }], 90 + (dir > 0 ? i : s.length - 1 - i) * 30, 150));
+    } else if (view === 'arena') {
+      const off = { tl: '-.3em -.3em', tr: '.3em -.3em', bl: '-.3em .3em', br: '.3em .3em' };
+      q('.lx-brk').forEach((n, i) => go(n, [{ translate: off[n.classList[1]], opacity: 0 }, { translate: '0 0', opacity: 1 }], 80 + i * 35, 220, E.kick));
+    } else if (view === 'home') {
+      q('.lx-chev i').forEach((n, i) => go(n, [{ translate: (-dir * 0.4).toFixed(1) + 'em 0', opacity: 0 }, { translate: '0 0', opacity: 1 }], 120 + i * 45, 170));
+    }
+    return { out: () => anim(a, [{ opacity: 1 }, { opacity: 0 }], { duration: 140, easing: E.in }) };
   }
 
   /* ---------- il cartello: lastra di carta, lettere una per una ---------- */
@@ -276,14 +404,17 @@
       ...letters.map((s, i) => anim(s, [{ transform: 'translateY(-.55em) rotate(' + R(-24, 24) + 'deg) scale(1.5)', opacity: 0 }, { opacity: 1, offset: 0.35 }, { transform: 'none', opacity: 1 }], { duration: 240, delay: 90 + i * 22 + R(0, 10), easing: E.kick })),
     ];
     if (subEl) inA.push(anim(subEl, [{ transform: 'translateX(' + -dir * 24 + 'px)', opacity: 0 }, { transform: 'none', opacity: 1 }], { duration: 240, delay: 160 + letters.length * 22, easing: E.out }));
+    // la finestra d'entrata garantita (l'ultima lettera, senza la parte casuale): gli ornamenti stanno qui dentro
+    const tin = 90 + Math.max(0, letters.length - 1) * 22 + 240;
+    const acc = deco(() => accent(cap, view, dir, tin));
     return {
-      el: cap,
+      el: cap, tin,
       shown: all(inA),
-      out: () => all([
+      out: () => (deco(() => acc && acc.out()), all([
         ...letters.map((s, i) => anim(s, [{ transform: 'none', opacity: 1 }, { transform: 'translateX(' + dir * 0.6 + 'em) skewX(-20deg)', opacity: 0 }], { duration: 150, delay: i * 9, easing: E.in })),
         anim(slab, [{ transform: 'scaleX(1)' }, { transform: 'scaleX(0)', transformOrigin: dir > 0 ? '100% 50%' : '0 50%' }], { duration: 200, delay: 60, easing: E.in }),
         ...(subEl ? [anim(subEl, [{ opacity: 1 }, { opacity: 0 }], { duration: 120, easing: E.in })] : []),
-      ]),
+      ])),
     };
   }
 
@@ -378,6 +509,7 @@
     const fam = choose(to);
     const recent = lastPointer && Date.now() - lastPointer.t < 1200 ? lastPointer : null;
     const shape = FAMILIES[fam](g, W, H, dir, P, defs, recent);
+    const orn = deco(() => ornaments(layer, fam, dir, P, shape)); // strati in più: nessuna attesa aggiunta
     // lo specchio per la direzione: le lame e il sipario arrivano dal lato giusto
     if (dir < 0 && (fam === 'lame')) g.setAttribute('transform', 'translate(' + W + ',0) scale(-1,1)');
     // il sipario non è mai dritto: qualche grado d'inclinazione, ingrandito quanto basta a coprire gli angoli
@@ -393,9 +525,11 @@
     const t0 = performance.now();
     // rete di sicurezza con i tempi di sempre: se le animazioni non arrivano in fondo, il cambio avviene lo stesso
     const guard = setTimeout(doSwap, 1400), clean = setTimeout(() => { doSwap(); layer.hidden = true; layer.innerHTML = ''; busy = false; }, 4500);
+    deco(() => orn && orn.cover());
     shape.cover()
       .then(() => {
         cap = caption(layer, opt, to, fam, P, dir);
+        deco(() => orn && cap && orn.rest(cap.el, cap.tin));
         if (canSeal) seal = stamp(layer, sealUrl, P, opt, cap && cap.el);
         else sfx('stamp', { at: 80 });
         doSwap();
@@ -403,13 +537,13 @@
         return Promise.all([cap ? cap.shown : null, seal ? seal.landed : null, new Promise((r) => setTimeout(r, 140))]);
       })
       // con il timbro il cartello resta fermo un po' di più: il tempo di leggere nome e sigillo
-      .then(() => new Promise((r) => setTimeout(r, opt.hold || (seal ? 420 : 110))))
+      .then(() => { const hold = opt.hold || (seal ? 420 : 110); deco(() => orn && cap && orn.settle(cap.el, hold)); return new Promise((r) => setTimeout(r, hold)); })
       .then(() => {
         const outs = [cap ? cap.out() : null];
         if (seal) outs.push(seal.out());
         enter(to, dir);
         emit('los:enter', { view: to, dir });
-        return Promise.all(outs.concat([new Promise((r) => setTimeout(r, 70)).then(() => shape.uncover())]));
+        return Promise.all(outs.concat([new Promise((r) => setTimeout(r, 70)).then(() => { deco(() => orn && orn.uncover()); return shape.uncover(); })]));
       })
       .catch(() => {})
       .then(() => { clearTimeout(guard); clearTimeout(clean); doSwap(); layer.hidden = true; layer.innerHTML = ''; busy = false; if (performance.now() - t0 > 4000) lastFamily = null; });

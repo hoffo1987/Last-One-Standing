@@ -499,3 +499,147 @@
 /* ---------- «In gara»: il numero delle uccisioni grande, l'unità piccola (markup aggiornato in ui.js) ---------- */
 #v-diretta .prow .pk { font: 800 11px / 1 var(--f-body); letter-spacing: .08em; text-transform: uppercase; }
 #v-diretta .prow .pk b { font: italic 900 22px / 1 var(--f-display); letter-spacing: -.02em; margin-right: 2px; }
+/* ---------- 8. MOMENTI DELLA PARTITA: strati in più dentro gli stessi tempi ----------
+ * 40-diretta.js aggiunge a ogni riga appena entrata uno strato .dx-fx (uccisione, morte, tradimento, dono, ordine del
+ * mentore, annuncio della regia) e lo toglie a effetto finito. Ogni pezzo parte e finisce dentro la finestra
+ * dell'effetto che la riga ha già: stesso ritardo (--d + …) e stessa durata, scritti accanto a ogni gruppo.
+ * A riposo non resta niente sopra il testo; si muovono solo transform, opacity e clip-path su strati piccoli. */
+#v-diretta .ev > .dx-fx { position: absolute; inset: 0; z-index: 2; pointer-events: none; overflow: hidden; }
+#v-diretta .ev > .dx-fx > * { position: absolute; display: block; opacity: 0; }
+
+/* uccisione · il taglio: --d + 200 ms per 550 ms · la scossa: --d + 300 ms per 320 ms · la macchia: --d + 260 ms per 500 ms.
+ * Una lama di carta attraversa la riga da destra, si ferma un istante e si assottiglia; dietro, la sua scia rossa.
+ * Sul colpo i volti si invertono per due scatti (solo il dorso, mai il testo), schegge e mezzitoni partono dal taglio. */
+#v-diretta .dx-fx-kill .k-line, #v-diretta .dx-fx-kill .k-ghost { left: -4%; right: -4%; top: 50%; --a: -4deg; transform-origin: 100% 50%; animation: dxCut .55s var(--look-out) both; animation-delay: calc(var(--d, 0ms) + 200ms); }
+#v-diretta .dx-fx-kill .k-line { height: 3px; margin-top: -1.5px; background: var(--dx-paper); box-shadow: 0 0 0 1px #e5484d, 0 0 12px 2px #e5484d; }
+#v-diretta .dx-fx-kill .k-ghost { height: 20px; margin-top: -10px; background: linear-gradient(90deg, transparent, hsl(358 75% 59% / .55) 35%, hsl(358 75% 59% / .55)); animation-name: dxCutGhost; }
+@keyframes dxCut { 0% { opacity: 1; transform: rotate(var(--a)) scaleX(0); } 42%, 70% { opacity: 1; transform: rotate(var(--a)) scaleX(1); } 100% { opacity: 0; transform: rotate(var(--a)) scaleX(1) scaleY(.2); } }
+@keyframes dxCutGhost { 0% { opacity: 0; transform: rotate(var(--a)) scaleX(0); } 55% { opacity: .85; transform: rotate(var(--a)) scaleX(1); } 100% { opacity: 0; transform: rotate(var(--a)) scaleX(1) scaleY(2.6); } }
+#v-diretta .dx-fx-kill .k-frame { left: 0; top: 0; bottom: 0; width: calc(var(--sp) + 5px); background: var(--dx-paper); mix-blend-mode: difference; clip-path: polygon(0 0, 100% 0, calc(100% - var(--k)) 100%, 0 100%);
+  animation: dxImpact .32s steps(2, end) both; animation-delay: calc(var(--d, 0ms) + 300ms); }
+@keyframes dxImpact { from { opacity: 1; } to { opacity: 0; } }
+#v-diretta .dx-fx-kill .k-tone { display: none; }
+.fx-forme #v-diretta .dx-fx-kill .k-tone { display: block; right: -34px; top: -70%; height: 240%; aspect-ratio: 1; background: #e5484d; -webkit-mask: var(--fx-mezzitoni) center / cover no-repeat, radial-gradient(closest-side, #000 52%, transparent 100%); -webkit-mask-composite: source-in; mask: var(--fx-mezzitoni) center / cover no-repeat, radial-gradient(closest-side, #000 52%, transparent 100%); mask-composite: intersect;
+  animation: dxTone .5s var(--look-out) both; animation-delay: calc(var(--d, 0ms) + 260ms); }
+@keyframes dxTone { 0% { opacity: 0; transform: translateX(30px) scale(.9); } 40% { opacity: .4; } 100% { opacity: 0; transform: translateX(0) scale(1); } }
+#v-diretta .dx-fx-kill .k-chip { left: calc(var(--sp) - 8px); width: 10px; height: 10px; background: var(--dx-paper); clip-path: polygon(0 0, 100% 40%, 30% 100%); animation: dxChip .5s var(--look-out) both; animation-delay: calc(var(--d, 0ms) + 260ms); }
+#v-diretta .dx-fx-kill .k-chip:nth-of-type(odd) { background: #e5484d; }
+@keyframes dxChip { 0% { opacity: 1; transform: translate(0, 0) rotate(0deg) scale(.4); } 70% { opacity: 1; } 100% { opacity: 0; transform: translate(var(--x), var(--y)) rotate(var(--r)) scale(1); } }
+/* chi cade arriva ancora a colori: sul colpo il colore si spegne e il taglio rosso si disegna sul volto (460 ms, poco più dell'entrata della riga) */
+#v-diretta .ev.in.fx-kill .avs .av.dead > * { animation: dxDrain .46s linear both; animation-delay: calc(var(--d, 0ms) + 300ms); }
+@keyframes dxDrain { from { filter: grayscale(0) contrast(1) brightness(1.12); } }
+#v-diretta .ev.in.fx-kill .avs .av.dead::after { animation: dxScar .46s var(--look-out) both; animation-delay: calc(var(--d, 0ms) + 300ms); }
+@keyframes dxScar { from { clip-path: inset(0 0 100% 0); } to { clip-path: inset(0 0 0 0); } }
+/* il primo nome della riga viene passato con l'evidenziatore, nel tempo del taglio: il colore del testo non cambia mai */
+#v-diretta .ev.in.fx-kill p > .nm:first-of-type { background: linear-gradient(color-mix(in srgb, var(--cc) 36%, transparent), color-mix(in srgb, var(--cc) 36%, transparent)) 0 0 / 0 100% no-repeat; animation: dxMark .55s var(--look-out) both; animation-delay: calc(var(--d, 0ms) + 200ms); }
+@keyframes dxMark { 0% { background-size: 0 100%; background-position: 0 0; } 45% { background-size: 100% 100%; background-position: 0 0; } 55% { background-size: 100% 100%; background-position: 100% 0; } 100% { background-size: 0 100%; background-position: 100% 0; } }
+
+/* morte · il velo: --d + 200 ms per 1,2 s · il volto che sprofonda: --d + 250 ms per 1 s.
+ * Una linea piatta attraversa lenta il piede della riga con un segnale in testa, una veneziana si chiude sul volto,
+ * qualche granello di cenere sale e si spegne insieme al volto. */
+#v-diretta .dx-fx-death .d-flat, #v-diretta .dx-fx-death .d-blip { left: 0; right: 0; bottom: 8px; height: 2px; animation: dxFlat 1.2s var(--look-out) both; animation-delay: calc(var(--d, 0ms) + 200ms); }
+#v-diretta .dx-fx-death .d-flat { background: var(--ink); transform-origin: 0 50%; }
+@keyframes dxFlat { 0% { opacity: .85; transform: scaleX(0); } 62% { opacity: .85; transform: scaleX(1); } 100% { opacity: 0; transform: scaleX(1); } }
+#v-diretta .dx-fx-death .d-blip { animation-name: dxBlip; }
+#v-diretta .dx-fx-death .d-blip::before { content: ""; position: absolute; left: -5px; top: -4px; width: 10px; height: 10px; background: var(--cc); clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%); }
+@keyframes dxBlip { 0% { opacity: 1; transform: translateX(0); } 62% { opacity: 1; transform: translateX(100%); } 100% { opacity: 0; transform: translateX(100%); } }
+#v-diretta .dx-fx-death .d-blind { left: 0; top: 0; bottom: 0; width: calc(var(--sp) + 5px); clip-path: polygon(0 0, 100% 0, calc(100% - var(--k)) 100%, 0 100%); background: repeating-linear-gradient(0deg, hsl(0 0% 4% / .8) 0 6px, transparent 6px 13px);
+  transform-origin: 50% 0; animation: dxBlind 1.2s var(--look-out) both; animation-delay: calc(var(--d, 0ms) + 200ms); }
+@keyframes dxBlind { 0% { opacity: 1; transform: scaleY(0); } 45% { opacity: 1; transform: scaleY(1); } 100% { opacity: 0; transform: scaleY(1); } }
+#v-diretta .dx-fx-death .d-ash { bottom: 34%; width: 6px; height: 6px; background: var(--dx-paper); animation: dxAsh 1s ease-out both; animation-delay: calc(var(--d, 0ms) + 250ms); }
+#v-diretta .dx-fx-death .d-ash:nth-of-type(2) { animation-duration: .9s; animation-delay: calc(var(--d, 0ms) + 350ms); }
+#v-diretta .dx-fx-death .d-ash:nth-of-type(3) { animation-duration: .8s; animation-delay: calc(var(--d, 0ms) + 450ms); }
+#v-diretta .dx-fx-death .d-ash:nth-of-type(4) { animation-duration: .7s; animation-delay: calc(var(--d, 0ms) + 550ms); }
+@keyframes dxAsh { 0% { opacity: 0; transform: translateY(0) rotate(0deg) scale(1); } 20% { opacity: .8; } 100% { opacity: 0; transform: translateY(var(--y)) rotate(var(--r)) scale(.3); } }
+
+/* tradimento · il testo che si spezza: --d + 220 ms per 600 ms. Uno strappo scende in mezzo ai volti, che si scostano
+ * (uno su, uno giù), restano così un istante e tornano al loro posto. */
+#v-diretta .dx-fx-betray .b-tear { left: calc(var(--sp) * .5 - 6px); top: -4%; height: 108%; width: 14px; background: var(--dx-paper); transform-origin: 50% 0;
+  clip-path: polygon(40% 0, 100% 0, 55% 14%, 90% 27%, 35% 41%, 80% 56%, 30% 70%, 75% 84%, 45% 100%, 0 100%, 30% 84%, 0 70%, 45% 56%, 0 41%, 50% 27%, 15% 14%);
+  animation: dxTear .6s var(--look-out) both; animation-delay: calc(var(--d, 0ms) + 220ms); }
+@keyframes dxTear { 0% { opacity: 1; transform: scaleY(0); } 35%, 70% { opacity: 1; transform: scaleY(1); } 100% { opacity: 0; transform: scaleY(1) scaleX(2.4); } }
+#v-diretta .dx-fx-betray .b-half { top: 0; bottom: 0; background: var(--cc); animation: dxHalfA .6s var(--look-out) both; animation-delay: calc(var(--d, 0ms) + 220ms); }
+#v-diretta .dx-fx-betray .b-half.a { left: 0; width: calc(var(--sp) * .5); }
+#v-diretta .dx-fx-betray .b-half.b { left: calc(var(--sp) * .5); width: calc(var(--sp) * .5 + 5px); animation-name: dxHalfB; }
+@keyframes dxHalfA { 0% { opacity: 0; transform: translateY(0); } 30% { opacity: .45; transform: translateY(-6px); } 100% { opacity: 0; transform: translateY(-6px); } }
+@keyframes dxHalfB { 0% { opacity: 0; transform: translateY(0); } 30% { opacity: .45; transform: translateY(6px); } 100% { opacity: 0; transform: translateY(6px); } }
+#v-diretta .ev.in.fx-betray .avs .av:nth-child(1) { animation: dxSplitA .6s var(--look-out) both; animation-delay: calc(var(--d, 0ms) + 220ms); }
+#v-diretta .ev.in.fx-betray .avs .av:nth-child(2) { animation: dxSplitB .6s var(--look-out) both; animation-delay: calc(var(--d, 0ms) + 220ms); }
+@keyframes dxSplitA { 30%, 70% { transform: translate(-3px, -5px) rotate(-1.5deg); } }
+@keyframes dxSplitB { 30%, 70% { transform: translate(4px, 5px) rotate(1.5deg); } }
+
+/* dono e sponsor · il riflesso: --d + 200 ms per 900 ms. Un cono di luce dall'alto, il pacco scende piano appeso al suo
+ * filo, tocca, si assesta; tre stelle si accendono una dopo l'altra e l'icona dell'evento cala al suo posto. */
+#v-diretta .dx-fx-gift .g-beam { left: 0; top: 0; bottom: 0; width: calc(var(--sp) + 46px); background: linear-gradient(180deg, hsl(48 100% 88% / .5), transparent 88%); clip-path: polygon(30% 0, 60% 0, 100% 100%, 0 100%);
+  animation: dxBeam .9s ease-out both; animation-delay: calc(var(--d, 0ms) + 200ms); }
+@keyframes dxBeam { 0% { opacity: 0; } 30% { opacity: 1; } 100% { opacity: 0; } }
+#v-diretta .dx-fx-gift .g-drop { left: calc(var(--sp) * .5 - 8px); top: 50%; width: 18px; height: 18px; margin-top: -9px; animation: dxDrop .9s cubic-bezier(.2, .9, .3, 1) both; animation-delay: calc(var(--d, 0ms) + 200ms); }
+#v-diretta .dx-fx-gift .g-drop::before { content: ""; position: absolute; inset: 0; background: var(--dx-paper); clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%); }
+#v-diretta .dx-fx-gift .g-drop::after { content: ""; position: absolute; left: 8px; bottom: 100%; width: 2px; height: 60px; background: linear-gradient(0deg, var(--dx-paper), transparent); }
+@keyframes dxDrop { 0% { opacity: 0; transform: translateY(-96px); } 18% { opacity: 1; } 62% { opacity: 1; transform: translateY(3px); } 78% { opacity: 1; transform: translateY(0); } 100% { opacity: 0; transform: translateY(0) scale(.6); } }
+#v-diretta .dx-fx-gift .g-star { width: 13px; height: 13px; background: var(--dx-paper); clip-path: polygon(50% 0, 60% 40%, 100% 50%, 60% 60%, 50% 100%, 40% 60%, 0 50%, 40% 40%); animation: dxStar .6s ease-out both; animation-delay: calc(var(--d, 0ms) + 500ms); }
+#v-diretta .dx-fx-gift .g-star:nth-of-type(2) { animation-duration: .5s; animation-delay: calc(var(--d, 0ms) + 600ms); }
+#v-diretta .dx-fx-gift .g-star:nth-of-type(3) { animation-duration: .42s; animation-delay: calc(var(--d, 0ms) + 680ms); }
+@keyframes dxStar { 0% { opacity: 0; transform: scale(0) rotate(-40deg); } 40% { opacity: 1; transform: scale(1.25) rotate(0deg); } 100% { opacity: 0; transform: scale(.5) rotate(30deg); } }
+#v-diretta .ev.in:is(.fx-sponsor, .ev-dono) .ev-mark { animation: dxMarkDrop .9s cubic-bezier(.2, .9, .3, 1) both; animation-delay: calc(var(--d, 0ms) + 200ms); }
+@keyframes dxMarkDrop { from { transform: translateY(-60px) rotate(-36deg); } }
+
+/* ordine del mentore · la targhetta: --d + 280 ms per 360 ms. Una carica corre lungo il bordo destro: se l'ordine è
+ * eseguito arriva in fondo insieme a una lama di tinta, se è ignorato si ferma a metà, esita e torna indietro. */
+#v-diretta .dx-fx-mentor .m-run { right: 0; top: 0; bottom: 0; width: 7px; background: var(--dx-paper); animation: dxRun .36s var(--look-out) both; animation-delay: calc(var(--d, 0ms) + 280ms); }
+@keyframes dxRun { from { opacity: 1; transform: translateY(-100%); } to { opacity: 1; transform: translateY(100%); } }
+#v-diretta .dx-fx-mentor.ko .m-run { animation-name: dxRunKo; }
+@keyframes dxRunKo { 0% { opacity: 1; transform: translateY(-100%); } 45% { opacity: 1; transform: translateY(-38%); } 60% { opacity: 1; transform: translateY(-46%); } 75% { opacity: 1; transform: translateY(-38%); } 100% { opacity: 1; transform: translateY(-100%); } }
+#v-diretta .dx-fx-mentor .m-band { top: 0; bottom: 0; right: 0; width: 34%; background: linear-gradient(100deg, transparent, color-mix(in srgb, var(--key) 34%, transparent) 50%, transparent); animation: dxBand .36s var(--look-out) both; animation-delay: calc(var(--d, 0ms) + 280ms); }
+#v-diretta .dx-fx-mentor.ko .m-band { display: none; }
+@keyframes dxBand { from { opacity: 1; transform: translateX(-230%) skewX(-14deg); } to { opacity: 1; transform: translateX(110%) skewX(-14deg); } }
+
+/* annuncio della regia · la targhetta: --d + 200 ms per 360 ms. Il ciak si chiude, una riga di tinta corre sotto la nota. */
+#v-diretta .dx-fx-regia .r-clap { left: 0; top: 0; width: 92px; height: 6px; background: repeating-linear-gradient(-55deg, var(--key) 0 8px, var(--dx-paper) 8px 16px); transform-origin: 0 50%; animation: dxClap .36s var(--ease-kick) both; animation-delay: calc(var(--d, 0ms) + 200ms); }
+@keyframes dxClap { 0% { opacity: 1; transform: rotate(18deg); } 55%, 80% { opacity: 1; transform: rotate(0deg); } 100% { opacity: 0; transform: rotate(0deg); } }
+#v-diretta .dx-fx-regia .r-run { left: 0; right: 0; bottom: 0; height: 2px; background: var(--key); transform-origin: 0 50%; animation: dxFlat .36s var(--look-out) both; animation-delay: calc(var(--d, 0ms) + 200ms); }
+
+/* ---------- 9. BILANCIO: i caduti ----------
+ * Ogni scheda entra in 700 ms con il suo ritardo (0, 120, 240, 360, 480 ms). Dentro quella finestra: il volto arriva
+ * a colori e si spegne, il taglio rosso si disegna, una lama di luce scende lungo la scheda. Il filetto del titolo si
+ * tende nei 450 ms in cui entra il pannello. */
+#v-diretta .memorial.rise .mem { position: relative; --md: 0s; }
+#v-diretta .memorial.rise .mem:nth-child(2) { --md: .12s; } #v-diretta .memorial.rise .mem:nth-child(3) { --md: .24s; }
+#v-diretta .memorial.rise .mem:nth-child(4) { --md: .36s; } #v-diretta .memorial.rise .mem:nth-child(n+5) { --md: .48s; }
+#v-diretta .memorial.rise .mem .av.dead > * { animation: dxDrain .7s linear both; animation-delay: var(--md); }
+#v-diretta .memorial.rise .mem .av.dead::after { animation: dxScarBar .7s var(--look-out) both; animation-delay: var(--md); }
+@keyframes dxScarBar { from { clip-path: inset(0 100% 0 0); } to { clip-path: inset(0 0 0 0); } }
+#v-diretta .memorial.rise .mem::after { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 34%; pointer-events: none; background: linear-gradient(180deg, transparent, hsl(0 0% 100% / .22) 60%, hsl(0 0% 100% / .46) 96%, transparent);
+  animation: dxMemSweep .7s var(--look-out) both; animation-delay: var(--md); }
+@keyframes dxMemSweep { from { transform: translateY(-110%); } to { transform: translateY(330%); } }
+#v-diretta .memorial.rise h2::after { transform-origin: 0 50%; animation: dxRule .45s var(--look-out) both; }
+@keyframes dxRule { from { transform: skewX(-30deg) scaleX(0); } }
+
+/* ---------- 10. CAMBIO DI FASE NELLA TESTATA ----------
+ * La parola di scenografia entra di taglio (600 ms, come le lettere del titolo) e, dietro titolo e contatore, passa un
+ * secondo strato con la stessa durata dell'effetto che la testata ha già: le veneziane del bilancio (800 ms), il
+ * controluce del finale (2 s, nel verso opposto al riflettore), il nastro di pericolo del disastro (700 ms),
+ * l'orizzonte del giorno (1,4 s). Sta sotto il testo: non lo copre mai. */
+#v-diretta .broadcast.fx-phase .bc-main::before { animation: dxWord .6s var(--look-out) both; }
+@keyframes dxWord { from { opacity: 0; transform: translateX(-48px) skewX(-8deg); } }
+#v-diretta .broadcast.fx-phase .bc-main::after { content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none; opacity: 0; }
+#v-diretta .broadcast.fx-phase[data-kind="fallen"] .bc-main::after { background: repeating-linear-gradient(0deg, hsl(0 0% 0% / .6) 0 5px, transparent 5px 16px); animation: dxFallen .8s ease-out; }
+@keyframes dxFallen { 0% { opacity: 0; transform: translateY(-30%); } 35% { opacity: 1; } 100% { opacity: 0; transform: translateY(0); } }
+#v-diretta .broadcast.fx-phase[data-kind="finale"] .bc-main::after { background: linear-gradient(100deg, transparent 38%, hsl(6 85% 65% / .4) 50%, transparent 62%); animation: dxFinale 2s ease-in-out; }
+@keyframes dxFinale { 0% { opacity: 1; transform: translateX(70%); } 100% { opacity: 0; transform: translateX(-70%); } }
+#v-diretta .broadcast.fx-phase[data-kind="dis"] .bc-main::after { inset: auto -10% 0 -10%; height: 10px; background: repeating-linear-gradient(-45deg, #f39a52 0 12px, transparent 12px 24px); animation: dxHazard .7s ease-out; }
+@keyframes dxHazard { 0% { opacity: 1; transform: translateX(-8%); } 70% { opacity: 1; } 100% { opacity: 0; transform: translateX(0); } }
+#v-diretta .broadcast.fx-phase[data-kind="d"] .bc-main::after { inset: auto 0 0 0; height: 3px; background: var(--key); transform-origin: 0 50%; animation: dxHorizon 1.4s ease-out; }
+@keyframes dxHorizon { 0% { opacity: 1; transform: translateY(0) scaleX(.15); } 100% { opacity: 0; transform: translateY(-110px) scaleX(1); } }
+
+/* movimento ridotto: nessuno strato in più, nessun movimento */
+@media (prefers-reduced-motion: reduce) {
+  #v-diretta .ev > .dx-fx { display: none; }
+  #v-diretta .ev.in.fx-kill .avs .av.dead > *, #v-diretta .ev.in.fx-kill .avs .av.dead::after, #v-diretta .ev.in.fx-kill p > .nm:first-of-type, #v-diretta .ev.in.fx-betray .avs .av, #v-diretta .ev.in .ev-mark,
+  #v-diretta .memorial.rise .mem .av.dead > *, #v-diretta .memorial.rise .mem .av.dead::after, #v-diretta .memorial.rise .mem::after, #v-diretta .memorial.rise h2::after, #v-diretta .broadcast.fx-phase .bc-main::before, #v-diretta .broadcast.fx-phase .bc-main::after { animation: none; }
+  #v-diretta .memorial.rise .mem::after { display: none; }
+}
+[data-reduced-motion] #v-diretta .ev > .dx-fx, [data-reduced-motion] #v-diretta .memorial.rise .mem::after { display: none; }
+[data-reduced-motion] #v-diretta :is(.ev.in.fx-kill .avs .av.dead > *, .ev.in.fx-kill p > .nm:first-of-type, .ev.in.fx-betray .avs .av, .ev.in .ev-mark, .memorial.rise .mem .av.dead > *) { animation: none; }
+[data-reduced-motion] #v-diretta .ev.in.fx-kill .avs .av.dead::after, [data-reduced-motion] #v-diretta .memorial.rise .mem .av.dead::after, [data-reduced-motion] #v-diretta .memorial.rise h2::after,
+[data-reduced-motion] #v-diretta .broadcast.fx-phase .bc-main::before, [data-reduced-motion] #v-diretta .broadcast.fx-phase .bc-main::after { animation: none; }

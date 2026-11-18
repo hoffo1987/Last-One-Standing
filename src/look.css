@@ -94,6 +94,11 @@ h3 { font-weight: 800; }
 .cutin .ci-eyes .ci-ini { font-family: var(--f-display); font-style: italic; font-weight: 900; font-stretch: 125%; font-size: clamp(48px, 9vw, 120px); line-height: 1; color: var(--key-ink); letter-spacing: .3em; }
 .cutin .ci-line { position: absolute; left: 0; right: 0; height: 4px; background: var(--key); }
 .cutin .ci-line.t { top: 0; } .cutin .ci-line.b { bottom: 0; }
+/* ornamenti del cut-in, dentro gli stessi 1,05 s della fascia: linee di velocità dietro gli occhi e un riflesso che li attraversa */
+.cutin .ci-band::before { content: ""; position: absolute; inset: 9% 0; z-index: 1; pointer-events: none; opacity: .5; background: repeating-linear-gradient(90deg, transparent 0 64px, hsl(0 0% 100% / .12) 64px 67px, transparent 67px 150px, color-mix(in srgb, var(--key) 40%, transparent) 150px 152px); animation: ciSpeed 1.05s linear both; }
+.cutin .ci-band::after { content: ""; position: absolute; inset: 9% 0; z-index: 2; pointer-events: none; background: linear-gradient(105deg, transparent 40%, hsl(0 0% 100% / .42) 49%, hsl(0 0% 100% / .1) 54%, transparent 62%) 0 0 / 100% 100% no-repeat; animation: ciGlint 1.05s var(--look-out) both; }
+@keyframes ciSpeed { from { transform: translateX(-8%); } to { transform: translateX(8%); } }
+@keyframes ciGlint { 0%, 22% { opacity: 1; transform: translateX(-70%); } 62% { opacity: 1; transform: translateX(70%); } 100% { opacity: 0; transform: translateX(70%); } }
 @keyframes ciFlash { 0% { opacity: .85; } 100% { opacity: 0; } }
 @keyframes ciBand { 0% { transform: skewY(-5deg) scaleX(0); } 14% { transform: skewY(-5deg) scaleX(1); } 78% { transform: skewY(-5deg) translateX(0); opacity: 1; } 100% { transform: skewY(-5deg) translateX(110%); opacity: 1; } }
 @keyframes ciDrift { from { transform: scale(1.12) translateX(-3%); } to { transform: scale(1.04) translateX(2%); } }
@@ -207,6 +212,49 @@ h3 { font-weight: 800; }
   padding: .5em 1em .46em 1.2em; clip-path: polygon(5% 0, 100% 0, 95% 100%, 0 100%); }
 .lx-st-fx { position: absolute; left: -50%; top: -50%; width: 200%; height: 200%; overflow: visible; }
 .lx-st-fx * { transform-box: fill-box; transform-origin: center; }
+/* ornamenti dello stacco (regia.js → ornaments): strati in più sopra la copertura e sotto il cartello.
+   Si muovono solo con transform e opacity, dentro i tempi della famiglia, e spariscono con .lx */
+.lx-svg .lx-x { will-change: transform, opacity; }
+.lx-grana { position: absolute; inset: 0; opacity: 0; background: #f7f5f0; -webkit-mask: var(--fx-grana) 0 0 / 384px 384px repeat; mask: var(--fx-grana) 0 0 / 384px 384px repeat; }
+.lx-ink { position: absolute; left: -10%; width: 120%; opacity: .94; transform: translateX(-135%); will-change: transform; -webkit-mask: center / 100% 100% no-repeat; mask: center / 100% 100% no-repeat; }
+.lx-tone { position: absolute; width: 92vmax; aspect-ratio: 1; opacity: 0; -webkit-mask: var(--fx-mezzitoni) center / cover no-repeat, radial-gradient(closest-side, #000 52%, transparent 100%); -webkit-mask-composite: source-in; mask: var(--fx-mezzitoni) center / cover no-repeat, radial-gradient(closest-side, #000 52%, transparent 100%); mask-composite: intersect; }
+.lx-splat { position: absolute; width: 78vmin; aspect-ratio: 1000 / 906; margin: -35.3vmin 0 0 -39vmin; opacity: 0; -webkit-mask: var(--fx-impatto) center / contain no-repeat; mask: var(--fx-impatto) center / contain no-repeat; }
+.lx-sweep { position: absolute; top: -20%; bottom: -20%; left: 0; width: 30%; transform: translateX(-130%) skewX(-18deg); will-change: transform;
+  background: linear-gradient(90deg, transparent, hsl(0 0% 100% / .2) 38%, hsl(0 0% 100% / .42) 50%, hsl(0 0% 100% / .2) 62%, transparent); }
+/* l'accento della destinazione: sta nel riquadro della lastra, sopra di lei e sotto le lettere; le misure sono in em del cartello */
+.lx-acc { position: absolute; left: -.42em; right: -.55em; top: .06em; height: 1.02em; font-size: 1em; pointer-events: none; }
+.lx-acc > *, .lx-foil { position: absolute; display: block; }
+/* Diretta: regia TV */
+.lx-live { left: .1em; bottom: calc(100% + .1em); display: flex !important; align-items: center; gap: .55em; padding: .5em .8em .46em .7em; background: #0a0a0c; color: #f7f5f0; outline: max(2px, .16em) solid #f7f5f0;
+  font: 800 max(10px, .115em) / 1 var(--f-body); letter-spacing: .24em; text-transform: uppercase; }
+.lx-dot { flex: none; width: .78em; height: .78em; border-radius: 50% !important; background: #e5484d; }
+.lx-bars { display: inline-flex; align-items: flex-end; gap: .18em; height: .95em; margin-left: .2em; }
+.lx-bars i { width: .22em; height: 100%; background: var(--lx-key); transform-origin: 50% 100%; }
+.lx-scan { left: 0; right: 0; top: 0; height: max(2px, .035em); background: #0a0a0c; opacity: 0; }
+/* Esito: verdetto */
+.lx-rule { left: -.16em; right: -.16em; height: .07em; background: #f7f5f0; box-shadow: .03em .03em 0 #0a0a0c; }
+.lx-rule.t { top: -.19em; transform-origin: 0 50%; }
+.lx-rule.b { bottom: -.19em; transform-origin: 100% 50%; }
+.lx-punch { left: -.36em; bottom: -.34em; width: .5em; height: .5em; background: #0a0a0c; clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%); }
+.lx-punch::after { content: ""; position: absolute; inset: 21%; background: var(--lx-key); clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%); }
+/* Trofei: riflesso d'oro e stelle */
+.lx-foilbox { inset: 0; overflow: hidden; clip-path: polygon(0 4%, 100% 0, 98.5% 100%, 1.2% 96%); }
+.lx-foil { top: -10%; bottom: -10%; left: 0; width: 34%; transform: translateX(-130%) skewX(-20deg); background: linear-gradient(90deg, transparent, hsl(44 96% 58% / .8) 34%, #fff 50%, hsl(44 96% 58% / .8) 66%, transparent); }
+.lx-star { width: .4em; height: .4em; margin: -.2em 0 0 -.2em; background: hsl(44 96% 60%); transform: scale(0); clip-path: polygon(50% 0, 60% 40%, 100% 50%, 60% 60%, 50% 100%, 40% 60%, 0 50%, 40% 40%); }
+.lx-star:nth-child(odd) { background: #f7f5f0; }
+/* Concorrenti: l'appello */
+.lx-slots { right: .3em; bottom: calc(100% + .09em); display: flex !important; gap: .08em; }
+.lx-slots i { width: .3em; height: .1em; background: #f7f5f0; box-shadow: .025em .025em 0 #0a0a0c; transform: skewX(-24deg) scaleX(0); transform-origin: 0 50%; }
+.lx-slots i:nth-child(3n) { background: #0a0a0c; box-shadow: .025em .025em 0 #f7f5f0; }
+/* Arena: il mirino */
+.lx-brk { width: .3em; height: .3em; border: 0 solid #f7f5f0; opacity: 0; filter: drop-shadow(.035em .035em 0 #0a0a0c); }
+.lx-brk.tl { left: -.2em; top: -.22em; border-width: .07em 0 0 .07em; }
+.lx-brk.tr { right: -.2em; top: -.22em; border-width: .07em .07em 0 0; }
+.lx-brk.bl { left: -.2em; bottom: -.22em; border-width: 0 0 .07em .07em; }
+.lx-brk.br { right: -.2em; bottom: -.22em; border-width: 0 .07em .07em 0; }
+/* Home: tre frecce */
+.lx-chev { right: .2em; bottom: calc(100% + .08em); display: flex !important; gap: .03em; }
+.lx-chev i { width: .2em; height: .3em; opacity: 0; background: #f7f5f0; clip-path: polygon(0 0, 45% 0, 100% 50%, 45% 100%, 0 100%, 55% 50%); }
 .stacco { display: none !important; }
 /* la pagina nuova entra con la regia di regia.js, non con la vecchia dissolvenza */
 .view-enter { animation: none; }

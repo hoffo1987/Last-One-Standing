@@ -24,6 +24,9 @@
   const h = (tag, cls, html) => { const n = document.createElement(tag); if (cls) n.className = cls; if (html != null) n.innerHTML = html; return n; };
   const esc = (s) => String(s == null ? '' : s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
   const anim = (n, kf, o) => n.animate(kf, Object.assign({ fill: 'both' }, o));
+  // gli ornamenti sono solo decorazione: se uno fallisce, il cartello va avanti lo stesso. Non aggiungono attese:
+  // ogni strato in più usa durata e ritardo di un pezzo che c'è già, quindi i tempi dei cartelli restano identici
+  const deco = (fn) => { try { fn(); } catch (e) { /* solo decorazione */ } };
   const ORDER = ['home', 'cast', 'arena', 'diretta', 'esito', 'trofei'];
   const viewOf = (x) => { const v = (x || '').replace(/^#/, ''); return ORDER.includes(v) ? v : 'home'; };
   // un bordo strappato come clip-path: diverso a ogni cartello
@@ -160,8 +163,8 @@
   function dayBoard(unit, prev, next, sub) {
     const D = 1500, b = openBoard('pb-day', D);
     const nums = [prev - 1, prev, next, next + 1, next + 2].map((n) => (n > 0 ? n : ''));
-    b.innerHTML = '<i class="pb-veil"></i><div class="pb-band"><i class="pb-bg"></i><div class="pb-rail"><span>' + (esc(unit) + ' • ').repeat(24) + '</span></div>' +
-      '<i class="pb-sel"></i><div class="pb-strip">' + nums.map((n, i) => '<b class="' + (i === 1 ? 'o' : i === 2 ? 'n' : '') + '">' + n + '</b>').join('') + '</div>' +
+    b.innerHTML = '<i class="pb-veil"></i><div class="pb-band"><i class="pb-bg"></i><i class="pb-tone"></i><i class="pb-hair t"></i><i class="pb-hair b"></i><div class="pb-rail"><span>' + (esc(unit) + ' • ').repeat(24) + '</span></div>' +
+      '<i class="pb-ticks"></i><i class="pb-sel"><i class="pb-glint"></i></i><div class="pb-strip">' + nums.map((n, i) => '<b class="' + (i === 1 ? 'o' : i === 2 ? 'n' : '') + '">' + n + '</b>').join('') + '</div>' +
       '<div class="pb-cap"><span class="pb-k">' + esc(unit) + ' ' + next + '</span>' + (sub ? '<span class="pb-sub">' + esc(sub) + '</span>' : '') + '</div></div>';
     const band = b.querySelector('.pb-band'), strip = b.querySelector('.pb-strip'), sel = b.querySelector('.pb-sel'), o = strip.querySelector('.o'), n = strip.querySelector('.n'), cap = b.querySelector('.pb-cap');
     b.querySelector('.pb-bg').style.clipPath = torn(R(3, 8), R(92, 97), 2.2);
@@ -177,13 +180,21 @@
     anim(o, [{ opacity: 1, transform: 'scale(1.5)' }, { opacity: 0.32, transform: 'scale(1)' }], { duration: 460, delay: 300, easing: E.io });
     anim(n, [{ opacity: 0.32, transform: 'scale(1)' }, { opacity: 1, transform: 'scale(1.72)' }, { opacity: 1, transform: 'scale(1.5)' }], { duration: 560, delay: 300, easing: E.out });
     anim(cap, [{ opacity: 0, translate: '40px 0' }, { opacity: 1, translate: '0 0' }], { duration: 300, delay: 760, easing: E.out });
+    // ornamenti: due filetti si tendono con la fascia; il righello scorre più della striscia (parallasse) e i mezzitoni
+    // affiorano nello stesso tempo; quando il nuovo giorno si ferma, un riflesso attraversa il selettore
+    deco(() => {
+      b.querySelectorAll('.pb-hair').forEach((x, i) => anim(x, [{ transform: 'scaleX(0)' }, { transform: 'scaleX(1)' }], { duration: 260, easing: i ? E.out : E.io }));
+      anim(b.querySelector('.pb-ticks'), [{ transform: 'translateX(calc(var(--slot) * 1.7))' }, { transform: 'translateX(0)' }], { duration: 460, delay: 300, easing: E.io });
+      anim(b.querySelector('.pb-tone'), [{ opacity: 0, translate: '7% 0' }, { opacity: 0.5, translate: '0 0' }], { duration: 460, delay: 300, easing: E.out });
+      anim(b.querySelector('.pb-glint'), [{ transform: 'translateX(-160%)' }, { transform: 'translateX(440%)' }], { duration: 260, delay: 740, easing: E.io });
+    });
     sfx('cut'); sfx('stamp', { at: 740 });
   }
 
   // disastro: nastro di pericolo, titolo che cade, pagina che trema
   function disBoard(title) {
     const D = 1700, b = openBoard('pb-dis', D);
-    b.innerHTML = '<i class="pb-veil"></i><div class="pb-band"><i class="pb-tape t"></i><i class="pb-bg"></i><i class="pb-tape b"></i><div class="pb-cap"><span class="pb-k">Disastro</span><b class="pb-t"></b></div></div>';
+    b.innerHTML = '<i class="pb-veil"></i><div class="pb-band"><i class="pb-tape t"></i><i class="pb-bg"></i><i class="pb-tone"></i><svg class="pb-crack" aria-hidden="true"></svg><i class="pb-splat"></i><i class="pb-tape b"></i><div class="pb-cap"><span class="pb-k">Disastro</span><b class="pb-t"></b></div></div>';
     const band = b.querySelector('.pb-band'), t = b.querySelector('.pb-t');
     b.querySelector('.pb-bg').style.clipPath = torn(R(2, 6), R(94, 98), 2.6);
     band.style.setProperty('--tilt', R(2.5, 4.5).toFixed(1) + 'deg');
@@ -193,6 +204,22 @@
     anim(band, [{ transform: 'rotate(var(--tilt)) scaleY(1)', opacity: 1 }, { transform: 'rotate(var(--tilt)) scaleY(0)', opacity: 1 }], { duration: 200, delay: D - 210, easing: E.in, fill: 'forwards' });
     anim(b.querySelector('.pb-k'), [{ translate: '-60px 0', opacity: 0 }, { translate: '0 0', opacity: 1 }], { duration: 240, delay: 140, easing: E.out });
     [...t.children].forEach((s, i) => anim(s, [{ transform: 'translateY(-120%) rotate(' + R(-10, 10) + 'deg) scale(1.6)', opacity: 0 }, { opacity: 1, offset: 0.5 }, { transform: 'none', opacity: 1 }], { duration: 300, delay: 260 + i * 90, easing: E.kick }));
+    // ornamenti: una macchia d'impatto esplode dietro la prima parola e resta in filigrana; le crepe partono dal centro
+    // e arrivano ai bordi della fascia nello stesso tempo in cui la pagina trema (280 → 800 ms)
+    deco(() => {
+      const svg = b.querySelector('.pb-crack'), bw = band.offsetWidth || 1200, bh = band.offsetHeight || 400, cx = R(0.36, 0.64) * bw;
+      svg.setAttribute('viewBox', '0 0 ' + bw + ' ' + bh);
+      for (let i = 0; i < 5; i++) {
+        const up = i % 2 ? 1 : -1, pt = [[cx, bh / 2]]; let x = cx, y = bh / 2;
+        while (y > -8 && y < bh + 8) { x += R(-0.05, 0.05) * bw + (i - 2) * 0.016 * bw; y += up * R(0.08, 0.17) * bh; pt.push([x, y]); }
+        const p = document.createElementNS(NS, 'polyline');
+        p.setAttribute('points', pt.map((q) => q[0].toFixed(1) + ',' + q[1].toFixed(1)).join(' ')); p.setAttribute('pathLength', '1'); p.setAttribute('class', i % 3 ? 'c1' : 'c2');
+        svg.appendChild(p);
+        anim(p, [{ strokeDashoffset: 1 }, { strokeDashoffset: 0 }], { duration: 520 - i * 40, delay: 280 + i * 40, easing: E.out });
+      }
+      anim(b.querySelector('.pb-splat'), [{ transform: 'translate(-50%,-50%) scale(.2) rotate(-24deg)', opacity: 0 }, { opacity: 0.9, offset: 0.35 }, { transform: 'translate(-50%,-50%) scale(1) rotate(0deg)', opacity: 0.26 }], { duration: 300, delay: 260, easing: E.out });
+      anim(b.querySelector('.pb-tone'), [{ opacity: 0, translate: '-7% 0' }, { opacity: 0.4, translate: '0 0' }], { duration: 240, delay: 140, easing: E.out });
+    });
     const main = document.querySelector('main');
     if (main) main.animate([0, 1, 2, 3, 4, 5, 6].map((i) => ({ translate: (i === 6 ? 0 : R(-9, 9) * (1 - i / 7)).toFixed(1) + 'px ' + (i === 6 ? 0 : R(-6, 6) * (1 - i / 7)).toFixed(1) + 'px' })), { duration: 520, delay: 280, easing: 'steps(7, end)' });
     sfx('cut'); sfx('disaster', { at: 200 });
@@ -201,7 +228,7 @@
   // scontro finale: gli occhi di chi resta, da lati alterni
   function finBoard(avs) {
     const list = avs.slice(0, 6), D = 1900 + list.length * 60, b = openBoard('pb-fin', D);
-    b.innerHTML = '<i class="pb-veil"></i><div class="pb-rows"></div><div class="pb-head"><span class="pb-k">Scontro finale</span></div>';
+    b.innerHTML = '<i class="pb-veil"></i><i class="pb-tone a"></i><i class="pb-tone b"></i><i class="pb-bar t"></i><i class="pb-bar b"></i><div class="pb-rows"></div><i class="pb-vs"></i><i class="pb-burst"></i><div class="pb-head"><span class="pb-k">Scontro finale</span></div>';
     const rows = b.querySelector('.pb-rows');
     list.forEach((av, i) => {
       const row = h('div', 'pb-row ' + (i % 2 ? 'r' : 'l')), p = eyes(av);
@@ -215,6 +242,19 @@
     anim(b.querySelector('.pb-veil'), [{ opacity: 0 }, { opacity: 1, offset: 0.08 }, { opacity: 1, offset: 0.86 }, { opacity: 0 }], { duration: D });
     anim(head, [{ transform: 'translate(-50%,-50%) rotate(-6deg) scale(2.2)', opacity: 0 }, { transform: 'translate(-50%,-50%) rotate(-6deg) scale(1)', opacity: 1 }], { duration: 260, delay: 220 + list.length * 70, easing: E.kick });
     anim(head, [{ opacity: 1 }, { opacity: 0 }], { duration: 160, delay: D - 260, easing: E.in, fill: 'forwards' });
+    // ornamenti: due fasce nere da cinema e i mezzitoni agli angoli per tutta la durata; appena una riga si ferma un
+    // riflesso le attraversa gli occhi; con il titolo arrivano un taglio di carta e una stella, e con lui se ne vanno
+    deco(() => {
+      const hd = 220 + list.length * 70;
+      b.querySelectorAll('.pb-tone').forEach((x, i) => anim(x, [{ opacity: 0, translate: (i ? 5 : -5) + '% 0' }, { opacity: 0.4, offset: 0.08 }, { opacity: 0.4, offset: 0.86 }, { opacity: 0, translate: (i ? -3 : 3) + '% 0' }], { duration: D }));
+      b.querySelectorAll('.pb-bar').forEach((x) => { anim(x, [{ transform: 'scaleY(0)' }, { transform: 'scaleY(1)' }], { duration: 300, delay: 160, easing: E.out }); anim(x, [{ transform: 'scaleY(1)' }, { transform: 'scaleY(0)' }], { duration: 160, delay: D - 260, easing: E.in, fill: 'forwards' }); });
+      rows.querySelectorAll('.pe').forEach((p, i) => anim(p, [{ backgroundPosition: '160% 0' }, { backgroundPosition: '-60% 0' }], { duration: 300, delay: 460 + i * 70, easing: E.io, pseudoElement: '::after' }));
+      const burst = b.querySelector('.pb-burst'), vs = b.querySelector('.pb-vs');
+      burst.style.clipPath = star(RI(12, 18), R(0.5, 0.62));
+      anim(burst, [{ transform: 'translate(-50%,-50%) rotate(-50deg) scale(0)' }, { transform: 'translate(-50%,-50%) rotate(0deg) scale(1)' }], { duration: 260, delay: hd, easing: E.out });
+      anim(vs, [{ transform: 'translate(-50%,-50%) rotate(-6deg) scaleX(0)' }, { transform: 'translate(-50%,-50%) rotate(-6deg) scaleX(1)' }], { duration: 260, delay: hd, easing: E.io });
+      [burst, vs].forEach((x) => anim(x, [{ opacity: 1 }, { opacity: 0 }], { duration: 160, delay: D - 260, easing: E.in, fill: 'forwards' }));
+    });
     sfx('cut'); sfx('finale', { at: 120 }); sfx('stamp', { at: 240 + list.length * 70 });
   }
 
@@ -234,7 +274,7 @@
     lastKill = Date.now();
     const D = 1600, CUT = 520, b = openBoard('pb-kill' + (live.length ? '' : ' solo'), D);
     const label = ((row.querySelector('.cat') || {}).textContent || 'Fuori').trim();
-    b.innerHTML = '<i class="pb-veil"></i><div class="pb-band"><i class="pb-bg"></i><i class="pb-speed"></i><div class="pb-duel"></div><i class="pb-flash"></i></div>' +
+    b.innerHTML = '<i class="pb-veil"></i><i class="pb-bar t"></i><i class="pb-bar b"></i><div class="pb-band"><i class="pb-bg"></i><i class="pb-speed"></i><i class="pb-tone"></i><div class="pb-duel"></div><i class="pb-flash"></i></div>' +
       '<i class="pb-inksplat"></i><b class="pb-stamp">' + esc(label) + '</b>';
     const band = b.querySelector('.pb-band'), duel = b.querySelector('.pb-duel'), stamp = b.querySelector('.pb-stamp'), ink = b.querySelector('.pb-inksplat');
     b.querySelector('.pb-bg').style.clipPath = torn(R(4, 9), R(91, 96), 2.4);
@@ -310,6 +350,34 @@
     anim(halfB, [{ translate: '0 0', opacity: 1 }, { translate: '36px ' + (ph * 1.2).toFixed(0) + 'px', rotate: '7deg', opacity: 0 }], { duration: 340, delay: D - 360, easing: E.in, fill: 'forwards' });
     anim(stamp, [{ scale: '1', opacity: 1 }, { scale: '1.14', opacity: 0 }], { duration: 180, delay: D - 250, easing: E.in, fill: 'forwards' });
     anim(ink, [{ opacity: 1 }, { opacity: 0 }], { duration: 200, delay: D - 250, easing: E.in, fill: 'forwards' });
+    /* ornamenti, tutti dentro i tempi che ci sono già:
+     * - due fasce nere da cinema entrano ed escono con la fascia degli occhi (220 e 210 ms);
+     * - sul colpo (CUT, 300 ms come la lama): una pennellata rossa resta lungo il taglio, i raggi d'impatto partono dal
+     *   centro del pannello, i mezzitoni rossi affiorano dietro chi cade mentre le metà si separano;
+     * - il nome di chi colpisce si inverte di colpo nella tinta e una riga lo sottolinea (360 ms, come il suo gesto);
+     * - il fotogramma tenuto: tra la fine del colpo e la caduta delle metà la scena avanza appena, senza altri scatti. */
+    deco(() => {
+      b.querySelectorAll('.pb-bar').forEach((x) => { anim(x, [{ transform: 'scaleY(0)' }, { transform: 'scaleY(1)' }], { duration: 220, easing: E.io }); anim(x, [{ transform: 'scaleY(1)' }, { transform: 'scaleY(0)' }], { duration: 210, delay: D - 220, easing: E.in, fill: 'forwards' }); });
+      const brush = h('i', 'pb-brush'); brush.style.setProperty('--ang', slash.style.getPropertyValue('--ang')); split.insertBefore(brush, slash);
+      anim(brush, [{ clipPath: 'inset(0 0 0 100%)', opacity: 0.95 }, { clipPath: 'inset(0 0 0 0)', opacity: 0.95, offset: 0.45 }, { clipPath: 'inset(0 0 0 0)', opacity: 0.82 }], { duration: 300, delay: CUT, easing: E.out });
+      anim(brush, [{ opacity: 0.82 }, { opacity: 0 }], { duration: 240, delay: D - 380, easing: E.in, fill: 'forwards' });
+      const rays = document.createElementNS(NS, 'svg'); rays.setAttribute('class', 'pb-rays'); rays.setAttribute('viewBox', '-100 -100 200 200'); rays.setAttribute('aria-hidden', 'true'); split.appendChild(rays);
+      const nr = RI(12, 16), a0 = R(0, 360);
+      for (let i = 0; i < nr; i++) {
+        const p = document.createElementNS(NS, 'polygon'), w = R(1.2, 3.4), len = R(58, 98), a = (a0 + (i / nr) * 360 + R(-7, 7)).toFixed(0);
+        p.setAttribute('points', '16,' + (-w / 2).toFixed(1) + ' ' + len.toFixed(0) + ',0 16,' + (w / 2).toFixed(1)); p.setAttribute('fill', i % 3 ? '#f7f5f0' : KILL); rays.appendChild(p);
+        anim(p, [{ transform: 'rotate(' + a + 'deg) scale(.2)', opacity: 0 }, { opacity: 1, offset: 0.25 }, { transform: 'rotate(' + a + 'deg) scale(1.25)', opacity: 0 }], { duration: 300, delay: CUT, easing: E.out });
+      }
+      const tone = b.querySelector('.pb-tone');
+      anim(tone, [{ opacity: 0, scale: '.84' }, { opacity: 0.55, scale: '1' }], { duration: 240, delay: CUT + 40, easing: E.out });
+      anim(tone, [{ opacity: 0.55 }, { opacity: 0 }], { duration: 240, delay: D - 380, easing: E.in, fill: 'forwards' });
+      if (L) {
+        const nm = L.querySelector('.pb-name'), ul = h('i', 'pb-ul'); L.appendChild(ul);
+        if (nm) anim(nm, [{ background: 'var(--void)', color: 'var(--paper)' }, { background: 'var(--key)', color: 'var(--key-ink)' }], { duration: 1, delay: CUT + 30 });
+        anim(ul, [{ transform: 'scaleX(0)' }, { transform: 'scaleX(1)' }], { duration: 360, delay: CUT, easing: E.out });
+      }
+      anim(duel, [{ scale: '1' }, { scale: '1.016' }], { duration: (D - 380) - (CUT + 300), delay: CUT + 300, easing: 'linear' });
+    });
     sfx('slash', { at: CUT - 40 }); sfx('kill', { at: CUT + 30 }); sfx('stamp', { at: CUT + 300 });
   }
   function watchKills() {
