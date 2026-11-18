@@ -1601,10 +1601,10 @@
         P.mentor.fid = Math.min(5, P.mentor.fid + 1); P.mo += 4;
         const th = { nascondersi: 'Il consiglio è chiaro: oggi non mi faccio vedere.', caccia: 'Il mentore vuole che vada a caccia. Va bene.', reclutare: 'Da soli non si va lontano: oggi cerco qualcuno di cui fidarmi.', cibo: 'Prima di tutto la pancia piena: oggi penso alle provviste.' }[k];
         P.thought = esc(th);
-        events.push(intEvent(P, n + ' riceve il messaggio del mentore e decide di ' + ORD[cosa] + (tg ? ': nel mirino c’è ' + nameTag(tg) : '') + '.', { whyTxt: 'Ordine del mentore', mentor: cosa, obeys: true }));
+        events.push(intEvent(P, n + ' riceve il messaggio del mentore e decide di ' + ORD[cosa] + (tg ? ': nel mirino c’è ' + nameTag(tg) : '') + '.', { whyTxt: 'Il consiglio del mentore', mentor: cosa, obeys: true }));
       } else {
         P.mentor.fid = Math.max(-3, P.mentor.fid - 1);
-        events.push(intEvent(P, n + ' legge il messaggio del mentore, che vorrebbe vederl' + (P.gender === 'F' ? 'a' : P.gender === 'N' ? 'ə' : 'o') + ' ' + (cosa === 'nasconditi' ? 'restare al riparo' : ORD[cosa]) + ', e fa di testa sua.', { cat: 'hurt', whyTxt: 'Ordine ignorato', mentor: cosa, obeys: false }));
+        events.push(intEvent(P, n + ' legge il messaggio del mentore, che vorrebbe vederl' + (P.gender === 'F' ? 'a' : P.gender === 'N' ? 'ə' : 'o') + ' ' + (cosa === 'nasconditi' ? 'restare al riparo' : ORD[cosa]) + ', e fa di testa sua.', { cat: 'hurt', whyTxt: 'Fa di testa sua', mentor: cosa, obeys: false }));
       }
     }
     function applyInterventions(events) {

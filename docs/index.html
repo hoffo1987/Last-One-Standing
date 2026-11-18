@@ -5343,103 +5343,423 @@ body:has(#editDlg[open]) #v-cast > :not(.dock) { translate: -34px 0; }
    e se ne vedeva solo la cima (capelli, fronte). Il ritaglio sugli occhi lo calcola src/skin/05-occhi.js */
 .av.es-strip > img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
 
-/* ================= PELLE · LA PARTITA GIOCATA (base) =================
- * Schermate di base per il cartello delle scelte (.sc), la barra del giocatore nella Diretta (#ptHud),
- * il pulsante del dono (#giftBtn), le impostazioni del ritmo e il riepilogo nell'Esito (.ps-sum).
- * Qui solo struttura e leggibilità con i gettoni del sito: la regia visiva e le animazioni stanno in 61-partita-*. */
+/* ================= PELLE · LA PARTITA GIOCATA =================
+ * Il cartello delle scelte (.sc), la barra del giocatore nella Diretta (#ptHud), il pulsante del dono (#giftBtn),
+ * i timbri delle puntate e il lancio del dono (creati da 61-partita.js), i segni sugli eventi causati dal giocatore
+ * (.ev-dono, .ev-mentor), il riepilogo nell'Esito (.ps-sum) e il ritmo nelle regole dell'Arena (#ritmoSeg).
+ * Tre colori: la tinta (--key), il nero (--void / --ink) e la carta (--paper / --bg); il rosso solo per ciò che si perde.
+ * Regola ferma: l'inversione al passaggio è istantanea. Nessuna transizione su colore o sfondo del testo (due colori
+ * opposti in dissolvenza passano dallo stesso grigio e il testo sparisce): si animano solo transform, opacity e
+ * clip-path di strati decorativi. Il movimento ridotto è in fondo. */
 
-/* ---------- il cartello delle scelte ---------- */
-.sc { position: fixed; inset: 0; z-index: 90; display: grid; place-items: center; padding: 16px; }
-.sc-back { position: absolute; inset: 0; background: hsl(0 0% 0% / .66); }
-.sc-card { position: relative; width: min(640px, 100%); max-height: calc(100dvh - 32px); overflow: auto; overscroll-behavior: contain;
-  background: var(--panel-solid, var(--panel)); color: var(--ink); box-shadow: inset 6px 0 0 var(--key), 8px 8px 0 var(--key); padding: 22px 24px 18px 30px; outline: none; }
-.sc.sc-pick .sc-card { width: min(920px, 100%); }
-.sc-head { display: grid; gap: 6px; margin-bottom: 14px; }
-.sc-k { font: 800 11px / 1 var(--f-body); letter-spacing: .22em; text-transform: uppercase; color: var(--key); }
-.sc-t { margin: 0; font: italic 900 clamp(24px, 4vw, 38px) / 1 var(--f-display); font-stretch: 116%; text-transform: uppercase; letter-spacing: -.01em; }
-.sc-x { margin: 0; font-size: 15px; line-height: 1.45; color: color-mix(in srgb, var(--ink) 78%, transparent); }
-.sc-x b { color: var(--ink); }
-.sc-faces { display: flex; gap: 8px; margin-bottom: 14px; }
+/* ---------- 1 · il cartello delle scelte: la scena ---------- */
+.sc { --sc-plate: var(--panel-solid, var(--panel)); --sc-slab: color-mix(in srgb, var(--ink) 10%, var(--sc-plate)); --sc-pad: 28px;
+  position: fixed; inset: 0; z-index: 90; display: grid; place-items: center; padding: 20px; overflow: hidden; }
+.sc-back { position: absolute; inset: 0; background-color: hsl(0 0% 0% / .8);
+  background-image: radial-gradient(circle, color-mix(in srgb, var(--key) 30%, transparent) 1.3px, transparent 1.7px); background-size: 14px 14px;
+  animation: scVeil .22s ease var(--sc-d, 0ms) backwards; }
+/* la lama: una lastra nella tinta attraversa lo schermo, una di carta la segue */
+.sc::before, .sc::after { content: ""; position: absolute; z-index: 1; top: -20%; bottom: -20%; pointer-events: none; transform: translateX(160vw) skewX(-24deg); }
+.sc::before { left: -30%; width: 46%; background: var(--key); animation: scBlade .52s var(--look-out) var(--sc-d, 0ms) backwards; }
+.sc::after { left: -12%; width: 5%; background: var(--paper); animation: scBlade .6s var(--look-out) calc(var(--sc-d, 0ms) + 60ms) backwards; }
+@keyframes scVeil { from { opacity: 0; } }
+@keyframes scBlade { from { transform: translateX(-60vw) skewX(-24deg); } to { transform: translateX(160vw) skewX(-24deg); } }
+
+/* la lastra: testata nera tagliata in diagonale, filo nella tinta, ombra piena */
+.sc-card { position: relative; z-index: 2; display: grid; grid-template-columns: minmax(0, 1fr) auto; align-content: start;
+  width: min(660px, 100%); max-height: calc(100dvh - 40px); overflow: hidden auto; overscroll-behavior: contain; padding: 0 0 20px;
+  background: var(--sc-plate); color: var(--ink); box-shadow: 10px 10px 0 var(--key); outline: none;
+  animation: scCardIn .4s var(--look-out) var(--sc-d, 0ms) backwards; }
+.sc.sc-pick .sc-card { width: min(960px, 100%); }
+.sc.sc-gift .sc-card { width: min(760px, 100%); }
+.sc-card > * { grid-column: 1 / -1; }
+.sc-card::before, .sc-card::after { content: ""; grid-area: 1 / 1 / 2 / -1; pointer-events: none; }
+.sc-card::before { z-index: 0; background: var(--key); clip-path: polygon(0 0, 100% 0, 100% calc(100% - 22px), 0 100%); }
+.sc-card::after { z-index: 1; background: var(--void); clip-path: polygon(0 0, 100% 0, 100% calc(100% - 29px), 0 calc(100% - 7px)); }
+@keyframes scCardIn { from { opacity: 0; transform: translateX(-90px) skewX(-10deg); } 45% { opacity: 1; } to { opacity: 1; transform: none; } }
+
+/* testata */
+.sc-head { grid-row: 1; position: relative; z-index: 2; display: grid; gap: 10px; justify-items: start; align-content: start; margin: 0; padding: 22px var(--sc-pad) 50px; color: var(--paper); overflow: hidden; }
+.sc-k { position: relative; padding: 6px 16px 6px 11px; background: var(--key); color: var(--key-ink); font: italic 900 12px / 1 var(--f-display); font-stretch: 112%; letter-spacing: .14em; text-transform: uppercase;
+  clip-path: polygon(0 0, 100% 0, calc(100% - 8px) 100%, 0 100%); animation: scKick .34s var(--ease-kick) calc(var(--sc-d, 0ms) + 80ms) backwards; }
+.sc-t { margin: 0; max-width: 100%; font: italic 900 clamp(27px, 4.6vw, 46px) / .96 var(--f-display); font-stretch: 118%; text-transform: uppercase; letter-spacing: -.02em; color: var(--paper);
+  text-shadow: .055em .055em 0 var(--key); text-wrap: balance; overflow-wrap: anywhere; }
+.sc-t .sc-w { display: inline-block; transform-origin: 0 100%; animation: scWord .42s var(--ease-kick) backwards; animation-delay: calc(var(--sc-d, 0ms) + 110ms + var(--i, 0) * 46ms); }
+.sc-x { margin: 0; max-width: 60ch; font-size: 15px; line-height: 1.5; color: color-mix(in srgb, var(--paper) 86%, var(--void)); }
+.sc-x b { color: var(--paper); }
+@keyframes scKick { from { opacity: 0; transform: translateX(-22px) skewX(-18deg); } }
+@keyframes scWord { from { opacity: 0; transform: translateY(.45em) rotate(-7deg) skewX(-16deg); } 40% { opacity: 1; } }
+/* un segno enorme in contorno dietro il titolo, tagliato dal bordo */
+.sc-pick .sc-head::after, .sc-bets .sc-head::after { content: "?"; position: absolute; z-index: -1; right: 18px; top: -.16em; font: italic 900 210px / 1 var(--f-display); font-stretch: 122%; color: transparent;
+  -webkit-text-stroke: 2px color-mix(in srgb, var(--paper) 20%, transparent); pointer-events: none; }
+.sc-bets .sc-head::after { content: "\00d7"; }
+
+/* volti: senza variante, una fila sotto la testata */
+.sc-faces { display: flex; gap: 8px; margin: 14px var(--sc-pad) 0; }
 .sc-faces .av { --s: 76px; }
-.sc-opts { display: grid; gap: 8px; }
-.sc-opt { position: relative; display: grid; grid-template-columns: auto minmax(0, 1fr) auto; grid-template-rows: auto auto; column-gap: 12px; align-items: center; text-align: left;
-  width: 100%; padding: 12px 16px; border: 2px solid color-mix(in srgb, var(--ink) 22%, transparent); background: transparent; color: var(--ink); font: inherit; cursor: pointer; }
-.sc-opt .sc-n { grid-row: 1 / 3; width: 28px; height: 28px; display: grid; place-items: center; background: var(--ink); color: var(--bg); font: italic 900 15px / 1 var(--f-display); }
-.sc-opt .sc-l { grid-column: 2; font: italic 900 17px / 1.15 var(--f-display); text-transform: uppercase; letter-spacing: .01em; }
-.sc-opt .sc-s { grid-column: 2; font-size: 13px; color: color-mix(in srgb, var(--ink) 70%, transparent); }
-.sc-opt .sc-cost { grid-column: 3; grid-row: 1 / 3; font: italic 900 18px / 1 var(--f-display); font-style: italic; color: var(--key); }
-.sc-opt:hover:not(:disabled), .sc-opt:focus-visible { background: var(--ink); color: var(--bg); border-color: var(--ink); outline: none; }
-.sc-opt:hover:not(:disabled) .sc-s, .sc-opt:focus-visible .sc-s { color: inherit; opacity: .8; }
-.sc-opt:hover:not(:disabled) .sc-n, .sc-opt:focus-visible .sc-n { background: var(--key); color: var(--key-ink); }
-.sc-opt:disabled { opacity: .38; cursor: not-allowed; }
-.sc-opt.is-picked { background: var(--key); color: var(--key-ink); border-color: var(--key); }
-/* scelta tra volti: una griglia di tessere */
-.sc-grid { grid-template-columns: repeat(auto-fill, minmax(118px, 1fr)); }
-.sc-grid .sc-opt { grid-template-columns: 1fr; grid-template-rows: auto auto auto; justify-items: center; text-align: center; gap: 6px; padding: 10px 6px 9px; }
-.sc-grid .sc-opt .av { --s: 64px; }
-.sc-grid .sc-opt .sc-l, .sc-grid .sc-opt .sc-s { grid-column: 1; font-size: 13px; }
-.sc-grid .sc-opt .sc-l { font-size: 14px; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-/* la posta */
-.sc-stake { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 14px; }
-.sc-stake > span:first-child { font: 800 11px / 1 var(--f-body); letter-spacing: .2em; text-transform: uppercase; color: color-mix(in srgb, var(--ink) 70%, transparent); margin-right: 4px; }
-.sc-stake button { min-width: 54px; padding: 7px 12px; border: 2px solid color-mix(in srgb, var(--ink) 22%, transparent); background: transparent; color: var(--ink); font: italic 900 16px / 1 var(--f-display); cursor: pointer; }
-.sc-stake button[aria-pressed="true"] { background: var(--key); color: var(--key-ink); border-color: var(--key); }
-.sc-stake button:disabled { opacity: .35; cursor: not-allowed; }
-.sc-wallet { margin-left: auto; font-size: 13px; }
-.sc-foot { display: flex; align-items: center; justify-content: space-between; gap: 14px; margin-top: 16px; }
-.sc-skip { border: 0; background: none; color: var(--ink); font: 800 12.5px / 1 var(--f-body); letter-spacing: .12em; text-transform: uppercase; padding: 8px 2px; box-shadow: inset 0 -2px 0 color-mix(in srgb, var(--ink) 30%, transparent); cursor: pointer; }
-.sc-skip:hover, .sc-skip:focus-visible { box-shadow: inset 0 -3px 0 var(--key); outline: none; }
-.sc-timer { flex: 1; height: 4px; background: color-mix(in srgb, var(--ink) 14%, transparent); overflow: hidden; }
+
+/* ---------- le scelte: lastre inclinate con la targa del numero ---------- */
+.sc-opts { display: grid; gap: 9px; margin: 14px var(--sc-pad) 0 calc(var(--sc-pad) - 6px); }
+.sc-opt { position: relative; isolation: isolate; display: grid; grid-template-columns: auto minmax(0, 1fr) auto; grid-template-rows: auto auto; column-gap: 14px; align-items: center; align-content: center; text-align: left;
+  width: 100%; min-height: 58px; padding: 10px 24px 10px 14px; border: 0; background: none; color: var(--ink); font: inherit; cursor: pointer; outline: none; transition: none; -webkit-tap-highlight-color: transparent;
+  animation: scOptIn .36s var(--look-out) backwards; animation-delay: calc(var(--sc-d, 0ms) + 170ms + var(--k, 0) * 52ms); }
+.sc-opt:nth-child(2) { --k: 1; } .sc-opt:nth-child(3) { --k: 2; } .sc-opt:nth-child(4) { --k: 3; } .sc-opt:nth-child(5) { --k: 4; } .sc-opt:nth-child(6) { --k: 5; } .sc-opt:nth-child(7) { --k: 6; } .sc-opt:nth-child(n+8) { --k: 7; }
+/* la lastra e la sua ombra piena sono strati: cambiano colore di colpo, si muovono soltanto */
+.sc-opt::before, .sc-opt::after { content: ""; position: absolute; inset: 0; clip-path: polygon(11px 0, 100% 0, calc(100% - 11px) 100%, 0 100%); }
+.sc-opt::before { z-index: -1; background: var(--sc-slab); }
+.sc-opt::after { z-index: -2; background: var(--key); opacity: 0; transition: transform .2s var(--ease-kick); }
+.sc-opt .sc-n { grid-row: 1 / 3; width: 36px; height: 36px; display: grid; place-items: center; background: var(--key); color: var(--key-ink); font: italic 900 20px / 1 var(--f-display);
+  clip-path: polygon(7px 0, 100% 0, calc(100% - 7px) 100%, 0 100%); transition: transform .22s var(--ease-kick); }
+.sc-opt .sc-l { grid-column: 2; font: italic 900 18px / 1.12 var(--f-display); font-stretch: 110%; text-transform: uppercase; letter-spacing: .005em; overflow-wrap: anywhere; }
+.sc-opt .sc-l:only-of-type, .sc-opt .sc-l:last-child { grid-row: 1 / 3; }
+.sc-opt .sc-s { grid-column: 2; font-size: 13.5px; line-height: 1.3; color: inherit; opacity: .8; }
+.sc-opt .sc-cost { grid-column: 3; grid-row: 1 / 3; font: italic 900 20px / 1 var(--f-display); color: inherit; white-space: nowrap; }
+@keyframes scOptIn { from { opacity: 0; transform: translateX(-34px) skewX(-12deg); } 50% { opacity: 1; } }
+/* passaggio e fuoco: inversione istantanea, l'ombra esce, la targa scatta */
+@media (hover: hover) {
+  .sc-opt:hover:not(:disabled) { color: var(--bg); }
+  .sc-opt:hover:not(:disabled)::before { background: var(--ink); }
+  .sc-opt:hover:not(:disabled)::after { opacity: 1; transform: translate(6px, 6px); }
+  .sc-opt:hover:not(:disabled) .sc-n { transform: scale(1.16) rotate(-7deg); }
+}
+.sc-opt:focus-visible { color: var(--bg); }
+.sc-opt:focus-visible::before { background: var(--ink); outline: 3px solid var(--key); outline-offset: -3px; }
+.sc-opt:focus-visible::after { opacity: 1; transform: translate(6px, 6px); }
+.sc-opt:focus-visible .sc-n { transform: scale(1.16) rotate(-7deg); }
+.sc-opt:active:not(:disabled)::after { transform: translate(2px, 2px); }
+/* non disponibile: lastra tratteggiata, niente inversione */
+.sc-opt:disabled { cursor: not-allowed; color: color-mix(in srgb, var(--ink) 76%, var(--sc-plate)); }
+.sc-opt:disabled .sc-s { opacity: 1; }
+.sc-opt:disabled::before { background: repeating-linear-gradient(-60deg, var(--sc-slab) 0 7px, transparent 7px 13px); }
+.sc-opt:disabled .sc-n { background: color-mix(in srgb, var(--ink) 30%, var(--sc-plate)); color: var(--sc-plate); }
+/* scelta fatta: la lastra prende la tinta, un colpo, l'onda d'urto dietro */
+.sc-opt.is-picked, .sc-opt.is-picked:hover, .sc-opt.is-picked:focus-visible { color: var(--key-ink); animation: scPunch .24s var(--ease-kick); }
+.sc-opt.is-picked::before, .sc-opt.is-picked:hover::before, .sc-opt.is-picked:focus-visible::before { background: var(--key); outline: 0; }
+.sc-opt.is-picked::after, .sc-opt.is-picked:hover::after { background: var(--ink); opacity: 0; transition: none; transform: none; animation: scWave .26s ease-out; }
+.sc-opt.is-picked .sc-n { background: var(--key-ink); color: var(--key); transform: scale(1.16) rotate(-7deg); }
+@keyframes scPunch { 0% { transform: scale(.97); } 45% { transform: scale(1.045) skewX(-2deg); } 100% { transform: none; } }
+@keyframes scWave { from { opacity: .9; transform: scale(1, 1); } to { opacity: 0; transform: scale(1.05, 1.5); } }
+
+/* ---------- la posta, il tempo, «lascia fare» ---------- */
+.sc-stake { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 16px var(--sc-pad) 0; animation: scOptIn .36s var(--look-out) calc(var(--sc-d, 0ms) + 340ms) backwards; }
+.sc-stake > span:first-child { font: italic 900 13px / 1 var(--f-display); letter-spacing: .16em; text-transform: uppercase; margin-right: 4px; }
+.sc-stake button { min-width: 64px; padding: 9px 16px 8px; border: 0; background: var(--sc-slab); color: var(--ink); font: italic 900 20px / 1 var(--f-display); font-variant-numeric: tabular-nums; cursor: pointer; outline: none;
+  clip-path: polygon(8px 0, 100% 0, calc(100% - 8px) 100%, 0 100%); transition: transform .2s var(--ease-kick); }
+@media (hover: hover) { .sc-stake button:hover:not(:disabled):not([aria-pressed="true"]) { background: var(--ink); color: var(--bg); } }
+.sc-stake button:focus-visible { background: var(--ink); color: var(--bg); box-shadow: inset 0 -5px 0 var(--key); }
+.sc-stake button[aria-pressed="true"] { background: var(--key); color: var(--key-ink); transform: scale(1.14); }
+.sc-stake button[aria-pressed="true"]:focus-visible { box-shadow: inset 0 -5px 0 var(--key-ink); }
+.sc-stake button:disabled { cursor: not-allowed; color: color-mix(in srgb, var(--ink) 55%, var(--sc-plate)); background: repeating-linear-gradient(-60deg, var(--sc-slab) 0 6px, transparent 6px 11px); text-decoration: line-through; }
+.sc-wallet { margin-left: auto; display: inline-flex; align-items: baseline; gap: 8px; padding: 7px 18px 6px 14px; background: var(--void); color: var(--paper); font: 800 11px / 1 var(--f-body); letter-spacing: .18em; text-transform: uppercase;
+  clip-path: polygon(8px 0, 100% 0, calc(100% - 8px) 100%, 0 100%); }
+.sc-wallet b { font: italic 900 22px / 1 var(--f-display); letter-spacing: 0; color: var(--key); font-variant-numeric: tabular-nums; }
+.sc-foot { display: flex; align-items: center; justify-content: space-between; gap: 18px; margin: 18px var(--sc-pad) 0; }
+/* il tempo è una lama che si consuma */
+.sc-timer { flex: 1; height: 12px; background: color-mix(in srgb, var(--ink) 16%, transparent); clip-path: polygon(8px 0, 100% 0, calc(100% - 8px) 100%, 0 100%); overflow: hidden; }
 .sc-timer i { display: block; height: 100%; background: var(--key); transform-origin: 0 50%; animation: scTimer var(--sc-t, 20s) linear both; }
-.sc.sc-hold .sc-timer { visibility: hidden; }
+.sc.sc-hold .sc-timer i { animation-play-state: paused; background: repeating-linear-gradient(-60deg, var(--key) 0 5px, transparent 5px 10px); }
 @keyframes scTimer { from { transform: scaleX(1); } to { transform: scaleX(0); } }
+.sc-skip { flex: none; margin-left: auto; border: 0; background: none; color: var(--ink); font: italic 900 13px / 1 var(--f-display); letter-spacing: .12em; text-transform: uppercase; padding: 10px 14px 9px; cursor: pointer; outline: none;
+  box-shadow: inset 0 -3px 0 color-mix(in srgb, var(--ink) 34%, transparent); transition: none; }
+@media (hover: hover) { .sc-skip:hover { background: var(--ink); color: var(--bg); box-shadow: inset 0 -3px 0 var(--key); } }
+.sc-skip:focus-visible { background: var(--ink); color: var(--bg); box-shadow: inset 0 -3px 0 var(--key); outline: 3px solid var(--key); outline-offset: 2px; }
+
+/* ---------- uscita: il colpo sulla scelta, poi la lastra parte di lato (partita.js toglie il nodo dopo 260 ms) ---------- */
 .sc.sc-out { pointer-events: none; }
+.sc.sc-out .sc-card { animation: scCardOut .17s var(--ease-cut, cubic-bezier(.7, 0, .84, 0)) 90ms forwards; }
+.sc.sc-out .sc-back { animation: scVeilOut .24s ease forwards; }
+.sc.sc-out::before, .sc.sc-out::after { animation: none; }
+@keyframes scCardOut { to { opacity: 0; transform: translateX(110px) skewX(-10deg); } }
+@keyframes scVeilOut { to { opacity: 0; } }
+/* un cartello dopo l'altro: il velo resta acceso, cambia solo la lastra (61-partita.js ritarda la nuova con --sc-d,
+   così il colpo sulla scelta appena fatta si vede) */
+.sc.sc-out:has(~ .sc) .sc-back { display: none; }
+.sc.sc-out ~ .sc .sc-back { animation: none; }
 html.sc-on { overflow: hidden; }
 
-/* ---------- la barra del giocatore nella Diretta ---------- */
-.pt-hud { display: flex; flex-wrap: wrap; align-items: stretch; gap: 10px 18px; margin: 0 0 14px; padding: 10px 16px; background: var(--panel-solid, var(--panel)); box-shadow: inset 5px 0 0 var(--key); }
-.pt-hud.busy { opacity: .6; }
-.pt-cr { display: grid; align-content: center; gap: 2px; }
-.pt-cr span, .pt-bets small, .pt-men small { font: 800 10.5px / 1 var(--f-body); letter-spacing: .18em; text-transform: uppercase; color: color-mix(in srgb, var(--ink) 68%, transparent); }
-.pt-cr b { font: italic 900 30px / .9 var(--f-display); font-stretch: 116%; color: var(--key); }
-.pt-men { display: flex; align-items: center; gap: 10px; border: 0; background: none; color: var(--ink); padding: 0; text-align: left; cursor: pointer; font: inherit; }
-.pt-men .av { --s: 40px; }
-.pt-men b { display: block; font: italic 900 17px / 1.1 var(--f-display); text-transform: uppercase; }
-.pt-men.dead b { text-decoration: line-through; opacity: .7; }
-.pt-bets { flex: 1 1 260px; display: flex; flex-wrap: wrap; align-items: center; gap: 6px 8px; }
-.pt-bets small { flex-basis: 100%; }
-.pt-bet { display: inline-flex; align-items: baseline; gap: 8px; padding: 4px 10px; background: color-mix(in srgb, var(--ink) 8%, transparent); box-shadow: inset 3px 0 0 var(--key); font-size: 13px; }
-.pt-bet em { font-style: normal; font-weight: 800; color: var(--key); white-space: nowrap; }
-.pt-none { font-size: 13px; opacity: .7; }
-.pt-gift { display: inline-flex; align-items: center; gap: 6px; }
-.pt-gift svg { width: 16px; height: 16px; }
+/* ---------- variante · ritratto in cut-in (mentore, dono, intervista) ---------- */
+.sc-mentor .sc-head, .sc-gift .sc-head, .sc-interview .sc-head { grid-column: 1; padding-right: 12px; }
+.sc-mentor .sc-faces, .sc-gift .sc-faces, .sc-interview .sc-faces { grid-area: 1 / 2 / 2 / 3; z-index: 2; align-self: stretch; margin: 0; gap: 0; min-height: 168px;
+  filter: drop-shadow(-7px 0 0 var(--key)); animation: scFaceIn .46s var(--look-out) calc(var(--sc-d, 0ms) + 100ms) backwards; }
+.sc-mentor .sc-faces .av, .sc-gift .sc-faces .av, .sc-interview .sc-faces .av { --s: 150px; width: clamp(128px, 27vw, 214px); height: auto; align-self: stretch; border-radius: 0 !important; box-shadow: none;
+  clip-path: polygon(30% 0, 100% 0, 100% 100%, 0 100%); }
+.sc-faces .av img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 50% 22%; }
+.sc-mentor .sc-faces .av .sil, .sc-gift .sc-faces .av .sil, .sc-interview .sc-faces .av .sil { inset: 8% -4% 0 12%; -webkit-mask-position: 50% 0; mask-position: 50% 0; }
+.sc-mentor .sc-faces .av .ini, .sc-gift .sc-faces .av .ini, .sc-interview .sc-faces .av .ini { right: 0; bottom: 0; padding: 5px 10px 4px; font: italic 900 15px / 1 var(--f-display); letter-spacing: .06em; background: var(--key); color: var(--key-ink); text-shadow: none; }
+.sc-mentor .sc-faces .av.has-volto .ini, .sc-gift .sc-faces .av.has-volto .ini, .sc-interview .sc-faces .av.has-volto .ini { display: block; }
+@keyframes scFaceIn { from { opacity: 0; transform: translateX(70px) skewX(-8deg); } 40% { opacity: 1; } }
+/* i valori del concorrente: numeri grandi nella tinta */
+.sc-mentor .sc-x b, .sc-gift .sc-x b { font: italic 900 1.3em / 1 var(--f-display); color: var(--key); font-variant-numeric: tabular-nums; }
 
-/* ---------- impostazioni ---------- */
-#ritmoSeg { display: flex; flex-wrap: wrap; }
-#ritmoSeg button { flex: 1 1 0; }
-
-/* ---------- riepilogo nell'Esito ---------- */
-.ps-sum { margin-bottom: 18px; }
-.ps-men { display: flex; align-items: center; gap: 14px; margin-bottom: 14px; }
-.ps-men .av { --s: 64px; }
-.ps-men p { margin: 0; font-size: 15px; }
-.ps-men small { display: block; font: 800 11px / 1 var(--f-body); letter-spacing: .18em; text-transform: uppercase; color: color-mix(in srgb, var(--ink) 68%, transparent); margin-bottom: 4px; }
-.ps-men b { font: italic 900 22px / 1 var(--f-display); text-transform: uppercase; }
-.ps-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 10px; }
-.ps-st { display: grid; gap: 4px; padding: 10px 12px; background: color-mix(in srgb, var(--ink) 7%, transparent); }
-.ps-st b { font: italic 900 30px / .9 var(--f-display); color: var(--key); }
-.ps-st span { font-size: 12px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; }
-.ps-best { margin: 12px 0 4px; }
-
-@media (max-width: 600px) {
-  .sc { padding: 8px; align-items: end; }
-  .sc-card { padding: 18px 16px 14px 20px; max-height: calc(100dvh - 16px); }
-  .sc-grid { grid-template-columns: repeat(auto-fill, minmax(96px, 1fr)); }
-  .sc-grid .sc-opt .av { --s: 52px; }
-  .pt-hud { padding: 8px 12px; gap: 8px 14px; }
-  .pt-cr b { font-size: 24px; }
+/* ---------- variante · puntate: biglietti con la quota sulla matrice ---------- */
+.sc-bets .sc-opt { --stub: 112px; min-height: 76px; padding: 12px 0 12px 16px; column-gap: 14px; }
+.sc-bets .sc-opt::before, .sc-bets .sc-opt::after { clip-path: none;
+  -webkit-mask: radial-gradient(circle 8px at calc(100% - var(--stub)) 0, #0000 97%, #000) top / 100% 51% no-repeat, radial-gradient(circle 8px at calc(100% - var(--stub)) 100%, #0000 97%, #000) bottom / 100% 51% no-repeat;
+  mask: radial-gradient(circle 8px at calc(100% - var(--stub)) 0, #0000 97%, #000) top / 100% 51% no-repeat, radial-gradient(circle 8px at calc(100% - var(--stub)) 100%, #0000 97%, #000) bottom / 100% 51% no-repeat; }
+.sc-bets .sc-opt::before { background: linear-gradient(90deg, var(--sc-slab) calc(100% - var(--stub)), var(--void) 0); }
+.sc-bets .sc-opt .sc-l { font-size: 19px; }
+.sc-bets .sc-opt .sc-cost { align-self: stretch; width: var(--stub); display: grid; align-content: center; justify-items: center; gap: 5px; border-left: 2px dashed color-mix(in srgb, var(--paper) 55%, transparent);
+  font-size: clamp(30px, 5vw, 38px); font-stretch: 112%; letter-spacing: -.02em; color: var(--key); font-variant-numeric: tabular-nums; transition: transform .22s var(--ease-kick); }
+.sc-bets .sc-opt .sc-cost::before { content: "Quota"; font: 800 10px / 1 var(--f-body); letter-spacing: .24em; text-transform: uppercase; color: var(--paper); }
+@media (hover: hover) {
+  .sc-bets .sc-opt:hover:not(:disabled)::before { background: linear-gradient(90deg, var(--ink) calc(100% - var(--stub)), var(--void) 0); }
+  .sc-bets .sc-opt:hover:not(:disabled) .sc-cost { transform: scale(1.12) rotate(-4deg); }
 }
-@media (prefers-reduced-motion: reduce) { .sc-timer i { animation-duration: 0s; } }
+.sc-bets .sc-opt:focus-visible::before { background: linear-gradient(90deg, var(--ink) calc(100% - var(--stub)), var(--void) 0); }
+.sc-bets .sc-opt:focus-visible .sc-cost { transform: scale(1.12) rotate(-4deg); }
+.sc-bets .sc-opt.is-picked::before, .sc-bets .sc-opt.is-picked:hover::before, .sc-bets .sc-opt.is-picked:focus-visible::before { background: linear-gradient(90deg, var(--key) calc(100% - var(--stub)), var(--void) 0); }
+
+/* ---------- variante · dono: cartellini delle casse con il prezzo adesivo ---------- */
+.sc-gift .sc-opts { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px 14px; }
+.sc-gift .sc-opt { min-height: 66px; padding: 10px 12px 10px 18px; column-gap: 12px; }
+.sc-gift .sc-opt .sc-l { font-size: 16.5px; font-stretch: 100%; overflow-wrap: break-word; }
+.sc-gift .sc-opt::before, .sc-gift .sc-opt::after { clip-path: polygon(14px 0, 100% 0, 100% 100%, 14px 100%, 0 calc(100% - 14px), 0 14px); }
+.sc-gift .sc-opt .sc-cost { padding: 7px 10px 6px; background: var(--key); color: var(--key-ink); font-size: 18px; box-shadow: 3px 3px 0 var(--void); rotate: -5deg; font-variant-numeric: tabular-nums; transition: transform .22s var(--ease-kick); }
+@media (hover: hover) { .sc-gift .sc-opt:hover:not(:disabled) .sc-cost { transform: scale(1.14) rotate(-4deg); box-shadow: 3px 3px 0 var(--bg); } }
+.sc-gift .sc-opt:focus-visible .sc-cost { transform: scale(1.14) rotate(-4deg); box-shadow: 3px 3px 0 var(--bg); }
+.sc-gift .sc-opt.is-picked .sc-cost { background: var(--key-ink); color: var(--key); box-shadow: none; }
+/* troppo caro: il prezzo è barrato in rosso e lo dice */
+.sc-gift .sc-opt:disabled .sc-cost { display: grid; justify-items: end; gap: 4px; padding: 5px 8px 4px; box-shadow: none; outline: 2px solid var(--c-kill); color: var(--c-kill);
+  background: linear-gradient(var(--c-kill), var(--c-kill)) 50% 13px / calc(100% - 10px) 2px no-repeat; }
+.sc-gift .sc-opt:disabled .sc-cost::after { content: "Non basta"; font: 800 9.5px / 1 var(--f-body); letter-spacing: .16em; text-transform: uppercase; }
+
+/* ---------- variante · scelta tra volti: tessere ---------- */
+.sc-grid { grid-template-columns: repeat(auto-fill, minmax(128px, 1fr)); gap: 14px 12px; }
+.sc-grid .sc-opt { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto auto auto; align-content: start; justify-items: stretch; text-align: left; gap: 0; min-height: 0; padding: 0 0 10px;
+  animation-delay: calc(var(--sc-d, 0ms) + 150ms + var(--k, 0) * 20ms); transition: transform .22s var(--ease-kick); }
+.sc-grid .sc-opt::before, .sc-grid .sc-opt::after { clip-path: polygon(0 0, 100% 0, 100% calc(100% - 13px), calc(100% - 13px) 100%, 0 100%); }
+.sc-grid .sc-opt::after { transition: none; }
+.sc-grid .sc-opt .av { --s: 84px; width: 100%; height: 96px; border-radius: 0 !important; box-shadow: none; clip-path: polygon(0 0, 100% 0, 100% 80%, 0 100%); }
+.sc-grid .sc-opt .av img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 50% 24%; }
+.sc-grid .sc-opt .av .sil { inset: 6% 12% 0; -webkit-mask-position: 50% 0; mask-position: 50% 0; }
+.sc-grid .sc-opt .av .ini { right: auto; left: 0; bottom: auto; top: 0; padding: 4px 8px 3px 7px; font: italic 900 12px / 1 var(--f-display); background: var(--void); color: var(--paper); text-shadow: none; }
+.sc-grid .sc-opt .sc-l, .sc-grid .sc-opt .sc-s { grid-column: 1; grid-row: auto; padding: 0 10px; }
+.sc-grid .sc-opt .sc-l { margin-top: 2px; font-size: 15px; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.sc-grid .sc-opt .sc-s { font-size: 12px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; }
+/* la tessera si alza; l'ombra (che fa parte del pulsante) copre il punto da cui è partita, così il puntatore non la perde */
+@media (hover: hover) {
+  .sc-grid .sc-opt:hover:not(:disabled) { transform: translateY(-7px); z-index: 1; }
+  .sc-grid .sc-opt:hover:not(:disabled)::after { transform: translate(7px, 9px); }
+}
+.sc-grid .sc-opt:focus-visible { transform: translateY(-7px); z-index: 1; }
+.sc-grid .sc-opt:focus-visible::after { transform: translate(7px, 9px); }
+.sc-grid .sc-opt.is-picked, .sc-grid .sc-opt.is-picked:hover { transform: none; }
+
+/* ---------- variante · intervista: fumetti da talk show ---------- */
+.sc-interview .sc-k { padding-left: 28px; }
+.sc-interview .sc-k::before { content: ""; position: absolute; left: 11px; top: 50%; width: 9px; height: 9px; margin-top: -5px; background: var(--key-ink); clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%); animation: scOnAir 1.1s steps(2, jump-none) infinite; }
+@keyframes scOnAir { from { opacity: 1; } to { opacity: .25; } }
+.sc-interview .sc-t { text-transform: none; font-stretch: 108%; letter-spacing: -.015em; }
+.sc-interview .sc-t::before { content: "\00ab\00a0"; color: var(--key); text-shadow: none; }
+.sc-interview .sc-t::after { content: "\00a0\00bb"; color: var(--key); text-shadow: none; }
+.sc-interview .sc-opts { gap: 12px; }
+.sc-interview .sc-opt { min-height: 64px; padding: 11px 38px 11px 14px; }
+.sc-interview .sc-opt:nth-child(odd) { margin-right: 30px; width: auto; }
+.sc-interview .sc-opt:nth-child(even) { margin-left: 30px; width: auto; }
+/* il fumetto: la coda guarda verso chi risponde */
+.sc-interview .sc-opt::before, .sc-interview .sc-opt::after { clip-path: polygon(0 0, calc(100% - 18px) 0, calc(100% - 18px) 9px, 100% 2px, calc(100% - 18px) 27px, calc(100% - 18px) 100%, 0 100%); }
+.sc-interview .sc-opt .sc-l { text-transform: none; font-size: 19px; letter-spacing: 0; }
+.sc-interview .sc-opt .sc-s { justify-self: start; margin-top: 4px; padding: 3px 10px 3px 8px; font: 800 11px / 1.1 var(--f-body); letter-spacing: .12em; text-transform: uppercase; opacity: 1; box-shadow: inset 3px 0 0 var(--key); }
+
+/* ---------- 2 · la barra del giocatore nella Diretta: una fascia da trasmissione ---------- */
+.pt-hud { position: relative; isolation: isolate; display: flex; flex-wrap: wrap; align-items: stretch; gap: 10px 22px; margin: 0 6px 20px 0; padding: 0 34px 0 0; min-height: 66px; color: var(--paper);
+  background: none; box-shadow: none; filter: drop-shadow(6px 6px 0 var(--key)); }
+.pt-hud[hidden] { display: none; }
+.pt-hud::before, .pt-hud::after { content: ""; position: absolute; inset: 0; pointer-events: none; clip-path: polygon(0 0, 100% 0, calc(100% - 20px) 100%, 0 100%); }
+.pt-hud::before { z-index: -2; background: var(--void); }
+/* retino in fondo alla fascia; durante la riscrittura diventa un nastro che scorre */
+.pt-hud::after { z-index: -1; left: auto; width: min(34%, 300px); background-image: radial-gradient(circle, var(--key) 30%, transparent 33%); background-size: 10px 10px; opacity: .3;
+  -webkit-mask-image: linear-gradient(270deg, #000, transparent); mask-image: linear-gradient(270deg, #000, transparent); }
+.pt-hud.busy::after { left: 0; width: auto; opacity: .36; -webkit-mask-image: none; mask-image: none;
+  background-image: repeating-linear-gradient(-60deg, transparent 0 14px, color-mix(in srgb, var(--key) 50%, transparent) 14px 28px); background-size: auto; animation: ptBusy .5s linear infinite; }
+@keyframes ptBusy { to { background-position: 32.33px 0; } }
+/* i crediti: una targa nella tinta con l'etichetta in verticale */
+.pt-cr { position: relative; display: grid; grid-template-columns: auto auto; align-items: center; gap: 0 9px; padding: 8px 34px 8px 12px; background: var(--key); color: var(--key-ink);
+  clip-path: polygon(0 0, 100% 0, calc(100% - 18px) 100%, 0 100%); }
+.pt-cr span { writing-mode: vertical-rl; transform: rotate(180deg); font: 800 10px / 1 var(--f-body); letter-spacing: .2em; text-transform: uppercase; color: inherit; }
+.pt-cr b { min-width: 2.2ch; font: italic 900 44px / .86 var(--f-display); font-stretch: 116%; letter-spacing: -.02em; color: inherit; font-variant-numeric: tabular-nums; }
+.pt-cr.pt-up b, .pt-cr.pt-down b { animation: ptBump .4s var(--ease-kick); }
+@keyframes ptBump { 30% { transform: scale(1.22) rotate(-4deg); } }
+/* il concorrente che alleni: la fascia sugli occhi, il nome grande */
+.pt-men { display: flex; align-items: center; gap: 12px; border: 0; background: none; color: var(--paper); padding: 6px 4px; text-align: left; cursor: pointer; font: inherit; outline: none; transition: none; }
+.pt-men .av { --s: 44px; width: 92px; height: 46px; border-radius: 0 !important; box-shadow: none; clip-path: polygon(10px 0, 100% 0, calc(100% - 10px) 100%, 0 100%); transition: transform .22s var(--ease-kick); }
+.pt-men .av img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 50% 30%; }
+.pt-men .av .sil { inset: 6% 22% -60%; -webkit-mask-position: 50% 0; mask-position: 50% 0; }
+.pt-men .av.has-volto > .volto, .ps-men .av.has-volto > .volto { object-position: 50% 50%; }
+.pt-men .av.has-volto > .ini, .ps-men .av.has-volto > .ini { display: none; }
+.pt-men small, .pt-bets small { display: block; font: 800 10px / 1 var(--f-body); letter-spacing: .2em; text-transform: uppercase; color: color-mix(in srgb, var(--paper) 74%, var(--void)); }
+.pt-men b { display: block; margin-top: 5px; padding: 1px 8px 2px 0; font: italic 900 21px / 1.05 var(--f-display); font-stretch: 112%; text-transform: uppercase; letter-spacing: -.01em; }
+@media (hover: hover) { .pt-men:hover .av { transform: scale(1.1) rotate(-3deg); } .pt-men:hover b { background: var(--key); color: var(--key-ink); box-shadow: -8px 0 0 var(--key); } }
+.pt-men:focus-visible { outline: 3px solid var(--key); outline-offset: 2px; }
+.pt-men:focus-visible b { background: var(--key); color: var(--key-ink); box-shadow: -8px 0 0 var(--key); }
+.pt-men.dead .av { background: hsl(0 0% 26%); }
+.pt-men.dead .av img { filter: grayscale(1) contrast(1.1); opacity: .6; }
+.pt-men.dead small { color: #f2685a; }
+.pt-men.dead b { text-decoration: line-through; text-decoration-color: #f2685a; text-decoration-thickness: 3px; opacity: 1; }
+/* le puntate aperte: ricevute con la quota sulla matrice */
+.pt-bets { flex: 1 1 280px; display: flex; flex-wrap: wrap; align-items: center; align-content: center; gap: 6px 8px; padding: 8px 0; }
+.pt-bets small { flex-basis: 100%; }
+.pt-bet { display: inline-flex; align-items: stretch; max-width: 100%; padding: 0; background: var(--paper); color: var(--void); box-shadow: none; font-size: 13px; line-height: 1.2;
+  clip-path: polygon(6px 0, 100% 0, calc(100% - 6px) 100%, 0 100%); }
+.pt-bet b { padding: 6px 10px 6px 13px; font-weight: 700; min-width: 0; }
+.pt-bet em { flex: none; display: grid; align-items: center; padding: 5px 14px 4px 10px; background: var(--key); color: var(--key-ink); border-left: 2px dashed var(--void); font: italic 900 14px / 1 var(--f-display); white-space: nowrap; font-variant-numeric: tabular-nums; }
+.pt-none { font-size: 13.5px; font-style: italic; opacity: 1; color: color-mix(in srgb, var(--paper) 74%, var(--void)); }
+
+/* il pulsante del dono nella barra dei comandi */
+.pt-gift { display: inline-flex; align-items: center; gap: 7px; }
+.pt-gift[hidden] { display: none; }
+.pt-gift svg { width: 17px; height: 17px; }
+#giftBtn.pt-gift { background: var(--key); border-color: var(--key); color: var(--key-ink); font: italic 900 14px / 1 var(--f-display); letter-spacing: .08em; text-transform: uppercase; box-shadow: 3px 3px 0 var(--paper);
+  transition: transform .26s var(--ease-kick), box-shadow .2s; }
+@media (hover: hover) { #giftBtn.pt-gift:hover { background: var(--paper); border-color: var(--paper); color: var(--void); box-shadow: 5px 5px 0 var(--key); } #giftBtn.pt-gift:hover svg { animation: ptGiftWig .4s var(--ease-kick); } }
+#giftBtn.pt-gift:focus-visible { outline: 3px solid var(--paper); outline-offset: 3px; }
+#giftBtn.pt-gift.pt-sent { animation: ptSent .42s var(--ease-kick); }
+@keyframes ptGiftWig { 40% { transform: skewX(var(--unslant)) rotate(-16deg) scale(1.2); } }
+@keyframes ptSent { 35% { transform: skewX(var(--slant)) scale(.86); } }
+
+/* ---------- 3 · il timbro della puntata (61-partita.js): vinta, persa, annullata ---------- */
+.pt-stamp { --st: var(--key); position: fixed; z-index: 70; left: 0; top: 0; pointer-events: none; display: grid; gap: 5px; max-width: min(380px, calc(100vw - 28px)); padding: 12px 24px 12px 18px;
+  background: var(--void); color: var(--paper); box-shadow: inset 0 0 0 3px var(--st), 7px 7px 0 var(--st); rotate: -5deg; transform-origin: 50% 50%;
+  animation: ptStampIn .4s var(--ease-kick) backwards, ptStampOut .28s var(--ease-cut, cubic-bezier(.7, 0, .84, 0)) 2s forwards; }
+.pt-stamp.persa { --st: #f2685a; rotate: 4deg; }
+.pt-stamp.nulla { --st: var(--paper); rotate: -2deg; }
+.pt-stamp b { font: italic 900 clamp(28px, 5vw, 42px) / .92 var(--f-display); font-stretch: 118%; letter-spacing: -.02em; text-transform: uppercase; color: var(--st); white-space: nowrap; }
+.pt-stamp b i { margin-left: .22em; font-style: inherit; color: var(--paper); font-variant-numeric: tabular-nums; }
+.pt-stamp small { font: 700 13px / 1.3 var(--f-body); color: var(--paper); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+/* l'onda dell'impatto, dietro il timbro */
+.pt-stamp::before { content: ""; position: absolute; z-index: -1; inset: -10px; border: 4px solid var(--st); opacity: 0; animation: ptStampWave .5s ease-out .16s backwards; }
+@keyframes ptStampIn { from { opacity: 0; transform: scale(2.3) rotate(-12deg); } 55% { opacity: 1; } }
+@keyframes ptStampOut { to { opacity: 0; transform: translateX(60px) skewX(-14deg); } }
+@keyframes ptStampWave { from { opacity: .9; transform: scale(.9); } to { opacity: 0; transform: scale(1.25, 1.6); } }
+
+/* ---------- 4 · il lancio del dono (61-partita.js): una cassa col paracadute dal pulsante al racconto ---------- */
+.pt-drop { position: fixed; z-index: 70; left: 0; top: 0; width: 0; height: 0; pointer-events: none; }
+.pt-drop > .pt-drop-in { position: absolute; left: -48px; top: -112px; width: 96px; display: grid; justify-items: center; gap: 0; }
+.pt-drop svg { display: block; width: 96px; height: 112px; overflow: visible; }
+.pt-drop .pd-chute { transform-box: fill-box; transform-origin: 50% 100%; }
+.pt-drop .pd-tag { margin-top: 4px; padding: 5px 12px 4px 9px; background: var(--void); color: var(--paper); font: italic 900 12px / 1 var(--f-display); letter-spacing: .12em; text-transform: uppercase; white-space: nowrap;
+  box-shadow: 3px 3px 0 var(--key); clip-path: none; }
+.pt-drop .pd-k { fill: var(--key); } .pt-drop .pd-v { fill: var(--void); } .pt-drop .pd-p { fill: var(--paper); }
+.pt-drop .pd-l { fill: none; stroke: var(--void); stroke-width: 2.5; stroke-linejoin: round; stroke-linecap: round; }
+.pt-drop .pd-lp { fill: none; stroke: var(--paper); stroke-width: 1.6; }
+
+/* ---------- 5 · gli eventi che hai causato tu: un cartellino e il bordo ---------- */
+.ev.ev-dono, .ev.ev-mentor.ev-ok, #v-diretta .ev.ev-dono, #v-diretta .ev.ev-mentor.ev-ok { box-shadow: inset -7px 0 0 var(--key); }
+.ev.ev-mentor.ev-ko, #v-diretta .ev.ev-mentor.ev-ko { box-shadow: inset -7px 0 0 color-mix(in srgb, var(--ink) 55%, transparent); }
+#v-diretta .ev.lethal.ev-dono, #v-diretta .ev.lethal.ev-mentor.ev-ok, #v-diretta .ev.c-betray.ev-dono, #v-diretta .ev.c-betray.ev-mentor.ev-ok { box-shadow: inset 0 -4px 0 var(--cc), inset -7px 0 0 var(--key); }
+#v-diretta .ev.lethal.ev-mentor.ev-ko, #v-diretta .ev.c-betray.ev-mentor.ev-ko { box-shadow: inset 0 -4px 0 var(--cc), inset -7px 0 0 color-mix(in srgb, var(--ink) 55%, transparent); }
+.ev.ev-dono .evbody::after, .ev.ev-mentor .evbody::after { order: -1; justify-self: start; display: block; padding: 5px 16px 4px 10px; font: italic 900 12px / 1 var(--f-display); font-stretch: 112%; letter-spacing: .14em; text-transform: uppercase;
+  background: var(--key); color: var(--key-ink); clip-path: polygon(0 0, 100% 0, calc(100% - 8px) 100%, 0 100%); transform-origin: 0 50%; }
+.ev.ev-dono .evbody::after { content: "\25c6\00a0 Dono tuo"; }
+.ev.ev-mentor.ev-ok .evbody::after { content: "\2713\00a0 Ordine eseguito"; }
+.ev.ev-mentor.ev-ko .evbody::after { content: "\2715\00a0 Ordine ignorato"; background: var(--ink); color: var(--bg); }
+.ev.in.ev-dono .evbody::after, .ev.in.ev-mentor .evbody::after { animation: ptTag .36s var(--ease-kick) backwards; animation-delay: calc(var(--d, 0ms) + 280ms); }
+@keyframes ptTag { from { opacity: 0; transform: scale(1.7) rotate(-7deg); } 50% { opacity: 1; } }
+
+/* ---------- 6 · «La tua partita» nell'Esito ---------- */
+.ps-sum { position: relative; margin-bottom: 30px; }
+#resBody.es-on .ps-sum { margin: 0 0 34px; }
+#resBody.es-on .ps-sum > h2 { font-size: clamp(34px, 4.6vw, 64px); }
+#resBody.es-on .ps-sum > h2::before { content: "TU"; }
+.ps-men { display: flex; align-items: center; gap: 16px; margin: 4px 0 20px; }
+.ps-men .av { --s: 60px; width: 132px; height: 62px; border-radius: 0 !important; box-shadow: none; clip-path: polygon(13px 0, 100% 0, calc(100% - 13px) 100%, 0 100%); }
+.ps-men .av img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 50% 30%; }
+.ps-men .av .sil { inset: 6% 24% -60%; -webkit-mask-position: 50% 0; mask-position: 50% 0; }
+.ps-men .av.dead::after { display: none; }
+.ps-men .av.dead img { filter: grayscale(1) contrast(1.1); opacity: .7; }
+.ps-men p { margin: 0; font-size: 15.5px; line-height: 1.4; min-width: 0; }
+.ps-men small { display: block; font: 800 11px / 1 var(--f-body); letter-spacing: .2em; text-transform: uppercase; color: color-mix(in srgb, var(--ink) 70%, transparent); margin-bottom: 6px; }
+.ps-men b { display: block; width: fit-content; max-width: 100%; margin-bottom: 4px; font: italic 900 clamp(24px, 3.4vw, 38px) / 1 var(--f-display); font-stretch: 116%; text-transform: uppercase; letter-spacing: -.02em;
+  box-shadow: inset 0 -.26em 0 color-mix(in srgb, var(--key) 60%, transparent); overflow-wrap: anywhere; }
+/* i numeri: linguette sfalsate, nere, con la cifra nella tinta */
+.ps-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px 6px; padding: 0 14px 10px 0; }
+.ps-st { position: relative; isolation: isolate; display: grid; align-content: end; gap: 8px; min-height: 104px; padding: 14px 26px 13px 20px; background: none; color: var(--bg); }
+.ps-st::before { content: ""; position: absolute; inset: 0; z-index: -1; background: var(--ink); clip-path: polygon(16px 0, 100% 0, calc(100% - 16px) 100%, 0 100%); }
+.ps-st:nth-child(even) { top: 10px; }
+.ps-st:first-child { color: var(--key-ink); }
+.ps-st:first-child::before { background: var(--key); }
+.ps-st b { font: italic 900 clamp(40px, 5vw, 62px) / .84 var(--f-display); font-stretch: 118%; letter-spacing: -.03em; color: var(--key); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.ps-st:first-child b { color: inherit; }
+.ps-st span { font: 800 11px / 1.15 var(--f-body); letter-spacing: .16em; text-transform: uppercase; }
+.ps-sum.ps-go .ps-st { animation: psTab .44s var(--look-out) backwards; animation-delay: calc(var(--k, 0) * 70ms); }
+@keyframes psTab { from { opacity: 0; transform: translateX(-30px) skewX(-12deg); } 50% { opacity: 1; } }
+.ps-best { margin: 22px 0 4px; padding: 10px 16px 10px 18px; max-width: 78ch; font-size: 15.5px; line-height: 1.45; background: color-mix(in srgb, var(--ink) 7%, transparent); box-shadow: inset 6px 0 0 var(--key);
+  clip-path: polygon(0 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%); }
+.ps-best b { font: italic 900 1.3em / 1 var(--f-display); white-space: nowrap; }
+
+/* ---------- 7 · il ritmo nelle regole dell'Arena: come la difficoltà, una pila di voci e la scelta è una lastra ---------- */
+#ritmoSeg { display: grid; grid-template-columns: minmax(0, 1fr); gap: 2px; padding: 0 16px 0 0; border: 0; background: none; overflow: visible; }
+#ritmoSeg button { display: block; min-width: 0; padding: 8px 12px 7px; border: 0; border-left: 5px solid color-mix(in srgb, var(--ink) 22%, transparent); background: none; color: var(--ink); box-shadow: none;
+  font: italic 900 18px / 1 var(--f-display); font-stretch: 112%; letter-spacing: 0; text-transform: uppercase; text-align: left; cursor: pointer; transition: none; }
+#ritmoSeg button[aria-pressed="true"] { margin-block: 5px 9px; padding: 13px 14px 12px; font-size: 27px; color: var(--key-ink); border-left-color: var(--void); }
+#ritmoSeg:not(.has-cursor) button[aria-pressed="true"] { background: var(--key); box-shadow: 6px 6px 0 var(--hard); }
+#ritmoSeg .sel-cursor { transform: none; box-shadow: 6px 6px 0 var(--hard); }
+@media (hover: hover) { #ritmoSeg button[aria-pressed="false"]:hover { background: var(--ink); color: var(--bg); border-left-color: var(--key); } }
+#ritmoSeg button:focus-visible { outline: 3px solid var(--key); outline-offset: 3px; }
+#ritmoHelp { border-left: 4px solid var(--key); padding-left: 10px; margin-top: 12px; }
+
+/* ---------- schermi stretti: il cartello diventa un foglio dal basso ---------- */
+@media (max-width: 600px) {
+  .sc { --sc-pad: 16px; padding: 0; place-items: end stretch; }
+  .sc-card, .sc.sc-pick .sc-card, .sc.sc-gift .sc-card { width: 100%; max-height: calc(100dvh - 28px); padding-bottom: calc(16px + env(safe-area-inset-bottom, 0px)); box-shadow: 0 -7px 0 var(--key); animation-name: scSheetIn; }
+  .sc.sc-out .sc-card { animation-name: scSheetOut; }
+  .sc-head { padding: 18px var(--sc-pad) 42px; gap: 8px; }
+  .sc-x { font-size: 14px; }
+  .sc-pick .sc-head::after, .sc-bets .sc-head::after { font-size: 150px; right: 6px; }
+  .sc-opts { margin-top: 10px; }
+  .sc-opt { padding-right: 20px; }
+  .sc-opt .sc-l { font-size: 16.5px; }
+  .sc-mentor .sc-faces, .sc-gift .sc-faces, .sc-interview .sc-faces { min-height: 140px; }
+  .sc-mentor .sc-faces .av, .sc-gift .sc-faces .av, .sc-interview .sc-faces .av { width: 104px; }
+  .sc-grid { grid-template-columns: repeat(auto-fill, minmax(96px, 1fr)); gap: 12px 9px; }
+  .sc-grid .sc-opt .av { height: 78px; }
+  .sc-grid .sc-opt .sc-l, .sc-grid .sc-opt .sc-s { padding: 0 7px; }
+  .sc-grid .sc-opt .sc-l { font-size: 13.5px; }
+  .sc-bets .sc-opt { --stub: 86px; padding-left: 12px; column-gap: 10px; }
+  .sc-bets .sc-opt .sc-l { font-size: 16px; }
+  .sc-gift .sc-opts { grid-template-columns: minmax(0, 1fr); gap: 8px; }
+  .sc-gift .sc-opt { min-height: 56px; }
+  .sc-interview .sc-opt:nth-child(odd) { margin-right: 14px; }
+  .sc-interview .sc-opt:nth-child(even) { margin-left: 14px; }
+  .sc-interview .sc-opt .sc-l { font-size: 17px; }
+  .sc-stake button { min-width: 56px; padding-inline: 12px; }
+  .sc-foot { gap: 12px; }
+  .pt-hud { margin-right: 6px; padding-right: 16px; gap: 4px 14px; }
+  .pt-cr { padding: 6px 28px 6px 9px; }
+  .pt-cr b { font-size: 34px; }
+  .pt-men .av { width: 70px; height: 40px; }
+  .pt-men b { font-size: 18px; }
+  .pt-bets { flex-basis: 100%; padding: 4px 12px 10px; }
+  .ps-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); padding-right: 6px; }
+  .ps-st { min-height: 86px; padding: 12px 20px 11px 16px; }
+  .ps-men .av { width: 96px; height: 52px; }
+}
+@keyframes scSheetIn { from { opacity: 0; transform: translateY(70px) skewY(-3deg); } 45% { opacity: 1; } }
+@keyframes scSheetOut { to { opacity: 0; transform: translateY(90px); } }
+
+/* ---------- movimento ridotto: niente si muove, gli stati sono immediati ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .sc::before, .sc::after { display: none; }
+  .sc-back, .sc-card, .sc-k, .sc-t .sc-w, .sc-opt, .sc-opt.is-picked, .sc-opt::after, .sc-stake, .sc-faces, .sc-interview .sc-k::before, .sc.sc-out .sc-card, .sc.sc-out .sc-back,
+  .pt-hud.busy::after, .pt-cr b, #giftBtn.pt-gift, #giftBtn.pt-gift svg, .pt-stamp, .pt-stamp::before, .ev .evbody::after, .ps-sum.ps-go .ps-st { animation: none !important; }
+  .sc-opt, .sc-opt::after, .sc-opt .sc-n, .sc-opt .sc-cost, .sc-stake button, .pt-men .av, #giftBtn.pt-gift { transition: none !important; }
+  .sc-timer i { animation-duration: 0s; }
+  .sc-grid .sc-opt:hover:not(:disabled), .sc-grid .sc-opt:focus-visible { transform: none; }
+  .pt-drop { display: none; }
+}
+[data-reduced-motion] .sc::before, [data-reduced-motion] .sc::after { display: none; }
+[data-reduced-motion] :is(.sc-back, .sc-card, .sc-k, .sc-t .sc-w, .sc-opt, .sc-opt.is-picked, .sc-stake, .sc-faces, .sc.sc-out .sc-card, .sc.sc-out .sc-back, .pt-cr b, #giftBtn.pt-gift, #giftBtn.pt-gift svg, .pt-stamp, .ps-sum.ps-go .ps-st),
+[data-reduced-motion] .sc-opt::after, [data-reduced-motion] .sc-interview .sc-k::before, [data-reduced-motion] .pt-hud.busy::after, [data-reduced-motion] .pt-stamp::before, [data-reduced-motion] .ev .evbody::after { animation: none !important; }
+[data-reduced-motion] :is(.sc-opt, .sc-opt .sc-n, .sc-opt .sc-cost, .sc-stake button, .pt-men .av, #giftBtn.pt-gift), [data-reduced-motion] .sc-opt::after { transition: none !important; }
+[data-reduced-motion] .sc-timer i { animation-duration: 0s; }
+[data-reduced-motion] .sc-grid .sc-opt:hover:not(:disabled), [data-reduced-motion] .sc-grid .sc-opt:focus-visible { transform: none; }
+[data-reduced-motion] .pt-drop { display: none; }
+
+/* ---------- regia: su telefono il dono resta un'icona, così la barra del lettore non trabocca ---------- */
+@media (max-width: 600px) {
+  .player #giftBtn.pt-gift { padding-inline: 10px; min-width: 0; gap: 0; }
+  .player #giftBtn.pt-gift > span { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+}
 
 /* ================= PELLE · COMUNI =================
  * Controlli, dialoghi, intestazione, piè di pagina, stati vuoti, notifiche: tutto ciò che si ripete in ogni sezione.
@@ -17630,10 +17950,10 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
         P.mentor.fid = Math.min(5, P.mentor.fid + 1); P.mo += 4;
         const th = { nascondersi: 'Il consiglio è chiaro: oggi non mi faccio vedere.', caccia: 'Il mentore vuole che vada a caccia. Va bene.', reclutare: 'Da soli non si va lontano: oggi cerco qualcuno di cui fidarmi.', cibo: 'Prima di tutto la pancia piena: oggi penso alle provviste.' }[k];
         P.thought = esc(th);
-        events.push(intEvent(P, n + ' riceve il messaggio del mentore e decide di ' + ORD[cosa] + (tg ? ': nel mirino c’è ' + nameTag(tg) : '') + '.', { whyTxt: 'Ordine del mentore', mentor: cosa, obeys: true }));
+        events.push(intEvent(P, n + ' riceve il messaggio del mentore e decide di ' + ORD[cosa] + (tg ? ': nel mirino c’è ' + nameTag(tg) : '') + '.', { whyTxt: 'Il consiglio del mentore', mentor: cosa, obeys: true }));
       } else {
         P.mentor.fid = Math.max(-3, P.mentor.fid - 1);
-        events.push(intEvent(P, n + ' legge il messaggio del mentore, che vorrebbe vederl' + (P.gender === 'F' ? 'a' : P.gender === 'N' ? 'ə' : 'o') + ' ' + (cosa === 'nasconditi' ? 'restare al riparo' : ORD[cosa]) + ', e fa di testa sua.', { cat: 'hurt', whyTxt: 'Ordine ignorato', mentor: cosa, obeys: false }));
+        events.push(intEvent(P, n + ' legge il messaggio del mentore, che vorrebbe vederl' + (P.gender === 'F' ? 'a' : P.gender === 'N' ? 'ə' : 'o') + ' ' + (cosa === 'nasconditi' ? 'restare al riparo' : ORD[cosa]) + ', e fa di testa sua.', { cat: 'hurt', whyTxt: 'Fa di testa sua', mentor: cosa, obeys: false }));
       }
     }
     function applyInterventions(events) {
@@ -19195,7 +19515,7 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
 </script>
 <script>window.LOS_ASSETS = {"logo":"img/logo.f2d5175789.webp","icona":"img/icona.8b02ddeb49.webp","favicon":"img/favicon.86774dc7cf.png","panoramica":"img/panoramica.66c4c27255.webp","sagome":["img/sagome-cappuccio.e8876ba986.webp","img/sagome-esploratore.9a99fd13f8.webp","img/sagome-viaggiatore.5e36435604.webp"],"arene":{"classico":"img/arene-classico.c2887324d1.webp","cyberpunk":"img/arene-cyberpunk.713b4c77ea.webp","fantasy":"img/arene-fantasy.ee494a9322.webp","horror":"img/arene-horror.76225517ca.webp","liceo":"img/arene-liceo.c591ac5f32.webp","royale":"img/arene-royale.46515caf90.webp","scifi":"img/arene-scifi.bc9d8e04eb.webp","ufficio":"img/arene-ufficio.a2e36d4f7f.webp","wasteland":"img/arene-wasteland.734ed966b2.webp","zombie":"img/arene-zombie.11476cf1ca.webp"},"atlas":{"classico":{"armi":{"arco":"img/arene-classico-armi-arco.57fa716aa9.webp","ascia":"img/arene-classico-armi-ascia.f48629747b.webp","coltello-da-campo":"img/arene-classico-armi-coltello-da-campo.3393de240f.webp","coltello":"img/arene-classico-armi-coltello.a0134af05c.webp","falce-corta":"img/arene-classico-armi-falce-corta.3131158a9f.webp","fionda":"img/arene-classico-armi-fionda.48c8c32c43.webp","lancia-da-caccia":"img/arene-classico-armi-lancia-da-caccia.6f2be560ec.webp","lancia":"img/arene-classico-armi-lancia.115909650b.webp","machete":"img/arene-classico-armi-machete.e1c9ef25d7.webp","mazza-corta":"img/arene-classico-armi-mazza-corta.e1092f0628.webp","mazza":"img/arene-classico-armi-mazza.1fddf37b46.webp","pugnale-da-cintura":"img/arene-classico-armi-pugnale-da-cintura.0bedc8a501.webp","pugnale":"img/arene-classico-armi-pugnale.fda9dbf38a.webp","scure-da-legna":"img/arene-classico-armi-scure-da-legna.837c5d1f78.webp","spada-corta":"img/arene-classico-armi-spada-corta.952e6b7f6a.webp","tridente":"img/arene-classico-armi-tridente.2fcb3547d9.webp"},"luoghi":{"altopiano":"img/arene-classico-luoghi-altopiano.36a37512d3.webp","bosco":"img/arene-classico-luoghi-bosco.2e9163544b.webp","cornucopia":"img/arene-classico-luoghi-cornucopia.393b2dabe1.webp","fiume":"img/arene-classico-luoghi-fiume.22b335a914.webp","paludi":"img/arene-classico-luoghi-paludi.77cf115eb4.webp","rovine":"img/arene-classico-luoghi-rovine.9ea4f70ca9.webp"},"pericoli":{"branco-di-lupi-mutanti":"img/arene-classico-pericoli-branco-di-lupi-mutanti.d786a62875.webp","orso-affamato":"img/arene-classico-pericoli-orso-affamato.e4f38a9892.webp","sciame-di-vespe-velenose":"img/arene-classico-pericoli-sciame-di-vespe-velenose.5adb2c7b8d.webp","serpente-gigante":"img/arene-classico-pericoli-serpente-gigante.b17e7f3d91.webp"}},"cyberpunk":{"armi":{"coltello-vibrante-in-ceramica":"img/arene-cyberpunk-armi-coltello-vibrante-in-ceramica.6bbcd0e9e4.webp","fucile-a-pompa-da-strada":"img/arene-cyberpunk-armi-fucile-a-pompa-da-strada.dbd0de34e1.webp","fucile-a-pompa-elettromagnetico":"img/arene-cyberpunk-armi-fucile-a-pompa-elettromagnetico.0555418cd0.webp","katana-termica":"img/arene-cyberpunk-armi-katana-termica.f1ff597173.webp","mazza-a-impulsi":"img/arene-cyberpunk-armi-mazza-a-impulsi.22d841ed1d.webp","mazza-da-baseball-chiodata":"img/arene-cyberpunk-armi-mazza-da-baseball-chiodata.db2996f744.webp","mitra-compatto":"img/arene-cyberpunk-armi-mitra-compatto.eaa3815798.webp","pistola-a-rotaia-artigianale":"img/arene-cyberpunk-armi-pistola-a-rotaia-artigianale.f9e83bda89.webp","pistola-smart":"img/arene-cyberpunk-armi-pistola-smart.2aa922ba8c.webp","sparachiodi-riprogrammato":"img/arene-cyberpunk-armi-sparachiodi-riprogrammato.70f6190cb0.webp","taser-da-buttafuori":"img/arene-cyberpunk-armi-taser-da-buttafuori.60b58b451d.webp","tirapugni-elettrificato":"img/arene-cyberpunk-armi-tirapugni-elettrificato.1ce19bab37.webp","ventaglio-da-combattimento-in-titanio":"img/arene-cyberpunk-armi-ventaglio-da-combattimento-in-titanio.f3b7bb5a10.webp"},"luoghi":{"clinica-del-ripperdoc":"img/arene-cyberpunk-luoghi-clinica-del-ripperdoc.8ef0cb941b.webp","club-della-braindance":"img/arene-cyberpunk-luoghi-club-della-braindance.7765542e70.webp","megablocco":"img/arene-cyberpunk-luoghi-megablocco.28b72e6ecf.webp","mercato-di-kabuki":"img/arene-cyberpunk-luoghi-mercato-di-kabuki.d5c8ab7b96.webp","nodo-dati-corporativo":"img/arene-cyberpunk-luoghi-nodo-dati-corporativo.56ca3e1335.webp","officina-dei-maelstrom":"img/arene-cyberpunk-luoghi-officina-dei-maelstrom.d69285cf21.webp","piazza-della-torre":"img/arene-cyberpunk-luoghi-piazza-della-torre.1e400212c8.webp"},"pericoli":{"banda-di-scav":"img/arene-cyberpunk-pericoli-banda-di-scav.f1a2b2ccc4.webp","gang-di-cromati":"img/arene-cyberpunk-pericoli-gang-di-cromati.74e5576e23.webp","sciame-di-droni-di-pattuglia":"img/arene-cyberpunk-pericoli-sciame-di-droni-di-pattuglia.6fb4b17ad9.webp","squadra-di-sicurezza-corporativa":"img/arene-cyberpunk-pericoli-squadra-di-sicurezza-corporativa.6195a3b15d.webp"}},"fantasy":{"armi":{"arco-elfico":"img/arene-fantasy-armi-arco-elfico.8012f9136d.webp","ascia-nanica":"img/arene-fantasy-armi-ascia-nanica.6913fdf008.webp","balestra":"img/arene-fantasy-armi-balestra.7767becc83.webp","bastone-magico":"img/arene-fantasy-armi-bastone-magico.0781aee860.webp","daga-dei-giuramenti":"img/arene-fantasy-armi-daga-dei-giuramenti.3b6d4b398c.webp","falcetto-dargento":"img/arene-fantasy-armi-falcetto-dargento.1ce0e4e163.webp","lancia-incantata":"img/arene-fantasy-armi-lancia-incantata.7371199824.webp","lancia-silvana":"img/arene-fantasy-armi-lancia-silvana.08fbc01ede.webp","martello-da-guerra":"img/arene-fantasy-armi-martello-da-guerra.4eb03f4db7.webp","martello-nanico":"img/arene-fantasy-armi-martello-nanico.82ad6b9b14.webp","mazza-di-quercia":"img/arene-fantasy-armi-mazza-di-quercia.0f6a8345a9.webp","pugnale-avvelenato":"img/arene-fantasy-armi-pugnale-avvelenato.aba554d177.webp","spada-da-viaggio":"img/arene-fantasy-armi-spada-da-viaggio.a7bdcab5f4.webp","spada-runica":"img/arene-fantasy-armi-spada-runica.ec4012c6cf.webp"},"luoghi":{"altare-delle-armi":"img/arene-fantasy-luoghi-altare-delle-armi.db06de44c1.webp","foresta-elfica":"img/arene-fantasy-luoghi-foresta-elfica.0448fcfbd3.webp","lago-nebbioso":"img/arene-fantasy-luoghi-lago-nebbioso.f19abc7c81.webp","miniere":"img/arene-fantasy-luoghi-miniere.5baa916ec9.webp","palude-stregata":"img/arene-fantasy-luoghi-palude-stregata.6a0b2af4a7.webp","picco-del-drago":"img/arene-fantasy-luoghi-picco-del-drago.06bdfd84b1.webp","torre-in-rovina":"img/arene-fantasy-luoghi-torre-in-rovina.ac716863c7.webp"},"pericoli":{"branco-di-lupi-mannari":"img/arene-fantasy-pericoli-branco-di-lupi-mannari.1c9124ceee.webp","spettro-errante":"img/arene-fantasy-pericoli-spettro-errante.056074bc23.webp","troll-di-caverna":"img/arene-fantasy-pericoli-troll-di-caverna.31aa2444f0.webp","viverna":"img/arene-fantasy-pericoli-viverna.577b91a819.webp"}},"horror":{"armi":{"ascia":"img/arene-horror-armi-ascia.f6793c220e.webp","attizzatoio":"img/arene-horror-armi-attizzatoio.12b9bf75af.webp","bastone-da-passeggio":"img/arene-horror-armi-bastone-da-passeggio.1a636ce4ab.webp","candelabro-dargento":"img/arene-horror-armi-candelabro-dargento.7d962054de.webp","coltello-dargento":"img/arene-horror-armi-coltello-dargento.73a6bb81ea.webp","crocifisso-appuntito":"img/arene-horror-armi-crocifisso-appuntito.203b41a170.webp","daga-da-cerimonia":"img/arene-horror-armi-daga-da-cerimonia.a597e15c53.webp","falce":"img/arene-horror-armi-falce.6513df8fa2.webp","fucile-da-caccia":"img/arene-horror-armi-fucile-da-caccia.169dc367e1.webp","pugnale-depoca":"img/arene-horror-armi-pugnale-depoca.f148afd005.webp","pugnale-rituale":"img/arene-horror-armi-pugnale-rituale.944cb9056c.webp","scure-da-legna":"img/arene-horror-armi-scure-da-legna.a11379a412.webp"},"luoghi":{"biblioteca":"img/arene-horror-luoghi-biblioteca.00d6ab97f4.webp","cantina":"img/arene-horror-luoghi-cantina.a196828c1d.webp","cappella":"img/arene-horror-luoghi-cappella.a51e505028.webp","cimitero":"img/arene-horror-luoghi-cimitero.7a441de089.webp","salone":"img/arene-horror-luoghi-salone.37f10c88c7.webp","serra":"img/arene-horror-luoghi-serra.b3d91121d4.webp","soffitta":"img/arene-horror-luoghi-soffitta.466d40cea3.webp"},"pericoli":{"bambola-posseduta":"img/arene-horror-pericoli-bambola-posseduta.7064eef1d7.webp","entita-senza-volto":"img/arene-horror-pericoli-entita-senza-volto.2c28467bdd.webp","spettro-urlante":"img/arene-horror-pericoli-spettro-urlante.25fa554e05.webp","stormo-di-corvi":"img/arene-horror-pericoli-stormo-di-corvi.fe5c85d7ae.webp"}},"liceo":{"armi":{"compito-copiato":"img/arene-liceo-armi-compito-copiato.c9ade27d61.webp","dossier-delle-revisioni":"img/arene-liceo-armi-dossier-delle-revisioni.77676a0f5f.webp","elenco-delle-correzioni":"img/arene-liceo-armi-elenco-delle-correzioni.04be1154c8.webp","fascicolo-di-risposte-motivate":"img/arene-liceo-armi-fascicolo-di-risposte-motivate.c29995b581.webp","foto-imbarazzante":"img/arene-liceo-armi-foto-imbarazzante.ff7d3ef284.webp","gossip-esplosivo":"img/arene-liceo-armi-gossip-esplosivo.552b1e6236.webp","pallone-da-dodgeball":"img/arene-liceo-armi-pallone-da-dodgeball.60a2576785.webp","profilo-falso":"img/arene-liceo-armi-profilo-falso.d1dac05a2b.webp","prospetto-dei-contributi":"img/arene-liceo-armi-prospetto-dei-contributi.0c121fd79a.webp","quaderno-delle-verifiche":"img/arene-liceo-armi-quaderno-delle-verifiche.7d8b07341a.webp","registro-rubato":"img/arene-liceo-armi-registro-rubato.67eb4b9eff.webp","riepilogo-delle-fonti":"img/arene-liceo-armi-riepilogo-delle-fonti.3c889a0ed5.webp"},"luoghi":{"aula-magna":"img/arene-liceo-luoghi-aula-magna.0478e35c5c.webp","aule":"img/arene-liceo-luoghi-aule.b3142d07cc.webp","biblioteca":"img/arene-liceo-luoghi-biblioteca.1ae806ae58.webp","cortile":"img/arene-liceo-luoghi-cortile.51bf433337.webp","laboratorio-di-chimica":"img/arene-liceo-luoghi-laboratorio-di-chimica.eba1434683.webp","mensa":"img/arene-liceo-luoghi-mensa.67bcbc7e37.webp","palestra":"img/arene-liceo-luoghi-palestra.8ecb872849.webp"},"pericoli":{"bidello-di-turno":"img/arene-liceo-pericoli-bidello-di-turno.191c43a8bd.webp","ispezione-a-sorpresa":"img/arene-liceo-pericoli-ispezione-a-sorpresa.bef087d9b9.webp","preside":"img/arene-liceo-pericoli-preside.033f6c9aae.webp","professoressa-di-matematica":"img/arene-liceo-pericoli-professoressa-di-matematica.6cb65c6a3f.webp"}},"royale":{"armi":{"balestra":"img/arene-royale-armi-balestra.64563b6cea.webp","carabina-compatta":"img/arene-royale-armi-carabina-compatta.a0fa150fbe.webp","coltello-da-combattimento":"img/arene-royale-armi-coltello-da-combattimento.74a64bca77.webp","coltello-tattico":"img/arene-royale-armi-coltello-tattico.8e9cb56197.webp","fucile-a-pompa":"img/arene-royale-armi-fucile-a-pompa.3d7fc7d83c.webp","fucile-da-cecchino":"img/arene-royale-armi-fucile-da-cecchino.fc3c4f19f1.webp","fucile-dassalto":"img/arene-royale-armi-fucile-dassalto.b91ccb0ec8.webp","granata":"img/arene-royale-armi-granata.fd9c359b27.webp","lancia-da-sopravvivenza":"img/arene-royale-armi-lancia-da-sopravvivenza.8a39c1a5e5.webp","manganello":"img/arene-royale-armi-manganello.dc6284893b.webp","mitraglietta":"img/arene-royale-armi-mitraglietta.6dcc3246e6.webp","pistola-da-segnalazione-modificata":"img/arene-royale-armi-pistola-da-segnalazione-modificata.1c7f899ca7.webp","pistola":"img/arene-royale-armi-pistola.acae268814.webp","scure-da-campo":"img/arene-royale-armi-scure-da-campo.6a5b0becd5.webp"},"luoghi":{"aeroporto":"img/arene-royale-luoghi-aeroporto.81e8ce98d4.webp","base-militare":"img/arene-royale-luoghi-base-militare.67f3a7de9d.webp","centrale-elettrica":"img/arene-royale-luoghi-centrale-elettrica.05ee57458a.webp","fattoria":"img/arene-royale-luoghi-fattoria.7c780dda87.webp","foresta":"img/arene-royale-luoghi-foresta.03b47644d0.webp","villaggio-costiero":"img/arene-royale-luoghi-villaggio-costiero.568519eb7c.webp"},"pericoli":{"cane-da-guardia-addestrato":"img/arene-royale-pericoli-cane-da-guardia-addestrato.c7853a67a0.webp","drone-armato":"img/arene-royale-pericoli-drone-armato.30d0b73e01.webp","elicottero-da-caccia":"img/arene-royale-pericoli-elicottero-da-caccia.8c68e62346.webp"}},"scifi":{"armi":{"bastone-a-impulsi":"img/arene-scifi-armi-bastone-a-impulsi.4e17e074e7.webp","cannone-a-rotaia-portatile":"img/arene-scifi-armi-cannone-a-rotaia-portatile.9a59b97d98.webp","frusta-monofilamento":"img/arene-scifi-armi-frusta-monofilamento.5ee8081aa9.webp","fucile-al-plasma":"img/arene-scifi-armi-fucile-al-plasma.ea2384a239.webp","granata-emp":"img/arene-scifi-armi-granata-emp.04cfd31203.webp","lama-di-servizio":"img/arene-scifi-armi-lama-di-servizio.a47d434464.webp","lama-vibrante":"img/arene-scifi-armi-lama-vibrante.02b0f47ff8.webp","lancia-da-abbordaggio":"img/arene-scifi-armi-lancia-da-abbordaggio.cf167e52ff.webp","perforatore-portatile":"img/arene-scifi-armi-perforatore-portatile.aa7e92ecab.webp","pistola-a-scarica":"img/arene-scifi-armi-pistola-a-scarica.33b3e5929e.webp","pistola-laser":"img/arene-scifi-armi-pistola-laser.aed4bbf3ed.webp","taglierino-ceramico":"img/arene-scifi-armi-taglierino-ceramico.b45d524836.webp","taser-a-impulsi":"img/arene-scifi-armi-taser-a-impulsi.360e29e1d5.webp"},"luoghi":{"condotti-di-servizio":"img/arene-scifi-luoghi-condotti-di-servizio.6817134b5e.webp","hangar":"img/arene-scifi-luoghi-hangar.6de551833b.webp","moduli-abitativi":"img/arene-scifi-luoghi-moduli-abitativi.9f5bb96d39.webp","ponte-di-comando":"img/arene-scifi-luoghi-ponte-di-comando.3e9ffd005a.webp","reattore":"img/arene-scifi-luoghi-reattore.d10a335006.webp","serra-idroponica":"img/arene-scifi-luoghi-serra-idroponica.b6f4407853.webp"},"pericoli":{"androide-da-combattimento":"img/arene-scifi-pericoli-androide-da-combattimento.1a3d3eb38e.webp","creatura-aliena-dai-tentacoli":"img/arene-scifi-pericoli-creatura-aliena-dai-tentacoli.b6b314ddd9.webp","drone-di-sicurezza-impazzito":"img/arene-scifi-pericoli-drone-di-sicurezza-impazzito.c8a9c6f9e3.webp","sciame-di-nanobot":"img/arene-scifi-pericoli-sciame-di-nanobot.d43296f047.webp"}},"ufficio":{"armi":{"badge-clonato-del-capo":"img/arene-ufficio-armi-badge-clonato-del-capo.be9f7381fe.webp","dossier-dei-risultati":"img/arene-ufficio-armi-dossier-dei-risultati.1888e2f671.webp","elenco-dei-contributi":"img/arene-ufficio-armi-elenco-dei-contributi.3de4fbe5bf.webp","fascicolo-delle-fonti":"img/arene-ufficio-armi-fascicolo-delle-fonti.02df27dfbf.webp","foglio-excel-con-le-prove":"img/arene-ufficio-armi-foglio-excel-con-le-prove.944f6ec708.webp","mail-in-copia-a-tutti":"img/arene-ufficio-armi-mail-in-copia-a-tutti.1d4304df14.webp","nota-spese-gonfiata":"img/arene-ufficio-armi-nota-spese-gonfiata.d2683cca4c.webp","presentazione-rubata":"img/arene-ufficio-armi-presentazione-rubata.815dc5c8b4.webp","prospetto-delle-metriche":"img/arene-ufficio-armi-prospetto-delle-metriche.356da1d2d9.webp","registro-delle-revisioni":"img/arene-ufficio-armi-registro-delle-revisioni.509eab44df.webp","report-pieno-di-errori-altrui":"img/arene-ufficio-armi-report-pieno-di-errori-altrui.c01c0ef897.webp","riepilogo-delle-approvazioni":"img/arene-ufficio-armi-riepilogo-delle-approvazioni.9394dadd6b.webp"},"luoghi":{"cucina":"img/arene-ufficio-luoghi-cucina.d968f8861d.webp","open-space":"img/arene-ufficio-luoghi-open-space.b6b7990c99.webp","parcheggio":"img/arene-ufficio-luoghi-parcheggio.d593f2ed83.webp","sala-riunioni":"img/arene-ufficio-luoghi-sala-riunioni.f92c4030a9.webp","sala-stampanti":"img/arene-ufficio-luoghi-sala-stampanti.1727f50082.webp","ufficio-del-direttore":"img/arene-ufficio-luoghi-ufficio-del-direttore.bb3b6cabab.webp"},"pericoli":{"consulente-esterno":"img/arene-ufficio-pericoli-consulente-esterno.ce6e200c3f.webp","direttore-generale":"img/arene-ufficio-pericoli-direttore-generale.da2eb1f708.webp","riorganizzazione-aziendale":"img/arene-ufficio-pericoli-riorganizzazione-aziendale.1fd57b76b3.webp","ufficio-risorse-umane":"img/arene-ufficio-pericoli-ufficio-risorse-umane.8392df7518.webp"}},"wasteland":{"armi":{"balestra-artigianale":"img/arene-wasteland-armi-balestra-artigianale.e09826852f.webp","catena":"img/arene-wasteland-armi-catena.866183d584.webp","coltello-da-strada":"img/arene-wasteland-armi-coltello-da-strada.1083c4429d.webp","fucile-arrugginito":"img/arene-wasteland-armi-fucile-arrugginito.797601f16e.webp","lama-di-recupero":"img/arene-wasteland-armi-lama-di-recupero.1ad13cfc78.webp","lancia-di-ferraglia":"img/arene-wasteland-armi-lancia-di-ferraglia.99d9f41307.webp","lancia-ricavata-da-un-tubo":"img/arene-wasteland-armi-lancia-ricavata-da-un-tubo.53b934e449.webp","lanciachiodi":"img/arene-wasteland-armi-lanciachiodi.e4f51e42e2.webp","mannaia":"img/arene-wasteland-armi-mannaia.518ae9c11c.webp","martello-da-officina":"img/arene-wasteland-armi-martello-da-officina.851055795e.webp","mazza-di-tubi":"img/arene-wasteland-armi-mazza-di-tubi.91babe82ac.webp","molotov":"img/arene-wasteland-armi-molotov.303d6fa315.webp","scure-da-demolizione":"img/arene-wasteland-armi-scure-da-demolizione.066ea5e066.webp"},"luoghi":{"autostrada-spezzata":"img/arene-wasteland-luoghi-autostrada-spezzata.19a72a0b97.webp","citta-fantasma":"img/arene-wasteland-luoghi-citta-fantasma.fe22bb72b2.webp","cratere":"img/arene-wasteland-luoghi-cratere.04de7ca40a.webp","deposito":"img/arene-wasteland-luoghi-deposito.f98aa31220.webp","diga":"img/arene-wasteland-luoghi-diga.3be9abe15a.webp","discarica":"img/arene-wasteland-luoghi-discarica.b8783ad9c6.webp","raffineria":"img/arene-wasteland-luoghi-raffineria.081e2d2ad6.webp"},"pericoli":{"banda-di-predoni":"img/arene-wasteland-pericoli-banda-di-predoni.1dfcfd1628.webp","branco-di-cani-mutati":"img/arene-wasteland-pericoli-branco-di-cani-mutati.442fabfc39.webp","scorpione-gigante":"img/arene-wasteland-pericoli-scorpione-gigante.2dd8911367.webp","verme-delle-sabbie":"img/arene-wasteland-pericoli-verme-delle-sabbie.a0d445beeb.webp"}},"zombie":{"armi":{"accetta-da-soccorso":"img/arene-zombie-armi-accetta-da-soccorso.6d36eb13ac.webp","accetta":"img/arene-zombie-armi-accetta.0eed163720.webp","balestra":"img/arene-zombie-armi-balestra.d705131d17.webp","coltello-da-campeggio":"img/arene-zombie-armi-coltello-da-campeggio.2abab58e78.webp","fucile-a-pompa":"img/arene-zombie-armi-fucile-a-pompa.b00b1d6a70.webp","katana":"img/arene-zombie-armi-katana.f631ad392f.webp","machete-da-potatura":"img/arene-zombie-armi-machete-da-potatura.94a93108a1.webp","martello-da-carpentiere":"img/arene-zombie-armi-martello-da-carpentiere.021e8a80f2.webp","mazza-chiodata":"img/arene-zombie-armi-mazza-chiodata.b4e11dcadb.webp","mazza-da-lavoro":"img/arene-zombie-armi-mazza-da-lavoro.c36a90108f.webp","motosega":"img/arene-zombie-armi-motosega.f74e603615.webp","piede-di-porco":"img/arene-zombie-armi-piede-di-porco.c185a97e0d.webp","pistola":"img/arene-zombie-armi-pistola.6d30022ca6.webp"},"luoghi":{"centro-commerciale":"img/arene-zombie-luoghi-centro-commerciale.333f4699d5.webp","metropolitana":"img/arene-zombie-luoghi-metropolitana.878a263605.webp","ospedale":"img/arene-zombie-luoghi-ospedale.f25de413a4.webp","periferia":"img/arene-zombie-luoghi-periferia.e28a7d70c7.webp","piazza":"img/arene-zombie-luoghi-piazza.b6ed86b3ad.webp","scuola":"img/arene-zombie-luoghi-scuola.153ddbaa75.webp","stazione-di-polizia":"img/arene-zombie-luoghi-stazione-di-polizia.157f7a17f5.webp"},"pericoli":{"cane-infetto":"img/arene-zombie-pericoli-cane-infetto.fdff913d6f.webp","gigante-mutato":"img/arene-zombie-pericoli-gigante-mutato.91fad36b70.webp","infetto-corridore":"img/arene-zombie-pericoli-infetto-corridore.61f48faafd.webp","orda-di-zombi":"img/arene-zombie-pericoli-orda-di-zombi.e0fc6d1b56.webp"}}},"fx":{"pennellate":["img/fx-pennellata-1.5527b3e9bd.webp","img/fx-pennellata-2.8526d34dcf.webp","img/fx-pennellata-3.a7f3e74ff3.webp","img/fx-pennellata-4.fe1f612999.webp"],"sigilli":{"classico":"img/fx-sigillo-classico.b781c63b8d.webp","cyberpunk":"img/fx-sigillo-cyberpunk.134a7f507c.webp","fantasy":"img/fx-sigillo-fantasy.d854d9ac19.webp","horror":"img/fx-sigillo-horror.54149e6a7e.webp","liceo":"img/fx-sigillo-liceo.7f1566a7a8.webp","royale":"img/fx-sigillo-royale.bedbb77f68.webp","scifi":"img/fx-sigillo-scifi.6c50b79280.webp","ufficio":"img/fx-sigillo-ufficio.fcbbcc051a.webp","wasteland":"img/fx-sigillo-wasteland.86f44d1714.webp","zombie":"img/fx-sigillo-zombie.44ac2a6473.webp"},"grana":"img/fx-grana.c1e72fd2da.webp","forme":{"fascia":"img/fx-forma-fascia.8a2f8ab92d.webp","freccia":"img/fx-forma-freccia.4e8039be8f.webp","fulmine":"img/fx-forma-fulmine.c9a15d227c.webp","stella":"img/fx-forma-stella.e773ba5dda.webp","strappo":"img/fx-forma-strappo.0e6a41d0d9.webp"},"impatto":"img/fx-impatto.fd13ac9554.webp","mezzitoni":"img/fx-mezzitoni.f9ef4df053.webp","occhi":{"f-1":"img/fx-occhi-f-1.3779df529a.webp","f-2":"img/fx-occhi-f-2.2f47e4535b.webp","f-3":"img/fx-occhi-f-3.8b10fc4b00.webp","f-4":"img/fx-occhi-f-4.08132e01f9.webp","m-1":"img/fx-occhi-m-1.fd94d5b0eb.webp","m-2":"img/fx-occhi-m-2.c7b9661e6b.webp","m-3":"img/fx-occhi-m-3.91ff950ae4.webp","m-4":"img/fx-occhi-m-4.d0a0e73220.webp","m-5":"img/fx-occhi-m-5.f4c19f2141.webp","n-1":"img/fx-occhi-n-1.21fc3b7adf.webp"},"fondali":{"classico":"img/fx-fondale-classico.8a3fc35342.webp","cyberpunk":"img/fx-fondale-cyberpunk.283c80cc1e.webp","fantasy":"img/fx-fondale-fantasy.0ca9b3f315.webp","horror":"img/fx-fondale-horror.4ba1241b63.webp","liceo":"img/fx-fondale-liceo.fb428a57f7.webp","royale":"img/fx-fondale-royale.aac1246425.webp","scifi":"img/fx-fondale-scifi.27ee2ce8cc.webp","ufficio":"img/fx-fondale-ufficio.780789ce70.webp","wasteland":"img/fx-fondale-wasteland.02311ed21d.webp","zombie":"img/fx-fondale-zombie.83b8d35716.webp"},"volti":{"f-1":"img/fx-volto-f-1.96d62771c1.webp","f-2":"img/fx-volto-f-2.79d3485864.webp","f-3":"img/fx-volto-f-3.aeb7664a4e.webp","f-4":"img/fx-volto-f-4.2f2c864354.webp","m-1":"img/fx-volto-m-1.f8b83b073e.webp","m-2":"img/fx-volto-m-2.b9eb346a31.webp","m-3":"img/fx-volto-m-3.5311549074.webp","m-4":"img/fx-volto-m-4.10b102bdb0.webp","m-5":"img/fx-volto-m-5.63e5c91778.webp","n-1":"img/fx-volto-n-1.02cf4d1c97.webp"},"vincitori":{"f-1":"img/vincitori-vincitore-f-1.10b1ec0d22.webp","f-2":"img/vincitori-vincitore-f-2.03d8a3a92a.webp","f-3":"img/vincitori-vincitore-f-3.bc0adcd66a.webp","m-1":"img/vincitori-vincitore-m-1.c597436dca.webp","m-2":"img/vincitori-vincitore-m-2.9c8b48e9f8.webp","n-1":"img/vincitori-vincitore-n-1.1539fc78b2.webp"},"occhiY":{"m-1":0.53,"m-2":0.6,"m-3":0.43,"m-4":0.39,"m-5":0.575,"f-1":0.52,"f-2":0.49,"f-3":0.41,"f-4":0.46,"n-1":0.55}},"audio":{"sfx":{"heavy":"img/audio-colpo.6c66fc3384.mp3","battle":"img/audio-scontro.171fdeb377.mp3","click":"img/audio-ui-click.75370fe5e2.wav","hover":"img/audio-ui-hover.39a84fb194.wav","tick":"img/audio-ui-tick.16c581af00.wav","jazz":"img/audio-vittoria.6a3763dedf.mp3"},"music":"img/audio-musica-dark-hour.53788a2c76.mp3"}};
 ;
-window.LOS_BUILD = "154e3f09de5bac6e11c746cd3a29af75f7efe9f0c297c2835ea121f3e1ab85be";
+window.LOS_BUILD = "10052e5ad4760ab51b22ba9e67c3bd2b250a5659c0a28678fa4fc550a306ecc3";
 ;
 /* Last One Standing — grafica vettoriale: logo, icone delle arene, illustrazioni.
  * Tutto è SVG generato in codice: nessuna immagine esterna. */
@@ -22192,6 +22512,240 @@ window.LOS_BUILD = "154e3f09de5bac6e11c746cd3a29af75f7efe9f0c297c2835ea121f3e1ab
   }
   if (doc.readyState === 'loading') doc.addEventListener('DOMContentLoaded', start); else start();
 })(typeof window === 'object' ? window : globalThis);
+
+;
+/* ================= PELLE · LA PARTITA GIOCATA (regia) =================
+ * I ganci grafici che partita.js e ui.js chiamano se esistono: window.LOS_PARTITA_FX = { card, bet, gift }.
+ * - card: il cartello delle scelte entra come un evento (titolo parola per parola, scelte a cascata, ritratto grande);
+ * - bet: quando una puntata si chiude cade un timbro vicino alla barra del giocatore;
+ * - gift: una cassa col paracadute parte dal pulsante del dono verso il racconto.
+ * In più, senza toccare ui.js: i crediti della barra contano quando cambiano e i numeri di «La tua partita»
+ * nell'Esito contano alla prima comparsa.
+ * Solo decorazione: ogni passo è protetto, niente blocca i comandi, tutto si toglie da solo. Con il movimento
+ * ridotto non si muove niente. Gli stili sono in 60-partita.css. */
+(function (G) {
+  'use strict';
+  const doc = G.document; if (!doc) return;
+  const root = doc.documentElement;
+  const LOOK = () => G.LOS_LOOK || {};
+  const reduced = () => !!((G.LOS_ANIM && G.LOS_ANIM.reduced) || root.hasAttribute('data-reduced-motion'));
+  const sfx = (n, o) => { try { const s = LOOK().sfx; if (s && s.play) s.play(n, o); } catch (e) { /* niente audio */ } };
+  const h = (tag, cls, txt) => { const el = doc.createElement(tag); if (cls) el.className = cls; if (txt != null) el.textContent = txt; return el; };
+  const safe = (fn) => { try { return fn(); } catch (e) { /* solo decorazione */ } };
+  const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
+  const fine = () => !!(G.matchMedia && G.matchMedia('(hover: hover) and (pointer: fine)').matches);
+
+  /* ---------- 1 · il cartello ---------- */
+  // il titolo entra parola per parola; il testo intero resta in aria-label
+  function words(el) {
+    if (!el || el.querySelector('.sc-w')) return;
+    const text = el.textContent; if (!text.trim()) return;
+    el.setAttribute('aria-label', text); el.textContent = '';
+    let i = 0;
+    text.split(/(\s+)/).forEach((part) => {
+      if (!part) return;
+      if (/^\s+$/.test(part)) { el.appendChild(doc.createTextNode(' ')); return; }
+      const w = h('span', 'sc-w', part); w.setAttribute('aria-hidden', 'true'); w.style.setProperty('--i', i++); el.appendChild(w);
+    });
+  }
+  // ritratto grande: chi non ha una foto riceve un volto di riserva tinto (lo stesso che ha altrove), se ci sono
+  function face(av) {
+    if (!av || av.querySelector('img') || av.classList.contains('has-volto')) return;
+    const fx = LOOK().fx || {}, pick = LOOK().pickFor; if (!pick || !fx.volti) return;
+    const u = pick(fx.volti, av.dataset.g, av.dataset.k || av.title); if (!u) return;
+    const im = h('img', 'volto'); im.alt = ''; im.decoding = 'async'; im.src = u;
+    av.prepend(im); av.classList.add('has-volto');
+  }
+  function card(el, opts) {
+    if (!el) return;
+    const o = opts || {};
+    // se arriva subito dopo un altro cartello aspetta che il colpo sulla scelta appena fatta si sia visto
+    if (!reduced() && doc.querySelector('.sc.sc-out')) el.style.setProperty('--sc-d', '150ms');
+    safe(() => el.querySelectorAll('.sc-opt').forEach((b, k) => b.style.setProperty('--k', o.grid ? Math.min(k, 22) : Math.min(k, 8))));
+    if (/\bsc-(mentor|gift|interview)\b/.test(el.className)) safe(() => face(el.querySelector('.sc-faces .av')));
+    if (!reduced()) safe(() => words(el.querySelector('.sc-t')));
+    sfx('cut');
+    // un soffio passando sulle scelte (solo mouse), la conferma quando si sceglie
+    if (fine()) {
+      let last = null;
+      el.addEventListener('pointerover', (e) => { const b = e.target.closest && e.target.closest('.sc-opt:not(:disabled), .sc-stake button:not(:disabled)'); if (!b || b === last) return; last = b; sfx('hover'); });
+    }
+    el.addEventListener('click', (e) => {
+      const b = e.target.closest && e.target.closest('.sc-opt, .sc-stake button, .sc-skip'); if (!b || b.disabled) return;
+      sfx(b.classList.contains('sc-opt') ? 'confirm' : 'tick');
+    });
+  }
+
+  /* ---------- 2 · la barra: i crediti contano ---------- */
+  // la fascia sugli occhi al posto della sagoma, per chi non ha una foto (la stessa riserva dell'Esito)
+  function eyes(av) {
+    if (!av || av.querySelector('img') || av.classList.contains('has-volto')) return;
+    const fx = LOOK().fx || {}, pick = LOOK().pickFor; if (!pick || !fx.occhi) return;
+    const u = pick(fx.occhi, av.dataset.g, av.dataset.k || av.title); if (!u) return;
+    const im = h('img', 'volto'); im.alt = ''; im.decoding = 'async'; im.src = u;
+    av.prepend(im); av.classList.add('has-volto');
+  }
+  // ui.js riscrive la barra a ogni fase: il conteggio non sta sul nodo ma qui, e continua sul numero nuovo
+  let hudMo = null, hudEl = null, cnt = null, cntRaf = 0, cntGuard = 0;
+  const cntNow = (now) => { const k = clamp((now - cnt.t0) / cnt.dur, 0, 1); return k >= 1 ? cnt.to : Math.round(cnt.from + (cnt.to - cnt.from) * (1 - Math.pow(1 - k, 3))); };
+  function cntEnd() {
+    cancelAnimationFrame(cntRaf); clearTimeout(cntGuard);
+    const b = hudEl && hudEl.querySelector('.pt-cr b');
+    if (b && cnt) b.textContent = cnt.to;
+    cnt = null; if (hudEl) hudEl.removeAttribute('aria-busy');
+  }
+  function cntStep(now) {
+    if (!cnt) return;
+    const b = hudEl && hudEl.querySelector('.pt-cr b');
+    if (!b || reduced() || now - cnt.t0 >= cnt.dur) return cntEnd();
+    b.textContent = cntNow(now); cntRaf = requestAnimationFrame(cntStep);
+  }
+  function countCredits(hud) {
+    const b = hud.querySelector('.pt-cr b'); if (!b) return;
+    const to = parseInt(b.textContent, 10); if (!Number.isFinite(to)) return;
+    // una partita nuova non conta dal saldo della precedente
+    const sameRun = hud.dataset.ptRun === (hud.dataset.run || '');
+    const from = sameRun && hud.dataset.ptCr != null ? parseInt(hud.dataset.ptCr, 10) : NaN, now = performance.now();
+    hud.dataset.ptCr = String(to); hud.dataset.ptRun = hud.dataset.run || '';
+    // stessa cifra d'arrivo, barra ridisegnata: il conteggio in corso prosegue sul nodo nuovo
+    if (cnt && cnt.to === to) { b.textContent = cntNow(now); b.parentNode.classList.add(cnt.to > cnt.from ? 'pt-up' : 'pt-down'); return; }
+    if (!Number.isFinite(from) || from === to || reduced() || doc.hidden) { if (cnt) cntEnd(); return; }
+    const start = cnt ? cntNow(now) : from;
+    cancelAnimationFrame(cntRaf); clearTimeout(cntGuard);
+    cnt = { from: start, to, t0: now, dur: clamp(Math.abs(to - start) * 14, 380, 900) };
+    b.parentNode.classList.add(to > start ? 'pt-up' : 'pt-down');
+    // mentre conta, i lettori di schermo aspettano il numero finale
+    hud.setAttribute('aria-busy', 'true');
+    b.textContent = start; cntRaf = requestAnimationFrame(cntStep);
+    // se i fotogrammi non arrivano (scheda nascosta) il numero vero torna comunque
+    cntGuard = setTimeout(cntEnd, cnt.dur + 400);
+  }
+  function watchHud() {
+    const hud = doc.getElementById('ptHud');
+    if (!hud || hud === hudEl) return;
+    if (hudMo) hudMo.disconnect();
+    hudEl = hud;
+    const on = () => { if (hud.hidden) { if (cnt) cntEnd(); delete hud.dataset.ptCr; return; } safe(() => eyes(hud.querySelector('.pt-men .av'))); safe(() => countCredits(hud)); };
+    // si guarda solo la riscrittura dell'interno, non i numeri che cambiano mentre contano
+    hudMo = new MutationObserver(on);
+    hudMo.observe(hud, { childList: true, attributes: true, attributeFilter: ['hidden'] });
+    on();
+  }
+
+  /* ---------- 3 · il timbro della puntata ---------- */
+  let stamps = 0;
+  function bet(b, hud) {
+    if (!b) return;
+    const kind = b.esito === 'vinta' ? 'vinta' : b.esito === 'persa' ? 'persa' : 'nulla';
+    const el = h('div', 'pt-stamp ' + kind); el.setAttribute('aria-hidden', 'true');
+    const big = h('b', '', kind === 'vinta' ? 'Vinta' : kind === 'persa' ? 'Persa' : 'Annullata');
+    if (kind === 'vinta') big.appendChild(h('i', '', '+' + b.vincita));
+    else if (kind === 'persa') big.appendChild(h('i', '', '−' + b.posta));
+    el.appendChild(big);
+    if (b.testo) el.appendChild(h('small', '', b.testo));
+    doc.body.appendChild(el);
+    // sulla barra se si vede, altrimenti sotto l'intestazione; mai fuori dallo schermo
+    const r = hud && !hud.hidden ? hud.getBoundingClientRect() : null, w = el.offsetWidth, hh = el.offsetHeight, vw = root.clientWidth, vh = G.innerHeight;
+    const top = doc.querySelector('.top'), minY = (top ? Math.max(0, top.getBoundingClientRect().bottom) : 0) + 16;
+    const visible = r && r.bottom > minY + 10 && r.top < vh - 120;
+    // sopra il fondo della fascia, dove non c'è testo; un secondo timbro si sposta un po' più in là
+    let x = visible ? r.right - w - 46 : vw - w - 28, y = visible ? r.top + (r.height - hh) / 2 : minY;
+    x -= (stamps % 3) * 26; y += (stamps % 3) * 12;
+    el.style.left = clamp(x, 14, Math.max(14, vw - w - 18)) + 'px';
+    el.style.top = clamp(y, minY, Math.max(minY, vh - hh - 150)) + 'px';
+    stamps++;
+    sfx(kind === 'vinta' ? 'stamp' : 'tick');
+    setTimeout(() => { el.remove(); stamps = Math.max(0, stamps - 1); }, reduced() ? 2200 : 2320);
+  }
+
+  /* ---------- 4 · il lancio del dono ---------- */
+  const NOMI = { cibo: 'Provviste', med: 'Medicine', arma: 'Arma', armatura: 'Protezione', attrezzo: 'Attrezzi', mappa: 'Mappa', amuleto: 'Portafortuna' };
+  const CASSA = '<svg viewBox="0 0 96 112" aria-hidden="true"><g class="pd-chute">' +
+    '<path class="pd-k" d="M6 44C8 18 26 4 48 4s40 14 42 40c-7-6-14-6-21 0-7-6-14-6-21 0-7-6-14-6-21 0-7-6-14-6-21 0z"/>' +
+    '<path class="pd-p" d="M27 44C28 22 36 8 48 4c12 4 20 18 21 40-7-6-14-6-21 0-7-6-14-6-21 0z" opacity=".9"/>' +
+    '<path class="pd-l" d="M6 44C8 18 26 4 48 4s40 14 42 40c-7-6-14-6-21 0-7-6-14-6-21 0-7-6-14-6-21 0-7-6-14-6-21 0z"/>' +
+    '<path class="pd-lp" d="M6 44 34 78M27 44l11 34M69 44 58 78M90 44 62 78"/></g>' +
+    '<g class="pd-box"><path class="pd-p" d="M26 76h44v32H26z"/><path class="pd-k" d="M26 88h44v8H26z"/><path class="pd-v" d="M44 76h8v32h-8z"/><path class="pd-l" d="M26 76h44v32H26z"/></g></svg>';
+  function gift(t, kind, btn) {
+    if (btn) { btn.classList.remove('pt-sent'); void btn.offsetWidth; btn.classList.add('pt-sent'); setTimeout(() => btn.classList.remove('pt-sent'), 600); }
+    if (reduced() || !btn || !doc.body.animate) return;
+    const b = btn.getBoundingClientRect(); if (!b.width) return;
+    const vw = root.clientWidth, vh = G.innerHeight;
+    // verso il racconto: l'ultima riga visibile della diretta, o il centro della colonna
+    const rows = [...doc.querySelectorAll('#v-diretta .ev')].map((e) => e.getBoundingClientRect()).filter((r) => r.width && r.bottom > 90 && r.top < b.top - 60);
+    const last = rows[rows.length - 1];
+    const tx = clamp(last ? last.left + last.width * 0.5 : vw / 2, 70, vw - 70), ty = clamp(last ? last.bottom + 6 : vh * 0.42, 150, Math.max(150, b.top - 90));
+    const sx = b.left + b.width / 2, sy = b.top + 6, mx = sx + (tx - sx) * 0.45, my = Math.min(sy, ty) - Math.min(120, vh * 0.16);
+    const el = h('div', 'pt-drop'); el.setAttribute('aria-hidden', 'true');
+    const inn = h('div', 'pt-drop-in'); inn.innerHTML = CASSA;
+    inn.appendChild(h('span', 'pd-tag', NOMI[kind] || 'Dono'));
+    el.appendChild(inn); doc.body.appendChild(el);
+    const T = 940;
+    safe(() => {
+      el.animate([
+        { transform: 'translate(' + sx + 'px,' + sy + 'px) scale(.25) rotate(-22deg)', opacity: 0, offset: 0, easing: 'cubic-bezier(.3,.5,.4,1)' },
+        { opacity: 1, offset: 0.1 },
+        { transform: 'translate(' + mx + 'px,' + my + 'px) scale(1.08) rotate(10deg)', offset: 0.42, easing: 'cubic-bezier(.4,0,.6,1)' },
+        { transform: 'translate(' + (tx + (mx - tx) * 0.2) + 'px,' + (ty - 26) + 'px) scale(1) rotate(-6deg)', offset: 0.74, easing: 'cubic-bezier(.3,0,.5,1)' },
+        { transform: 'translate(' + tx + 'px,' + ty + 'px) scale(1) rotate(0deg)', opacity: 1, offset: 0.86 },
+        { transform: 'translate(' + tx + 'px,' + ty + 'px) scale(1.06, .9) rotate(0deg)', opacity: 1, offset: 0.92 },
+        { transform: 'translate(' + tx + 'px,' + (ty + 4) + 'px) scale(.9) rotate(0deg)', opacity: 0, offset: 1 },
+      ], { duration: T, easing: 'linear', fill: 'both' });
+      // il paracadute si apre in volo e si affloscia all'arrivo
+      const chute = el.querySelector('.pd-chute');
+      if (chute) chute.animate([{ transform: 'scale(.2, .1)', offset: 0 }, { transform: 'scale(1.1, 1.05)', offset: 0.3 }, { transform: 'scale(1, 1)', offset: 0.45 }, { transform: 'scale(1, 1)', offset: 0.84 }, { transform: 'scale(1.15, .2)', offset: 1 }], { duration: T, fill: 'both' });
+    });
+    sfx('move');
+    setTimeout(() => el.remove(), T + 80);
+  }
+
+  /* ---------- 6 · «La tua partita»: i numeri contano alla prima comparsa ---------- */
+  function countStat(b, delay) {
+    const text = b.textContent, nums = text.match(/\d+/g); if (!nums || !nums.some((n) => +n > 0)) return;
+    const parts = text.split(/(\d+)/), t0 = performance.now() + delay, dur = 900;
+    const draw = (e) => { b.textContent = parts.map((p) => (/^\d+$/.test(p) ? String(Math.round(+p * e)) : p)).join(''); };
+    const step = (now) => {
+      if (!b.isConnected) return;
+      const k = clamp((now - t0) / dur, 0, 1);
+      if (k >= 1 || reduced()) { b.textContent = text; return; }
+      draw(1 - Math.pow(1 - k, 3)); requestAnimationFrame(step);
+    };
+    // lo zero si scrive solo dentro un fotogramma: se la scheda non ne compone, resta il numero vero
+    requestAnimationFrame((now) => { draw(0); step(now); });
+    setTimeout(() => { if (b.isConnected) b.textContent = text; }, delay + dur + 500);
+  }
+  let sumStop = null;
+  function summary() {
+    const s = doc.getElementById('playerSummary'); if (!s || s.__pt) return; s.__pt = true;
+    if (sumStop) { sumStop(); sumStop = null; }
+    s.querySelectorAll('.ps-st').forEach((st, k) => st.style.setProperty('--k', k));
+    safe(() => eyes(s.querySelector('.ps-men .av')));
+    if (reduced()) return;
+    // niente IntersectionObserver (in una scheda che non compone fotogrammi non avvisa): si misura allo scorrimento
+    let off = false; const born = Date.now(), body = doc.getElementById('resBody');
+    const go = () => {
+      if (off || !s.isConnected) { stop(); return; }
+      // la sequenza di vittoria copre tutto: si aspetta che se ne vada (es-go lo mette 50-esito.js; dopo 8 secondi si parte comunque)
+      if (Date.now() - born < 8000 && (doc.querySelector('body > .pf') || (body && body.classList.contains('es-on') && !body.classList.contains('es-go')))) return;
+      const r = s.getBoundingClientRect(); if (!r.height || r.top > G.innerHeight * 0.9 || r.bottom < 0) return;
+      stop(); s.classList.add('ps-go');
+      s.querySelectorAll('.ps-st b').forEach((b, k) => countStat(b, 120 + k * 70));
+    };
+    const stop = () => { off = true; G.removeEventListener('scroll', go, true); G.removeEventListener('resize', go); clearInterval(beat); };
+    G.addEventListener('scroll', go, { capture: true, passive: true }); G.addEventListener('resize', go);
+    const beat = setInterval(go, 400);
+    sumStop = stop; setTimeout(go, 90); // dopo che 50-esito.js e il palco hanno preparato la scena
+  }
+  function watchEsito() {
+    const body = doc.getElementById('resBody'); if (!body || body.__pt) return; body.__pt = true;
+    new MutationObserver(() => safe(summary)).observe(body, { childList: true });
+    safe(summary);
+  }
+
+  function boot() { safe(watchHud); safe(watchEsito); }
+  if (doc.readyState === 'loading') doc.addEventListener('DOMContentLoaded', boot); else boot();
+  G.LOS_PARTITA_FX = { card(el, o) { safe(watchHud); safe(() => card(el, o)); }, bet(b, hud) { safe(watchHud); safe(() => bet(b, hud)); }, gift(t, k, btn) { safe(() => gift(t, k, btn)); } };
+})(typeof window !== 'undefined' ? window : globalThis);
 
 ;
 /* Last One Standing — pelle · comuni: piccoli comportamenti condivisi.
@@ -25630,7 +26184,7 @@ window.LOS_BUILD = "154e3f09de5bac6e11c746cd3a29af75f7efe9f0c297c2835ea121f3e1ab
   function renderHud() {
     const h = $('#ptHud'), gb = $('#giftBtn'), g = S.run && S.run.gioco;
     if (!PT || !SIM || !g) { h.hidden = true; gb.hidden = true; return; }
-    gb.hidden = false; h.hidden = false;
+    gb.hidden = false; h.hidden = false; h.dataset.run = String(g.inizio || '');
     const i = Math.min(S.run.phase || 0, SIM.phases.length - 1), alive = SIM.phases[i].snap.alive;
     const m = g.mentore && BY[g.mentore], mAlive = m && alive.includes(m.id);
     const open = g.puntate.filter((b) => !b.esito);
@@ -26047,7 +26601,7 @@ window.LOS_BUILD = "154e3f09de5bac6e11c746cd3a29af75f7efe9f0c297c2835ea121f3e1ab
     const best = won.slice().sort((a, b) => (b.vincita - b.posta) - (a.vincita - a.posta))[0];
     const stat = (v, l) => '<div class="ps-st"><b>' + v + '</b><span>' + l + '</span></div>';
     return '<section class="block card ps-sum" id="playerSummary"><h2>La tua partita</h2>' +
-      (m ? '<div class="ps-men">' + avHTML(m, { dead: !m.alive }) + '<p><small>Il tuo concorrente</small><b>' + esc(m.name) + '</b> ' + esc(fate) + (ord.length ? ' · ha seguito ' + ord.filter((o) => o.obeys).length + ' ordini su ' + ord.length : '') + '</p></div>' : '') +
+      (m ? '<div class="ps-men">' + avHTML(m, { dead: !m.alive }) + '<p><small>Il tuo concorrente</small><b>' + esc(m.name) + '</b> ' + esc(fate) + (ord.length ? ' · ha seguito ' + ord.filter((o) => o.obeys).length + (ord.length === 1 ? ' ordine su 1' : ' ordini su ' + ord.length) : '') + '</p></div>' : '') +
       '<div class="ps-stats">' + stat(g.crediti, 'Crediti finali') + stat(won.length + '/' + (won.length + lost.length), 'Puntate vinte') + stat(doni.length, doni.length === 1 ? 'Dono mandato' : 'Doni mandati') + stat(p.record, 'Il tuo record') + '</div>' +
       (best ? '<p class="ps-best">Colpo migliore: «' + esc(best.testo) + '» · ' + best.posta + ' × ' + best.q + ' = <b>+' + best.vincita + '</b></p>' : '') +
       '<p class="help">Partite giocate: ' + p.partite + ' · puntate vinte in tutto: ' + p.vinte + ' su ' + p.puntate + '.</p></section>';

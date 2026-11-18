@@ -1920,7 +1920,7 @@
   function renderHud() {
     const h = $('#ptHud'), gb = $('#giftBtn'), g = S.run && S.run.gioco;
     if (!PT || !SIM || !g) { h.hidden = true; gb.hidden = true; return; }
-    gb.hidden = false; h.hidden = false;
+    gb.hidden = false; h.hidden = false; h.dataset.run = String(g.inizio || '');
     const i = Math.min(S.run.phase || 0, SIM.phases.length - 1), alive = SIM.phases[i].snap.alive;
     const m = g.mentore && BY[g.mentore], mAlive = m && alive.includes(m.id);
     const open = g.puntate.filter((b) => !b.esito);
@@ -2337,7 +2337,7 @@
     const best = won.slice().sort((a, b) => (b.vincita - b.posta) - (a.vincita - a.posta))[0];
     const stat = (v, l) => '<div class="ps-st"><b>' + v + '</b><span>' + l + '</span></div>';
     return '<section class="block card ps-sum" id="playerSummary"><h2>La tua partita</h2>' +
-      (m ? '<div class="ps-men">' + avHTML(m, { dead: !m.alive }) + '<p><small>Il tuo concorrente</small><b>' + esc(m.name) + '</b> ' + esc(fate) + (ord.length ? ' · ha seguito ' + ord.filter((o) => o.obeys).length + ' ordini su ' + ord.length : '') + '</p></div>' : '') +
+      (m ? '<div class="ps-men">' + avHTML(m, { dead: !m.alive }) + '<p><small>Il tuo concorrente</small><b>' + esc(m.name) + '</b> ' + esc(fate) + (ord.length ? ' · ha seguito ' + ord.filter((o) => o.obeys).length + (ord.length === 1 ? ' ordine su 1' : ' ordini su ' + ord.length) : '') + '</p></div>' : '') +
       '<div class="ps-stats">' + stat(g.crediti, 'Crediti finali') + stat(won.length + '/' + (won.length + lost.length), 'Puntate vinte') + stat(doni.length, doni.length === 1 ? 'Dono mandato' : 'Doni mandati') + stat(p.record, 'Il tuo record') + '</div>' +
       (best ? '<p class="ps-best">Colpo migliore: «' + esc(best.testo) + '» · ' + best.posta + ' × ' + best.q + ' = <b>+' + best.vincita + '</b></p>' : '') +
       '<p class="help">Partite giocate: ' + p.partite + ' · puntate vinte in tutto: ' + p.vinte + ' su ' + p.puntate + '.</p></section>';
