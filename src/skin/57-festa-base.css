@@ -1,0 +1,64 @@
+/* ================= PELLE · FESTA E CARTOLINE, FASE 4 (base) =================
+ * Struttura e leggibilità: la finestra della festa (giocatori, stanza online, server), la classifica dei giocatori
+ * nella barra della Diretta e nell'Esito, le cartoline (finestra, pulsanti). La regia visiva va nei file 6x. */
+
+/* ---------- finestra della festa ---------- */
+#festaDlg { width: min(760px, 100%); }
+.fs-tabs { display: flex; gap: 6px; margin: 10px 0 14px; flex-wrap: wrap; }
+.fs-tabs button { padding: 8px 16px; border: 2px solid color-mix(in srgb, var(--ink) 22%, transparent); background: transparent; color: var(--ink); font: italic 900 14px / 1 var(--f-display); text-transform: uppercase; cursor: pointer; }
+.fs-tabs button[aria-selected="true"] { background: var(--key); color: var(--key-ink); border-color: var(--key); }
+.fs-players { list-style: none; margin: 0 0 10px; padding: 0; display: grid; gap: 8px; }
+.fs-players li { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr) auto; gap: 8px; align-items: center; padding: 8px 10px; background: color-mix(in srgb, var(--ink) 6%, transparent); box-shadow: inset 5px 0 0 var(--pc, var(--key)); }
+.fs-players input, .fs-players select { min-width: 0; }
+.fs-h { margin: 16px 0 8px; font: italic 900 16px / 1 var(--f-display); text-transform: uppercase; }
+.fs-h span { color: var(--key); }
+.fs-room { display: grid; gap: 4px; justify-items: start; padding: 14px 16px; background: var(--void); color: var(--paper); }
+.fs-room > span { font: 800 11px / 1 var(--f-body); letter-spacing: .2em; text-transform: uppercase; opacity: .75; }
+.fs-code { font: italic 900 64px / 1 var(--f-display); letter-spacing: .12em; color: var(--key); }
+.fs-room small { font-size: 13px; opacity: .85; }
+.fs-guests { margin: 0; padding-left: 18px; display: grid; gap: 4px; }
+.fs-online { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+.fs-online section { display: grid; gap: 8px; align-content: start; }
+.fs-server { margin-top: 16px; }
+.fs-server summary { cursor: pointer; font-weight: 800; }
+.fs-open { margin-right: 8px; }
+
+/* ---------- la barra della festa nella Diretta ---------- */
+.pt-festa { flex: 1 1 100%; display: grid; gap: 6px; }
+.pt-festa > small { font: 800 10.5px / 1 var(--f-body); letter-spacing: .18em; text-transform: uppercase; color: color-mix(in srgb, var(--ink) 68%, transparent); }
+.pt-festa ol { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 8px; }
+.pf-pl { display: grid; grid-template-columns: auto auto; grid-template-rows: auto auto; column-gap: 8px; align-items: center; padding: 6px 10px; background: color-mix(in srgb, var(--ink) 7%, transparent); box-shadow: inset 4px 0 0 var(--pc); min-width: 150px; }
+.pf-pl .pf-nm { grid-column: 1 / -1; font: italic 900 15px / 1.1 var(--f-display); text-transform: uppercase; }
+.pf-pl .av { --s: 30px; grid-row: 2; }
+.pf-pl .pf-ch { grid-row: 2; font-size: 13px; }
+.pf-pl em { grid-column: 1 / -1; font-style: normal; font-weight: 800; font-size: 12px; color: var(--key); }
+.pf-pl.me { outline: 2px solid var(--key); }
+body.fs-ospite #prevBtn, body.fs-ospite #playBtn, body.fs-ospite #nextBtn, body.fs-ospite #speedSeg { opacity: .35; pointer-events: none; }
+
+/* ---------- classifica della festa nell'Esito ---------- */
+.fs-rank ol { list-style: none; margin: 0 0 10px; padding: 0; display: grid; gap: 8px; }
+.fs-rank li { display: grid; grid-template-columns: 44px minmax(0, 1fr) 44px minmax(0, 1fr) auto; gap: 10px; align-items: center; padding: 10px 12px; background: color-mix(in srgb, var(--ink) 6%, transparent); box-shadow: inset 5px 0 0 var(--pc); }
+.fs-rank li.top { background: color-mix(in srgb, var(--key) 16%, transparent); }
+.fr-pos { font: italic 900 32px / 1 var(--f-display); color: var(--key); }
+.fr-nm { font: italic 900 20px / 1.1 var(--f-display); text-transform: uppercase; }
+.fs-rank .av { --s: 40px; }
+.fr-ch { font-size: 14px; }
+.fr-pt { font: italic 900 26px / 1 var(--f-display); font-style: italic; }
+.fr-pt small { font: 700 12px / 1 var(--f-body); }
+
+/* ---------- cartoline ---------- */
+#cartolinaDlg { width: min(560px, 100%); }
+.ct-frame { margin: 10px 0 14px; background: color-mix(in srgb, var(--ink) 8%, transparent); aspect-ratio: 4 / 5; display: grid; place-items: center; }
+.ct-frame img { width: 100%; height: 100%; object-fit: contain; display: block; }
+.cards-share .row { gap: 8px; flex-wrap: wrap; }
+.tr-share { grid-column: 2; justify-self: start; margin-top: 4px; padding: 2px 8px; border: 0; background: transparent; color: var(--key); font: 800 11px / 1.4 var(--f-body); letter-spacing: .1em; text-transform: uppercase; cursor: pointer; box-shadow: inset 0 -2px 0 currentColor; }
+.ac-share { margin-top: 2px; }
+
+@media (max-width: 600px) {
+  .fs-online { grid-template-columns: 1fr; }
+  .fs-players li { grid-template-columns: 1fr auto; }
+  .fs-players select { grid-column: 1 / -1; grid-row: 2; }
+  .fs-rank li { grid-template-columns: 34px minmax(0, 1fr) auto; }
+  .fs-rank li .av, .fs-rank .fr-ch { display: none; }
+  .fs-code { font-size: 48px; }
+}

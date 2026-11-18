@@ -102,6 +102,7 @@
     n.regia = Array.isArray(g.regia) ? g.regia.filter((x) => x && typeof x.k === 'string').slice(-30) : [];
     n.voti = g.voti && typeof g.voti === 'object' ? g.voti : {};
     n.prove = Array.isArray(g.prove) ? g.prove.slice(-100) : [];
+    n.festa = festaSana(g.festa);
     n.log = Array.isArray(g.log) ? g.log.slice(-100) : [];
     return n;
   }
@@ -198,7 +199,8 @@
       if (!esito) return;
       b.esito = esito; b.fase = i;
       b.vincita = esito === 'vinta' ? Math.round(b.posta * b.q) : esito === 'nulla' ? b.posta : 0;
-      g.crediti += b.vincita;
+      const pl = b.chi && g.festa ? g.festa.giocatori.find((x) => x.id === b.chi) : null;
+      if (pl) pl.crediti += b.vincita; else g.crediti += b.vincita;
       out.push(b);
     });
     return out;
@@ -367,5 +369,26 @@
   // dal punteggio al bonus sul tiro: da −2 a +4
   const bonusProva = (s) => (s >= 0.8 ? 4 : s >= 0.5 ? 2 : s >= 0.25 ? 0 : -2);
 
-  G.LOS_PARTITA = { chiedi, gioca, tipoProva, bonusProva, REGIA, mano, votoRegia, aperto, nuovo, sano, profilo, salvaProfilo, chiudiPartita, proposte, risolvi, prezzo, rischio, quota, nuovoGiorno, vivi, vit, DONI, INTERVISTA, ORDINI, RITMI, START };
+  /* ================= la modalità festa =================
+   * giocatori: { id, nome, campione, crediti, remoto (id dell'ospite online, se gioca da un altro dispositivo), caduti: [] } */
+  const COLORI = ['#f61e42', '#2fb6ff', '#ffc531', '#36d399', '#b06ce0', '#ff7a1a', '#ff5fb2', '#9ad13b'];
+  function festaSana(f) {
+    if (!f || !Array.isArray(f.giocatori)) return null;
+    const giocatori = f.giocatori.filter((x) => x && typeof x.id === 'string').slice(0, 8).map((x, i) => ({ id: x.id, nome: String(x.nome || 'Giocatore ' + (i + 1)).slice(0, 24), campione: typeof x.campione === 'string' ? x.campione : null,
+      crediti: Number.isFinite(x.crediti) ? clamp(Math.round(x.crediti), 0, 1e6) : START, remoto: typeof x.remoto === 'string' ? x.remoto : null, caduti: Array.isArray(x.caduti) ? x.caduti.slice(-20) : [], colore: x.colore || COLORI[i % COLORI.length] }));
+    return giocatori.length ? { giocatori, stanza: typeof f.stanza === 'string' ? f.stanza : null } : null;
+  }
+  // il punteggio della festa: piazzamento del campione (e di quelli caduti prima), eliminazioni, crediti
+  function punteggi(SIM, festa) {
+    const by = Object.fromEntries(SIM.tributes.map((t) => [t.id, t])), N = SIM.tributes.length;
+    return festa.giocatori.map((p) => {
+      const ids = [...new Set((p.caduti || []).concat(p.campione ? [p.campione] : []))].filter((id) => by[id]);
+      const best = ids.reduce((m, id) => Math.max(m, N - by[id].rank + 1), 0);
+      const kills = ids.reduce((s, id) => s + (by[id].kills || 0), 0);
+      const win = ids.some((id) => SIM.winners.includes(id));
+      const punti = best * 10 + kills * 5 + Math.floor(p.crediti / 10) + (win ? 50 : 0);
+      return { p, punti, kills, win, campione: p.campione && by[p.campione] };
+    }).sort((a, b) => b.punti - a.punti);
+  }
+  G.LOS_PARTITA = { festaSana, punteggi, COLORI, chiedi, gioca, tipoProva, bonusProva, REGIA, mano, votoRegia, aperto, nuovo, sano, profilo, salvaProfilo, chiudiPartita, proposte, risolvi, prezzo, rischio, quota, nuovoGiorno, vivi, vit, DONI, INTERVISTA, ORDINI, RITMI, START };
 })(typeof window !== 'undefined' ? window : globalThis);

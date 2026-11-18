@@ -196,7 +196,7 @@
         </details>
       </aside>
     </div>
-    <div class="dock arenadock"><div class="dockin"><div class="startsum" id="startSum"></div><div class="startgo"><p class="help" id="startMsg" role="status"></p><button class="btn primary lg" id="btnStart" type="button" aria-label="Avvia la simulazione"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4.5v15l12-7.5z" fill="currentColor"/></svg><span>Avvia<span class="bl"> la simulazione</span></span></button></div></div></div>
+    <div class="dock arenadock"><div class="dockin"><div class="startsum" id="startSum"></div><div class="startgo"><p class="help" id="startMsg" role="status"></p><button class="btn lg fs-open" id="btnFesta" type="button">Festa con gli amici</button><button class="btn primary lg" id="btnStart" type="button" aria-label="Avvia la simulazione"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4.5v15l12-7.5z" fill="currentColor"/></svg><span>Avvia<span class="bl"> la simulazione</span></span></button></div></div></div>
   </section>
 
   <!-- DIRETTA -->
@@ -355,6 +355,23 @@
     <div class="row between"><h2 id="h-bacheca">La tua bacheca</h2><button class="iconbtn" type="button" data-close aria-label="Chiudi la bacheca">✕</button></div>
     <div class="bc-tabs" role="tablist" aria-label="Bacheca"><button type="button" role="tab" data-bc="trofei" aria-selected="true">Trofei</button><button type="button" role="tab" data-bc="album" aria-selected="false">Album</button><button type="button" role="tab" data-bc="record" aria-selected="false">Record</button></div>
     <div id="bachecaBody" role="tabpanel"></div>
+  </div>
+</dialog>
+<dialog id="cartolinaDlg" class="modal tool-dialog" aria-labelledby="h-cartolina">
+  <div class="db cartolina-dialog">
+    <div class="row between"><h2 id="h-cartolina">Cartolina</h2><button class="iconbtn" type="button" data-close aria-label="Chiudi la cartolina">✕</button></div>
+    <div class="ct-frame"><img id="cartImg" alt=""></div>
+    <div class="row"><button class="btn primary" type="button" id="cartShare">Condividi</button><button class="btn" type="button" id="cartLink">Copia il link della partita</button></div>
+    <p class="help" id="cartMsg" role="status"></p>
+  </div>
+</dialog>
+<dialog id="festaDlg" class="modal tool-dialog" aria-labelledby="h-festa">
+  <div class="db festa-dialog">
+    <div class="row between"><h2 id="h-festa">Modalità festa</h2><button class="iconbtn" type="button" data-close aria-label="Chiudi la modalità festa">✕</button></div>
+    <p class="help">Ognuno sceglie il suo campione. A ogni alba tocca a ciascuno: un ordine e una puntata. Vince chi porta più lontano il suo campione.</p>
+    <div class="fs-tabs" role="tablist" aria-label="Dove si gioca"><button type="button" role="tab" data-fs="locale" aria-selected="true">Su questo telefono</button><button type="button" role="tab" data-fs="online" aria-selected="false">Online</button></div>
+    <div id="festaBody" role="tabpanel"></div>
+    <p class="help" id="festaMsg" role="status"></p>
   </div>
 </dialog>
 <dialog id="labDlg" class="modal tool-dialog" aria-labelledby="h-lab"><div class="db studio-dialog">

@@ -1736,7 +1736,9 @@
     if (generation !== runGeneration) return false;
     SIM = result;
     BY = Object.fromEntries(SIM.tributes.map((t) => [t.id, t]));
-    S.run = { cfg, phase: 0, seen: 0, gioco: PT ? PT.nuovo(runSim.pre) : null }; runSim.pre = null; lastRendered = -1;
+    S.run = { cfg, phase: 0, seen: 0, gioco: PT && !runSim.condivisa ? PT.nuovo(runSim.pre) : null, condivisa: !!runSim.condivisa || undefined }; runSim.pre = null; runSim.condivisa = false; lastRendered = -1;
+    if (S.run.gioco && runSim.festa) S.run.gioco.festa = runSim.festa;
+    runSim.festa = null;
     if (S.run.gioco && runSim.firstOrder && S.run.gioco.mentore) { const g = S.run.gioco, ev = SIM.phases[0].events.find((e) => e.mentor && e.ids[0] === g.mentore); g.ordini.push({ fase: 0, cosa: runSim.firstOrder, obeys: !!(ev && ev.obeys) }); }
     runSim.firstOrder = null;
     const run = S.run, stored = persistRun(run, SIM);
@@ -1914,13 +1916,14 @@
     $$('#speedSeg button').forEach((b) => b.setAttribute('aria-pressed', b.dataset.v === S.settings.speed));
     syncPlay();
     if (PT && S.run.gioco) { const closed = PT.risolvi(SIM, i, S.run.gioco); renderHud(); if (closed.length) announceBets(closed); }
-    renderCast(i);
+    renderCommentary(i);
+    publishState();
     save();
   }
   /* =============== TELECRONACA E PUBBLICO =============== */
   const TC = window.LOS_TELECRONACA;
   const tcCtx = () => ({ BY, soft: !!resultTheme(SIM).soft, mentore: S.run && S.run.gioco ? S.run.gioco.mentore : null, memoria: S.run && S.run.cfg ? S.run.cfg.memoria : null });
-  function renderCast(i) {
+  function renderCommentary(i) {
     const box = $('#ptCast'); if (!box) return;
     if (!TC || !SIM) { box.hidden = true; return; }
     const lines = TC.commento(SIM, i, tcCtx());
@@ -1956,6 +1959,13 @@
   const himHer = (t) => (t.gender === 'F' ? 'lei' : t.gender === 'N' ? 'ləi' : 'lui');
   function renderHud() {
     const h = $('#ptHud'), gb = $('#giftBtn'), g = S.run && S.run.gioco;
+    const fest = g && g.festa ? g.festa.giocatori : (S.run && S.run.ospite && FS.stato ? FS.stato.giocatori : null);
+    if (PT && SIM && fest) {
+      const alive = SIM.phases[Math.min(S.run.phase || 0, SIM.phases.length - 1)].snap.alive;
+      h.hidden = false; gb.hidden = false; h.dataset.run = String(S.run.cfg.seed);
+      h.innerHTML = '<div class="pt-festa"><small>Modalità festa' + (FS.code ? ' · stanza ' + esc(FS.code) : '') + '</small><ol>' + fest.map((p) => { const c = p.campione && BY[p.campione]; return '<li class="pf-pl' + (S.run.ospite && p.remoto === FS.gid ? ' me' : '') + '" style="--pc:' + esc(p.colore || '#888') + '"><b class="pf-nm">' + esc(p.nome) + '</b>' + (c ? avHTML(c, { dead: !alive.includes(c.id) }) + '<span class="pf-ch">' + esc(c.name) + '</span>' : '<span class="pf-ch">senza campione</span>') + '<em>' + p.crediti + ' cr</em></li>'; }).join('') + '</ol></div>';
+      return;
+    }
     if (!PT || !SIM || !g) { h.hidden = true; gb.hidden = true; return; }
     gb.hidden = false; h.hidden = false; h.dataset.run = String(g.inizio || '');
     const i = Math.min(S.run.phase || 0, SIM.phases.length - 1), alive = SIM.phases[i].snap.alive;
@@ -1995,10 +2005,10 @@
   // prima di ogni fase nuova: le scelte dell'alba (e del tramonto), poi l'eventuale prova giocata
   async function beforePhase(k) {
     const P = SIM.phases, rit = S.settings.ritmo;
-    if (!P[k] || rit === 'spettatore' || k <= (S.run.seen || 0)) return;
+    if (!P[k] || (rit === 'spettatore' && !S.run.gioco.festa) || k <= (S.run.seen || 0)) return;
     if (playTimer) { clearTimeout(playTimer); playTimer = null; }
     await dayDecisions(k);
-    await playableTest(k);
+    if (S.run.gioco.festa) await festaTest(k); else await playableTest(k);
   }
   // la prova giocata: se nella prossima fase l'allievo affronta una prova, la si gioca con un minigioco
   async function playableTest(k) {
@@ -2023,6 +2033,7 @@
     const key = (dawn ? 'g' : 'n') + P[k].day;
     if (!(dawn || dusk) || g.chiesto[key]) return;
     g.chiesto[key] = 1; save();
+    if (g.festa) { if (dawn) await festaDay(k); return; }
     const timer = playing ? 20 : 0, soft = !!resultTheme(SIM).soft, i = k - 1;
     let changed = false;
     // chi alleni è caduto: all'alba se ne sceglie un altro, così la partita resta tua fino alla fine
@@ -2059,25 +2070,35 @@
     save(); renderHud();
   }
   async function giftFlow(preId) {
+    if (S.run && S.run.ospite) return guestGift();
     if (!PT || !SIM || !S.run.gioco || gate) return;
     const i = S.run.phase || 0, k = i + 1, P = SIM.phases, g = S.run.gioco;
     if (k >= P.length) return toast('La partita è finita: niente più doni.');
     if (!atEdge()) return toast('Puoi mandare doni solo dalla fase più recente.');
-    if (g.doni[k]) return toast('Hai già mandato un dono per la prossima fase.');
+    if (!g.festa && g.doni[k]) return toast('Hai già mandato un dono per la prossima fase.');
     stopPlay(); gate = true;
     try {
+      // in festa paga chi manda il dono: ognuno ha i suoi crediti e un dono per fase
+      let wallet = g, dkey = k;
+      if (g.festa) {
+        const locals = g.festa.giocatori.filter((x) => !x.remoto && !g.doni[k + ':' + x.id]);
+        if (!locals.length) return toast('Tutti hanno già mandato un dono per la prossima fase.');
+        const pr = locals.length === 1 ? { value: locals[0].id } : await PT.chiedi({ kicker: 'Sponsor', title: 'Chi manda il dono?', options: locals.map((x) => ({ value: x.id, label: x.nome, sub: x.crediti + ' crediti' })), skip: 'Annulla' });
+        if (!pr) return;
+        wallet = g.festa.giocatori.find((x) => x.id === pr.value); dkey = k + ':' + wallet.id;
+      }
       const A = P[i].snap.alive;
-      const who = typeof preId === 'string' && A.includes(preId) ? { value: preId } : await PT.chiedi({ kicker: 'Sponsor', title: 'A chi mandi un dono?', text: 'Crediti disponibili: <b>' + g.crediti + '</b>. I favoriti costano di più.', grid: true, cls: 'sc-pick',
+      const who = typeof preId === 'string' && A.includes(preId) ? { value: preId } : await PT.chiedi({ kicker: 'Sponsor', title: 'A chi mandi un dono?', text: 'Crediti disponibili: <b>' + wallet.crediti + '</b>. I favoriti costano di più.', grid: true, cls: 'sc-pick',
         options: A.map((id) => ({ value: id, html: avHTML(BY[id]) + '<b class="sc-l">' + esc(BY[id].name) + '</b><small class="sc-s">Salute ' + PT.vit(SIM, i, id)[0] + '</small>' })), skip: 'Annulla' });
       if (!who) return;
       const t = BY[who.value], price = (x) => PT.prezzo(SIM, i, who.value, x);
-      const d = await PT.chiedi({ kicker: 'Sponsor · ' + t.name, title: 'Che cosa mandi?', faces: avHTML(t), text: moodHTML(t, i) + '<br>Arriverà nella prossima fase. Crediti: <b>' + g.crediti + '</b>', cls: 'sc-gift',
-        options: PT.DONI.map((x) => ({ value: x.k, label: x.label, sub: x.sub, cost: price(x) + ' cr', disabled: price(x) > g.crediti })), skip: 'Annulla' });
+      const d = await PT.chiedi({ kicker: 'Sponsor · ' + t.name, title: 'Che cosa mandi?', faces: avHTML(t), text: moodHTML(t, i) + '<br>Arriverà nella prossima fase. Crediti: <b>' + wallet.crediti + '</b>', cls: 'sc-gift',
+        options: PT.DONI.map((x) => ({ value: x.k, label: x.label, sub: x.sub, cost: price(x) + ' cr', disabled: price(x) > wallet.crediti })), skip: 'Annulla' });
       if (!d) return;
       const cost = price(PT.DONI.find((x) => x.k === d.value)), before = S.run.cfg.interventi || [];
       S.run.cfg.interventi = before.concat([{ fase: k, tipo: 'dono', chi: who.value, cosa: d.value }]);
       if (!await resimulate()) { S.run.cfg.interventi = before; return; }
-      g.crediti -= cost; g.doni[k] = { chi: who.value, cosa: d.value, costo: cost }; save(); renderHud();
+      wallet.crediti -= cost; g.doni[dkey] = { chi: who.value, cosa: d.value, costo: cost, da: wallet.id || null }; save(); renderHud();
       toast('Dono in viaggio per ' + t.name + ': arriva nella prossima fase.');
       if (window.LOS_PARTITA_FX && window.LOS_PARTITA_FX.gift) try { window.LOS_PARTITA_FX.gift(t, d.value, $('#giftBtn')); } catch (e) { /* solo grafica */ }
     } finally { gate = false; }
@@ -2179,8 +2200,9 @@
   let gate = false;
   async function next() {
     if (!SIM || gate) return;
-    if (S.run.phase >= SIM.phases.length - 1) { stopPlay(); location.hash = '#esito'; return; }
-    if (S.run.gioco && PT) { gate = true; try { await beforePhase(S.run.phase + 1); } finally { gate = false; } if (!SIM) return; }
+    if (S.run && S.run.ospite) return;
+    if (S.run.phase >= SIM.phases.length - 1) { stopPlay(); publishState(true); location.hash = '#esito'; return; }
+    if (S.run.gioco && PT) { gate = true; try { await processActions(); await beforePhase(S.run.phase + 1); } finally { gate = false; } if (!SIM) return; }
     go(S.run.phase + 1);
     if (S.run.phase >= SIM.phases.length - 1) stopPlay();
     if (window.scrollY > 300 && !playTimer) $('.broadcast').scrollIntoView({ behavior: AN.reduced ? 'auto' : 'smooth' });
@@ -2198,9 +2220,9 @@
     if (playTimer) clearTimeout(playTimer);
     playTimer = setTimeout(() => { playTimer = null; if (playing) next(); }, phaseReadDelay(SIM.phases[S.run.phase], S.settings.speed, S.settings.adaptivePlay));
   }
-  function startPlay() { stopPlay(); if (!SIM || document.hidden || S.run.phase >= SIM.phases.length - 1) return; playing = true; schedulePlay(); syncPlay(); }
+  function startPlay() { stopPlay(); if (!SIM || (S.run && S.run.ospite) || document.hidden || S.run.phase >= SIM.phases.length - 1) return; playing = true; schedulePlay(); syncPlay(); }
   $('#nextBtn').addEventListener('click', () => { if (gate) return; stopPlay(); next(); });
-  $('#prevBtn').addEventListener('click', () => { stopPlay(); lastRendered = -2; go(S.run.phase - 1); });
+  $('#prevBtn').addEventListener('click', () => { if (S.run && S.run.ospite) return; stopPlay(); lastRendered = -2; go(S.run.phase - 1); });
   $('#playBtn').addEventListener('click', () => { if (!SIM) return; if (playing) return stopPlay(); if (S.run.phase >= SIM.phases.length - 1) go(0); startPlay(); next(); });
   $('#speedSeg').addEventListener('click', (e) => { const b = e.target.closest('button'); if (!b) return; S.settings.speed = b.dataset.v; save(); $$('#speedSeg button').forEach((x) => x.setAttribute('aria-pressed', x === b)); if (playing) startPlay(); });
   $('#readBar').addEventListener('click', (e) => {
@@ -2274,7 +2296,7 @@
           '<div class="pf-id"><span class="pf-status">' + esc(status) + (dead ? ' · ' + esc(outShort.toLowerCase()) : '') + (atRes && t.rank ? ' · ' + t.rank + '° posto' : '') + '</span>' +
             '<p class="pf-team"><i></i>Squadra ' + t.team + '</p>' +
             '<div class="pf-tchips">' + (traits.length ? traits.map((x) => '<span class="chip" title="' + esc(x.desc || '') + '">' + esc(x.name) + '</span>').join('') : '<span class="chip dim">Nessun tratto</span>') + '</div>' +
-            '<div id="profFollow" class="pf-actions"></div>' + (typeof PT !== 'undefined' && PT && S.run && S.run.gioco && atEdge() && S.run.phase < SIM.phases.length - 1 && SIM.phases[S.run.phase].snap.alive.includes(t.id) && !S.run.gioco.doni[S.run.phase + 1] ? '<button type="button" class="btn sm pf-gift" data-gift="' + esc(t.id) + '">Manda un dono</button>' : '') + '</div></section>' +
+            '<div id="profFollow" class="pf-actions"></div>' + (typeof PT !== 'undefined' && PT && S.run && S.run.gioco && atEdge() && S.run.phase < SIM.phases.length - 1 && SIM.phases[S.run.phase].snap.alive.includes(t.id) && !S.run.gioco.doni[S.run.phase + 1] ? '<button type="button" class="btn sm pf-gift" data-gift="' + esc(t.id) + '">Manda un dono</button>' : '') + (typeof CT !== 'undefined' && CT && SIM && !t.alive && t.deathPhase <= (S.run ? S.run.phase : 0) ? '<button type="button" class="btn sm pf-card" data-cart="eliminazione" data-id="' + esc(t.id) + '">Cartolina</button>' : '') + '</div></section>' +
         '<div class="pf-kpis">' + tile(kills, soft ? 'eliminazioni' : 'uccisioni', kills ? 'hot' : '') + tile(hist.length, 'eventi vissuti') + (dead ? tile(esc(outShort), 'uscita', 'txt') : tile(ally.length, ally.length === 1 ? 'alleato in gara' : 'alleati in gara')) + tile(tests ? passed + '<small>/' + tests + '</small>' : '–', 'prove riuscite') + '</div>' +
         panel('now', nowPanel) + panel('bonds', bondsPanel) + panel('story', storyPanel) + panel('self', selfPanel) +
       '</div>';
@@ -2421,7 +2443,7 @@
   function trophyHTML(t, on, when) {
     const hidden = t.segreto && !on;
     return '<li class="tr' + (on ? ' on' : '') + (hidden ? ' secret' : '') + '" data-tr="' + esc(t.id) + '" data-cat="' + esc(t.cat) + '"><span class="tr-ic" aria-hidden="true"></span><span class="tr-tx"><b>' + (hidden ? 'Trofeo segreto' : esc(t.nome)) + '</b><small>' + (hidden ? 'Si scopre giocando.' : esc(t.desc)) + '</small>' +
-      (on && when ? '<em>' + new Date(when).toLocaleDateString('it-IT') + '</em>' : '') + '</span></li>';
+      (on && when ? '<em>' + new Date(when).toLocaleDateString('it-IT') + '</em>' : '') + '</span>' + (on && CT ? '<button type="button" class="tr-share" data-cart="trofeo" data-id="' + esc(t.id) + '" aria-label="Cartolina del trofeo ' + esc(t.nome) + '">Condividi</button>' : '') + '</li>';
   }
   function resultsExtraHTML(nuovi) {
     if (!BC || !SIM) return '';
@@ -2431,10 +2453,285 @@
     const iv = (id, label) => { const t = BY[id]; if (!t) return ''; const qa = BC.intervista(SIM, id, ctx); return qa.length ? '<article class="iv">' + avHTML(t, { dead: !t.alive }) + '<div class="iv-in"><span class="iv-k">' + esc(label) + '</span><h3>' + esc(t.name) + '</h3><dl>' + qa.map((x) => '<dt>' + x.q + '</dt><dd>«' + x.a + '»</dd>').join('') + '</dl></div></article>' : ''; };
     const ivs = iv(winner, SIM.winners.length > 1 ? 'Tra chi ha vinto' : 'Chi ha vinto') + (second && second.id !== winner ? iv(second.id, theme.soft ? 'L’ultimo a uscire' : 'L’ultimo a cadere') : '');
     const ed = S.run.cfg.edizione || 1;
-    return (nuovi.length ? '<section class="block card tr-new"><h2>Trofei sbloccati <span>' + nuovi.length + '</span></h2><ul class="trlist">' + nuovi.map((t) => trophyHTML(t, true)).join('') + '</ul><button class="btn sm" type="button" data-bacheca="trofei">Tutti i trofei</button></section>' : '') +
+    const fest = g && g.festa ? g.festa : S.run.ospite && FS.stato ? { giocatori: FS.stato.giocatori || [] } : null;
+    const festaH = fest && fest.giocatori.length ? (() => { const sc = PT.punteggi(SIM, fest); return '<section class="block card fs-rank"><h2>La classifica della festa</h2><ol>' + sc.map((x, k) => '<li class="' + (k === 0 ? 'top' : '') + '" style="--pc:' + esc(x.p.colore || '#888') + '"><span class="fr-pos">' + (k + 1) + '</span><b class="fr-nm">' + esc(x.p.nome) + '</b>' + (x.campione ? avHTML(x.campione, { dead: !x.campione.alive }) + '<span class="fr-ch">' + esc(x.campione.name) + (x.win ? ' · vince' : ' · ' + x.campione.rank + 'º') + '</span>' : '<span class="fr-ch">senza campione</span>') + '<em class="fr-pt">' + x.punti + '<small> punti</small></em></li>').join('') + '</ol><p class="help">Punti: piazzamento del campione (10 per posizione guadagnata), 5 per eliminazione, 1 ogni 10 crediti, 50 se vince.</p></section>'; })() : '';
+    return festaH + (nuovi.length ? '<section class="block card tr-new"><h2>Trofei sbloccati <span>' + nuovi.length + '</span></h2><ul class="trlist">' + nuovi.map((t) => trophyHTML(t, true)).join('') + '</ul><button class="btn sm" type="button" data-bacheca="trofei">Tutti i trofei</button></section>' : '') +
       (ivs ? '<section class="block card ivbox"><h2>Le interviste</h2>' + ivs + '</section>' : '') +
+      postcardsHTML() +
       '<section class="block card rematch"><h2>Rivincita' + (ed > 1 ? ' <span>edizione ' + (ed + 1) + '</span>' : '') + '</h2><p>Lo stesso cast torna nell’arena: chi è sopravvissuto porta una cicatrice e un po’ d’esperienza, chi è caduto torna con i conti in sospeso.</p><div class="row"><button class="btn primary" type="button" id="rRematch">Rivincita</button><button class="btn" type="button" data-bacheca="album">Album dei concorrenti</button></div></section>';
   }
+  /* =============== MODALITÀ FESTA: sullo stesso telefono e online =============== */
+  const FE = window.LOS_FESTA;
+  const FS = { tab: 'locale', giocatori: [], room: null, role: null, code: null, gid: null, off: null, stato: null, rev: 0, pubblicato: '', risposte: new Set(), ultimo: null };
+  const fsPlayer = (i) => ({ id: 'p' + (i + 1) + Date.now().toString(36).slice(-3), nome: 'Giocatore ' + (i + 1), campione: null });
+  function openFesta() {
+    if (!PT) return;
+    if (!FS.giocatori.length) FS.giocatori = [fsPlayer(0), fsPlayer(1)];
+    stopPlay(); renderFesta(); const d = $('#festaDlg'); if (!d.open) d.showModal();
+  }
+  function castOptions(sel, taken) {
+    return '<option value="">Scegli il campione…</option>' + S.cast.map((t) => '<option value="' + esc(t.id) + '"' + (t.id === sel ? ' selected' : taken.has(t.id) ? ' disabled' : '') + '>' + esc(t.name || 'Senza nome') + ' · squadra ' + t.team + '</option>').join('');
+  }
+  function playersHTML() {
+    const taken = new Set(FS.giocatori.map((p) => p.campione).filter(Boolean).concat(Object.values(FS.room && FS.role === 'host' ? FS.room.get().ingressi || {} : {}).map((x) => x.campione)));
+    return '<ol class="fs-players">' + FS.giocatori.map((p, i) => '<li style="--pc:' + PT.COLORI[i % PT.COLORI.length] + '"><input type="text" maxlength="24" value="' + esc(p.nome) + '" data-fs-nome="' + i + '" aria-label="Nome del giocatore ' + (i + 1) + '"><select data-fs-camp="' + i + '" aria-label="Campione di ' + esc(p.nome) + '">' + castOptions(p.campione, taken) + '</select>' +
+      (FS.giocatori.length > 1 ? '<button type="button" class="iconbtn" data-fs-del="' + i + '" aria-label="Togli ' + esc(p.nome) + '">✕</button>' : '') + '</li>').join('') + '</ol>' +
+      (FS.giocatori.length < 8 ? '<button type="button" class="btn sm" data-fs-add>Aggiungi un giocatore</button>' : '');
+  }
+  function renderFesta() {
+    $$('#festaDlg [data-fs]').forEach((b) => b.setAttribute('aria-selected', String(b.dataset.fs === FS.tab)));
+    let h = '';
+    if (FS.tab === 'locale') {
+      h = playersHTML() + '<p class="help">Il telefono passa di mano a ogni turno. Servono almeno due giocatori, ognuno con il suo campione.</p><div class="row"><button type="button" class="btn primary lg" data-fs-start>Inizia la festa</button></div>';
+    } else if (FS.role === 'host') {
+      const ing = Object.entries(FS.room.get().ingressi || {});
+      h = '<div class="fs-room"><span>Codice della stanza</span><b class="fs-code">' + esc(FS.code) + '</b><small>Gli amici aprono il gioco, scelgono «Online» → «Entra» e scrivono questo codice.</small></div>' +
+        '<h3 class="fs-h">Giocatori su questo dispositivo</h3>' + playersHTML() +
+        '<h3 class="fs-h">Amici collegati <span>' + ing.length + '</span></h3>' + (ing.length ? '<ul class="fs-guests">' + ing.map(([gid, x]) => '<li><b>' + esc(x.nome) + '</b> · ' + (x.campione && S.cast.find((t) => t.id === x.campione) ? esc(S.cast.find((t) => t.id === x.campione).name) : '<em>sta scegliendo…</em>') + '</li>').join('') + '</ul>' : '<p class="help">Nessuno ancora: aspetta che entrino.</p>') +
+        '<div class="row"><button type="button" class="btn primary lg" data-fs-start>Inizia la festa</button><button type="button" class="btn" data-fs-leave>Chiudi la stanza</button></div>';
+    } else if (FS.role === 'guest') {
+      const cfg = FS.room.get().cfg, me = (FS.room.get().ingressi || {})[FS.gid] || {};
+      const taken = new Set(Object.entries(FS.room.get().ingressi || {}).filter(([g]) => g !== FS.gid).map(([, x]) => x.campione));
+      h = '<div class="fs-room"><span>Sei nella stanza</span><b class="fs-code">' + esc(FS.code) + '</b><small>' + (FS.room.get().stato ? 'La partita è cominciata.' : 'Aspetta che l’host inizi la partita.') + '</small></div>' +
+        (cfg ? '<label class="field"><span>Il tuo campione</span><select data-fs-mycamp>' + '<option value="">Scegli…</option>' + cfg.cast.map((t) => '<option value="' + esc(t.id) + '"' + (t.id === me.campione ? ' selected' : taken.has(t.id) ? ' disabled' : '') + '>' + esc(t.name) + ' · squadra ' + t.team + '</option>').join('') + '</select></label>' : '<p class="help">In attesa della configurazione dall’host…</p>') +
+        '<div class="row"><button type="button" class="btn" data-fs-leave>Esci dalla stanza</button></div>';
+    } else {
+      const srv = FE ? FE.server() : '';
+      h = '<div class="fs-online"><section><h3 class="fs-h">Crea una stanza</h3><p class="help">Questo dispositivo fa da regia: manda avanti la diretta, gli altri seguono e scelgono per il loro campione.</p><button type="button" class="btn primary" data-fs-create' + (srv ? '' : ' disabled') + '>Crea la stanza</button></section>' +
+        '<section><h3 class="fs-h">Entra in una stanza</h3><label class="field"><span>Il tuo nome</span><input type="text" maxlength="24" id="fsName" value="' + esc(FS.ultimo || '') + '"></label><label class="field"><span>Codice</span><input type="text" maxlength="4" id="fsCode" autocomplete="off" style="text-transform:uppercase"></label><button type="button" class="btn" data-fs-join' + (srv ? '' : ' disabled') + '>Entra</button></section></div>' +
+        '<details class="fs-server"' + (srv ? '' : ' open') + '><summary>Server della festa' + (srv ? ': collegato' : ': da impostare') + '</summary><p class="help">Per giocare online serve un database gratuito di Firebase: su console.firebase.google.com crea un progetto, aggiungi un «Realtime Database» in modalità di prova e incolla qui il suo indirizzo (finisce con firebasedatabase.app o firebaseio.com). Tutti i giocatori devono usare lo stesso indirizzo. Nella modalità di prova chiunque conosca l’indirizzo può leggere le stanze: non scriverci nulla di privato.</p>' +
+        '<label class="field"><span>Indirizzo del database</span><input type="url" id="fsServer" placeholder="https://il-tuo-progetto-default-rtdb.europe-west1.firebasedatabase.app" value="' + esc(srv) + '"></label><button type="button" class="btn sm" data-fs-server>Salva l’indirizzo</button></details>';
+    }
+    $('#festaBody').innerHTML = h;
+  }
+  function leanCfg(cfg) { return Object.assign({}, cfg, { cast: cfg.cast.map((t) => Object.assign({}, t, { img: '' })) }); }
+  function leaveRoom() { if (FS.off) FS.off(); if (FS.room) FS.room.close(); Object.assign(FS, { room: null, role: null, code: null, gid: null, off: null, stato: null, pubblicato: '' }); FS.risposte = new Set(); document.body.classList.remove('fs-ospite'); }
+  $('#festaDlg').addEventListener('click', async (e) => {
+    const tab = e.target.closest('[data-fs]'); if (tab) { FS.tab = tab.dataset.fs; renderFesta(); return; }
+    if (e.target.closest('[data-fs-add]')) { FS.giocatori.push(fsPlayer(FS.giocatori.length)); renderFesta(); return; }
+    const del = e.target.closest('[data-fs-del]'); if (del) { FS.giocatori.splice(+del.dataset.fsDel, 1); renderFesta(); return; }
+    if (e.target.closest('[data-fs-server]')) { const u = $('#fsServer').value.trim(); if (u && !FE.serverValido(u)) { $('#festaMsg').textContent = 'Indirizzo non valido: deve essere un Realtime Database di Firebase (https://…firebasedatabase.app).'; return; } FE.setServer(u); $('#festaMsg').textContent = u ? 'Server salvato.' : 'Server rimosso.'; renderFesta(); return; }
+    if (e.target.closest('[data-fs-create]')) { try { FS.code = FE.codice(); FS.room = FE.stanza(FS.code, 'host'); FS.role = 'host'; FS.room.set('meta', { build: window.LOS_BUILD || '', creata: Date.now() }); FS.room.set('cfg', leanCfg(currentConfiguration())); FS.off = FS.room.on(() => { if ($('#festaDlg').open && FS.role === 'host') renderFestaSoft(); hostInbox(); }); renderFesta(); } catch (x) { $('#festaMsg').textContent = x.message; } return; }
+    if (e.target.closest('[data-fs-join]')) {
+      const code = $('#fsCode').value.trim().toUpperCase(), nome = $('#fsName').value.trim() || 'Ospite';
+      if (!FE.okCodice(code)) { $('#festaMsg').textContent = 'Il codice è di quattro lettere.'; return; }
+      try { FS.code = code; FS.room = FE.stanza(code, 'guest'); FS.role = 'guest'; FS.gid = FE.nuovoId('g'); FS.ultimo = nome; FS.room.set('ingressi/' + FS.gid, { nome, campione: '' }); FS.off = FS.room.on(guestSync); document.body.classList.add('fs-ospite'); renderFesta(); $('#festaMsg').textContent = 'Sei dentro. Scegli il tuo campione.'; } catch (x) { $('#festaMsg').textContent = x.message; }
+      return;
+    }
+    if (e.target.closest('[data-fs-leave]')) { leaveRoom(); renderFesta(); return; }
+    if (e.target.closest('[data-fs-start]')) startFesta();
+  });
+  $('#festaDlg').addEventListener('change', (e) => {
+    const n = e.target.closest('[data-fs-nome]'); if (n) { FS.giocatori[+n.dataset.fsNome].nome = n.value.trim().slice(0, 24) || 'Giocatore'; return; }
+    const c = e.target.closest('[data-fs-camp]'); if (c) { FS.giocatori[+c.dataset.fsCamp].campione = c.value || null; renderFesta(); return; }
+    const m = e.target.closest('[data-fs-mycamp]'); if (m && FS.room) { FS.room.patch('ingressi/' + FS.gid, { campione: m.value }); }
+  });
+  // l'elenco degli ospiti si aggiorna senza rubare il fuoco a chi sta scrivendo
+  function renderFestaSoft() { if (!$('#festaDlg').contains(document.activeElement) || document.activeElement.tagName === 'BUTTON') renderFesta(); }
+  $('#btnFesta').addEventListener('click', openFesta);
+  function startFesta() {
+    const remote = FS.role === 'host' ? Object.entries(FS.room.get().ingressi || {}).filter(([, x]) => x.campione).map(([gid, x]) => ({ id: 'o' + gid, nome: x.nome, campione: x.campione, remoto: gid })) : [];
+    const locals = FS.giocatori.filter((p) => p.campione);
+    const all = locals.concat(remote);
+    if (all.length < (FS.role === 'host' ? 1 : 2)) { $('#festaMsg').textContent = FS.role === 'host' ? 'Serve almeno un giocatore con un campione.' : 'Servono almeno due giocatori, ognuno con un campione.'; return; }
+    if (S.cast.length < 2) { $('#festaMsg').textContent = 'Servono almeno 2 concorrenti nel cast.'; return; }
+    S.cast.forEach((t, i) => { if (!t.name.trim()) t.name = 'Concorrente ' + (i + 1); });
+    S.settings.seed = newSeed();
+    const cfg = currentConfiguration();
+    runSim.festa = PT.festaSana({ giocatori: all.map((p, i) => Object.assign({ crediti: PT.START, colore: PT.COLORI[i % PT.COLORI.length] }, p)), stanza: FS.code });
+    if (FS.role === 'host') { FS.room.set('cfg', leanCfg(cfg)); FS.room.set('richieste', null); FS.room.set('risposte', null); FS.room.set('azioni', null); FS.rev = 0; FS.pubblicato = ''; }
+    $('#festaDlg').close();
+    runSim(cfg);
+  }
+  // l'host pubblica lo stato a ogni fase: fase, interventi, giocatori (crediti e campioni)
+  function publishState(esito) {
+    if (FS.role !== 'host' || !FS.room || !SIM || !S.run || !S.run.gioco || !S.run.gioco.festa) return;
+    const st = { fase: S.run.phase || 0, interventi: S.run.cfg.interventi || [], giocatori: S.run.gioco.festa.giocatori, esito: !!esito, seme: S.run.cfg.seed };
+    const sig = JSON.stringify(st); if (sig === FS.pubblicato) return; FS.pubblicato = sig;
+    FS.room.set('stato', Object.assign(st, { rev: ++FS.rev }));
+  }
+  // le azioni spontanee degli ospiti (i doni): si applicano prima della fase successiva
+  let inboxBusy = false;
+  function hostInbox() { /* le azioni si raccolgono in next(), qui basta tenerle in coda */ }
+  async function processActions() {
+    if (FS.role !== 'host' || !FS.room || inboxBusy || !S.run || !S.run.gioco || !S.run.gioco.festa) return;
+    const az = Object.entries(FS.room.get().azioni || {}); if (!az.length) return;
+    inboxBusy = true;
+    try {
+      const g = S.run.gioco, i = S.run.phase || 0, k = i + 1, alive = SIM.phases[i].snap.alive; let changed = false;
+      for (const [aid, a] of az) {
+        FS.room.set('azioni/' + aid, null);
+        const p = g.festa.giocatori.find((x) => x.remoto === a.gid), dono = PT.DONI.find((x) => x.k === a.cosa);
+        if (!p || !dono || !alive.includes(a.chi) || k >= SIM.phases.length) continue;
+        const cost = PT.prezzo(SIM, i, a.chi, dono); if (cost > p.crediti) continue;
+        S.run.cfg.interventi = (S.run.cfg.interventi || []).concat([{ fase: k, tipo: 'dono', chi: a.chi, cosa: a.cosa }]); p.crediti -= cost; changed = true;
+        g.doni[k + ':' + p.id] = { chi: a.chi, cosa: a.cosa, costo: cost, da: p.id };
+        toast(p.nome + ' manda un dono a ' + BY[a.chi].name + '.');
+      }
+      if (changed) await resimulate();
+    } finally { inboxBusy = false; }
+  }
+  // una domanda a un giocatore: online va sul suo dispositivo, in locale si passa il telefono
+  let lastLocal = null;
+  async function askPlayer(p, opts) {
+    if (p.remoto && FS.room) { const r = await FE.chiediA(FS.room, p.remoto, Object.assign({}, opts, { kicker: p.nome + ' · ' + (opts.kicker || '') }), ((opts.timer || 25) + 8) * 1000); return r; }
+    const locals = S.run.gioco.festa.giocatori.filter((x) => !x.remoto);
+    if (locals.length > 1 && lastLocal !== p.id) {
+      const ok = await PT.chiedi({ kicker: 'Modalità festa', title: 'Passa il telefono a ' + p.nome, text: 'Tocca a ' + esc(p.nome) + '. Gli altri non guardano!', cls: 'sc-pass', options: [{ value: 1, label: 'Sono ' + p.nome + ', vai' }], skip: 'Salta il turno' });
+      if (!ok) return null;
+    }
+    lastLocal = p.id;
+    return PT.chiedi(Object.assign({}, opts, { kicker: p.nome + ' · ' + (opts.kicker || '') }));
+  }
+  async function askGame(p, tipo, opts) {
+    if (p.remoto && FS.room) { const r = await FE.chiediA(FS.room, p.remoto, Object.assign({ gioco: tipo }, opts), 45000); return r && typeof r.value === 'number' ? r.value : null; }
+    const locals = S.run.gioco.festa.giocatori.filter((x) => !x.remoto);
+    if (locals.length > 1 && lastLocal !== p.id) { const ok = await PT.chiedi({ kicker: 'Modalità festa', title: 'Passa il telefono a ' + p.nome, text: 'Il campione di ' + esc(p.nome) + ' affronta una prova.', cls: 'sc-pass', options: [{ value: 1, label: 'Sono ' + p.nome + ', vai' }], skip: 'Salta' }); if (!ok) return null; }
+    lastLocal = p.id;
+    return PT.gioca(tipo, opts);
+  }
+  // l'alba della festa: per ciascuno, nell'ordine, il nuovo campione (se serve), l'ordine e la puntata
+  async function festaDay(k) {
+    const P = SIM.phases, g = S.run.gioco, i = k - 1, soft = !!resultTheme(SIM).soft;
+    let changed = false;
+    for (const p of g.festa.giocatori) {
+      const alive = P[i].snap.alive;
+      if (p.campione && !alive.includes(p.campione)) {
+        p.caduti = (p.caduti || []).concat([p.campione]);
+        const taken = new Set(g.festa.giocatori.map((x) => x.campione).filter(Boolean));
+        const free = alive.filter((id) => !taken.has(id));
+        p.campione = null;
+        if (free.length) {
+          const r = await askPlayer(p, { kicker: 'Giorno ' + P[k].day + ' · nuovo campione', title: 'Il tuo campione è fuori. Chi scegli?', grid: true, cls: 'sc-pick', options: free.map((id) => ({ value: id, html: avHTML(BY[id]) + '<b class="sc-l">' + esc(BY[id].name) + '</b><small class="sc-s">Salute ' + PT.vit(SIM, i, id)[0] + '</small>' })), skip: 'Nessuno' });
+          p.campione = r && free.includes(r.value) ? r.value : null;
+        }
+        save(); renderHud();
+      }
+      if (!p.campione) continue;
+      const t = BY[p.campione];
+      const o = await askPlayer(p, { kicker: 'Giorno ' + P[k].day + ' · ordine', title: 'Cosa deve fare ' + t.name + ' oggi?', faces: avHTML(t), text: moodHTML(t, i), cls: 'sc-mentor', options: PT.ORDINI.map((x) => ({ value: x.v, label: x.label, sub: x.sub })), timer: 25, skip: 'Lascia decidere' });
+      if (o && PT.ORDINI.some((x) => x.v === o.value)) { S.run.cfg.interventi = (S.run.cfg.interventi || []).concat([{ fase: k, tipo: 'ordine', chi: t.id, cosa: o.value }]); g.ordini.push({ fase: k, cosa: o.value, da: p.id }); changed = true; }
+      if (p.crediti >= 10) {
+        const offers = PT.proposte(SIM, k, { mentore: p.campione }, BY, [], soft);
+        if (offers.length) {
+          const b = await askPlayer(p, { kicker: 'Giorno ' + P[k].day + ' · puntata', title: 'Su cosa scommetti?', options: offers.map((x, j) => ({ value: j, label: x.testo, cost: '×' + x.q })), stake: [10, 25, 50].filter((v) => v <= p.crediti), credits: p.crediti, cls: 'sc-bets', timer: 25, skip: 'Non punto' });
+          const stake = b && +b.stake;
+          if (b && offers[b.value] && stake && stake <= p.crediti) { g.puntate.push(Object.assign({ id: 'b' + k + '-' + g.puntate.length, posta: stake, esito: null, aperta: k, chi: p.id }, offers[b.value])); p.crediti -= stake; }
+        }
+      }
+      save(); renderHud();
+    }
+    if (changed && !await resimulate()) S.run.cfg.interventi = (S.run.cfg.interventi || []).filter((x) => x.fase !== k || x.tipo !== 'ordine');
+    save(); renderHud(); publishState();
+  }
+  async function festaTest(k) {
+    const g = S.run.gioco, P = SIM.phases;
+    for (const p of g.festa.giocatori) {
+      if (!p.campione || g.chiesto['p' + k + p.id]) continue;
+      const ev = P[k].events.find((e) => e.test && (e.test.who ? e.test.who === p.campione : e.ids[0] === p.campione)); if (!ev) continue;
+      g.chiesto['p' + k + p.id] = 1;
+      const t = BY[p.campione], tipo = PT.tipoProva(ev.test.attr), an = ATTRN[ev.test.attr] || ev.test.attr;
+      const score = await askGame(p, tipo, { kicker: p.nome + ' · prova di ' + an, title: { tempismo: 'Questione di riflessi', sequenza: 'Questione di testa', via: 'Questione di istinto' }[tipo], faces: avHTML(t), text: esc(t.name) + ' affronta una prova di <b>' + esc(an) + '</b>.' });
+      if (score == null) continue;
+      const v = PT.bonusProva(score); if (!v) continue;
+      const before = S.run.cfg.interventi || [];
+      S.run.cfg.interventi = before.concat([{ fase: k, tipo: 'prova', chi: t.id, cosa: String(v) }]);
+      if (!await resimulate()) S.run.cfg.interventi = before;
+    }
+  }
+  // l'ospite: segue la stanza, ricalcola la partita da sé, risponde alle domande che gli arrivano
+  let guestBusy = false;
+  async function guestSync(tree) {
+    if (FS.role !== 'guest') return;
+    if ($('#festaDlg').open) renderFestaSoft();
+    const st = tree.stato, cfg = tree.cfg;
+    FS.stato = st || null;
+    if (tree.meta && tree.meta.build && window.LOS_BUILD && tree.meta.build !== window.LOS_BUILD && !FS.avvisato) { FS.avvisato = true; toast('Attenzione: l’host usa un’altra versione del gioco, la partita potrebbe non coincidere.'); }
+    // le domande per me
+    Object.entries(tree.richieste || {}).forEach(([rid, r]) => {
+      if (!r || r.gid !== FS.gid || FS.risposte.has(rid) || (r.scade && r.scade < Date.now())) return;
+      FS.risposte.add(rid);
+      const card = Object.assign({}, r.card, { timer: undefined });
+      (card.gioco ? PT.gioca(card.gioco, card).then((s) => ({ value: s == null ? '__salta__' : s })) : PT.chiedi(card).then((x) => (x ? { value: x.value, stake: x.stake == null ? 0 : x.stake } : { value: '__salta__' })))
+        .then((res) => FS.room && FS.room.set('risposte/' + rid, res));
+    });
+    if (!st || !cfg || guestBusy) return;
+    guestBusy = true;
+    try {
+      const inter = (x) => JSON.stringify(x || []);
+      if (!SIM || !S.run || !S.run.ospite || S.run.ospite.code !== FS.code || S.run.cfg.seed !== st.seme) {
+        const c = Object.assign({}, cfg, { cast: normalizeCast(cfg.cast), custom: normalizeCustoms(cfg.custom || []), interventi: st.interventi || [] });
+        runSim.condivisa = true; runSim.pre = null;
+        if (!await runSim(c)) return;
+        S.run.ospite = { code: FS.code, gid: FS.gid }; save();
+        if ($('#festaDlg').open) $('#festaDlg').close();
+      } else if (inter(S.run.cfg.interventi) !== inter(st.interventi)) {
+        S.run.cfg.interventi = st.interventi || [];
+        await resimulate();
+      }
+      if (st.esito) { if (location.hash !== '#esito') location.hash = '#esito'; else renderResults(); }
+      else if ((S.run.phase || 0) !== st.fase) { S.run.phase = Math.min(st.fase, SIM.phases.length - 1); renderLive(false); }
+      else renderHud();
+    } finally { guestBusy = false; }
+  }
+  async function guestGift() {
+    if (!FS.room || !SIM || !FS.stato) return;
+    const me = (FS.stato.giocatori || []).find((p) => p.remoto === FS.gid); if (!me) return toast('Non hai un posto in questa partita.');
+    const i = S.run.phase || 0, A = SIM.phases[i].snap.alive;
+    const who = await PT.chiedi({ kicker: 'Sponsor · ' + me.nome, title: 'A chi mandi un dono?', text: 'Crediti: <b>' + me.crediti + '</b>. L’host lo consegna alla prossima fase.', grid: true, cls: 'sc-pick', options: A.map((id) => ({ value: id, html: avHTML(BY[id]) + '<b class="sc-l">' + esc(BY[id].name) + '</b>' })), skip: 'Annulla' });
+    if (!who) return;
+    const t = BY[who.value], price = (x) => PT.prezzo(SIM, i, who.value, x);
+    const d = await PT.chiedi({ kicker: 'Sponsor · ' + t.name, title: 'Che cosa mandi?', faces: avHTML(t), cls: 'sc-gift', options: PT.DONI.map((x) => ({ value: x.k, label: x.label, sub: x.sub, cost: price(x) + ' cr', disabled: price(x) > me.crediti })), skip: 'Annulla' });
+    if (!d) return;
+    FS.room.set('azioni/' + FE.nuovoId('a'), { gid: FS.gid, chi: who.value, cosa: d.value });
+    toast('Richiesta inviata: il dono parte alla prossima fase.');
+  }
+
+  /* ---------- cartoline e link della partita ---------- */
+  const CT = window.LOS_CARTOLINE;
+  let cartCanvas = null, cartName = 'last-one-standing';
+  function postcardsHTML() {
+    if (!CT) return '';
+    return '<section class="block card cards-share"><h2>Cartoline</h2><p class="help">Immagini pronte per i social, e un link per far vedere a chiunque la stessa identica partita.</p><div class="row"><button class="btn" type="button" data-cart="vincitore">Il vincitore</button><button class="btn" type="button" data-cart="riepilogo">La partita</button><button class="btn primary" type="button" data-cart-link>Copia il link della partita</button></div></section>';
+  }
+  async function makePostcard(kind, id) {
+    if (!CT || !SIM) return;
+    const theme = resultTheme(SIM), g = S.run && S.run.gioco;
+    $('#cartMsg').textContent = 'Preparo la cartolina…'; $('#cartImg').removeAttribute('src');
+    const d = $('#cartolinaDlg'); if (!d.open) d.showModal();
+    try { if (document.fonts && document.fonts.ready) await document.fonts.ready; } catch (e) { /* niente */ }
+    let c = null;
+    if (kind === 'vincitore') { c = await CT.vincitore(SIM, theme); cartName = 'vincitore'; }
+    else if (kind === 'riepilogo') { const m = g && g.mentore && BY[g.mentore]; c = await CT.riepilogo(SIM, theme, { tu: m ? 'Il mio allievo: ' + m.name + ' · ' + (SIM.winners.includes(m.id) ? 'vincitore' : m.rank + 'º') : g && g.puntate.length ? 'Le mie puntate: ' + g.puntate.filter((b) => b.esito === 'vinta').length + ' vinte su ' + g.puntate.length : '' }); cartName = 'partita'; }
+    else if (kind === 'eliminazione') { c = await CT.eliminazione(SIM, id, theme); cartName = 'eliminazione-' + (BY[id] ? BY[id].name : id); }
+    else if (kind === 'carta' && BC && PT) { const x = (PT.profilo().album || {})[id]; if (x) { c = await CT.carta(x, BC.rarita(x)); cartName = 'carta-' + x.name; } }
+    else if (kind === 'trofeo' && BC && PT) { const t = BC.TROFEI.find((x) => x.id === id); if (t) { c = await CT.trofeo(t, (PT.profilo().trofei || {})[id]); cartName = 'trofeo-' + t.nome; } }
+    cartCanvas = c;
+    if (!c) { $('#cartMsg').textContent = 'Cartolina non disponibile.'; return; }
+    $('#cartImg').src = c.toDataURL('image/png'); $('#cartImg').alt = 'Cartolina: ' + cartName;
+    $('#cartMsg').textContent = '';
+    $('#cartLink').hidden = !SIM || kind === 'carta' || kind === 'trofeo';
+    if (window.LOS_PARTITA_FX && window.LOS_PARTITA_FX.postcard) try { window.LOS_PARTITA_FX.postcard($('#cartolinaDlg'), kind); } catch (e) { /* solo grafica */ }
+  }
+  async function copyGameLink() {
+    if (!CT || !S.run) return;
+    try { const code = await CT.codifica(S.run.cfg); copyText(location.origin + location.pathname + '#vedi=' + code, 'Link copiato: chi lo apre vede la stessa partita, con le stesse scelte.'); }
+    catch (e) { toast('Link non disponibile in questo browser.'); }
+  }
+  async function openShared(code) {
+    let cfg;
+    try { cfg = await CT.decodifica(code); if (!cfg || !Array.isArray(cfg.cast)) throw new Error('vuoto'); cfg.cast = normalizeCast(cfg.cast); cfg.custom = normalizeCustoms(cfg.custom || []); }
+    catch (e) { toast('Il link della partita non è valido.'); location.hash = '#home'; route(); return; }
+    runSim.condivisa = true; runSim.pre = null;
+    toast('Partita condivisa: la stai guardando così come è stata giocata.');
+    await runSim(cfg);
+  }
+  document.addEventListener('click', (e) => {
+    const c = e.target.closest('[data-cart]'); if (c) { e.preventDefault(); makePostcard(c.dataset.cart, c.dataset.id); return; }
+    if (e.target.closest('[data-cart-link]')) copyGameLink();
+  });
+  $('#cartShare').addEventListener('click', async () => { if (!cartCanvas) return; const r = await CT.condividi(cartCanvas, cartName.replace(/[^w-àèéìòù]+/gi, '-').toLowerCase(), 'Last One Standing'); $('#cartMsg').textContent = r === 'condivisa' ? 'Condivisa.' : r === 'scaricata' ? 'Immagine scaricata.' : r === 'annullata' ? '' : 'Non riuscito.'; });
+  $('#cartLink').addEventListener('click', copyGameLink);
   function startRematch() {
     if (!BC || !SIM || !S.run) return;
     const res = BC.rivincita(S.run.cfg, SIM, TRAITS);
@@ -2464,7 +2761,7 @@
       h = cards.length ? '<p class="bc-count"><b>' + cards.length + '</b> carte · ' + cards.filter((c) => c[1].k !== 'comune').length + ' rare o meglio</p><ul class="album">' + cards.map(([x, r]) => {
         const inCast = S.cast.some((t) => t.id === x.id);
         return '<li class="acard r-' + r.k + '"><span class="ac-r">' + esc(r.nome) + '</span>' + avHTML(x) + '<b class="ac-n">' + esc(x.name) + '</b><span class="ac-st"><span><b>' + x.partite + '</b> ' + (x.partite === 1 ? 'partita' : 'partite') + '</span><span><b>' + x.vittorie + '</b> ' + (x.vittorie === 1 ? 'vittoria' : 'vittorie') + '</span><span><b>' + x.uccisioni + '</b> ' + (x.uccisioni === 1 ? 'eliminazione' : 'eliminazioni') + '</span></span>' +
-          '<span class="ac-best">Migliore: ' + (x.migliore === 1 ? 'vittoria' : x.migliore + 'º posto') + '</span><button type="button" class="btn sm" data-album-add="' + esc(x.id) + '"' + (inCast ? ' disabled' : '') + '>' + (inCast ? 'Già nel cast' : 'Porta nel cast') + '</button></li>';
+          '<span class="ac-best">Migliore: ' + (x.migliore === 1 ? 'vittoria' : x.migliore + 'º posto') + '</span><button type="button" class="btn sm" data-album-add="' + esc(x.id) + '"' + (inCast ? ' disabled' : '') + '>' + (inCast ? 'Già nel cast' : 'Porta nel cast') + '</button>' + (CT ? '<button type="button" class="btn sm ac-share" data-cart="carta" data-id="' + esc(x.id) + '">Cartolina</button>' : '') + '</li>';
       }).join('') + '</ul>' : '<p class="help">L’album si riempie a ogni partita che arriva all’esito: ogni concorrente diventa una carta, e la carta diventa più rara con le vittorie.</p>';
     } else {
       const rows = [['Partite giocate', p.partite || 0], ['Crediti record', p.record || 0], ['Puntate vinte', (p.vinte || 0) + ' su ' + (p.puntate || 0)], ['Doni mandati', p.doni || 0], ['Ordini seguiti', (p.seguiti || 0) + ' su ' + (p.ordini || 0)], ['Allievi vincitori', p.mentoriVincenti || 0], ['Arene visitate', (p.arene || []).length + ' su ' + D.themes.length]];
@@ -2752,6 +3049,7 @@
     AN.ripple(document.body);
     try { const ic = document.createElement('link'); ic.rel = 'icon'; ic.href = ART.logoDataUri('#e3b04b'); document.head.appendChild(ic); } catch (e) { /* niente */ }
     updateCounts();
+    if (/^#vedi=/.test(location.hash)) { await openShared(location.hash.slice(6)); return; }
     if (!await restoreRun()) return;
     if (hot && typeof hot.phase === 'number' && S.run) S.run.phase = hot.phase;
     updateCounts();

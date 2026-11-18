@@ -5343,6 +5343,71 @@ body:has(#editDlg[open]) #v-cast > :not(.dock) { translate: -34px 0; }
    e se ne vedeva solo la cima (capelli, fronte). Il ritaglio sugli occhi lo calcola src/skin/05-occhi.js */
 .av.es-strip > img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
 
+/* ================= PELLE · FESTA E CARTOLINE, FASE 4 (base) =================
+ * Struttura e leggibilità: la finestra della festa (giocatori, stanza online, server), la classifica dei giocatori
+ * nella barra della Diretta e nell'Esito, le cartoline (finestra, pulsanti). La regia visiva va nei file 6x. */
+
+/* ---------- finestra della festa ---------- */
+#festaDlg { width: min(760px, 100%); }
+.fs-tabs { display: flex; gap: 6px; margin: 10px 0 14px; flex-wrap: wrap; }
+.fs-tabs button { padding: 8px 16px; border: 2px solid color-mix(in srgb, var(--ink) 22%, transparent); background: transparent; color: var(--ink); font: italic 900 14px / 1 var(--f-display); text-transform: uppercase; cursor: pointer; }
+.fs-tabs button[aria-selected="true"] { background: var(--key); color: var(--key-ink); border-color: var(--key); }
+.fs-players { list-style: none; margin: 0 0 10px; padding: 0; display: grid; gap: 8px; }
+.fs-players li { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr) auto; gap: 8px; align-items: center; padding: 8px 10px; background: color-mix(in srgb, var(--ink) 6%, transparent); box-shadow: inset 5px 0 0 var(--pc, var(--key)); }
+.fs-players input, .fs-players select { min-width: 0; }
+.fs-h { margin: 16px 0 8px; font: italic 900 16px / 1 var(--f-display); text-transform: uppercase; }
+.fs-h span { color: var(--key); }
+.fs-room { display: grid; gap: 4px; justify-items: start; padding: 14px 16px; background: var(--void); color: var(--paper); }
+.fs-room > span { font: 800 11px / 1 var(--f-body); letter-spacing: .2em; text-transform: uppercase; opacity: .75; }
+.fs-code { font: italic 900 64px / 1 var(--f-display); letter-spacing: .12em; color: var(--key); }
+.fs-room small { font-size: 13px; opacity: .85; }
+.fs-guests { margin: 0; padding-left: 18px; display: grid; gap: 4px; }
+.fs-online { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+.fs-online section { display: grid; gap: 8px; align-content: start; }
+.fs-server { margin-top: 16px; }
+.fs-server summary { cursor: pointer; font-weight: 800; }
+.fs-open { margin-right: 8px; }
+
+/* ---------- la barra della festa nella Diretta ---------- */
+.pt-festa { flex: 1 1 100%; display: grid; gap: 6px; }
+.pt-festa > small { font: 800 10.5px / 1 var(--f-body); letter-spacing: .18em; text-transform: uppercase; color: color-mix(in srgb, var(--ink) 68%, transparent); }
+.pt-festa ol { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 8px; }
+.pf-pl { display: grid; grid-template-columns: auto auto; grid-template-rows: auto auto; column-gap: 8px; align-items: center; padding: 6px 10px; background: color-mix(in srgb, var(--ink) 7%, transparent); box-shadow: inset 4px 0 0 var(--pc); min-width: 150px; }
+.pf-pl .pf-nm { grid-column: 1 / -1; font: italic 900 15px / 1.1 var(--f-display); text-transform: uppercase; }
+.pf-pl .av { --s: 30px; grid-row: 2; }
+.pf-pl .pf-ch { grid-row: 2; font-size: 13px; }
+.pf-pl em { grid-column: 1 / -1; font-style: normal; font-weight: 800; font-size: 12px; color: var(--key); }
+.pf-pl.me { outline: 2px solid var(--key); }
+body.fs-ospite #prevBtn, body.fs-ospite #playBtn, body.fs-ospite #nextBtn, body.fs-ospite #speedSeg { opacity: .35; pointer-events: none; }
+
+/* ---------- classifica della festa nell'Esito ---------- */
+.fs-rank ol { list-style: none; margin: 0 0 10px; padding: 0; display: grid; gap: 8px; }
+.fs-rank li { display: grid; grid-template-columns: 44px minmax(0, 1fr) 44px minmax(0, 1fr) auto; gap: 10px; align-items: center; padding: 10px 12px; background: color-mix(in srgb, var(--ink) 6%, transparent); box-shadow: inset 5px 0 0 var(--pc); }
+.fs-rank li.top { background: color-mix(in srgb, var(--key) 16%, transparent); }
+.fr-pos { font: italic 900 32px / 1 var(--f-display); color: var(--key); }
+.fr-nm { font: italic 900 20px / 1.1 var(--f-display); text-transform: uppercase; }
+.fs-rank .av { --s: 40px; }
+.fr-ch { font-size: 14px; }
+.fr-pt { font: italic 900 26px / 1 var(--f-display); font-style: italic; }
+.fr-pt small { font: 700 12px / 1 var(--f-body); }
+
+/* ---------- cartoline ---------- */
+#cartolinaDlg { width: min(560px, 100%); }
+.ct-frame { margin: 10px 0 14px; background: color-mix(in srgb, var(--ink) 8%, transparent); aspect-ratio: 4 / 5; display: grid; place-items: center; }
+.ct-frame img { width: 100%; height: 100%; object-fit: contain; display: block; }
+.cards-share .row { gap: 8px; flex-wrap: wrap; }
+.tr-share { grid-column: 2; justify-self: start; margin-top: 4px; padding: 2px 8px; border: 0; background: transparent; color: var(--key); font: 800 11px / 1.4 var(--f-body); letter-spacing: .1em; text-transform: uppercase; cursor: pointer; box-shadow: inset 0 -2px 0 currentColor; }
+.ac-share { margin-top: 2px; }
+
+@media (max-width: 600px) {
+  .fs-online { grid-template-columns: 1fr; }
+  .fs-players li { grid-template-columns: 1fr auto; }
+  .fs-players select { grid-column: 1 / -1; grid-row: 2; }
+  .fs-rank li { grid-template-columns: 34px minmax(0, 1fr) auto; }
+  .fs-rank li .av, .fs-rank .fr-ch { display: none; }
+  .fs-code { font-size: 48px; }
+}
+
 /* ================= PELLE · BACHECA, FASE 3 (base) =================
  * Struttura e leggibilità: trofei sbloccati e interviste nell'Esito, la rivincita, la finestra «La tua bacheca»
  * (trofei, album delle carte, record) e il pulsante in home. La regia visiva va nei file 6x. */
@@ -6840,7 +6905,7 @@ dialog[open]::backdrop { animation: cmVeil .3s ease both; }
         </details>
       </aside>
     </div>
-    <div class="dock arenadock"><div class="dockin"><div class="startsum" id="startSum"></div><div class="startgo"><p class="help" id="startMsg" role="status"></p><button class="btn primary lg" id="btnStart" type="button" aria-label="Avvia la simulazione"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4.5v15l12-7.5z" fill="currentColor"/></svg><span>Avvia<span class="bl"> la simulazione</span></span></button></div></div></div>
+    <div class="dock arenadock"><div class="dockin"><div class="startsum" id="startSum"></div><div class="startgo"><p class="help" id="startMsg" role="status"></p><button class="btn lg fs-open" id="btnFesta" type="button">Festa con gli amici</button><button class="btn primary lg" id="btnStart" type="button" aria-label="Avvia la simulazione"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4.5v15l12-7.5z" fill="currentColor"/></svg><span>Avvia<span class="bl"> la simulazione</span></span></button></div></div></div>
   </section>
 
   <!-- DIRETTA -->
@@ -6999,6 +7064,23 @@ dialog[open]::backdrop { animation: cmVeil .3s ease both; }
     <div class="row between"><h2 id="h-bacheca">La tua bacheca</h2><button class="iconbtn" type="button" data-close aria-label="Chiudi la bacheca">✕</button></div>
     <div class="bc-tabs" role="tablist" aria-label="Bacheca"><button type="button" role="tab" data-bc="trofei" aria-selected="true">Trofei</button><button type="button" role="tab" data-bc="album" aria-selected="false">Album</button><button type="button" role="tab" data-bc="record" aria-selected="false">Record</button></div>
     <div id="bachecaBody" role="tabpanel"></div>
+  </div>
+</dialog>
+<dialog id="cartolinaDlg" class="modal tool-dialog" aria-labelledby="h-cartolina">
+  <div class="db cartolina-dialog">
+    <div class="row between"><h2 id="h-cartolina">Cartolina</h2><button class="iconbtn" type="button" data-close aria-label="Chiudi la cartolina">✕</button></div>
+    <div class="ct-frame"><img id="cartImg" alt=""></div>
+    <div class="row"><button class="btn primary" type="button" id="cartShare">Condividi</button><button class="btn" type="button" id="cartLink">Copia il link della partita</button></div>
+    <p class="help" id="cartMsg" role="status"></p>
+  </div>
+</dialog>
+<dialog id="festaDlg" class="modal tool-dialog" aria-labelledby="h-festa">
+  <div class="db festa-dialog">
+    <div class="row between"><h2 id="h-festa">Modalità festa</h2><button class="iconbtn" type="button" data-close aria-label="Chiudi la modalità festa">✕</button></div>
+    <p class="help">Ognuno sceglie il suo campione. A ogni alba tocca a ciascuno: un ordine e una puntata. Vince chi porta più lontano il suo campione.</p>
+    <div class="fs-tabs" role="tablist" aria-label="Dove si gioca"><button type="button" role="tab" data-fs="locale" aria-selected="true">Su questo telefono</button><button type="button" role="tab" data-fs="online" aria-selected="false">Online</button></div>
+    <div id="festaBody" role="tabpanel"></div>
+    <p class="help" id="festaMsg" role="status"></p>
   </div>
 </dialog>
 <dialog id="labDlg" class="modal tool-dialog" aria-labelledby="h-lab"><div class="db studio-dialog">
@@ -20333,7 +20415,7 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
 </script>
 <script>window.LOS_ASSETS = {"logo":"img/logo.f2d5175789.webp","icona":"img/icona.8b02ddeb49.webp","favicon":"img/favicon.86774dc7cf.png","panoramica":"img/panoramica.66c4c27255.webp","sagome":["img/sagome-cappuccio.e8876ba986.webp","img/sagome-esploratore.9a99fd13f8.webp","img/sagome-viaggiatore.5e36435604.webp"],"arene":{"classico":"img/arene-classico.c2887324d1.webp","cyberpunk":"img/arene-cyberpunk.713b4c77ea.webp","fantasy":"img/arene-fantasy.ee494a9322.webp","horror":"img/arene-horror.76225517ca.webp","liceo":"img/arene-liceo.c591ac5f32.webp","royale":"img/arene-royale.46515caf90.webp","scifi":"img/arene-scifi.bc9d8e04eb.webp","ufficio":"img/arene-ufficio.a2e36d4f7f.webp","wasteland":"img/arene-wasteland.734ed966b2.webp","zombie":"img/arene-zombie.11476cf1ca.webp"},"atlas":{"classico":{"armi":{"arco":"img/arene-classico-armi-arco.57fa716aa9.webp","ascia":"img/arene-classico-armi-ascia.f48629747b.webp","coltello-da-campo":"img/arene-classico-armi-coltello-da-campo.3393de240f.webp","coltello":"img/arene-classico-armi-coltello.a0134af05c.webp","falce-corta":"img/arene-classico-armi-falce-corta.3131158a9f.webp","fionda":"img/arene-classico-armi-fionda.48c8c32c43.webp","lancia-da-caccia":"img/arene-classico-armi-lancia-da-caccia.6f2be560ec.webp","lancia":"img/arene-classico-armi-lancia.115909650b.webp","machete":"img/arene-classico-armi-machete.e1c9ef25d7.webp","mazza-corta":"img/arene-classico-armi-mazza-corta.e1092f0628.webp","mazza":"img/arene-classico-armi-mazza.1fddf37b46.webp","pugnale-da-cintura":"img/arene-classico-armi-pugnale-da-cintura.0bedc8a501.webp","pugnale":"img/arene-classico-armi-pugnale.fda9dbf38a.webp","scure-da-legna":"img/arene-classico-armi-scure-da-legna.837c5d1f78.webp","spada-corta":"img/arene-classico-armi-spada-corta.952e6b7f6a.webp","tridente":"img/arene-classico-armi-tridente.2fcb3547d9.webp"},"luoghi":{"altopiano":"img/arene-classico-luoghi-altopiano.36a37512d3.webp","bosco":"img/arene-classico-luoghi-bosco.2e9163544b.webp","cornucopia":"img/arene-classico-luoghi-cornucopia.393b2dabe1.webp","fiume":"img/arene-classico-luoghi-fiume.22b335a914.webp","paludi":"img/arene-classico-luoghi-paludi.77cf115eb4.webp","rovine":"img/arene-classico-luoghi-rovine.9ea4f70ca9.webp"},"pericoli":{"branco-di-lupi-mutanti":"img/arene-classico-pericoli-branco-di-lupi-mutanti.d786a62875.webp","orso-affamato":"img/arene-classico-pericoli-orso-affamato.e4f38a9892.webp","sciame-di-vespe-velenose":"img/arene-classico-pericoli-sciame-di-vespe-velenose.5adb2c7b8d.webp","serpente-gigante":"img/arene-classico-pericoli-serpente-gigante.b17e7f3d91.webp"}},"cyberpunk":{"armi":{"coltello-vibrante-in-ceramica":"img/arene-cyberpunk-armi-coltello-vibrante-in-ceramica.6bbcd0e9e4.webp","fucile-a-pompa-da-strada":"img/arene-cyberpunk-armi-fucile-a-pompa-da-strada.dbd0de34e1.webp","fucile-a-pompa-elettromagnetico":"img/arene-cyberpunk-armi-fucile-a-pompa-elettromagnetico.0555418cd0.webp","katana-termica":"img/arene-cyberpunk-armi-katana-termica.f1ff597173.webp","mazza-a-impulsi":"img/arene-cyberpunk-armi-mazza-a-impulsi.22d841ed1d.webp","mazza-da-baseball-chiodata":"img/arene-cyberpunk-armi-mazza-da-baseball-chiodata.db2996f744.webp","mitra-compatto":"img/arene-cyberpunk-armi-mitra-compatto.eaa3815798.webp","pistola-a-rotaia-artigianale":"img/arene-cyberpunk-armi-pistola-a-rotaia-artigianale.f9e83bda89.webp","pistola-smart":"img/arene-cyberpunk-armi-pistola-smart.2aa922ba8c.webp","sparachiodi-riprogrammato":"img/arene-cyberpunk-armi-sparachiodi-riprogrammato.70f6190cb0.webp","taser-da-buttafuori":"img/arene-cyberpunk-armi-taser-da-buttafuori.60b58b451d.webp","tirapugni-elettrificato":"img/arene-cyberpunk-armi-tirapugni-elettrificato.1ce19bab37.webp","ventaglio-da-combattimento-in-titanio":"img/arene-cyberpunk-armi-ventaglio-da-combattimento-in-titanio.f3b7bb5a10.webp"},"luoghi":{"clinica-del-ripperdoc":"img/arene-cyberpunk-luoghi-clinica-del-ripperdoc.8ef0cb941b.webp","club-della-braindance":"img/arene-cyberpunk-luoghi-club-della-braindance.7765542e70.webp","megablocco":"img/arene-cyberpunk-luoghi-megablocco.28b72e6ecf.webp","mercato-di-kabuki":"img/arene-cyberpunk-luoghi-mercato-di-kabuki.d5c8ab7b96.webp","nodo-dati-corporativo":"img/arene-cyberpunk-luoghi-nodo-dati-corporativo.56ca3e1335.webp","officina-dei-maelstrom":"img/arene-cyberpunk-luoghi-officina-dei-maelstrom.d69285cf21.webp","piazza-della-torre":"img/arene-cyberpunk-luoghi-piazza-della-torre.1e400212c8.webp"},"pericoli":{"banda-di-scav":"img/arene-cyberpunk-pericoli-banda-di-scav.f1a2b2ccc4.webp","gang-di-cromati":"img/arene-cyberpunk-pericoli-gang-di-cromati.74e5576e23.webp","sciame-di-droni-di-pattuglia":"img/arene-cyberpunk-pericoli-sciame-di-droni-di-pattuglia.6fb4b17ad9.webp","squadra-di-sicurezza-corporativa":"img/arene-cyberpunk-pericoli-squadra-di-sicurezza-corporativa.6195a3b15d.webp"}},"fantasy":{"armi":{"arco-elfico":"img/arene-fantasy-armi-arco-elfico.8012f9136d.webp","ascia-nanica":"img/arene-fantasy-armi-ascia-nanica.6913fdf008.webp","balestra":"img/arene-fantasy-armi-balestra.7767becc83.webp","bastone-magico":"img/arene-fantasy-armi-bastone-magico.0781aee860.webp","daga-dei-giuramenti":"img/arene-fantasy-armi-daga-dei-giuramenti.3b6d4b398c.webp","falcetto-dargento":"img/arene-fantasy-armi-falcetto-dargento.1ce0e4e163.webp","lancia-incantata":"img/arene-fantasy-armi-lancia-incantata.7371199824.webp","lancia-silvana":"img/arene-fantasy-armi-lancia-silvana.08fbc01ede.webp","martello-da-guerra":"img/arene-fantasy-armi-martello-da-guerra.4eb03f4db7.webp","martello-nanico":"img/arene-fantasy-armi-martello-nanico.82ad6b9b14.webp","mazza-di-quercia":"img/arene-fantasy-armi-mazza-di-quercia.0f6a8345a9.webp","pugnale-avvelenato":"img/arene-fantasy-armi-pugnale-avvelenato.aba554d177.webp","spada-da-viaggio":"img/arene-fantasy-armi-spada-da-viaggio.a7bdcab5f4.webp","spada-runica":"img/arene-fantasy-armi-spada-runica.ec4012c6cf.webp"},"luoghi":{"altare-delle-armi":"img/arene-fantasy-luoghi-altare-delle-armi.db06de44c1.webp","foresta-elfica":"img/arene-fantasy-luoghi-foresta-elfica.0448fcfbd3.webp","lago-nebbioso":"img/arene-fantasy-luoghi-lago-nebbioso.f19abc7c81.webp","miniere":"img/arene-fantasy-luoghi-miniere.5baa916ec9.webp","palude-stregata":"img/arene-fantasy-luoghi-palude-stregata.6a0b2af4a7.webp","picco-del-drago":"img/arene-fantasy-luoghi-picco-del-drago.06bdfd84b1.webp","torre-in-rovina":"img/arene-fantasy-luoghi-torre-in-rovina.ac716863c7.webp"},"pericoli":{"branco-di-lupi-mannari":"img/arene-fantasy-pericoli-branco-di-lupi-mannari.1c9124ceee.webp","spettro-errante":"img/arene-fantasy-pericoli-spettro-errante.056074bc23.webp","troll-di-caverna":"img/arene-fantasy-pericoli-troll-di-caverna.31aa2444f0.webp","viverna":"img/arene-fantasy-pericoli-viverna.577b91a819.webp"}},"horror":{"armi":{"ascia":"img/arene-horror-armi-ascia.f6793c220e.webp","attizzatoio":"img/arene-horror-armi-attizzatoio.12b9bf75af.webp","bastone-da-passeggio":"img/arene-horror-armi-bastone-da-passeggio.1a636ce4ab.webp","candelabro-dargento":"img/arene-horror-armi-candelabro-dargento.7d962054de.webp","coltello-dargento":"img/arene-horror-armi-coltello-dargento.73a6bb81ea.webp","crocifisso-appuntito":"img/arene-horror-armi-crocifisso-appuntito.203b41a170.webp","daga-da-cerimonia":"img/arene-horror-armi-daga-da-cerimonia.a597e15c53.webp","falce":"img/arene-horror-armi-falce.6513df8fa2.webp","fucile-da-caccia":"img/arene-horror-armi-fucile-da-caccia.169dc367e1.webp","pugnale-depoca":"img/arene-horror-armi-pugnale-depoca.f148afd005.webp","pugnale-rituale":"img/arene-horror-armi-pugnale-rituale.944cb9056c.webp","scure-da-legna":"img/arene-horror-armi-scure-da-legna.a11379a412.webp"},"luoghi":{"biblioteca":"img/arene-horror-luoghi-biblioteca.00d6ab97f4.webp","cantina":"img/arene-horror-luoghi-cantina.a196828c1d.webp","cappella":"img/arene-horror-luoghi-cappella.a51e505028.webp","cimitero":"img/arene-horror-luoghi-cimitero.7a441de089.webp","salone":"img/arene-horror-luoghi-salone.37f10c88c7.webp","serra":"img/arene-horror-luoghi-serra.b3d91121d4.webp","soffitta":"img/arene-horror-luoghi-soffitta.466d40cea3.webp"},"pericoli":{"bambola-posseduta":"img/arene-horror-pericoli-bambola-posseduta.7064eef1d7.webp","entita-senza-volto":"img/arene-horror-pericoli-entita-senza-volto.2c28467bdd.webp","spettro-urlante":"img/arene-horror-pericoli-spettro-urlante.25fa554e05.webp","stormo-di-corvi":"img/arene-horror-pericoli-stormo-di-corvi.fe5c85d7ae.webp"}},"liceo":{"armi":{"compito-copiato":"img/arene-liceo-armi-compito-copiato.c9ade27d61.webp","dossier-delle-revisioni":"img/arene-liceo-armi-dossier-delle-revisioni.77676a0f5f.webp","elenco-delle-correzioni":"img/arene-liceo-armi-elenco-delle-correzioni.04be1154c8.webp","fascicolo-di-risposte-motivate":"img/arene-liceo-armi-fascicolo-di-risposte-motivate.c29995b581.webp","foto-imbarazzante":"img/arene-liceo-armi-foto-imbarazzante.ff7d3ef284.webp","gossip-esplosivo":"img/arene-liceo-armi-gossip-esplosivo.552b1e6236.webp","pallone-da-dodgeball":"img/arene-liceo-armi-pallone-da-dodgeball.60a2576785.webp","profilo-falso":"img/arene-liceo-armi-profilo-falso.d1dac05a2b.webp","prospetto-dei-contributi":"img/arene-liceo-armi-prospetto-dei-contributi.0c121fd79a.webp","quaderno-delle-verifiche":"img/arene-liceo-armi-quaderno-delle-verifiche.7d8b07341a.webp","registro-rubato":"img/arene-liceo-armi-registro-rubato.67eb4b9eff.webp","riepilogo-delle-fonti":"img/arene-liceo-armi-riepilogo-delle-fonti.3c889a0ed5.webp"},"luoghi":{"aula-magna":"img/arene-liceo-luoghi-aula-magna.0478e35c5c.webp","aule":"img/arene-liceo-luoghi-aule.b3142d07cc.webp","biblioteca":"img/arene-liceo-luoghi-biblioteca.1ae806ae58.webp","cortile":"img/arene-liceo-luoghi-cortile.51bf433337.webp","laboratorio-di-chimica":"img/arene-liceo-luoghi-laboratorio-di-chimica.eba1434683.webp","mensa":"img/arene-liceo-luoghi-mensa.67bcbc7e37.webp","palestra":"img/arene-liceo-luoghi-palestra.8ecb872849.webp"},"pericoli":{"bidello-di-turno":"img/arene-liceo-pericoli-bidello-di-turno.191c43a8bd.webp","ispezione-a-sorpresa":"img/arene-liceo-pericoli-ispezione-a-sorpresa.bef087d9b9.webp","preside":"img/arene-liceo-pericoli-preside.033f6c9aae.webp","professoressa-di-matematica":"img/arene-liceo-pericoli-professoressa-di-matematica.6cb65c6a3f.webp"}},"royale":{"armi":{"balestra":"img/arene-royale-armi-balestra.64563b6cea.webp","carabina-compatta":"img/arene-royale-armi-carabina-compatta.a0fa150fbe.webp","coltello-da-combattimento":"img/arene-royale-armi-coltello-da-combattimento.74a64bca77.webp","coltello-tattico":"img/arene-royale-armi-coltello-tattico.8e9cb56197.webp","fucile-a-pompa":"img/arene-royale-armi-fucile-a-pompa.3d7fc7d83c.webp","fucile-da-cecchino":"img/arene-royale-armi-fucile-da-cecchino.fc3c4f19f1.webp","fucile-dassalto":"img/arene-royale-armi-fucile-dassalto.b91ccb0ec8.webp","granata":"img/arene-royale-armi-granata.fd9c359b27.webp","lancia-da-sopravvivenza":"img/arene-royale-armi-lancia-da-sopravvivenza.8a39c1a5e5.webp","manganello":"img/arene-royale-armi-manganello.dc6284893b.webp","mitraglietta":"img/arene-royale-armi-mitraglietta.6dcc3246e6.webp","pistola-da-segnalazione-modificata":"img/arene-royale-armi-pistola-da-segnalazione-modificata.1c7f899ca7.webp","pistola":"img/arene-royale-armi-pistola.acae268814.webp","scure-da-campo":"img/arene-royale-armi-scure-da-campo.6a5b0becd5.webp"},"luoghi":{"aeroporto":"img/arene-royale-luoghi-aeroporto.81e8ce98d4.webp","base-militare":"img/arene-royale-luoghi-base-militare.67f3a7de9d.webp","centrale-elettrica":"img/arene-royale-luoghi-centrale-elettrica.05ee57458a.webp","fattoria":"img/arene-royale-luoghi-fattoria.7c780dda87.webp","foresta":"img/arene-royale-luoghi-foresta.03b47644d0.webp","villaggio-costiero":"img/arene-royale-luoghi-villaggio-costiero.568519eb7c.webp"},"pericoli":{"cane-da-guardia-addestrato":"img/arene-royale-pericoli-cane-da-guardia-addestrato.c7853a67a0.webp","drone-armato":"img/arene-royale-pericoli-drone-armato.30d0b73e01.webp","elicottero-da-caccia":"img/arene-royale-pericoli-elicottero-da-caccia.8c68e62346.webp"}},"scifi":{"armi":{"bastone-a-impulsi":"img/arene-scifi-armi-bastone-a-impulsi.4e17e074e7.webp","cannone-a-rotaia-portatile":"img/arene-scifi-armi-cannone-a-rotaia-portatile.9a59b97d98.webp","frusta-monofilamento":"img/arene-scifi-armi-frusta-monofilamento.5ee8081aa9.webp","fucile-al-plasma":"img/arene-scifi-armi-fucile-al-plasma.ea2384a239.webp","granata-emp":"img/arene-scifi-armi-granata-emp.04cfd31203.webp","lama-di-servizio":"img/arene-scifi-armi-lama-di-servizio.a47d434464.webp","lama-vibrante":"img/arene-scifi-armi-lama-vibrante.02b0f47ff8.webp","lancia-da-abbordaggio":"img/arene-scifi-armi-lancia-da-abbordaggio.cf167e52ff.webp","perforatore-portatile":"img/arene-scifi-armi-perforatore-portatile.aa7e92ecab.webp","pistola-a-scarica":"img/arene-scifi-armi-pistola-a-scarica.33b3e5929e.webp","pistola-laser":"img/arene-scifi-armi-pistola-laser.aed4bbf3ed.webp","taglierino-ceramico":"img/arene-scifi-armi-taglierino-ceramico.b45d524836.webp","taser-a-impulsi":"img/arene-scifi-armi-taser-a-impulsi.360e29e1d5.webp"},"luoghi":{"condotti-di-servizio":"img/arene-scifi-luoghi-condotti-di-servizio.6817134b5e.webp","hangar":"img/arene-scifi-luoghi-hangar.6de551833b.webp","moduli-abitativi":"img/arene-scifi-luoghi-moduli-abitativi.9f5bb96d39.webp","ponte-di-comando":"img/arene-scifi-luoghi-ponte-di-comando.3e9ffd005a.webp","reattore":"img/arene-scifi-luoghi-reattore.d10a335006.webp","serra-idroponica":"img/arene-scifi-luoghi-serra-idroponica.b6f4407853.webp"},"pericoli":{"androide-da-combattimento":"img/arene-scifi-pericoli-androide-da-combattimento.1a3d3eb38e.webp","creatura-aliena-dai-tentacoli":"img/arene-scifi-pericoli-creatura-aliena-dai-tentacoli.b6b314ddd9.webp","drone-di-sicurezza-impazzito":"img/arene-scifi-pericoli-drone-di-sicurezza-impazzito.c8a9c6f9e3.webp","sciame-di-nanobot":"img/arene-scifi-pericoli-sciame-di-nanobot.d43296f047.webp"}},"ufficio":{"armi":{"badge-clonato-del-capo":"img/arene-ufficio-armi-badge-clonato-del-capo.be9f7381fe.webp","dossier-dei-risultati":"img/arene-ufficio-armi-dossier-dei-risultati.1888e2f671.webp","elenco-dei-contributi":"img/arene-ufficio-armi-elenco-dei-contributi.3de4fbe5bf.webp","fascicolo-delle-fonti":"img/arene-ufficio-armi-fascicolo-delle-fonti.02df27dfbf.webp","foglio-excel-con-le-prove":"img/arene-ufficio-armi-foglio-excel-con-le-prove.944f6ec708.webp","mail-in-copia-a-tutti":"img/arene-ufficio-armi-mail-in-copia-a-tutti.1d4304df14.webp","nota-spese-gonfiata":"img/arene-ufficio-armi-nota-spese-gonfiata.d2683cca4c.webp","presentazione-rubata":"img/arene-ufficio-armi-presentazione-rubata.815dc5c8b4.webp","prospetto-delle-metriche":"img/arene-ufficio-armi-prospetto-delle-metriche.356da1d2d9.webp","registro-delle-revisioni":"img/arene-ufficio-armi-registro-delle-revisioni.509eab44df.webp","report-pieno-di-errori-altrui":"img/arene-ufficio-armi-report-pieno-di-errori-altrui.c01c0ef897.webp","riepilogo-delle-approvazioni":"img/arene-ufficio-armi-riepilogo-delle-approvazioni.9394dadd6b.webp"},"luoghi":{"cucina":"img/arene-ufficio-luoghi-cucina.d968f8861d.webp","open-space":"img/arene-ufficio-luoghi-open-space.b6b7990c99.webp","parcheggio":"img/arene-ufficio-luoghi-parcheggio.d593f2ed83.webp","sala-riunioni":"img/arene-ufficio-luoghi-sala-riunioni.f92c4030a9.webp","sala-stampanti":"img/arene-ufficio-luoghi-sala-stampanti.1727f50082.webp","ufficio-del-direttore":"img/arene-ufficio-luoghi-ufficio-del-direttore.bb3b6cabab.webp"},"pericoli":{"consulente-esterno":"img/arene-ufficio-pericoli-consulente-esterno.ce6e200c3f.webp","direttore-generale":"img/arene-ufficio-pericoli-direttore-generale.da2eb1f708.webp","riorganizzazione-aziendale":"img/arene-ufficio-pericoli-riorganizzazione-aziendale.1fd57b76b3.webp","ufficio-risorse-umane":"img/arene-ufficio-pericoli-ufficio-risorse-umane.8392df7518.webp"}},"wasteland":{"armi":{"balestra-artigianale":"img/arene-wasteland-armi-balestra-artigianale.e09826852f.webp","catena":"img/arene-wasteland-armi-catena.866183d584.webp","coltello-da-strada":"img/arene-wasteland-armi-coltello-da-strada.1083c4429d.webp","fucile-arrugginito":"img/arene-wasteland-armi-fucile-arrugginito.797601f16e.webp","lama-di-recupero":"img/arene-wasteland-armi-lama-di-recupero.1ad13cfc78.webp","lancia-di-ferraglia":"img/arene-wasteland-armi-lancia-di-ferraglia.99d9f41307.webp","lancia-ricavata-da-un-tubo":"img/arene-wasteland-armi-lancia-ricavata-da-un-tubo.53b934e449.webp","lanciachiodi":"img/arene-wasteland-armi-lanciachiodi.e4f51e42e2.webp","mannaia":"img/arene-wasteland-armi-mannaia.518ae9c11c.webp","martello-da-officina":"img/arene-wasteland-armi-martello-da-officina.851055795e.webp","mazza-di-tubi":"img/arene-wasteland-armi-mazza-di-tubi.91babe82ac.webp","molotov":"img/arene-wasteland-armi-molotov.303d6fa315.webp","scure-da-demolizione":"img/arene-wasteland-armi-scure-da-demolizione.066ea5e066.webp"},"luoghi":{"autostrada-spezzata":"img/arene-wasteland-luoghi-autostrada-spezzata.19a72a0b97.webp","citta-fantasma":"img/arene-wasteland-luoghi-citta-fantasma.fe22bb72b2.webp","cratere":"img/arene-wasteland-luoghi-cratere.04de7ca40a.webp","deposito":"img/arene-wasteland-luoghi-deposito.f98aa31220.webp","diga":"img/arene-wasteland-luoghi-diga.3be9abe15a.webp","discarica":"img/arene-wasteland-luoghi-discarica.b8783ad9c6.webp","raffineria":"img/arene-wasteland-luoghi-raffineria.081e2d2ad6.webp"},"pericoli":{"banda-di-predoni":"img/arene-wasteland-pericoli-banda-di-predoni.1dfcfd1628.webp","branco-di-cani-mutati":"img/arene-wasteland-pericoli-branco-di-cani-mutati.442fabfc39.webp","scorpione-gigante":"img/arene-wasteland-pericoli-scorpione-gigante.2dd8911367.webp","verme-delle-sabbie":"img/arene-wasteland-pericoli-verme-delle-sabbie.a0d445beeb.webp"}},"zombie":{"armi":{"accetta-da-soccorso":"img/arene-zombie-armi-accetta-da-soccorso.6d36eb13ac.webp","accetta":"img/arene-zombie-armi-accetta.0eed163720.webp","balestra":"img/arene-zombie-armi-balestra.d705131d17.webp","coltello-da-campeggio":"img/arene-zombie-armi-coltello-da-campeggio.2abab58e78.webp","fucile-a-pompa":"img/arene-zombie-armi-fucile-a-pompa.b00b1d6a70.webp","katana":"img/arene-zombie-armi-katana.f631ad392f.webp","machete-da-potatura":"img/arene-zombie-armi-machete-da-potatura.94a93108a1.webp","martello-da-carpentiere":"img/arene-zombie-armi-martello-da-carpentiere.021e8a80f2.webp","mazza-chiodata":"img/arene-zombie-armi-mazza-chiodata.b4e11dcadb.webp","mazza-da-lavoro":"img/arene-zombie-armi-mazza-da-lavoro.c36a90108f.webp","motosega":"img/arene-zombie-armi-motosega.f74e603615.webp","piede-di-porco":"img/arene-zombie-armi-piede-di-porco.c185a97e0d.webp","pistola":"img/arene-zombie-armi-pistola.6d30022ca6.webp"},"luoghi":{"centro-commerciale":"img/arene-zombie-luoghi-centro-commerciale.333f4699d5.webp","metropolitana":"img/arene-zombie-luoghi-metropolitana.878a263605.webp","ospedale":"img/arene-zombie-luoghi-ospedale.f25de413a4.webp","periferia":"img/arene-zombie-luoghi-periferia.e28a7d70c7.webp","piazza":"img/arene-zombie-luoghi-piazza.b6ed86b3ad.webp","scuola":"img/arene-zombie-luoghi-scuola.153ddbaa75.webp","stazione-di-polizia":"img/arene-zombie-luoghi-stazione-di-polizia.157f7a17f5.webp"},"pericoli":{"cane-infetto":"img/arene-zombie-pericoli-cane-infetto.fdff913d6f.webp","gigante-mutato":"img/arene-zombie-pericoli-gigante-mutato.91fad36b70.webp","infetto-corridore":"img/arene-zombie-pericoli-infetto-corridore.61f48faafd.webp","orda-di-zombi":"img/arene-zombie-pericoli-orda-di-zombi.e0fc6d1b56.webp"}}},"fx":{"pennellate":["img/fx-pennellata-1.5527b3e9bd.webp","img/fx-pennellata-2.8526d34dcf.webp","img/fx-pennellata-3.a7f3e74ff3.webp","img/fx-pennellata-4.fe1f612999.webp"],"sigilli":{"classico":"img/fx-sigillo-classico.b781c63b8d.webp","cyberpunk":"img/fx-sigillo-cyberpunk.134a7f507c.webp","fantasy":"img/fx-sigillo-fantasy.d854d9ac19.webp","horror":"img/fx-sigillo-horror.54149e6a7e.webp","liceo":"img/fx-sigillo-liceo.7f1566a7a8.webp","royale":"img/fx-sigillo-royale.bedbb77f68.webp","scifi":"img/fx-sigillo-scifi.6c50b79280.webp","ufficio":"img/fx-sigillo-ufficio.fcbbcc051a.webp","wasteland":"img/fx-sigillo-wasteland.86f44d1714.webp","zombie":"img/fx-sigillo-zombie.44ac2a6473.webp"},"grana":"img/fx-grana.c1e72fd2da.webp","forme":{"fascia":"img/fx-forma-fascia.8a2f8ab92d.webp","freccia":"img/fx-forma-freccia.4e8039be8f.webp","fulmine":"img/fx-forma-fulmine.c9a15d227c.webp","stella":"img/fx-forma-stella.e773ba5dda.webp","strappo":"img/fx-forma-strappo.0e6a41d0d9.webp"},"impatto":"img/fx-impatto.fd13ac9554.webp","mezzitoni":"img/fx-mezzitoni.f9ef4df053.webp","occhi":{"f-1":"img/fx-occhi-f-1.3779df529a.webp","f-2":"img/fx-occhi-f-2.2f47e4535b.webp","f-3":"img/fx-occhi-f-3.8b10fc4b00.webp","f-4":"img/fx-occhi-f-4.08132e01f9.webp","m-1":"img/fx-occhi-m-1.fd94d5b0eb.webp","m-2":"img/fx-occhi-m-2.c7b9661e6b.webp","m-3":"img/fx-occhi-m-3.91ff950ae4.webp","m-4":"img/fx-occhi-m-4.d0a0e73220.webp","m-5":"img/fx-occhi-m-5.f4c19f2141.webp","n-1":"img/fx-occhi-n-1.21fc3b7adf.webp"},"fondali":{"classico":"img/fx-fondale-classico.8a3fc35342.webp","cyberpunk":"img/fx-fondale-cyberpunk.283c80cc1e.webp","fantasy":"img/fx-fondale-fantasy.0ca9b3f315.webp","horror":"img/fx-fondale-horror.4ba1241b63.webp","liceo":"img/fx-fondale-liceo.fb428a57f7.webp","royale":"img/fx-fondale-royale.aac1246425.webp","scifi":"img/fx-fondale-scifi.27ee2ce8cc.webp","ufficio":"img/fx-fondale-ufficio.780789ce70.webp","wasteland":"img/fx-fondale-wasteland.02311ed21d.webp","zombie":"img/fx-fondale-zombie.83b8d35716.webp"},"volti":{"f-1":"img/fx-volto-f-1.96d62771c1.webp","f-2":"img/fx-volto-f-2.79d3485864.webp","f-3":"img/fx-volto-f-3.aeb7664a4e.webp","f-4":"img/fx-volto-f-4.2f2c864354.webp","m-1":"img/fx-volto-m-1.f8b83b073e.webp","m-2":"img/fx-volto-m-2.b9eb346a31.webp","m-3":"img/fx-volto-m-3.5311549074.webp","m-4":"img/fx-volto-m-4.10b102bdb0.webp","m-5":"img/fx-volto-m-5.63e5c91778.webp","n-1":"img/fx-volto-n-1.02cf4d1c97.webp"},"vincitori":{"f-1":"img/vincitori-vincitore-f-1.10b1ec0d22.webp","f-2":"img/vincitori-vincitore-f-2.03d8a3a92a.webp","f-3":"img/vincitori-vincitore-f-3.bc0adcd66a.webp","m-1":"img/vincitori-vincitore-m-1.c597436dca.webp","m-2":"img/vincitori-vincitore-m-2.9c8b48e9f8.webp","n-1":"img/vincitori-vincitore-n-1.1539fc78b2.webp"},"occhiY":{"m-1":0.53,"m-2":0.6,"m-3":0.43,"m-4":0.39,"m-5":0.575,"f-1":0.52,"f-2":0.49,"f-3":0.41,"f-4":0.46,"n-1":0.55}},"audio":{"sfx":{"heavy":"img/audio-colpo.6c66fc3384.mp3","battle":"img/audio-scontro.171fdeb377.mp3","click":"img/audio-ui-click.75370fe5e2.wav","hover":"img/audio-ui-hover.39a84fb194.wav","tick":"img/audio-ui-tick.16c581af00.wav","jazz":"img/audio-vittoria.6a3763dedf.mp3"},"music":"img/audio-musica-dark-hour.53788a2c76.mp3"}};
 ;
-window.LOS_BUILD = "cd17f28800cde3f9639ca5528cc87d19291d131b86a38d5f275ed0f2e79990eb";
+window.LOS_BUILD = "5d05701230dcbe5f57102a7ead2708604b41e588b0e6fa887f45b3fb66e741dd";
 ;
 /* Last One Standing — grafica vettoriale: logo, icone delle arene, illustrazioni.
  * Tutto è SVG generato in codice: nessuna immagine esterna. */
@@ -25287,6 +25369,7 @@ window.LOS_BUILD = "cd17f28800cde3f9639ca5528cc87d19291d131b86a38d5f275ed0f2e799
     n.regia = Array.isArray(g.regia) ? g.regia.filter((x) => x && typeof x.k === 'string').slice(-30) : [];
     n.voti = g.voti && typeof g.voti === 'object' ? g.voti : {};
     n.prove = Array.isArray(g.prove) ? g.prove.slice(-100) : [];
+    n.festa = festaSana(g.festa);
     n.log = Array.isArray(g.log) ? g.log.slice(-100) : [];
     return n;
   }
@@ -25383,7 +25466,8 @@ window.LOS_BUILD = "cd17f28800cde3f9639ca5528cc87d19291d131b86a38d5f275ed0f2e799
       if (!esito) return;
       b.esito = esito; b.fase = i;
       b.vincita = esito === 'vinta' ? Math.round(b.posta * b.q) : esito === 'nulla' ? b.posta : 0;
-      g.crediti += b.vincita;
+      const pl = b.chi && g.festa ? g.festa.giocatori.find((x) => x.id === b.chi) : null;
+      if (pl) pl.crediti += b.vincita; else g.crediti += b.vincita;
       out.push(b);
     });
     return out;
@@ -25552,7 +25636,28 @@ window.LOS_BUILD = "cd17f28800cde3f9639ca5528cc87d19291d131b86a38d5f275ed0f2e799
   // dal punteggio al bonus sul tiro: da −2 a +4
   const bonusProva = (s) => (s >= 0.8 ? 4 : s >= 0.5 ? 2 : s >= 0.25 ? 0 : -2);
 
-  G.LOS_PARTITA = { chiedi, gioca, tipoProva, bonusProva, REGIA, mano, votoRegia, aperto, nuovo, sano, profilo, salvaProfilo, chiudiPartita, proposte, risolvi, prezzo, rischio, quota, nuovoGiorno, vivi, vit, DONI, INTERVISTA, ORDINI, RITMI, START };
+  /* ================= la modalità festa =================
+   * giocatori: { id, nome, campione, crediti, remoto (id dell'ospite online, se gioca da un altro dispositivo), caduti: [] } */
+  const COLORI = ['#f61e42', '#2fb6ff', '#ffc531', '#36d399', '#b06ce0', '#ff7a1a', '#ff5fb2', '#9ad13b'];
+  function festaSana(f) {
+    if (!f || !Array.isArray(f.giocatori)) return null;
+    const giocatori = f.giocatori.filter((x) => x && typeof x.id === 'string').slice(0, 8).map((x, i) => ({ id: x.id, nome: String(x.nome || 'Giocatore ' + (i + 1)).slice(0, 24), campione: typeof x.campione === 'string' ? x.campione : null,
+      crediti: Number.isFinite(x.crediti) ? clamp(Math.round(x.crediti), 0, 1e6) : START, remoto: typeof x.remoto === 'string' ? x.remoto : null, caduti: Array.isArray(x.caduti) ? x.caduti.slice(-20) : [], colore: x.colore || COLORI[i % COLORI.length] }));
+    return giocatori.length ? { giocatori, stanza: typeof f.stanza === 'string' ? f.stanza : null } : null;
+  }
+  // il punteggio della festa: piazzamento del campione (e di quelli caduti prima), eliminazioni, crediti
+  function punteggi(SIM, festa) {
+    const by = Object.fromEntries(SIM.tributes.map((t) => [t.id, t])), N = SIM.tributes.length;
+    return festa.giocatori.map((p) => {
+      const ids = [...new Set((p.caduti || []).concat(p.campione ? [p.campione] : []))].filter((id) => by[id]);
+      const best = ids.reduce((m, id) => Math.max(m, N - by[id].rank + 1), 0);
+      const kills = ids.reduce((s, id) => s + (by[id].kills || 0), 0);
+      const win = ids.some((id) => SIM.winners.includes(id));
+      const punti = best * 10 + kills * 5 + Math.floor(p.crediti / 10) + (win ? 50 : 0);
+      return { p, punti, kills, win, campione: p.campione && by[p.campione] };
+    }).sort((a, b) => b.punti - a.punti);
+  }
+  G.LOS_PARTITA = { festaSana, punteggi, COLORI, chiedi, gioca, tipoProva, bonusProva, REGIA, mano, votoRegia, aperto, nuovo, sano, profilo, salvaProfilo, chiudiPartita, proposte, risolvi, prezzo, rischio, quota, nuovoGiorno, vivi, vit, DONI, INTERVISTA, ORDINI, RITMI, START };
 })(typeof window !== 'undefined' ? window : globalThis);
 
 ;
@@ -25858,6 +25963,270 @@ window.LOS_BUILD = "cd17f28800cde3f9639ca5528cc87d19291d131b86a38d5f275ed0f2e799
   }
 
   G.LOS_BACHECA = { TROFEI, RARITA, rarita, registra, rivincita, intervista, contesto };
+})(typeof window !== 'undefined' ? window : globalThis);
+
+;
+/* Last One Standing — cartoline da condividere (src/cartoline.js).
+ * Immagini 1080×1350 (formato dei social) disegnate su canvas con la grafica del sito: il vincitore, un'eliminazione,
+ * il riepilogo della partita, una carta dell'album, un trofeo. Si condividono col menu del telefono dove esiste,
+ * altrimenti si scaricano come PNG. Più il link per rivedere la stessa partita (seme, cast e scelte, senza foto). */
+(function (G) {
+  'use strict';
+  if (typeof document === 'undefined') return;
+  const W = 1080, H = 1350;
+  const css = (v, d) => { try { return getComputedStyle(document.documentElement).getPropertyValue(v).trim() || d; } catch (e) { return d; } };
+  const DISP = () => css('--f-display', 'Archivo, sans-serif'), BODY = () => css('--f-body', 'Figtree, sans-serif');
+  const KEY = () => css('--key', '#f61e42'), KEYINK = () => css('--key-ink', '#0a0a0c');
+  const VOID = '#0a0a0c', PAPER = '#f4f1ea', KILL = '#e5482f';
+  const loadImg = (src) => new Promise((res) => { if (!src) return res(null); const im = new Image(); im.crossOrigin = 'anonymous'; im.onload = () => res(im); im.onerror = () => res(null); im.src = src; });
+
+  /* ---------- strumenti di disegno ---------- */
+  function canvas() { const c = document.createElement('canvas'); c.width = W; c.height = H; return [c, c.getContext('2d')]; }
+  function para(g, x, y, w, h, lean) { g.beginPath(); g.moveTo(x + lean, y); g.lineTo(x + w, y); g.lineTo(x + w - lean, y + h); g.lineTo(x, y + h); g.closePath(); }
+  function frame(g, kicker) {
+    g.fillStyle = VOID; g.fillRect(0, 0, W, H);
+    // mezzitoni in diagonale
+    g.fillStyle = 'rgba(255,255,255,.05)';
+    for (let y = 0; y < H; y += 18) for (let x = (y / 18) % 2 ? 9 : 0; x < W; x += 18) { const r = 1.2 + 3.2 * (x + y) / (W + H); g.beginPath(); g.arc(x, y, r, 0, Math.PI * 2); g.fill(); }
+    // la lama nella tinta
+    g.fillStyle = KEY(); g.beginPath(); g.moveTo(0, 210); g.lineTo(W, 120); g.lineTo(W, 168); g.lineTo(0, 258); g.closePath(); g.fill();
+    // testata
+    g.fillStyle = PAPER; g.font = 'italic 900 34px ' + DISP(); g.textAlign = 'left'; g.textBaseline = 'alphabetic';
+    g.fillText('LAST ONE STANDING', 64, 92);
+    if (kicker) { g.font = '800 26px ' + BODY(); const w = g.measureText(kicker.toUpperCase()).width + 44; g.fillStyle = KEY(); para(g, 64, 112, w, 46, 12); g.fill(); g.fillStyle = KEYINK(); g.fillText(kicker.toUpperCase(), 86, 145); }
+  }
+  function footer(g, txt) {
+    g.fillStyle = PAPER; g.globalAlpha = 0.6; g.font = '700 24px ' + BODY(); g.textAlign = 'left';
+    g.fillText(txt, 64, H - 52); g.globalAlpha = 1;
+  }
+  function fit(g, text, max, size, weight, font) { let s = size; do { g.font = (weight || 'italic 900') + ' ' + s + 'px ' + (font || DISP()); if (g.measureText(text).width <= max) break; s -= 4; } while (s > 24); return s; }
+  function wrap(g, text, x, y, max, lh, lines) {
+    const words = String(text).split(/\s+/); let line = '', n = 0;
+    for (let i = 0; i < words.length; i++) {
+      const t = line ? line + ' ' + words[i] : words[i];
+      if (g.measureText(t).width > max && line) { g.fillText(line, x, y + n * lh); n++; line = words[i]; if (n >= lines) return n; } else line = t;
+    }
+    if (line && n < lines) { g.fillText(line, x, y + n * lh); n++; }
+    return n;
+  }
+  // il volto: la foto, oppure il volto di riserva del sito (stesso concorrente, stessa faccia), dentro una lastra inclinata
+  async function face(g, t, x, y, w, h, opt) {
+    opt = opt || {};
+    const LK = G.LOS_LOOK, src = t.img || (LK && LK.fx && LK.pickFor(LK.fx.volti, t.gender, t.id)) || '';
+    g.save(); para(g, x, y, w, h, opt.lean == null ? 60 : opt.lean); g.clip();
+    g.fillStyle = t.color || '#444'; g.fillRect(x, y, w, h);
+    const im = await loadImg(src);
+    if (im) {
+      const s = Math.max(w / im.naturalWidth, h / im.naturalHeight), iw = im.naturalWidth * s, ih = im.naturalHeight * s;
+      if (opt.grey) g.filter = 'grayscale(1) contrast(1.15)';
+      g.drawImage(im, x + (w - iw) / 2, y + (h - ih) * 0.3, iw, ih); g.filter = 'none';
+    } else { g.fillStyle = PAPER; g.font = 'italic 900 ' + Math.round(h * 0.4) + 'px ' + DISP(); g.textAlign = 'center'; g.fillText((t.name || '?').slice(0, 2).toUpperCase(), x + w / 2, y + h * 0.62); g.textAlign = 'left'; }
+    if (opt.tint) { g.globalCompositeOperation = 'multiply'; g.fillStyle = opt.tint; g.fillRect(x, y, w, h); g.globalCompositeOperation = 'source-over'; }
+    g.restore();
+    // ombra dura nella tinta
+    g.save(); g.globalCompositeOperation = 'destination-over'; g.fillStyle = opt.shadow || KEY(); para(g, x + 18, y + 18, w, h, opt.lean == null ? 60 : opt.lean); g.fill(); g.restore();
+  }
+  function stat(g, x, y, num, label, color) {
+    g.fillStyle = color || KEY(); g.font = 'italic 900 88px ' + DISP(); g.textAlign = 'left'; g.fillText(String(num), x, y);
+    g.fillStyle = PAPER; g.font = '800 22px ' + BODY(); g.fillText(label.toUpperCase(), x + 4, y + 36);
+  }
+  const genre = (t, m, f, n) => (t && t.gender === 'F' ? f : t && t.gender === 'N' ? n : m);
+
+  /* ---------- le cartoline ---------- */
+  async function vincitore(SIM, theme) {
+    const [c, g] = canvas(); frame(g, theme.name + ' · ' + SIM.days + (SIM.days === 1 ? ' giorno' : ' giorni'));
+    const by = Object.fromEntries(SIM.tributes.map((t) => [t.id, t])), Wn = SIM.winners.map((id) => by[id]);
+    if (Wn.length === 1) {
+      const w = Wn[0];
+      await face(g, w, 120, 300, 840, 640);
+      g.fillStyle = PAPER; g.font = 'italic 900 64px ' + DISP(); g.fillText(genre(w, 'ULTIMO IN PIEDI', 'ULTIMA IN PIEDI', 'ULTIMƏ IN PIEDI'), 64, 1030);
+      fit(g, w.name.toUpperCase(), 950, 150); g.fillStyle = KEY(); g.fillText(w.name.toUpperCase(), 60, 1170);
+      g.fillStyle = PAPER; g.font = '700 32px ' + BODY(); g.fillText(w.kills + (theme.soft ? (w.kills === 1 ? ' eliminazione' : ' eliminazioni') : (w.kills === 1 ? ' uccisione' : ' uccisioni')) + ' · su ' + SIM.tributes.length + ' concorrenti', 64, 1225);
+    } else {
+      const n = Math.max(1, Wn.length), cw = Math.min(420, 900 / n);
+      for (let k = 0; k < Wn.length; k++) await face(g, Wn[k], 90 + k * (cw + 20), 340, cw, 560, { lean: 40 });
+      g.fillStyle = PAPER; g.font = 'italic 900 70px ' + DISP(); g.fillText(Wn.length ? 'VINCE LA SQUADRA ' + Wn[0].team : 'NESSUN SUPERSTITE', 64, 1040);
+      g.fillStyle = KEY(); g.font = 'italic 900 46px ' + DISP(); wrap(g, Wn.map((t) => t.name).join(' · ').toUpperCase(), 64, 1110, 950, 56, 2);
+    }
+    footer(g, 'Chi resterà in piedi? · ' + new Date().toLocaleDateString('it-IT'));
+    return c;
+  }
+  async function eliminazione(SIM, id, theme) {
+    const by = Object.fromEntries(SIM.tributes.map((t) => [t.id, t])), t = by[id]; if (!t) return null;
+    const [c, g] = canvas(); frame(g, theme.soft ? 'Fuori dai giochi' : 'Eliminazione');
+    await face(g, t, 120, 300, 840, 600, { grey: true, shadow: KILL });
+    // il timbro
+    g.save(); g.translate(720, 820); g.rotate(-0.14); g.fillStyle = KILL; para(g, -250, -70, 500, 120, 30); g.fill();
+    g.fillStyle = '#fff'; g.font = 'italic 900 96px ' + DISP(); g.textAlign = 'center'; g.fillText('FUORI', 0, 22); g.restore(); g.textAlign = 'left';
+    fit(g, t.name.toUpperCase(), 950, 130); g.fillStyle = PAPER; g.fillText(t.name.toUpperCase(), 60, 1030);
+    g.fillStyle = KEY(); g.font = 'italic 900 44px ' + DISP(); g.fillText(t.rank + 'º SU ' + SIM.tributes.length + ' · GIORNO ' + (t.deathDay || '?'), 64, 1090);
+    const killer = (t.killerIds || []).map((k) => by[k]).find(Boolean);
+    g.fillStyle = PAPER; g.font = '600 34px ' + BODY();
+    const txt = (t.deathText || (killer ? 'Per mano di ' + killer.name + '.' : '')).replace(/<[^>]+>/g, '');
+    wrap(g, txt, 64, 1150, 950, 44, 3);
+    footer(g, theme.name + ' · Last One Standing');
+    return c;
+  }
+  async function riepilogo(SIM, theme, extra) {
+    extra = extra || {};
+    const [c, g] = canvas(); frame(g, 'La partita');
+    const by = Object.fromEntries(SIM.tributes.map((t) => [t.id, t])), Wn = SIM.winners.map((id) => by[id]);
+    fit(g, theme.name.toUpperCase(), 950, 110); g.fillStyle = PAPER; g.fillText(theme.name.toUpperCase(), 60, 380);
+    const st = SIM.stats || {};
+    stat(g, 64, 520, SIM.days, SIM.days === 1 ? 'giorno' : 'giorni'); stat(g, 360, 520, SIM.tributes.length, 'concorrenti'); stat(g, 700, 520, st.betrayals || 0, 'tradimenti');
+    if (Wn[0]) { await face(g, Wn[0], 64, 640, 360, 420, { lean: 36 }); g.fillStyle = KEY(); g.font = '800 26px ' + BODY(); g.fillText(Wn.length > 1 ? 'VINCONO' : 'VINCE', 470, 700); fit(g, Wn.map((t) => t.name).join(', ').toUpperCase(), 540, 80); g.fillStyle = PAPER; g.fillText(Wn.map((t) => t.name).join(', ').toUpperCase(), 466, 780); }
+    const top = SIM.tributes.slice().sort((a, b) => b.kills - a.kills).filter((t) => t.kills).slice(0, 3);
+    g.fillStyle = PAPER; g.font = '800 24px ' + BODY(); g.fillText(theme.soft ? 'CHI HA ELIMINATO DI PIÙ' : 'CHI HA UCCISO DI PIÙ', 470, 860);
+    top.forEach((t, k) => { g.font = 'italic 900 40px ' + DISP(); g.fillStyle = k ? PAPER : KEY(); g.fillText(t.kills + '  ' + t.name.toUpperCase(), 470, 915 + k * 52); });
+    if (extra.tu) { g.fillStyle = KEY(); para(g, 64, 1110, 952, 110, 24); g.fill(); g.fillStyle = KEYINK(); g.font = 'italic 900 40px ' + DISP(); wrap(g, extra.tu.toUpperCase(), 100, 1178, 880, 46, 1); }
+    footer(g, 'Last One Standing · ' + new Date().toLocaleDateString('it-IT'));
+    return c;
+  }
+  async function carta(x, rar) {
+    const [c, g] = canvas(); frame(g, 'Album · ' + rar.nome);
+    const col = { comune: '#9a9a9a', rara: '#5aa9e6', epica: '#b06ce0', leggendaria: '#e3b04b' }[rar.k] || KEY();
+    await face(g, Object.assign({ color: col }, x), 140, 300, 800, 660, { shadow: col });
+    fit(g, x.name.toUpperCase(), 950, 130); g.fillStyle = PAPER; g.fillText(x.name.toUpperCase(), 60, 1080);
+    stat(g, 64, 1210, x.partite, x.partite === 1 ? 'partita' : 'partite', col); stat(g, 380, 1210, x.vittorie, x.vittorie === 1 ? 'vittoria' : 'vittorie', col); stat(g, 700, 1210, x.uccisioni, 'eliminazioni', col);
+    return c;
+  }
+  async function trofeo(t, quando) {
+    const [c, g] = canvas(); frame(g, 'Trofeo sbloccato');
+    g.save(); g.translate(540, 640); g.fillStyle = KEY(); g.beginPath(); for (let k = 0; k < 6; k++) { const a = Math.PI / 3 * k - Math.PI / 2; g.lineTo(Math.cos(a) * 260, Math.sin(a) * 260); } g.closePath(); g.fill();
+    g.fillStyle = VOID; g.font = 'italic 900 200px ' + DISP(); g.textAlign = 'center'; g.fillText('★', 0, 70); g.restore(); g.textAlign = 'left';
+    fit(g, t.nome.toUpperCase(), 950, 110); g.fillStyle = PAPER; g.fillText(t.nome.toUpperCase(), 60, 1040);
+    g.font = '600 38px ' + BODY(); wrap(g, t.desc, 64, 1110, 950, 48, 3);
+    footer(g, (t.cat || '') + (quando ? ' · ' + new Date(quando).toLocaleDateString('it-IT') : ''));
+    return c;
+  }
+
+  /* ---------- condividere ---------- */
+  function blob(c) { return new Promise((res) => c.toBlob((b) => res(b), 'image/png')); }
+  async function condividi(c, nome, titolo) {
+    const b = await blob(c); if (!b) return 'errore';
+    const file = new File([b], nome + '.png', { type: 'image/png' });
+    try { if (navigator.canShare && navigator.canShare({ files: [file] })) { await navigator.share({ files: [file], title: titolo || 'Last One Standing' }); return 'condivisa'; } }
+    catch (e) { if (e && e.name === 'AbortError') return 'annullata'; }
+    const a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = nome + '.png'; document.body.appendChild(a); a.click();
+    setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1500);
+    return 'scaricata';
+  }
+
+  /* ---------- il link della partita: configurazione compressa nell'indirizzo (senza foto) ---------- */
+  const b64u = (bytes) => { let s = ''; bytes.forEach((x) => (s += String.fromCharCode(x))); return btoa(s).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, ''); };
+  const unb64u = (s) => { const b = atob(s.replace(/-/g, '+').replace(/_/g, '/')); return Uint8Array.from(b, (c) => c.charCodeAt(0)); };
+  async function pipe(bytes, Stream) { const r = new Response(new Blob([bytes]).stream().pipeThrough(new Stream('deflate-raw'))); return new Uint8Array(await r.arrayBuffer()); }
+  async function codifica(cfg) {
+    const lean = Object.assign({}, cfg, { cast: cfg.cast.map((t) => Object.assign({}, t, { img: '' })) });
+    const raw = new TextEncoder().encode(JSON.stringify(lean));
+    return typeof CompressionStream === 'function' ? 'z' + b64u(await pipe(raw, CompressionStream)) : 'j' + b64u(raw);
+  }
+  async function decodifica(s) {
+    const kind = s[0], bytes = unb64u(s.slice(1));
+    const raw = kind === 'z' ? await pipe(bytes, DecompressionStream) : bytes;
+    return JSON.parse(new TextDecoder().decode(raw));
+  }
+
+  G.LOS_CARTOLINE = { vincitore, eliminazione, riepilogo, carta, trofeo, condividi, codifica, decodifica };
+})(typeof window !== 'undefined' ? window : globalThis);
+
+;
+/* Last One Standing — le stanze della festa online (src/festa.js).
+ * Una stanza è un piccolo albero di dati condiviso: l'host scrive la configurazione e lo stato della diretta,
+ * gli ospiti entrano, scelgono il campione e rispondono alle richieste. Il motore è deterministico: in rete viaggiano
+ * solo seme, configurazione (senza foto) e interventi; ogni dispositivo ricalcola la partita da sé.
+ *
+ * Due trasporti con la stessa interfaccia:
+ *  - Firebase Realtime Database, via REST e flusso di eventi (nessuna libreria): basta l'indirizzo del database;
+ *  - «locale»: BroadcastChannel tra schede dello stesso browser, per provare senza server.
+ * Struttura della stanza: meta, cfg, ingressi/<ospite>, stato, richieste/<id>, risposte/<id>, azioni/<id>. */
+(function (G) {
+  'use strict';
+  if (typeof document === 'undefined') return;
+  const SKEY = 'los-festa-server';
+  const ALFA = 'ABCDEFGHJKLMNPQRSTUVWXYZ';
+  const codice = () => Array.from({ length: 4 }, () => ALFA[Math.floor(Math.random() * ALFA.length)]).join('');
+  const nuovoId = (p) => (p || 'x') + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+  const server = () => { try { return G.localStorage.getItem(SKEY) || ''; } catch (e) { return ''; } };
+  const setServer = (u) => { try { if (u) G.localStorage.setItem(SKEY, u); else G.localStorage.removeItem(SKEY); } catch (e) { /* niente */ } };
+  // l'indirizzo del database: https://<progetto>-default-rtdb.<regione>.firebasedatabase.app (o .firebaseio.com)
+  function serverValido(u) {
+    if (u === 'locale') return true;
+    try { const x = new URL(u); return x.protocol === 'https:' && /(\.firebaseio\.com|\.firebasedatabase\.app)$/.test(x.hostname); } catch (e) { return false; }
+  }
+  const okCodice = (c) => /^[A-Z]{4}$/.test(c);
+
+  /* ---------- l'albero locale: si applicano scritture per percorso ---------- */
+  function applica(tree, path, val, merge) {
+    const parts = String(path || '').split('/').filter(Boolean);
+    if (!parts.length) { if (merge && val && typeof val === 'object') { Object.keys(val).forEach((k) => applica(tree, k, val[k])); return tree; } return val == null ? {} : JSON.parse(JSON.stringify(val)); }
+    let o = tree;
+    for (let i = 0; i < parts.length - 1; i++) { if (!o[parts[i]] || typeof o[parts[i]] !== 'object') o[parts[i]] = {}; o = o[parts[i]]; }
+    const k = parts[parts.length - 1];
+    if (merge && val && typeof val === 'object') { if (!o[k] || typeof o[k] !== 'object') o[k] = {}; Object.keys(val).forEach((x) => { if (val[x] == null) delete o[k][x]; else o[k][x] = JSON.parse(JSON.stringify(val[x])); }); }
+    else if (val == null) delete o[k]; else o[k] = JSON.parse(JSON.stringify(val));
+    return tree;
+  }
+
+  /* ---------- trasporto locale (schede dello stesso browser) ---------- */
+  function locale(code, role) {
+    let tree = {}; const subs = new Set(), ch = new BroadcastChannel('los-stanza-' + code);
+    const emit = () => subs.forEach((f) => { try { f(tree); } catch (e) { /* niente */ } });
+    ch.onmessage = (e) => {
+      const m = e.data || {};
+      if (m.op === 'hello' && role === 'host') ch.postMessage({ op: 'full', tree });
+      else if (m.op === 'full' && role !== 'host') { tree = m.tree || {}; emit(); }
+      else if (m.op === 'set' || m.op === 'patch') { tree = applica(tree, m.path, m.val, m.op === 'patch'); emit(); }
+    };
+    const write = (op, path, val) => { tree = applica(tree, path, val, op === 'patch'); ch.postMessage({ op, path, val }); emit(); return Promise.resolve(); };
+    if (role !== 'host') ch.postMessage({ op: 'hello' });
+    return { set: (p, v) => write('set', p, v), patch: (p, v) => write('patch', p, v), on: (f) => { subs.add(f); f(tree); return () => subs.delete(f); }, get: () => tree, close: () => { subs.clear(); ch.close(); }, tipo: 'locale' };
+  }
+
+  /* ---------- trasporto Firebase (REST + flusso di eventi) ---------- */
+  function firebase(base, code) {
+    const root = base.replace(/\/+$/, '') + '/stanze/' + code;
+    let tree = {}, es = null, closed = false, retry = 0; const subs = new Set();
+    const emit = () => subs.forEach((f) => { try { f(tree); } catch (e) { /* niente */ } });
+    function listen() {
+      if (closed) return;
+      es = new EventSource(root + '.json');
+      const on = (merge) => (e) => { try { const d = JSON.parse(e.data); tree = applica(tree, d.path, d.data, merge); retry = 0; emit(); } catch (x) { /* niente */ } };
+      es.addEventListener('put', on(false)); es.addEventListener('patch', on(true));
+      es.addEventListener('cancel', () => { es.close(); });
+      es.onerror = () => { if (closed) return; es.close(); setTimeout(listen, Math.min(8000, 800 * ++retry)); };
+    }
+    listen();
+    const write = (method, path, val) => fetch(root + '/' + path + '.json', { method, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(val) }).then((r) => { if (!r.ok) throw new Error('Il server ha risposto ' + r.status); });
+    return {
+      set: (p, v) => { tree = applica(tree, p, v); emit(); return write(v == null ? 'DELETE' : 'PUT', p, v == null ? undefined : v).catch((e) => { if (G.LOS_FESTA && G.LOS_FESTA.onerror) G.LOS_FESTA.onerror(e); }); },
+      patch: (p, v) => { tree = applica(tree, p, v, true); emit(); return write('PATCH', p, v).catch((e) => { if (G.LOS_FESTA && G.LOS_FESTA.onerror) G.LOS_FESTA.onerror(e); }); },
+      on: (f) => { subs.add(f); f(tree); return () => subs.delete(f); }, get: () => tree,
+      close: () => { closed = true; subs.clear(); if (es) es.close(); }, tipo: 'firebase',
+    };
+  }
+
+  function stanza(code, role) {
+    const u = server();
+    if (!okCodice(code)) throw new Error('Codice della stanza non valido.');
+    if (u === 'locale') return locale(code, role);
+    if (!serverValido(u)) throw new Error('Manca l’indirizzo del server: aprilo nelle impostazioni della festa.');
+    return firebase(u, code);
+  }
+
+  // una richiesta a un ospite e l'attesa della risposta (o del tempo scaduto)
+  function chiediA(room, gid, card, ms) {
+    const rid = nuovoId('r');
+    return new Promise((resolve) => {
+      let done = false, off = null;
+      const end = (v) => { if (done) return; done = true; if (off) off(); clearTimeout(t); room.set('richieste/' + rid, null); room.set('risposte/' + rid, null); resolve(v); };
+      const t = setTimeout(() => end(null), ms || 30000);
+      off = room.on((tree) => { const r = tree.risposte && tree.risposte[rid]; if (r) end(r.value === undefined || r.value === '__salta__' ? null : r); });
+      room.set('richieste/' + rid, { gid, card, scade: Date.now() + (ms || 30000) });
+    });
+  }
+
+  G.LOS_FESTA = { codice, nuovoId, server, setServer, serverValido, okCodice, stanza, chiediA, onerror: null };
 })(typeof window !== 'undefined' ? window : globalThis);
 
 ;
@@ -27599,7 +27968,9 @@ window.LOS_BUILD = "cd17f28800cde3f9639ca5528cc87d19291d131b86a38d5f275ed0f2e799
     if (generation !== runGeneration) return false;
     SIM = result;
     BY = Object.fromEntries(SIM.tributes.map((t) => [t.id, t]));
-    S.run = { cfg, phase: 0, seen: 0, gioco: PT ? PT.nuovo(runSim.pre) : null }; runSim.pre = null; lastRendered = -1;
+    S.run = { cfg, phase: 0, seen: 0, gioco: PT && !runSim.condivisa ? PT.nuovo(runSim.pre) : null, condivisa: !!runSim.condivisa || undefined }; runSim.pre = null; runSim.condivisa = false; lastRendered = -1;
+    if (S.run.gioco && runSim.festa) S.run.gioco.festa = runSim.festa;
+    runSim.festa = null;
     if (S.run.gioco && runSim.firstOrder && S.run.gioco.mentore) { const g = S.run.gioco, ev = SIM.phases[0].events.find((e) => e.mentor && e.ids[0] === g.mentore); g.ordini.push({ fase: 0, cosa: runSim.firstOrder, obeys: !!(ev && ev.obeys) }); }
     runSim.firstOrder = null;
     const run = S.run, stored = persistRun(run, SIM);
@@ -27777,13 +28148,14 @@ window.LOS_BUILD = "cd17f28800cde3f9639ca5528cc87d19291d131b86a38d5f275ed0f2e799
     $$('#speedSeg button').forEach((b) => b.setAttribute('aria-pressed', b.dataset.v === S.settings.speed));
     syncPlay();
     if (PT && S.run.gioco) { const closed = PT.risolvi(SIM, i, S.run.gioco); renderHud(); if (closed.length) announceBets(closed); }
-    renderCast(i);
+    renderCommentary(i);
+    publishState();
     save();
   }
   /* =============== TELECRONACA E PUBBLICO =============== */
   const TC = window.LOS_TELECRONACA;
   const tcCtx = () => ({ BY, soft: !!resultTheme(SIM).soft, mentore: S.run && S.run.gioco ? S.run.gioco.mentore : null, memoria: S.run && S.run.cfg ? S.run.cfg.memoria : null });
-  function renderCast(i) {
+  function renderCommentary(i) {
     const box = $('#ptCast'); if (!box) return;
     if (!TC || !SIM) { box.hidden = true; return; }
     const lines = TC.commento(SIM, i, tcCtx());
@@ -27819,6 +28191,13 @@ window.LOS_BUILD = "cd17f28800cde3f9639ca5528cc87d19291d131b86a38d5f275ed0f2e799
   const himHer = (t) => (t.gender === 'F' ? 'lei' : t.gender === 'N' ? 'ləi' : 'lui');
   function renderHud() {
     const h = $('#ptHud'), gb = $('#giftBtn'), g = S.run && S.run.gioco;
+    const fest = g && g.festa ? g.festa.giocatori : (S.run && S.run.ospite && FS.stato ? FS.stato.giocatori : null);
+    if (PT && SIM && fest) {
+      const alive = SIM.phases[Math.min(S.run.phase || 0, SIM.phases.length - 1)].snap.alive;
+      h.hidden = false; gb.hidden = false; h.dataset.run = String(S.run.cfg.seed);
+      h.innerHTML = '<div class="pt-festa"><small>Modalità festa' + (FS.code ? ' · stanza ' + esc(FS.code) : '') + '</small><ol>' + fest.map((p) => { const c = p.campione && BY[p.campione]; return '<li class="pf-pl' + (S.run.ospite && p.remoto === FS.gid ? ' me' : '') + '" style="--pc:' + esc(p.colore || '#888') + '"><b class="pf-nm">' + esc(p.nome) + '</b>' + (c ? avHTML(c, { dead: !alive.includes(c.id) }) + '<span class="pf-ch">' + esc(c.name) + '</span>' : '<span class="pf-ch">senza campione</span>') + '<em>' + p.crediti + ' cr</em></li>'; }).join('') + '</ol></div>';
+      return;
+    }
     if (!PT || !SIM || !g) { h.hidden = true; gb.hidden = true; return; }
     gb.hidden = false; h.hidden = false; h.dataset.run = String(g.inizio || '');
     const i = Math.min(S.run.phase || 0, SIM.phases.length - 1), alive = SIM.phases[i].snap.alive;
@@ -27858,10 +28237,10 @@ window.LOS_BUILD = "cd17f28800cde3f9639ca5528cc87d19291d131b86a38d5f275ed0f2e799
   // prima di ogni fase nuova: le scelte dell'alba (e del tramonto), poi l'eventuale prova giocata
   async function beforePhase(k) {
     const P = SIM.phases, rit = S.settings.ritmo;
-    if (!P[k] || rit === 'spettatore' || k <= (S.run.seen || 0)) return;
+    if (!P[k] || (rit === 'spettatore' && !S.run.gioco.festa) || k <= (S.run.seen || 0)) return;
     if (playTimer) { clearTimeout(playTimer); playTimer = null; }
     await dayDecisions(k);
-    await playableTest(k);
+    if (S.run.gioco.festa) await festaTest(k); else await playableTest(k);
   }
   // la prova giocata: se nella prossima fase l'allievo affronta una prova, la si gioca con un minigioco
   async function playableTest(k) {
@@ -27886,6 +28265,7 @@ window.LOS_BUILD = "cd17f28800cde3f9639ca5528cc87d19291d131b86a38d5f275ed0f2e799
     const key = (dawn ? 'g' : 'n') + P[k].day;
     if (!(dawn || dusk) || g.chiesto[key]) return;
     g.chiesto[key] = 1; save();
+    if (g.festa) { if (dawn) await festaDay(k); return; }
     const timer = playing ? 20 : 0, soft = !!resultTheme(SIM).soft, i = k - 1;
     let changed = false;
     // chi alleni è caduto: all'alba se ne sceglie un altro, così la partita resta tua fino alla fine
@@ -27922,25 +28302,35 @@ window.LOS_BUILD = "cd17f28800cde3f9639ca5528cc87d19291d131b86a38d5f275ed0f2e799
     save(); renderHud();
   }
   async function giftFlow(preId) {
+    if (S.run && S.run.ospite) return guestGift();
     if (!PT || !SIM || !S.run.gioco || gate) return;
     const i = S.run.phase || 0, k = i + 1, P = SIM.phases, g = S.run.gioco;
     if (k >= P.length) return toast('La partita è finita: niente più doni.');
     if (!atEdge()) return toast('Puoi mandare doni solo dalla fase più recente.');
-    if (g.doni[k]) return toast('Hai già mandato un dono per la prossima fase.');
+    if (!g.festa && g.doni[k]) return toast('Hai già mandato un dono per la prossima fase.');
     stopPlay(); gate = true;
     try {
+      // in festa paga chi manda il dono: ognuno ha i suoi crediti e un dono per fase
+      let wallet = g, dkey = k;
+      if (g.festa) {
+        const locals = g.festa.giocatori.filter((x) => !x.remoto && !g.doni[k + ':' + x.id]);
+        if (!locals.length) return toast('Tutti hanno già mandato un dono per la prossima fase.');
+        const pr = locals.length === 1 ? { value: locals[0].id } : await PT.chiedi({ kicker: 'Sponsor', title: 'Chi manda il dono?', options: locals.map((x) => ({ value: x.id, label: x.nome, sub: x.crediti + ' crediti' })), skip: 'Annulla' });
+        if (!pr) return;
+        wallet = g.festa.giocatori.find((x) => x.id === pr.value); dkey = k + ':' + wallet.id;
+      }
       const A = P[i].snap.alive;
-      const who = typeof preId === 'string' && A.includes(preId) ? { value: preId } : await PT.chiedi({ kicker: 'Sponsor', title: 'A chi mandi un dono?', text: 'Crediti disponibili: <b>' + g.crediti + '</b>. I favoriti costano di più.', grid: true, cls: 'sc-pick',
+      const who = typeof preId === 'string' && A.includes(preId) ? { value: preId } : await PT.chiedi({ kicker: 'Sponsor', title: 'A chi mandi un dono?', text: 'Crediti disponibili: <b>' + wallet.crediti + '</b>. I favoriti costano di più.', grid: true, cls: 'sc-pick',
         options: A.map((id) => ({ value: id, html: avHTML(BY[id]) + '<b class="sc-l">' + esc(BY[id].name) + '</b><small class="sc-s">Salute ' + PT.vit(SIM, i, id)[0] + '</small>' })), skip: 'Annulla' });
       if (!who) return;
       const t = BY[who.value], price = (x) => PT.prezzo(SIM, i, who.value, x);
-      const d = await PT.chiedi({ kicker: 'Sponsor · ' + t.name, title: 'Che cosa mandi?', faces: avHTML(t), text: moodHTML(t, i) + '<br>Arriverà nella prossima fase. Crediti: <b>' + g.crediti + '</b>', cls: 'sc-gift',
-        options: PT.DONI.map((x) => ({ value: x.k, label: x.label, sub: x.sub, cost: price(x) + ' cr', disabled: price(x) > g.crediti })), skip: 'Annulla' });
+      const d = await PT.chiedi({ kicker: 'Sponsor · ' + t.name, title: 'Che cosa mandi?', faces: avHTML(t), text: moodHTML(t, i) + '<br>Arriverà nella prossima fase. Crediti: <b>' + wallet.crediti + '</b>', cls: 'sc-gift',
+        options: PT.DONI.map((x) => ({ value: x.k, label: x.label, sub: x.sub, cost: price(x) + ' cr', disabled: price(x) > wallet.crediti })), skip: 'Annulla' });
       if (!d) return;
       const cost = price(PT.DONI.find((x) => x.k === d.value)), before = S.run.cfg.interventi || [];
       S.run.cfg.interventi = before.concat([{ fase: k, tipo: 'dono', chi: who.value, cosa: d.value }]);
       if (!await resimulate()) { S.run.cfg.interventi = before; return; }
-      g.crediti -= cost; g.doni[k] = { chi: who.value, cosa: d.value, costo: cost }; save(); renderHud();
+      wallet.crediti -= cost; g.doni[dkey] = { chi: who.value, cosa: d.value, costo: cost, da: wallet.id || null }; save(); renderHud();
       toast('Dono in viaggio per ' + t.name + ': arriva nella prossima fase.');
       if (window.LOS_PARTITA_FX && window.LOS_PARTITA_FX.gift) try { window.LOS_PARTITA_FX.gift(t, d.value, $('#giftBtn')); } catch (e) { /* solo grafica */ }
     } finally { gate = false; }
@@ -28042,8 +28432,9 @@ window.LOS_BUILD = "cd17f28800cde3f9639ca5528cc87d19291d131b86a38d5f275ed0f2e799
   let gate = false;
   async function next() {
     if (!SIM || gate) return;
-    if (S.run.phase >= SIM.phases.length - 1) { stopPlay(); location.hash = '#esito'; return; }
-    if (S.run.gioco && PT) { gate = true; try { await beforePhase(S.run.phase + 1); } finally { gate = false; } if (!SIM) return; }
+    if (S.run && S.run.ospite) return;
+    if (S.run.phase >= SIM.phases.length - 1) { stopPlay(); publishState(true); location.hash = '#esito'; return; }
+    if (S.run.gioco && PT) { gate = true; try { await processActions(); await beforePhase(S.run.phase + 1); } finally { gate = false; } if (!SIM) return; }
     go(S.run.phase + 1);
     if (S.run.phase >= SIM.phases.length - 1) stopPlay();
     if (window.scrollY > 300 && !playTimer) $('.broadcast').scrollIntoView({ behavior: AN.reduced ? 'auto' : 'smooth' });
@@ -28061,9 +28452,9 @@ window.LOS_BUILD = "cd17f28800cde3f9639ca5528cc87d19291d131b86a38d5f275ed0f2e799
     if (playTimer) clearTimeout(playTimer);
     playTimer = setTimeout(() => { playTimer = null; if (playing) next(); }, phaseReadDelay(SIM.phases[S.run.phase], S.settings.speed, S.settings.adaptivePlay));
   }
-  function startPlay() { stopPlay(); if (!SIM || document.hidden || S.run.phase >= SIM.phases.length - 1) return; playing = true; schedulePlay(); syncPlay(); }
+  function startPlay() { stopPlay(); if (!SIM || (S.run && S.run.ospite) || document.hidden || S.run.phase >= SIM.phases.length - 1) return; playing = true; schedulePlay(); syncPlay(); }
   $('#nextBtn').addEventListener('click', () => { if (gate) return; stopPlay(); next(); });
-  $('#prevBtn').addEventListener('click', () => { stopPlay(); lastRendered = -2; go(S.run.phase - 1); });
+  $('#prevBtn').addEventListener('click', () => { if (S.run && S.run.ospite) return; stopPlay(); lastRendered = -2; go(S.run.phase - 1); });
   $('#playBtn').addEventListener('click', () => { if (!SIM) return; if (playing) return stopPlay(); if (S.run.phase >= SIM.phases.length - 1) go(0); startPlay(); next(); });
   $('#speedSeg').addEventListener('click', (e) => { const b = e.target.closest('button'); if (!b) return; S.settings.speed = b.dataset.v; save(); $$('#speedSeg button').forEach((x) => x.setAttribute('aria-pressed', x === b)); if (playing) startPlay(); });
   $('#readBar').addEventListener('click', (e) => {
@@ -28137,7 +28528,7 @@ window.LOS_BUILD = "cd17f28800cde3f9639ca5528cc87d19291d131b86a38d5f275ed0f2e799
           '<div class="pf-id"><span class="pf-status">' + esc(status) + (dead ? ' · ' + esc(outShort.toLowerCase()) : '') + (atRes && t.rank ? ' · ' + t.rank + '° posto' : '') + '</span>' +
             '<p class="pf-team"><i></i>Squadra ' + t.team + '</p>' +
             '<div class="pf-tchips">' + (traits.length ? traits.map((x) => '<span class="chip" title="' + esc(x.desc || '') + '">' + esc(x.name) + '</span>').join('') : '<span class="chip dim">Nessun tratto</span>') + '</div>' +
-            '<div id="profFollow" class="pf-actions"></div>' + (typeof PT !== 'undefined' && PT && S.run && S.run.gioco && atEdge() && S.run.phase < SIM.phases.length - 1 && SIM.phases[S.run.phase].snap.alive.includes(t.id) && !S.run.gioco.doni[S.run.phase + 1] ? '<button type="button" class="btn sm pf-gift" data-gift="' + esc(t.id) + '">Manda un dono</button>' : '') + '</div></section>' +
+            '<div id="profFollow" class="pf-actions"></div>' + (typeof PT !== 'undefined' && PT && S.run && S.run.gioco && atEdge() && S.run.phase < SIM.phases.length - 1 && SIM.phases[S.run.phase].snap.alive.includes(t.id) && !S.run.gioco.doni[S.run.phase + 1] ? '<button type="button" class="btn sm pf-gift" data-gift="' + esc(t.id) + '">Manda un dono</button>' : '') + (typeof CT !== 'undefined' && CT && SIM && !t.alive && t.deathPhase <= (S.run ? S.run.phase : 0) ? '<button type="button" class="btn sm pf-card" data-cart="eliminazione" data-id="' + esc(t.id) + '">Cartolina</button>' : '') + '</div></section>' +
         '<div class="pf-kpis">' + tile(kills, soft ? 'eliminazioni' : 'uccisioni', kills ? 'hot' : '') + tile(hist.length, 'eventi vissuti') + (dead ? tile(esc(outShort), 'uscita', 'txt') : tile(ally.length, ally.length === 1 ? 'alleato in gara' : 'alleati in gara')) + tile(tests ? passed + '<small>/' + tests + '</small>' : '–', 'prove riuscite') + '</div>' +
         panel('now', nowPanel) + panel('bonds', bondsPanel) + panel('story', storyPanel) + panel('self', selfPanel) +
       '</div>';
@@ -28284,7 +28675,7 @@ window.LOS_BUILD = "cd17f28800cde3f9639ca5528cc87d19291d131b86a38d5f275ed0f2e799
   function trophyHTML(t, on, when) {
     const hidden = t.segreto && !on;
     return '<li class="tr' + (on ? ' on' : '') + (hidden ? ' secret' : '') + '" data-tr="' + esc(t.id) + '" data-cat="' + esc(t.cat) + '"><span class="tr-ic" aria-hidden="true"></span><span class="tr-tx"><b>' + (hidden ? 'Trofeo segreto' : esc(t.nome)) + '</b><small>' + (hidden ? 'Si scopre giocando.' : esc(t.desc)) + '</small>' +
-      (on && when ? '<em>' + new Date(when).toLocaleDateString('it-IT') + '</em>' : '') + '</span></li>';
+      (on && when ? '<em>' + new Date(when).toLocaleDateString('it-IT') + '</em>' : '') + '</span>' + (on && CT ? '<button type="button" class="tr-share" data-cart="trofeo" data-id="' + esc(t.id) + '" aria-label="Cartolina del trofeo ' + esc(t.nome) + '">Condividi</button>' : '') + '</li>';
   }
   function resultsExtraHTML(nuovi) {
     if (!BC || !SIM) return '';
@@ -28294,10 +28685,285 @@ window.LOS_BUILD = "cd17f28800cde3f9639ca5528cc87d19291d131b86a38d5f275ed0f2e799
     const iv = (id, label) => { const t = BY[id]; if (!t) return ''; const qa = BC.intervista(SIM, id, ctx); return qa.length ? '<article class="iv">' + avHTML(t, { dead: !t.alive }) + '<div class="iv-in"><span class="iv-k">' + esc(label) + '</span><h3>' + esc(t.name) + '</h3><dl>' + qa.map((x) => '<dt>' + x.q + '</dt><dd>«' + x.a + '»</dd>').join('') + '</dl></div></article>' : ''; };
     const ivs = iv(winner, SIM.winners.length > 1 ? 'Tra chi ha vinto' : 'Chi ha vinto') + (second && second.id !== winner ? iv(second.id, theme.soft ? 'L’ultimo a uscire' : 'L’ultimo a cadere') : '');
     const ed = S.run.cfg.edizione || 1;
-    return (nuovi.length ? '<section class="block card tr-new"><h2>Trofei sbloccati <span>' + nuovi.length + '</span></h2><ul class="trlist">' + nuovi.map((t) => trophyHTML(t, true)).join('') + '</ul><button class="btn sm" type="button" data-bacheca="trofei">Tutti i trofei</button></section>' : '') +
+    const fest = g && g.festa ? g.festa : S.run.ospite && FS.stato ? { giocatori: FS.stato.giocatori || [] } : null;
+    const festaH = fest && fest.giocatori.length ? (() => { const sc = PT.punteggi(SIM, fest); return '<section class="block card fs-rank"><h2>La classifica della festa</h2><ol>' + sc.map((x, k) => '<li class="' + (k === 0 ? 'top' : '') + '" style="--pc:' + esc(x.p.colore || '#888') + '"><span class="fr-pos">' + (k + 1) + '</span><b class="fr-nm">' + esc(x.p.nome) + '</b>' + (x.campione ? avHTML(x.campione, { dead: !x.campione.alive }) + '<span class="fr-ch">' + esc(x.campione.name) + (x.win ? ' · vince' : ' · ' + x.campione.rank + 'º') + '</span>' : '<span class="fr-ch">senza campione</span>') + '<em class="fr-pt">' + x.punti + '<small> punti</small></em></li>').join('') + '</ol><p class="help">Punti: piazzamento del campione (10 per posizione guadagnata), 5 per eliminazione, 1 ogni 10 crediti, 50 se vince.</p></section>'; })() : '';
+    return festaH + (nuovi.length ? '<section class="block card tr-new"><h2>Trofei sbloccati <span>' + nuovi.length + '</span></h2><ul class="trlist">' + nuovi.map((t) => trophyHTML(t, true)).join('') + '</ul><button class="btn sm" type="button" data-bacheca="trofei">Tutti i trofei</button></section>' : '') +
       (ivs ? '<section class="block card ivbox"><h2>Le interviste</h2>' + ivs + '</section>' : '') +
+      postcardsHTML() +
       '<section class="block card rematch"><h2>Rivincita' + (ed > 1 ? ' <span>edizione ' + (ed + 1) + '</span>' : '') + '</h2><p>Lo stesso cast torna nell’arena: chi è sopravvissuto porta una cicatrice e un po’ d’esperienza, chi è caduto torna con i conti in sospeso.</p><div class="row"><button class="btn primary" type="button" id="rRematch">Rivincita</button><button class="btn" type="button" data-bacheca="album">Album dei concorrenti</button></div></section>';
   }
+  /* =============== MODALITÀ FESTA: sullo stesso telefono e online =============== */
+  const FE = window.LOS_FESTA;
+  const FS = { tab: 'locale', giocatori: [], room: null, role: null, code: null, gid: null, off: null, stato: null, rev: 0, pubblicato: '', risposte: new Set(), ultimo: null };
+  const fsPlayer = (i) => ({ id: 'p' + (i + 1) + Date.now().toString(36).slice(-3), nome: 'Giocatore ' + (i + 1), campione: null });
+  function openFesta() {
+    if (!PT) return;
+    if (!FS.giocatori.length) FS.giocatori = [fsPlayer(0), fsPlayer(1)];
+    stopPlay(); renderFesta(); const d = $('#festaDlg'); if (!d.open) d.showModal();
+  }
+  function castOptions(sel, taken) {
+    return '<option value="">Scegli il campione…</option>' + S.cast.map((t) => '<option value="' + esc(t.id) + '"' + (t.id === sel ? ' selected' : taken.has(t.id) ? ' disabled' : '') + '>' + esc(t.name || 'Senza nome') + ' · squadra ' + t.team + '</option>').join('');
+  }
+  function playersHTML() {
+    const taken = new Set(FS.giocatori.map((p) => p.campione).filter(Boolean).concat(Object.values(FS.room && FS.role === 'host' ? FS.room.get().ingressi || {} : {}).map((x) => x.campione)));
+    return '<ol class="fs-players">' + FS.giocatori.map((p, i) => '<li style="--pc:' + PT.COLORI[i % PT.COLORI.length] + '"><input type="text" maxlength="24" value="' + esc(p.nome) + '" data-fs-nome="' + i + '" aria-label="Nome del giocatore ' + (i + 1) + '"><select data-fs-camp="' + i + '" aria-label="Campione di ' + esc(p.nome) + '">' + castOptions(p.campione, taken) + '</select>' +
+      (FS.giocatori.length > 1 ? '<button type="button" class="iconbtn" data-fs-del="' + i + '" aria-label="Togli ' + esc(p.nome) + '">✕</button>' : '') + '</li>').join('') + '</ol>' +
+      (FS.giocatori.length < 8 ? '<button type="button" class="btn sm" data-fs-add>Aggiungi un giocatore</button>' : '');
+  }
+  function renderFesta() {
+    $$('#festaDlg [data-fs]').forEach((b) => b.setAttribute('aria-selected', String(b.dataset.fs === FS.tab)));
+    let h = '';
+    if (FS.tab === 'locale') {
+      h = playersHTML() + '<p class="help">Il telefono passa di mano a ogni turno. Servono almeno due giocatori, ognuno con il suo campione.</p><div class="row"><button type="button" class="btn primary lg" data-fs-start>Inizia la festa</button></div>';
+    } else if (FS.role === 'host') {
+      const ing = Object.entries(FS.room.get().ingressi || {});
+      h = '<div class="fs-room"><span>Codice della stanza</span><b class="fs-code">' + esc(FS.code) + '</b><small>Gli amici aprono il gioco, scelgono «Online» → «Entra» e scrivono questo codice.</small></div>' +
+        '<h3 class="fs-h">Giocatori su questo dispositivo</h3>' + playersHTML() +
+        '<h3 class="fs-h">Amici collegati <span>' + ing.length + '</span></h3>' + (ing.length ? '<ul class="fs-guests">' + ing.map(([gid, x]) => '<li><b>' + esc(x.nome) + '</b> · ' + (x.campione && S.cast.find((t) => t.id === x.campione) ? esc(S.cast.find((t) => t.id === x.campione).name) : '<em>sta scegliendo…</em>') + '</li>').join('') + '</ul>' : '<p class="help">Nessuno ancora: aspetta che entrino.</p>') +
+        '<div class="row"><button type="button" class="btn primary lg" data-fs-start>Inizia la festa</button><button type="button" class="btn" data-fs-leave>Chiudi la stanza</button></div>';
+    } else if (FS.role === 'guest') {
+      const cfg = FS.room.get().cfg, me = (FS.room.get().ingressi || {})[FS.gid] || {};
+      const taken = new Set(Object.entries(FS.room.get().ingressi || {}).filter(([g]) => g !== FS.gid).map(([, x]) => x.campione));
+      h = '<div class="fs-room"><span>Sei nella stanza</span><b class="fs-code">' + esc(FS.code) + '</b><small>' + (FS.room.get().stato ? 'La partita è cominciata.' : 'Aspetta che l’host inizi la partita.') + '</small></div>' +
+        (cfg ? '<label class="field"><span>Il tuo campione</span><select data-fs-mycamp>' + '<option value="">Scegli…</option>' + cfg.cast.map((t) => '<option value="' + esc(t.id) + '"' + (t.id === me.campione ? ' selected' : taken.has(t.id) ? ' disabled' : '') + '>' + esc(t.name) + ' · squadra ' + t.team + '</option>').join('') + '</select></label>' : '<p class="help">In attesa della configurazione dall’host…</p>') +
+        '<div class="row"><button type="button" class="btn" data-fs-leave>Esci dalla stanza</button></div>';
+    } else {
+      const srv = FE ? FE.server() : '';
+      h = '<div class="fs-online"><section><h3 class="fs-h">Crea una stanza</h3><p class="help">Questo dispositivo fa da regia: manda avanti la diretta, gli altri seguono e scelgono per il loro campione.</p><button type="button" class="btn primary" data-fs-create' + (srv ? '' : ' disabled') + '>Crea la stanza</button></section>' +
+        '<section><h3 class="fs-h">Entra in una stanza</h3><label class="field"><span>Il tuo nome</span><input type="text" maxlength="24" id="fsName" value="' + esc(FS.ultimo || '') + '"></label><label class="field"><span>Codice</span><input type="text" maxlength="4" id="fsCode" autocomplete="off" style="text-transform:uppercase"></label><button type="button" class="btn" data-fs-join' + (srv ? '' : ' disabled') + '>Entra</button></section></div>' +
+        '<details class="fs-server"' + (srv ? '' : ' open') + '><summary>Server della festa' + (srv ? ': collegato' : ': da impostare') + '</summary><p class="help">Per giocare online serve un database gratuito di Firebase: su console.firebase.google.com crea un progetto, aggiungi un «Realtime Database» in modalità di prova e incolla qui il suo indirizzo (finisce con firebasedatabase.app o firebaseio.com). Tutti i giocatori devono usare lo stesso indirizzo. Nella modalità di prova chiunque conosca l’indirizzo può leggere le stanze: non scriverci nulla di privato.</p>' +
+        '<label class="field"><span>Indirizzo del database</span><input type="url" id="fsServer" placeholder="https://il-tuo-progetto-default-rtdb.europe-west1.firebasedatabase.app" value="' + esc(srv) + '"></label><button type="button" class="btn sm" data-fs-server>Salva l’indirizzo</button></details>';
+    }
+    $('#festaBody').innerHTML = h;
+  }
+  function leanCfg(cfg) { return Object.assign({}, cfg, { cast: cfg.cast.map((t) => Object.assign({}, t, { img: '' })) }); }
+  function leaveRoom() { if (FS.off) FS.off(); if (FS.room) FS.room.close(); Object.assign(FS, { room: null, role: null, code: null, gid: null, off: null, stato: null, pubblicato: '' }); FS.risposte = new Set(); document.body.classList.remove('fs-ospite'); }
+  $('#festaDlg').addEventListener('click', async (e) => {
+    const tab = e.target.closest('[data-fs]'); if (tab) { FS.tab = tab.dataset.fs; renderFesta(); return; }
+    if (e.target.closest('[data-fs-add]')) { FS.giocatori.push(fsPlayer(FS.giocatori.length)); renderFesta(); return; }
+    const del = e.target.closest('[data-fs-del]'); if (del) { FS.giocatori.splice(+del.dataset.fsDel, 1); renderFesta(); return; }
+    if (e.target.closest('[data-fs-server]')) { const u = $('#fsServer').value.trim(); if (u && !FE.serverValido(u)) { $('#festaMsg').textContent = 'Indirizzo non valido: deve essere un Realtime Database di Firebase (https://…firebasedatabase.app).'; return; } FE.setServer(u); $('#festaMsg').textContent = u ? 'Server salvato.' : 'Server rimosso.'; renderFesta(); return; }
+    if (e.target.closest('[data-fs-create]')) { try { FS.code = FE.codice(); FS.room = FE.stanza(FS.code, 'host'); FS.role = 'host'; FS.room.set('meta', { build: window.LOS_BUILD || '', creata: Date.now() }); FS.room.set('cfg', leanCfg(currentConfiguration())); FS.off = FS.room.on(() => { if ($('#festaDlg').open && FS.role === 'host') renderFestaSoft(); hostInbox(); }); renderFesta(); } catch (x) { $('#festaMsg').textContent = x.message; } return; }
+    if (e.target.closest('[data-fs-join]')) {
+      const code = $('#fsCode').value.trim().toUpperCase(), nome = $('#fsName').value.trim() || 'Ospite';
+      if (!FE.okCodice(code)) { $('#festaMsg').textContent = 'Il codice è di quattro lettere.'; return; }
+      try { FS.code = code; FS.room = FE.stanza(code, 'guest'); FS.role = 'guest'; FS.gid = FE.nuovoId('g'); FS.ultimo = nome; FS.room.set('ingressi/' + FS.gid, { nome, campione: '' }); FS.off = FS.room.on(guestSync); document.body.classList.add('fs-ospite'); renderFesta(); $('#festaMsg').textContent = 'Sei dentro. Scegli il tuo campione.'; } catch (x) { $('#festaMsg').textContent = x.message; }
+      return;
+    }
+    if (e.target.closest('[data-fs-leave]')) { leaveRoom(); renderFesta(); return; }
+    if (e.target.closest('[data-fs-start]')) startFesta();
+  });
+  $('#festaDlg').addEventListener('change', (e) => {
+    const n = e.target.closest('[data-fs-nome]'); if (n) { FS.giocatori[+n.dataset.fsNome].nome = n.value.trim().slice(0, 24) || 'Giocatore'; return; }
+    const c = e.target.closest('[data-fs-camp]'); if (c) { FS.giocatori[+c.dataset.fsCamp].campione = c.value || null; renderFesta(); return; }
+    const m = e.target.closest('[data-fs-mycamp]'); if (m && FS.room) { FS.room.patch('ingressi/' + FS.gid, { campione: m.value }); }
+  });
+  // l'elenco degli ospiti si aggiorna senza rubare il fuoco a chi sta scrivendo
+  function renderFestaSoft() { if (!$('#festaDlg').contains(document.activeElement) || document.activeElement.tagName === 'BUTTON') renderFesta(); }
+  $('#btnFesta').addEventListener('click', openFesta);
+  function startFesta() {
+    const remote = FS.role === 'host' ? Object.entries(FS.room.get().ingressi || {}).filter(([, x]) => x.campione).map(([gid, x]) => ({ id: 'o' + gid, nome: x.nome, campione: x.campione, remoto: gid })) : [];
+    const locals = FS.giocatori.filter((p) => p.campione);
+    const all = locals.concat(remote);
+    if (all.length < (FS.role === 'host' ? 1 : 2)) { $('#festaMsg').textContent = FS.role === 'host' ? 'Serve almeno un giocatore con un campione.' : 'Servono almeno due giocatori, ognuno con un campione.'; return; }
+    if (S.cast.length < 2) { $('#festaMsg').textContent = 'Servono almeno 2 concorrenti nel cast.'; return; }
+    S.cast.forEach((t, i) => { if (!t.name.trim()) t.name = 'Concorrente ' + (i + 1); });
+    S.settings.seed = newSeed();
+    const cfg = currentConfiguration();
+    runSim.festa = PT.festaSana({ giocatori: all.map((p, i) => Object.assign({ crediti: PT.START, colore: PT.COLORI[i % PT.COLORI.length] }, p)), stanza: FS.code });
+    if (FS.role === 'host') { FS.room.set('cfg', leanCfg(cfg)); FS.room.set('richieste', null); FS.room.set('risposte', null); FS.room.set('azioni', null); FS.rev = 0; FS.pubblicato = ''; }
+    $('#festaDlg').close();
+    runSim(cfg);
+  }
+  // l'host pubblica lo stato a ogni fase: fase, interventi, giocatori (crediti e campioni)
+  function publishState(esito) {
+    if (FS.role !== 'host' || !FS.room || !SIM || !S.run || !S.run.gioco || !S.run.gioco.festa) return;
+    const st = { fase: S.run.phase || 0, interventi: S.run.cfg.interventi || [], giocatori: S.run.gioco.festa.giocatori, esito: !!esito, seme: S.run.cfg.seed };
+    const sig = JSON.stringify(st); if (sig === FS.pubblicato) return; FS.pubblicato = sig;
+    FS.room.set('stato', Object.assign(st, { rev: ++FS.rev }));
+  }
+  // le azioni spontanee degli ospiti (i doni): si applicano prima della fase successiva
+  let inboxBusy = false;
+  function hostInbox() { /* le azioni si raccolgono in next(), qui basta tenerle in coda */ }
+  async function processActions() {
+    if (FS.role !== 'host' || !FS.room || inboxBusy || !S.run || !S.run.gioco || !S.run.gioco.festa) return;
+    const az = Object.entries(FS.room.get().azioni || {}); if (!az.length) return;
+    inboxBusy = true;
+    try {
+      const g = S.run.gioco, i = S.run.phase || 0, k = i + 1, alive = SIM.phases[i].snap.alive; let changed = false;
+      for (const [aid, a] of az) {
+        FS.room.set('azioni/' + aid, null);
+        const p = g.festa.giocatori.find((x) => x.remoto === a.gid), dono = PT.DONI.find((x) => x.k === a.cosa);
+        if (!p || !dono || !alive.includes(a.chi) || k >= SIM.phases.length) continue;
+        const cost = PT.prezzo(SIM, i, a.chi, dono); if (cost > p.crediti) continue;
+        S.run.cfg.interventi = (S.run.cfg.interventi || []).concat([{ fase: k, tipo: 'dono', chi: a.chi, cosa: a.cosa }]); p.crediti -= cost; changed = true;
+        g.doni[k + ':' + p.id] = { chi: a.chi, cosa: a.cosa, costo: cost, da: p.id };
+        toast(p.nome + ' manda un dono a ' + BY[a.chi].name + '.');
+      }
+      if (changed) await resimulate();
+    } finally { inboxBusy = false; }
+  }
+  // una domanda a un giocatore: online va sul suo dispositivo, in locale si passa il telefono
+  let lastLocal = null;
+  async function askPlayer(p, opts) {
+    if (p.remoto && FS.room) { const r = await FE.chiediA(FS.room, p.remoto, Object.assign({}, opts, { kicker: p.nome + ' · ' + (opts.kicker || '') }), ((opts.timer || 25) + 8) * 1000); return r; }
+    const locals = S.run.gioco.festa.giocatori.filter((x) => !x.remoto);
+    if (locals.length > 1 && lastLocal !== p.id) {
+      const ok = await PT.chiedi({ kicker: 'Modalità festa', title: 'Passa il telefono a ' + p.nome, text: 'Tocca a ' + esc(p.nome) + '. Gli altri non guardano!', cls: 'sc-pass', options: [{ value: 1, label: 'Sono ' + p.nome + ', vai' }], skip: 'Salta il turno' });
+      if (!ok) return null;
+    }
+    lastLocal = p.id;
+    return PT.chiedi(Object.assign({}, opts, { kicker: p.nome + ' · ' + (opts.kicker || '') }));
+  }
+  async function askGame(p, tipo, opts) {
+    if (p.remoto && FS.room) { const r = await FE.chiediA(FS.room, p.remoto, Object.assign({ gioco: tipo }, opts), 45000); return r && typeof r.value === 'number' ? r.value : null; }
+    const locals = S.run.gioco.festa.giocatori.filter((x) => !x.remoto);
+    if (locals.length > 1 && lastLocal !== p.id) { const ok = await PT.chiedi({ kicker: 'Modalità festa', title: 'Passa il telefono a ' + p.nome, text: 'Il campione di ' + esc(p.nome) + ' affronta una prova.', cls: 'sc-pass', options: [{ value: 1, label: 'Sono ' + p.nome + ', vai' }], skip: 'Salta' }); if (!ok) return null; }
+    lastLocal = p.id;
+    return PT.gioca(tipo, opts);
+  }
+  // l'alba della festa: per ciascuno, nell'ordine, il nuovo campione (se serve), l'ordine e la puntata
+  async function festaDay(k) {
+    const P = SIM.phases, g = S.run.gioco, i = k - 1, soft = !!resultTheme(SIM).soft;
+    let changed = false;
+    for (const p of g.festa.giocatori) {
+      const alive = P[i].snap.alive;
+      if (p.campione && !alive.includes(p.campione)) {
+        p.caduti = (p.caduti || []).concat([p.campione]);
+        const taken = new Set(g.festa.giocatori.map((x) => x.campione).filter(Boolean));
+        const free = alive.filter((id) => !taken.has(id));
+        p.campione = null;
+        if (free.length) {
+          const r = await askPlayer(p, { kicker: 'Giorno ' + P[k].day + ' · nuovo campione', title: 'Il tuo campione è fuori. Chi scegli?', grid: true, cls: 'sc-pick', options: free.map((id) => ({ value: id, html: avHTML(BY[id]) + '<b class="sc-l">' + esc(BY[id].name) + '</b><small class="sc-s">Salute ' + PT.vit(SIM, i, id)[0] + '</small>' })), skip: 'Nessuno' });
+          p.campione = r && free.includes(r.value) ? r.value : null;
+        }
+        save(); renderHud();
+      }
+      if (!p.campione) continue;
+      const t = BY[p.campione];
+      const o = await askPlayer(p, { kicker: 'Giorno ' + P[k].day + ' · ordine', title: 'Cosa deve fare ' + t.name + ' oggi?', faces: avHTML(t), text: moodHTML(t, i), cls: 'sc-mentor', options: PT.ORDINI.map((x) => ({ value: x.v, label: x.label, sub: x.sub })), timer: 25, skip: 'Lascia decidere' });
+      if (o && PT.ORDINI.some((x) => x.v === o.value)) { S.run.cfg.interventi = (S.run.cfg.interventi || []).concat([{ fase: k, tipo: 'ordine', chi: t.id, cosa: o.value }]); g.ordini.push({ fase: k, cosa: o.value, da: p.id }); changed = true; }
+      if (p.crediti >= 10) {
+        const offers = PT.proposte(SIM, k, { mentore: p.campione }, BY, [], soft);
+        if (offers.length) {
+          const b = await askPlayer(p, { kicker: 'Giorno ' + P[k].day + ' · puntata', title: 'Su cosa scommetti?', options: offers.map((x, j) => ({ value: j, label: x.testo, cost: '×' + x.q })), stake: [10, 25, 50].filter((v) => v <= p.crediti), credits: p.crediti, cls: 'sc-bets', timer: 25, skip: 'Non punto' });
+          const stake = b && +b.stake;
+          if (b && offers[b.value] && stake && stake <= p.crediti) { g.puntate.push(Object.assign({ id: 'b' + k + '-' + g.puntate.length, posta: stake, esito: null, aperta: k, chi: p.id }, offers[b.value])); p.crediti -= stake; }
+        }
+      }
+      save(); renderHud();
+    }
+    if (changed && !await resimulate()) S.run.cfg.interventi = (S.run.cfg.interventi || []).filter((x) => x.fase !== k || x.tipo !== 'ordine');
+    save(); renderHud(); publishState();
+  }
+  async function festaTest(k) {
+    const g = S.run.gioco, P = SIM.phases;
+    for (const p of g.festa.giocatori) {
+      if (!p.campione || g.chiesto['p' + k + p.id]) continue;
+      const ev = P[k].events.find((e) => e.test && (e.test.who ? e.test.who === p.campione : e.ids[0] === p.campione)); if (!ev) continue;
+      g.chiesto['p' + k + p.id] = 1;
+      const t = BY[p.campione], tipo = PT.tipoProva(ev.test.attr), an = ATTRN[ev.test.attr] || ev.test.attr;
+      const score = await askGame(p, tipo, { kicker: p.nome + ' · prova di ' + an, title: { tempismo: 'Questione di riflessi', sequenza: 'Questione di testa', via: 'Questione di istinto' }[tipo], faces: avHTML(t), text: esc(t.name) + ' affronta una prova di <b>' + esc(an) + '</b>.' });
+      if (score == null) continue;
+      const v = PT.bonusProva(score); if (!v) continue;
+      const before = S.run.cfg.interventi || [];
+      S.run.cfg.interventi = before.concat([{ fase: k, tipo: 'prova', chi: t.id, cosa: String(v) }]);
+      if (!await resimulate()) S.run.cfg.interventi = before;
+    }
+  }
+  // l'ospite: segue la stanza, ricalcola la partita da sé, risponde alle domande che gli arrivano
+  let guestBusy = false;
+  async function guestSync(tree) {
+    if (FS.role !== 'guest') return;
+    if ($('#festaDlg').open) renderFestaSoft();
+    const st = tree.stato, cfg = tree.cfg;
+    FS.stato = st || null;
+    if (tree.meta && tree.meta.build && window.LOS_BUILD && tree.meta.build !== window.LOS_BUILD && !FS.avvisato) { FS.avvisato = true; toast('Attenzione: l’host usa un’altra versione del gioco, la partita potrebbe non coincidere.'); }
+    // le domande per me
+    Object.entries(tree.richieste || {}).forEach(([rid, r]) => {
+      if (!r || r.gid !== FS.gid || FS.risposte.has(rid) || (r.scade && r.scade < Date.now())) return;
+      FS.risposte.add(rid);
+      const card = Object.assign({}, r.card, { timer: undefined });
+      (card.gioco ? PT.gioca(card.gioco, card).then((s) => ({ value: s == null ? '__salta__' : s })) : PT.chiedi(card).then((x) => (x ? { value: x.value, stake: x.stake == null ? 0 : x.stake } : { value: '__salta__' })))
+        .then((res) => FS.room && FS.room.set('risposte/' + rid, res));
+    });
+    if (!st || !cfg || guestBusy) return;
+    guestBusy = true;
+    try {
+      const inter = (x) => JSON.stringify(x || []);
+      if (!SIM || !S.run || !S.run.ospite || S.run.ospite.code !== FS.code || S.run.cfg.seed !== st.seme) {
+        const c = Object.assign({}, cfg, { cast: normalizeCast(cfg.cast), custom: normalizeCustoms(cfg.custom || []), interventi: st.interventi || [] });
+        runSim.condivisa = true; runSim.pre = null;
+        if (!await runSim(c)) return;
+        S.run.ospite = { code: FS.code, gid: FS.gid }; save();
+        if ($('#festaDlg').open) $('#festaDlg').close();
+      } else if (inter(S.run.cfg.interventi) !== inter(st.interventi)) {
+        S.run.cfg.interventi = st.interventi || [];
+        await resimulate();
+      }
+      if (st.esito) { if (location.hash !== '#esito') location.hash = '#esito'; else renderResults(); }
+      else if ((S.run.phase || 0) !== st.fase) { S.run.phase = Math.min(st.fase, SIM.phases.length - 1); renderLive(false); }
+      else renderHud();
+    } finally { guestBusy = false; }
+  }
+  async function guestGift() {
+    if (!FS.room || !SIM || !FS.stato) return;
+    const me = (FS.stato.giocatori || []).find((p) => p.remoto === FS.gid); if (!me) return toast('Non hai un posto in questa partita.');
+    const i = S.run.phase || 0, A = SIM.phases[i].snap.alive;
+    const who = await PT.chiedi({ kicker: 'Sponsor · ' + me.nome, title: 'A chi mandi un dono?', text: 'Crediti: <b>' + me.crediti + '</b>. L’host lo consegna alla prossima fase.', grid: true, cls: 'sc-pick', options: A.map((id) => ({ value: id, html: avHTML(BY[id]) + '<b class="sc-l">' + esc(BY[id].name) + '</b>' })), skip: 'Annulla' });
+    if (!who) return;
+    const t = BY[who.value], price = (x) => PT.prezzo(SIM, i, who.value, x);
+    const d = await PT.chiedi({ kicker: 'Sponsor · ' + t.name, title: 'Che cosa mandi?', faces: avHTML(t), cls: 'sc-gift', options: PT.DONI.map((x) => ({ value: x.k, label: x.label, sub: x.sub, cost: price(x) + ' cr', disabled: price(x) > me.crediti })), skip: 'Annulla' });
+    if (!d) return;
+    FS.room.set('azioni/' + FE.nuovoId('a'), { gid: FS.gid, chi: who.value, cosa: d.value });
+    toast('Richiesta inviata: il dono parte alla prossima fase.');
+  }
+
+  /* ---------- cartoline e link della partita ---------- */
+  const CT = window.LOS_CARTOLINE;
+  let cartCanvas = null, cartName = 'last-one-standing';
+  function postcardsHTML() {
+    if (!CT) return '';
+    return '<section class="block card cards-share"><h2>Cartoline</h2><p class="help">Immagini pronte per i social, e un link per far vedere a chiunque la stessa identica partita.</p><div class="row"><button class="btn" type="button" data-cart="vincitore">Il vincitore</button><button class="btn" type="button" data-cart="riepilogo">La partita</button><button class="btn primary" type="button" data-cart-link>Copia il link della partita</button></div></section>';
+  }
+  async function makePostcard(kind, id) {
+    if (!CT || !SIM) return;
+    const theme = resultTheme(SIM), g = S.run && S.run.gioco;
+    $('#cartMsg').textContent = 'Preparo la cartolina…'; $('#cartImg').removeAttribute('src');
+    const d = $('#cartolinaDlg'); if (!d.open) d.showModal();
+    try { if (document.fonts && document.fonts.ready) await document.fonts.ready; } catch (e) { /* niente */ }
+    let c = null;
+    if (kind === 'vincitore') { c = await CT.vincitore(SIM, theme); cartName = 'vincitore'; }
+    else if (kind === 'riepilogo') { const m = g && g.mentore && BY[g.mentore]; c = await CT.riepilogo(SIM, theme, { tu: m ? 'Il mio allievo: ' + m.name + ' · ' + (SIM.winners.includes(m.id) ? 'vincitore' : m.rank + 'º') : g && g.puntate.length ? 'Le mie puntate: ' + g.puntate.filter((b) => b.esito === 'vinta').length + ' vinte su ' + g.puntate.length : '' }); cartName = 'partita'; }
+    else if (kind === 'eliminazione') { c = await CT.eliminazione(SIM, id, theme); cartName = 'eliminazione-' + (BY[id] ? BY[id].name : id); }
+    else if (kind === 'carta' && BC && PT) { const x = (PT.profilo().album || {})[id]; if (x) { c = await CT.carta(x, BC.rarita(x)); cartName = 'carta-' + x.name; } }
+    else if (kind === 'trofeo' && BC && PT) { const t = BC.TROFEI.find((x) => x.id === id); if (t) { c = await CT.trofeo(t, (PT.profilo().trofei || {})[id]); cartName = 'trofeo-' + t.nome; } }
+    cartCanvas = c;
+    if (!c) { $('#cartMsg').textContent = 'Cartolina non disponibile.'; return; }
+    $('#cartImg').src = c.toDataURL('image/png'); $('#cartImg').alt = 'Cartolina: ' + cartName;
+    $('#cartMsg').textContent = '';
+    $('#cartLink').hidden = !SIM || kind === 'carta' || kind === 'trofeo';
+    if (window.LOS_PARTITA_FX && window.LOS_PARTITA_FX.postcard) try { window.LOS_PARTITA_FX.postcard($('#cartolinaDlg'), kind); } catch (e) { /* solo grafica */ }
+  }
+  async function copyGameLink() {
+    if (!CT || !S.run) return;
+    try { const code = await CT.codifica(S.run.cfg); copyText(location.origin + location.pathname + '#vedi=' + code, 'Link copiato: chi lo apre vede la stessa partita, con le stesse scelte.'); }
+    catch (e) { toast('Link non disponibile in questo browser.'); }
+  }
+  async function openShared(code) {
+    let cfg;
+    try { cfg = await CT.decodifica(code); if (!cfg || !Array.isArray(cfg.cast)) throw new Error('vuoto'); cfg.cast = normalizeCast(cfg.cast); cfg.custom = normalizeCustoms(cfg.custom || []); }
+    catch (e) { toast('Il link della partita non è valido.'); location.hash = '#home'; route(); return; }
+    runSim.condivisa = true; runSim.pre = null;
+    toast('Partita condivisa: la stai guardando così come è stata giocata.');
+    await runSim(cfg);
+  }
+  document.addEventListener('click', (e) => {
+    const c = e.target.closest('[data-cart]'); if (c) { e.preventDefault(); makePostcard(c.dataset.cart, c.dataset.id); return; }
+    if (e.target.closest('[data-cart-link]')) copyGameLink();
+  });
+  $('#cartShare').addEventListener('click', async () => { if (!cartCanvas) return; const r = await CT.condividi(cartCanvas, cartName.replace(/[^w-àèéìòù]+/gi, '-').toLowerCase(), 'Last One Standing'); $('#cartMsg').textContent = r === 'condivisa' ? 'Condivisa.' : r === 'scaricata' ? 'Immagine scaricata.' : r === 'annullata' ? '' : 'Non riuscito.'; });
+  $('#cartLink').addEventListener('click', copyGameLink);
   function startRematch() {
     if (!BC || !SIM || !S.run) return;
     const res = BC.rivincita(S.run.cfg, SIM, TRAITS);
@@ -28327,7 +28993,7 @@ window.LOS_BUILD = "cd17f28800cde3f9639ca5528cc87d19291d131b86a38d5f275ed0f2e799
       h = cards.length ? '<p class="bc-count"><b>' + cards.length + '</b> carte · ' + cards.filter((c) => c[1].k !== 'comune').length + ' rare o meglio</p><ul class="album">' + cards.map(([x, r]) => {
         const inCast = S.cast.some((t) => t.id === x.id);
         return '<li class="acard r-' + r.k + '"><span class="ac-r">' + esc(r.nome) + '</span>' + avHTML(x) + '<b class="ac-n">' + esc(x.name) + '</b><span class="ac-st"><span><b>' + x.partite + '</b> ' + (x.partite === 1 ? 'partita' : 'partite') + '</span><span><b>' + x.vittorie + '</b> ' + (x.vittorie === 1 ? 'vittoria' : 'vittorie') + '</span><span><b>' + x.uccisioni + '</b> ' + (x.uccisioni === 1 ? 'eliminazione' : 'eliminazioni') + '</span></span>' +
-          '<span class="ac-best">Migliore: ' + (x.migliore === 1 ? 'vittoria' : x.migliore + 'º posto') + '</span><button type="button" class="btn sm" data-album-add="' + esc(x.id) + '"' + (inCast ? ' disabled' : '') + '>' + (inCast ? 'Già nel cast' : 'Porta nel cast') + '</button></li>';
+          '<span class="ac-best">Migliore: ' + (x.migliore === 1 ? 'vittoria' : x.migliore + 'º posto') + '</span><button type="button" class="btn sm" data-album-add="' + esc(x.id) + '"' + (inCast ? ' disabled' : '') + '>' + (inCast ? 'Già nel cast' : 'Porta nel cast') + '</button>' + (CT ? '<button type="button" class="btn sm ac-share" data-cart="carta" data-id="' + esc(x.id) + '">Cartolina</button>' : '') + '</li>';
       }).join('') + '</ul>' : '<p class="help">L’album si riempie a ogni partita che arriva all’esito: ogni concorrente diventa una carta, e la carta diventa più rara con le vittorie.</p>';
     } else {
       const rows = [['Partite giocate', p.partite || 0], ['Crediti record', p.record || 0], ['Puntate vinte', (p.vinte || 0) + ' su ' + (p.puntate || 0)], ['Doni mandati', p.doni || 0], ['Ordini seguiti', (p.seguiti || 0) + ' su ' + (p.ordini || 0)], ['Allievi vincitori', p.mentoriVincenti || 0], ['Arene visitate', (p.arene || []).length + ' su ' + D.themes.length]];
@@ -28615,6 +29281,7 @@ window.LOS_BUILD = "cd17f28800cde3f9639ca5528cc87d19291d131b86a38d5f275ed0f2e799
     AN.ripple(document.body);
     try { const ic = document.createElement('link'); ic.rel = 'icon'; ic.href = ART.logoDataUri('#e3b04b'); document.head.appendChild(ic); } catch (e) { /* niente */ }
     updateCounts();
+    if (/^#vedi=/.test(location.hash)) { await openShared(location.hash.slice(6)); return; }
     if (!await restoreRun()) return;
     if (hot && typeof hot.phase === 'number' && S.run) S.run.phase = hot.phase;
     updateCounts();
