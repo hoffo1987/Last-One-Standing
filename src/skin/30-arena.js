@@ -1,5 +1,5 @@
-/* Last One Standing — pelle dell'area «Arena» (src/skin/30-arena.css).
- * - il «palcoscenico» accanto al selettore: dipinto dell'arena scelta, nome su lastre, numero, sigillo, targhe dei dati;
+/* Last One Standing — pelle dell'area «Arena» (src/skin/30-arena.js).
+ * - il «palcoscenico» accanto al selettore: dipinto dell'arena scelta con il numero, nome su una lastra, descrizione, targhe dei dati;
  * - il «mondo dietro»: il fondale dipinto dell'arena come scheggia fissa dietro la pagina, che cambia con la scelta.
  * È tutta decorazione costruita leggendo il DOM che ui.js già produce (le voci del selettore e la guida):
  * non tocca lo stato, non intercetta i comandi, e se manca qualcosa non fa nulla. Va caricato prima di ui.js. */
@@ -14,32 +14,27 @@
   const url = (u) => 'url("' + String(u).replace(/"/g, '%22') + '")';
 
   let sec, list, apick, prev, stage, world, cur = null;
+  // ogni cambio parte pulito: `gen` invalida i caricamenti e i timer del cambio precedente, `live` sono le sole animazioni in corso
+  let gen = 0, live = [], tidy = 0;
+  const q = (c) => stage.querySelector(c);
+  const play = (n, kf, o) => { const x = n && anim(n, kf, o); if (x) live.push(x); return x; };
+  function halt() { live.forEach((x) => { try { x.cancel(); } catch (e) { /* già finita */ } }); live = []; clearTimeout(tidy); }
+  // in ogni contenitore resta un solo strato: l'ultimo arrivato
+  function settle(box) { const k = box.children; while (k.length > 1) k[0].remove(); }
+  const boxes = () => [q('.ar-paint'), world];
 
-  // il nome su due righe: al trattino se c'è, altrimenti dove le righe vengono più equilibrate
-  function lines(name) {
-    const parts = name.split(/\s+[—–-]\s+/);
-    if (parts.length > 1) return parts.slice(0, 3);
-    const w = name.split(/\s+/).filter(Boolean);
-    if (w.length < 2) return w;
-    let best = 1, score = Infinity;
-    for (let i = 1; i < w.length; i++) { const s = Math.max(w.slice(0, i).join(' ').length, w.slice(i).join(' ').length); if (s < score) { score = s; best = i; } }
-    return [w.slice(0, best).join(' '), w.slice(best).join(' ')];
-  }
-
-  // uno strato nuovo sopra il vecchio, che entra con un taglio diagonale; il vecchio se ne va a fine corsa
-  function swapLayer(box, make, animate) {
-    const old = [...box.children], n = make(); if (!n) return;
-    box.appendChild(n);
-    const done = () => old.forEach((o) => o.remove());
-    if (!animate || reduced()) return done();
-    const a = anim(n, [{ clipPath: 'polygon(100% 0, 100% 0, 100% 100%, 100% 100%)' }, { clipPath: 'polygon(-30% 0, 100% 0, 100% 100%, 0 100%)' }], { duration: 460, easing: E.out });
-    if (a) a.finished.then(done, done); else done();
+  // doppio buffer: al più due strati, il nuovo entra sopra con un taglio diagonale e a fine corsa il vecchio se ne va
+  function swapLayer(box, n, animate) {
+    settle(box); box.appendChild(n);
+    if (!animate) return settle(box);
+    const x = play(n, [{ clipPath: 'polygon(100% 0, 100% 0, 100% 100%, 100% 100%)' }, { clipPath: 'polygon(-30% 0, 100% 0, 100% 100%, 0 100%)' }], { duration: 380, easing: E.out });
+    if (!x) return settle(box);
+    x.onfinish = () => settle(box);
   }
 
   function build() {
     stage = h('div', 'ar-stage'); stage.setAttribute('aria-hidden', 'true');
-    stage.innerHTML = '<i class="ar-bg"></i><b class="ar-ghost"></b><b class="ar-num"></b><div class="ar-paint"></div><i class="ar-seal"></i>' +
-      '<div class="ar-title"></div><p class="ar-tag"></p><span class="ar-soft" hidden></span><div class="ar-stats"></div>';
+    stage.innerHTML = '<div class="ar-card"><div class="ar-paint"></div><b class="ar-num"></b><div class="ar-title"></div><p class="ar-tag"></p><span class="ar-soft" hidden></span><div class="ar-stats"></div></div>';
     apick.appendChild(stage); apick.classList.add('has-stage');
     world = h('div'); world.id = 'arWorld'; world.setAttribute('aria-hidden', 'true');
     const atmo = document.getElementById('atmo');
@@ -49,40 +44,49 @@
   function sync() {
     const card = list.querySelector('[aria-checked="true"]'); if (!card) return;
     const id = card.dataset.theme; if (!id || id === cur) return;
-    const first = cur === null, go = !first && !reduced(); cur = id;
+    const first = cur === null, go = !first && !reduced(), my = ++gen; cur = id;
     const nameEl = card.querySelector('b'), tagEl = card.querySelector('small'), softEl = card.querySelector('.psoft');
     const name = nameEl ? nameEl.textContent.trim() : id, idx = [...list.children].indexOf(card) + 1;
     const paint = AS.arene && AS.arene[id], fond = (FX.fondali && FX.fondali[id]) || paint;
     stage.dataset.arena = id;
 
-    swapLayer(stage.querySelector('.ar-bg'), () => { const l = h('i', 'ar-l'); if (fond) l.style.backgroundImage = url(fond); return l; }, go);
-    swapLayer(world, () => { const l = h('i', 'arw-l'); if (fond) l.style.backgroundImage = url(fond); return l; }, go);
-    swapLayer(stage.querySelector('.ar-paint'), () => {
-      if (paint) { const im = h('img'); im.alt = ''; im.decoding = 'async'; im.draggable = false; im.src = paint; return im; }
-      const sc = card.querySelector('.pscene'); const c = sc ? sc.cloneNode(true) : h('i'); c.className = 'ar-svg'; return c;
-    }, go);
+    // 1. si ferma tutto ciò che il cambio precedente aveva avviato e si toglie ogni strato di troppo
+    halt(); boxes().forEach(settle);
 
-    const num = stage.querySelector('.ar-num'); num.textContent = (idx < 10 ? '0' : '') + idx;
-    const ls = lines(name), ghost = stage.querySelector('.ar-ghost'); ghost.textContent = ls[ls.length - 1];
-    const title = stage.querySelector('.ar-title'); title.textContent = '';
-    title.style.setProperty('--len', Math.max(6, ...ls.map((x) => x.length)));
-    ls.forEach((t, i) => title.appendChild(h('span', 'ar-ln' + (i === ls.length - 1 && ls.length > 1 ? ' k' : ''), t)));
-    const tag = stage.querySelector('.ar-tag'); tag.textContent = tagEl ? tagEl.textContent.trim() : '';
-    const soft = stage.querySelector('.ar-soft'); soft.hidden = !softEl; soft.textContent = softEl ? softEl.textContent.trim() : '';
+    // 2. il testo cambia subito, in un colpo
+    const num = q('.ar-num'), title = q('.ar-title'), tag = q('.ar-tag'), soft = q('.ar-soft');
+    num.textContent = (idx < 10 ? '0' : '') + idx;
+    title.textContent = name.replace(/s+[—–]s+/g, ' — ');
+    tag.textContent = tagEl ? tagEl.textContent.trim() : '';
+    soft.hidden = !softEl; soft.textContent = softEl ? softEl.textContent.trim() : '';
+
+    // 3. gli strati dipinti: il fondale subito, il dipinto appena l'immagine è pronta (se nel frattempo si è cambiato ancora, si lascia perdere)
+    const wl = h('i', 'arw-l'); if (fond) wl.style.backgroundImage = url(fond);
+    swapLayer(world, wl, go);
+    const box = q('.ar-paint');
+    if (paint) {
+      const im = h('img'); im.alt = ''; im.draggable = false;
+      const put = () => { if (my === gen && !im.parentNode) swapLayer(box, im, go); };
+      im.onload = put; im.onerror = put; im.src = paint;
+      if (im.complete) put();
+    } else {
+      const sc = card.querySelector('.pscene'), c = sc ? sc.cloneNode(true) : h('i'); c.className = 'ar-svg';
+      swapLayer(box, c, go);
+    }
 
     if (go) {
-      anim(num, [{ transform: 'translate(-30%, -20%) scale(1.6) rotate(-14deg)', opacity: 0 }, { transform: 'none', opacity: 1 }], { duration: 380, easing: E.kick });
-      anim(ghost, [{ transform: 'translateX(12%)', opacity: 0 }, { transform: 'none', opacity: 1 }], { duration: 520, easing: E.out });
-      [...title.children].forEach((s, i) => anim(s, [{ clipPath: 'inset(0 100% 0 0)', transform: 'translateX(-36px) skewX(-14deg)' }, { clipPath: 'inset(-20% -20% -20% 0)', transform: 'none' }], { duration: 360, delay: 70 + i * 55, easing: E.out }));
-      anim(tag, [{ opacity: 0, transform: 'translateX(-22px)' }, { opacity: 1, transform: 'none' }], { duration: 300, delay: 200, easing: E.out });
-      anim(stage.querySelector('.ar-seal'), [{ transform: 'rotate(40deg) scale(2.2)', opacity: 0 }, { transform: 'rotate(11deg) scale(1)', opacity: 1 }], { duration: 340, delay: 260, easing: E.kick });
-      [...stage.querySelectorAll('.ar-st')].forEach((s, i) => anim(s, [{ transform: 'translateY(18px) rotate(3deg)', opacity: 0 }, { transform: 'none', opacity: 1 }], { duration: 300, delay: 150 + i * 45, easing: E.kick }));
+      play(num, [{ transform: 'translateX(-40%)', opacity: 0 }, { transform: 'none', opacity: 1 }], { duration: 240, easing: E.out });
+      play(title, [{ clipPath: 'inset(0 100% 0 0)', transform: 'translateX(-24px)' }, { clipPath: 'inset(-20px -20px -20px 0)', transform: 'none' }], { duration: 300, delay: 40, easing: E.out });
+      play(tag, [{ opacity: 0, transform: 'translateX(-14px)' }, { opacity: 1, transform: 'none' }], { duration: 260, delay: 90, easing: E.out });
+      play(q('.ar-stats'), [{ opacity: 0, transform: 'translateY(10px)' }, { opacity: 1, transform: 'none' }], { duration: 260, delay: 130, easing: E.out });
+      // rete di sicurezza: se le animazioni non arrivano in fondo (scheda in secondo piano), lo stato finale si impone lo stesso
+      tidy = setTimeout(() => { if (my === gen) { halt(); boxes().forEach(settle); } }, 900);
     }
   }
 
   // le targhe dei dati copiano i quattro numeri della guida, anche mentre contano
   function syncStats() {
-    const src = prev.querySelectorAll('.dx-stat'), box = stage.querySelector('.ar-stats');
+    const src = prev.querySelectorAll('.dx-stat'), box = q('.ar-stats');
     if (!src.length) return;
     if (box.children.length !== src.length) { box.textContent = ''; src.forEach(() => { const d = h('div', 'ar-st'); d.appendChild(h('b')); d.appendChild(h('span')); box.appendChild(d); }); }
     src.forEach((s, i) => {

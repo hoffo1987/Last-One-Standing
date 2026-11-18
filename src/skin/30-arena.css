@@ -1,6 +1,6 @@
 /* ================= PELLE · ARENA (#v-arena) =================
- * La schermata di selezione: un selettore a cascata (non una griglia di card), un palcoscenico con il dipinto,
- * il nome su lastre e le targhe dei dati, il fondale dipinto come «mondo dietro» che cambia con la scelta
+ * La schermata di selezione: un selettore a cascata (non una griglia di card), un palcoscenico in quattro piani
+ * (dipinto, nome su una lastra, descrizione, targhe dei dati), il fondale dipinto come «mondo dietro» che cambia con la scelta
  * (30-arena.js), le regole come menu di opzioni, la guida impaginata come un compendio, gli eventi personalizzati
  * come pannello di secondo livello. Tre colori di scena: --key, --void, --paper; il rosso solo per lo stato.
  * I comandi generici (campi, interruttori) hanno specificità bassa (:where) così 90-comuni può uniformarli. */
@@ -17,87 +17,76 @@
 .arw-l { position: absolute; top: 0; right: 0; width: 58%; height: 100%; background: var(--key) center / cover no-repeat; clip-path: polygon(46% 0, 100% 0, 100% 100%, 12% 100%); }
 .arw-l::after { content: ""; position: absolute; inset: 0; background: linear-gradient(100deg, transparent 46%, var(--bg) 46.2%, var(--bg) 46.9%, transparent 47.1%); opacity: .0; }
 
-/* ---------- selettore: voci a cascata, la scelta cresce e si inverte ---------- */
+/* ---------- selettore: voci a cascata; la scelta si inverte, niente cambia misura (nessuna voce si sposta) ---------- */
 #v-arena .apick-head h2 { font-size: 13px; font-style: normal; font-weight: 800; font-family: var(--f-body); letter-spacing: .22em; text-transform: uppercase; background: var(--ink); color: var(--bg); padding: .55em 1.5em .5em .9em; clip-path: polygon(0 0, 100% 0, calc(100% - .8em) 100%, 0 100%); }
 #v-arena .pnav { border: 0; background: var(--ink); color: var(--bg); box-shadow: none; transform: skewX(var(--slant)); }
 #v-arena .pnav:active { background: var(--key); color: var(--key-ink); }
 #themeList { counter-reset: ar; }
-#themeList .poster-card { counter-increment: ar; position: relative; min-height: 46px; height: auto; padding: 6px 14px 6px 58px; flex-direction: row; align-items: center; justify-content: flex-start; flex-wrap: wrap; gap: 2px 10px;
+/* la scatola della voce resta ferma in ogni stato: al passaggio si muovono solo la lastra e il testo dentro */
+#themeList .poster-card { counter-increment: ar; position: relative; min-height: 52px; height: auto; padding: 7px 14px 7px 60px; flex-direction: row; align-items: center; align-content: center; justify-content: flex-start; flex-wrap: wrap; gap: 3px 10px;
   border: 0; background: none; color: var(--ink); box-shadow: none; animation: none; filter: none; overflow: visible; isolation: isolate;
-  transform: perspective(800px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg)) skewX(var(--slant)) translateX(var(--tx, 0px));
-  transition: transform .3s var(--look-out), min-height .3s var(--look-out), padding .3s var(--look-out), color .14s; }
-#themeList .poster-card.tilting { box-shadow: none; transition: transform .08s linear, min-height .3s var(--look-out), color .14s; }
+  transform: skewX(var(--slant)) translateX(var(--tx, 0px)) scale(var(--sc, 1)); transform-origin: 0 50%;
+  transition: transform .26s var(--look-out), color .14s; }
 /* il numero d'ordine: contorno finché la voce riposa, pieno quando è scelta */
 #themeList .poster-card::before { content: counter(ar, decimal-leading-zero); position: absolute; inset: 50% auto auto 8px; z-index: 1; translate: 0 -50%; box-shadow: none;
-  font: italic 900 30px / 1 var(--f-display); font-stretch: 116%; letter-spacing: -.03em; color: transparent; -webkit-text-stroke: 1.5px currentColor; opacity: .7; transition: font-size .3s var(--look-out), opacity .14s; }
+  font: italic 900 30px / 1 var(--f-display); font-stretch: 116%; letter-spacing: -.03em; color: inherit; -webkit-text-fill-color: transparent; -webkit-text-stroke: 1.5px currentColor; opacity: .75; transition: opacity .14s; }
 /* la lastra che attraversa la voce al passaggio */
-#themeList .poster-card::after { content: ""; position: absolute; inset: 0; z-index: -1; background: var(--ink); box-shadow: 5px 5px 0 var(--key); transform: scaleX(0); transform-origin: 0 50%; transition: transform .22s var(--look-out); }
-#themeList .poster-card b { position: relative; z-index: 1; font: italic 900 17px / 1.02 var(--f-display); font-stretch: 112%; letter-spacing: -.01em; text-transform: uppercase; text-shadow: none; transition: font-size .3s var(--look-out); }
+#themeList .poster-card::after { content: ""; position: absolute; inset: 0; z-index: -1; background: var(--ink); transform: scaleX(0); transform-origin: 0 50%; transition: transform .2s var(--look-out); }
+#themeList .poster-card b { position: relative; z-index: 1; min-width: 0; font: italic 900 17px / 1.04 var(--f-display); font-stretch: 112%; letter-spacing: -.01em; text-transform: uppercase; text-shadow: none; transition: translate .2s var(--look-out); }
 #themeList .poster-card small, #themeList .poster-card .pcheck, #themeList .poster-card .picon, #themeList .poster-card .pscene { display: none; }
-/* solo la voce scelta mostra la sottoetichetta */
-#themeList .poster-card[aria-checked="true"] small { display: block; flex-basis: 100%; position: relative; z-index: 1; color: inherit; font: 600 13px / 1.3 var(--f-body); -webkit-line-clamp: 3; }
-#themeList .poster-card .psoft { position: relative; z-index: 1; inset: auto; padding: 2px 6px 1px; border: 1.5px solid currentColor; background: none; font: 800 10px / 1.2 var(--f-body); letter-spacing: .14em; text-transform: uppercase; }
+#themeList .poster-card .psoft { position: relative; z-index: 1; inset: auto; padding: 2px 6px 1px; border: 1.5px solid currentColor; border-radius: 0; background: none; font: 800 10px / 1.2 var(--f-body); letter-spacing: .14em; text-transform: uppercase; }
+#themeList .poster-card:has(.psoft) { flex-direction: column; align-items: flex-start; justify-content: center; flex-wrap: nowrap; }
 #themeList .poster-card[aria-checked="false"] { opacity: 1; }
 @media (hover: hover) {
-  #themeList .poster-card[aria-checked="false"]:hover { color: var(--bg); --tx: 10px; }
+  #themeList .poster-card[aria-checked="false"]:hover { color: var(--bg); }
   #themeList .poster-card[aria-checked="false"]:hover::after { transform: scaleX(1); }
   #themeList .poster-card[aria-checked="false"]:hover::before { opacity: 1; }
+  #themeList .poster-card[aria-checked="false"]:hover b { translate: 6px 0; }
 }
 #themeList .poster-card:focus-visible { outline: 3px solid var(--ink); outline-offset: 3px; }
-#themeList .poster-card:active { --tx: 4px; }
-#themeList .poster-card[aria-checked="true"] { min-height: 92px; padding: 12px 16px 12px 90px; align-content: center; background: var(--key); color: var(--key-ink); box-shadow: 7px 7px 0 var(--hard); --tx: 14px; z-index: 2; }
-#themeList .poster-card[aria-checked="true"] b { font-size: 23px; }
-#themeList .poster-card[aria-checked="true"]::before { font-size: 50px; color: currentColor; -webkit-text-stroke: 0; opacity: 1; }
+#themeList .poster-card[aria-checked="true"] { background: var(--key); color: var(--key-ink); box-shadow: 6px 6px 0 var(--hard); --tx: 12px; --sc: 1.05; z-index: 2; }
+#themeList .poster-card[aria-checked="true"]::before { -webkit-text-fill-color: currentColor; -webkit-text-stroke: 0; opacity: 1; }
+#themeList .poster-card[aria-checked="true"]::after { display: none; }
 
 @media (min-width: 761px) {
-  #v-arena .apick.has-stage { display: grid; grid-template-columns: minmax(250px, 310px) minmax(0, 1fr); grid-template-rows: auto 1fr; gap: 14px 30px; align-items: start; }
+  #v-arena .apick.has-stage { display: grid; grid-template-columns: minmax(260px, 320px) minmax(0, 1fr); grid-template-rows: auto 1fr; gap: 14px 30px; align-items: start; }
   #v-arena .apick.has-stage .apick-head { grid-column: 1; }
   #v-arena .apick.has-stage #themeList { grid-column: 1; grid-row: 2; }
-  #v-arena .apick.has-stage .ar-stage { grid-column: 2; grid-row: 1 / span 2; align-self: stretch; }
-  #themeList { display: flex; flex-direction: column; gap: 0; padding: 0 22px 12px 0; }
-  /* la cascata: ogni voce rientra un po' di più, e si sovrappone appena alla precedente */
-  #themeList .poster-card { width: calc(100% - 40px); margin: -2px 0 0 calc(var(--n, 0) * 4px); }
-  #themeList .poster-card[aria-checked="true"] { margin-block: 8px 12px; width: calc(100% - 22px); }
+  #v-arena .apick.has-stage .ar-stage { grid-column: 2; grid-row: 1 / span 2; }
+  #themeList { display: flex; flex-direction: column; gap: 6px; padding: 4px 22px 12px 0; }
+  /* la cascata: ogni voce rientra un po' di più */
+  #themeList .poster-card { width: calc(100% - 44px); margin: 0 0 0 calc(var(--n, 0) * 4px); }
   #themeList .poster-card:nth-child(2) { --n: 1; } #themeList .poster-card:nth-child(3) { --n: 2; } #themeList .poster-card:nth-child(4) { --n: 3; }
   #themeList .poster-card:nth-child(5) { --n: 4; } #themeList .poster-card:nth-child(6) { --n: 5; } #themeList .poster-card:nth-child(7) { --n: 6; }
   #themeList .poster-card:nth-child(8) { --n: 7; } #themeList .poster-card:nth-child(9) { --n: 8; } #themeList .poster-card:nth-child(n+10) { --n: 9; }
-  #themeList .poster-card:last-child:nth-child(3n+1) { grid-column: auto; min-height: 46px; }
-  #themeList .poster-card[aria-checked="true"]:last-child:nth-child(3n+1) { min-height: 92px; }
+  #themeList .poster-card:last-child:nth-child(3n+1) { grid-column: auto; min-height: 52px; }
 }
 
-/* ---------- palcoscenico: fondale, dipinto, nome su lastre, targhe ---------- */
-.ar-stage { position: relative; isolation: isolate; container-type: inline-size; display: flex; flex-direction: column; align-items: flex-start; min-height: 600px; padding: 0 0 22px; color: var(--paper); }
-.ar-stage::before { content: ""; position: absolute; inset: 0; z-index: -2; translate: 9px 9px; background: var(--hard); clip-path: polygon(0 0, 100% 0, 100% calc(100% - 38px), calc(100% - 38px) 100%, 0 100%); }
-.ar-bg { position: absolute; inset: 0; z-index: -1; overflow: hidden; background: var(--void); clip-path: polygon(0 0, 100% 0, 100% calc(100% - 38px), calc(100% - 38px) 100%, 0 100%); }
-.ar-l { position: absolute; inset: 0; background: var(--key) 30% 50% / cover no-repeat; animation: arDrift 46s ease-in-out infinite alternate; }
-@keyframes arDrift { from { transform: scale(1.04) translate(-1%, 0); } to { transform: scale(1.14) translate(2%, -2%); } }
-/* la parola dell'arena, enorme, tagliata dal bordo alto */
-.ar-ghost { position: absolute; left: 0; right: 0; top: -.4em; z-index: 0; overflow: hidden; white-space: nowrap; padding-left: 22%; clip-path: inset(40% 0 -10% 0);
-  font: italic 900 clamp(110px, 34cqw, 230px) / 1 var(--f-display); font-stretch: 122%; letter-spacing: -.04em; text-transform: uppercase; color: var(--void); opacity: .9; pointer-events: none; }
-.ar-num { position: absolute; left: 14px; top: 8px; z-index: 3; font: italic 900 clamp(64px, 17cqw, 112px) / .85 var(--f-display); font-stretch: 118%; letter-spacing: -.04em; color: var(--paper); text-shadow: .06em .06em 0 var(--void); }
-.ar-paint { position: relative; z-index: 2; align-self: flex-end; width: 84%; aspect-ratio: 2.05 / 1; margin: clamp(56px, 13cqw, 84px) 0 0; overflow: hidden; background: var(--void); clip-path: polygon(9% 0, 100% 0, 100% 100%, 0 100%); }
+/* ---------- palcoscenico: una scheda in quattro piani ordinati: dipinto, nome, descrizione, targhe ---------- */
+.ar-stage { position: relative; isolation: isolate; container-type: inline-size; filter: drop-shadow(8px 8px 0 var(--hard)); }
+.ar-card { display: flex; flex-direction: column; align-items: flex-start; padding: 0 0 26px; background: var(--void); color: var(--paper); clip-path: polygon(0 0, 100% 0, 100% calc(100% - 30px), calc(100% - 30px) 100%, 0 100%); }
+/* il dipinto: grande, pulito, senza testo sopra (solo il numero nell'angolo) */
+.ar-paint { position: relative; align-self: stretch; aspect-ratio: 16 / 9; overflow: hidden; background: var(--void); clip-path: polygon(0 0, 100% 0, 100% calc(100% - 5cqw), 0 100%); }
 .ar-paint > * { position: absolute; inset: 0; width: 100%; height: 100%; display: block; object-fit: cover; }
-.ar-paint > img, .ar-paint > .ar-svg { animation: arPan 34s ease-in-out infinite alternate; }
-@keyframes arPan { from { transform: scale(1.1) translateX(-2.5%); } to { transform: scale(1.1) translateX(2.5%); } }
-.ar-paint::after { content: ""; position: absolute; inset: auto 0 0 0; height: 7px; z-index: 2; background: var(--paper); }
-.ar-title { position: relative; z-index: 4; display: grid; justify-items: start; gap: .1em; margin: -.5em 0 0 -16px; transform: rotate(-4deg); transform-origin: 0 100%;
-  font: italic 900 min(78px, calc(104cqw / var(--len, 8))) / 1 var(--f-display); font-stretch: 118%; letter-spacing: -.025em; text-transform: uppercase; }
-.ar-ln { display: block; white-space: nowrap; padding: .03em .3em .08em .26em; background: var(--paper); color: var(--void); box-shadow: .09em .09em 0 var(--void); }
-.ar-ln.k { margin-left: .7em; background: var(--void); color: var(--key); box-shadow: .09em .09em 0 var(--paper); }
-.ar-tag { position: relative; z-index: 3; margin: 26px 0 0 26px; max-width: min(44ch, 66%); padding: 11px 22px 11px 16px; background: var(--void); color: var(--paper); font: 600 16px / 1.4 var(--f-body); clip-path: polygon(0 0, 100% 0, calc(100% - 12px) 100%, 0 100%); }
-.ar-soft { position: relative; z-index: 3; margin: 10px 0 0 40px; padding: .5em 1em .45em; background: var(--paper); color: var(--void); font: 800 11.5px / 1.2 var(--f-body); letter-spacing: .2em; text-transform: uppercase; transform: rotate(-2deg); }
-.ar-seal { position: absolute; right: 22px; top: calc(clamp(56px, 13cqw, 84px) + 41cqw + 22px); z-index: 3; width: clamp(76px, 18cqw, 118px); aspect-ratio: 1; background: var(--paper); transform: rotate(11deg); filter: drop-shadow(4px 4px 0 var(--void));
-  -webkit-mask: var(--fx-sigillo) center / contain no-repeat; mask: var(--fx-sigillo) center / contain no-repeat; }
-:root:not(.fx-seal) .ar-seal { display: none; }
-/* le targhe dei dati: carta, un filetto, il numero grande; la linea sopra porta l'occhio verso «Avvia» in basso a destra */
-.ar-stats { position: relative; z-index: 3; align-self: stretch; margin: auto 0 0; padding: 30px 46px 0 22px; display: flex; align-items: flex-end; gap: 10px; }
-.ar-stats::before { content: ""; position: absolute; left: 22px; right: 8px; top: 2px; height: 22px; background: linear-gradient(to top right, transparent calc(50% - 2.5px), var(--paper) calc(50% - 2px), var(--paper) calc(50% + 2px), transparent calc(50% + 2.5px)); }
-.ar-st { flex: 1 1 0; display: grid; gap: 5px; padding: 9px 12px 8px; background: var(--paper); color: var(--void); box-shadow: 4px 4px 0 var(--void); min-width: 0; }
-.ar-st b { font: italic 900 clamp(26px, 6.2cqw, 38px) / .9 var(--f-display); font-stretch: 114%; letter-spacing: -.03em; font-variant-numeric: tabular-nums; }
-.ar-st span { padding-top: 5px; border-top: 1px solid var(--void); font: 800 10px / 1.25 var(--f-body); letter-spacing: .16em; text-transform: uppercase; overflow-wrap: anywhere; }
-.ar-st:first-child { flex: 0 0 auto; transform: rotate(-2deg); padding-block: 12px 9px; }
-.ar-st:first-child b { font-size: clamp(44px, 11.5cqw, 68px); }
-.ar-st:nth-child(3) { translate: 0 8px; } .ar-st:nth-child(4) { translate: 0 16px; }
+.ar-num { position: absolute; left: 0; top: 0; z-index: 2; padding: .1em .4em .12em .22em; background: var(--void); color: var(--paper); clip-path: polygon(0 0, 100% 0, calc(100% - .3em) 100%, 0 100%);
+  font: italic 900 clamp(34px, 9cqw, 54px) / .9 var(--f-display); font-stretch: 116%; letter-spacing: -.03em; font-variant-numeric: tabular-nums; }
+/* il nome: una sola lastra di carta, sotto il dipinto */
+.ar-title { position: relative; z-index: 2; max-width: calc(100% - 22px); margin: calc(6px - 5cqw) 0 0 0; padding: .16em .5em .2em 22px; background: var(--paper); color: var(--void); box-shadow: 6px 6px 0 var(--key);
+  font: italic 900 clamp(26px, 8cqw, 46px) / .96 var(--f-display); font-stretch: 114%; letter-spacing: -.02em; text-transform: uppercase; text-wrap: balance; }
+/* la descrizione: testo pieno su nero, un filetto di tinta a sinistra */
+.ar-tag { margin: 24px 22px 0; padding-left: 14px; border-left: 5px solid var(--key); max-width: 52ch; color: var(--paper); font: 500 17px / 1.45 var(--f-body); }
+.ar-tag:empty { display: none; }
+.ar-soft { margin: 12px 22px 0; padding: .5em .9em .42em; background: var(--key); color: var(--key-ink); font: 800 11.5px / 1.2 var(--f-body); letter-spacing: .2em; text-transform: uppercase; }
+/* le targhe: una fila sola, quattro celle uguali, numeri sulla stessa riga, etichetta sempre sotto */
+.ar-stats { align-self: stretch; margin: 24px 22px 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 2px; }
+.ar-st { display: grid; grid-template-rows: auto 1fr; align-content: start; gap: 7px; padding: 11px 10px 10px 12px; background: var(--paper); color: var(--void); min-width: 0; }
+.ar-st b { font: italic 900 clamp(22px, 6.2cqw, 36px) / .9 var(--f-display); font-stretch: 108%; letter-spacing: -.03em; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.ar-st span { padding-top: 6px; border-top: 2px solid var(--void); font: 800 10.5px / 1.25 var(--f-body); letter-spacing: .12em; text-transform: uppercase; }
+@container (max-width: 430px) {
+  .ar-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .ar-st b { font-size: 30px; }
+  .ar-tag { font-size: 16px; }
+}
 
 /* ---------- regole: un menu di opzioni ---------- */
 #v-arena .rules { background: var(--ar-surface); border: 0; border-top: 8px solid var(--key); box-shadow: none; padding: 20px 22px 26px; gap: 24px; clip-path: polygon(0 0, 100% 0, 100% calc(100% - 26px), calc(100% - 26px) 100%, 0 100%); }
@@ -352,24 +341,15 @@
 @media (max-width: 760px) {
   #themeList { grid-auto-columns: 64%; gap: 14px; padding: 8px 22px 16px 16px; }
   #themeList .poster-card { min-height: 60px; border-bottom: 3px solid var(--ink); }
-  #themeList .poster-card[aria-checked="true"] { min-height: 60px; padding: 8px 12px 8px 66px; border-bottom-color: transparent; --tx: 0px; box-shadow: 5px 5px 0 var(--hard); }
-  #themeList .poster-card[aria-checked="true"] b { font-size: 18px; }
-  #themeList .poster-card[aria-checked="true"]::before { font-size: 38px; }
+  #themeList .poster-card[aria-checked="true"] { border-bottom-color: transparent; --tx: 0px; --sc: 1; box-shadow: 5px 5px 0 var(--hard); }
   #v-arena .apick.has-stage { display: flex; flex-direction: column; }
   #v-arena .apick.has-stage > * { min-width: 0; max-width: 100%; }
   #v-arena .apick.has-stage #themeList { max-width: none; }
-  .ar-stage { min-height: 0; padding-bottom: 20px; margin-right: 8px; }
-  .ar-paint { margin-top: 48px; }
-  .ar-stage::before { translate: 6px 6px; }
-  .ar-paint { width: 92%; }
-  .ar-title { margin-left: -6px; }
-  .ar-tag { margin: 20px 0 0 12px; max-width: 78%; font-size: 15px; }
-  .ar-soft { margin-left: 20px; }
-  .ar-seal { right: 10px; top: auto; bottom: 150px; width: 70px; }
-  .ar-stats { margin-top: 26px; padding: 30px 26px 0 12px; flex-wrap: wrap; gap: 10px 12px; }
-  .ar-st { flex: 1 1 34%; }
-  #themeList .poster-card[aria-checked="true"] small { display: none; }
-  .ar-st:nth-child(3), .ar-st:nth-child(4) { translate: none; }
+  .ar-stage { margin-right: 8px; filter: drop-shadow(6px 6px 0 var(--hard)); }
+  .ar-title { padding-left: 16px; }
+  .ar-tag { margin: 18px 16px 0; }
+  .ar-soft { margin-left: 16px; }
+  .ar-stats { margin: 20px 16px 0; }
   #v-arena .rules { padding: 18px 16px 24px; }
   #v-arena .rules .fcount b { font-size: 54px; }
   #v-arena .arenadock::before { height: 5px; }
@@ -401,8 +381,8 @@
 
 /* ---------- movimento ridotto: le forme restano, il movimento si ferma ---------- */
 @media (prefers-reduced-motion: reduce) {
-  .ar-l, .ar-paint > *, #arenaPreview .dx-panel, #customBox[open] .custombody { animation: none !important; }
-  #themeList .poster-card, #themeList .poster-card::after, #diffSeg button { transition: none; }
+  #arenaPreview .dx-panel, #customBox[open] .custombody { animation: none !important; }
+  #themeList .poster-card, #themeList .poster-card::after, #themeList .poster-card b, #diffSeg button { transition: none; }
 }
-[data-reduced-motion] .ar-l, [data-reduced-motion] .ar-paint > *, [data-reduced-motion] #arenaPreview .dx-panel, [data-reduced-motion] #customBox[open] .custombody { animation: none !important; }
+[data-reduced-motion] #arenaPreview .dx-panel, [data-reduced-motion] #customBox[open] .custombody { animation: none !important; }
 [data-reduced-motion] #themeList .poster-card, [data-reduced-motion] #themeList .poster-card::after, [data-reduced-motion] #diffSeg button { transition: none; }

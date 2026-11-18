@@ -3222,7 +3222,9 @@ h2.sec { text-transform: uppercase; font-stretch: 114%; letter-spacing: -.02em; 
 
 /* ---------- titolo su due lastre (10-home.js divide le righe) ---------- */
 #v-home .homehero h1 { background: none; -webkit-background-clip: border-box; background-clip: border-box; color: var(--void); animation: none; text-shadow: none;
-  display: grid; justify-items: start; gap: .08em; font-size: clamp(34px, 5.6vw, 92px); line-height: .9; white-space: nowrap; text-transform: uppercase; font-stretch: 120%; letter-spacing: -.035em; margin: 14px 0 26px; }
+  display: grid; justify-items: start; gap: .08em; line-height: .9; white-space: nowrap; position: relative; z-index: 2;
+  /* la riga più lunga («CHI RESTERÀ», ~8,4 em) deve stare nella sua colonna: la grandezza segue la colonna, non lo schermo */
+  font-size: min(5vw, 70px); text-transform: uppercase; font-stretch: 120%; letter-spacing: -.035em; margin: 14px 0 26px; }
 #v-home .homehero h1 .hl { display: inline-block; padding: .04em .26em .1em .18em; transform: skewX(var(--slant)); }
 #v-home .homehero h1 .hl > span { display: inline-block; transform: skewX(var(--unslant)); }
 #v-home .homehero h1 .hl1 { background: var(--paper); color: var(--void); box-shadow: .07em .07em 0 var(--key); }
@@ -3829,9 +3831,63 @@ body:has(#editDlg[open]) #v-cast > :not(.dock) { translate: -34px 0; }
 @media (hover: hover) { #v-cast .teamblock:hover h3 .tbfaces .av { transform: translateY(-2px); } }
 @media (max-width: 600px) { #v-cast .teamblock h3 .tbfaces { display: none; } }
 
+/* ================= CORREZIONI (regia, 18 nov) =================
+ * Dal riscontro dell'utente: scritte coperte, la griglia che si muove tutta al passaggio del mouse,
+ * comandi e testi troppo attaccati. Qui la lastra si ricompone con righe nette e nessun testo sovrapposto. */
+
+/* righe della lastra: nome, profilo, tratti, genere, azioni. Il volto resta a tutta altezza a sinistra. */
+#v-cast .tile { grid-template-columns: 108px minmax(0, 1fr); grid-template-rows: auto auto auto auto auto; padding: 0 30px 0 0; min-height: 0; transition: none; }
+
+/* il numero d'ordine non sta più dietro al testo: è una targhetta sopra il nome */
+#v-cast .tile .tid { padding: 14px 34px 0 0; }
+#v-cast .tile .tid::before { content: "N\00B0  " counter(ck, decimal-leading-zero); position: static; z-index: auto; display: block; margin: 0 0 4px;
+  font: 800 11px / 1 var(--f-body); letter-spacing: .2em; color: var(--key); -webkit-text-stroke: 0; transform: none; }
+
+/* la squadra: etichetta sotto il nome, non più ruotata sopra il volto */
+#v-cast .tile .tsub { position: static; writing-mode: horizontal-tb; transform: none; margin-top: 6px; pointer-events: auto; }
+#v-cast .tile .teamchip { padding: 4px 9px 4px 8px; font-size: 10.5px; letter-spacing: .16em; box-shadow: inset 4px 0 0 var(--c); }
+
+#v-cast .tile .tprofile { grid-row: 2; padding-top: 12px; }
+#v-cast .tile .chips { grid-row: 3; padding-top: 12px; }
+
+/* genere: un selettore a tre caselle con i bordi visibili, separato dal resto da un filetto */
+#v-cast .tile .gsel { grid-column: 2; grid-row: 4; margin: 14px 0 0; padding: 0; border: 2px solid var(--t-rule); box-shadow: none; background: transparent; }
+#v-cast .tile .gsel::before { transform: translateX(calc(var(--gi, 0) * 100%)); }
+#v-cast .tile .gsel button + button { box-shadow: inset 2px 0 0 var(--t-rule); }
+@media (hover: hover) { #v-cast .tile .gsel button:hover:not([aria-pressed="true"]) { box-shadow: inset 0 -3px 0 var(--key) !important; } }
+
+/* azioni: «Modifica» e «altro» orizzontali, in una riga loro, con spazio e un bordo vero */
+#v-cast .tile .tedit { grid-column: 2; grid-row: 5; justify-self: start; align-self: center; writing-mode: horizontal-tb; transform: skewX(var(--slant)); margin: 10px 0 14px;
+  padding: 7px 14px; border: 2px solid var(--t-rule); box-shadow: none; background-size: 0% 100%; background-position: 0 0; font-size: 12px; }
+#v-cast .tile .tedit:hover:not(:disabled), #v-cast .tile .tedit:focus-visible { border-color: var(--key); }
+#v-cast .tile .tedit:active:not(:disabled) { transform: skewX(var(--slant)) scale(.96); }
+#v-cast .tile .tmenu { grid-column: 2; grid-row: 5; justify-self: end; align-self: center; margin: 10px 0 14px; width: 40px; height: 32px; box-shadow: none; border: 2px solid var(--t-rule); }
+
+/* la maniglia per riordinare: in alto a destra, lontana dal nome */
+#v-cast .tile .grip { top: 12px; right: 30px; }
+
+/* il passaggio del mouse non muove più niente: la lastra si accende, l'ombra di tinta esce, le altre restano ferme */
+@media (hover: hover) {
+  #v-cast .tile:hover { --t-bg: var(--panel-solid, var(--panel)); --t-ink: var(--ink); transform: none; z-index: 2; }
+  #v-cast .tile:hover::before { box-shadow: inset 6px 0 0 var(--key); }
+  #v-cast .tile:hover::after { transform: translate(7px, 7px); }
+  #v-cast .tile:hover .tid::before { transform: none; color: var(--key); }
+  #v-cast .tile:hover .av > .sil, #v-cast .tile:hover .av > img { transform: scale(1.04); }
+  #v-cast .castgrid:has(.tile:hover) .tile:not(:hover):not(:focus-within):not(.menuopen) { filter: none; transform: none; }
+}
+#v-cast .tile:focus-within { transform: none; }
+#v-cast .tile:focus-within::after { transform: translate(7px, 7px); }
+/* la cascata delle righe pari resta, ma senza muoversi al passaggio */
+@media (min-width: 840px) { #v-cast #castList > .castgrid > :nth-child(even) { translate: 0 10px; } }
+
+/* barra degli strumenti: ogni comando ha il suo bordo e uno spazio chiaro dagli altri */
+#v-cast .toolbar .btn:not(.primary) { box-shadow: none; border: 2px solid var(--ck-rule); padding: 6px 12px; }
+#v-cast .toolbar .tgroup { gap: 8px 10px; }
+@media (hover: hover) { #v-cast .toolbar .btn:not(.primary):hover { border-color: var(--ink); } }
+
 /* ================= PELLE · ARENA (#v-arena) =================
- * La schermata di selezione: un selettore a cascata (non una griglia di card), un palcoscenico con il dipinto,
- * il nome su lastre e le targhe dei dati, il fondale dipinto come «mondo dietro» che cambia con la scelta
+ * La schermata di selezione: un selettore a cascata (non una griglia di card), un palcoscenico in quattro piani
+ * (dipinto, nome su una lastra, descrizione, targhe dei dati), il fondale dipinto come «mondo dietro» che cambia con la scelta
  * (30-arena.js), le regole come menu di opzioni, la guida impaginata come un compendio, gli eventi personalizzati
  * come pannello di secondo livello. Tre colori di scena: --key, --void, --paper; il rosso solo per lo stato.
  * I comandi generici (campi, interruttori) hanno specificità bassa (:where) così 90-comuni può uniformarli. */
@@ -3848,87 +3904,76 @@ body:has(#editDlg[open]) #v-cast > :not(.dock) { translate: -34px 0; }
 .arw-l { position: absolute; top: 0; right: 0; width: 58%; height: 100%; background: var(--key) center / cover no-repeat; clip-path: polygon(46% 0, 100% 0, 100% 100%, 12% 100%); }
 .arw-l::after { content: ""; position: absolute; inset: 0; background: linear-gradient(100deg, transparent 46%, var(--bg) 46.2%, var(--bg) 46.9%, transparent 47.1%); opacity: .0; }
 
-/* ---------- selettore: voci a cascata, la scelta cresce e si inverte ---------- */
+/* ---------- selettore: voci a cascata; la scelta si inverte, niente cambia misura (nessuna voce si sposta) ---------- */
 #v-arena .apick-head h2 { font-size: 13px; font-style: normal; font-weight: 800; font-family: var(--f-body); letter-spacing: .22em; text-transform: uppercase; background: var(--ink); color: var(--bg); padding: .55em 1.5em .5em .9em; clip-path: polygon(0 0, 100% 0, calc(100% - .8em) 100%, 0 100%); }
 #v-arena .pnav { border: 0; background: var(--ink); color: var(--bg); box-shadow: none; transform: skewX(var(--slant)); }
 #v-arena .pnav:active { background: var(--key); color: var(--key-ink); }
 #themeList { counter-reset: ar; }
-#themeList .poster-card { counter-increment: ar; position: relative; min-height: 46px; height: auto; padding: 6px 14px 6px 58px; flex-direction: row; align-items: center; justify-content: flex-start; flex-wrap: wrap; gap: 2px 10px;
+/* la scatola della voce resta ferma in ogni stato: al passaggio si muovono solo la lastra e il testo dentro */
+#themeList .poster-card { counter-increment: ar; position: relative; min-height: 52px; height: auto; padding: 7px 14px 7px 60px; flex-direction: row; align-items: center; align-content: center; justify-content: flex-start; flex-wrap: wrap; gap: 3px 10px;
   border: 0; background: none; color: var(--ink); box-shadow: none; animation: none; filter: none; overflow: visible; isolation: isolate;
-  transform: perspective(800px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg)) skewX(var(--slant)) translateX(var(--tx, 0px));
-  transition: transform .3s var(--look-out), min-height .3s var(--look-out), padding .3s var(--look-out), color .14s; }
-#themeList .poster-card.tilting { box-shadow: none; transition: transform .08s linear, min-height .3s var(--look-out), color .14s; }
+  transform: skewX(var(--slant)) translateX(var(--tx, 0px)) scale(var(--sc, 1)); transform-origin: 0 50%;
+  transition: transform .26s var(--look-out), color .14s; }
 /* il numero d'ordine: contorno finché la voce riposa, pieno quando è scelta */
 #themeList .poster-card::before { content: counter(ar, decimal-leading-zero); position: absolute; inset: 50% auto auto 8px; z-index: 1; translate: 0 -50%; box-shadow: none;
-  font: italic 900 30px / 1 var(--f-display); font-stretch: 116%; letter-spacing: -.03em; color: transparent; -webkit-text-stroke: 1.5px currentColor; opacity: .7; transition: font-size .3s var(--look-out), opacity .14s; }
+  font: italic 900 30px / 1 var(--f-display); font-stretch: 116%; letter-spacing: -.03em; color: inherit; -webkit-text-fill-color: transparent; -webkit-text-stroke: 1.5px currentColor; opacity: .75; transition: opacity .14s; }
 /* la lastra che attraversa la voce al passaggio */
-#themeList .poster-card::after { content: ""; position: absolute; inset: 0; z-index: -1; background: var(--ink); box-shadow: 5px 5px 0 var(--key); transform: scaleX(0); transform-origin: 0 50%; transition: transform .22s var(--look-out); }
-#themeList .poster-card b { position: relative; z-index: 1; font: italic 900 17px / 1.02 var(--f-display); font-stretch: 112%; letter-spacing: -.01em; text-transform: uppercase; text-shadow: none; transition: font-size .3s var(--look-out); }
+#themeList .poster-card::after { content: ""; position: absolute; inset: 0; z-index: -1; background: var(--ink); transform: scaleX(0); transform-origin: 0 50%; transition: transform .2s var(--look-out); }
+#themeList .poster-card b { position: relative; z-index: 1; min-width: 0; font: italic 900 17px / 1.04 var(--f-display); font-stretch: 112%; letter-spacing: -.01em; text-transform: uppercase; text-shadow: none; transition: translate .2s var(--look-out); }
 #themeList .poster-card small, #themeList .poster-card .pcheck, #themeList .poster-card .picon, #themeList .poster-card .pscene { display: none; }
-/* solo la voce scelta mostra la sottoetichetta */
-#themeList .poster-card[aria-checked="true"] small { display: block; flex-basis: 100%; position: relative; z-index: 1; color: inherit; font: 600 13px / 1.3 var(--f-body); -webkit-line-clamp: 3; }
-#themeList .poster-card .psoft { position: relative; z-index: 1; inset: auto; padding: 2px 6px 1px; border: 1.5px solid currentColor; background: none; font: 800 10px / 1.2 var(--f-body); letter-spacing: .14em; text-transform: uppercase; }
+#themeList .poster-card .psoft { position: relative; z-index: 1; inset: auto; padding: 2px 6px 1px; border: 1.5px solid currentColor; border-radius: 0; background: none; font: 800 10px / 1.2 var(--f-body); letter-spacing: .14em; text-transform: uppercase; }
+#themeList .poster-card:has(.psoft) { flex-direction: column; align-items: flex-start; justify-content: center; flex-wrap: nowrap; }
 #themeList .poster-card[aria-checked="false"] { opacity: 1; }
 @media (hover: hover) {
-  #themeList .poster-card[aria-checked="false"]:hover { color: var(--bg); --tx: 10px; }
+  #themeList .poster-card[aria-checked="false"]:hover { color: var(--bg); }
   #themeList .poster-card[aria-checked="false"]:hover::after { transform: scaleX(1); }
   #themeList .poster-card[aria-checked="false"]:hover::before { opacity: 1; }
+  #themeList .poster-card[aria-checked="false"]:hover b { translate: 6px 0; }
 }
 #themeList .poster-card:focus-visible { outline: 3px solid var(--ink); outline-offset: 3px; }
-#themeList .poster-card:active { --tx: 4px; }
-#themeList .poster-card[aria-checked="true"] { min-height: 92px; padding: 12px 16px 12px 90px; align-content: center; background: var(--key); color: var(--key-ink); box-shadow: 7px 7px 0 var(--hard); --tx: 14px; z-index: 2; }
-#themeList .poster-card[aria-checked="true"] b { font-size: 23px; }
-#themeList .poster-card[aria-checked="true"]::before { font-size: 50px; color: currentColor; -webkit-text-stroke: 0; opacity: 1; }
+#themeList .poster-card[aria-checked="true"] { background: var(--key); color: var(--key-ink); box-shadow: 6px 6px 0 var(--hard); --tx: 12px; --sc: 1.05; z-index: 2; }
+#themeList .poster-card[aria-checked="true"]::before { -webkit-text-fill-color: currentColor; -webkit-text-stroke: 0; opacity: 1; }
+#themeList .poster-card[aria-checked="true"]::after { display: none; }
 
 @media (min-width: 761px) {
-  #v-arena .apick.has-stage { display: grid; grid-template-columns: minmax(250px, 310px) minmax(0, 1fr); grid-template-rows: auto 1fr; gap: 14px 30px; align-items: start; }
+  #v-arena .apick.has-stage { display: grid; grid-template-columns: minmax(260px, 320px) minmax(0, 1fr); grid-template-rows: auto 1fr; gap: 14px 30px; align-items: start; }
   #v-arena .apick.has-stage .apick-head { grid-column: 1; }
   #v-arena .apick.has-stage #themeList { grid-column: 1; grid-row: 2; }
-  #v-arena .apick.has-stage .ar-stage { grid-column: 2; grid-row: 1 / span 2; align-self: stretch; }
-  #themeList { display: flex; flex-direction: column; gap: 0; padding: 0 22px 12px 0; }
-  /* la cascata: ogni voce rientra un po' di più, e si sovrappone appena alla precedente */
-  #themeList .poster-card { width: calc(100% - 40px); margin: -2px 0 0 calc(var(--n, 0) * 4px); }
-  #themeList .poster-card[aria-checked="true"] { margin-block: 8px 12px; width: calc(100% - 22px); }
+  #v-arena .apick.has-stage .ar-stage { grid-column: 2; grid-row: 1 / span 2; }
+  #themeList { display: flex; flex-direction: column; gap: 6px; padding: 4px 22px 12px 0; }
+  /* la cascata: ogni voce rientra un po' di più */
+  #themeList .poster-card { width: calc(100% - 44px); margin: 0 0 0 calc(var(--n, 0) * 4px); }
   #themeList .poster-card:nth-child(2) { --n: 1; } #themeList .poster-card:nth-child(3) { --n: 2; } #themeList .poster-card:nth-child(4) { --n: 3; }
   #themeList .poster-card:nth-child(5) { --n: 4; } #themeList .poster-card:nth-child(6) { --n: 5; } #themeList .poster-card:nth-child(7) { --n: 6; }
   #themeList .poster-card:nth-child(8) { --n: 7; } #themeList .poster-card:nth-child(9) { --n: 8; } #themeList .poster-card:nth-child(n+10) { --n: 9; }
-  #themeList .poster-card:last-child:nth-child(3n+1) { grid-column: auto; min-height: 46px; }
-  #themeList .poster-card[aria-checked="true"]:last-child:nth-child(3n+1) { min-height: 92px; }
+  #themeList .poster-card:last-child:nth-child(3n+1) { grid-column: auto; min-height: 52px; }
 }
 
-/* ---------- palcoscenico: fondale, dipinto, nome su lastre, targhe ---------- */
-.ar-stage { position: relative; isolation: isolate; container-type: inline-size; display: flex; flex-direction: column; align-items: flex-start; min-height: 600px; padding: 0 0 22px; color: var(--paper); }
-.ar-stage::before { content: ""; position: absolute; inset: 0; z-index: -2; translate: 9px 9px; background: var(--hard); clip-path: polygon(0 0, 100% 0, 100% calc(100% - 38px), calc(100% - 38px) 100%, 0 100%); }
-.ar-bg { position: absolute; inset: 0; z-index: -1; overflow: hidden; background: var(--void); clip-path: polygon(0 0, 100% 0, 100% calc(100% - 38px), calc(100% - 38px) 100%, 0 100%); }
-.ar-l { position: absolute; inset: 0; background: var(--key) 30% 50% / cover no-repeat; animation: arDrift 46s ease-in-out infinite alternate; }
-@keyframes arDrift { from { transform: scale(1.04) translate(-1%, 0); } to { transform: scale(1.14) translate(2%, -2%); } }
-/* la parola dell'arena, enorme, tagliata dal bordo alto */
-.ar-ghost { position: absolute; left: 0; right: 0; top: -.4em; z-index: 0; overflow: hidden; white-space: nowrap; padding-left: 22%; clip-path: inset(40% 0 -10% 0);
-  font: italic 900 clamp(110px, 34cqw, 230px) / 1 var(--f-display); font-stretch: 122%; letter-spacing: -.04em; text-transform: uppercase; color: var(--void); opacity: .9; pointer-events: none; }
-.ar-num { position: absolute; left: 14px; top: 8px; z-index: 3; font: italic 900 clamp(64px, 17cqw, 112px) / .85 var(--f-display); font-stretch: 118%; letter-spacing: -.04em; color: var(--paper); text-shadow: .06em .06em 0 var(--void); }
-.ar-paint { position: relative; z-index: 2; align-self: flex-end; width: 84%; aspect-ratio: 2.05 / 1; margin: clamp(56px, 13cqw, 84px) 0 0; overflow: hidden; background: var(--void); clip-path: polygon(9% 0, 100% 0, 100% 100%, 0 100%); }
+/* ---------- palcoscenico: una scheda in quattro piani ordinati: dipinto, nome, descrizione, targhe ---------- */
+.ar-stage { position: relative; isolation: isolate; container-type: inline-size; filter: drop-shadow(8px 8px 0 var(--hard)); }
+.ar-card { display: flex; flex-direction: column; align-items: flex-start; padding: 0 0 26px; background: var(--void); color: var(--paper); clip-path: polygon(0 0, 100% 0, 100% calc(100% - 30px), calc(100% - 30px) 100%, 0 100%); }
+/* il dipinto: grande, pulito, senza testo sopra (solo il numero nell'angolo) */
+.ar-paint { position: relative; align-self: stretch; aspect-ratio: 16 / 9; overflow: hidden; background: var(--void); clip-path: polygon(0 0, 100% 0, 100% calc(100% - 5cqw), 0 100%); }
 .ar-paint > * { position: absolute; inset: 0; width: 100%; height: 100%; display: block; object-fit: cover; }
-.ar-paint > img, .ar-paint > .ar-svg { animation: arPan 34s ease-in-out infinite alternate; }
-@keyframes arPan { from { transform: scale(1.1) translateX(-2.5%); } to { transform: scale(1.1) translateX(2.5%); } }
-.ar-paint::after { content: ""; position: absolute; inset: auto 0 0 0; height: 7px; z-index: 2; background: var(--paper); }
-.ar-title { position: relative; z-index: 4; display: grid; justify-items: start; gap: .1em; margin: -.5em 0 0 -16px; transform: rotate(-4deg); transform-origin: 0 100%;
-  font: italic 900 min(78px, calc(104cqw / var(--len, 8))) / 1 var(--f-display); font-stretch: 118%; letter-spacing: -.025em; text-transform: uppercase; }
-.ar-ln { display: block; white-space: nowrap; padding: .03em .3em .08em .26em; background: var(--paper); color: var(--void); box-shadow: .09em .09em 0 var(--void); }
-.ar-ln.k { margin-left: .7em; background: var(--void); color: var(--key); box-shadow: .09em .09em 0 var(--paper); }
-.ar-tag { position: relative; z-index: 3; margin: 26px 0 0 26px; max-width: min(44ch, 66%); padding: 11px 22px 11px 16px; background: var(--void); color: var(--paper); font: 600 16px / 1.4 var(--f-body); clip-path: polygon(0 0, 100% 0, calc(100% - 12px) 100%, 0 100%); }
-.ar-soft { position: relative; z-index: 3; margin: 10px 0 0 40px; padding: .5em 1em .45em; background: var(--paper); color: var(--void); font: 800 11.5px / 1.2 var(--f-body); letter-spacing: .2em; text-transform: uppercase; transform: rotate(-2deg); }
-.ar-seal { position: absolute; right: 22px; top: calc(clamp(56px, 13cqw, 84px) + 41cqw + 22px); z-index: 3; width: clamp(76px, 18cqw, 118px); aspect-ratio: 1; background: var(--paper); transform: rotate(11deg); filter: drop-shadow(4px 4px 0 var(--void));
-  -webkit-mask: var(--fx-sigillo) center / contain no-repeat; mask: var(--fx-sigillo) center / contain no-repeat; }
-:root:not(.fx-seal) .ar-seal { display: none; }
-/* le targhe dei dati: carta, un filetto, il numero grande; la linea sopra porta l'occhio verso «Avvia» in basso a destra */
-.ar-stats { position: relative; z-index: 3; align-self: stretch; margin: auto 0 0; padding: 30px 46px 0 22px; display: flex; align-items: flex-end; gap: 10px; }
-.ar-stats::before { content: ""; position: absolute; left: 22px; right: 8px; top: 2px; height: 22px; background: linear-gradient(to top right, transparent calc(50% - 2.5px), var(--paper) calc(50% - 2px), var(--paper) calc(50% + 2px), transparent calc(50% + 2.5px)); }
-.ar-st { flex: 1 1 0; display: grid; gap: 5px; padding: 9px 12px 8px; background: var(--paper); color: var(--void); box-shadow: 4px 4px 0 var(--void); min-width: 0; }
-.ar-st b { font: italic 900 clamp(26px, 6.2cqw, 38px) / .9 var(--f-display); font-stretch: 114%; letter-spacing: -.03em; font-variant-numeric: tabular-nums; }
-.ar-st span { padding-top: 5px; border-top: 1px solid var(--void); font: 800 10px / 1.25 var(--f-body); letter-spacing: .16em; text-transform: uppercase; overflow-wrap: anywhere; }
-.ar-st:first-child { flex: 0 0 auto; transform: rotate(-2deg); padding-block: 12px 9px; }
-.ar-st:first-child b { font-size: clamp(44px, 11.5cqw, 68px); }
-.ar-st:nth-child(3) { translate: 0 8px; } .ar-st:nth-child(4) { translate: 0 16px; }
+.ar-num { position: absolute; left: 0; top: 0; z-index: 2; padding: .1em .4em .12em .22em; background: var(--void); color: var(--paper); clip-path: polygon(0 0, 100% 0, calc(100% - .3em) 100%, 0 100%);
+  font: italic 900 clamp(34px, 9cqw, 54px) / .9 var(--f-display); font-stretch: 116%; letter-spacing: -.03em; font-variant-numeric: tabular-nums; }
+/* il nome: una sola lastra di carta, sotto il dipinto */
+.ar-title { position: relative; z-index: 2; max-width: calc(100% - 22px); margin: calc(6px - 5cqw) 0 0 0; padding: .16em .5em .2em 22px; background: var(--paper); color: var(--void); box-shadow: 6px 6px 0 var(--key);
+  font: italic 900 clamp(26px, 8cqw, 46px) / .96 var(--f-display); font-stretch: 114%; letter-spacing: -.02em; text-transform: uppercase; text-wrap: balance; }
+/* la descrizione: testo pieno su nero, un filetto di tinta a sinistra */
+.ar-tag { margin: 24px 22px 0; padding-left: 14px; border-left: 5px solid var(--key); max-width: 52ch; color: var(--paper); font: 500 17px / 1.45 var(--f-body); }
+.ar-tag:empty { display: none; }
+.ar-soft { margin: 12px 22px 0; padding: .5em .9em .42em; background: var(--key); color: var(--key-ink); font: 800 11.5px / 1.2 var(--f-body); letter-spacing: .2em; text-transform: uppercase; }
+/* le targhe: una fila sola, quattro celle uguali, numeri sulla stessa riga, etichetta sempre sotto */
+.ar-stats { align-self: stretch; margin: 24px 22px 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 2px; }
+.ar-st { display: grid; grid-template-rows: auto 1fr; align-content: start; gap: 7px; padding: 11px 10px 10px 12px; background: var(--paper); color: var(--void); min-width: 0; }
+.ar-st b { font: italic 900 clamp(22px, 6.2cqw, 36px) / .9 var(--f-display); font-stretch: 108%; letter-spacing: -.03em; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.ar-st span { padding-top: 6px; border-top: 2px solid var(--void); font: 800 10.5px / 1.25 var(--f-body); letter-spacing: .12em; text-transform: uppercase; }
+@container (max-width: 430px) {
+  .ar-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .ar-st b { font-size: 30px; }
+  .ar-tag { font-size: 16px; }
+}
 
 /* ---------- regole: un menu di opzioni ---------- */
 #v-arena .rules { background: var(--ar-surface); border: 0; border-top: 8px solid var(--key); box-shadow: none; padding: 20px 22px 26px; gap: 24px; clip-path: polygon(0 0, 100% 0, 100% calc(100% - 26px), calc(100% - 26px) 100%, 0 100%); }
@@ -4183,24 +4228,15 @@ body:has(#editDlg[open]) #v-cast > :not(.dock) { translate: -34px 0; }
 @media (max-width: 760px) {
   #themeList { grid-auto-columns: 64%; gap: 14px; padding: 8px 22px 16px 16px; }
   #themeList .poster-card { min-height: 60px; border-bottom: 3px solid var(--ink); }
-  #themeList .poster-card[aria-checked="true"] { min-height: 60px; padding: 8px 12px 8px 66px; border-bottom-color: transparent; --tx: 0px; box-shadow: 5px 5px 0 var(--hard); }
-  #themeList .poster-card[aria-checked="true"] b { font-size: 18px; }
-  #themeList .poster-card[aria-checked="true"]::before { font-size: 38px; }
+  #themeList .poster-card[aria-checked="true"] { border-bottom-color: transparent; --tx: 0px; --sc: 1; box-shadow: 5px 5px 0 var(--hard); }
   #v-arena .apick.has-stage { display: flex; flex-direction: column; }
   #v-arena .apick.has-stage > * { min-width: 0; max-width: 100%; }
   #v-arena .apick.has-stage #themeList { max-width: none; }
-  .ar-stage { min-height: 0; padding-bottom: 20px; margin-right: 8px; }
-  .ar-paint { margin-top: 48px; }
-  .ar-stage::before { translate: 6px 6px; }
-  .ar-paint { width: 92%; }
-  .ar-title { margin-left: -6px; }
-  .ar-tag { margin: 20px 0 0 12px; max-width: 78%; font-size: 15px; }
-  .ar-soft { margin-left: 20px; }
-  .ar-seal { right: 10px; top: auto; bottom: 150px; width: 70px; }
-  .ar-stats { margin-top: 26px; padding: 30px 26px 0 12px; flex-wrap: wrap; gap: 10px 12px; }
-  .ar-st { flex: 1 1 34%; }
-  #themeList .poster-card[aria-checked="true"] small { display: none; }
-  .ar-st:nth-child(3), .ar-st:nth-child(4) { translate: none; }
+  .ar-stage { margin-right: 8px; filter: drop-shadow(6px 6px 0 var(--hard)); }
+  .ar-title { padding-left: 16px; }
+  .ar-tag { margin: 18px 16px 0; }
+  .ar-soft { margin-left: 16px; }
+  .ar-stats { margin: 20px 16px 0; }
   #v-arena .rules { padding: 18px 16px 24px; }
   #v-arena .rules .fcount b { font-size: 54px; }
   #v-arena .arenadock::before { height: 5px; }
@@ -4232,10 +4268,10 @@ body:has(#editDlg[open]) #v-cast > :not(.dock) { translate: -34px 0; }
 
 /* ---------- movimento ridotto: le forme restano, il movimento si ferma ---------- */
 @media (prefers-reduced-motion: reduce) {
-  .ar-l, .ar-paint > *, #arenaPreview .dx-panel, #customBox[open] .custombody { animation: none !important; }
-  #themeList .poster-card, #themeList .poster-card::after, #diffSeg button { transition: none; }
+  #arenaPreview .dx-panel, #customBox[open] .custombody { animation: none !important; }
+  #themeList .poster-card, #themeList .poster-card::after, #themeList .poster-card b, #diffSeg button { transition: none; }
 }
-[data-reduced-motion] .ar-l, [data-reduced-motion] .ar-paint > *, [data-reduced-motion] #arenaPreview .dx-panel, [data-reduced-motion] #customBox[open] .custombody { animation: none !important; }
+[data-reduced-motion] #arenaPreview .dx-panel, [data-reduced-motion] #customBox[open] .custombody { animation: none !important; }
 [data-reduced-motion] #themeList .poster-card, [data-reduced-motion] #themeList .poster-card::after, [data-reduced-motion] #diffSeg button { transition: none; }
 
 /* ================= PELLE · DIRETTA (#v-diretta) =================
@@ -4250,6 +4286,9 @@ body:has(#editDlg[open]) #v-cast > :not(.dock) { translate: -34px 0; }
   --dx-void: var(--void, #0a0a0c); --dx-paper: var(--paper, #f7f5f0);
   --dx-para: polygon(20% 0, 100% 0, 80% 100%, 0 100%);
   --dx-glass: hsl(0 0% 100% / .07);
+  /* lastre piene: il fondale (con le sue scritte giganti) non deve passare dietro il testo */
+  --dx-card: var(--panel-solid, var(--panel));
+  --dx-card-low: color-mix(in srgb, var(--dx-card) 72%, var(--bg));
 }
 
 /* ---------- 1. TESTATA DELLA TRASMISSIONE ---------- */
@@ -4310,32 +4349,32 @@ body:has(#editDlg[open]) #v-cast > :not(.dock) { translate: -34px 0; }
 #v-diretta .tally i.d { background: repeating-linear-gradient(-45deg, #f2685a 0 2px, transparent 2px 5px); opacity: .8; }
 #v-diretta .tally i.new { opacity: 1; }
 
-/* ---------- 2. LINEA DEI GIORNI: un calendario a numeri grandi ---------- */
-#v-diretta .timeline { gap: 6px 22px; padding: 18px 8px 14px 4px; align-items: end; }
-#v-diretta .tday { position: relative; grid-template-columns: auto auto; align-items: end; column-gap: 8px; row-gap: 5px; padding: 0; border: 0; background: none; box-shadow: none; transition: none; }
-#v-diretta .tday > .tdl { grid-column: 1 / -1; display: flex; align-items: center; gap: 8px; font: 800 10.5px / 1 var(--f-body); letter-spacing: .2em; text-transform: uppercase; color: var(--muted); }
-#v-diretta .tday > .tdl::after { content: ""; flex: 1; min-width: 12px; height: 2px; background: currentColor; opacity: .3; }
+/* ---------- 2. LINEA DEI GIORNI: una sola striscia, un solo tono ----------
+ * Tutto sta sulla stessa lastra piena. I giorni passati sono spenti, quello in corso è più chiaro,
+ * e solo la fase corrente prende la tinta. Nessun blocco di carta, nessun numero gigante. */
+#v-diretta .timeline { gap: 0; margin-top: 14px; padding: 10px 18px 11px 18px; align-items: end; background: var(--dx-card); box-shadow: inset 4px 0 0 var(--key);
+  clip-path: polygon(0 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%); scrollbar-color: color-mix(in srgb, var(--ink) 30%, transparent) transparent; }
+#v-diretta .tday { position: relative; display: grid; grid-template-columns: auto; gap: 7px; padding: 0 12px 0 0; margin-right: 11px; border: 0; background: none; box-shadow: none; transition: none; }
+#v-diretta .tday:last-child { margin-right: 0; padding-right: 4px; }
+#v-diretta .tday:not(:last-child)::after { content: ""; position: absolute; right: 0; top: 1px; bottom: 1px; width: 2px; background: color-mix(in srgb, var(--ink) 14%, transparent); transform: skewX(-16deg); }
+#v-diretta .tday > .tdl { display: flex; align-items: center; gap: 7px; font: 800 11px / 1 var(--f-body); letter-spacing: .14em; text-transform: uppercase; white-space: nowrap; color: var(--muted); }
 #v-diretta .tday.tcur > .tdl { color: var(--ink); }
-#v-diretta .tday.tcur > .tdl::after { background: var(--key); opacity: 1; height: 3px; }
-#v-diretta .tday.tfin > .tdl { color: color-mix(in srgb, var(--c-kill) 80%, var(--ink)); }
-/* il numero del giorno (lo scrive 40-diretta.js): enorme, e quello corrente chiuso in carta */
-#v-diretta .tday[data-n]::before { content: attr(data-n); grid-row: 2; grid-column: 1; align-self: end; min-width: .9em; padding: 0 .16em 0 .08em; text-align: center;
-  font: italic 900 40px / .84 var(--f-display); font-stretch: 120%; letter-spacing: -.04em; color: color-mix(in srgb, var(--ink) 34%, transparent); }
-#v-diretta .tday.tcur[data-n]::before { color: var(--dx-void); background: var(--dx-paper); box-shadow: 4px 4px 0 var(--key); transform: skewX(var(--slant)); padding: .06em .2em .04em .14em; }
-#v-diretta .tday.tfin[data-n]::before { content: "F"; color: var(--c-kill); }
-#v-diretta .tday.tfin.tcur[data-n]::before { color: #fff; background: #c8302c; box-shadow: 4px 4px 0 var(--hard); }
-#v-diretta .tday:not([data-n]) > div { grid-column: 1 / -1; }
-#v-diretta .tday > div { grid-row: 2; gap: 3px; padding-bottom: 3px; }
-#v-diretta .tph { width: 34px; height: 30px; border: 0; border-radius: 0; background: var(--ink); color: var(--bg); transform: skewX(var(--slant)); animation: none; box-shadow: none;
+#v-diretta .tday.tcur > .tdl::before { content: ""; flex: none; width: 14px; height: 3px; background: var(--key); transform: skewX(-30deg); }
+#v-diretta .tday.tfin.tcur > .tdl { color: color-mix(in srgb, var(--c-kill) 70%, var(--ink)); }
+#v-diretta .tday > div { gap: 3px; }
+#v-diretta .tph { --tc: var(--muted); width: 28px; height: 26px; border: 0; border-radius: 0; background: color-mix(in srgb, var(--ink) 8%, transparent); color: var(--tc); transform: skewX(var(--slant)); animation: none; box-shadow: none;
   transition: transform .22s var(--ease-kick), background-color .12s, color .12s; }
+#v-diretta .tph svg { width: 14px; height: 14px; }
 #v-diretta .tph > svg, #v-diretta .tph > span:first-child { transform: skewX(var(--unslant)); }
-#v-diretta .tph > span:first-child { font: italic 900 15px / 1 var(--f-display); }
-#v-diretta .tph.locked { background: transparent; color: var(--muted); box-shadow: inset 0 0 0 2px color-mix(in srgb, var(--ink) 22%, transparent); }
-#v-diretta .tph.k-dis.seen { color: #f39a52; }
-#v-diretta .tph.k-finale.seen { color: #f2685a; }
-#v-diretta .tph.cur, #v-diretta .tph.k-dis.cur { background: var(--key); color: var(--key-ink); box-shadow: 4px 4px 0 var(--hard); transform: skewX(var(--slant)) translateY(-3px) scale(1.16); z-index: 1; }
-@media (hover: hover) { #v-diretta .tph:not(.cur):hover { background: var(--key); color: var(--key-ink); transform: skewX(var(--slant)) translateY(-4px); box-shadow: none; } }
-#v-diretta .tph .dn { top: -9px; right: -6px; min-width: 17px; height: 15px; border-radius: 0; padding: 0 4px; background: #c8302c; color: #fff; font: 800 11px / 1 var(--f-body); z-index: 2; }
+#v-diretta .tph > span:first-child { font: italic 900 13px / 1 var(--f-display); }
+#v-diretta .tday.tcur .tph.seen { --tc: color-mix(in srgb, var(--ink) 86%, transparent); background: color-mix(in srgb, var(--ink) 13%, transparent); }
+#v-diretta .tph.locked { background: transparent; --tc: color-mix(in srgb, var(--muted) 80%, transparent); box-shadow: inset 0 0 0 1.5px color-mix(in srgb, var(--ink) 15%, transparent); }
+#v-diretta .tph.k-dis.seen { color: color-mix(in srgb, var(--c-hurt) 60%, var(--tc)); }
+#v-diretta .tph.k-finale.seen { color: color-mix(in srgb, var(--c-kill) 60%, var(--tc)); }
+#v-diretta .tph.cur, #v-diretta .tph.k-dis.cur { background: var(--key); color: var(--key-ink); box-shadow: none; transform: skewX(var(--slant)) scale(1.1); z-index: 1; }
+@media (hover: hover) { #v-diretta .tph:not(.cur):hover { background: color-mix(in srgb, var(--key) 30%, var(--dx-card)); color: var(--ink); transform: skewX(var(--slant)) translateY(-2px); box-shadow: none; } }
+#v-diretta .tph:focus-visible { outline: 2px solid var(--key); outline-offset: 2px; }
+#v-diretta .tph .dn { top: -6px; right: -6px; min-width: 0; height: 13px; border-radius: 0; padding: 0 3px; background: var(--dx-card); color: color-mix(in srgb, var(--c-kill) 78%, var(--ink)); font: 800 10.5px / 13px var(--f-body); transform: skewX(var(--unslant)); z-index: 2; }
 
 /* ---------- 3. FILTRI E OPZIONI DI LETTURA ---------- */
 #v-diretta .readbar { margin: 8px 0 16px; padding: 0; gap: 0; border: 0; background: none; box-shadow: none; -webkit-backdrop-filter: none; backdrop-filter: none; }
@@ -4369,27 +4408,46 @@ body:has(#editDlg[open]) #v-cast > :not(.dock) { translate: -34px 0; }
 /* ---------- 4. LA CRONACA: righe con ritmo ---------- */
 #v-diretta .livegrid { grid-template-columns: minmax(0, 1fr) 388px; gap: 28px; margin-top: 4px; }
 #v-diretta .livefeed { gap: 8px; }
-#v-diretta .ev { --sp: 104px; grid-template-columns: var(--sp) minmax(0, 1fr); gap: 0 14px; align-items: stretch; padding: 13px 22px 14px 0; border: 0; border-radius: 0; background: var(--panel);
+#v-diretta .ev { --sp: 136px; --k: 16px; --rh: 84px; grid-template-columns: var(--sp) minmax(0, 1fr); gap: 0 18px; align-items: stretch; min-height: var(--rh); padding: 0; border: 0; border-radius: 0; background: var(--dx-card);
   box-shadow: none; -webkit-backdrop-filter: none; backdrop-filter: none; outline: 0; }
-/* il dorso: la fascia a sinistra dove stanno i volti, nel colore di ciò che è successo */
-#v-diretta .ev::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: calc(var(--sp) + 4px); background: color-mix(in srgb, var(--cc) 20%, var(--panel)); box-shadow: inset 5px 0 0 var(--cc);
-  clip-path: polygon(0 0, 100% 0, calc(100% - 18px) 100%, 0 100%); pointer-events: none; }
-#v-diretta .ev .evbody { gap: 7px; align-content: center; padding: 1px 0; }
+/* il dorso: sta dietro ai ritratti e ne esce di un filo a sinistra, a destra e tra un volto e l'altro, nel colore di ciò che è successo */
+#v-diretta .ev::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: calc(var(--sp) + 5px); background: var(--cc);
+  clip-path: polygon(0 0, 100% 0, calc(100% - var(--k)) 100%, 0 100%); pointer-events: none; }
+#v-diretta .ev .evbody { gap: 7px; align-content: center; padding: 13px 22px 14px 0; }
 #v-diretta .ev p { font-size: 16px; line-height: 1.56; color: var(--ink); max-width: 72ch; }
 #v-diretta .ev .nm { text-decoration-thickness: 2px; text-underline-offset: 3px; }
 
-/* volti tagliati: parallelogrammi sovrapposti, chi cade perde il colore e prende un taglio */
-#v-diretta .ev .avs { display: flex; flex-wrap: wrap; align-content: center; justify-content: center; gap: 3px 0; padding: 0 18px 0 8px; z-index: 1; }
-#v-diretta .ev .avs .av .sil { opacity: .78; }
-#v-diretta .ev .avs .av { --s: 50px; width: calc(var(--s) * .94); border-radius: 0; clip-path: var(--dx-para); margin-left: calc(var(--s) * -.2); box-shadow: none; transition: transform .22s var(--ease-kick); }
-#v-diretta .ev .avs .av:first-child, #v-diretta .ev .avs .av:nth-child(3) { margin-left: 0; }
-#v-diretta .ev .avs .av:first-child:nth-last-child(2), #v-diretta .ev .avs .av:first-child:nth-last-child(2) ~ .av { --s: 44px; }
-#v-diretta .ev .avs .av:first-child:nth-last-child(n+3), #v-diretta .ev .avs .av:first-child:nth-last-child(n+3) ~ .av { --s: 36px; }
-#v-diretta .ev .avs .av:nth-child(3):last-child { margin-left: calc(var(--s) * .4); }
-@media (hover: hover) { #v-diretta .ev .avs button.av:hover { transform: scale(1.16) rotate(-3deg); z-index: 2; } }
+/* ritratti: lame verticali alte quanto la riga, tagliate dalla stessa diagonale e affiancate.
+ * Una persona occupa tutto il dorso, due lo dividono, quattro diventano quattro lame. Chi cade perde il colore e prende il taglio. */
+#v-diretta .ev .avs { display: flex; flex-wrap: nowrap; align-items: stretch; gap: 0; padding: 0 0 0 5px; z-index: 1; }
+#v-diretta .ev .avs .av { --s: 60px; flex: 1 1 0; min-width: 0; width: auto; height: auto; align-self: stretch; border-radius: 0; box-shadow: none; margin-left: calc(3px - var(--k));
+  clip-path: polygon(var(--k) 0, 100% 0, calc(100% - var(--k)) 100%, 0 100%); transition: flex-grow .3s var(--look-out); }
+#v-diretta .ev .avs .av:first-child { margin-left: 0; clip-path: polygon(0 0, 100% 0, calc(100% - var(--k)) 100%, 0 100%); }
+#v-diretta .ev .avs .av:first-child:nth-last-child(n+2), #v-diretta .ev .avs .av:first-child:nth-last-child(n+2) ~ .av { --s: 44px; }
+#v-diretta .ev .avs .av:first-child:nth-last-child(n+3), #v-diretta .ev .avs .av:first-child:nth-last-child(n+3) ~ .av { --s: 34px; }
+#v-diretta .ev .avs .av img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 50% 26%; }
+/* la sagoma resta una figura intera: riempie le lame basse dall'alto e si posa al piede di quelle alte (misure dal contenitore) */
+#v-diretta .ev .avs .av { container-type: size; }
+#v-diretta .ev .avs .av .sil { --sh: max(104cqw, min(64cqh, 190cqw)); inset: auto; left: calc(50cqw - var(--sh) * .457); width: calc(var(--sh) * .914); height: var(--sh); top: max(7cqh, calc(100cqh - var(--sh))); opacity: .8; -webkit-mask-position: 50% 0; mask-position: 50% 0; }
+/* le iniziali: una targhetta al piede della lama, non una scritta sopra la faccia */
+#v-diretta .ev .avs .av .ini { inset: auto auto 0 0; width: auto; height: auto; display: block; padding: 4px 7px 3px 6px; background: var(--dx-void); color: var(--dx-paper); text-shadow: none; z-index: 1;
+  font: italic 900 11.5px / 1 var(--f-display); letter-spacing: .04em; transition: background-color .12s, color .12s; }
+#v-diretta .ev .avs .av:first-child:nth-last-child(n+3) .ini, #v-diretta .ev .avs .av:first-child:nth-last-child(n+3) ~ .av .ini { padding: 3px 5px 2px 4px; font-size: 10.5px; letter-spacing: 0; }
+@media (hover: hover) {
+  #v-diretta .ev .avs button.av:hover { flex-grow: 1.9; }
+  #v-diretta .ev .avs button.av:hover .ini { background: var(--key); color: var(--key-ink); }
+}
 #v-diretta .av.dead > * { filter: grayscale(1) contrast(1.1); }
 #v-diretta .av.dead::after { content: ""; position: absolute; left: -20%; right: -20%; top: calc(50% - 2px); height: 4px; background: #e5484d; transform: rotate(-38deg); pointer-events: none; }
+#v-diretta .ev .avs .av.dead { background: hsl(0 0% 24%); }
+#v-diretta .ev .avs .av.dead .sil { background: hsl(0 0% 70%); opacity: .7; }
+#v-diretta .ev .avs .av.dead .ini { background: #c8302c; color: #fff; filter: none; }
+#v-diretta .ev .avs .av.dead::after { inset: 0; height: auto; transform: none; z-index: 1;
+  background: linear-gradient(to top right, transparent calc(50% - 2.5px), #e5484d calc(50% - 2.5px), #e5484d calc(50% + 2.5px), transparent calc(50% + 2.5px)); }
 #v-diretta button.av:focus-visible { clip-path: none; outline: 3px solid var(--key); outline-offset: 2px; z-index: 3; }
+#v-diretta .ev .avs button.av:focus-visible { clip-path: polygon(var(--k) 0, 100% 0, calc(100% - var(--k)) 100%, 0 100%); outline: 3px solid var(--dx-paper); outline-offset: -3px; flex-grow: 1.9; }
+#v-diretta .ev .avs button.av:first-child:focus-visible { clip-path: polygon(0 0, 100% 0, calc(100% - var(--k)) 100%, 0 100%); }
+#v-diretta .ev .avs button.av:focus-visible .ini { background: var(--key); color: var(--key-ink); }
 
 /* etichette come timbri */
 #v-diretta .ev-meta { gap: 6px 12px; }
@@ -4420,62 +4478,60 @@ body:has(#editDlg[open]) #v-cast > :not(.dock) { translate: -34px 0; }
 #v-diretta .ev-mark { right: -6px; bottom: -18px; width: 108px; height: 108px; opacity: .07; transform: rotate(-12deg); }
 
 /* piano alto: uccisioni, morti e tradimenti. Dorso pieno, testo più grande, la riga sporge dalla colonna */
-#v-diretta .ev.lethal, #v-diretta .ev.c-betray { padding-block: 18px 19px; background: color-mix(in srgb, var(--cc) 9%, var(--panel)); box-shadow: inset 0 -4px 0 var(--cc); }
-#v-diretta .ev.lethal::before, #v-diretta .ev.c-betray::before { background: var(--cc); box-shadow: none; }
+#v-diretta .ev.lethal, #v-diretta .ev.c-betray { --rh: 108px; --k: 20px; background: color-mix(in srgb, var(--cc) 11%, var(--dx-card)); box-shadow: inset 0 -4px 0 var(--cc); }
+#v-diretta .ev.lethal .evbody, #v-diretta .ev.c-betray .evbody { padding-block: 18px 20px; }
 #v-diretta .ev.lethal p, #v-diretta .ev.c-betray p { font-size: 17.5px; line-height: 1.5; font-weight: 600; }
 #v-diretta .ev.lethal .echo li, #v-diretta .ev.c-betray .echo li { font-weight: 400; }
 #v-diretta .ev.lethal .cat, #v-diretta .ev.c-betray .cat { font-size: 14px; padding: 6px 15px 6px 10px; }
-#v-diretta .ev.lethal .avs .av, #v-diretta .ev.c-betray .avs .av { --s: 56px; }
-#v-diretta .ev.lethal .avs .av:first-child:nth-last-child(2), #v-diretta .ev.lethal .avs .av:first-child:nth-last-child(2) ~ .av,
-#v-diretta .ev.c-betray .avs .av:first-child:nth-last-child(2), #v-diretta .ev.c-betray .avs .av:first-child:nth-last-child(2) ~ .av { --s: 48px; }
-#v-diretta .ev.lethal .avs .av:first-child:nth-last-child(n+3), #v-diretta .ev.lethal .avs .av:first-child:nth-last-child(n+3) ~ .av { --s: 40px; }
 #v-diretta .ev.lethal .ev-mark, #v-diretta .ev.c-betray .ev-mark { opacity: .13; width: 132px; height: 132px; }
 .fx-forme #v-diretta .ev.in.fx-kill .avs::before { background: var(--dx-void); }
-@media (min-width: 1081px) { #v-diretta .ev.lethal, #v-diretta .ev.c-betray { margin-left: -16px; --sp: 120px; } }
+@media (min-width: 1081px) { #v-diretta .ev.lethal, #v-diretta .ev.c-betray { margin-left: -16px; --sp: 152px; } }
 
-/* piano basso: i fatti senza conseguenze si spengono, le note ambientali sono didascalie */
-#v-diretta .ev.c-none { background: transparent; box-shadow: inset 0 -1px 0 color-mix(in srgb, var(--ink) 14%, transparent); padding-block: 10px 11px; clip-path: none; }
-#v-diretta .ev.c-none::before { background: none; box-shadow: inset 3px 0 0 color-mix(in srgb, var(--ink) 22%, transparent); }
-#v-diretta .ev.c-none p { color: color-mix(in srgb, var(--ink) 86%, transparent); }
-#v-diretta .ev.c-none .avs .av { --s: 40px; opacity: .9; }
-#v-diretta .ev.c-none .avs .av:first-child:nth-last-child(n+2), #v-diretta .ev.c-none .avs .av:first-child:nth-last-child(n+2) ~ .av { --s: 34px; }
+/* piano basso: i fatti senza conseguenze sono più bassi e più scuri, le note ambientali sono didascalie. Sempre su fondo pieno */
+#v-diretta .ev.c-none { --rh: 66px; --k: 13px; background: var(--dx-card-low); }
+#v-diretta .ev.c-none::before { background: color-mix(in srgb, var(--ink) 30%, var(--dx-card-low)); }
+#v-diretta .ev.c-none .evbody { padding-block: 10px 11px; }
+#v-diretta .ev.c-none p { color: color-mix(in srgb, var(--ink) 88%, var(--dx-card-low)); }
 #v-diretta .ev.c-none .ev-mark { display: none; }
-#v-diretta .ev.note { grid-template-columns: auto minmax(0, 1fr); gap: 10px; align-items: center; padding: 4px 0 6px 4px; background: none; border: 0; box-shadow: none; clip-path: none; }
+#v-diretta .ev.note { grid-template-columns: auto minmax(0, 1fr); gap: 10px; align-items: center; width: fit-content; max-width: 100%; min-height: 0; padding: 7px 18px 8px 12px; background: var(--dx-card-low); border: 0;
+  box-shadow: inset 3px 0 0 color-mix(in srgb, var(--ink) 26%, var(--dx-card-low)); clip-path: polygon(0 0, 100% 0, calc(100% - 9px) 100%, 0 100%); }
 #v-diretta .ev.note::before { content: none; }
-#v-diretta .ev.note .note-ic { width: 24px; height: 24px; background: none; color: var(--muted); }
+#v-diretta .ev.note .note-ic { width: 22px; height: 22px; background: none; color: var(--muted); }
 #v-diretta .ev.note p { font-size: 14.5px; line-height: 1.5; color: var(--muted); max-width: none; }
 #v-diretta .ev.note p b { margin-right: 4px; font: 800 11px / 1 var(--f-body); letter-spacing: .18em; text-transform: uppercase; color: var(--ink); }
-#v-diretta .ev.note.finale-why { grid-template-columns: minmax(0, 1fr); padding: 16px 22px 17px 24px; background: var(--dx-void); box-shadow: inset 8px 0 0 #e5484d; clip-path: polygon(0 0, 100% 0, 100% calc(100% - var(--cut)), calc(100% - var(--cut)) 100%, 0 100%); }
+#v-diretta .ev.note.finale-why { grid-template-columns: minmax(0, 1fr); width: auto; padding: 16px 22px 17px 24px; background: var(--dx-void); box-shadow: inset 8px 0 0 #e5484d; clip-path: polygon(0 0, 100% 0, 100% calc(100% - var(--cut)), calc(100% - var(--cut)) 100%, 0 100%); }
 #v-diretta .ev.note.finale-why p { font-size: 16px; color: hsl(0 0% 100% / .88); max-width: 80ch; }
 #v-diretta .ev.note.finale-why p b { display: block; margin: 0 0 6px; font: italic 900 20px / 1 var(--f-display); font-stretch: 114%; letter-spacing: 0; color: var(--dx-paper); }
 
 /* chi segui: una cornice di tinta e una linguetta */
-#v-diretta .ev.followed { outline: 0; box-shadow: inset 0 0 0 3px var(--key); }
+#v-diretta .ev.followed { outline: 3px solid var(--key); outline-offset: -3px; }
 #v-diretta .ev.followed .evbody::before { content: "Seguito"; justify-self: start; padding: 4px 12px 4px 8px; font: 800 10.5px / 1 var(--f-body); letter-spacing: .2em; text-transform: uppercase; color: var(--key-ink); background: var(--key);
   clip-path: polygon(0 0, 100% 0, calc(100% - 7px) 100%, 0 100%); }
-#v-diretta .ev:focus-visible { outline: 0; box-shadow: inset 0 0 0 4px var(--key); }
+#v-diretta .ev:focus-visible { outline: 4px solid var(--key); outline-offset: -4px; }
 
 /* nessun risultato */
-#v-diretta .ev-empty { gap: 14px; padding: 26px 28px; border: 0; border-radius: 0; color: var(--ink); background: repeating-linear-gradient(-45deg, transparent 0 12px, color-mix(in srgb, var(--ink) 6%, transparent) 12px 14px);
+#v-diretta .ev-empty { gap: 14px; padding: 26px 28px; border: 0; border-radius: 0; color: var(--ink); background: repeating-linear-gradient(-45deg, transparent 0 12px, color-mix(in srgb, var(--ink) 6%, transparent) 12px 14px), var(--dx-card);
   box-shadow: inset 6px 0 0 var(--ink); }
 #v-diretta .ev-empty p, #v-diretta .livefeed > .help { font: italic 800 clamp(18px, 2.2vw, 24px) / 1.2 var(--f-display); color: var(--ink); max-width: 30ch; text-wrap: balance; }
-#v-diretta .livefeed > .help { max-width: 44ch; padding: 22px 0 22px 20px; font-size: 18px; box-shadow: inset 6px 0 0 var(--key); }
+#v-diretta .livefeed > .help { max-width: 44ch; padding: 22px 22px 22px 22px; font-size: 18px; background: var(--dx-card); box-shadow: inset 6px 0 0 var(--key); }
 
 /* densità, grandezza e opzioni di lettura */
 #v-diretta #phBody.dens-compatta { gap: 4px; }
-#v-diretta .dens-compatta .ev { --sp: 76px; padding: 8px 16px 9px 0; margin-left: 0; }
-#v-diretta .dens-compatta .ev .avs { padding: 0 14px 0 8px; }
-#v-diretta .dens-compatta .ev .avs .av, #v-diretta .dens-compatta .ev .avs .av:first-child:nth-last-child(n+2), #v-diretta .dens-compatta .ev .avs .av:first-child:nth-last-child(n+2) ~ .av { --s: 30px; }
+#v-diretta .dens-compatta .ev:not(.note) { --sp: 104px; --k: 11px; --rh: 54px; margin-left: 0; gap: 0 14px; }
+#v-diretta .dens-compatta .ev:is(.lethal, .c-betray) { --rh: 62px; }
+#v-diretta .dens-compatta .ev .evbody { padding: 8px 16px 9px 0; }
+#v-diretta .dens-compatta .ev .avs .av .ini { padding: 3px 5px 2px 4px; font-size: 10.5px; }
 #v-diretta .dens-compatta .ev p { font-size: 15px; line-height: 1.45; }
 #v-diretta .dens-compatta .ev.lethal p, #v-diretta .dens-compatta .ev.c-betray p { font-size: 15.5px; }
 #v-diretta .dens-compatta .ev .cat { font-size: 11px; padding: 3px 9px 3px 7px; }
-#v-diretta .dens-compatta .ev.note { padding: 2px 0 2px 4px; }
+#v-diretta .dens-compatta .ev.note { padding: 4px 16px 5px 10px; }
 #v-diretta .size-grande .ev p { font-size: 18.5px; line-height: 1.6; }
 #v-diretta .size-grande .ev.lethal p, #v-diretta .size-grande .ev.c-betray p { font-size: 20px; }
 #v-diretta .size-grande .ev .echo li, #v-diretta .size-grande .ev.note p { font-size: 16px; }
 #v-diretta .size-grande .ev .event-place { font-size: 12px; }
 #v-diretta .size-grande .ev .why { font-size: 14.5px; }
-#v-diretta .no-faces .ev:not(.note) { --sp: 10px; grid-template-columns: minmax(0, 1fr); padding-left: 30px; margin-left: 0; }
+#v-diretta .no-faces .ev:not(.note) { --sp: 6px; --k: 0px; --rh: 0px; grid-template-columns: minmax(0, 1fr); margin-left: 0; }
+#v-diretta .no-faces .ev:not(.note) .evbody { padding-left: 28px; }
 
 /* il memoriale del bilancio */
 #v-diretta .memorial { gap: 20px; padding: 26px 28px 30px; border-radius: 0; background: var(--dx-void); color: var(--dx-paper); clip-path: polygon(0 0, calc(100% - 26px) 0, 100% 26px, 100% 100%, 0 100%); }
@@ -4674,18 +4730,22 @@ body:has(#editDlg[open]) #v-cast > :not(.dock) { translate: -34px 0; }
   #v-diretta .bc-lbl { margin: 0 0 4px; font-size: 10px; letter-spacing: .16em; max-width: 9ch; line-height: 1.25; }
   #v-diretta .tally { padding: 0 14px 12px 26px; gap: 2px; }
   #v-diretta .tally i { height: 10px; }
-  #v-diretta .timeline { gap: 6px 16px; padding-top: 14px; }
-  #v-diretta .tday[data-n]::before { font-size: 32px; }
+  #v-diretta .timeline { margin-top: 12px; padding: 9px 14px 10px 14px; }
+  #v-diretta .tday { padding-right: 12px; margin-right: 11px; }
   #v-diretta .rb-tools { width: 100%; justify-content: space-between; }
   #v-diretta .rbc { padding: 9px 10px 9px 11px; font-size: 11px; letter-spacing: .1em; }
   #v-diretta .rb-panel { padding: 18px 16px 20px 22px; }
-  #v-diretta .ev { --sp: 66px; gap: 0 8px; padding: 11px 14px 12px 0; }
-  #v-diretta .ev .avs { padding: 0 10px 0 6px; }
-  #v-diretta .ev .avs .av, #v-diretta .ev.lethal .avs .av, #v-diretta .ev.c-betray .avs .av { --s: 40px; }
-  #v-diretta .ev .avs .av:first-child:nth-last-child(n+2), #v-diretta .ev .avs .av:first-child:nth-last-child(n+2) ~ .av,
-  #v-diretta .ev:is(.lethal, .c-betray) .avs .av:first-child:nth-last-child(n+2), #v-diretta .ev:is(.lethal, .c-betray) .avs .av:first-child:nth-last-child(n+2) ~ .av { --s: 28px; }
+  /* telefono: il dorso è stretto, le righe sono alte. Fino a tre lame verticali; in quattro, due file da due */
+  #v-diretta .ev:not(.note) { --sp: 84px; --k: 9px; --rh: 88px; gap: 0 12px; }
+  #v-diretta .ev.c-none { --rh: 72px; }
+  #v-diretta .ev .evbody { padding: 11px 14px 12px 0; }
+  #v-diretta .ev .avs { flex-wrap: wrap; gap: 3px 0; padding-left: 4px; }
+  #v-diretta .ev .avs .av:first-child:nth-last-child(4), #v-diretta .ev .avs .av:first-child:nth-last-child(4) ~ .av { flex: 1 1 40%; }
+  #v-diretta .ev .avs .av:first-child:nth-last-child(4) ~ .av:nth-child(3) { margin-left: 0; clip-path: polygon(0 0, 100% 0, calc(100% - var(--k)) 100%, 0 100%); }
+  #v-diretta .ev .avs .av .ini { padding: 3px 5px 2px 4px; font-size: 10.5px; letter-spacing: 0; }
   #v-diretta .ev .cat { grid-column: auto; }
-  #v-diretta .ev.lethal, #v-diretta .ev.c-betray { padding-block: 14px 15px; }
+  #v-diretta .ev.lethal .evbody, #v-diretta .ev.c-betray .evbody { padding-block: 14px 15px; }
+  #v-diretta .ev.note { padding: 6px 14px 7px 10px; }
   #v-diretta .ev.lethal p, #v-diretta .ev.c-betray p { font-size: 16.5px; }
   #v-diretta .ev-mark { width: 84px; height: 84px; }
   #v-diretta .memorial { padding: 20px 16px 22px; }
@@ -4706,7 +4766,9 @@ body:has(#editDlg[open]) #v-cast > :not(.dock) { translate: -34px 0; }
 @media (prefers-reduced-motion: reduce) {
   #v-diretta .rb-panel, #v-diretta .ev.in .cat, #v-diretta .sbody.dx-swap > *, #v-diretta .zcard, #v-diretta .pbtn.next svg { animation: none; }
   #v-diretta :is(.tph, .rbc, .stabs button, .zrow, .prow, .pbtn, .mem, .zc-link, .av, .mn-disc) { transition: none; }
+  #v-diretta .ev .avs .av { transition: none; }
 }
+[data-reduced-motion] #v-diretta .ev .avs .av { transition: none; }
 [data-reduced-motion] #v-diretta .rb-panel, [data-reduced-motion] #v-diretta .ev.in .cat, [data-reduced-motion] #v-diretta .sbody.dx-swap > *, [data-reduced-motion] #v-diretta .zcard, [data-reduced-motion] #v-diretta .pbtn.next svg { animation: none; }
 [data-reduced-motion] #v-diretta :is(.tph, .rbc, .stabs button, .zrow, .prow, .pbtn, .mem, .zc-link, .av, .mn-disc) { transition: none; }
 
@@ -5198,6 +5260,26 @@ body:has(#editDlg[open]) #v-cast > :not(.dock) { translate: -34px 0; }
 [data-reduced-motion] #resBody .es-unit, [data-reduced-motion] #resBody .es-unit *, [data-reduced-motion] #resBody .es-unit::before, [data-reduced-motion] #resBody .es-unit::after, [data-reduced-motion] #resBody .es-unit *::before, [data-reduced-motion] #resBody .es-unit *::after, [data-reduced-motion] #archiveDlg .archive-entry { animation: none !important; }
 [data-reduced-motion] #resBody.es-on .es-unit:not(.es-in) { opacity: 1; }
 [data-reduced-motion] .es-poster, [data-reduced-motion] .es-poster::before, [data-reduced-motion] #resBody.es-on .pod.es-pod, [data-reduced-motion] #resBody.es-on .award.es-aw, [data-reduced-motion] #archiveList .archive-entry, [data-reduced-motion] .es-dw { transition: none; }
+
+/* ================= CORREZIONI (regia, 18 nov) =================
+ * Riscontro dell'utente: titoli tagliati e testi mal centrati. I titoli dei blocchi ora stanno interi dentro la lastra,
+ * il numero è una targhetta allineata al centro della prima riga, e il calendario non accavalla «Finale» e il conteggio. */
+#resBody.es-on .block > h2, #resBody.es-on .block[data-es="premi"] > h2, #resBody.es-on .block[data-es="salienti"] > h2, #resBody.es-on .block[data-es="svolte"] > h2 {
+  --up: 0em; display: flex; align-items: center; flex-wrap: wrap; gap: .1em .4em; clip-path: none; margin: 0 0 .5em; padding: 26px 24px 0 0;
+  font-size: clamp(28px, 3.4vw, 54px); line-height: 1; letter-spacing: -.025em; text-wrap: balance; }
+#resBody.es-on .block > h2::before { align-self: center; margin: 0 .1em 0 0; font-size: 13px; }
+#resBody.es-on .block[data-es="podio"] > h2::after { align-self: center; margin: 0; }
+#resBody.es-on .es-colB .block > h2 { padding-top: 0; margin: 20px 0 16px; font-size: clamp(22px, 2.1vw, 30px); }
+/* calendario: «Finale» e il conteggio in due colonne che non si toccano */
+.es-dh { grid-template-columns: minmax(0, 1fr) max-content; column-gap: 14px; }
+.es-dc { white-space: nowrap; }
+.es-day.es-fin .es-du { font-size: clamp(24px, 2.2vw, 32px); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+/* premi: le etichette dei conteggi vanno a capo dentro la loro colonna, senza uscire */
+#resBody.es-on .award.es-num small { max-width: 13ch; text-align: right; }
+#resBody.es-on .award.es-num small span { line-height: 1.25; overflow-wrap: anywhere; }
+@media (max-width: 760px) {
+  #resBody.es-on .block > h2, #resBody.es-on .block[data-es="premi"] > h2, #resBody.es-on .block[data-es="salienti"] > h2, #resBody.es-on .block[data-es="svolte"] > h2 { font-size: clamp(24px, 7.4vw, 34px); padding-top: 18px; }
+}
 
 /* ================= PELLE · COMUNI =================
  * Controlli, dialoghi, intestazione, piè di pagina, stati vuoti, notifiche: tutto ciò che si ripete in ogni sezione.
@@ -18863,7 +18945,7 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
 </script>
 <script>window.LOS_ASSETS = {"logo":"img/logo.f2d5175789.webp","icona":"img/icona.8b02ddeb49.webp","favicon":"img/favicon.86774dc7cf.png","panoramica":"img/panoramica.66c4c27255.webp","sagome":["img/sagome-cappuccio.e8876ba986.webp","img/sagome-esploratore.9a99fd13f8.webp","img/sagome-viaggiatore.5e36435604.webp"],"arene":{"classico":"img/arene-classico.c2887324d1.webp","cyberpunk":"img/arene-cyberpunk.713b4c77ea.webp","fantasy":"img/arene-fantasy.ee494a9322.webp","horror":"img/arene-horror.76225517ca.webp","liceo":"img/arene-liceo.c591ac5f32.webp","royale":"img/arene-royale.46515caf90.webp","scifi":"img/arene-scifi.bc9d8e04eb.webp","ufficio":"img/arene-ufficio.a2e36d4f7f.webp","wasteland":"img/arene-wasteland.734ed966b2.webp","zombie":"img/arene-zombie.11476cf1ca.webp"},"atlas":{"classico":{"armi":{"arco":"img/arene-classico-armi-arco.57fa716aa9.webp","ascia":"img/arene-classico-armi-ascia.f48629747b.webp","coltello-da-campo":"img/arene-classico-armi-coltello-da-campo.3393de240f.webp","coltello":"img/arene-classico-armi-coltello.a0134af05c.webp","falce-corta":"img/arene-classico-armi-falce-corta.3131158a9f.webp","fionda":"img/arene-classico-armi-fionda.48c8c32c43.webp","lancia-da-caccia":"img/arene-classico-armi-lancia-da-caccia.6f2be560ec.webp","lancia":"img/arene-classico-armi-lancia.115909650b.webp","machete":"img/arene-classico-armi-machete.e1c9ef25d7.webp","mazza-corta":"img/arene-classico-armi-mazza-corta.e1092f0628.webp","mazza":"img/arene-classico-armi-mazza.1fddf37b46.webp","pugnale-da-cintura":"img/arene-classico-armi-pugnale-da-cintura.0bedc8a501.webp","pugnale":"img/arene-classico-armi-pugnale.fda9dbf38a.webp","scure-da-legna":"img/arene-classico-armi-scure-da-legna.837c5d1f78.webp","spada-corta":"img/arene-classico-armi-spada-corta.952e6b7f6a.webp","tridente":"img/arene-classico-armi-tridente.2fcb3547d9.webp"},"luoghi":{"altopiano":"img/arene-classico-luoghi-altopiano.36a37512d3.webp","bosco":"img/arene-classico-luoghi-bosco.2e9163544b.webp","cornucopia":"img/arene-classico-luoghi-cornucopia.393b2dabe1.webp","fiume":"img/arene-classico-luoghi-fiume.22b335a914.webp","paludi":"img/arene-classico-luoghi-paludi.77cf115eb4.webp","rovine":"img/arene-classico-luoghi-rovine.9ea4f70ca9.webp"},"pericoli":{"branco-di-lupi-mutanti":"img/arene-classico-pericoli-branco-di-lupi-mutanti.d786a62875.webp","orso-affamato":"img/arene-classico-pericoli-orso-affamato.e4f38a9892.webp","sciame-di-vespe-velenose":"img/arene-classico-pericoli-sciame-di-vespe-velenose.5adb2c7b8d.webp","serpente-gigante":"img/arene-classico-pericoli-serpente-gigante.b17e7f3d91.webp"}},"cyberpunk":{"armi":{"coltello-vibrante-in-ceramica":"img/arene-cyberpunk-armi-coltello-vibrante-in-ceramica.6bbcd0e9e4.webp","fucile-a-pompa-da-strada":"img/arene-cyberpunk-armi-fucile-a-pompa-da-strada.dbd0de34e1.webp","fucile-a-pompa-elettromagnetico":"img/arene-cyberpunk-armi-fucile-a-pompa-elettromagnetico.0555418cd0.webp","katana-termica":"img/arene-cyberpunk-armi-katana-termica.f1ff597173.webp","mazza-a-impulsi":"img/arene-cyberpunk-armi-mazza-a-impulsi.22d841ed1d.webp","mazza-da-baseball-chiodata":"img/arene-cyberpunk-armi-mazza-da-baseball-chiodata.db2996f744.webp","mitra-compatto":"img/arene-cyberpunk-armi-mitra-compatto.eaa3815798.webp","pistola-a-rotaia-artigianale":"img/arene-cyberpunk-armi-pistola-a-rotaia-artigianale.f9e83bda89.webp","pistola-smart":"img/arene-cyberpunk-armi-pistola-smart.2aa922ba8c.webp","sparachiodi-riprogrammato":"img/arene-cyberpunk-armi-sparachiodi-riprogrammato.70f6190cb0.webp","taser-da-buttafuori":"img/arene-cyberpunk-armi-taser-da-buttafuori.60b58b451d.webp","tirapugni-elettrificato":"img/arene-cyberpunk-armi-tirapugni-elettrificato.1ce19bab37.webp","ventaglio-da-combattimento-in-titanio":"img/arene-cyberpunk-armi-ventaglio-da-combattimento-in-titanio.f3b7bb5a10.webp"},"luoghi":{"clinica-del-ripperdoc":"img/arene-cyberpunk-luoghi-clinica-del-ripperdoc.8ef0cb941b.webp","club-della-braindance":"img/arene-cyberpunk-luoghi-club-della-braindance.7765542e70.webp","megablocco":"img/arene-cyberpunk-luoghi-megablocco.28b72e6ecf.webp","mercato-di-kabuki":"img/arene-cyberpunk-luoghi-mercato-di-kabuki.d5c8ab7b96.webp","nodo-dati-corporativo":"img/arene-cyberpunk-luoghi-nodo-dati-corporativo.56ca3e1335.webp","officina-dei-maelstrom":"img/arene-cyberpunk-luoghi-officina-dei-maelstrom.d69285cf21.webp","piazza-della-torre":"img/arene-cyberpunk-luoghi-piazza-della-torre.1e400212c8.webp"},"pericoli":{"banda-di-scav":"img/arene-cyberpunk-pericoli-banda-di-scav.f1a2b2ccc4.webp","gang-di-cromati":"img/arene-cyberpunk-pericoli-gang-di-cromati.74e5576e23.webp","sciame-di-droni-di-pattuglia":"img/arene-cyberpunk-pericoli-sciame-di-droni-di-pattuglia.6fb4b17ad9.webp","squadra-di-sicurezza-corporativa":"img/arene-cyberpunk-pericoli-squadra-di-sicurezza-corporativa.6195a3b15d.webp"}},"fantasy":{"armi":{"arco-elfico":"img/arene-fantasy-armi-arco-elfico.8012f9136d.webp","ascia-nanica":"img/arene-fantasy-armi-ascia-nanica.6913fdf008.webp","balestra":"img/arene-fantasy-armi-balestra.7767becc83.webp","bastone-magico":"img/arene-fantasy-armi-bastone-magico.0781aee860.webp","daga-dei-giuramenti":"img/arene-fantasy-armi-daga-dei-giuramenti.3b6d4b398c.webp","falcetto-dargento":"img/arene-fantasy-armi-falcetto-dargento.1ce0e4e163.webp","lancia-incantata":"img/arene-fantasy-armi-lancia-incantata.7371199824.webp","lancia-silvana":"img/arene-fantasy-armi-lancia-silvana.08fbc01ede.webp","martello-da-guerra":"img/arene-fantasy-armi-martello-da-guerra.4eb03f4db7.webp","martello-nanico":"img/arene-fantasy-armi-martello-nanico.82ad6b9b14.webp","mazza-di-quercia":"img/arene-fantasy-armi-mazza-di-quercia.0f6a8345a9.webp","pugnale-avvelenato":"img/arene-fantasy-armi-pugnale-avvelenato.aba554d177.webp","spada-da-viaggio":"img/arene-fantasy-armi-spada-da-viaggio.a7bdcab5f4.webp","spada-runica":"img/arene-fantasy-armi-spada-runica.ec4012c6cf.webp"},"luoghi":{"altare-delle-armi":"img/arene-fantasy-luoghi-altare-delle-armi.db06de44c1.webp","foresta-elfica":"img/arene-fantasy-luoghi-foresta-elfica.0448fcfbd3.webp","lago-nebbioso":"img/arene-fantasy-luoghi-lago-nebbioso.f19abc7c81.webp","miniere":"img/arene-fantasy-luoghi-miniere.5baa916ec9.webp","palude-stregata":"img/arene-fantasy-luoghi-palude-stregata.6a0b2af4a7.webp","picco-del-drago":"img/arene-fantasy-luoghi-picco-del-drago.06bdfd84b1.webp","torre-in-rovina":"img/arene-fantasy-luoghi-torre-in-rovina.ac716863c7.webp"},"pericoli":{"branco-di-lupi-mannari":"img/arene-fantasy-pericoli-branco-di-lupi-mannari.1c9124ceee.webp","spettro-errante":"img/arene-fantasy-pericoli-spettro-errante.056074bc23.webp","troll-di-caverna":"img/arene-fantasy-pericoli-troll-di-caverna.31aa2444f0.webp","viverna":"img/arene-fantasy-pericoli-viverna.577b91a819.webp"}},"horror":{"armi":{"ascia":"img/arene-horror-armi-ascia.f6793c220e.webp","attizzatoio":"img/arene-horror-armi-attizzatoio.12b9bf75af.webp","bastone-da-passeggio":"img/arene-horror-armi-bastone-da-passeggio.1a636ce4ab.webp","candelabro-dargento":"img/arene-horror-armi-candelabro-dargento.7d962054de.webp","coltello-dargento":"img/arene-horror-armi-coltello-dargento.73a6bb81ea.webp","crocifisso-appuntito":"img/arene-horror-armi-crocifisso-appuntito.203b41a170.webp","daga-da-cerimonia":"img/arene-horror-armi-daga-da-cerimonia.a597e15c53.webp","falce":"img/arene-horror-armi-falce.6513df8fa2.webp","fucile-da-caccia":"img/arene-horror-armi-fucile-da-caccia.169dc367e1.webp","pugnale-depoca":"img/arene-horror-armi-pugnale-depoca.f148afd005.webp","pugnale-rituale":"img/arene-horror-armi-pugnale-rituale.944cb9056c.webp","scure-da-legna":"img/arene-horror-armi-scure-da-legna.a11379a412.webp"},"luoghi":{"biblioteca":"img/arene-horror-luoghi-biblioteca.00d6ab97f4.webp","cantina":"img/arene-horror-luoghi-cantina.a196828c1d.webp","cappella":"img/arene-horror-luoghi-cappella.a51e505028.webp","cimitero":"img/arene-horror-luoghi-cimitero.7a441de089.webp","salone":"img/arene-horror-luoghi-salone.37f10c88c7.webp","serra":"img/arene-horror-luoghi-serra.b3d91121d4.webp","soffitta":"img/arene-horror-luoghi-soffitta.466d40cea3.webp"},"pericoli":{"bambola-posseduta":"img/arene-horror-pericoli-bambola-posseduta.7064eef1d7.webp","entita-senza-volto":"img/arene-horror-pericoli-entita-senza-volto.2c28467bdd.webp","spettro-urlante":"img/arene-horror-pericoli-spettro-urlante.25fa554e05.webp","stormo-di-corvi":"img/arene-horror-pericoli-stormo-di-corvi.fe5c85d7ae.webp"}},"liceo":{"armi":{"compito-copiato":"img/arene-liceo-armi-compito-copiato.c9ade27d61.webp","dossier-delle-revisioni":"img/arene-liceo-armi-dossier-delle-revisioni.77676a0f5f.webp","elenco-delle-correzioni":"img/arene-liceo-armi-elenco-delle-correzioni.04be1154c8.webp","fascicolo-di-risposte-motivate":"img/arene-liceo-armi-fascicolo-di-risposte-motivate.c29995b581.webp","foto-imbarazzante":"img/arene-liceo-armi-foto-imbarazzante.ff7d3ef284.webp","gossip-esplosivo":"img/arene-liceo-armi-gossip-esplosivo.552b1e6236.webp","pallone-da-dodgeball":"img/arene-liceo-armi-pallone-da-dodgeball.60a2576785.webp","profilo-falso":"img/arene-liceo-armi-profilo-falso.d1dac05a2b.webp","prospetto-dei-contributi":"img/arene-liceo-armi-prospetto-dei-contributi.0c121fd79a.webp","quaderno-delle-verifiche":"img/arene-liceo-armi-quaderno-delle-verifiche.7d8b07341a.webp","registro-rubato":"img/arene-liceo-armi-registro-rubato.67eb4b9eff.webp","riepilogo-delle-fonti":"img/arene-liceo-armi-riepilogo-delle-fonti.3c889a0ed5.webp"},"luoghi":{"aula-magna":"img/arene-liceo-luoghi-aula-magna.0478e35c5c.webp","aule":"img/arene-liceo-luoghi-aule.b3142d07cc.webp","biblioteca":"img/arene-liceo-luoghi-biblioteca.1ae806ae58.webp","cortile":"img/arene-liceo-luoghi-cortile.51bf433337.webp","laboratorio-di-chimica":"img/arene-liceo-luoghi-laboratorio-di-chimica.eba1434683.webp","mensa":"img/arene-liceo-luoghi-mensa.67bcbc7e37.webp","palestra":"img/arene-liceo-luoghi-palestra.8ecb872849.webp"},"pericoli":{"bidello-di-turno":"img/arene-liceo-pericoli-bidello-di-turno.191c43a8bd.webp","ispezione-a-sorpresa":"img/arene-liceo-pericoli-ispezione-a-sorpresa.bef087d9b9.webp","preside":"img/arene-liceo-pericoli-preside.033f6c9aae.webp","professoressa-di-matematica":"img/arene-liceo-pericoli-professoressa-di-matematica.6cb65c6a3f.webp"}},"royale":{"armi":{"balestra":"img/arene-royale-armi-balestra.64563b6cea.webp","carabina-compatta":"img/arene-royale-armi-carabina-compatta.a0fa150fbe.webp","coltello-da-combattimento":"img/arene-royale-armi-coltello-da-combattimento.74a64bca77.webp","coltello-tattico":"img/arene-royale-armi-coltello-tattico.8e9cb56197.webp","fucile-a-pompa":"img/arene-royale-armi-fucile-a-pompa.3d7fc7d83c.webp","fucile-da-cecchino":"img/arene-royale-armi-fucile-da-cecchino.fc3c4f19f1.webp","fucile-dassalto":"img/arene-royale-armi-fucile-dassalto.b91ccb0ec8.webp","granata":"img/arene-royale-armi-granata.fd9c359b27.webp","lancia-da-sopravvivenza":"img/arene-royale-armi-lancia-da-sopravvivenza.8a39c1a5e5.webp","manganello":"img/arene-royale-armi-manganello.dc6284893b.webp","mitraglietta":"img/arene-royale-armi-mitraglietta.6dcc3246e6.webp","pistola-da-segnalazione-modificata":"img/arene-royale-armi-pistola-da-segnalazione-modificata.1c7f899ca7.webp","pistola":"img/arene-royale-armi-pistola.acae268814.webp","scure-da-campo":"img/arene-royale-armi-scure-da-campo.6a5b0becd5.webp"},"luoghi":{"aeroporto":"img/arene-royale-luoghi-aeroporto.81e8ce98d4.webp","base-militare":"img/arene-royale-luoghi-base-militare.67f3a7de9d.webp","centrale-elettrica":"img/arene-royale-luoghi-centrale-elettrica.05ee57458a.webp","fattoria":"img/arene-royale-luoghi-fattoria.7c780dda87.webp","foresta":"img/arene-royale-luoghi-foresta.03b47644d0.webp","villaggio-costiero":"img/arene-royale-luoghi-villaggio-costiero.568519eb7c.webp"},"pericoli":{"cane-da-guardia-addestrato":"img/arene-royale-pericoli-cane-da-guardia-addestrato.c7853a67a0.webp","drone-armato":"img/arene-royale-pericoli-drone-armato.30d0b73e01.webp","elicottero-da-caccia":"img/arene-royale-pericoli-elicottero-da-caccia.8c68e62346.webp"}},"scifi":{"armi":{"bastone-a-impulsi":"img/arene-scifi-armi-bastone-a-impulsi.4e17e074e7.webp","cannone-a-rotaia-portatile":"img/arene-scifi-armi-cannone-a-rotaia-portatile.9a59b97d98.webp","frusta-monofilamento":"img/arene-scifi-armi-frusta-monofilamento.5ee8081aa9.webp","fucile-al-plasma":"img/arene-scifi-armi-fucile-al-plasma.ea2384a239.webp","granata-emp":"img/arene-scifi-armi-granata-emp.04cfd31203.webp","lama-di-servizio":"img/arene-scifi-armi-lama-di-servizio.a47d434464.webp","lama-vibrante":"img/arene-scifi-armi-lama-vibrante.02b0f47ff8.webp","lancia-da-abbordaggio":"img/arene-scifi-armi-lancia-da-abbordaggio.cf167e52ff.webp","perforatore-portatile":"img/arene-scifi-armi-perforatore-portatile.aa7e92ecab.webp","pistola-a-scarica":"img/arene-scifi-armi-pistola-a-scarica.33b3e5929e.webp","pistola-laser":"img/arene-scifi-armi-pistola-laser.aed4bbf3ed.webp","taglierino-ceramico":"img/arene-scifi-armi-taglierino-ceramico.b45d524836.webp","taser-a-impulsi":"img/arene-scifi-armi-taser-a-impulsi.360e29e1d5.webp"},"luoghi":{"condotti-di-servizio":"img/arene-scifi-luoghi-condotti-di-servizio.6817134b5e.webp","hangar":"img/arene-scifi-luoghi-hangar.6de551833b.webp","moduli-abitativi":"img/arene-scifi-luoghi-moduli-abitativi.9f5bb96d39.webp","ponte-di-comando":"img/arene-scifi-luoghi-ponte-di-comando.3e9ffd005a.webp","reattore":"img/arene-scifi-luoghi-reattore.d10a335006.webp","serra-idroponica":"img/arene-scifi-luoghi-serra-idroponica.b6f4407853.webp"},"pericoli":{"androide-da-combattimento":"img/arene-scifi-pericoli-androide-da-combattimento.1a3d3eb38e.webp","creatura-aliena-dai-tentacoli":"img/arene-scifi-pericoli-creatura-aliena-dai-tentacoli.b6b314ddd9.webp","drone-di-sicurezza-impazzito":"img/arene-scifi-pericoli-drone-di-sicurezza-impazzito.c8a9c6f9e3.webp","sciame-di-nanobot":"img/arene-scifi-pericoli-sciame-di-nanobot.d43296f047.webp"}},"ufficio":{"armi":{"badge-clonato-del-capo":"img/arene-ufficio-armi-badge-clonato-del-capo.be9f7381fe.webp","dossier-dei-risultati":"img/arene-ufficio-armi-dossier-dei-risultati.1888e2f671.webp","elenco-dei-contributi":"img/arene-ufficio-armi-elenco-dei-contributi.3de4fbe5bf.webp","fascicolo-delle-fonti":"img/arene-ufficio-armi-fascicolo-delle-fonti.02df27dfbf.webp","foglio-excel-con-le-prove":"img/arene-ufficio-armi-foglio-excel-con-le-prove.944f6ec708.webp","mail-in-copia-a-tutti":"img/arene-ufficio-armi-mail-in-copia-a-tutti.1d4304df14.webp","nota-spese-gonfiata":"img/arene-ufficio-armi-nota-spese-gonfiata.d2683cca4c.webp","presentazione-rubata":"img/arene-ufficio-armi-presentazione-rubata.815dc5c8b4.webp","prospetto-delle-metriche":"img/arene-ufficio-armi-prospetto-delle-metriche.356da1d2d9.webp","registro-delle-revisioni":"img/arene-ufficio-armi-registro-delle-revisioni.509eab44df.webp","report-pieno-di-errori-altrui":"img/arene-ufficio-armi-report-pieno-di-errori-altrui.c01c0ef897.webp","riepilogo-delle-approvazioni":"img/arene-ufficio-armi-riepilogo-delle-approvazioni.9394dadd6b.webp"},"luoghi":{"cucina":"img/arene-ufficio-luoghi-cucina.d968f8861d.webp","open-space":"img/arene-ufficio-luoghi-open-space.b6b7990c99.webp","parcheggio":"img/arene-ufficio-luoghi-parcheggio.d593f2ed83.webp","sala-riunioni":"img/arene-ufficio-luoghi-sala-riunioni.f92c4030a9.webp","sala-stampanti":"img/arene-ufficio-luoghi-sala-stampanti.1727f50082.webp","ufficio-del-direttore":"img/arene-ufficio-luoghi-ufficio-del-direttore.bb3b6cabab.webp"},"pericoli":{"consulente-esterno":"img/arene-ufficio-pericoli-consulente-esterno.ce6e200c3f.webp","direttore-generale":"img/arene-ufficio-pericoli-direttore-generale.da2eb1f708.webp","riorganizzazione-aziendale":"img/arene-ufficio-pericoli-riorganizzazione-aziendale.1fd57b76b3.webp","ufficio-risorse-umane":"img/arene-ufficio-pericoli-ufficio-risorse-umane.8392df7518.webp"}},"wasteland":{"armi":{"balestra-artigianale":"img/arene-wasteland-armi-balestra-artigianale.e09826852f.webp","catena":"img/arene-wasteland-armi-catena.866183d584.webp","coltello-da-strada":"img/arene-wasteland-armi-coltello-da-strada.1083c4429d.webp","fucile-arrugginito":"img/arene-wasteland-armi-fucile-arrugginito.797601f16e.webp","lama-di-recupero":"img/arene-wasteland-armi-lama-di-recupero.1ad13cfc78.webp","lancia-di-ferraglia":"img/arene-wasteland-armi-lancia-di-ferraglia.99d9f41307.webp","lancia-ricavata-da-un-tubo":"img/arene-wasteland-armi-lancia-ricavata-da-un-tubo.53b934e449.webp","lanciachiodi":"img/arene-wasteland-armi-lanciachiodi.e4f51e42e2.webp","mannaia":"img/arene-wasteland-armi-mannaia.518ae9c11c.webp","martello-da-officina":"img/arene-wasteland-armi-martello-da-officina.851055795e.webp","mazza-di-tubi":"img/arene-wasteland-armi-mazza-di-tubi.91babe82ac.webp","molotov":"img/arene-wasteland-armi-molotov.303d6fa315.webp","scure-da-demolizione":"img/arene-wasteland-armi-scure-da-demolizione.066ea5e066.webp"},"luoghi":{"autostrada-spezzata":"img/arene-wasteland-luoghi-autostrada-spezzata.19a72a0b97.webp","citta-fantasma":"img/arene-wasteland-luoghi-citta-fantasma.fe22bb72b2.webp","cratere":"img/arene-wasteland-luoghi-cratere.04de7ca40a.webp","deposito":"img/arene-wasteland-luoghi-deposito.f98aa31220.webp","diga":"img/arene-wasteland-luoghi-diga.3be9abe15a.webp","discarica":"img/arene-wasteland-luoghi-discarica.b8783ad9c6.webp","raffineria":"img/arene-wasteland-luoghi-raffineria.081e2d2ad6.webp"},"pericoli":{"banda-di-predoni":"img/arene-wasteland-pericoli-banda-di-predoni.1dfcfd1628.webp","branco-di-cani-mutati":"img/arene-wasteland-pericoli-branco-di-cani-mutati.442fabfc39.webp","scorpione-gigante":"img/arene-wasteland-pericoli-scorpione-gigante.2dd8911367.webp","verme-delle-sabbie":"img/arene-wasteland-pericoli-verme-delle-sabbie.a0d445beeb.webp"}},"zombie":{"armi":{"accetta-da-soccorso":"img/arene-zombie-armi-accetta-da-soccorso.6d36eb13ac.webp","accetta":"img/arene-zombie-armi-accetta.0eed163720.webp","balestra":"img/arene-zombie-armi-balestra.d705131d17.webp","coltello-da-campeggio":"img/arene-zombie-armi-coltello-da-campeggio.2abab58e78.webp","fucile-a-pompa":"img/arene-zombie-armi-fucile-a-pompa.b00b1d6a70.webp","katana":"img/arene-zombie-armi-katana.f631ad392f.webp","machete-da-potatura":"img/arene-zombie-armi-machete-da-potatura.94a93108a1.webp","martello-da-carpentiere":"img/arene-zombie-armi-martello-da-carpentiere.021e8a80f2.webp","mazza-chiodata":"img/arene-zombie-armi-mazza-chiodata.b4e11dcadb.webp","mazza-da-lavoro":"img/arene-zombie-armi-mazza-da-lavoro.c36a90108f.webp","motosega":"img/arene-zombie-armi-motosega.f74e603615.webp","piede-di-porco":"img/arene-zombie-armi-piede-di-porco.c185a97e0d.webp","pistola":"img/arene-zombie-armi-pistola.6d30022ca6.webp"},"luoghi":{"centro-commerciale":"img/arene-zombie-luoghi-centro-commerciale.333f4699d5.webp","metropolitana":"img/arene-zombie-luoghi-metropolitana.878a263605.webp","ospedale":"img/arene-zombie-luoghi-ospedale.f25de413a4.webp","periferia":"img/arene-zombie-luoghi-periferia.e28a7d70c7.webp","piazza":"img/arene-zombie-luoghi-piazza.b6ed86b3ad.webp","scuola":"img/arene-zombie-luoghi-scuola.153ddbaa75.webp","stazione-di-polizia":"img/arene-zombie-luoghi-stazione-di-polizia.157f7a17f5.webp"},"pericoli":{"cane-infetto":"img/arene-zombie-pericoli-cane-infetto.fdff913d6f.webp","gigante-mutato":"img/arene-zombie-pericoli-gigante-mutato.91fad36b70.webp","infetto-corridore":"img/arene-zombie-pericoli-infetto-corridore.61f48faafd.webp","orda-di-zombi":"img/arene-zombie-pericoli-orda-di-zombi.e0fc6d1b56.webp"}}},"fx":{"pennellate":["img/fx-pennellata-1.5527b3e9bd.webp","img/fx-pennellata-2.8526d34dcf.webp","img/fx-pennellata-3.a7f3e74ff3.webp","img/fx-pennellata-4.fe1f612999.webp"],"sigilli":{"classico":"img/fx-sigillo-classico.b781c63b8d.webp","cyberpunk":"img/fx-sigillo-cyberpunk.134a7f507c.webp","fantasy":"img/fx-sigillo-fantasy.d854d9ac19.webp","horror":"img/fx-sigillo-horror.54149e6a7e.webp","liceo":"img/fx-sigillo-liceo.7f1566a7a8.webp","royale":"img/fx-sigillo-royale.bedbb77f68.webp","scifi":"img/fx-sigillo-scifi.6c50b79280.webp","ufficio":"img/fx-sigillo-ufficio.fcbbcc051a.webp","wasteland":"img/fx-sigillo-wasteland.86f44d1714.webp","zombie":"img/fx-sigillo-zombie.44ac2a6473.webp"},"grana":"img/fx-grana.c1e72fd2da.webp","forme":{"fascia":"img/fx-forma-fascia.8a2f8ab92d.webp","freccia":"img/fx-forma-freccia.4e8039be8f.webp","fulmine":"img/fx-forma-fulmine.c9a15d227c.webp","stella":"img/fx-forma-stella.e773ba5dda.webp","strappo":"img/fx-forma-strappo.0e6a41d0d9.webp"},"impatto":"img/fx-impatto.fd13ac9554.webp","mezzitoni":"img/fx-mezzitoni.f9ef4df053.webp","occhi":{"f-1":"img/fx-occhi-f-1.3779df529a.webp","f-2":"img/fx-occhi-f-2.2f47e4535b.webp","f-3":"img/fx-occhi-f-3.8b10fc4b00.webp","f-4":"img/fx-occhi-f-4.08132e01f9.webp","m-1":"img/fx-occhi-m-1.fd94d5b0eb.webp","m-2":"img/fx-occhi-m-2.c7b9661e6b.webp","m-3":"img/fx-occhi-m-3.91ff950ae4.webp","m-4":"img/fx-occhi-m-4.d0a0e73220.webp","m-5":"img/fx-occhi-m-5.f4c19f2141.webp","n-1":"img/fx-occhi-n-1.21fc3b7adf.webp"},"fondali":{"classico":"img/fx-fondale-classico.8a3fc35342.webp","cyberpunk":"img/fx-fondale-cyberpunk.283c80cc1e.webp","fantasy":"img/fx-fondale-fantasy.0ca9b3f315.webp","horror":"img/fx-fondale-horror.4ba1241b63.webp","liceo":"img/fx-fondale-liceo.fb428a57f7.webp","royale":"img/fx-fondale-royale.aac1246425.webp","scifi":"img/fx-fondale-scifi.27ee2ce8cc.webp","ufficio":"img/fx-fondale-ufficio.780789ce70.webp","wasteland":"img/fx-fondale-wasteland.02311ed21d.webp","zombie":"img/fx-fondale-zombie.83b8d35716.webp"},"volti":{"f-1":"img/fx-volto-f-1.96d62771c1.webp","f-2":"img/fx-volto-f-2.79d3485864.webp","f-3":"img/fx-volto-f-3.aeb7664a4e.webp","f-4":"img/fx-volto-f-4.2f2c864354.webp","m-1":"img/fx-volto-m-1.f8b83b073e.webp","m-2":"img/fx-volto-m-2.b9eb346a31.webp","m-3":"img/fx-volto-m-3.5311549074.webp","m-4":"img/fx-volto-m-4.10b102bdb0.webp","m-5":"img/fx-volto-m-5.63e5c91778.webp","n-1":"img/fx-volto-n-1.02cf4d1c97.webp"},"vincitori":{"f-1":"img/vincitori-vincitore-f-1.10b1ec0d22.webp","f-2":"img/vincitori-vincitore-f-2.03d8a3a92a.webp","f-3":"img/vincitori-vincitore-f-3.bc0adcd66a.webp","m-1":"img/vincitori-vincitore-m-1.c597436dca.webp","m-2":"img/vincitori-vincitore-m-2.9c8b48e9f8.webp","n-1":"img/vincitori-vincitore-n-1.1539fc78b2.webp"}},"audio":{"sfx":{"heavy":"img/audio-colpo.6c66fc3384.mp3","battle":"img/audio-scontro.171fdeb377.mp3","click":"img/audio-ui-click.75370fe5e2.wav","hover":"img/audio-ui-hover.39a84fb194.wav","tick":"img/audio-ui-tick.16c581af00.wav","jazz":"img/audio-vittoria.6a3763dedf.mp3"},"music":"img/audio-musica-dark-hour.53788a2c76.mp3"}};
 ;
-window.LOS_BUILD = "331bfd429bfa891314ca86a80ba451e4bca6d49470bee4e0353c4da4a808e861";
+window.LOS_BUILD = "43fd5e634ba3ebfab182b32d24cb885e7795c3aefe9f44cc2ed443c92b82ccec";
 ;
 /* Last One Standing — grafica vettoriale: logo, icone delle arene, illustrazioni.
  * Tutto è SVG generato in codice: nessuna immagine esterna. */
@@ -21259,8 +21341,8 @@ window.LOS_BUILD = "331bfd429bfa891314ca86a80ba451e4bca6d49470bee4e0353c4da4a808
 })(typeof window !== 'undefined' ? window : globalThis);
 
 ;
-/* Last One Standing — pelle dell'area «Arena» (src/skin/30-arena.css).
- * - il «palcoscenico» accanto al selettore: dipinto dell'arena scelta, nome su lastre, numero, sigillo, targhe dei dati;
+/* Last One Standing — pelle dell'area «Arena» (src/skin/30-arena.js).
+ * - il «palcoscenico» accanto al selettore: dipinto dell'arena scelta con il numero, nome su una lastra, descrizione, targhe dei dati;
  * - il «mondo dietro»: il fondale dipinto dell'arena come scheggia fissa dietro la pagina, che cambia con la scelta.
  * È tutta decorazione costruita leggendo il DOM che ui.js già produce (le voci del selettore e la guida):
  * non tocca lo stato, non intercetta i comandi, e se manca qualcosa non fa nulla. Va caricato prima di ui.js. */
@@ -21275,32 +21357,27 @@ window.LOS_BUILD = "331bfd429bfa891314ca86a80ba451e4bca6d49470bee4e0353c4da4a808
   const url = (u) => 'url("' + String(u).replace(/"/g, '%22') + '")';
 
   let sec, list, apick, prev, stage, world, cur = null;
+  // ogni cambio parte pulito: `gen` invalida i caricamenti e i timer del cambio precedente, `live` sono le sole animazioni in corso
+  let gen = 0, live = [], tidy = 0;
+  const q = (c) => stage.querySelector(c);
+  const play = (n, kf, o) => { const x = n && anim(n, kf, o); if (x) live.push(x); return x; };
+  function halt() { live.forEach((x) => { try { x.cancel(); } catch (e) { /* già finita */ } }); live = []; clearTimeout(tidy); }
+  // in ogni contenitore resta un solo strato: l'ultimo arrivato
+  function settle(box) { const k = box.children; while (k.length > 1) k[0].remove(); }
+  const boxes = () => [q('.ar-paint'), world];
 
-  // il nome su due righe: al trattino se c'è, altrimenti dove le righe vengono più equilibrate
-  function lines(name) {
-    const parts = name.split(/\s+[—–-]\s+/);
-    if (parts.length > 1) return parts.slice(0, 3);
-    const w = name.split(/\s+/).filter(Boolean);
-    if (w.length < 2) return w;
-    let best = 1, score = Infinity;
-    for (let i = 1; i < w.length; i++) { const s = Math.max(w.slice(0, i).join(' ').length, w.slice(i).join(' ').length); if (s < score) { score = s; best = i; } }
-    return [w.slice(0, best).join(' '), w.slice(best).join(' ')];
-  }
-
-  // uno strato nuovo sopra il vecchio, che entra con un taglio diagonale; il vecchio se ne va a fine corsa
-  function swapLayer(box, make, animate) {
-    const old = [...box.children], n = make(); if (!n) return;
-    box.appendChild(n);
-    const done = () => old.forEach((o) => o.remove());
-    if (!animate || reduced()) return done();
-    const a = anim(n, [{ clipPath: 'polygon(100% 0, 100% 0, 100% 100%, 100% 100%)' }, { clipPath: 'polygon(-30% 0, 100% 0, 100% 100%, 0 100%)' }], { duration: 460, easing: E.out });
-    if (a) a.finished.then(done, done); else done();
+  // doppio buffer: al più due strati, il nuovo entra sopra con un taglio diagonale e a fine corsa il vecchio se ne va
+  function swapLayer(box, n, animate) {
+    settle(box); box.appendChild(n);
+    if (!animate) return settle(box);
+    const x = play(n, [{ clipPath: 'polygon(100% 0, 100% 0, 100% 100%, 100% 100%)' }, { clipPath: 'polygon(-30% 0, 100% 0, 100% 100%, 0 100%)' }], { duration: 380, easing: E.out });
+    if (!x) return settle(box);
+    x.onfinish = () => settle(box);
   }
 
   function build() {
     stage = h('div', 'ar-stage'); stage.setAttribute('aria-hidden', 'true');
-    stage.innerHTML = '<i class="ar-bg"></i><b class="ar-ghost"></b><b class="ar-num"></b><div class="ar-paint"></div><i class="ar-seal"></i>' +
-      '<div class="ar-title"></div><p class="ar-tag"></p><span class="ar-soft" hidden></span><div class="ar-stats"></div>';
+    stage.innerHTML = '<div class="ar-card"><div class="ar-paint"></div><b class="ar-num"></b><div class="ar-title"></div><p class="ar-tag"></p><span class="ar-soft" hidden></span><div class="ar-stats"></div></div>';
     apick.appendChild(stage); apick.classList.add('has-stage');
     world = h('div'); world.id = 'arWorld'; world.setAttribute('aria-hidden', 'true');
     const atmo = document.getElementById('atmo');
@@ -21310,40 +21387,49 @@ window.LOS_BUILD = "331bfd429bfa891314ca86a80ba451e4bca6d49470bee4e0353c4da4a808
   function sync() {
     const card = list.querySelector('[aria-checked="true"]'); if (!card) return;
     const id = card.dataset.theme; if (!id || id === cur) return;
-    const first = cur === null, go = !first && !reduced(); cur = id;
+    const first = cur === null, go = !first && !reduced(), my = ++gen; cur = id;
     const nameEl = card.querySelector('b'), tagEl = card.querySelector('small'), softEl = card.querySelector('.psoft');
     const name = nameEl ? nameEl.textContent.trim() : id, idx = [...list.children].indexOf(card) + 1;
     const paint = AS.arene && AS.arene[id], fond = (FX.fondali && FX.fondali[id]) || paint;
     stage.dataset.arena = id;
 
-    swapLayer(stage.querySelector('.ar-bg'), () => { const l = h('i', 'ar-l'); if (fond) l.style.backgroundImage = url(fond); return l; }, go);
-    swapLayer(world, () => { const l = h('i', 'arw-l'); if (fond) l.style.backgroundImage = url(fond); return l; }, go);
-    swapLayer(stage.querySelector('.ar-paint'), () => {
-      if (paint) { const im = h('img'); im.alt = ''; im.decoding = 'async'; im.draggable = false; im.src = paint; return im; }
-      const sc = card.querySelector('.pscene'); const c = sc ? sc.cloneNode(true) : h('i'); c.className = 'ar-svg'; return c;
-    }, go);
+    // 1. si ferma tutto ciò che il cambio precedente aveva avviato e si toglie ogni strato di troppo
+    halt(); boxes().forEach(settle);
 
-    const num = stage.querySelector('.ar-num'); num.textContent = (idx < 10 ? '0' : '') + idx;
-    const ls = lines(name), ghost = stage.querySelector('.ar-ghost'); ghost.textContent = ls[ls.length - 1];
-    const title = stage.querySelector('.ar-title'); title.textContent = '';
-    title.style.setProperty('--len', Math.max(6, ...ls.map((x) => x.length)));
-    ls.forEach((t, i) => title.appendChild(h('span', 'ar-ln' + (i === ls.length - 1 && ls.length > 1 ? ' k' : ''), t)));
-    const tag = stage.querySelector('.ar-tag'); tag.textContent = tagEl ? tagEl.textContent.trim() : '';
-    const soft = stage.querySelector('.ar-soft'); soft.hidden = !softEl; soft.textContent = softEl ? softEl.textContent.trim() : '';
+    // 2. il testo cambia subito, in un colpo
+    const num = q('.ar-num'), title = q('.ar-title'), tag = q('.ar-tag'), soft = q('.ar-soft');
+    num.textContent = (idx < 10 ? '0' : '') + idx;
+    title.textContent = name.replace(/s+[—–]s+/g, ' — ');
+    tag.textContent = tagEl ? tagEl.textContent.trim() : '';
+    soft.hidden = !softEl; soft.textContent = softEl ? softEl.textContent.trim() : '';
+
+    // 3. gli strati dipinti: il fondale subito, il dipinto appena l'immagine è pronta (se nel frattempo si è cambiato ancora, si lascia perdere)
+    const wl = h('i', 'arw-l'); if (fond) wl.style.backgroundImage = url(fond);
+    swapLayer(world, wl, go);
+    const box = q('.ar-paint');
+    if (paint) {
+      const im = h('img'); im.alt = ''; im.draggable = false;
+      const put = () => { if (my === gen && !im.parentNode) swapLayer(box, im, go); };
+      im.onload = put; im.onerror = put; im.src = paint;
+      if (im.complete) put();
+    } else {
+      const sc = card.querySelector('.pscene'), c = sc ? sc.cloneNode(true) : h('i'); c.className = 'ar-svg';
+      swapLayer(box, c, go);
+    }
 
     if (go) {
-      anim(num, [{ transform: 'translate(-30%, -20%) scale(1.6) rotate(-14deg)', opacity: 0 }, { transform: 'none', opacity: 1 }], { duration: 380, easing: E.kick });
-      anim(ghost, [{ transform: 'translateX(12%)', opacity: 0 }, { transform: 'none', opacity: 1 }], { duration: 520, easing: E.out });
-      [...title.children].forEach((s, i) => anim(s, [{ clipPath: 'inset(0 100% 0 0)', transform: 'translateX(-36px) skewX(-14deg)' }, { clipPath: 'inset(-20% -20% -20% 0)', transform: 'none' }], { duration: 360, delay: 70 + i * 55, easing: E.out }));
-      anim(tag, [{ opacity: 0, transform: 'translateX(-22px)' }, { opacity: 1, transform: 'none' }], { duration: 300, delay: 200, easing: E.out });
-      anim(stage.querySelector('.ar-seal'), [{ transform: 'rotate(40deg) scale(2.2)', opacity: 0 }, { transform: 'rotate(11deg) scale(1)', opacity: 1 }], { duration: 340, delay: 260, easing: E.kick });
-      [...stage.querySelectorAll('.ar-st')].forEach((s, i) => anim(s, [{ transform: 'translateY(18px) rotate(3deg)', opacity: 0 }, { transform: 'none', opacity: 1 }], { duration: 300, delay: 150 + i * 45, easing: E.kick }));
+      play(num, [{ transform: 'translateX(-40%)', opacity: 0 }, { transform: 'none', opacity: 1 }], { duration: 240, easing: E.out });
+      play(title, [{ clipPath: 'inset(0 100% 0 0)', transform: 'translateX(-24px)' }, { clipPath: 'inset(-20px -20px -20px 0)', transform: 'none' }], { duration: 300, delay: 40, easing: E.out });
+      play(tag, [{ opacity: 0, transform: 'translateX(-14px)' }, { opacity: 1, transform: 'none' }], { duration: 260, delay: 90, easing: E.out });
+      play(q('.ar-stats'), [{ opacity: 0, transform: 'translateY(10px)' }, { opacity: 1, transform: 'none' }], { duration: 260, delay: 130, easing: E.out });
+      // rete di sicurezza: se le animazioni non arrivano in fondo (scheda in secondo piano), lo stato finale si impone lo stesso
+      tidy = setTimeout(() => { if (my === gen) { halt(); boxes().forEach(settle); } }, 900);
     }
   }
 
   // le targhe dei dati copiano i quattro numeri della guida, anche mentre contano
   function syncStats() {
-    const src = prev.querySelectorAll('.dx-stat'), box = stage.querySelector('.ar-stats');
+    const src = prev.querySelectorAll('.dx-stat'), box = q('.ar-stats');
     if (!src.length) return;
     if (box.children.length !== src.length) { box.textContent = ''; src.forEach(() => { const d = h('div', 'ar-st'); d.appendChild(h('b')); d.appendChild(h('span')); box.appendChild(d); }); }
     src.forEach((s, i) => {
@@ -21371,7 +21457,6 @@ window.LOS_BUILD = "331bfd429bfa891314ca86a80ba451e4bca6d49470bee4e0353c4da4a808
 
 ;
 /* PELLE · DIRETTA: piccole decorazioni che il solo CSS non può fare, senza toccare ui.js.
- *  - il numero del giorno accanto a ogni gruppo della linea dei giorni (calendario a numeri grandi);
  *  - la linea di avanzamento sul controller (--dx-prog), solo se la durata totale non è nascosta;
  *  - il cambio di piano del pannello laterale quando si cambia scheda (classe .dx-swap, con la direzione);
  *  - i suggerimenti dei tasti sui comandi di riproduzione.
@@ -21382,16 +21467,6 @@ window.LOS_BUILD = "331bfd429bfa891314ca86a80ba451e4bca6d49470bee4e0353c4da4a808
   const D = G.document;
   const safe = (fn) => function () { try { return fn.apply(this, arguments); } catch (e) { /* solo decorazione */ } };
   const reduced = () => D.documentElement.hasAttribute('data-reduced-motion') || (G.matchMedia && G.matchMedia('(prefers-reduced-motion: reduce)').matches);
-
-  // «Giorno 3», «Notte 12», «Turno 2»: il numero finale dell'etichetta diventa il numero grande del gruppo
-  const days = safe(() => {
-    D.querySelectorAll('#timeline .tday').forEach((g) => {
-      if (g.hasAttribute('data-n')) return;
-      const l = g.querySelector('.tdl'); if (!l) return;
-      const m = l.textContent.match(/(\d+)\s*$/);
-      if (m) g.setAttribute('data-n', m[1]); else if (g.classList.contains('tfin')) g.setAttribute('data-n', 'F');
-    });
-  });
 
   // «Fase 7 di 31» → 7/31; con le fasi future nascoste («Fase 7») la linea resta spenta
   const progress = safe(() => {
@@ -21419,9 +21494,8 @@ window.LOS_BUILD = "331bfd429bfa891314ca86a80ba451e4bca6d49470bee4e0353c4da4a808
   });
 
   const start = safe(() => {
-    const tl = D.getElementById('timeline'), ph = D.getElementById('bcPhase'), st = D.querySelector('#v-diretta .stabs');
+    const ph = D.getElementById('bcPhase'), st = D.querySelector('#v-diretta .stabs');
     if (typeof MutationObserver === 'undefined') return;
-    if (tl) { new MutationObserver(days).observe(tl, { childList: true }); days(); }
     if (ph) { new MutationObserver(progress).observe(ph, { childList: true, characterData: true, subtree: true }); progress(); }
     if (st) { new MutationObserver(tabs).observe(st, { attributes: true, subtree: true, attributeFilter: ['aria-selected'] }); tabs(); }
     hints();

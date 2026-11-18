@@ -1,5 +1,4 @@
 /* PELLE · DIRETTA: piccole decorazioni che il solo CSS non può fare, senza toccare ui.js.
- *  - il numero del giorno accanto a ogni gruppo della linea dei giorni (calendario a numeri grandi);
  *  - la linea di avanzamento sul controller (--dx-prog), solo se la durata totale non è nascosta;
  *  - il cambio di piano del pannello laterale quando si cambia scheda (classe .dx-swap, con la direzione);
  *  - i suggerimenti dei tasti sui comandi di riproduzione.
@@ -10,16 +9,6 @@
   const D = G.document;
   const safe = (fn) => function () { try { return fn.apply(this, arguments); } catch (e) { /* solo decorazione */ } };
   const reduced = () => D.documentElement.hasAttribute('data-reduced-motion') || (G.matchMedia && G.matchMedia('(prefers-reduced-motion: reduce)').matches);
-
-  // «Giorno 3», «Notte 12», «Turno 2»: il numero finale dell'etichetta diventa il numero grande del gruppo
-  const days = safe(() => {
-    D.querySelectorAll('#timeline .tday').forEach((g) => {
-      if (g.hasAttribute('data-n')) return;
-      const l = g.querySelector('.tdl'); if (!l) return;
-      const m = l.textContent.match(/(\d+)\s*$/);
-      if (m) g.setAttribute('data-n', m[1]); else if (g.classList.contains('tfin')) g.setAttribute('data-n', 'F');
-    });
-  });
 
   // «Fase 7 di 31» → 7/31; con le fasi future nascoste («Fase 7») la linea resta spenta
   const progress = safe(() => {
@@ -47,9 +36,8 @@
   });
 
   const start = safe(() => {
-    const tl = D.getElementById('timeline'), ph = D.getElementById('bcPhase'), st = D.querySelector('#v-diretta .stabs');
+    const ph = D.getElementById('bcPhase'), st = D.querySelector('#v-diretta .stabs');
     if (typeof MutationObserver === 'undefined') return;
-    if (tl) { new MutationObserver(days).observe(tl, { childList: true }); days(); }
     if (ph) { new MutationObserver(progress).observe(ph, { childList: true, characterData: true, subtree: true }); progress(); }
     if (st) { new MutationObserver(tabs).observe(st, { attributes: true, subtree: true, attributeFilter: ['aria-selected'] }); tabs(); }
     hints();

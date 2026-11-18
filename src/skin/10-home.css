@@ -5,7 +5,9 @@
 
 /* ---------- titolo su due lastre (10-home.js divide le righe) ---------- */
 #v-home .homehero h1 { background: none; -webkit-background-clip: border-box; background-clip: border-box; color: var(--void); animation: none; text-shadow: none;
-  display: grid; justify-items: start; gap: .08em; font-size: clamp(34px, 5.6vw, 92px); line-height: .9; white-space: nowrap; text-transform: uppercase; font-stretch: 120%; letter-spacing: -.035em; margin: 14px 0 26px; }
+  display: grid; justify-items: start; gap: .08em; line-height: .9; white-space: nowrap; position: relative; z-index: 2;
+  /* la riga più lunga («CHI RESTERÀ», ~8,4 em) deve stare nella sua colonna: la grandezza segue la colonna, non lo schermo */
+  font-size: min(5vw, 70px); text-transform: uppercase; font-stretch: 120%; letter-spacing: -.035em; margin: 14px 0 26px; }
 #v-home .homehero h1 .hl { display: inline-block; padding: .04em .26em .1em .18em; transform: skewX(var(--slant)); }
 #v-home .homehero h1 .hl > span { display: inline-block; transform: skewX(var(--unslant)); }
 #v-home .homehero h1 .hl1 { background: var(--paper); color: var(--void); box-shadow: .07em .07em 0 var(--key); }

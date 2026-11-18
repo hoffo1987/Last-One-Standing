@@ -10,6 +10,9 @@
   --dx-void: var(--void, #0a0a0c); --dx-paper: var(--paper, #f7f5f0);
   --dx-para: polygon(20% 0, 100% 0, 80% 100%, 0 100%);
   --dx-glass: hsl(0 0% 100% / .07);
+  /* lastre piene: il fondale (con le sue scritte giganti) non deve passare dietro il testo */
+  --dx-card: var(--panel-solid, var(--panel));
+  --dx-card-low: color-mix(in srgb, var(--dx-card) 72%, var(--bg));
 }
 
 /* ---------- 1. TESTATA DELLA TRASMISSIONE ---------- */
@@ -70,32 +73,32 @@
 #v-diretta .tally i.d { background: repeating-linear-gradient(-45deg, #f2685a 0 2px, transparent 2px 5px); opacity: .8; }
 #v-diretta .tally i.new { opacity: 1; }
 
-/* ---------- 2. LINEA DEI GIORNI: un calendario a numeri grandi ---------- */
-#v-diretta .timeline { gap: 6px 22px; padding: 18px 8px 14px 4px; align-items: end; }
-#v-diretta .tday { position: relative; grid-template-columns: auto auto; align-items: end; column-gap: 8px; row-gap: 5px; padding: 0; border: 0; background: none; box-shadow: none; transition: none; }
-#v-diretta .tday > .tdl { grid-column: 1 / -1; display: flex; align-items: center; gap: 8px; font: 800 10.5px / 1 var(--f-body); letter-spacing: .2em; text-transform: uppercase; color: var(--muted); }
-#v-diretta .tday > .tdl::after { content: ""; flex: 1; min-width: 12px; height: 2px; background: currentColor; opacity: .3; }
+/* ---------- 2. LINEA DEI GIORNI: una sola striscia, un solo tono ----------
+ * Tutto sta sulla stessa lastra piena. I giorni passati sono spenti, quello in corso è più chiaro,
+ * e solo la fase corrente prende la tinta. Nessun blocco di carta, nessun numero gigante. */
+#v-diretta .timeline { gap: 0; margin-top: 14px; padding: 10px 18px 11px 18px; align-items: end; background: var(--dx-card); box-shadow: inset 4px 0 0 var(--key);
+  clip-path: polygon(0 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%); scrollbar-color: color-mix(in srgb, var(--ink) 30%, transparent) transparent; }
+#v-diretta .tday { position: relative; display: grid; grid-template-columns: auto; gap: 7px; padding: 0 12px 0 0; margin-right: 11px; border: 0; background: none; box-shadow: none; transition: none; }
+#v-diretta .tday:last-child { margin-right: 0; padding-right: 4px; }
+#v-diretta .tday:not(:last-child)::after { content: ""; position: absolute; right: 0; top: 1px; bottom: 1px; width: 2px; background: color-mix(in srgb, var(--ink) 14%, transparent); transform: skewX(-16deg); }
+#v-diretta .tday > .tdl { display: flex; align-items: center; gap: 7px; font: 800 11px / 1 var(--f-body); letter-spacing: .14em; text-transform: uppercase; white-space: nowrap; color: var(--muted); }
 #v-diretta .tday.tcur > .tdl { color: var(--ink); }
-#v-diretta .tday.tcur > .tdl::after { background: var(--key); opacity: 1; height: 3px; }
-#v-diretta .tday.tfin > .tdl { color: color-mix(in srgb, var(--c-kill) 80%, var(--ink)); }
-/* il numero del giorno (lo scrive 40-diretta.js): enorme, e quello corrente chiuso in carta */
-#v-diretta .tday[data-n]::before { content: attr(data-n); grid-row: 2; grid-column: 1; align-self: end; min-width: .9em; padding: 0 .16em 0 .08em; text-align: center;
-  font: italic 900 40px / .84 var(--f-display); font-stretch: 120%; letter-spacing: -.04em; color: color-mix(in srgb, var(--ink) 34%, transparent); }
-#v-diretta .tday.tcur[data-n]::before { color: var(--dx-void); background: var(--dx-paper); box-shadow: 4px 4px 0 var(--key); transform: skewX(var(--slant)); padding: .06em .2em .04em .14em; }
-#v-diretta .tday.tfin[data-n]::before { content: "F"; color: var(--c-kill); }
-#v-diretta .tday.tfin.tcur[data-n]::before { color: #fff; background: #c8302c; box-shadow: 4px 4px 0 var(--hard); }
-#v-diretta .tday:not([data-n]) > div { grid-column: 1 / -1; }
-#v-diretta .tday > div { grid-row: 2; gap: 3px; padding-bottom: 3px; }
-#v-diretta .tph { width: 34px; height: 30px; border: 0; border-radius: 0; background: var(--ink); color: var(--bg); transform: skewX(var(--slant)); animation: none; box-shadow: none;
+#v-diretta .tday.tcur > .tdl::before { content: ""; flex: none; width: 14px; height: 3px; background: var(--key); transform: skewX(-30deg); }
+#v-diretta .tday.tfin.tcur > .tdl { color: color-mix(in srgb, var(--c-kill) 70%, var(--ink)); }
+#v-diretta .tday > div { gap: 3px; }
+#v-diretta .tph { --tc: var(--muted); width: 28px; height: 26px; border: 0; border-radius: 0; background: color-mix(in srgb, var(--ink) 8%, transparent); color: var(--tc); transform: skewX(var(--slant)); animation: none; box-shadow: none;
   transition: transform .22s var(--ease-kick), background-color .12s, color .12s; }
+#v-diretta .tph svg { width: 14px; height: 14px; }
 #v-diretta .tph > svg, #v-diretta .tph > span:first-child { transform: skewX(var(--unslant)); }
-#v-diretta .tph > span:first-child { font: italic 900 15px / 1 var(--f-display); }
-#v-diretta .tph.locked { background: transparent; color: var(--muted); box-shadow: inset 0 0 0 2px color-mix(in srgb, var(--ink) 22%, transparent); }
-#v-diretta .tph.k-dis.seen { color: #f39a52; }
-#v-diretta .tph.k-finale.seen { color: #f2685a; }
-#v-diretta .tph.cur, #v-diretta .tph.k-dis.cur { background: var(--key); color: var(--key-ink); box-shadow: 4px 4px 0 var(--hard); transform: skewX(var(--slant)) translateY(-3px) scale(1.16); z-index: 1; }
-@media (hover: hover) { #v-diretta .tph:not(.cur):hover { background: var(--key); color: var(--key-ink); transform: skewX(var(--slant)) translateY(-4px); box-shadow: none; } }
-#v-diretta .tph .dn { top: -9px; right: -6px; min-width: 17px; height: 15px; border-radius: 0; padding: 0 4px; background: #c8302c; color: #fff; font: 800 11px / 1 var(--f-body); z-index: 2; }
+#v-diretta .tph > span:first-child { font: italic 900 13px / 1 var(--f-display); }
+#v-diretta .tday.tcur .tph.seen { --tc: color-mix(in srgb, var(--ink) 86%, transparent); background: color-mix(in srgb, var(--ink) 13%, transparent); }
+#v-diretta .tph.locked { background: transparent; --tc: color-mix(in srgb, var(--muted) 80%, transparent); box-shadow: inset 0 0 0 1.5px color-mix(in srgb, var(--ink) 15%, transparent); }
+#v-diretta .tph.k-dis.seen { color: color-mix(in srgb, var(--c-hurt) 60%, var(--tc)); }
+#v-diretta .tph.k-finale.seen { color: color-mix(in srgb, var(--c-kill) 60%, var(--tc)); }
+#v-diretta .tph.cur, #v-diretta .tph.k-dis.cur { background: var(--key); color: var(--key-ink); box-shadow: none; transform: skewX(var(--slant)) scale(1.1); z-index: 1; }
+@media (hover: hover) { #v-diretta .tph:not(.cur):hover { background: color-mix(in srgb, var(--key) 30%, var(--dx-card)); color: var(--ink); transform: skewX(var(--slant)) translateY(-2px); box-shadow: none; } }
+#v-diretta .tph:focus-visible { outline: 2px solid var(--key); outline-offset: 2px; }
+#v-diretta .tph .dn { top: -6px; right: -6px; min-width: 0; height: 13px; border-radius: 0; padding: 0 3px; background: var(--dx-card); color: color-mix(in srgb, var(--c-kill) 78%, var(--ink)); font: 800 10.5px / 13px var(--f-body); transform: skewX(var(--unslant)); z-index: 2; }
 
 /* ---------- 3. FILTRI E OPZIONI DI LETTURA ---------- */
 #v-diretta .readbar { margin: 8px 0 16px; padding: 0; gap: 0; border: 0; background: none; box-shadow: none; -webkit-backdrop-filter: none; backdrop-filter: none; }
@@ -129,27 +132,46 @@
 /* ---------- 4. LA CRONACA: righe con ritmo ---------- */
 #v-diretta .livegrid { grid-template-columns: minmax(0, 1fr) 388px; gap: 28px; margin-top: 4px; }
 #v-diretta .livefeed { gap: 8px; }
-#v-diretta .ev { --sp: 104px; grid-template-columns: var(--sp) minmax(0, 1fr); gap: 0 14px; align-items: stretch; padding: 13px 22px 14px 0; border: 0; border-radius: 0; background: var(--panel);
+#v-diretta .ev { --sp: 136px; --k: 16px; --rh: 84px; grid-template-columns: var(--sp) minmax(0, 1fr); gap: 0 18px; align-items: stretch; min-height: var(--rh); padding: 0; border: 0; border-radius: 0; background: var(--dx-card);
   box-shadow: none; -webkit-backdrop-filter: none; backdrop-filter: none; outline: 0; }
-/* il dorso: la fascia a sinistra dove stanno i volti, nel colore di ciò che è successo */
-#v-diretta .ev::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: calc(var(--sp) + 4px); background: color-mix(in srgb, var(--cc) 20%, var(--panel)); box-shadow: inset 5px 0 0 var(--cc);
-  clip-path: polygon(0 0, 100% 0, calc(100% - 18px) 100%, 0 100%); pointer-events: none; }
-#v-diretta .ev .evbody { gap: 7px; align-content: center; padding: 1px 0; }
+/* il dorso: sta dietro ai ritratti e ne esce di un filo a sinistra, a destra e tra un volto e l'altro, nel colore di ciò che è successo */
+#v-diretta .ev::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: calc(var(--sp) + 5px); background: var(--cc);
+  clip-path: polygon(0 0, 100% 0, calc(100% - var(--k)) 100%, 0 100%); pointer-events: none; }
+#v-diretta .ev .evbody { gap: 7px; align-content: center; padding: 13px 22px 14px 0; }
 #v-diretta .ev p { font-size: 16px; line-height: 1.56; color: var(--ink); max-width: 72ch; }
 #v-diretta .ev .nm { text-decoration-thickness: 2px; text-underline-offset: 3px; }
 
-/* volti tagliati: parallelogrammi sovrapposti, chi cade perde il colore e prende un taglio */
-#v-diretta .ev .avs { display: flex; flex-wrap: wrap; align-content: center; justify-content: center; gap: 3px 0; padding: 0 18px 0 8px; z-index: 1; }
-#v-diretta .ev .avs .av .sil { opacity: .78; }
-#v-diretta .ev .avs .av { --s: 50px; width: calc(var(--s) * .94); border-radius: 0; clip-path: var(--dx-para); margin-left: calc(var(--s) * -.2); box-shadow: none; transition: transform .22s var(--ease-kick); }
-#v-diretta .ev .avs .av:first-child, #v-diretta .ev .avs .av:nth-child(3) { margin-left: 0; }
-#v-diretta .ev .avs .av:first-child:nth-last-child(2), #v-diretta .ev .avs .av:first-child:nth-last-child(2) ~ .av { --s: 44px; }
-#v-diretta .ev .avs .av:first-child:nth-last-child(n+3), #v-diretta .ev .avs .av:first-child:nth-last-child(n+3) ~ .av { --s: 36px; }
-#v-diretta .ev .avs .av:nth-child(3):last-child { margin-left: calc(var(--s) * .4); }
-@media (hover: hover) { #v-diretta .ev .avs button.av:hover { transform: scale(1.16) rotate(-3deg); z-index: 2; } }
+/* ritratti: lame verticali alte quanto la riga, tagliate dalla stessa diagonale e affiancate.
+ * Una persona occupa tutto il dorso, due lo dividono, quattro diventano quattro lame. Chi cade perde il colore e prende il taglio. */
+#v-diretta .ev .avs { display: flex; flex-wrap: nowrap; align-items: stretch; gap: 0; padding: 0 0 0 5px; z-index: 1; }
+#v-diretta .ev .avs .av { --s: 60px; flex: 1 1 0; min-width: 0; width: auto; height: auto; align-self: stretch; border-radius: 0; box-shadow: none; margin-left: calc(3px - var(--k));
+  clip-path: polygon(var(--k) 0, 100% 0, calc(100% - var(--k)) 100%, 0 100%); transition: flex-grow .3s var(--look-out); }
+#v-diretta .ev .avs .av:first-child { margin-left: 0; clip-path: polygon(0 0, 100% 0, calc(100% - var(--k)) 100%, 0 100%); }
+#v-diretta .ev .avs .av:first-child:nth-last-child(n+2), #v-diretta .ev .avs .av:first-child:nth-last-child(n+2) ~ .av { --s: 44px; }
+#v-diretta .ev .avs .av:first-child:nth-last-child(n+3), #v-diretta .ev .avs .av:first-child:nth-last-child(n+3) ~ .av { --s: 34px; }
+#v-diretta .ev .avs .av img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 50% 26%; }
+/* la sagoma resta una figura intera: riempie le lame basse dall'alto e si posa al piede di quelle alte (misure dal contenitore) */
+#v-diretta .ev .avs .av { container-type: size; }
+#v-diretta .ev .avs .av .sil { --sh: max(104cqw, min(64cqh, 190cqw)); inset: auto; left: calc(50cqw - var(--sh) * .457); width: calc(var(--sh) * .914); height: var(--sh); top: max(7cqh, calc(100cqh - var(--sh))); opacity: .8; -webkit-mask-position: 50% 0; mask-position: 50% 0; }
+/* le iniziali: una targhetta al piede della lama, non una scritta sopra la faccia */
+#v-diretta .ev .avs .av .ini { inset: auto auto 0 0; width: auto; height: auto; display: block; padding: 4px 7px 3px 6px; background: var(--dx-void); color: var(--dx-paper); text-shadow: none; z-index: 1;
+  font: italic 900 11.5px / 1 var(--f-display); letter-spacing: .04em; transition: background-color .12s, color .12s; }
+#v-diretta .ev .avs .av:first-child:nth-last-child(n+3) .ini, #v-diretta .ev .avs .av:first-child:nth-last-child(n+3) ~ .av .ini { padding: 3px 5px 2px 4px; font-size: 10.5px; letter-spacing: 0; }
+@media (hover: hover) {
+  #v-diretta .ev .avs button.av:hover { flex-grow: 1.9; }
+  #v-diretta .ev .avs button.av:hover .ini { background: var(--key); color: var(--key-ink); }
+}
 #v-diretta .av.dead > * { filter: grayscale(1) contrast(1.1); }
 #v-diretta .av.dead::after { content: ""; position: absolute; left: -20%; right: -20%; top: calc(50% - 2px); height: 4px; background: #e5484d; transform: rotate(-38deg); pointer-events: none; }
+#v-diretta .ev .avs .av.dead { background: hsl(0 0% 24%); }
+#v-diretta .ev .avs .av.dead .sil { background: hsl(0 0% 70%); opacity: .7; }
+#v-diretta .ev .avs .av.dead .ini { background: #c8302c; color: #fff; filter: none; }
+#v-diretta .ev .avs .av.dead::after { inset: 0; height: auto; transform: none; z-index: 1;
+  background: linear-gradient(to top right, transparent calc(50% - 2.5px), #e5484d calc(50% - 2.5px), #e5484d calc(50% + 2.5px), transparent calc(50% + 2.5px)); }
 #v-diretta button.av:focus-visible { clip-path: none; outline: 3px solid var(--key); outline-offset: 2px; z-index: 3; }
+#v-diretta .ev .avs button.av:focus-visible { clip-path: polygon(var(--k) 0, 100% 0, calc(100% - var(--k)) 100%, 0 100%); outline: 3px solid var(--dx-paper); outline-offset: -3px; flex-grow: 1.9; }
+#v-diretta .ev .avs button.av:first-child:focus-visible { clip-path: polygon(0 0, 100% 0, calc(100% - var(--k)) 100%, 0 100%); }
+#v-diretta .ev .avs button.av:focus-visible .ini { background: var(--key); color: var(--key-ink); }
 
 /* etichette come timbri */
 #v-diretta .ev-meta { gap: 6px 12px; }
@@ -180,62 +202,60 @@
 #v-diretta .ev-mark { right: -6px; bottom: -18px; width: 108px; height: 108px; opacity: .07; transform: rotate(-12deg); }
 
 /* piano alto: uccisioni, morti e tradimenti. Dorso pieno, testo più grande, la riga sporge dalla colonna */
-#v-diretta .ev.lethal, #v-diretta .ev.c-betray { padding-block: 18px 19px; background: color-mix(in srgb, var(--cc) 9%, var(--panel)); box-shadow: inset 0 -4px 0 var(--cc); }
-#v-diretta .ev.lethal::before, #v-diretta .ev.c-betray::before { background: var(--cc); box-shadow: none; }
+#v-diretta .ev.lethal, #v-diretta .ev.c-betray { --rh: 108px; --k: 20px; background: color-mix(in srgb, var(--cc) 11%, var(--dx-card)); box-shadow: inset 0 -4px 0 var(--cc); }
+#v-diretta .ev.lethal .evbody, #v-diretta .ev.c-betray .evbody { padding-block: 18px 20px; }
 #v-diretta .ev.lethal p, #v-diretta .ev.c-betray p { font-size: 17.5px; line-height: 1.5; font-weight: 600; }
 #v-diretta .ev.lethal .echo li, #v-diretta .ev.c-betray .echo li { font-weight: 400; }
 #v-diretta .ev.lethal .cat, #v-diretta .ev.c-betray .cat { font-size: 14px; padding: 6px 15px 6px 10px; }
-#v-diretta .ev.lethal .avs .av, #v-diretta .ev.c-betray .avs .av { --s: 56px; }
-#v-diretta .ev.lethal .avs .av:first-child:nth-last-child(2), #v-diretta .ev.lethal .avs .av:first-child:nth-last-child(2) ~ .av,
-#v-diretta .ev.c-betray .avs .av:first-child:nth-last-child(2), #v-diretta .ev.c-betray .avs .av:first-child:nth-last-child(2) ~ .av { --s: 48px; }
-#v-diretta .ev.lethal .avs .av:first-child:nth-last-child(n+3), #v-diretta .ev.lethal .avs .av:first-child:nth-last-child(n+3) ~ .av { --s: 40px; }
 #v-diretta .ev.lethal .ev-mark, #v-diretta .ev.c-betray .ev-mark { opacity: .13; width: 132px; height: 132px; }
 .fx-forme #v-diretta .ev.in.fx-kill .avs::before { background: var(--dx-void); }
-@media (min-width: 1081px) { #v-diretta .ev.lethal, #v-diretta .ev.c-betray { margin-left: -16px; --sp: 120px; } }
+@media (min-width: 1081px) { #v-diretta .ev.lethal, #v-diretta .ev.c-betray { margin-left: -16px; --sp: 152px; } }
 
-/* piano basso: i fatti senza conseguenze si spengono, le note ambientali sono didascalie */
-#v-diretta .ev.c-none { background: transparent; box-shadow: inset 0 -1px 0 color-mix(in srgb, var(--ink) 14%, transparent); padding-block: 10px 11px; clip-path: none; }
-#v-diretta .ev.c-none::before { background: none; box-shadow: inset 3px 0 0 color-mix(in srgb, var(--ink) 22%, transparent); }
-#v-diretta .ev.c-none p { color: color-mix(in srgb, var(--ink) 86%, transparent); }
-#v-diretta .ev.c-none .avs .av { --s: 40px; opacity: .9; }
-#v-diretta .ev.c-none .avs .av:first-child:nth-last-child(n+2), #v-diretta .ev.c-none .avs .av:first-child:nth-last-child(n+2) ~ .av { --s: 34px; }
+/* piano basso: i fatti senza conseguenze sono più bassi e più scuri, le note ambientali sono didascalie. Sempre su fondo pieno */
+#v-diretta .ev.c-none { --rh: 66px; --k: 13px; background: var(--dx-card-low); }
+#v-diretta .ev.c-none::before { background: color-mix(in srgb, var(--ink) 30%, var(--dx-card-low)); }
+#v-diretta .ev.c-none .evbody { padding-block: 10px 11px; }
+#v-diretta .ev.c-none p { color: color-mix(in srgb, var(--ink) 88%, var(--dx-card-low)); }
 #v-diretta .ev.c-none .ev-mark { display: none; }
-#v-diretta .ev.note { grid-template-columns: auto minmax(0, 1fr); gap: 10px; align-items: center; padding: 4px 0 6px 4px; background: none; border: 0; box-shadow: none; clip-path: none; }
+#v-diretta .ev.note { grid-template-columns: auto minmax(0, 1fr); gap: 10px; align-items: center; width: fit-content; max-width: 100%; min-height: 0; padding: 7px 18px 8px 12px; background: var(--dx-card-low); border: 0;
+  box-shadow: inset 3px 0 0 color-mix(in srgb, var(--ink) 26%, var(--dx-card-low)); clip-path: polygon(0 0, 100% 0, calc(100% - 9px) 100%, 0 100%); }
 #v-diretta .ev.note::before { content: none; }
-#v-diretta .ev.note .note-ic { width: 24px; height: 24px; background: none; color: var(--muted); }
+#v-diretta .ev.note .note-ic { width: 22px; height: 22px; background: none; color: var(--muted); }
 #v-diretta .ev.note p { font-size: 14.5px; line-height: 1.5; color: var(--muted); max-width: none; }
 #v-diretta .ev.note p b { margin-right: 4px; font: 800 11px / 1 var(--f-body); letter-spacing: .18em; text-transform: uppercase; color: var(--ink); }
-#v-diretta .ev.note.finale-why { grid-template-columns: minmax(0, 1fr); padding: 16px 22px 17px 24px; background: var(--dx-void); box-shadow: inset 8px 0 0 #e5484d; clip-path: polygon(0 0, 100% 0, 100% calc(100% - var(--cut)), calc(100% - var(--cut)) 100%, 0 100%); }
+#v-diretta .ev.note.finale-why { grid-template-columns: minmax(0, 1fr); width: auto; padding: 16px 22px 17px 24px; background: var(--dx-void); box-shadow: inset 8px 0 0 #e5484d; clip-path: polygon(0 0, 100% 0, 100% calc(100% - var(--cut)), calc(100% - var(--cut)) 100%, 0 100%); }
 #v-diretta .ev.note.finale-why p { font-size: 16px; color: hsl(0 0% 100% / .88); max-width: 80ch; }
 #v-diretta .ev.note.finale-why p b { display: block; margin: 0 0 6px; font: italic 900 20px / 1 var(--f-display); font-stretch: 114%; letter-spacing: 0; color: var(--dx-paper); }
 
 /* chi segui: una cornice di tinta e una linguetta */
-#v-diretta .ev.followed { outline: 0; box-shadow: inset 0 0 0 3px var(--key); }
+#v-diretta .ev.followed { outline: 3px solid var(--key); outline-offset: -3px; }
 #v-diretta .ev.followed .evbody::before { content: "Seguito"; justify-self: start; padding: 4px 12px 4px 8px; font: 800 10.5px / 1 var(--f-body); letter-spacing: .2em; text-transform: uppercase; color: var(--key-ink); background: var(--key);
   clip-path: polygon(0 0, 100% 0, calc(100% - 7px) 100%, 0 100%); }
-#v-diretta .ev:focus-visible { outline: 0; box-shadow: inset 0 0 0 4px var(--key); }
+#v-diretta .ev:focus-visible { outline: 4px solid var(--key); outline-offset: -4px; }
 
 /* nessun risultato */
-#v-diretta .ev-empty { gap: 14px; padding: 26px 28px; border: 0; border-radius: 0; color: var(--ink); background: repeating-linear-gradient(-45deg, transparent 0 12px, color-mix(in srgb, var(--ink) 6%, transparent) 12px 14px);
+#v-diretta .ev-empty { gap: 14px; padding: 26px 28px; border: 0; border-radius: 0; color: var(--ink); background: repeating-linear-gradient(-45deg, transparent 0 12px, color-mix(in srgb, var(--ink) 6%, transparent) 12px 14px), var(--dx-card);
   box-shadow: inset 6px 0 0 var(--ink); }
 #v-diretta .ev-empty p, #v-diretta .livefeed > .help { font: italic 800 clamp(18px, 2.2vw, 24px) / 1.2 var(--f-display); color: var(--ink); max-width: 30ch; text-wrap: balance; }
-#v-diretta .livefeed > .help { max-width: 44ch; padding: 22px 0 22px 20px; font-size: 18px; box-shadow: inset 6px 0 0 var(--key); }
+#v-diretta .livefeed > .help { max-width: 44ch; padding: 22px 22px 22px 22px; font-size: 18px; background: var(--dx-card); box-shadow: inset 6px 0 0 var(--key); }
 
 /* densità, grandezza e opzioni di lettura */
 #v-diretta #phBody.dens-compatta { gap: 4px; }
-#v-diretta .dens-compatta .ev { --sp: 76px; padding: 8px 16px 9px 0; margin-left: 0; }
-#v-diretta .dens-compatta .ev .avs { padding: 0 14px 0 8px; }
-#v-diretta .dens-compatta .ev .avs .av, #v-diretta .dens-compatta .ev .avs .av:first-child:nth-last-child(n+2), #v-diretta .dens-compatta .ev .avs .av:first-child:nth-last-child(n+2) ~ .av { --s: 30px; }
+#v-diretta .dens-compatta .ev:not(.note) { --sp: 104px; --k: 11px; --rh: 54px; margin-left: 0; gap: 0 14px; }
+#v-diretta .dens-compatta .ev:is(.lethal, .c-betray) { --rh: 62px; }
+#v-diretta .dens-compatta .ev .evbody { padding: 8px 16px 9px 0; }
+#v-diretta .dens-compatta .ev .avs .av .ini { padding: 3px 5px 2px 4px; font-size: 10.5px; }
 #v-diretta .dens-compatta .ev p { font-size: 15px; line-height: 1.45; }
 #v-diretta .dens-compatta .ev.lethal p, #v-diretta .dens-compatta .ev.c-betray p { font-size: 15.5px; }
 #v-diretta .dens-compatta .ev .cat { font-size: 11px; padding: 3px 9px 3px 7px; }
-#v-diretta .dens-compatta .ev.note { padding: 2px 0 2px 4px; }
+#v-diretta .dens-compatta .ev.note { padding: 4px 16px 5px 10px; }
 #v-diretta .size-grande .ev p { font-size: 18.5px; line-height: 1.6; }
 #v-diretta .size-grande .ev.lethal p, #v-diretta .size-grande .ev.c-betray p { font-size: 20px; }
 #v-diretta .size-grande .ev .echo li, #v-diretta .size-grande .ev.note p { font-size: 16px; }
 #v-diretta .size-grande .ev .event-place { font-size: 12px; }
 #v-diretta .size-grande .ev .why { font-size: 14.5px; }
-#v-diretta .no-faces .ev:not(.note) { --sp: 10px; grid-template-columns: minmax(0, 1fr); padding-left: 30px; margin-left: 0; }
+#v-diretta .no-faces .ev:not(.note) { --sp: 6px; --k: 0px; --rh: 0px; grid-template-columns: minmax(0, 1fr); margin-left: 0; }
+#v-diretta .no-faces .ev:not(.note) .evbody { padding-left: 28px; }
 
 /* il memoriale del bilancio */
 #v-diretta .memorial { gap: 20px; padding: 26px 28px 30px; border-radius: 0; background: var(--dx-void); color: var(--dx-paper); clip-path: polygon(0 0, calc(100% - 26px) 0, 100% 26px, 100% 100%, 0 100%); }
@@ -434,18 +454,22 @@
   #v-diretta .bc-lbl { margin: 0 0 4px; font-size: 10px; letter-spacing: .16em; max-width: 9ch; line-height: 1.25; }
   #v-diretta .tally { padding: 0 14px 12px 26px; gap: 2px; }
   #v-diretta .tally i { height: 10px; }
-  #v-diretta .timeline { gap: 6px 16px; padding-top: 14px; }
-  #v-diretta .tday[data-n]::before { font-size: 32px; }
+  #v-diretta .timeline { margin-top: 12px; padding: 9px 14px 10px 14px; }
+  #v-diretta .tday { padding-right: 12px; margin-right: 11px; }
   #v-diretta .rb-tools { width: 100%; justify-content: space-between; }
   #v-diretta .rbc { padding: 9px 10px 9px 11px; font-size: 11px; letter-spacing: .1em; }
   #v-diretta .rb-panel { padding: 18px 16px 20px 22px; }
-  #v-diretta .ev { --sp: 66px; gap: 0 8px; padding: 11px 14px 12px 0; }
-  #v-diretta .ev .avs { padding: 0 10px 0 6px; }
-  #v-diretta .ev .avs .av, #v-diretta .ev.lethal .avs .av, #v-diretta .ev.c-betray .avs .av { --s: 40px; }
-  #v-diretta .ev .avs .av:first-child:nth-last-child(n+2), #v-diretta .ev .avs .av:first-child:nth-last-child(n+2) ~ .av,
-  #v-diretta .ev:is(.lethal, .c-betray) .avs .av:first-child:nth-last-child(n+2), #v-diretta .ev:is(.lethal, .c-betray) .avs .av:first-child:nth-last-child(n+2) ~ .av { --s: 28px; }
+  /* telefono: il dorso è stretto, le righe sono alte. Fino a tre lame verticali; in quattro, due file da due */
+  #v-diretta .ev:not(.note) { --sp: 84px; --k: 9px; --rh: 88px; gap: 0 12px; }
+  #v-diretta .ev.c-none { --rh: 72px; }
+  #v-diretta .ev .evbody { padding: 11px 14px 12px 0; }
+  #v-diretta .ev .avs { flex-wrap: wrap; gap: 3px 0; padding-left: 4px; }
+  #v-diretta .ev .avs .av:first-child:nth-last-child(4), #v-diretta .ev .avs .av:first-child:nth-last-child(4) ~ .av { flex: 1 1 40%; }
+  #v-diretta .ev .avs .av:first-child:nth-last-child(4) ~ .av:nth-child(3) { margin-left: 0; clip-path: polygon(0 0, 100% 0, calc(100% - var(--k)) 100%, 0 100%); }
+  #v-diretta .ev .avs .av .ini { padding: 3px 5px 2px 4px; font-size: 10.5px; letter-spacing: 0; }
   #v-diretta .ev .cat { grid-column: auto; }
-  #v-diretta .ev.lethal, #v-diretta .ev.c-betray { padding-block: 14px 15px; }
+  #v-diretta .ev.lethal .evbody, #v-diretta .ev.c-betray .evbody { padding-block: 14px 15px; }
+  #v-diretta .ev.note { padding: 6px 14px 7px 10px; }
   #v-diretta .ev.lethal p, #v-diretta .ev.c-betray p { font-size: 16.5px; }
   #v-diretta .ev-mark { width: 84px; height: 84px; }
   #v-diretta .memorial { padding: 20px 16px 22px; }
@@ -466,7 +490,9 @@
 @media (prefers-reduced-motion: reduce) {
   #v-diretta .rb-panel, #v-diretta .ev.in .cat, #v-diretta .sbody.dx-swap > *, #v-diretta .zcard, #v-diretta .pbtn.next svg { animation: none; }
   #v-diretta :is(.tph, .rbc, .stabs button, .zrow, .prow, .pbtn, .mem, .zc-link, .av, .mn-disc) { transition: none; }
+  #v-diretta .ev .avs .av { transition: none; }
 }
+[data-reduced-motion] #v-diretta .ev .avs .av { transition: none; }
 [data-reduced-motion] #v-diretta .rb-panel, [data-reduced-motion] #v-diretta .ev.in .cat, [data-reduced-motion] #v-diretta .sbody.dx-swap > *, [data-reduced-motion] #v-diretta .zcard, [data-reduced-motion] #v-diretta .pbtn.next svg { animation: none; }
 [data-reduced-motion] #v-diretta :is(.tph, .rbc, .stabs button, .zrow, .prow, .pbtn, .mem, .zc-link, .av, .mn-disc) { transition: none; }
 

@@ -482,3 +482,23 @@
 [data-reduced-motion] #resBody .es-unit, [data-reduced-motion] #resBody .es-unit *, [data-reduced-motion] #resBody .es-unit::before, [data-reduced-motion] #resBody .es-unit::after, [data-reduced-motion] #resBody .es-unit *::before, [data-reduced-motion] #resBody .es-unit *::after, [data-reduced-motion] #archiveDlg .archive-entry { animation: none !important; }
 [data-reduced-motion] #resBody.es-on .es-unit:not(.es-in) { opacity: 1; }
 [data-reduced-motion] .es-poster, [data-reduced-motion] .es-poster::before, [data-reduced-motion] #resBody.es-on .pod.es-pod, [data-reduced-motion] #resBody.es-on .award.es-aw, [data-reduced-motion] #archiveList .archive-entry, [data-reduced-motion] .es-dw { transition: none; }
+
+/* ================= CORREZIONI (regia, 18 nov) =================
+ * Riscontro dell'utente: titoli tagliati e testi mal centrati. I titoli dei blocchi ora stanno interi dentro la lastra,
+ * il numero è una targhetta allineata al centro della prima riga, e il calendario non accavalla «Finale» e il conteggio. */
+#resBody.es-on .block > h2, #resBody.es-on .block[data-es="premi"] > h2, #resBody.es-on .block[data-es="salienti"] > h2, #resBody.es-on .block[data-es="svolte"] > h2 {
+  --up: 0em; display: flex; align-items: center; flex-wrap: wrap; gap: .1em .4em; clip-path: none; margin: 0 0 .5em; padding: 26px 24px 0 0;
+  font-size: clamp(28px, 3.4vw, 54px); line-height: 1; letter-spacing: -.025em; text-wrap: balance; }
+#resBody.es-on .block > h2::before { align-self: center; margin: 0 .1em 0 0; font-size: 13px; }
+#resBody.es-on .block[data-es="podio"] > h2::after { align-self: center; margin: 0; }
+#resBody.es-on .es-colB .block > h2 { padding-top: 0; margin: 20px 0 16px; font-size: clamp(22px, 2.1vw, 30px); }
+/* calendario: «Finale» e il conteggio in due colonne che non si toccano */
+.es-dh { grid-template-columns: minmax(0, 1fr) max-content; column-gap: 14px; }
+.es-dc { white-space: nowrap; }
+.es-day.es-fin .es-du { font-size: clamp(24px, 2.2vw, 32px); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+/* premi: le etichette dei conteggi vanno a capo dentro la loro colonna, senza uscire */
+#resBody.es-on .award.es-num small { max-width: 13ch; text-align: right; }
+#resBody.es-on .award.es-num small span { line-height: 1.25; overflow-wrap: anywhere; }
+@media (max-width: 760px) {
+  #resBody.es-on .block > h2, #resBody.es-on .block[data-es="premi"] > h2, #resBody.es-on .block[data-es="salienti"] > h2, #resBody.es-on .block[data-es="svolte"] > h2 { font-size: clamp(24px, 7.4vw, 34px); padding-top: 18px; }
+}
