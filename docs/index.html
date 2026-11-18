@@ -5344,94 +5344,40 @@ body:has(#editDlg[open]) #v-cast > :not(.dock) { translate: -34px 0; }
 .av.es-strip > img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
 
 /* ================= PELLE · PARTITA GIOCATA, FASE 2 (base) =================
- * Struttura e leggibilità per telecronaca (#ptCast), pubblico (scheda «Pubblico»: .aud-poll, .aud-chat),
- * minigiochi delle prove (.sc-game, .mg-*), segnalini sulla mappa (.mn-pins), doni dalla mappa e dalla scheda,
- * voto della regia nell'Esito (.ps-regia). Caricato prima di 60/61: la regia visiva sta lì. */
+ * Solo l'ossatura di telecronaca (#ptCast), pubblico (.aud-poll, .aud-chat), minigiochi (.sc-game, .mg-*),
+ * segnalini sulla mappa (.mn-pins), doni dalla mappa e dalla scheda, voto della regia nell'Esito (.ps-regia):
+ * ciò che serve perché le schermate stiano in piedi. Forme, colori e movimento sono in 60-partita.css
+ * (dal punto 8 in poi) e in 61-partita.js. */
 
-/* ---------- telecronaca ---------- */
-.pt-cast { display: grid; gap: 6px; margin: 0 0 14px; padding: 10px 16px 12px; background: var(--panel-solid, var(--panel)); box-shadow: inset 5px 0 0 var(--ink); }
-.pt-cast .pc-on { justify-self: start; font: 800 10.5px / 1 var(--f-body); letter-spacing: .2em; text-transform: uppercase; color: var(--key); }
-.pc-line { margin: 0; display: grid; grid-template-columns: 74px minmax(0, 1fr); gap: 10px; align-items: baseline; font-size: 15px; line-height: 1.4; }
-.pc-who { font: italic 900 14px / 1.2 var(--f-display); text-transform: uppercase; }
-.pc-e .pc-who { color: var(--key); }
-.pc-say b { font-weight: 800; }
+/* telecronaca */
+.pt-cast { display: grid; margin: 0 0 14px; }
+.pt-cast[hidden] { display: none; }
+.pc-line { margin: 0; }
 
-/* ---------- pubblico: sondaggio e chat ---------- */
-.aud-poll h4, .aud-chat h4 { display: flex; justify-content: space-between; align-items: baseline; margin: 0 0 10px; font: italic 900 16px / 1.1 var(--f-display); text-transform: uppercase; }
-.aud-poll h4 span, .aud-chat h4 span { font: 800 10.5px / 1 var(--f-body); letter-spacing: .16em; color: color-mix(in srgb, var(--ink) 65%, transparent); }
-.aud-poll ol { list-style: none; margin: 0 0 8px; padding: 0; display: grid; gap: 8px; }
-.aud-poll li { display: grid; grid-template-columns: 34px minmax(0, 1fr) auto auto; grid-template-rows: auto auto; column-gap: 10px; align-items: center; }
-.aud-poll li .av { --s: 34px; grid-row: 1 / 3; }
-.aud-poll .ap-name { font-weight: 800; font-size: 14px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.aud-poll .ap-bar { grid-column: 2; grid-row: 2; height: 6px; background: color-mix(in srgb, var(--ink) 12%, transparent); }
-.aud-poll .ap-bar b { display: block; height: 100%; background: var(--key); }
-.aud-poll em { grid-column: 3; grid-row: 1 / 3; font: italic 900 18px / 1 var(--f-display); font-style: italic; }
-.aud-poll .ap-vote, .aud-poll .ap-mine { grid-column: 4; grid-row: 1 / 3; }
-.aud-poll .ap-mine { font: 800 10.5px / 1 var(--f-body); letter-spacing: .12em; text-transform: uppercase; color: var(--key); }
-.aud-poll li.mine .ap-name { color: var(--key); }
-.aud-chat { margin-top: 18px; }
-.aud-chat ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
-.aud-chat li { font-size: 14px; line-height: 1.35; padding: 6px 10px; background: color-mix(in srgb, var(--ink) 6%, transparent); }
-.aud-chat li > b:first-child { color: var(--key); font-weight: 800; margin-right: 4px; }
-.aud-chat li.sad { box-shadow: inset 3px 0 0 var(--c-kill); }
-.aud-chat li.hype, .aud-chat li.fav { box-shadow: inset 3px 0 0 var(--key); }
+/* pubblico */
+.aud-poll ol, .aud-chat ul { list-style: none; margin: 0; padding: 0; display: grid; }
+.aud-poll .ap-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.aud-chat { margin-top: 22px; }
 
-/* ---------- minigiochi ---------- */
-.mg { display: grid; gap: 14px; margin: 4px 0 6px; }
-.mg-hint { margin: 0; font-size: 13px; color: color-mix(in srgb, var(--ink) 72%, transparent); }
-.mg-bar { position: relative; height: 44px; background: color-mix(in srgb, var(--ink) 10%, transparent); overflow: hidden; }
-.mg-zone { position: absolute; top: 0; bottom: 0; background: var(--key); opacity: .85; }
-.mg-needle { position: absolute; top: -4px; bottom: -4px; width: 4px; margin-left: -2px; background: var(--ink); }
-.mg-row { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
-.mg-round { font: 800 12px / 1 var(--f-body); letter-spacing: .14em; text-transform: uppercase; }
-.mg-go { padding: 12px 26px; border: 0; background: var(--key); color: var(--key-ink); font: italic 900 18px / 1 var(--f-display); text-transform: uppercase; cursor: pointer; }
-.mg-seq { display: flex; gap: 8px; justify-content: center; }
-.mg-cell { width: 48px; height: 56px; display: grid; place-items: center; background: color-mix(in srgb, var(--ink) 10%, transparent); font: 900 26px / 1 var(--f-display); font-style: normal; }
-.mg-cell.on { background: var(--ink); color: var(--bg); }
-.mg-cell.ok { background: var(--key); color: var(--key-ink); }
-.mg-cell.ko { background: var(--c-kill); color: #fff; }
-.mg-pad { display: grid; grid-template-columns: repeat(4, 56px); gap: 8px; justify-content: center; }
-.mg-pad button { height: 52px; border: 2px solid color-mix(in srgb, var(--ink) 25%, transparent); background: transparent; color: var(--ink); font: 900 24px / 1 var(--f-display); cursor: pointer; }
-.mg-pad button:not(:disabled):hover, .mg-pad button:focus-visible { background: var(--ink); color: var(--bg); outline: none; }
-.mg-pad button:disabled { opacity: .35; }
-.mg-clues { margin: 0; padding-left: 18px; display: grid; gap: 6px; font-size: 15px; }
-.mg-doors { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
-.mg-doors button { display: grid; gap: 6px; justify-items: center; padding: 18px 8px; border: 2px solid color-mix(in srgb, var(--ink) 25%, transparent); background: transparent; color: var(--ink); font: italic 900 16px / 1 var(--f-display); text-transform: uppercase; cursor: pointer; }
-.mg-doors button span { font-size: 12px; opacity: .7; }
-.mg-doors button:not(:disabled):hover, .mg-doors button:focus-visible { background: var(--ink); color: var(--bg); outline: none; }
-.mg-doors button.ok { background: var(--key); color: var(--key-ink); border-color: var(--key); }
-.mg-doors button.ko { background: var(--c-kill); color: #fff; border-color: var(--c-kill); }
-.mg-score b { font: italic 900 20px / 1 var(--f-display); text-transform: uppercase; }
-.sc.mg-great .mg-score b, .sc.mg-good .mg-score b { color: var(--key); }
-.sc.mg-bad .mg-score b { color: var(--c-kill); }
+/* minigiochi: le posizioni di fascia e ago le scrive partita.js (left / width in linea) */
+.mg { display: grid; }
+.mg-hint { margin: 0; }
+.mg-bar { position: relative; }
+.mg-zone, .mg-needle { position: absolute; }
+.mg-row { display: flex; align-items: center; }
+.mg-seq { display: flex; justify-content: center; }
+.mg-cell { display: grid; place-items: center; font-style: normal; }
+.mg-pad { display: grid; justify-content: center; }
+.mg-clues { margin: 0; display: grid; }
+.mg-doors { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); }
 
-/* ---------- mappa: segnalini e doni ---------- */
-.map-node .mn-pins { position: absolute; left: 50%; top: 100%; translate: -50% 14px; display: flex; gap: 2px; pointer-events: none; }
-.mn-pin { min-width: 20px; padding: 2px 4px; font: 800 9.5px / 1.2 var(--f-body); font-style: normal; text-align: center; background: var(--ink); color: var(--bg); }
-.mn-pin.pin-men { background: var(--key); color: var(--key-ink); }
-.mn-pin.pin-gift { background: var(--paper); color: var(--void); box-shadow: inset 0 0 0 2px var(--key); }
-.zc-gift, .pf-gift { font-size: 12px; }
-.zc-face .zc-gift { display: block; margin-top: 4px; padding: 3px 8px; border: 0; background: var(--key); color: var(--key-ink); font: 800 11px / 1 var(--f-body); letter-spacing: .08em; text-transform: uppercase; cursor: pointer; }
+/* mappa */
+.map-node .mn-pins { position: absolute; left: 50%; top: 100%; display: flex; pointer-events: none; }
+.mn-pin { font-style: normal; text-align: center; }
 
-/* ---------- esito: regia e prove ---------- */
-.ps-regia { margin-top: 16px; padding: 14px 16px; background: color-mix(in srgb, var(--ink) 6%, transparent); }
-.ps-regia h3 { margin: 0 0 6px; font: italic 900 18px / 1 var(--f-display); text-transform: uppercase; display: flex; align-items: baseline; gap: 8px; }
-.ps-regia h3 b { font-size: 34px; color: var(--key); }
-.ps-regia h3 small { font-size: 13px; opacity: .7; }
-.ps-rbars { display: grid; gap: 6px; margin: 10px 0; }
-.ps-rb { display: grid; grid-template-columns: 120px minmax(0, 1fr) 34px; gap: 10px; align-items: center; font-size: 13px; }
-.ps-rb em { font-style: normal; font-weight: 800; text-transform: uppercase; letter-spacing: .08em; font-size: 11px; }
-.ps-rb i { height: 8px; background: color-mix(in srgb, var(--ink) 12%, transparent); }
-.ps-rb i b { display: block; height: 100%; background: var(--key); }
-.ps-rb strong { font: italic 900 16px / 1 var(--f-display); text-align: right; }
-.ps-tests { margin: 12px 0 0; }
-
-@media (max-width: 600px) {
-  .pc-line { grid-template-columns: 1fr; gap: 2px; }
-  .mg-pad { grid-template-columns: repeat(4, 1fr); }
-  .mg-cell { width: 40px; height: 48px; }
-  .ps-rb { grid-template-columns: 96px minmax(0, 1fr) 30px; }
-}
+/* esito */
+.ps-rbars { display: grid; }
+.ps-rb i b { display: block; height: 100%; }
 
 /* ================= PELLE · LA PARTITA GIOCATA =================
  * Il cartello delle scelte (.sc), la barra del giocatore nella Diretta (#ptHud), il pulsante del dono (#giftBtn),
@@ -5850,6 +5796,366 @@ html.sc-on { overflow: hidden; }
   .player #giftBtn.pt-gift { padding-inline: 10px; min-width: 0; gap: 0; }
   .player #giftBtn.pt-gift > span { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 }
+
+/* =====================================================================================================
+ * FASE 2 · regia, prove giocabili, telecronaca, pubblico, mappa viva, voto della regia.
+ * Stesse regole: tre colori, inversioni istantanee, si muovono solo transform / opacity / clip-path.
+ * Le lastre «da trasmissione» (telecronaca, carte, barra dell'ago, voto) sono sempre nere con testo carta,
+ * così reggono tema chiaro e scuro; il resto usa --ink / --bg. L'ossatura è in 59-partita-base.css.
+ * ===================================================================================================== */
+
+/* ---------- 8 · le carte del Regista: una mano di tre cartelli da cabina di regia ---------- */
+.sc-regia .sc-head::after { content: "REC"; position: absolute; z-index: -1; right: 14px; top: -.06em; font: italic 900 150px / 1 var(--f-display); font-stretch: 122%; letter-spacing: -.04em; color: transparent;
+  -webkit-text-stroke: 2px color-mix(in srgb, var(--paper) 20%, transparent); pointer-events: none; }
+.sc-regia .sc-opt { color: var(--paper); }
+.sc-regia .sc-opt::before { background: repeating-linear-gradient(-60deg, var(--key) 0 9px, transparent 9px 18px) 0 0 / 100% 9px no-repeat, var(--void); }
+.sc-regia .sc-opt::after { background: var(--ink); }
+.sc-regia .sc-opt .sc-s { opacity: 1; color: color-mix(in srgb, currentColor 86%, transparent); }
+/* l'icona della carta (la mette 61-partita.js): nella tinta a riposo, del colore del testo quando la carta si accende */
+.sc-regia .rg-ic { display: grid; place-items: center; width: 40px; height: 40px; color: var(--key); transform-origin: 30% 80%; transition: transform .24s var(--ease-kick); }
+.sc-regia .rg-ic svg { display: block; width: 100%; height: 100%; fill: currentColor; overflow: visible; }
+.sc-regia .rg-ic .rg-s { fill: none; stroke: currentColor; stroke-width: 3.4; stroke-linecap: round; stroke-linejoin: round; }
+/* passaggio, fuoco, scelta: la carta prende la tinta di colpo, l'ombra esce, l'icona scatta */
+@media (hover: hover) {
+  .sc-regia .sc-opt:hover:not(:disabled) { color: var(--key-ink); }
+  .sc-regia .sc-opt:hover:not(:disabled)::before { background: repeating-linear-gradient(-60deg, var(--key-ink) 0 9px, transparent 9px 18px) 0 0 / 100% 9px no-repeat, var(--key); }
+  .sc-regia .sc-opt:hover:not(:disabled) .rg-ic { color: inherit; transform: scale(1.18) rotate(-8deg); }
+  .sc-regia .sc-opt:hover:not(:disabled) .sc-n { background: var(--key-ink); color: var(--key); }
+}
+.sc-regia .sc-opt:focus-visible, .sc-regia .sc-opt.is-picked, .sc-regia .sc-opt.is-picked:hover { color: var(--key-ink); }
+.sc-regia .sc-opt:focus-visible::before, .sc-regia .sc-opt.is-picked::before, .sc-regia .sc-opt.is-picked:hover::before { background: repeating-linear-gradient(-60deg, var(--key-ink) 0 9px, transparent 9px 18px) 0 0 / 100% 9px no-repeat, var(--key); }
+.sc-regia .sc-opt:focus-visible::before { outline: 3px solid var(--key-ink); outline-offset: -7px; }
+.sc-regia .sc-opt:focus-visible .rg-ic, .sc-regia .sc-opt.is-picked .rg-ic { color: inherit; transform: scale(1.18) rotate(-8deg); }
+.sc-regia .sc-opt:focus-visible .sc-n { background: var(--key-ink); color: var(--key); }
+.sc-regia .sc-opt:disabled { color: color-mix(in srgb, var(--ink) 76%, var(--sc-plate)); }
+.sc-regia .sc-opt:disabled::before { background: repeating-linear-gradient(-60deg, var(--sc-slab) 0 7px, transparent 7px 13px); }
+.sc-regia .sc-opt:disabled .rg-ic { color: inherit; }
+/* su schermi stretti restano righe: numero, icona, testo */
+.sc-regia .sc-opt { grid-template-columns: auto auto minmax(0, 1fr); padding-top: 17px; }
+.sc-regia .sc-opt .rg-ic { grid-column: 2; grid-row: 1 / 3; }
+.sc-regia .sc-opt .sc-l, .sc-regia .sc-opt .sc-s { grid-column: 3; }
+@media (min-width: 601px) {
+  /* una mano: tre carte in piedi, aperte a ventaglio */
+  .sc-regia .sc-opts { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; align-items: stretch; margin: 24px calc(var(--sc-pad) + 4px) 0 var(--sc-pad); padding-bottom: 12px; }
+  .sc-regia .sc-opt { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto auto auto 1fr; justify-items: start; align-content: start; row-gap: 0; min-height: 232px; padding: 26px 14px 18px 16px;
+    rotate: var(--rg-r, 0deg); translate: 0 var(--rg-y, 0px); transform-origin: 50% 130%; animation-name: rgDeal; animation-duration: .46s; animation-delay: calc(var(--sc-d, 0ms) + 190ms + var(--k, 0) * 90ms); }
+  .sc-regia .sc-opt:nth-child(1):not(:only-child) { --rg-r: -3deg; --rg-y: 7px; }
+  .sc-regia .sc-opt:nth-child(3) { --rg-r: 3deg; --rg-y: 7px; }
+  .sc-regia .sc-opt::before, .sc-regia .sc-opt::after { clip-path: polygon(0 0, calc(100% - 18px) 0, 100% 18px, 100% 100%, 0 100%); }
+  .sc-regia .sc-opt .sc-n, .sc-regia .sc-opt .rg-ic, .sc-regia .sc-opt .sc-l, .sc-regia .sc-opt .sc-l:only-of-type, .sc-regia .sc-opt .sc-s { grid-column: 1; grid-row: auto; }
+  .sc-regia .sc-opt .sc-n { width: 30px; height: 30px; font-size: 17px; }
+  .sc-regia .sc-opt .rg-ic { width: 76px; height: 76px; margin: 12px 0 10px -4px; }
+  .sc-regia .sc-opt .sc-l { font-size: clamp(14.5px, 2.45vw, 17px); font-stretch: 104%; line-height: 1.04; overflow-wrap: normal; }
+  .sc-regia .sc-opt .sc-s { margin-top: 8px; font-size: 13px; line-height: 1.34; }
+  /* la carta sotto il puntatore esce dalla mano; l'ombra (parte del pulsante) copre il punto da cui è partita */
+  @media (hover: hover) {
+    .sc-regia .sc-opt:hover:not(:disabled) { transform: translateY(-9px); z-index: 1; }
+    .sc-regia .sc-opt:hover:not(:disabled)::after { transform: translate(8px, 12px); }
+  }
+  .sc-regia .sc-opt:focus-visible { transform: translateY(-9px); z-index: 1; }
+  .sc-regia .sc-opt:focus-visible::after { transform: translate(8px, 12px); }
+  .sc-regia .sc-opt.is-picked, .sc-regia .sc-opt.is-picked:hover { z-index: 1; }
+}
+/* le carte arrivano dall'alto a sinistra: da sotto allungherebbero la lastra e comparirebbe la barra di scorrimento */
+@keyframes rgDeal { from { opacity: 0; transform: translate(-80px, -46px) rotate(-20deg); } 45% { opacity: 1; } }
+
+/* l'annuncio della regia nel racconto: un cartellino da ciak (ui.js mette .ev-regia sulla nota) */
+#v-diretta .ev.note.ev-regia { background: var(--void); box-shadow: inset 6px 0 0 var(--key); padding: 9px 22px 10px 16px; clip-path: polygon(0 0, 100% 0, calc(100% - 10px) 100%, 0 100%); }
+#v-diretta .ev.note.ev-regia p, #v-diretta .ev.note.ev-regia p b { color: var(--paper); }
+#v-diretta .ev.note.ev-regia p::before { content: "Regia"; display: inline-block; margin-right: 10px; padding: 4px 12px 3px 8px; vertical-align: 1px; background: var(--key); color: var(--key-ink); font: italic 900 11.5px / 1 var(--f-display); font-stretch: 112%; letter-spacing: .14em; text-transform: uppercase;
+  clip-path: polygon(0 0, 100% 0, calc(100% - 7px) 100%, 0 100%); transform-origin: 0 50%; }
+#v-diretta .ev.note.ev-regia .note-ic { color: var(--key); background: currentColor;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M2 10h20v11H2zM2.2 8.6 1 4.4l19.3-3.9 1.2 4.2zm3.3-3.4 1.9 2.5 2.6-.5-1.9-2.6zm5.9-1.2 1.9 2.5 2.6-.5L14 3.5zm5.9-1.2 1.9 2.6 1.5-.3-.6-2.2z' fill-rule='evenodd'/%3E%3C/svg%3E") 50% / contain no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M2 10h20v11H2zM2.2 8.6 1 4.4l19.3-3.9 1.2 4.2zm3.3-3.4 1.9 2.5 2.6-.5-1.9-2.6zm5.9-1.2 1.9 2.5 2.6-.5L14 3.5zm5.9-1.2 1.9 2.6 1.5-.3-.6-2.2z' fill-rule='evenodd'/%3E%3C/svg%3E") 50% / contain no-repeat; }
+#v-diretta .ev.note.ev-regia .note-ic svg { visibility: hidden; }
+#v-diretta .ev.in.ev-regia p::before { animation: ptTag .36s var(--ease-kick) backwards; animation-delay: calc(var(--d, 0ms) + 200ms); }
+
+/* ---------- 9 · le prove giocabili: tre colpi secchi ---------- */
+.sc-game .sc-head { grid-column: 1; padding-right: 12px; }
+.sc-game .sc-head::after { position: absolute; z-index: -1; right: 6px; top: -.14em; font: italic 900 190px / 1 var(--f-display); font-stretch: 122%; color: transparent; -webkit-text-stroke: 2px color-mix(in srgb, var(--paper) 18%, transparent); pointer-events: none; }
+.sc-g-tempismo .sc-head::after { content: "!"; } .sc-g-sequenza .sc-head::after { content: "\2192"; } .sc-g-via .sc-head::after { content: "?"; }
+/* chi affronta la prova entra in cut-in come il mentore */
+.sc-game .sc-faces { grid-area: 1 / 2 / 2 / 3; z-index: 2; align-self: stretch; margin: 0; gap: 0; min-height: 150px; filter: drop-shadow(-7px 0 0 var(--key)); animation: scFaceIn .46s var(--look-out) calc(var(--sc-d, 0ms) + 100ms) backwards; }
+.sc-game .sc-faces .av { --s: 150px; width: clamp(118px, 24vw, 190px); height: auto; align-self: stretch; border-radius: 0 !important; box-shadow: none; clip-path: polygon(30% 0, 100% 0, 100% 100%, 0 100%); }
+.sc-game .sc-faces .av .sil { inset: 8% -4% 0 12%; -webkit-mask-position: 50% 0; mask-position: 50% 0; }
+.sc-game .sc-faces .av .ini { right: 0; bottom: 0; padding: 5px 10px 4px; font: italic 900 15px / 1 var(--f-display); letter-spacing: .06em; background: var(--key); color: var(--key-ink); text-shadow: none; }
+.sc-game .sc-faces .av.has-volto .ini { display: block; }
+.sc-game .sc-x b { color: var(--paper); box-shadow: inset 0 -.3em 0 color-mix(in srgb, var(--key) 60%, transparent); }
+
+.sc-game .mg { gap: 16px; margin: 20px var(--sc-pad) 0; animation: scOptIn .36s var(--look-out) calc(var(--sc-d, 0ms) + 200ms) backwards; }
+.mg-hint { font-size: 13.5px; line-height: 1.4; color: color-mix(in srgb, var(--ink) 78%, transparent); }
+.mg-hint kbd { display: inline-block; padding: 3px 7px 2px; background: var(--ink); color: var(--bg); font: 800 11px / 1 var(--f-body); letter-spacing: .08em; text-transform: uppercase; }
+.mg-hint .mg-sec { display: inline-block; min-width: 2ch; text-align: center; color: var(--ink); font: italic 900 1.5em / 1 var(--f-display); font-variant-numeric: tabular-nums; box-shadow: inset 0 -.3em 0 color-mix(in srgb, var(--key) 60%, transparent); }
+
+/* tempismo: la barra è uno schermo nero con le tacche, la fascia buona nella tinta, l'ago una lama a due punte */
+.mg-bar { height: 76px; margin: 10px 6px 12px 0; overflow: visible; background-color: var(--void);
+  background-image: repeating-linear-gradient(90deg, color-mix(in srgb, var(--paper) 30%, transparent) 0 2px, transparent 2px 10%), linear-gradient(color-mix(in srgb, var(--paper) 12%, transparent), color-mix(in srgb, var(--paper) 12%, transparent));
+  background-size: 100% 14px, 100% 2px; background-position: 0 100%, 0 50%; background-repeat: no-repeat; box-shadow: 6px 6px 0 var(--key); }
+.mg-zone { top: 0; bottom: 0; background: linear-gradient(90deg, transparent calc(50% - 1px), var(--key-ink) calc(50% - 1px) calc(50% + 1px), transparent calc(50% + 1px)), var(--key); box-shadow: inset 0 0 0 3px var(--paper); }
+.mg-needle { top: -10px; bottom: -10px; width: 24px; margin-left: -12px; pointer-events: none; will-change: left;
+  background: linear-gradient(var(--key) 12px, transparent 12px calc(100% - 12px), var(--key) calc(100% - 12px)), linear-gradient(90deg, transparent 8px, var(--void) 8px 10px, var(--paper) 10px 14px, var(--void) 14px 16px, transparent 16px);
+  clip-path: polygon(0 0, 100% 0, 16px 12px, 16px calc(100% - 12px), 100% 100%, 0 100%, 8px calc(100% - 12px), 8px 12px); }
+/* il colpo: un lampo sulla barra (strato sopra, senza testo) e la parola accanto al conto dei colpi */
+.mg-bar::after { content: ""; position: absolute; inset: 0; opacity: 0; pointer-events: none; }
+.mg.mg-hit .mg-bar::after { background: var(--paper); animation: mgFlash .34s ease-out; }
+.mg.mg-miss .mg-bar::after { background: var(--c-kill); animation: mgFlash .34s ease-out; }
+.mg.mg-miss .mg-bar { animation: mgShake .3s linear; }
+.mg.mg-hit .mg-zone { animation: mgZone .3s var(--ease-kick); }
+@keyframes mgFlash { from { opacity: .8; } to { opacity: 0; } }
+@keyframes mgShake { 20% { transform: translateX(-7px); } 45% { transform: translateX(6px); } 70% { transform: translateX(-4px); } 90% { transform: translateX(2px); } }
+@keyframes mgZone { from { transform: scaleY(1.5); } }
+.mg-row { gap: 12px 16px; flex-wrap: wrap; }
+.mg-round { display: inline-flex; align-items: center; gap: 10px; font: italic 900 14px / 1 var(--f-display); letter-spacing: .12em; text-transform: uppercase; }
+.mg-round::after { padding: 6px 13px 5px 9px; font-size: 13px; letter-spacing: .1em; clip-path: polygon(0 0, 100% 0, calc(100% - 7px) 100%, 0 100%); transform-origin: 0 50%; }
+.mg.mg-hit .mg-round::after { content: "A segno!"; background: var(--key); color: var(--key-ink); animation: mgWord .3s var(--ease-kick); }
+.mg.mg-miss .mg-round::after { content: "Fuori!"; background: var(--c-kill); color: var(--panel-solid, #fff); animation: mgWord .3s var(--ease-kick); }
+@keyframes mgWord { from { transform: scale(1.7) rotate(-6deg); } }
+/* i tre colpi: rombi che si riempiono (li mette 61-partita.js) */
+.mg-pips { display: inline-flex; gap: 7px; margin-right: auto; }
+.mg-pips i { width: 16px; height: 16px; background: color-mix(in srgb, var(--ink) 22%, transparent); clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%); }
+.mg-pips i.ok { background: var(--key); animation: mgPip .3s var(--ease-kick); }
+.mg-pips i.ko { background: var(--c-kill); clip-path: polygon(18% 0, 50% 32%, 82% 0, 100% 18%, 68% 50%, 100% 82%, 82% 100%, 50% 68%, 18% 100%, 0 82%, 32% 50%, 0 18%); animation: mgPip .3s var(--ease-kick); }
+@keyframes mgPip { from { transform: scale(2.4) rotate(-40deg); } }
+.mg-go { margin: 0 8px 6px auto; padding: 17px 44px 15px; border: 0; background: var(--key); color: var(--key-ink); font: italic 900 27px / 1 var(--f-display); font-stretch: 116%; letter-spacing: .02em; text-transform: uppercase; cursor: pointer; outline: none;
+  transform: skewX(-8deg); box-shadow: 6px 6px 0 var(--ink); transition: none; -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
+@media (hover: hover) { .mg-go:hover { background: var(--ink); color: var(--bg); box-shadow: 6px 6px 0 var(--key); } }
+.mg-go:focus-visible { outline: 3px solid var(--ink); outline-offset: 4px; }
+.mg-go:active { transform: skewX(-8deg) translate(4px, 4px); box-shadow: 2px 2px 0 var(--ink); }
+
+/* sequenza: cinque lastre che si accendono, poi il tastierino */
+.mg-seq { gap: 9px; padding: 6px 0 2px; }
+.mg-cell { position: relative; width: 66px; height: 78px; background: var(--sc-slab); color: var(--ink); font: 900 36px / 1 var(--f-display); font-style: normal; clip-path: polygon(11px 0, 100% 0, calc(100% - 11px) 100%, 0 100%); }
+.mg-cell.on { background: var(--void); color: var(--paper); box-shadow: inset 0 -8px 0 var(--key); animation: mgCellOn .3s var(--ease-kick); }
+.mg-cell.ok { background: var(--key); color: var(--key-ink); box-shadow: none; animation: mgCellOk .3s var(--ease-kick); }
+/* sbagliata: nera col bordo rosso e una barra di traverso, così non si confonde con la tinta quando la tinta è rossa */
+.mg-cell.ko { background: linear-gradient(to top right, transparent calc(50% - 2px), var(--c-kill) calc(50% - 2px) calc(50% + 2px), transparent calc(50% + 2px)), var(--void); color: #fff; box-shadow: inset 0 0 0 4px var(--c-kill); animation: mgShake .3s linear; }
+/* tocca a te: la prossima casella ha il filo nella tinta */
+.sc.mg-ready .mg-cell:not(.ok, .ko):not(.mg-cell:not(.ok, .ko) ~ .mg-cell) { box-shadow: inset 0 -8px 0 var(--key); }
+.sc.mg-ready:is(.mg-great, .mg-good, .mg-meh, .mg-bad) .mg-cell:not(.ok, .ko):not(.mg-cell:not(.ok, .ko) ~ .mg-cell) { box-shadow: none; }
+@keyframes mgCellOn { from { transform: scale(1.32) rotate(-5deg); } }
+@keyframes mgCellOk { from { transform: scale(.72); } 55% { transform: scale(1.14); } }
+.mg-pad { grid-template-columns: repeat(4, 70px); gap: 12px; padding-bottom: 8px; }
+.mg-pad button { height: 64px; padding: 0; border: 0; background: var(--ink); color: var(--bg); font: 900 30px / 1 var(--f-display); cursor: pointer; outline: none; box-shadow: 0 6px 0 var(--key); transition: none; -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
+@media (hover: hover) { .mg-pad button:not(:disabled):hover { background: var(--key); color: var(--key-ink); box-shadow: 0 6px 0 var(--ink); } }
+.mg-pad button:focus-visible { outline: 3px solid var(--key); outline-offset: 3px; }
+.mg-pad button:not(:disabled):active { transform: translateY(5px); box-shadow: 0 1px 0 var(--key); }
+.mg-pad button:disabled { cursor: default; color: color-mix(in srgb, var(--ink) 66%, var(--sc-plate)); background: repeating-linear-gradient(-60deg, var(--sc-slab) 0 7px, transparent 7px 13px); box-shadow: none; }
+.sc.mg-ready .mg-pad { animation: mgPadGo .34s var(--ease-kick); }
+@keyframes mgPadGo { from { transform: scale(.9) skewX(-6deg); } }
+
+/* la via: indizi come dispacci, tre porte; il tempo è una lama che si consuma */
+.sc-g-via .mg::before { content: ""; height: 8px; background: var(--key); transform-origin: 0 50%; clip-path: polygon(6px 0, 100% 0, calc(100% - 6px) 100%, 0 100%); animation: scTimer 12s linear both; }
+.sc-g-via.mg-chosen .mg::before { animation-play-state: paused; }
+.mg-clues { list-style: none; padding: 0; gap: 8px; counter-reset: indizio; }
+.mg-clues li { counter-increment: indizio; display: grid; gap: 4px; padding: 9px 16px 10px 18px; font-size: 15.5px; line-height: 1.35; background: var(--sc-slab); box-shadow: inset 6px 0 0 var(--key); clip-path: polygon(0 0, 100% 0, calc(100% - 10px) 100%, 0 100%); }
+.mg-clues li::before { content: "Indizio " counter(indizio); font: 800 10px / 1 var(--f-body); letter-spacing: .22em; text-transform: uppercase; color: color-mix(in srgb, var(--ink) 74%, transparent); }
+.mg-doors { gap: 12px; padding: 2px 6px 6px 0; }
+.mg-doors button { position: relative; isolation: isolate; display: grid; align-content: start; justify-items: center; gap: 2px; min-height: 148px; padding: 16px 6px 40px; border: 0; background: none; color: var(--paper); font: italic 900 16px / 1.05 var(--f-display); font-stretch: 110%; text-transform: uppercase; cursor: pointer; outline: none;
+  transition: none; -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
+/* la porta: un trapezio nero con la soglia nella tinta */
+.mg-doors button::before { content: ""; position: absolute; inset: 0; z-index: -1; background: linear-gradient(var(--key), var(--key)) 0 100% / 100% 7px no-repeat, var(--void); clip-path: polygon(9% 0, 91% 0, 100% 100%, 0 100%); }
+.mg-doors button span { font-size: 62px; line-height: .9; font-stretch: 120%; color: var(--key); opacity: 1; transition: transform .22s var(--ease-kick); }
+.mg-doors button::after { position: absolute; left: 50%; bottom: 13px; translate: -50% 0; padding: 5px 11px 4px 8px; white-space: nowrap; font: 800 10px / 1 var(--f-body); letter-spacing: .14em; font-style: normal; }
+@media (hover: hover) {
+  .mg-doors button:not(:disabled):hover { color: var(--key-ink); filter: drop-shadow(6px 6px 0 var(--ink)); }
+  .mg-doors button:not(:disabled):hover::before { background: var(--key); }
+  .mg-doors button:not(:disabled):hover span { color: inherit; transform: scale(1.16) rotate(-6deg); }
+}
+.mg-doors button:focus-visible { color: var(--key-ink); filter: drop-shadow(6px 6px 0 var(--ink)); }
+.mg-doors button:focus-visible::before { background: var(--key); }
+.mg-doors button:focus-visible span { color: inherit; transform: scale(1.16) rotate(-6deg); }
+.mg-doors button:not(:disabled):active span { transform: scale(.94); }
+/* scelta fatta: la via sicura si accende, quella sbagliata diventa rossa, le altre si spengono */
+.mg-doors button:disabled { cursor: default; color: color-mix(in srgb, var(--ink) 76%, var(--sc-plate)); filter: none; }
+.mg-doors button:disabled::before { background: repeating-linear-gradient(-60deg, var(--sc-slab) 0 7px, transparent 7px 13px); }
+.mg-doors button:disabled span { color: inherit; transform: none; }
+.mg-doors button.ok { color: var(--key-ink); animation: scPunch .26s var(--ease-kick); }
+.mg-doors button.ok::before { background: var(--key); }
+.mg-doors button.ok::after { content: "\2713\00a0 Via sicura"; background: var(--key-ink); color: var(--key); }
+.mg-doors button.ko { color: var(--panel-solid, #fff); animation: mgShake .3s linear; }
+.mg-doors button.ko::before { background: var(--c-kill); }
+.mg-doors button.ko::after { content: "\2715\00a0 Trappola"; background: var(--panel-solid, #fff); color: var(--c-kill); }
+
+/* sul rosso il testo prende il colore della lastra (scuro nel tema scuro, chiaro in quello chiaro): è il contrasto migliore nei due temi */
+/* il verdetto: un timbro al piede del cartello; la lastra accusa il colpo */
+.sc-game .sc-foot { min-height: 52px; }
+.mg-score { display: flex; align-items: center; min-width: 0; }
+.mg-score b { display: inline-block; margin-left: 4px; padding: 9px 22px 8px 15px; background: var(--key); color: var(--key-ink); font: italic 900 clamp(22px, 4.4vw, 32px) / 1 var(--f-display); font-stretch: 116%; letter-spacing: -.01em; text-transform: uppercase; white-space: nowrap;
+  rotate: -4deg; box-shadow: 5px 5px 0 var(--ink); transform-origin: 20% 60%; animation: mgStamp .38s var(--ease-kick) backwards; }
+.sc.mg-meh .mg-score b { background: var(--ink); color: var(--bg); box-shadow: 5px 5px 0 var(--key); rotate: -2deg; }
+.sc.mg-bad .mg-score b { background: var(--c-kill); color: var(--panel-solid, #fff); rotate: 3deg; }
+@keyframes mgStamp { from { opacity: 0; transform: scale(2.6) rotate(-14deg); } 50% { opacity: 1; } }
+.sc.mg-great:not(.sc-out) .sc-card, .sc.mg-good:not(.sc-out) .sc-card { animation: mgCardHit .3s var(--ease-kick); }
+.sc.mg-bad:not(.sc-out) .sc-card, .sc.mg-meh:not(.sc-out) .sc-card { animation: mgCardMiss .32s linear; }
+.sc.mg-bad .sc-card { box-shadow: 10px 10px 0 var(--c-kill); }
+@keyframes mgCardHit { 40% { transform: scale(1.022); } }
+@keyframes mgCardMiss { 20% { transform: translateX(-6px); } 45% { transform: translateX(5px); } 70% { transform: translateX(-3px); } }
+/* le schegge dell'impatto (61-partita.js): partono da dietro la lastra, non passano mai sopra il testo */
+.mg-burst { position: absolute; z-index: 1; left: 0; top: 0; width: 0; height: 0; pointer-events: none; }
+.mg-burst i { position: absolute; left: -13px; top: -13px; width: 26px; height: 26px; background: var(--key); clip-path: polygon(50% 0, 100% 100%, 0 70%); }
+.mg-burst i:nth-child(3n) { background: var(--paper); } .mg-burst i:nth-child(4n) { clip-path: polygon(0 0, 100% 40%, 30% 100%); }
+
+/* ---------- 10 · la telecronaca: la cabina dei commentatori, un sottopancia a due voci ---------- */
+.pt-cast { position: relative; isolation: isolate; grid-template-columns: auto minmax(0, 1fr); gap: 0; margin: 0 6px 21px 0; padding: 0 30px 0 0; color: var(--paper); background: none; box-shadow: none; }
+.pt-cast::before { content: ""; position: absolute; inset: 0; z-index: -1; background: var(--void); clip-path: polygon(0 0, 100% 0, calc(100% - 20px) 100%, 0 100%); }
+/* il filo nella tinta sotto la fascia: entra a ogni battuta nuova */
+.pt-cast::after { content: ""; position: absolute; z-index: -1; left: 0; right: 16px; bottom: -5px; height: 5px; background: var(--key); transform-origin: 0 50%; clip-path: polygon(0 0, 100% 0, calc(100% - 5px) 100%, 0 100%); }
+.pt-cast .pc-on { grid-row: 1 / span 2; display: flex; align-items: center; justify-content: center; gap: 7px; writing-mode: vertical-rl; transform: rotate(180deg); padding: 10px 8px; background: var(--key); color: var(--key-ink); font: 800 10px / 1 var(--f-body); letter-spacing: .22em; text-transform: uppercase; white-space: nowrap; }
+.pt-cast .pc-on::before { content: ""; width: 8px; height: 8px; background: currentColor; clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%); animation: scOnAir 1.1s steps(2, jump-none) infinite; }
+.pc-line { grid-column: 2; display: grid; grid-template-columns: 92px minmax(0, 1fr); gap: 4px 14px; align-items: center; padding: 11px 0 9px 14px; font-size: 16px; line-height: 1.36; }
+.pc-line + .pc-line { padding: 9px 0 12px 14px; box-shadow: inset 0 1px 0 color-mix(in srgb, var(--paper) 18%, transparent); }
+.pc-who { justify-self: start; padding: 6px 15px 5px 10px; font: italic 900 13px / 1 var(--f-display); font-stretch: 112%; letter-spacing: .08em; text-transform: uppercase; clip-path: polygon(0 0, 100% 0, calc(100% - 8px) 100%, 0 100%); transform-origin: 0 50%; }
+.pc-e .pc-who { background: var(--key); color: var(--key-ink); }
+.pc-b .pc-who { background: var(--paper); color: var(--void); }
+.pc-say { min-width: 0; color: var(--paper); overflow-wrap: anywhere; }
+.pc-e .pc-say { font-weight: 700; }
+.pc-b .pc-say { font-style: italic; color: color-mix(in srgb, var(--paper) 88%, var(--void)); }
+.pc-say b { font-weight: 800; font-style: normal; color: var(--paper); box-shadow: inset 0 -.3em 0 color-mix(in srgb, var(--key) 62%, transparent); }
+/* battuta nuova (61-partita.js mette .pc-in): le targhe scattano, le righe arrivano una dopo l'altra */
+.pt-cast.pc-in::after { animation: pcRule .5s var(--look-out) backwards; }
+.pt-cast.pc-in .pc-line { animation: pcLine .34s var(--look-out) backwards; }
+.pt-cast.pc-in .pc-line + .pc-line { animation-delay: .13s; }
+.pt-cast.pc-in .pc-who { animation: scKick .32s var(--ease-kick) backwards; }
+.pt-cast.pc-in .pc-line + .pc-line .pc-who { animation-delay: .13s; }
+@keyframes pcRule { from { transform: scaleX(0); } }
+@keyframes pcLine { from { opacity: 0; transform: translateX(-16px); } 40% { opacity: 1; } }
+
+/* ---------- 11 · il pubblico: sondaggio da trasmissione e chat dal vivo ---------- */
+.aud-poll h4, .aud-chat h4 { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 6px 12px; margin: 0 0 12px; padding-bottom: 9px; font: italic 900 20px / 1 var(--f-display); font-stretch: 114%; letter-spacing: -.01em; text-transform: uppercase;
+  box-shadow: inset 0 -4px 0 var(--key); }
+.aud-poll h4 span, .aud-chat h4 span { display: inline-flex; align-items: center; gap: 7px; padding: 5px 13px 4px 9px; background: var(--key); color: var(--key-ink); font: 800 10px / 1 var(--f-body); font-style: normal; letter-spacing: .18em; clip-path: polygon(0 0, 100% 0, calc(100% - 7px) 100%, 0 100%); }
+.aud-chat h4 span::before { content: ""; width: 7px; height: 7px; background: currentColor; clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%); animation: scOnAir 1.1s steps(2, jump-none) infinite; }
+/* il sondaggio: classifica con posto, volto, barra obliqua e percentuale grande */
+.aud-poll ol { gap: 7px; margin-bottom: 10px; }
+.aud-poll li { position: relative; display: grid; grid-template-columns: 8px 40px minmax(0, 1fr) auto auto; grid-template-rows: auto auto; gap: 5px 10px; align-items: center; padding: 8px 12px 8px 8px;
+  background: color-mix(in srgb, var(--ink) 8%, transparent); clip-path: polygon(0 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%); }
+.aud-poll li:nth-child(2) { --i: 1; } .aud-poll li:nth-child(3) { --i: 2; } .aud-poll li:nth-child(4) { --i: 3; } .aud-poll li:nth-child(n+5) { --i: 4; }
+/* la costola a sinistra: nella tinta per chi è in testa (.ap-top lo mette 61-partita.js: l'ordine delle righe non è la classifica) */
+.aud-poll li::before { content: ""; grid-column: 1; grid-row: 1 / 3; align-self: stretch; margin: -8px 0 -8px -8px; width: 8px; background: color-mix(in srgb, var(--ink) 30%, transparent); }
+.aud-poll li.ap-top::before { background: var(--key); }
+.aud-poll li.ap-top em::after { content: "In testa"; display: block; margin-top: 3px; font: 800 8.5px / 1 var(--f-body); font-style: normal; letter-spacing: .16em; text-transform: uppercase; }
+.aud-poll li .av { --s: 40px; grid-column: 2; grid-row: 1 / 3; }
+.aud-poll .ap-name { grid-column: 3; grid-row: 1; align-self: end; font: italic 900 15px / 1.1 var(--f-display); text-transform: uppercase; letter-spacing: .01em; }
+.aud-poll .ap-bar { grid-column: 3; grid-row: 2; align-self: start; height: 9px; margin-right: 4px; background: color-mix(in srgb, var(--ink) 16%, transparent); transform: skewX(-22deg); overflow: hidden; }
+.aud-poll .ap-bar b { display: block; height: 100%; min-width: 3px; background: var(--key); transform-origin: 0 50%; animation: apFill .7s var(--look-out) backwards; animation-delay: calc(120ms + var(--i, 0) * 70ms); }
+.aud-poll ol.ap-ranked li:not(.ap-top):not(.mine) .ap-bar b { background: var(--ink); }
+.aud-poll em { grid-column: 4; grid-row: 1 / 3; min-width: 3.1ch; text-align: right; font: italic 900 23px / 1 var(--f-display); font-stretch: 112%; letter-spacing: -.02em; font-variant-numeric: tabular-nums; }
+.aud-poll .ap-vote, .aud-poll .ap-mine { grid-column: 5; grid-row: 1 / 3; }
+.aud-poll li.mine { box-shadow: inset 0 0 0 2px var(--key); }
+.aud-poll .ap-mine { padding: 6px 11px 5px 8px; background: var(--key); color: var(--key-ink); font: 800 9.5px / 1 var(--f-body); letter-spacing: .14em; text-transform: uppercase; clip-path: polygon(0 0, 100% 0, calc(100% - 6px) 100%, 0 100%); }
+.aud-poll .btn.ap-vote { background: var(--key); border-color: var(--key); color: var(--key-ink); font: italic 900 12px / 1 var(--f-display); letter-spacing: .1em; text-transform: uppercase; box-shadow: 3px 3px 0 var(--ink); transition: none; }
+@media (hover: hover) { .aud-poll .btn.ap-vote:hover { background: var(--ink); border-color: var(--ink); color: var(--bg); box-shadow: 3px 3px 0 var(--key); filter: none; } }
+.aud-poll .btn.ap-vote:focus-visible { outline: 3px solid var(--ink); outline-offset: 3px; }
+@keyframes apFill { from { transform: scaleX(0); } }
+/* la chat: messaggi che spuntano uno dopo l'altro; il colore del filo dice l'umore */
+.aud-chat ul { gap: 7px; }
+.aud-chat li { --filo: color-mix(in srgb, var(--ink) 34%, transparent); padding: 7px 14px 8px 13px; font-size: 14px; line-height: 1.36; overflow-wrap: anywhere; background: color-mix(in srgb, var(--ink) 7%, transparent); box-shadow: inset 4px 0 0 var(--filo);
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 9px 100%, 0 calc(100% - 9px)); transform-origin: 0 100%; animation: audMsg .32s var(--look-out) backwards; animation-delay: calc(90ms + var(--i, 0) * 75ms); }
+.aud-chat li:nth-child(2) { --i: 1; } .aud-chat li:nth-child(3) { --i: 2; } .aud-chat li:nth-child(4) { --i: 3; } .aud-chat li:nth-child(5) { --i: 4; } .aud-chat li:nth-child(6) { --i: 5; } .aud-chat li:nth-child(7) { --i: 6; }
+.aud-chat li:nth-child(8) { --i: 7; } .aud-chat li:nth-child(9) { --i: 8; } .aud-chat li:nth-child(10) { --i: 9; } .aud-chat li:nth-child(n+11) { --i: 10; }
+.aud-chat li > b:first-child { margin-right: 5px; font: italic 900 12.5px / 1 var(--f-display); letter-spacing: .03em; color: inherit; box-shadow: inset 0 -.34em 0 color-mix(in srgb, var(--key) 55%, transparent); }
+.aud-chat li.sad { --filo: var(--c-kill); }
+.aud-chat li.hype, .aud-chat li.fav, .aud-chat li.love { --filo: var(--key); }
+.aud-chat li.hype { font-weight: 700; }
+.aud-chat li.love::after { content: "\2665"; margin-left: 6px; font-size: 13px; }
+.aud-chat li.gift { background: var(--key); color: var(--key-ink); box-shadow: none; }
+.aud-chat li.gift > b:first-child { box-shadow: inset 0 -2px 0 currentColor; }
+@keyframes audMsg { from { opacity: 0; transform: translateY(10px) scale(.94); } 45% { opacity: 1; } }
+
+/* ---------- 12 · la mappa viva: segnalini sotto le zone, doni dalla scheda della zona e del concorrente ---------- */
+.map-node .mn-pins { translate: -50% 2px; gap: 3px; z-index: 2; }
+.mn-pin { flex: none; white-space: nowrap; min-width: 24px; padding: 7px 5px 3px; font: 800 9.5px / 1 var(--f-body); font-style: normal; letter-spacing: .05em; background: var(--paper); color: var(--void);
+  clip-path: polygon(0 4px, calc(50% - 4px) 4px, 50% 0, calc(50% + 4px) 4px, 100% 4px, 100% 100%, 0 100%); }
+.mn-pin.pin-men { background: var(--key); color: var(--key-ink); }
+.mn-pin.pin-fol { background: var(--paper); color: var(--void); }
+.mn-pin.pin-gift { background: linear-gradient(var(--key), var(--key)) 0 100% / 100% 3px no-repeat, var(--void); color: var(--paper); padding-bottom: 5px; white-space: nowrap; }
+.mn-pin.pin-gift::before { content: "\25c6\00a0"; color: var(--key); }
+/* la zona del tuo allievo ha un anello tratteggiato nella tinta */
+.map-node:has(.pin-men) .mn-disc { outline: 2px dashed var(--key); outline-offset: 6px; }
+.zc-face .zc-gift { display: block; margin-top: 4px; padding: 6px 8px 5px 7px; white-space: nowrap; border: 0; background: var(--key); color: var(--key-ink); font: italic 900 10px / 1 var(--f-display); letter-spacing: .06em; text-transform: uppercase; cursor: pointer; outline: none;
+  clip-path: polygon(5px 0, 100% 0, calc(100% - 5px) 100%, 0 100%); transition: none; }
+@media (hover: hover) { .zc-face .zc-gift:hover { background: var(--ink); color: var(--bg); } }
+.zc-face .zc-gift:focus-visible { background: var(--ink); color: var(--bg); box-shadow: inset 0 -3px 0 var(--key); }
+.zc-face .zc-gift:active { transform: scale(.92); }
+.btn.pf-gift, #profDlg .pf-panel .btn.pf-gift:not(.primary) { background: var(--key); border: 0; color: var(--key-ink); font: italic 900 13px / 1 var(--f-display); letter-spacing: .08em; text-transform: uppercase; box-shadow: 4px 4px 0 var(--hard); transition: none; }
+.btn.pf-gift::before { content: "\25c6\00a0"; }
+@media (hover: hover) { .btn.pf-gift:hover, #profDlg .pf-panel .btn.pf-gift:not(.primary):hover { background: var(--ink); color: var(--bg); box-shadow: 4px 4px 0 var(--key); filter: none; } }
+.btn.pf-gift:focus-visible { outline: 3px solid var(--key); outline-offset: 3px; }
+
+/* ---------- 13 · l'Esito: le prove e il voto della regia, un cartellone da critica televisiva ---------- */
+.ps-tests { margin: 20px 0 0; padding: 9px 16px 9px 18px; max-width: 78ch; font-size: 15.5px; line-height: 1.45; background: color-mix(in srgb, var(--ink) 7%, transparent); box-shadow: inset 6px 0 0 var(--ink); clip-path: polygon(0 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%); }
+.ps-tests b { font: italic 900 1.3em / 1 var(--f-display); }
+.ps-regia { position: relative; isolation: isolate; display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 4px 30px; align-items: center; max-width: 880px; margin: 26px 12px 8px 0; padding: 30px 34px 22px 26px; color: var(--paper); background: none; filter: drop-shadow(8px 8px 0 var(--key)); }
+.ps-regia::before { content: ""; position: absolute; inset: 0; z-index: -1; clip-path: polygon(0 0, calc(100% - 26px) 0, 100% 26px, 100% 100%, 0 100%);
+  background: repeating-linear-gradient(-60deg, var(--key) 0 11px, transparent 11px 22px) 0 0 / 100% 11px no-repeat, var(--void); }
+.ps-regia h3 { grid-column: 1; grid-row: 1 / 3; display: grid; grid-template-columns: max-content max-content; align-items: end; justify-content: start; gap: 4px 4px; margin: 0; font: 800 11px / 1 var(--f-body); letter-spacing: .22em; text-transform: uppercase; color: var(--paper); }
+/* il titolo occupa la prima casella, il voto sta sotto e «/100» gli si affianca */
+.ps-regia h3 b { grid-column: 1; grid-row: 2; font: italic 900 clamp(84px, 11vw, 132px) / .8 var(--f-display); font-stretch: 120%; letter-spacing: -.05em; color: var(--key); font-variant-numeric: tabular-nums; text-shadow: .045em .045em 0 var(--paper); padding-right: .06em; }
+.ps-regia h3 small { grid-column: 2; grid-row: 2; margin-bottom: 4px; font: italic 900 20px / 1 var(--f-display); letter-spacing: 0; opacity: 1; color: var(--paper); }
+.ps-regia::after { content: "Il verdetto del pubblico"; grid-column: 1; grid-row: 3; justify-self: start; align-self: start; margin-top: 10px; padding: 5px 13px 4px 9px; background: var(--paper); color: var(--void); font: italic 900 10.5px / 1 var(--f-display); letter-spacing: .14em; text-transform: uppercase; clip-path: polygon(0 0, 100% 0, calc(100% - 7px) 100%, 0 100%); }
+.ps-regia > p:not(.help) { grid-column: 2; grid-row: 1; margin: 0; font: italic 900 clamp(21px, 2.7vw, 32px) / 1.06 var(--f-display); font-stretch: 112%; letter-spacing: -.01em; text-wrap: balance; color: var(--paper); }
+.ps-regia > p:not(.help)::before { content: "\00ab"; color: var(--key); } .ps-regia > p:not(.help)::after { content: "\00bb"; color: var(--key); }
+.ps-rbars { grid-column: 2; grid-row: 2 / 4; align-self: start; gap: 9px; margin: 12px 0 0; }
+.ps-rb { display: grid; grid-template-columns: 128px minmax(0, 1fr) 40px; gap: 12px; align-items: center; }
+.ps-rb em { font: 800 11px / 1.1 var(--f-body); font-style: normal; letter-spacing: .14em; text-transform: uppercase; color: var(--paper); }
+.ps-rb i { height: 12px; background: color-mix(in srgb, var(--paper) 20%, transparent); transform: skewX(-22deg); overflow: hidden; }
+.ps-rb i b { background: var(--key); transform-origin: 0 50%; }
+.ps-rb strong { font: italic 900 22px / 1 var(--f-display); text-align: right; color: var(--paper); font-variant-numeric: tabular-nums; }
+.ps-regia > .help { grid-column: 1 / -1; grid-row: 4; margin: 16px 0 0; padding-top: 11px; font-size: 13px; line-height: 1.45; color: color-mix(in srgb, var(--paper) 84%, var(--void)); box-shadow: inset 0 1px 0 color-mix(in srgb, var(--paper) 22%, transparent); }
+/* alla prima comparsa (61-partita.js mette .rg-go): il voto timbra, le barre si riempiono */
+.ps-regia.rg-go h3 b { animation: rgScore .5s var(--ease-kick) backwards; transform-origin: 20% 80%; }
+.ps-regia.rg-go .ps-rb i b { animation: apFill .9s var(--look-out) backwards; }
+.ps-regia.rg-go .ps-rb:nth-child(1) i b { animation-delay: .22s; } .ps-regia.rg-go .ps-rb:nth-child(2) i b { animation-delay: .34s; } .ps-regia.rg-go .ps-rb:nth-child(3) i b { animation-delay: .46s; }
+@keyframes rgScore { from { transform: scale(1.5) rotate(-8deg); } }
+
+/* ---------- fase 2 · schermi stretti ---------- */
+@media (max-width: 600px) {
+  .sc-regia .sc-head::after { font-size: 104px; right: 4px; }
+  .sc-regia .sc-opt { min-height: 68px; column-gap: 11px; }
+  .sc-game .sc-head::after { font-size: 140px; }
+  .sc-game .sc-faces { min-height: 128px; }
+  .sc-game .sc-faces .av { width: 96px; }
+  .sc-game .mg { margin-top: 16px; gap: 13px; }
+  .mg-bar { height: 64px; margin-right: 6px; }
+  /* il timbro del verdetto ha la sua riga sopra «Lascia fare»: non lo copre e niente si sposta quando arriva */
+  .sc-game .sc-foot { flex-wrap: wrap; gap: 6px 12px; }
+  .sc-game .mg-score { flex: 1 1 100%; min-height: 50px; }
+  .mg-go { flex: 1 1 100%; margin: 0 8px 6px 4px; padding: 18px 20px 16px; }
+  .mg-seq { gap: 6px; }
+  .mg-cell { width: 54px; height: 64px; font-size: 30px; clip-path: polygon(8px 0, 100% 0, calc(100% - 8px) 100%, 0 100%); }
+  .mg-pad { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 9px; }
+  .mg-pad button { height: 60px; }
+  .mg-clues li { font-size: 14.5px; }
+  .mg-doors { gap: 8px; padding-right: 0; }
+  .mg-doors button { min-height: 132px; font-size: 13.5px; }
+  .mg-doors button span { font-size: 50px; }
+  .mg-doors button::after { font-size: 9px; letter-spacing: .08em; padding: 5px 7px 4px 6px; }
+  .pt-cast { margin-right: 6px; padding-right: 18px; }
+  .pc-line, .pc-line + .pc-line { grid-template-columns: minmax(0, 1fr); padding-left: 12px; font-size: 15px; }
+  .aud-poll li { grid-template-columns: 8px 36px minmax(0, 1fr) auto auto; gap: 5px 8px; padding-right: 10px; }
+  .aud-poll li .av { --s: 36px; }
+  .aud-poll em { font-size: 20px; }
+  .ps-regia { grid-template-columns: minmax(0, 1fr); margin-right: 8px; padding: 28px 22px 18px 18px; filter: drop-shadow(6px 6px 0 var(--key)); }
+  .ps-regia h3, .ps-regia::after, .ps-regia > p:not(.help), .ps-rbars, .ps-regia > .help { grid-column: 1; grid-row: auto; }
+  .ps-regia h3 { font-size: 10px; letter-spacing: .1em; }
+  .ps-regia::after { order: 1; } .ps-regia > p:not(.help) { order: 2; } .ps-rbars { order: 3; } .ps-regia > .help { order: 4; }
+  .ps-regia > p:not(.help) { margin-top: 14px; }
+  .ps-rb { grid-template-columns: 104px minmax(0, 1fr) 34px; gap: 9px; }
+}
+
+/* ---------- fase 2 · movimento ridotto: stati immediati (l'ago delle prove si muove comunque: è il gioco) ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .sc-regia .sc-opt, .sc-game .sc-faces, .sc-game .mg, .mg-bar, .mg-bar::after, .mg-zone, .mg-round::after, .mg-pips i, .mg-cell, .mg-pad, .mg-doors button, .mg-score b, .sc.sc-game .sc-card,
+  .pt-cast::after, .pt-cast .pc-on::before, .pc-line, .pc-who, .aud-chat h4 span::before, .aud-poll .ap-bar b, .aud-chat li, .ps-regia h3 b, .ps-rb i b, #v-diretta .ev.ev-regia p::before { animation: none !important; }
+  .sc-regia .rg-ic, .mg-doors button span { transition: none !important; }
+  .sc-regia .sc-opt:hover:not(:disabled), .sc-regia .sc-opt:focus-visible { transform: none; }
+  .sc-g-via .mg::before, .mg-burst { display: none; }
+}
+[data-reduced-motion] :is(.sc-regia .sc-opt, .sc-game .sc-faces, .sc-game .mg, .mg-bar, .mg-zone, .mg-pips i, .mg-cell, .mg-pad, .mg-doors button, .mg-score b, .sc.sc-game .sc-card, .pc-line, .pc-who, .aud-poll .ap-bar b, .aud-chat li, .ps-regia h3 b, .ps-rb i b),
+[data-reduced-motion] .mg-bar::after, [data-reduced-motion] .mg-round::after, [data-reduced-motion] .pt-cast::after, [data-reduced-motion] .pt-cast .pc-on::before, [data-reduced-motion] .aud-chat h4 span::before, [data-reduced-motion] #v-diretta .ev.ev-regia p::before { animation: none !important; }
+[data-reduced-motion] :is(.sc-regia .rg-ic, .mg-doors button span) { transition: none !important; }
+[data-reduced-motion] .sc-regia .sc-opt:hover:not(:disabled), [data-reduced-motion] .sc-regia .sc-opt:focus-visible { transform: none; }
+[data-reduced-motion] .sc-g-via .mg::before, [data-reduced-motion] .mg-burst { display: none; }
 
 /* ================= PELLE · COMUNI =================
  * Controlli, dialoghi, intestazione, piè di pagina, stati vuoti, notifiche: tutto ciò che si ripete in ogni sezione.
@@ -19642,7 +19948,7 @@ Il laboratorio | Un laboratorio militare esplode e libera una nuova variante. | 
 </script>
 <script>window.LOS_ASSETS = {"logo":"img/logo.f2d5175789.webp","icona":"img/icona.8b02ddeb49.webp","favicon":"img/favicon.86774dc7cf.png","panoramica":"img/panoramica.66c4c27255.webp","sagome":["img/sagome-cappuccio.e8876ba986.webp","img/sagome-esploratore.9a99fd13f8.webp","img/sagome-viaggiatore.5e36435604.webp"],"arene":{"classico":"img/arene-classico.c2887324d1.webp","cyberpunk":"img/arene-cyberpunk.713b4c77ea.webp","fantasy":"img/arene-fantasy.ee494a9322.webp","horror":"img/arene-horror.76225517ca.webp","liceo":"img/arene-liceo.c591ac5f32.webp","royale":"img/arene-royale.46515caf90.webp","scifi":"img/arene-scifi.bc9d8e04eb.webp","ufficio":"img/arene-ufficio.a2e36d4f7f.webp","wasteland":"img/arene-wasteland.734ed966b2.webp","zombie":"img/arene-zombie.11476cf1ca.webp"},"atlas":{"classico":{"armi":{"arco":"img/arene-classico-armi-arco.57fa716aa9.webp","ascia":"img/arene-classico-armi-ascia.f48629747b.webp","coltello-da-campo":"img/arene-classico-armi-coltello-da-campo.3393de240f.webp","coltello":"img/arene-classico-armi-coltello.a0134af05c.webp","falce-corta":"img/arene-classico-armi-falce-corta.3131158a9f.webp","fionda":"img/arene-classico-armi-fionda.48c8c32c43.webp","lancia-da-caccia":"img/arene-classico-armi-lancia-da-caccia.6f2be560ec.webp","lancia":"img/arene-classico-armi-lancia.115909650b.webp","machete":"img/arene-classico-armi-machete.e1c9ef25d7.webp","mazza-corta":"img/arene-classico-armi-mazza-corta.e1092f0628.webp","mazza":"img/arene-classico-armi-mazza.1fddf37b46.webp","pugnale-da-cintura":"img/arene-classico-armi-pugnale-da-cintura.0bedc8a501.webp","pugnale":"img/arene-classico-armi-pugnale.fda9dbf38a.webp","scure-da-legna":"img/arene-classico-armi-scure-da-legna.837c5d1f78.webp","spada-corta":"img/arene-classico-armi-spada-corta.952e6b7f6a.webp","tridente":"img/arene-classico-armi-tridente.2fcb3547d9.webp"},"luoghi":{"altopiano":"img/arene-classico-luoghi-altopiano.36a37512d3.webp","bosco":"img/arene-classico-luoghi-bosco.2e9163544b.webp","cornucopia":"img/arene-classico-luoghi-cornucopia.393b2dabe1.webp","fiume":"img/arene-classico-luoghi-fiume.22b335a914.webp","paludi":"img/arene-classico-luoghi-paludi.77cf115eb4.webp","rovine":"img/arene-classico-luoghi-rovine.9ea4f70ca9.webp"},"pericoli":{"branco-di-lupi-mutanti":"img/arene-classico-pericoli-branco-di-lupi-mutanti.d786a62875.webp","orso-affamato":"img/arene-classico-pericoli-orso-affamato.e4f38a9892.webp","sciame-di-vespe-velenose":"img/arene-classico-pericoli-sciame-di-vespe-velenose.5adb2c7b8d.webp","serpente-gigante":"img/arene-classico-pericoli-serpente-gigante.b17e7f3d91.webp"}},"cyberpunk":{"armi":{"coltello-vibrante-in-ceramica":"img/arene-cyberpunk-armi-coltello-vibrante-in-ceramica.6bbcd0e9e4.webp","fucile-a-pompa-da-strada":"img/arene-cyberpunk-armi-fucile-a-pompa-da-strada.dbd0de34e1.webp","fucile-a-pompa-elettromagnetico":"img/arene-cyberpunk-armi-fucile-a-pompa-elettromagnetico.0555418cd0.webp","katana-termica":"img/arene-cyberpunk-armi-katana-termica.f1ff597173.webp","mazza-a-impulsi":"img/arene-cyberpunk-armi-mazza-a-impulsi.22d841ed1d.webp","mazza-da-baseball-chiodata":"img/arene-cyberpunk-armi-mazza-da-baseball-chiodata.db2996f744.webp","mitra-compatto":"img/arene-cyberpunk-armi-mitra-compatto.eaa3815798.webp","pistola-a-rotaia-artigianale":"img/arene-cyberpunk-armi-pistola-a-rotaia-artigianale.f9e83bda89.webp","pistola-smart":"img/arene-cyberpunk-armi-pistola-smart.2aa922ba8c.webp","sparachiodi-riprogrammato":"img/arene-cyberpunk-armi-sparachiodi-riprogrammato.70f6190cb0.webp","taser-da-buttafuori":"img/arene-cyberpunk-armi-taser-da-buttafuori.60b58b451d.webp","tirapugni-elettrificato":"img/arene-cyberpunk-armi-tirapugni-elettrificato.1ce19bab37.webp","ventaglio-da-combattimento-in-titanio":"img/arene-cyberpunk-armi-ventaglio-da-combattimento-in-titanio.f3b7bb5a10.webp"},"luoghi":{"clinica-del-ripperdoc":"img/arene-cyberpunk-luoghi-clinica-del-ripperdoc.8ef0cb941b.webp","club-della-braindance":"img/arene-cyberpunk-luoghi-club-della-braindance.7765542e70.webp","megablocco":"img/arene-cyberpunk-luoghi-megablocco.28b72e6ecf.webp","mercato-di-kabuki":"img/arene-cyberpunk-luoghi-mercato-di-kabuki.d5c8ab7b96.webp","nodo-dati-corporativo":"img/arene-cyberpunk-luoghi-nodo-dati-corporativo.56ca3e1335.webp","officina-dei-maelstrom":"img/arene-cyberpunk-luoghi-officina-dei-maelstrom.d69285cf21.webp","piazza-della-torre":"img/arene-cyberpunk-luoghi-piazza-della-torre.1e400212c8.webp"},"pericoli":{"banda-di-scav":"img/arene-cyberpunk-pericoli-banda-di-scav.f1a2b2ccc4.webp","gang-di-cromati":"img/arene-cyberpunk-pericoli-gang-di-cromati.74e5576e23.webp","sciame-di-droni-di-pattuglia":"img/arene-cyberpunk-pericoli-sciame-di-droni-di-pattuglia.6fb4b17ad9.webp","squadra-di-sicurezza-corporativa":"img/arene-cyberpunk-pericoli-squadra-di-sicurezza-corporativa.6195a3b15d.webp"}},"fantasy":{"armi":{"arco-elfico":"img/arene-fantasy-armi-arco-elfico.8012f9136d.webp","ascia-nanica":"img/arene-fantasy-armi-ascia-nanica.6913fdf008.webp","balestra":"img/arene-fantasy-armi-balestra.7767becc83.webp","bastone-magico":"img/arene-fantasy-armi-bastone-magico.0781aee860.webp","daga-dei-giuramenti":"img/arene-fantasy-armi-daga-dei-giuramenti.3b6d4b398c.webp","falcetto-dargento":"img/arene-fantasy-armi-falcetto-dargento.1ce0e4e163.webp","lancia-incantata":"img/arene-fantasy-armi-lancia-incantata.7371199824.webp","lancia-silvana":"img/arene-fantasy-armi-lancia-silvana.08fbc01ede.webp","martello-da-guerra":"img/arene-fantasy-armi-martello-da-guerra.4eb03f4db7.webp","martello-nanico":"img/arene-fantasy-armi-martello-nanico.82ad6b9b14.webp","mazza-di-quercia":"img/arene-fantasy-armi-mazza-di-quercia.0f6a8345a9.webp","pugnale-avvelenato":"img/arene-fantasy-armi-pugnale-avvelenato.aba554d177.webp","spada-da-viaggio":"img/arene-fantasy-armi-spada-da-viaggio.a7bdcab5f4.webp","spada-runica":"img/arene-fantasy-armi-spada-runica.ec4012c6cf.webp"},"luoghi":{"altare-delle-armi":"img/arene-fantasy-luoghi-altare-delle-armi.db06de44c1.webp","foresta-elfica":"img/arene-fantasy-luoghi-foresta-elfica.0448fcfbd3.webp","lago-nebbioso":"img/arene-fantasy-luoghi-lago-nebbioso.f19abc7c81.webp","miniere":"img/arene-fantasy-luoghi-miniere.5baa916ec9.webp","palude-stregata":"img/arene-fantasy-luoghi-palude-stregata.6a0b2af4a7.webp","picco-del-drago":"img/arene-fantasy-luoghi-picco-del-drago.06bdfd84b1.webp","torre-in-rovina":"img/arene-fantasy-luoghi-torre-in-rovina.ac716863c7.webp"},"pericoli":{"branco-di-lupi-mannari":"img/arene-fantasy-pericoli-branco-di-lupi-mannari.1c9124ceee.webp","spettro-errante":"img/arene-fantasy-pericoli-spettro-errante.056074bc23.webp","troll-di-caverna":"img/arene-fantasy-pericoli-troll-di-caverna.31aa2444f0.webp","viverna":"img/arene-fantasy-pericoli-viverna.577b91a819.webp"}},"horror":{"armi":{"ascia":"img/arene-horror-armi-ascia.f6793c220e.webp","attizzatoio":"img/arene-horror-armi-attizzatoio.12b9bf75af.webp","bastone-da-passeggio":"img/arene-horror-armi-bastone-da-passeggio.1a636ce4ab.webp","candelabro-dargento":"img/arene-horror-armi-candelabro-dargento.7d962054de.webp","coltello-dargento":"img/arene-horror-armi-coltello-dargento.73a6bb81ea.webp","crocifisso-appuntito":"img/arene-horror-armi-crocifisso-appuntito.203b41a170.webp","daga-da-cerimonia":"img/arene-horror-armi-daga-da-cerimonia.a597e15c53.webp","falce":"img/arene-horror-armi-falce.6513df8fa2.webp","fucile-da-caccia":"img/arene-horror-armi-fucile-da-caccia.169dc367e1.webp","pugnale-depoca":"img/arene-horror-armi-pugnale-depoca.f148afd005.webp","pugnale-rituale":"img/arene-horror-armi-pugnale-rituale.944cb9056c.webp","scure-da-legna":"img/arene-horror-armi-scure-da-legna.a11379a412.webp"},"luoghi":{"biblioteca":"img/arene-horror-luoghi-biblioteca.00d6ab97f4.webp","cantina":"img/arene-horror-luoghi-cantina.a196828c1d.webp","cappella":"img/arene-horror-luoghi-cappella.a51e505028.webp","cimitero":"img/arene-horror-luoghi-cimitero.7a441de089.webp","salone":"img/arene-horror-luoghi-salone.37f10c88c7.webp","serra":"img/arene-horror-luoghi-serra.b3d91121d4.webp","soffitta":"img/arene-horror-luoghi-soffitta.466d40cea3.webp"},"pericoli":{"bambola-posseduta":"img/arene-horror-pericoli-bambola-posseduta.7064eef1d7.webp","entita-senza-volto":"img/arene-horror-pericoli-entita-senza-volto.2c28467bdd.webp","spettro-urlante":"img/arene-horror-pericoli-spettro-urlante.25fa554e05.webp","stormo-di-corvi":"img/arene-horror-pericoli-stormo-di-corvi.fe5c85d7ae.webp"}},"liceo":{"armi":{"compito-copiato":"img/arene-liceo-armi-compito-copiato.c9ade27d61.webp","dossier-delle-revisioni":"img/arene-liceo-armi-dossier-delle-revisioni.77676a0f5f.webp","elenco-delle-correzioni":"img/arene-liceo-armi-elenco-delle-correzioni.04be1154c8.webp","fascicolo-di-risposte-motivate":"img/arene-liceo-armi-fascicolo-di-risposte-motivate.c29995b581.webp","foto-imbarazzante":"img/arene-liceo-armi-foto-imbarazzante.ff7d3ef284.webp","gossip-esplosivo":"img/arene-liceo-armi-gossip-esplosivo.552b1e6236.webp","pallone-da-dodgeball":"img/arene-liceo-armi-pallone-da-dodgeball.60a2576785.webp","profilo-falso":"img/arene-liceo-armi-profilo-falso.d1dac05a2b.webp","prospetto-dei-contributi":"img/arene-liceo-armi-prospetto-dei-contributi.0c121fd79a.webp","quaderno-delle-verifiche":"img/arene-liceo-armi-quaderno-delle-verifiche.7d8b07341a.webp","registro-rubato":"img/arene-liceo-armi-registro-rubato.67eb4b9eff.webp","riepilogo-delle-fonti":"img/arene-liceo-armi-riepilogo-delle-fonti.3c889a0ed5.webp"},"luoghi":{"aula-magna":"img/arene-liceo-luoghi-aula-magna.0478e35c5c.webp","aule":"img/arene-liceo-luoghi-aule.b3142d07cc.webp","biblioteca":"img/arene-liceo-luoghi-biblioteca.1ae806ae58.webp","cortile":"img/arene-liceo-luoghi-cortile.51bf433337.webp","laboratorio-di-chimica":"img/arene-liceo-luoghi-laboratorio-di-chimica.eba1434683.webp","mensa":"img/arene-liceo-luoghi-mensa.67bcbc7e37.webp","palestra":"img/arene-liceo-luoghi-palestra.8ecb872849.webp"},"pericoli":{"bidello-di-turno":"img/arene-liceo-pericoli-bidello-di-turno.191c43a8bd.webp","ispezione-a-sorpresa":"img/arene-liceo-pericoli-ispezione-a-sorpresa.bef087d9b9.webp","preside":"img/arene-liceo-pericoli-preside.033f6c9aae.webp","professoressa-di-matematica":"img/arene-liceo-pericoli-professoressa-di-matematica.6cb65c6a3f.webp"}},"royale":{"armi":{"balestra":"img/arene-royale-armi-balestra.64563b6cea.webp","carabina-compatta":"img/arene-royale-armi-carabina-compatta.a0fa150fbe.webp","coltello-da-combattimento":"img/arene-royale-armi-coltello-da-combattimento.74a64bca77.webp","coltello-tattico":"img/arene-royale-armi-coltello-tattico.8e9cb56197.webp","fucile-a-pompa":"img/arene-royale-armi-fucile-a-pompa.3d7fc7d83c.webp","fucile-da-cecchino":"img/arene-royale-armi-fucile-da-cecchino.fc3c4f19f1.webp","fucile-dassalto":"img/arene-royale-armi-fucile-dassalto.b91ccb0ec8.webp","granata":"img/arene-royale-armi-granata.fd9c359b27.webp","lancia-da-sopravvivenza":"img/arene-royale-armi-lancia-da-sopravvivenza.8a39c1a5e5.webp","manganello":"img/arene-royale-armi-manganello.dc6284893b.webp","mitraglietta":"img/arene-royale-armi-mitraglietta.6dcc3246e6.webp","pistola-da-segnalazione-modificata":"img/arene-royale-armi-pistola-da-segnalazione-modificata.1c7f899ca7.webp","pistola":"img/arene-royale-armi-pistola.acae268814.webp","scure-da-campo":"img/arene-royale-armi-scure-da-campo.6a5b0becd5.webp"},"luoghi":{"aeroporto":"img/arene-royale-luoghi-aeroporto.81e8ce98d4.webp","base-militare":"img/arene-royale-luoghi-base-militare.67f3a7de9d.webp","centrale-elettrica":"img/arene-royale-luoghi-centrale-elettrica.05ee57458a.webp","fattoria":"img/arene-royale-luoghi-fattoria.7c780dda87.webp","foresta":"img/arene-royale-luoghi-foresta.03b47644d0.webp","villaggio-costiero":"img/arene-royale-luoghi-villaggio-costiero.568519eb7c.webp"},"pericoli":{"cane-da-guardia-addestrato":"img/arene-royale-pericoli-cane-da-guardia-addestrato.c7853a67a0.webp","drone-armato":"img/arene-royale-pericoli-drone-armato.30d0b73e01.webp","elicottero-da-caccia":"img/arene-royale-pericoli-elicottero-da-caccia.8c68e62346.webp"}},"scifi":{"armi":{"bastone-a-impulsi":"img/arene-scifi-armi-bastone-a-impulsi.4e17e074e7.webp","cannone-a-rotaia-portatile":"img/arene-scifi-armi-cannone-a-rotaia-portatile.9a59b97d98.webp","frusta-monofilamento":"img/arene-scifi-armi-frusta-monofilamento.5ee8081aa9.webp","fucile-al-plasma":"img/arene-scifi-armi-fucile-al-plasma.ea2384a239.webp","granata-emp":"img/arene-scifi-armi-granata-emp.04cfd31203.webp","lama-di-servizio":"img/arene-scifi-armi-lama-di-servizio.a47d434464.webp","lama-vibrante":"img/arene-scifi-armi-lama-vibrante.02b0f47ff8.webp","lancia-da-abbordaggio":"img/arene-scifi-armi-lancia-da-abbordaggio.cf167e52ff.webp","perforatore-portatile":"img/arene-scifi-armi-perforatore-portatile.aa7e92ecab.webp","pistola-a-scarica":"img/arene-scifi-armi-pistola-a-scarica.33b3e5929e.webp","pistola-laser":"img/arene-scifi-armi-pistola-laser.aed4bbf3ed.webp","taglierino-ceramico":"img/arene-scifi-armi-taglierino-ceramico.b45d524836.webp","taser-a-impulsi":"img/arene-scifi-armi-taser-a-impulsi.360e29e1d5.webp"},"luoghi":{"condotti-di-servizio":"img/arene-scifi-luoghi-condotti-di-servizio.6817134b5e.webp","hangar":"img/arene-scifi-luoghi-hangar.6de551833b.webp","moduli-abitativi":"img/arene-scifi-luoghi-moduli-abitativi.9f5bb96d39.webp","ponte-di-comando":"img/arene-scifi-luoghi-ponte-di-comando.3e9ffd005a.webp","reattore":"img/arene-scifi-luoghi-reattore.d10a335006.webp","serra-idroponica":"img/arene-scifi-luoghi-serra-idroponica.b6f4407853.webp"},"pericoli":{"androide-da-combattimento":"img/arene-scifi-pericoli-androide-da-combattimento.1a3d3eb38e.webp","creatura-aliena-dai-tentacoli":"img/arene-scifi-pericoli-creatura-aliena-dai-tentacoli.b6b314ddd9.webp","drone-di-sicurezza-impazzito":"img/arene-scifi-pericoli-drone-di-sicurezza-impazzito.c8a9c6f9e3.webp","sciame-di-nanobot":"img/arene-scifi-pericoli-sciame-di-nanobot.d43296f047.webp"}},"ufficio":{"armi":{"badge-clonato-del-capo":"img/arene-ufficio-armi-badge-clonato-del-capo.be9f7381fe.webp","dossier-dei-risultati":"img/arene-ufficio-armi-dossier-dei-risultati.1888e2f671.webp","elenco-dei-contributi":"img/arene-ufficio-armi-elenco-dei-contributi.3de4fbe5bf.webp","fascicolo-delle-fonti":"img/arene-ufficio-armi-fascicolo-delle-fonti.02df27dfbf.webp","foglio-excel-con-le-prove":"img/arene-ufficio-armi-foglio-excel-con-le-prove.944f6ec708.webp","mail-in-copia-a-tutti":"img/arene-ufficio-armi-mail-in-copia-a-tutti.1d4304df14.webp","nota-spese-gonfiata":"img/arene-ufficio-armi-nota-spese-gonfiata.d2683cca4c.webp","presentazione-rubata":"img/arene-ufficio-armi-presentazione-rubata.815dc5c8b4.webp","prospetto-delle-metriche":"img/arene-ufficio-armi-prospetto-delle-metriche.356da1d2d9.webp","registro-delle-revisioni":"img/arene-ufficio-armi-registro-delle-revisioni.509eab44df.webp","report-pieno-di-errori-altrui":"img/arene-ufficio-armi-report-pieno-di-errori-altrui.c01c0ef897.webp","riepilogo-delle-approvazioni":"img/arene-ufficio-armi-riepilogo-delle-approvazioni.9394dadd6b.webp"},"luoghi":{"cucina":"img/arene-ufficio-luoghi-cucina.d968f8861d.webp","open-space":"img/arene-ufficio-luoghi-open-space.b6b7990c99.webp","parcheggio":"img/arene-ufficio-luoghi-parcheggio.d593f2ed83.webp","sala-riunioni":"img/arene-ufficio-luoghi-sala-riunioni.f92c4030a9.webp","sala-stampanti":"img/arene-ufficio-luoghi-sala-stampanti.1727f50082.webp","ufficio-del-direttore":"img/arene-ufficio-luoghi-ufficio-del-direttore.bb3b6cabab.webp"},"pericoli":{"consulente-esterno":"img/arene-ufficio-pericoli-consulente-esterno.ce6e200c3f.webp","direttore-generale":"img/arene-ufficio-pericoli-direttore-generale.da2eb1f708.webp","riorganizzazione-aziendale":"img/arene-ufficio-pericoli-riorganizzazione-aziendale.1fd57b76b3.webp","ufficio-risorse-umane":"img/arene-ufficio-pericoli-ufficio-risorse-umane.8392df7518.webp"}},"wasteland":{"armi":{"balestra-artigianale":"img/arene-wasteland-armi-balestra-artigianale.e09826852f.webp","catena":"img/arene-wasteland-armi-catena.866183d584.webp","coltello-da-strada":"img/arene-wasteland-armi-coltello-da-strada.1083c4429d.webp","fucile-arrugginito":"img/arene-wasteland-armi-fucile-arrugginito.797601f16e.webp","lama-di-recupero":"img/arene-wasteland-armi-lama-di-recupero.1ad13cfc78.webp","lancia-di-ferraglia":"img/arene-wasteland-armi-lancia-di-ferraglia.99d9f41307.webp","lancia-ricavata-da-un-tubo":"img/arene-wasteland-armi-lancia-ricavata-da-un-tubo.53b934e449.webp","lanciachiodi":"img/arene-wasteland-armi-lanciachiodi.e4f51e42e2.webp","mannaia":"img/arene-wasteland-armi-mannaia.518ae9c11c.webp","martello-da-officina":"img/arene-wasteland-armi-martello-da-officina.851055795e.webp","mazza-di-tubi":"img/arene-wasteland-armi-mazza-di-tubi.91babe82ac.webp","molotov":"img/arene-wasteland-armi-molotov.303d6fa315.webp","scure-da-demolizione":"img/arene-wasteland-armi-scure-da-demolizione.066ea5e066.webp"},"luoghi":{"autostrada-spezzata":"img/arene-wasteland-luoghi-autostrada-spezzata.19a72a0b97.webp","citta-fantasma":"img/arene-wasteland-luoghi-citta-fantasma.fe22bb72b2.webp","cratere":"img/arene-wasteland-luoghi-cratere.04de7ca40a.webp","deposito":"img/arene-wasteland-luoghi-deposito.f98aa31220.webp","diga":"img/arene-wasteland-luoghi-diga.3be9abe15a.webp","discarica":"img/arene-wasteland-luoghi-discarica.b8783ad9c6.webp","raffineria":"img/arene-wasteland-luoghi-raffineria.081e2d2ad6.webp"},"pericoli":{"banda-di-predoni":"img/arene-wasteland-pericoli-banda-di-predoni.1dfcfd1628.webp","branco-di-cani-mutati":"img/arene-wasteland-pericoli-branco-di-cani-mutati.442fabfc39.webp","scorpione-gigante":"img/arene-wasteland-pericoli-scorpione-gigante.2dd8911367.webp","verme-delle-sabbie":"img/arene-wasteland-pericoli-verme-delle-sabbie.a0d445beeb.webp"}},"zombie":{"armi":{"accetta-da-soccorso":"img/arene-zombie-armi-accetta-da-soccorso.6d36eb13ac.webp","accetta":"img/arene-zombie-armi-accetta.0eed163720.webp","balestra":"img/arene-zombie-armi-balestra.d705131d17.webp","coltello-da-campeggio":"img/arene-zombie-armi-coltello-da-campeggio.2abab58e78.webp","fucile-a-pompa":"img/arene-zombie-armi-fucile-a-pompa.b00b1d6a70.webp","katana":"img/arene-zombie-armi-katana.f631ad392f.webp","machete-da-potatura":"img/arene-zombie-armi-machete-da-potatura.94a93108a1.webp","martello-da-carpentiere":"img/arene-zombie-armi-martello-da-carpentiere.021e8a80f2.webp","mazza-chiodata":"img/arene-zombie-armi-mazza-chiodata.b4e11dcadb.webp","mazza-da-lavoro":"img/arene-zombie-armi-mazza-da-lavoro.c36a90108f.webp","motosega":"img/arene-zombie-armi-motosega.f74e603615.webp","piede-di-porco":"img/arene-zombie-armi-piede-di-porco.c185a97e0d.webp","pistola":"img/arene-zombie-armi-pistola.6d30022ca6.webp"},"luoghi":{"centro-commerciale":"img/arene-zombie-luoghi-centro-commerciale.333f4699d5.webp","metropolitana":"img/arene-zombie-luoghi-metropolitana.878a263605.webp","ospedale":"img/arene-zombie-luoghi-ospedale.f25de413a4.webp","periferia":"img/arene-zombie-luoghi-periferia.e28a7d70c7.webp","piazza":"img/arene-zombie-luoghi-piazza.b6ed86b3ad.webp","scuola":"img/arene-zombie-luoghi-scuola.153ddbaa75.webp","stazione-di-polizia":"img/arene-zombie-luoghi-stazione-di-polizia.157f7a17f5.webp"},"pericoli":{"cane-infetto":"img/arene-zombie-pericoli-cane-infetto.fdff913d6f.webp","gigante-mutato":"img/arene-zombie-pericoli-gigante-mutato.91fad36b70.webp","infetto-corridore":"img/arene-zombie-pericoli-infetto-corridore.61f48faafd.webp","orda-di-zombi":"img/arene-zombie-pericoli-orda-di-zombi.e0fc6d1b56.webp"}}},"fx":{"pennellate":["img/fx-pennellata-1.5527b3e9bd.webp","img/fx-pennellata-2.8526d34dcf.webp","img/fx-pennellata-3.a7f3e74ff3.webp","img/fx-pennellata-4.fe1f612999.webp"],"sigilli":{"classico":"img/fx-sigillo-classico.b781c63b8d.webp","cyberpunk":"img/fx-sigillo-cyberpunk.134a7f507c.webp","fantasy":"img/fx-sigillo-fantasy.d854d9ac19.webp","horror":"img/fx-sigillo-horror.54149e6a7e.webp","liceo":"img/fx-sigillo-liceo.7f1566a7a8.webp","royale":"img/fx-sigillo-royale.bedbb77f68.webp","scifi":"img/fx-sigillo-scifi.6c50b79280.webp","ufficio":"img/fx-sigillo-ufficio.fcbbcc051a.webp","wasteland":"img/fx-sigillo-wasteland.86f44d1714.webp","zombie":"img/fx-sigillo-zombie.44ac2a6473.webp"},"grana":"img/fx-grana.c1e72fd2da.webp","forme":{"fascia":"img/fx-forma-fascia.8a2f8ab92d.webp","freccia":"img/fx-forma-freccia.4e8039be8f.webp","fulmine":"img/fx-forma-fulmine.c9a15d227c.webp","stella":"img/fx-forma-stella.e773ba5dda.webp","strappo":"img/fx-forma-strappo.0e6a41d0d9.webp"},"impatto":"img/fx-impatto.fd13ac9554.webp","mezzitoni":"img/fx-mezzitoni.f9ef4df053.webp","occhi":{"f-1":"img/fx-occhi-f-1.3779df529a.webp","f-2":"img/fx-occhi-f-2.2f47e4535b.webp","f-3":"img/fx-occhi-f-3.8b10fc4b00.webp","f-4":"img/fx-occhi-f-4.08132e01f9.webp","m-1":"img/fx-occhi-m-1.fd94d5b0eb.webp","m-2":"img/fx-occhi-m-2.c7b9661e6b.webp","m-3":"img/fx-occhi-m-3.91ff950ae4.webp","m-4":"img/fx-occhi-m-4.d0a0e73220.webp","m-5":"img/fx-occhi-m-5.f4c19f2141.webp","n-1":"img/fx-occhi-n-1.21fc3b7adf.webp"},"fondali":{"classico":"img/fx-fondale-classico.8a3fc35342.webp","cyberpunk":"img/fx-fondale-cyberpunk.283c80cc1e.webp","fantasy":"img/fx-fondale-fantasy.0ca9b3f315.webp","horror":"img/fx-fondale-horror.4ba1241b63.webp","liceo":"img/fx-fondale-liceo.fb428a57f7.webp","royale":"img/fx-fondale-royale.aac1246425.webp","scifi":"img/fx-fondale-scifi.27ee2ce8cc.webp","ufficio":"img/fx-fondale-ufficio.780789ce70.webp","wasteland":"img/fx-fondale-wasteland.02311ed21d.webp","zombie":"img/fx-fondale-zombie.83b8d35716.webp"},"volti":{"f-1":"img/fx-volto-f-1.96d62771c1.webp","f-2":"img/fx-volto-f-2.79d3485864.webp","f-3":"img/fx-volto-f-3.aeb7664a4e.webp","f-4":"img/fx-volto-f-4.2f2c864354.webp","m-1":"img/fx-volto-m-1.f8b83b073e.webp","m-2":"img/fx-volto-m-2.b9eb346a31.webp","m-3":"img/fx-volto-m-3.5311549074.webp","m-4":"img/fx-volto-m-4.10b102bdb0.webp","m-5":"img/fx-volto-m-5.63e5c91778.webp","n-1":"img/fx-volto-n-1.02cf4d1c97.webp"},"vincitori":{"f-1":"img/vincitori-vincitore-f-1.10b1ec0d22.webp","f-2":"img/vincitori-vincitore-f-2.03d8a3a92a.webp","f-3":"img/vincitori-vincitore-f-3.bc0adcd66a.webp","m-1":"img/vincitori-vincitore-m-1.c597436dca.webp","m-2":"img/vincitori-vincitore-m-2.9c8b48e9f8.webp","n-1":"img/vincitori-vincitore-n-1.1539fc78b2.webp"},"occhiY":{"m-1":0.53,"m-2":0.6,"m-3":0.43,"m-4":0.39,"m-5":0.575,"f-1":0.52,"f-2":0.49,"f-3":0.41,"f-4":0.46,"n-1":0.55}},"audio":{"sfx":{"heavy":"img/audio-colpo.6c66fc3384.mp3","battle":"img/audio-scontro.171fdeb377.mp3","click":"img/audio-ui-click.75370fe5e2.wav","hover":"img/audio-ui-hover.39a84fb194.wav","tick":"img/audio-ui-tick.16c581af00.wav","jazz":"img/audio-vittoria.6a3763dedf.mp3"},"music":"img/audio-musica-dark-hour.53788a2c76.mp3"}};
 ;
-window.LOS_BUILD = "8da0036b41654a2997a0024c85f429b379291326971a2fb4d3782665ec140ede";
+window.LOS_BUILD = "039894cf100688a263efa1217ec9ec483e3f873a47588c542fac4ef29b4614a2";
 ;
 /* Last One Standing — grafica vettoriale: logo, icone delle arene, illustrazioni.
  * Tutto è SVG generato in codice: nessuna immagine esterna. */
@@ -22642,10 +22948,13 @@ window.LOS_BUILD = "8da0036b41654a2997a0024c85f429b379291326971a2fb4d3782665ec14
 
 ;
 /* ================= PELLE · LA PARTITA GIOCATA (regia) =================
- * I ganci grafici che partita.js e ui.js chiamano se esistono: window.LOS_PARTITA_FX = { card, bet, gift }.
+ * I ganci grafici che partita.js e ui.js chiamano se esistono: window.LOS_PARTITA_FX = { card, bet, gift, game }.
  * - card: il cartello delle scelte entra come un evento (titolo parola per parola, scelte a cascata, ritratto grande);
  * - bet: quando una puntata si chiude cade un timbro vicino alla barra del giocatore;
- * - gift: una cassa col paracadute parte dal pulsante del dono verso il racconto.
+ * - gift: una cassa col paracadute parte dal pulsante del dono verso il racconto;
+ * - game: il verdetto di una prova giocabile (schegge da dietro la lastra, il colpo sonoro).
+ * Fase 2: le carte del Regista ricevono la loro icona, il tempismo i tre rombi dei colpi, la telecronaca (#ptCast)
+ * entra a ogni battuta nuova, il voto della regia nell'Esito timbra e riempie le barre alla prima comparsa.
  * In più, senza toccare ui.js: i crediti della barra contano quando cambiano e i numeri di «La tua partita»
  * nell'Esito contano alla prima comparsa.
  * Solo decorazione: ogni passo è protetto, niente blocca i comandi, tutto si toglie da solo. Con il movimento
@@ -22689,7 +22998,9 @@ window.LOS_BUILD = "8da0036b41654a2997a0024c85f429b379291326971a2fb4d3782665ec14
     // se arriva subito dopo un altro cartello aspetta che il colpo sulla scelta appena fatta si sia visto
     if (!reduced() && doc.querySelector('.sc.sc-out')) el.style.setProperty('--sc-d', '150ms');
     safe(() => el.querySelectorAll('.sc-opt').forEach((b, k) => b.style.setProperty('--k', o.grid ? Math.min(k, 22) : Math.min(k, 8))));
-    if (/\bsc-(mentor|gift|interview)\b/.test(el.className)) safe(() => face(el.querySelector('.sc-faces .av')));
+    if (/\bsc-(mentor|gift|interview|game)\b/.test(el.className)) safe(() => face(el.querySelector('.sc-faces .av')));
+    if (el.classList.contains('sc-regia')) safe(() => hand(el, o));
+    if (o.game === 'tempismo') safe(() => pips(el));
     if (!reduced()) safe(() => words(el.querySelector('.sc-t')));
     sfx('cut');
     // un soffio passando sulle scelte (solo mouse), la conferma quando si sceglie
@@ -22698,9 +23009,104 @@ window.LOS_BUILD = "8da0036b41654a2997a0024c85f429b379291326971a2fb4d3782665ec14
       el.addEventListener('pointerover', (e) => { const b = e.target.closest && e.target.closest('.sc-opt:not(:disabled), .sc-stake button:not(:disabled)'); if (!b || b === last) return; last = b; sfx('hover'); });
     }
     el.addEventListener('click', (e) => {
-      const b = e.target.closest && e.target.closest('.sc-opt, .sc-stake button, .sc-skip'); if (!b || b.disabled) return;
+      const b = e.target.closest && e.target.closest('.sc-opt, .sc-stake button, .sc-skip, .mg-pad button, .mg-doors button'); if (!b || b.disabled) return;
       sfx(b.classList.contains('sc-opt') ? 'confirm' : 'tick');
     });
+  }
+
+  /* ---------- 1b · le carte del Regista: ogni carta ha la sua icona ---------- */
+  // disegni pieni su 48×48, nel colore del testo (la tinta a riposo, vedi 60-partita.css); .rg-s sono i tratti
+  const CARTE = {
+    tempesta: '<path d="M13 29a9 9 0 0 1 1.2-17.9A12 12 0 0 1 37 13.5 8 8 0 0 1 36 29z"/><path d="M25 31l-8 9h6l-2 7 9-11h-6l3-5z"/>',
+    banchetto: '<path d="M6 34a18 18 0 0 1 36 0z"/><circle cx="24" cy="11.5" r="3.4"/><path d="M3 37h42v4.5H3z"/>',
+    disastro: '<path d="M7 40h34v5H7zM12 31h24l2.5 7h-29zM14.5 29a9.5 9.5 0 0 1 19 0z"/><path class="rg-s" d="M24 4v8M9 9l5 6.5M39 9l-5 6.5"/>',
+    buio: '<path d="M30 5a19 19 0 1 0 13 29A15.5 15.5 0 0 1 30 5z"/><path d="M11 5l1.6 3.9 3.9 1.6-3.9 1.6L11 16l-1.6-3.9-3.9-1.6 3.9-1.6z"/>',
+    bestie: '<path d="M7 4q11 17 7 40Q11 25 1 9z"/><path d="M21 4q11 17 7 40Q25 25 15 9z"/><path d="M35 4q11 17 7 40Q39 25 29 9z"/>',
+    rifornimenti: '<path d="M6 20C7 9 15 3 24 3s17 6 18 17c-4-3-8-3-12 0-4-3-8-3-12 0-4-3-8-3-12 0z"/><path class="rg-s" d="M7 20l11 11M41 20L30 31M24 20v11" style="stroke-width:2"/><path d="M14 31h20v14H14z"/>',
+  };
+  // il valore della carta arriva con le opzioni del cartello; se manca si risale dall'etichetta
+  function hand(el, o) {
+    const defs = (G.LOS_PARTITA && G.LOS_PARTITA.REGIA) || [], opts = o.options || [];
+    el.querySelectorAll('.sc-opt').forEach((b, k) => {
+      if (b.querySelector('.rg-ic')) return;
+      const lab = (b.querySelector('.sc-l') || {}).textContent || '';
+      const key = (opts[k] && CARTE[opts[k].value] ? opts[k].value : null) || (defs.find((c) => c.label === lab) || {}).k;
+      if (!CARTE[key]) return;
+      const ic = h('span', 'rg-ic'); ic.setAttribute('aria-hidden', 'true');
+      ic.innerHTML = '<svg viewBox="0 0 48 48">' + CARTE[key] + '</svg>';
+      const n = b.querySelector('.sc-n'); if (n) n.after(ic); else b.prepend(ic);
+    });
+  }
+
+  /* ---------- 1c · le prove giocabili ---------- */
+  // tempismo: tre rombi accanto al conto dei colpi; partita.js rimette .mg-hit / .mg-miss a ogni colpo
+  function pips(el) {
+    const box = el.querySelector('.mg'), row = el.querySelector('.mg-row'); if (!box || !row || row.querySelector('.mg-pips')) return;
+    const p = h('span', 'mg-pips'); p.setAttribute('aria-hidden', 'true');
+    for (let k = 0; k < 3; k++) p.appendChild(h('i'));
+    row.insertBefore(p, row.querySelector('.mg-go'));
+    let n = 0;
+    new MutationObserver(() => {
+      const hit = box.classList.contains('mg-hit'); if (!hit && !box.classList.contains('mg-miss')) return;
+      const d = p.children[n++]; if (d) d.classList.add(hit ? 'ok' : 'ko');
+      sfx(hit ? 'confirm' : 'tick');
+    }).observe(box, { attributes: true, attributeFilter: ['class'] });
+  }
+  // il verdetto: le schegge partono da dietro la lastra (non passano sopra il testo) e solo se è andata bene
+  function game(el, score) {
+    if (!el) return;
+    const good = score >= 0.5, great = score >= 0.8;
+    sfx(good ? 'stamp' : 'tick');
+    const cardEl = el.querySelector('.sc-card');
+    if (reduced() || !good || !cardEl || !el.animate) return;
+    const r = cardEl.getBoundingClientRect(), o = el.getBoundingClientRect(); if (!r.width) return;
+    const b = h('div', 'mg-burst'); b.setAttribute('aria-hidden', 'true');
+    b.style.left = (r.left - o.left + r.width / 2) + 'px'; b.style.top = (r.top - o.top + r.height / 2) + 'px';
+    const N = great ? 16 : 9, T = 620;
+    for (let k = 0; k < N; k++) {
+      const a = (k / N) * Math.PI * 2 + Math.random() * 0.3, c = Math.cos(a), s = Math.sin(a), far = 70 + Math.random() * 90;
+      const i = h('i'); b.appendChild(i);
+      i.animate([
+        { transform: 'translate(' + (c * r.width * 0.4) + 'px,' + (s * r.height * 0.4) + 'px) rotate(0deg) scale(.6)', opacity: 1 },
+        { opacity: 1, offset: 0.6 },
+        { transform: 'translate(' + (c * (r.width / 2 + far)) + 'px,' + (s * (r.height / 2 + far)) + 'px) rotate(' + (Math.random() * 300 - 150) + 'deg) scale(' + (0.8 + Math.random() * 0.9) + ')', opacity: 0 },
+      ], { duration: T, delay: Math.random() * 60, easing: 'cubic-bezier(.16,1,.3,1)', fill: 'both' });
+    }
+    el.insertBefore(b, cardEl);
+    setTimeout(() => b.remove(), T + 140);
+  }
+
+  /* ---------- 1d · la telecronaca: a ogni battuta nuova il sottopancia rientra ---------- */
+  // ui.js riscrive #ptCast a ogni fase: si entra solo se il testo è cambiato; la classe si toglie da sola
+  let castEl = null, castTxt = '', castT = 0;
+  function watchCast() {
+    const c = doc.getElementById('ptCast'); if (!c || c === castEl) return;
+    castEl = c;
+    const on = () => {
+      if (c.hidden) { castTxt = ''; return; }
+      const t = c.textContent; if (t === castTxt) return; castTxt = t;
+      if (reduced() || doc.hidden) return;
+      clearTimeout(castT); c.classList.remove('pc-in'); void c.offsetWidth; c.classList.add('pc-in');
+      castT = setTimeout(() => c.classList.remove('pc-in'), 900);
+    };
+    new MutationObserver(on).observe(c, { childList: true, attributes: true, attributeFilter: ['hidden'] });
+    on();
+  }
+
+  /* ---------- 1e · il sondaggio del pubblico: chi è in testa ---------- */
+  // l'ordine delle righe non è la classifica: si legge la percentuale e si segna la più alta (a pari merito, tutte)
+  function watchSide() {
+    const sb = doc.getElementById('sideBody'); if (!sb || sb.__pt) return; sb.__pt = true;
+    const on = () => {
+      const ol = sb.querySelector('.aud-poll ol'); if (!ol || ol.classList.contains('ap-ranked')) return;
+      const rows = [...ol.children].map((li) => [li, parseFloat((li.querySelector('em') || {}).textContent)]).filter((x) => Number.isFinite(x[1]));
+      if (!rows.length) return;
+      const top = Math.max(...rows.map((x) => x[1]));
+      rows.forEach((x) => { if (x[1] === top) x[0].classList.add('ap-top'); });
+      ol.classList.add('ap-ranked');
+    };
+    new MutationObserver(() => safe(on)).observe(sb, { childList: true });
+    safe(on);
   }
 
   /* ---------- 2 · la barra: i crediti contano ---------- */
@@ -22862,6 +23268,27 @@ window.LOS_BUILD = "8da0036b41654a2997a0024c85f429b379291326971a2fb4d3782665ec14
     G.addEventListener('scroll', go, { capture: true, passive: true }); G.addEventListener('resize', go);
     const beat = setInterval(go, 400);
     sumStop = stop; setTimeout(go, 90); // dopo che 50-esito.js e il palco hanno preparato la scena
+    safe(() => verdict(s, born, body));
+  }
+  // il voto della regia sta più in basso del riepilogo: ha la sua misura, timbra e riempie le barre quando si vede
+  let rgStop = null;
+  function verdict(s, born, body) {
+    if (rgStop) { rgStop(); rgStop = null; }
+    const rg = s.querySelector('.ps-regia'); if (!rg) return;
+    let off = false;
+    const go = () => {
+      if (off || !rg.isConnected) { stop(); return; }
+      if (Date.now() - born < 8000 && (doc.querySelector('body > .pf') || (body && body.classList.contains('es-on') && !body.classList.contains('es-go')))) return;
+      const r = rg.getBoundingClientRect(); if (!r.height || r.top > G.innerHeight * 0.84 || r.bottom < 0) return;
+      stop(); rg.classList.add('rg-go');
+      const b = rg.querySelector('h3 b'); if (b) countStat(b, 60);
+      // la classe si toglie: tornando all'Esito le barre non ripartono
+      setTimeout(() => rg.classList.remove('rg-go'), 2200);
+    };
+    const stop = () => { off = true; G.removeEventListener('scroll', go, true); G.removeEventListener('resize', go); clearInterval(beat); };
+    G.addEventListener('scroll', go, { capture: true, passive: true }); G.addEventListener('resize', go);
+    const beat = setInterval(go, 400);
+    rgStop = stop; setTimeout(go, 120);
   }
   function watchEsito() {
     const body = doc.getElementById('resBody'); if (!body || body.__pt) return; body.__pt = true;
@@ -22869,9 +23296,9 @@ window.LOS_BUILD = "8da0036b41654a2997a0024c85f429b379291326971a2fb4d3782665ec14
     safe(summary);
   }
 
-  function boot() { safe(watchHud); safe(watchEsito); }
+  function boot() { safe(watchHud); safe(watchCast); safe(watchSide); safe(watchEsito); }
   if (doc.readyState === 'loading') doc.addEventListener('DOMContentLoaded', boot); else boot();
-  G.LOS_PARTITA_FX = { card(el, o) { safe(watchHud); safe(() => card(el, o)); }, bet(b, hud) { safe(watchHud); safe(() => bet(b, hud)); }, gift(t, k, btn) { safe(() => gift(t, k, btn)); } };
+  G.LOS_PARTITA_FX = { card(el, o) { safe(watchHud); safe(watchCast); safe(() => card(el, o)); }, bet(b, hud) { safe(watchHud); safe(() => bet(b, hud)); }, gift(t, k, btn) { safe(() => gift(t, k, btn)); }, game(el, s) { safe(() => game(el, s)); } };
 })(typeof window !== 'undefined' ? window : globalThis);
 
 ;
@@ -24414,13 +24841,16 @@ window.LOS_BUILD = "8da0036b41654a2997a0024c85f429b379291326971a2fb4d3782665ec14
     const st = SIM.stats || {}, P = SIM.phases, days = Math.max(1, SIM.days);
     const kills = P.reduce((s, p) => s + (p.kind === 'fallen' ? 0 : p.events.reduce((a, e) => a + (e.cat === 'kill' ? e.deaths.length : 0), 0)), 0);
     const byDay = {}; P.forEach((p) => { if (p.kind !== 'fallen') byDay[p.day] = (byDay[p.day] || 0) + p.events.reduce((a, e) => a + e.deaths.length, 0); });
-    const dd = Object.keys(byDay).length || 1, busy = Object.values(byDay).filter((n) => n > 0).length;
+    const dd = Object.keys(byDay).length || 1, busy = Object.values(byDay).filter((n) => n > 0).length, N = SIM.tributes.length;
+    // tarato su 40 partite normali: media intorno a 63, così 100 resta un'impresa
+    const total = Object.values(byDay).reduce((a, b) => a + b, 0) || 1, share1 = (byDay[1] || 0) / total;
+    let streak = 0, maxS = 0; P.forEach((p) => { if (p.kind === 'fallen') return; const d = p.events.reduce((a, e) => a + e.deaths.length, 0); streak = d ? 0 : streak + 1; maxS = Math.max(maxS, streak); });
     const twists = (st.betrayals || 0) + (st.revenges || 0) + (st.tough || 0) + (st.mentorSaves || 0) + (st.couples || 0);
-    const spettacolo = clamp(Math.round(40 + kills * 4 + (st.sponsors || 0) * 3), 0, 100);
-    const ritmo = clamp(Math.round((busy / dd) * 100), 0, 100);
-    const sorprese = clamp(Math.round(30 + twists * 9), 0, 100);
+    const spettacolo = clamp(Math.round(25 + 45 * (kills / Math.max(1, N - 1)) + Math.min(20, (st.sponsors || 0) * 2) + Math.min(10, (st.regia || []).length * 2.5)), 0, 100);
+    const ritmo = clamp(Math.round(100 * (busy / dd) - 70 * Math.max(0, share1 - 0.3) - 8 * Math.max(0, maxS - 2) - (dd < 4 ? 20 : 0)), 0, 100);
+    const sorprese = clamp(Math.round(20 + 75 * Math.min(1, twists / (N * 0.7))), 0, 100);
     const tot = Math.round(spettacolo * 0.35 + ritmo * 0.35 + sorprese * 0.3);
-    const giudizio = tot >= 85 ? 'Capolavoro: il pubblico chiede il bis.' : tot >= 70 ? 'Grande televisione.' : tot >= 55 ? 'Una buona puntata, con qualche calo.' : tot >= 40 ? 'Il pubblico ha cambiato canale un paio di volte.' : 'Noia mortale: la rete ti richiama domani.';
+    const giudizio = tot >= 78 ? 'Capolavoro: il pubblico chiede il bis.' : tot >= 68 ? 'Grande televisione.' : tot >= 58 ? 'Una buona puntata, con qualche calo.' : tot >= 48 ? 'Il pubblico ha cambiato canale un paio di volte.' : 'Noia mortale: la rete ti richiama domani.';
     return { tot, spettacolo, ritmo, sorprese, giudizio, carte: (st.regia || []).length, giorni: days };
   }
 
@@ -24555,7 +24985,7 @@ window.LOS_BUILD = "8da0036b41654a2997a0024c85f429b379291326971a2fb4d3782665ec14
     if (deaths.length >= 3) out.push({ k: 'strage', n: deaths.length, w: 6 });
     evs.filter((e) => e.cat === 'betray').slice(0, 1).forEach((e) => out.push({ k: 'tradimento', t: BY[e.ids[0]], u: BY[e.ids[1]], w: 6 }));
     evs.filter((e) => e.cat === 'love').slice(0, 1).forEach((e) => out.push({ k: 'amore', t: BY[e.ids[0]], u: BY[e.ids[1]], w: 4 }));
-    evs.filter((e) => e.test && e.ids[0] === ctx.mentore).forEach((e) => out.push({ k: e.test.pass ? 'provaOk' : 'provaKo', t: BY[e.ids[0]], w: 6 }));
+    evs.filter((e) => e.test && ctx.mentore && (e.test.who ? e.test.who === ctx.mentore : e.ids[0] === ctx.mentore)).forEach((e) => out.push({ k: e.test.pass ? 'provaOk' : 'provaKo', t: BY[ctx.mentore], w: 6 }));
     if (deaths.length === 1 && !out.some((f) => f.k === 'menMorto')) out.push({ k: 'morto', t: BY[deaths[0]], w: 3 });
     const alive = ph.snap.alive.length;
     if (alive <= 3 && alive > 1 && ph.kind !== 'fallen') out.push({ k: 'ultimi', n: alive, w: 5 });
@@ -24632,7 +25062,7 @@ window.LOS_BUILD = "8da0036b41654a2997a0024c85f429b379291326971a2fb4d3782665ec14
     const ids = ph.snap.alive.slice().sort((a, b) => ((ph.snap.rel[b] || {}).f || 0) - ((ph.snap.rel[a] || {}).f || 0) || (ph.snap.kills[b] || 0) - (ph.snap.kills[a] || 0)).slice(0, 4);
     const w = ids.map((id) => Math.pow(((ph.snap.rel[id] || {}).f || 0) + 1.5, 1.4) * (0.75 + r() * 0.5) + (votes && votes[id] ? 0.6 * votes[id] : 0));
     const tot = w.reduce((s, x) => s + x, 0) || 1;
-    return ids.map((id, k) => ({ id, pct: Math.round((w[k] / tot) * 100) }));
+    return ids.map((id, k) => ({ id, pct: Math.round((w[k] / tot) * 100) })).sort((a, b) => b.pct - a.pct);
   }
 
   G.LOS_TELECRONACA = { commento, chat, sondaggio, favorito, fatti };
@@ -26423,7 +26853,7 @@ window.LOS_BUILD = "8da0036b41654a2997a0024c85f429b379291326971a2fb4d3782665ec14
   /* =============== DIRETTA =============== */
   function evHTML(e, tributes, theme, anim, plain, delay) {
     const by = tributes ? Object.fromEntries(tributes.map((t) => [t.id, t])) : BY;
-    if (e.note) return '<div class="ev note' + (e.meteo ? ' meteo' : '') + (anim ? ' in' : '') + '" style="--d:' + (delay || 0) + 'ms"><span class="note-ic" aria-hidden="true">' + (e.meteo ? '<svg viewBox="0 0 24 24"><path d="M7 17.5h10a4 4 0 0 0 .6-7.95A6 6 0 0 0 6.2 9.6 4 4 0 0 0 7 17.5z"/></svg>' : '<svg viewBox="0 0 24 24"><path d="M4 12a8 8 0 1 0 16 0 8 8 0 0 0-16 0zM12 8v5M12 16v.5"/></svg>') + '</span><p>' + e.html + '</p></div>';
+    if (e.note) return '<div class="ev note' + (e.meteo ? ' meteo' : '') + (e.regia ? ' ev-regia rg-' + e.regia : '') + (anim ? ' in' : '') + '" style="--d:' + (delay || 0) + 'ms"><span class="note-ic" aria-hidden="true">' + (e.meteo ? '<svg viewBox="0 0 24 24"><path d="M7 17.5h10a4 4 0 0 0 .6-7.95A6 6 0 0 0 6.2 9.6 4 4 0 0 0 7 17.5z"/></svg>' : '<svg viewBox="0 0 24 24"><path d="M4 12a8 8 0 1 0 16 0 8 8 0 0 0-16 0zM12 8v5M12 16v.5"/></svg>') + '</span><p>' + e.html + '</p></div>';
     const cat = e.cat || 'none';
     const lbl = CAT[cat][theme.soft ? 1 : 0];
     const avs = '<span class="avs">' + e.ids.slice(0, 4).map((id) => avHTML(by[id], { dead: e.deaths.includes(id), btn: !plain })).join('') + '</span>';
@@ -26644,7 +27074,7 @@ window.LOS_BUILD = "8da0036b41654a2997a0024c85f429b379291326971a2fb4d3782665ec14
   async function playableTest(k) {
     const g = S.run.gioco, P = SIM.phases;
     if (!P[k] || !g.mentore || g.chiesto['p' + k]) return;
-    const ev = P[k].events.find((e) => e.test && e.ids[0] === g.mentore);
+    const ev = P[k].events.find((e) => e.test && (e.test.who ? e.test.who === g.mentore : e.ids[0] === g.mentore));
     if (!ev) return;
     g.chiesto['p' + k] = 1; save();
     const t = BY[g.mentore], tipo = PT.tipoProva(ev.test.attr), an = ATTRN[ev.test.attr] || ev.test.attr;

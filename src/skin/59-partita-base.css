@@ -1,89 +1,35 @@
 /* ================= PELLE · PARTITA GIOCATA, FASE 2 (base) =================
- * Struttura e leggibilità per telecronaca (#ptCast), pubblico (scheda «Pubblico»: .aud-poll, .aud-chat),
- * minigiochi delle prove (.sc-game, .mg-*), segnalini sulla mappa (.mn-pins), doni dalla mappa e dalla scheda,
- * voto della regia nell'Esito (.ps-regia). Caricato prima di 60/61: la regia visiva sta lì. */
+ * Solo l'ossatura di telecronaca (#ptCast), pubblico (.aud-poll, .aud-chat), minigiochi (.sc-game, .mg-*),
+ * segnalini sulla mappa (.mn-pins), doni dalla mappa e dalla scheda, voto della regia nell'Esito (.ps-regia):
+ * ciò che serve perché le schermate stiano in piedi. Forme, colori e movimento sono in 60-partita.css
+ * (dal punto 8 in poi) e in 61-partita.js. */
 
-/* ---------- telecronaca ---------- */
-.pt-cast { display: grid; gap: 6px; margin: 0 0 14px; padding: 10px 16px 12px; background: var(--panel-solid, var(--panel)); box-shadow: inset 5px 0 0 var(--ink); }
-.pt-cast .pc-on { justify-self: start; font: 800 10.5px / 1 var(--f-body); letter-spacing: .2em; text-transform: uppercase; color: var(--key); }
-.pc-line { margin: 0; display: grid; grid-template-columns: 74px minmax(0, 1fr); gap: 10px; align-items: baseline; font-size: 15px; line-height: 1.4; }
-.pc-who { font: italic 900 14px / 1.2 var(--f-display); text-transform: uppercase; }
-.pc-e .pc-who { color: var(--key); }
-.pc-say b { font-weight: 800; }
+/* telecronaca */
+.pt-cast { display: grid; margin: 0 0 14px; }
+.pt-cast[hidden] { display: none; }
+.pc-line { margin: 0; }
 
-/* ---------- pubblico: sondaggio e chat ---------- */
-.aud-poll h4, .aud-chat h4 { display: flex; justify-content: space-between; align-items: baseline; margin: 0 0 10px; font: italic 900 16px / 1.1 var(--f-display); text-transform: uppercase; }
-.aud-poll h4 span, .aud-chat h4 span { font: 800 10.5px / 1 var(--f-body); letter-spacing: .16em; color: color-mix(in srgb, var(--ink) 65%, transparent); }
-.aud-poll ol { list-style: none; margin: 0 0 8px; padding: 0; display: grid; gap: 8px; }
-.aud-poll li { display: grid; grid-template-columns: 34px minmax(0, 1fr) auto auto; grid-template-rows: auto auto; column-gap: 10px; align-items: center; }
-.aud-poll li .av { --s: 34px; grid-row: 1 / 3; }
-.aud-poll .ap-name { font-weight: 800; font-size: 14px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.aud-poll .ap-bar { grid-column: 2; grid-row: 2; height: 6px; background: color-mix(in srgb, var(--ink) 12%, transparent); }
-.aud-poll .ap-bar b { display: block; height: 100%; background: var(--key); }
-.aud-poll em { grid-column: 3; grid-row: 1 / 3; font: italic 900 18px / 1 var(--f-display); font-style: italic; }
-.aud-poll .ap-vote, .aud-poll .ap-mine { grid-column: 4; grid-row: 1 / 3; }
-.aud-poll .ap-mine { font: 800 10.5px / 1 var(--f-body); letter-spacing: .12em; text-transform: uppercase; color: var(--key); }
-.aud-poll li.mine .ap-name { color: var(--key); }
-.aud-chat { margin-top: 18px; }
-.aud-chat ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
-.aud-chat li { font-size: 14px; line-height: 1.35; padding: 6px 10px; background: color-mix(in srgb, var(--ink) 6%, transparent); }
-.aud-chat li > b:first-child { color: var(--key); font-weight: 800; margin-right: 4px; }
-.aud-chat li.sad { box-shadow: inset 3px 0 0 var(--c-kill); }
-.aud-chat li.hype, .aud-chat li.fav { box-shadow: inset 3px 0 0 var(--key); }
+/* pubblico */
+.aud-poll ol, .aud-chat ul { list-style: none; margin: 0; padding: 0; display: grid; }
+.aud-poll .ap-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.aud-chat { margin-top: 22px; }
 
-/* ---------- minigiochi ---------- */
-.mg { display: grid; gap: 14px; margin: 4px 0 6px; }
-.mg-hint { margin: 0; font-size: 13px; color: color-mix(in srgb, var(--ink) 72%, transparent); }
-.mg-bar { position: relative; height: 44px; background: color-mix(in srgb, var(--ink) 10%, transparent); overflow: hidden; }
-.mg-zone { position: absolute; top: 0; bottom: 0; background: var(--key); opacity: .85; }
-.mg-needle { position: absolute; top: -4px; bottom: -4px; width: 4px; margin-left: -2px; background: var(--ink); }
-.mg-row { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
-.mg-round { font: 800 12px / 1 var(--f-body); letter-spacing: .14em; text-transform: uppercase; }
-.mg-go { padding: 12px 26px; border: 0; background: var(--key); color: var(--key-ink); font: italic 900 18px / 1 var(--f-display); text-transform: uppercase; cursor: pointer; }
-.mg-seq { display: flex; gap: 8px; justify-content: center; }
-.mg-cell { width: 48px; height: 56px; display: grid; place-items: center; background: color-mix(in srgb, var(--ink) 10%, transparent); font: 900 26px / 1 var(--f-display); font-style: normal; }
-.mg-cell.on { background: var(--ink); color: var(--bg); }
-.mg-cell.ok { background: var(--key); color: var(--key-ink); }
-.mg-cell.ko { background: var(--c-kill); color: #fff; }
-.mg-pad { display: grid; grid-template-columns: repeat(4, 56px); gap: 8px; justify-content: center; }
-.mg-pad button { height: 52px; border: 2px solid color-mix(in srgb, var(--ink) 25%, transparent); background: transparent; color: var(--ink); font: 900 24px / 1 var(--f-display); cursor: pointer; }
-.mg-pad button:not(:disabled):hover, .mg-pad button:focus-visible { background: var(--ink); color: var(--bg); outline: none; }
-.mg-pad button:disabled { opacity: .35; }
-.mg-clues { margin: 0; padding-left: 18px; display: grid; gap: 6px; font-size: 15px; }
-.mg-doors { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
-.mg-doors button { display: grid; gap: 6px; justify-items: center; padding: 18px 8px; border: 2px solid color-mix(in srgb, var(--ink) 25%, transparent); background: transparent; color: var(--ink); font: italic 900 16px / 1 var(--f-display); text-transform: uppercase; cursor: pointer; }
-.mg-doors button span { font-size: 12px; opacity: .7; }
-.mg-doors button:not(:disabled):hover, .mg-doors button:focus-visible { background: var(--ink); color: var(--bg); outline: none; }
-.mg-doors button.ok { background: var(--key); color: var(--key-ink); border-color: var(--key); }
-.mg-doors button.ko { background: var(--c-kill); color: #fff; border-color: var(--c-kill); }
-.mg-score b { font: italic 900 20px / 1 var(--f-display); text-transform: uppercase; }
-.sc.mg-great .mg-score b, .sc.mg-good .mg-score b { color: var(--key); }
-.sc.mg-bad .mg-score b { color: var(--c-kill); }
+/* minigiochi: le posizioni di fascia e ago le scrive partita.js (left / width in linea) */
+.mg { display: grid; }
+.mg-hint { margin: 0; }
+.mg-bar { position: relative; }
+.mg-zone, .mg-needle { position: absolute; }
+.mg-row { display: flex; align-items: center; }
+.mg-seq { display: flex; justify-content: center; }
+.mg-cell { display: grid; place-items: center; font-style: normal; }
+.mg-pad { display: grid; justify-content: center; }
+.mg-clues { margin: 0; display: grid; }
+.mg-doors { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); }
 
-/* ---------- mappa: segnalini e doni ---------- */
-.map-node .mn-pins { position: absolute; left: 50%; top: 100%; translate: -50% 14px; display: flex; gap: 2px; pointer-events: none; }
-.mn-pin { min-width: 20px; padding: 2px 4px; font: 800 9.5px / 1.2 var(--f-body); font-style: normal; text-align: center; background: var(--ink); color: var(--bg); }
-.mn-pin.pin-men { background: var(--key); color: var(--key-ink); }
-.mn-pin.pin-gift { background: var(--paper); color: var(--void); box-shadow: inset 0 0 0 2px var(--key); }
-.zc-gift, .pf-gift { font-size: 12px; }
-.zc-face .zc-gift { display: block; margin-top: 4px; padding: 3px 8px; border: 0; background: var(--key); color: var(--key-ink); font: 800 11px / 1 var(--f-body); letter-spacing: .08em; text-transform: uppercase; cursor: pointer; }
+/* mappa */
+.map-node .mn-pins { position: absolute; left: 50%; top: 100%; display: flex; pointer-events: none; }
+.mn-pin { font-style: normal; text-align: center; }
 
-/* ---------- esito: regia e prove ---------- */
-.ps-regia { margin-top: 16px; padding: 14px 16px; background: color-mix(in srgb, var(--ink) 6%, transparent); }
-.ps-regia h3 { margin: 0 0 6px; font: italic 900 18px / 1 var(--f-display); text-transform: uppercase; display: flex; align-items: baseline; gap: 8px; }
-.ps-regia h3 b { font-size: 34px; color: var(--key); }
-.ps-regia h3 small { font-size: 13px; opacity: .7; }
-.ps-rbars { display: grid; gap: 6px; margin: 10px 0; }
-.ps-rb { display: grid; grid-template-columns: 120px minmax(0, 1fr) 34px; gap: 10px; align-items: center; font-size: 13px; }
-.ps-rb em { font-style: normal; font-weight: 800; text-transform: uppercase; letter-spacing: .08em; font-size: 11px; }
-.ps-rb i { height: 8px; background: color-mix(in srgb, var(--ink) 12%, transparent); }
-.ps-rb i b { display: block; height: 100%; background: var(--key); }
-.ps-rb strong { font: italic 900 16px / 1 var(--f-display); text-align: right; }
-.ps-tests { margin: 12px 0 0; }
-
-@media (max-width: 600px) {
-  .pc-line { grid-template-columns: 1fr; gap: 2px; }
-  .mg-pad { grid-template-columns: repeat(4, 1fr); }
-  .mg-cell { width: 40px; height: 48px; }
-  .ps-rb { grid-template-columns: 96px minmax(0, 1fr) 30px; }
-}
+/* esito */
+.ps-rbars { display: grid; }
+.ps-rb i b { display: block; height: 100%; }

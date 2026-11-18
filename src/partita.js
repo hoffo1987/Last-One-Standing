@@ -259,13 +259,16 @@
     const st = SIM.stats || {}, P = SIM.phases, days = Math.max(1, SIM.days);
     const kills = P.reduce((s, p) => s + (p.kind === 'fallen' ? 0 : p.events.reduce((a, e) => a + (e.cat === 'kill' ? e.deaths.length : 0), 0)), 0);
     const byDay = {}; P.forEach((p) => { if (p.kind !== 'fallen') byDay[p.day] = (byDay[p.day] || 0) + p.events.reduce((a, e) => a + e.deaths.length, 0); });
-    const dd = Object.keys(byDay).length || 1, busy = Object.values(byDay).filter((n) => n > 0).length;
+    const dd = Object.keys(byDay).length || 1, busy = Object.values(byDay).filter((n) => n > 0).length, N = SIM.tributes.length;
+    // tarato su 40 partite normali: media intorno a 63, così 100 resta un'impresa
+    const total = Object.values(byDay).reduce((a, b) => a + b, 0) || 1, share1 = (byDay[1] || 0) / total;
+    let streak = 0, maxS = 0; P.forEach((p) => { if (p.kind === 'fallen') return; const d = p.events.reduce((a, e) => a + e.deaths.length, 0); streak = d ? 0 : streak + 1; maxS = Math.max(maxS, streak); });
     const twists = (st.betrayals || 0) + (st.revenges || 0) + (st.tough || 0) + (st.mentorSaves || 0) + (st.couples || 0);
-    const spettacolo = clamp(Math.round(40 + kills * 4 + (st.sponsors || 0) * 3), 0, 100);
-    const ritmo = clamp(Math.round((busy / dd) * 100), 0, 100);
-    const sorprese = clamp(Math.round(30 + twists * 9), 0, 100);
+    const spettacolo = clamp(Math.round(25 + 45 * (kills / Math.max(1, N - 1)) + Math.min(20, (st.sponsors || 0) * 2) + Math.min(10, (st.regia || []).length * 2.5)), 0, 100);
+    const ritmo = clamp(Math.round(100 * (busy / dd) - 70 * Math.max(0, share1 - 0.3) - 8 * Math.max(0, maxS - 2) - (dd < 4 ? 20 : 0)), 0, 100);
+    const sorprese = clamp(Math.round(20 + 75 * Math.min(1, twists / (N * 0.7))), 0, 100);
     const tot = Math.round(spettacolo * 0.35 + ritmo * 0.35 + sorprese * 0.3);
-    const giudizio = tot >= 85 ? 'Capolavoro: il pubblico chiede il bis.' : tot >= 70 ? 'Grande televisione.' : tot >= 55 ? 'Una buona puntata, con qualche calo.' : tot >= 40 ? 'Il pubblico ha cambiato canale un paio di volte.' : 'Noia mortale: la rete ti richiama domani.';
+    const giudizio = tot >= 78 ? 'Capolavoro: il pubblico chiede il bis.' : tot >= 68 ? 'Grande televisione.' : tot >= 58 ? 'Una buona puntata, con qualche calo.' : tot >= 48 ? 'Il pubblico ha cambiato canale un paio di volte.' : 'Noia mortale: la rete ti richiama domani.';
     return { tot, spettacolo, ritmo, sorprese, giudizio, carte: (st.regia || []).length, giorni: days };
   }
 

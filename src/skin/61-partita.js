@@ -1,8 +1,11 @@
 /* ================= PELLE · LA PARTITA GIOCATA (regia) =================
- * I ganci grafici che partita.js e ui.js chiamano se esistono: window.LOS_PARTITA_FX = { card, bet, gift }.
+ * I ganci grafici che partita.js e ui.js chiamano se esistono: window.LOS_PARTITA_FX = { card, bet, gift, game }.
  * - card: il cartello delle scelte entra come un evento (titolo parola per parola, scelte a cascata, ritratto grande);
  * - bet: quando una puntata si chiude cade un timbro vicino alla barra del giocatore;
- * - gift: una cassa col paracadute parte dal pulsante del dono verso il racconto.
+ * - gift: una cassa col paracadute parte dal pulsante del dono verso il racconto;
+ * - game: il verdetto di una prova giocabile (schegge da dietro la lastra, il colpo sonoro).
+ * Fase 2: le carte del Regista ricevono la loro icona, il tempismo i tre rombi dei colpi, la telecronaca (#ptCast)
+ * entra a ogni battuta nuova, il voto della regia nell'Esito timbra e riempie le barre alla prima comparsa.
  * In più, senza toccare ui.js: i crediti della barra contano quando cambiano e i numeri di «La tua partita»
  * nell'Esito contano alla prima comparsa.
  * Solo decorazione: ogni passo è protetto, niente blocca i comandi, tutto si toglie da solo. Con il movimento
@@ -46,7 +49,9 @@
     // se arriva subito dopo un altro cartello aspetta che il colpo sulla scelta appena fatta si sia visto
     if (!reduced() && doc.querySelector('.sc.sc-out')) el.style.setProperty('--sc-d', '150ms');
     safe(() => el.querySelectorAll('.sc-opt').forEach((b, k) => b.style.setProperty('--k', o.grid ? Math.min(k, 22) : Math.min(k, 8))));
-    if (/\bsc-(mentor|gift|interview)\b/.test(el.className)) safe(() => face(el.querySelector('.sc-faces .av')));
+    if (/\bsc-(mentor|gift|interview|game)\b/.test(el.className)) safe(() => face(el.querySelector('.sc-faces .av')));
+    if (el.classList.contains('sc-regia')) safe(() => hand(el, o));
+    if (o.game === 'tempismo') safe(() => pips(el));
     if (!reduced()) safe(() => words(el.querySelector('.sc-t')));
     sfx('cut');
     // un soffio passando sulle scelte (solo mouse), la conferma quando si sceglie
@@ -55,9 +60,104 @@
       el.addEventListener('pointerover', (e) => { const b = e.target.closest && e.target.closest('.sc-opt:not(:disabled), .sc-stake button:not(:disabled)'); if (!b || b === last) return; last = b; sfx('hover'); });
     }
     el.addEventListener('click', (e) => {
-      const b = e.target.closest && e.target.closest('.sc-opt, .sc-stake button, .sc-skip'); if (!b || b.disabled) return;
+      const b = e.target.closest && e.target.closest('.sc-opt, .sc-stake button, .sc-skip, .mg-pad button, .mg-doors button'); if (!b || b.disabled) return;
       sfx(b.classList.contains('sc-opt') ? 'confirm' : 'tick');
     });
+  }
+
+  /* ---------- 1b · le carte del Regista: ogni carta ha la sua icona ---------- */
+  // disegni pieni su 48×48, nel colore del testo (la tinta a riposo, vedi 60-partita.css); .rg-s sono i tratti
+  const CARTE = {
+    tempesta: '<path d="M13 29a9 9 0 0 1 1.2-17.9A12 12 0 0 1 37 13.5 8 8 0 0 1 36 29z"/><path d="M25 31l-8 9h6l-2 7 9-11h-6l3-5z"/>',
+    banchetto: '<path d="M6 34a18 18 0 0 1 36 0z"/><circle cx="24" cy="11.5" r="3.4"/><path d="M3 37h42v4.5H3z"/>',
+    disastro: '<path d="M7 40h34v5H7zM12 31h24l2.5 7h-29zM14.5 29a9.5 9.5 0 0 1 19 0z"/><path class="rg-s" d="M24 4v8M9 9l5 6.5M39 9l-5 6.5"/>',
+    buio: '<path d="M30 5a19 19 0 1 0 13 29A15.5 15.5 0 0 1 30 5z"/><path d="M11 5l1.6 3.9 3.9 1.6-3.9 1.6L11 16l-1.6-3.9-3.9-1.6 3.9-1.6z"/>',
+    bestie: '<path d="M7 4q11 17 7 40Q11 25 1 9z"/><path d="M21 4q11 17 7 40Q25 25 15 9z"/><path d="M35 4q11 17 7 40Q39 25 29 9z"/>',
+    rifornimenti: '<path d="M6 20C7 9 15 3 24 3s17 6 18 17c-4-3-8-3-12 0-4-3-8-3-12 0-4-3-8-3-12 0z"/><path class="rg-s" d="M7 20l11 11M41 20L30 31M24 20v11" style="stroke-width:2"/><path d="M14 31h20v14H14z"/>',
+  };
+  // il valore della carta arriva con le opzioni del cartello; se manca si risale dall'etichetta
+  function hand(el, o) {
+    const defs = (G.LOS_PARTITA && G.LOS_PARTITA.REGIA) || [], opts = o.options || [];
+    el.querySelectorAll('.sc-opt').forEach((b, k) => {
+      if (b.querySelector('.rg-ic')) return;
+      const lab = (b.querySelector('.sc-l') || {}).textContent || '';
+      const key = (opts[k] && CARTE[opts[k].value] ? opts[k].value : null) || (defs.find((c) => c.label === lab) || {}).k;
+      if (!CARTE[key]) return;
+      const ic = h('span', 'rg-ic'); ic.setAttribute('aria-hidden', 'true');
+      ic.innerHTML = '<svg viewBox="0 0 48 48">' + CARTE[key] + '</svg>';
+      const n = b.querySelector('.sc-n'); if (n) n.after(ic); else b.prepend(ic);
+    });
+  }
+
+  /* ---------- 1c · le prove giocabili ---------- */
+  // tempismo: tre rombi accanto al conto dei colpi; partita.js rimette .mg-hit / .mg-miss a ogni colpo
+  function pips(el) {
+    const box = el.querySelector('.mg'), row = el.querySelector('.mg-row'); if (!box || !row || row.querySelector('.mg-pips')) return;
+    const p = h('span', 'mg-pips'); p.setAttribute('aria-hidden', 'true');
+    for (let k = 0; k < 3; k++) p.appendChild(h('i'));
+    row.insertBefore(p, row.querySelector('.mg-go'));
+    let n = 0;
+    new MutationObserver(() => {
+      const hit = box.classList.contains('mg-hit'); if (!hit && !box.classList.contains('mg-miss')) return;
+      const d = p.children[n++]; if (d) d.classList.add(hit ? 'ok' : 'ko');
+      sfx(hit ? 'confirm' : 'tick');
+    }).observe(box, { attributes: true, attributeFilter: ['class'] });
+  }
+  // il verdetto: le schegge partono da dietro la lastra (non passano sopra il testo) e solo se è andata bene
+  function game(el, score) {
+    if (!el) return;
+    const good = score >= 0.5, great = score >= 0.8;
+    sfx(good ? 'stamp' : 'tick');
+    const cardEl = el.querySelector('.sc-card');
+    if (reduced() || !good || !cardEl || !el.animate) return;
+    const r = cardEl.getBoundingClientRect(), o = el.getBoundingClientRect(); if (!r.width) return;
+    const b = h('div', 'mg-burst'); b.setAttribute('aria-hidden', 'true');
+    b.style.left = (r.left - o.left + r.width / 2) + 'px'; b.style.top = (r.top - o.top + r.height / 2) + 'px';
+    const N = great ? 16 : 9, T = 620;
+    for (let k = 0; k < N; k++) {
+      const a = (k / N) * Math.PI * 2 + Math.random() * 0.3, c = Math.cos(a), s = Math.sin(a), far = 70 + Math.random() * 90;
+      const i = h('i'); b.appendChild(i);
+      i.animate([
+        { transform: 'translate(' + (c * r.width * 0.4) + 'px,' + (s * r.height * 0.4) + 'px) rotate(0deg) scale(.6)', opacity: 1 },
+        { opacity: 1, offset: 0.6 },
+        { transform: 'translate(' + (c * (r.width / 2 + far)) + 'px,' + (s * (r.height / 2 + far)) + 'px) rotate(' + (Math.random() * 300 - 150) + 'deg) scale(' + (0.8 + Math.random() * 0.9) + ')', opacity: 0 },
+      ], { duration: T, delay: Math.random() * 60, easing: 'cubic-bezier(.16,1,.3,1)', fill: 'both' });
+    }
+    el.insertBefore(b, cardEl);
+    setTimeout(() => b.remove(), T + 140);
+  }
+
+  /* ---------- 1d · la telecronaca: a ogni battuta nuova il sottopancia rientra ---------- */
+  // ui.js riscrive #ptCast a ogni fase: si entra solo se il testo è cambiato; la classe si toglie da sola
+  let castEl = null, castTxt = '', castT = 0;
+  function watchCast() {
+    const c = doc.getElementById('ptCast'); if (!c || c === castEl) return;
+    castEl = c;
+    const on = () => {
+      if (c.hidden) { castTxt = ''; return; }
+      const t = c.textContent; if (t === castTxt) return; castTxt = t;
+      if (reduced() || doc.hidden) return;
+      clearTimeout(castT); c.classList.remove('pc-in'); void c.offsetWidth; c.classList.add('pc-in');
+      castT = setTimeout(() => c.classList.remove('pc-in'), 900);
+    };
+    new MutationObserver(on).observe(c, { childList: true, attributes: true, attributeFilter: ['hidden'] });
+    on();
+  }
+
+  /* ---------- 1e · il sondaggio del pubblico: chi è in testa ---------- */
+  // l'ordine delle righe non è la classifica: si legge la percentuale e si segna la più alta (a pari merito, tutte)
+  function watchSide() {
+    const sb = doc.getElementById('sideBody'); if (!sb || sb.__pt) return; sb.__pt = true;
+    const on = () => {
+      const ol = sb.querySelector('.aud-poll ol'); if (!ol || ol.classList.contains('ap-ranked')) return;
+      const rows = [...ol.children].map((li) => [li, parseFloat((li.querySelector('em') || {}).textContent)]).filter((x) => Number.isFinite(x[1]));
+      if (!rows.length) return;
+      const top = Math.max(...rows.map((x) => x[1]));
+      rows.forEach((x) => { if (x[1] === top) x[0].classList.add('ap-top'); });
+      ol.classList.add('ap-ranked');
+    };
+    new MutationObserver(() => safe(on)).observe(sb, { childList: true });
+    safe(on);
   }
 
   /* ---------- 2 · la barra: i crediti contano ---------- */
@@ -219,6 +319,27 @@
     G.addEventListener('scroll', go, { capture: true, passive: true }); G.addEventListener('resize', go);
     const beat = setInterval(go, 400);
     sumStop = stop; setTimeout(go, 90); // dopo che 50-esito.js e il palco hanno preparato la scena
+    safe(() => verdict(s, born, body));
+  }
+  // il voto della regia sta più in basso del riepilogo: ha la sua misura, timbra e riempie le barre quando si vede
+  let rgStop = null;
+  function verdict(s, born, body) {
+    if (rgStop) { rgStop(); rgStop = null; }
+    const rg = s.querySelector('.ps-regia'); if (!rg) return;
+    let off = false;
+    const go = () => {
+      if (off || !rg.isConnected) { stop(); return; }
+      if (Date.now() - born < 8000 && (doc.querySelector('body > .pf') || (body && body.classList.contains('es-on') && !body.classList.contains('es-go')))) return;
+      const r = rg.getBoundingClientRect(); if (!r.height || r.top > G.innerHeight * 0.84 || r.bottom < 0) return;
+      stop(); rg.classList.add('rg-go');
+      const b = rg.querySelector('h3 b'); if (b) countStat(b, 60);
+      // la classe si toglie: tornando all'Esito le barre non ripartono
+      setTimeout(() => rg.classList.remove('rg-go'), 2200);
+    };
+    const stop = () => { off = true; G.removeEventListener('scroll', go, true); G.removeEventListener('resize', go); clearInterval(beat); };
+    G.addEventListener('scroll', go, { capture: true, passive: true }); G.addEventListener('resize', go);
+    const beat = setInterval(go, 400);
+    rgStop = stop; setTimeout(go, 120);
   }
   function watchEsito() {
     const body = doc.getElementById('resBody'); if (!body || body.__pt) return; body.__pt = true;
@@ -226,7 +347,7 @@
     safe(summary);
   }
 
-  function boot() { safe(watchHud); safe(watchEsito); }
+  function boot() { safe(watchHud); safe(watchCast); safe(watchSide); safe(watchEsito); }
   if (doc.readyState === 'loading') doc.addEventListener('DOMContentLoaded', boot); else boot();
-  G.LOS_PARTITA_FX = { card(el, o) { safe(watchHud); safe(() => card(el, o)); }, bet(b, hud) { safe(watchHud); safe(() => bet(b, hud)); }, gift(t, k, btn) { safe(() => gift(t, k, btn)); } };
+  G.LOS_PARTITA_FX = { card(el, o) { safe(watchHud); safe(watchCast); safe(() => card(el, o)); }, bet(b, hud) { safe(watchHud); safe(() => bet(b, hud)); }, gift(t, k, btn) { safe(() => gift(t, k, btn)); }, game(el, s) { safe(() => game(el, s)); } };
 })(typeof window !== 'undefined' ? window : globalThis);

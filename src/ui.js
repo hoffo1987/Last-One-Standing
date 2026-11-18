@@ -1782,7 +1782,7 @@
   /* =============== DIRETTA =============== */
   function evHTML(e, tributes, theme, anim, plain, delay) {
     const by = tributes ? Object.fromEntries(tributes.map((t) => [t.id, t])) : BY;
-    if (e.note) return '<div class="ev note' + (e.meteo ? ' meteo' : '') + (anim ? ' in' : '') + '" style="--d:' + (delay || 0) + 'ms"><span class="note-ic" aria-hidden="true">' + (e.meteo ? '<svg viewBox="0 0 24 24"><path d="M7 17.5h10a4 4 0 0 0 .6-7.95A6 6 0 0 0 6.2 9.6 4 4 0 0 0 7 17.5z"/></svg>' : '<svg viewBox="0 0 24 24"><path d="M4 12a8 8 0 1 0 16 0 8 8 0 0 0-16 0zM12 8v5M12 16v.5"/></svg>') + '</span><p>' + e.html + '</p></div>';
+    if (e.note) return '<div class="ev note' + (e.meteo ? ' meteo' : '') + (e.regia ? ' ev-regia rg-' + e.regia : '') + (anim ? ' in' : '') + '" style="--d:' + (delay || 0) + 'ms"><span class="note-ic" aria-hidden="true">' + (e.meteo ? '<svg viewBox="0 0 24 24"><path d="M7 17.5h10a4 4 0 0 0 .6-7.95A6 6 0 0 0 6.2 9.6 4 4 0 0 0 7 17.5z"/></svg>' : '<svg viewBox="0 0 24 24"><path d="M4 12a8 8 0 1 0 16 0 8 8 0 0 0-16 0zM12 8v5M12 16v.5"/></svg>') + '</span><p>' + e.html + '</p></div>';
     const cat = e.cat || 'none';
     const lbl = CAT[cat][theme.soft ? 1 : 0];
     const avs = '<span class="avs">' + e.ids.slice(0, 4).map((id) => avHTML(by[id], { dead: e.deaths.includes(id), btn: !plain })).join('') + '</span>';
@@ -2003,7 +2003,7 @@
   async function playableTest(k) {
     const g = S.run.gioco, P = SIM.phases;
     if (!P[k] || !g.mentore || g.chiesto['p' + k]) return;
-    const ev = P[k].events.find((e) => e.test && e.ids[0] === g.mentore);
+    const ev = P[k].events.find((e) => e.test && (e.test.who ? e.test.who === g.mentore : e.ids[0] === g.mentore));
     if (!ev) return;
     g.chiesto['p' + k] = 1; save();
     const t = BY[g.mentore], tipo = PT.tipoProva(ev.test.attr), an = ATTRN[ev.test.attr] || ev.test.attr;

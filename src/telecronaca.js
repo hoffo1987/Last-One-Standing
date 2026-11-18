@@ -30,7 +30,7 @@
     if (deaths.length >= 3) out.push({ k: 'strage', n: deaths.length, w: 6 });
     evs.filter((e) => e.cat === 'betray').slice(0, 1).forEach((e) => out.push({ k: 'tradimento', t: BY[e.ids[0]], u: BY[e.ids[1]], w: 6 }));
     evs.filter((e) => e.cat === 'love').slice(0, 1).forEach((e) => out.push({ k: 'amore', t: BY[e.ids[0]], u: BY[e.ids[1]], w: 4 }));
-    evs.filter((e) => e.test && e.ids[0] === ctx.mentore).forEach((e) => out.push({ k: e.test.pass ? 'provaOk' : 'provaKo', t: BY[e.ids[0]], w: 6 }));
+    evs.filter((e) => e.test && ctx.mentore && (e.test.who ? e.test.who === ctx.mentore : e.ids[0] === ctx.mentore)).forEach((e) => out.push({ k: e.test.pass ? 'provaOk' : 'provaKo', t: BY[ctx.mentore], w: 6 }));
     if (deaths.length === 1 && !out.some((f) => f.k === 'menMorto')) out.push({ k: 'morto', t: BY[deaths[0]], w: 3 });
     const alive = ph.snap.alive.length;
     if (alive <= 3 && alive > 1 && ph.kind !== 'fallen') out.push({ k: 'ultimi', n: alive, w: 5 });
@@ -107,7 +107,7 @@
     const ids = ph.snap.alive.slice().sort((a, b) => ((ph.snap.rel[b] || {}).f || 0) - ((ph.snap.rel[a] || {}).f || 0) || (ph.snap.kills[b] || 0) - (ph.snap.kills[a] || 0)).slice(0, 4);
     const w = ids.map((id) => Math.pow(((ph.snap.rel[id] || {}).f || 0) + 1.5, 1.4) * (0.75 + r() * 0.5) + (votes && votes[id] ? 0.6 * votes[id] : 0));
     const tot = w.reduce((s, x) => s + x, 0) || 1;
-    return ids.map((id, k) => ({ id, pct: Math.round((w[k] / tot) * 100) }));
+    return ids.map((id, k) => ({ id, pct: Math.round((w[k] / tot) * 100) })).sort((a, b) => b.pct - a.pct);
   }
 
   G.LOS_TELECRONACA = { commento, chat, sondaggio, favorito, fatti };
