@@ -1732,7 +1732,7 @@
     if (RUNNER) RUNNER.cancel(); stopPlay(); simulationBusy(true);
     let result;
     try { result = RUNNER ? await RUNNER.simulate(cfg) : L.simulate(cfg); }
-    catch (e) { if (generation === runGeneration && e.name !== 'AbortError') toast('Simulazione non riuscita: ' + e.message); return false; }
+    catch (e) { runSim.festa = null; runSim.pre = null; runSim.condivisa = false; if (generation === runGeneration && e.name !== 'AbortError') toast('Simulazione non riuscita: ' + e.message); return false; }
     finally { if (generation === runGeneration) simulationBusy(false); }
     if (generation !== runGeneration) return false;
     SIM = result;
@@ -2036,6 +2036,8 @@
     g.chiesto[key] = 1; save();
     if (g.festa) { if (dawn) await festaDay(k); return; }
     const timer = playing ? 20 : 0, soft = !!resultTheme(SIM).soft, i = k - 1;
+    // ogni alba gli sponsor versano qualcosa: 10 crediti, 5 in più se il tuo allievo è ancora in gara
+    if (dawn) { const inc = 10 + (g.mentore && P[i].snap.alive.includes(g.mentore) ? 5 : 0); g.crediti += inc; renderHud(); }
     let changed = false;
     // chi alleni è caduto: all'alba se ne sceglie un altro, così la partita resta tua fino alla fine
     if (dawn && g.mentore && !P[i].snap.alive.includes(g.mentore) && P[i].snap.alive.length > 2) {
@@ -2507,7 +2509,7 @@
     $('#festaBody').innerHTML = h;
   }
   function leanCfg(cfg) { return Object.assign({}, cfg, { cast: cfg.cast.map((t) => Object.assign({}, t, { img: '' })) }); }
-  function leaveRoom() { if (FS.off) FS.off(); if (FS.room) FS.room.close(); Object.assign(FS, { room: null, role: null, code: null, gid: null, off: null, stato: null, pubblicato: '' }); FS.risposte = new Set(); document.body.classList.remove('fs-ospite'); }
+  function leaveRoom() { if (FS.off) FS.off(); if (FS.room) { if (FS.role === 'host') FS.room.set('', null); else FS.room.set('ingressi/' + FS.gid, null); FS.room.close(); } Object.assign(FS, { room: null, role: null, code: null, gid: null, off: null, stato: null, pubblicato: '' }); FS.risposte = new Set(); document.body.classList.remove('fs-ospite'); }
   $('#festaDlg').addEventListener('click', async (e) => {
     const tab = e.target.closest('[data-fs]'); if (tab) { FS.tab = tab.dataset.fs; renderFesta(); return; }
     if (e.target.closest('[data-fs-add]')) { FS.giocatori.push(fsPlayer(FS.giocatori.length)); renderFesta(); return; }
@@ -2534,7 +2536,8 @@
   function startFesta() {
     const remote = FS.role === 'host' ? Object.entries(FS.room.get().ingressi || {}).filter(([, x]) => x.campione).map(([gid, x]) => ({ id: 'o' + gid, nome: x.nome, campione: x.campione, remoto: gid })) : [];
     const locals = FS.giocatori.filter((p) => p.campione);
-    const all = locals.concat(remote);
+    const seenC = new Set();
+    const all = locals.concat(remote).map((p) => { if (seenC.has(p.campione)) return Object.assign({}, p, { campione: null }); seenC.add(p.campione); return p; });
     if (all.length < (FS.role === 'host' ? 1 : 2)) { $('#festaMsg').textContent = FS.role === 'host' ? 'Serve almeno un giocatore con un campione.' : 'Servono almeno due giocatori, ognuno con un campione.'; return; }
     if (S.cast.length < 2) { $('#festaMsg').textContent = 'Servono almeno 2 concorrenti nel cast.'; return; }
     S.cast.forEach((t, i) => { if (!t.name.trim()) t.name = 'Concorrente ' + (i + 1); });
@@ -2596,10 +2599,13 @@
   async function festaDay(k) {
     const P = SIM.phases, g = S.run.gioco, i = k - 1, soft = !!resultTheme(SIM).soft;
     let changed = false;
+    // l'entrata dell'alba, per ciascuno: 10 crediti, 5 in più se il campione è in gara
+    g.festa.giocatori.forEach((p) => { p.crediti += 10 + (p.campione && P[i].snap.alive.includes(p.campione) ? 5 : 0); });
+    renderHud();
     for (const p of g.festa.giocatori) {
       const alive = P[i].snap.alive;
-      if (p.campione && !alive.includes(p.campione)) {
-        p.caduti = (p.caduti || []).concat([p.campione]);
+      if (!p.campione || !alive.includes(p.campione)) {
+        if (p.campione) p.caduti = (p.caduti || []).concat([p.campione]);
         const taken = new Set(g.festa.giocatori.map((x) => x.campione).filter(Boolean));
         const free = alive.filter((id) => !taken.has(id));
         p.campione = null;
@@ -2651,12 +2657,15 @@
     if (tree.meta && tree.meta.build && window.LOS_BUILD && tree.meta.build !== window.LOS_BUILD && !FS.avvisato) { FS.avvisato = true; toast('Attenzione: l’host usa un’altra versione del gioco, la partita potrebbe non coincidere.'); }
     // le domande per me
     Object.entries(tree.richieste || {}).forEach(([rid, r]) => {
-      if (!r || r.gid !== FS.gid || FS.risposte.has(rid) || (r.scade && r.scade < Date.now())) return;
-      FS.risposte.add(rid);
-      const card = Object.assign({}, r.card, { timer: undefined });
+      if (!r || r.gid !== FS.gid || FS.risposte.has(rid)) return;
+      FS.risposte.add(rid); FS.aperta = rid;
+      // il tempo lo decide l'host come durata (gli orologi dei dispositivi possono non coincidere)
+      const card = Object.assign({}, r.card, { timer: Math.max(5, Math.round((r.durata || 30000) / 1000) - 4) });
       (card.gioco ? PT.gioca(card.gioco, card).then((s) => ({ value: s == null ? '__salta__' : s })) : PT.chiedi(card).then((x) => (x ? { value: x.value, stake: x.stake == null ? 0 : x.stake } : { value: '__salta__' })))
-        .then((res) => FS.room && FS.room.set('risposte/' + rid, res));
+        .then((res) => { if (FS.aperta === rid) FS.aperta = null; if (FS.room && (FS.room.get().richieste || {})[rid]) FS.room.set('risposte/' + rid, res); });
     });
+    // l'host ha smesso di aspettare: il cartello rimasto aperto si chiude
+    if (FS.aperta && !(tree.richieste || {})[FS.aperta]) { FS.aperta = null; PT.chiudi(); }
     if (!st || !cfg || guestBusy) return;
     guestBusy = true;
     try {

@@ -64,7 +64,7 @@
       es.onerror = () => { if (closed) return; es.close(); setTimeout(listen, Math.min(8000, 800 * ++retry)); };
     }
     listen();
-    const write = (method, path, val) => fetch(root + '/' + path + '.json', { method, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(val) }).then((r) => { if (!r.ok) throw new Error('Il server ha risposto ' + r.status); });
+    const write = (method, path, val) => fetch((path ? root + '/' + path : root) + '.json', { method, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(val) }).then((r) => { if (!r.ok) throw new Error('Il server ha risposto ' + r.status); });
     return {
       set: (p, v) => { tree = applica(tree, p, v); emit(); return write(v == null ? 'DELETE' : 'PUT', p, v == null ? undefined : v).catch((e) => { if (G.LOS_FESTA && G.LOS_FESTA.onerror) G.LOS_FESTA.onerror(e); }); },
       patch: (p, v) => { tree = applica(tree, p, v, true); emit(); return write('PATCH', p, v).catch((e) => { if (G.LOS_FESTA && G.LOS_FESTA.onerror) G.LOS_FESTA.onerror(e); }); },
@@ -89,7 +89,7 @@
       const end = (v) => { if (done) return; done = true; if (off) off(); clearTimeout(t); room.set('richieste/' + rid, null); room.set('risposte/' + rid, null); resolve(v); };
       const t = setTimeout(() => end(null), ms || 30000);
       off = room.on((tree) => { const r = tree.risposte && tree.risposte[rid]; if (r) end(r.value === undefined || r.value === '__salta__' ? null : r); });
-      room.set('richieste/' + rid, { gid, card, scade: Date.now() + (ms || 30000) });
+      room.set('richieste/' + rid, { gid, card, durata: ms || 30000 });
     });
   }
 

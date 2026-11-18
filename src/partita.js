@@ -83,6 +83,8 @@
     });
   }
   const aperto = () => !!open;
+  // chiude il cartello aperto, se c'è (es. l'host ha smesso di aspettare la risposta)
+  const chiudi = () => { if (open) open.close(null); };
 
   /* ================= stato della partita giocata ================= */
   function nuovo(pre) {
@@ -165,17 +167,18 @@
     const b = pick(rest), c = pick(rest.filter((x) => x !== b));
     if (b && c) {
       const rb = rischio(SIM, i, b), rc = rischio(SIM, i, c), pb = rb / (rb + rc);
-      out.push({ tipo: 'prima', a: b, b: c, q: quota(pb * 0.92), testo: (soft ? 'Esce prima ' : 'Cade prima ') + BY[b].name + ' di ' + BY[c].name });
+      out.push({ tipo: 'prima', a: b, b: c, q: quota(pb), testo: (soft ? 'Esce prima ' : 'Cade prima ') + BY[b].name + ' di ' + BY[c].name });
     }
     // 3. il giorno: tradimenti o sangue
     const seenDays = Math.max(1, P[i].day);
-    const betrays = P.slice(0, k).reduce((s, ph) => s + ph.events.filter((e) => e.cat === 'betray').length, 0);
-    if (rng() < 0.5 && betrays > 0) {
-      const pt = clamp(betrays / seenDays, 0.15, 0.8);
+    // la probabilità di un tradimento si stima dai giorni (non dai tradimenti): due nello stesso giorno contano una volta
+    const giorniTradimento = new Set(P.slice(0, k).filter((ph) => ph.events.some((e) => e.cat === 'betray')).map((ph) => ph.day)).size;
+    if (rng() < 0.5 && giorniTradimento > 0) {
+      const pt = clamp(giorniTradimento / seenDays * 0.6, 0.08, 0.6);
       out.push({ tipo: 'tradimento', giorno: day, q: quota(pt), testo: 'Oggi qualcuno tradisce un alleato' });
     } else {
       const exp = tasso(SIM, i) * A.length, n = Math.max(1, Math.round(exp));
-      out.push({ tipo: 'sangue', n, giorno: day, q: quota(exp >= n ? 0.55 : 0.42), testo: 'Almeno ' + n + (soft ? (n === 1 ? ' eliminazione' : ' eliminazioni') : (n === 1 ? ' morto' : ' morti')) + ' oggi' });
+      out.push({ tipo: 'sangue', n, giorno: day, q: quota(exp >= n ? 0.58 : 0.46), testo: 'Almeno ' + n + (soft ? (n === 1 ? ' eliminazione' : ' eliminazioni') : (n === 1 ? ' morto' : ' morti')) + ' oggi' });
     }
     return out;
   }
@@ -390,5 +393,5 @@
       return { p, punti, kills, win, campione: p.campione && by[p.campione] };
     }).sort((a, b) => b.punti - a.punti);
   }
-  G.LOS_PARTITA = { festaSana, punteggi, COLORI, chiedi, gioca, tipoProva, bonusProva, REGIA, mano, votoRegia, aperto, nuovo, sano, profilo, salvaProfilo, chiudiPartita, proposte, risolvi, prezzo, rischio, quota, nuovoGiorno, vivi, vit, DONI, INTERVISTA, ORDINI, RITMI, START };
+  G.LOS_PARTITA = { chiudi, festaSana, punteggi, COLORI, chiedi, gioca, tipoProva, bonusProva, REGIA, mano, votoRegia, aperto, nuovo, sano, profilo, salvaProfilo, chiudiPartita, proposte, risolvi, prezzo, rischio, quota, nuovoGiorno, vivi, vit, DONI, INTERVISTA, ORDINI, RITMI, START };
 })(typeof window !== 'undefined' ? window : globalThis);
