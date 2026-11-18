@@ -2414,13 +2414,13 @@
   // all'esito: si registra la partita (una volta sola) e si tengono i trofei nuovi per i ridisegni successivi
   function closeGame() {
     if (!BC || !S.run || !SIM) return [];
-    const nuovi = BC.registra(S.run, SIM);
+    const nuovi = BC.registra(S.run, SIM); closeGame.fresh = nuovi;
     if (nuovi.length) { S.run.trofeiNuovi = (S.run.trofeiNuovi || []).concat(nuovi.map((t) => t.id)); save(); }
     return (S.run.trofeiNuovi || []).map((id) => BC.TROFEI.find((t) => t.id === id)).filter(Boolean);
   }
   function trophyHTML(t, on, when) {
     const hidden = t.segreto && !on;
-    return '<li class="tr' + (on ? ' on' : '') + (hidden ? ' secret' : '') + '" data-tr="' + esc(t.id) + '"><span class="tr-ic" aria-hidden="true"></span><span class="tr-tx"><b>' + (hidden ? 'Trofeo segreto' : esc(t.nome)) + '</b><small>' + (hidden ? 'Si scopre giocando.' : esc(t.desc)) + '</small>' +
+    return '<li class="tr' + (on ? ' on' : '') + (hidden ? ' secret' : '') + '" data-tr="' + esc(t.id) + '" data-cat="' + esc(t.cat) + '"><span class="tr-ic" aria-hidden="true"></span><span class="tr-tx"><b>' + (hidden ? 'Trofeo segreto' : esc(t.nome)) + '</b><small>' + (hidden ? 'Si scopre giocando.' : esc(t.desc)) + '</small>' +
       (on && when ? '<em>' + new Date(when).toLocaleDateString('it-IT') + '</em>' : '') + '</span></li>';
   }
   function resultsExtraHTML(nuovi) {
@@ -2607,6 +2607,8 @@
     $('#rAgain').addEventListener('click', () => { const cfg = Object.assign({}, S.run.cfg, { seed: newSeed() }); delete cfg.seasonId; delete cfg.interventi; delete cfg.interviste; runSim(cfg); });
     $('#rArchive').addEventListener('click', openArchive);
     if ($('#rRematch')) $('#rRematch').addEventListener('click', startRematch);
+    // i trofei appena sbloccati: la grafica può annunciarli (una volta sola, al primo esito)
+    if (closeGame.fresh && closeGame.fresh.length && window.LOS_PARTITA_FX && window.LOS_PARTITA_FX.trophy) { const f = closeGame.fresh; closeGame.fresh = null; try { window.LOS_PARTITA_FX.trophy(f, $('#resBody .tr-new')); } catch (e) { /* solo grafica */ } }
     $('#rCopy').addEventListener('click', () => copyText(summaryText(), 'Riepilogo copiato negli appunti.'));
     if (S.run && S.run.interattiva && !S.run.replayId) persistRun(S.run, SIM);
     if (typeof studio !== 'undefined' && studio) studio.renderResults();

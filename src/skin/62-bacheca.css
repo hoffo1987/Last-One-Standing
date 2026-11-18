@@ -1,0 +1,313 @@
+/* ================= PELLE · LA BACHECA, FASE 3 (regia) =================
+ * Trofei (.tr) e lo stacco «Trofeo sbloccato» (.tr-cut, creato da 62-bacheca.js), l'album delle carte (.acard),
+ * la finestra «La tua bacheca» (#bachecaDlg), le interviste del dopo partita (.ivbox), la rivincita (.rematch)
+ * e il pulsante in home (.hh-bacheca). La struttura sta in 58-bacheca-base.css; qui l'aspetto e il movimento.
+ * Stesse regole di 60-partita.css: tinta, nero e carta; l'inversione al passaggio è istantanea (nessuna
+ * transizione su colore o sfondo del testo); il testo non sparisce mai (entra solo con transform, mai da
+ * opacity 0); opacity e fondi si animano soltanto sugli strati decorativi; al
+ * passaggio si muove soltanto l'elemento toccato. Il movimento ridotto è in fondo. */
+
+/* ---------- 1 · trofei: la riga e il distintivo ---------- */
+.trlist { grid-template-columns: repeat(auto-fill, minmax(256px, 1fr)); gap: 9px 12px; margin: 0 0 14px; padding-right: 4px; }
+.tr { --tr-slab: color-mix(in srgb, var(--ink) 9%, transparent); --bz: 46px; position: relative; isolation: isolate; grid-template-columns: var(--bz) minmax(0, 1fr) auto; gap: 12px; min-height: 66px; padding: 9px 20px 9px 14px; background: none; opacity: 1; box-shadow: none; }
+.tr::before { content: ""; position: absolute; inset: 0; z-index: -1; background: repeating-linear-gradient(-60deg, var(--tr-slab) 0 7px, transparent 7px 13px); clip-path: polygon(10px 0, 100% 0, calc(100% - 10px) 100%, 0 100%); }
+.tr.on { box-shadow: none; }
+.tr.on::before { background: linear-gradient(90deg, var(--key) 0 15px, var(--tr-slab) 15px); }
+/* il distintivo: uno scudo a sei lati, bordo e interno sono due strati; il disegno della categoria lo mette 62-bacheca.js */
+.tr-ic { position: relative; width: var(--bz); height: var(--bz); display: grid; place-items: center; background: color-mix(in srgb, var(--ink) 34%, transparent); color: color-mix(in srgb, var(--ink) 62%, transparent);
+  clip-path: polygon(50% 0, 100% 22%, 100% 66%, 50% 100%, 0 66%, 0 22%); }
+.tr-ic::before { content: ""; position: absolute; inset: 3px; background: var(--panel-solid, var(--panel)); clip-path: inherit; }
+.tr-ic svg { position: relative; width: 48%; height: 48%; fill: currentColor; }
+.tr-ic svg text { font: italic 900 22px / 1 var(--f-display); }
+/* senza il disegno resta un rombo */
+.tr-ic:empty::after { content: ""; position: relative; width: 32%; height: 32%; background: currentColor; clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%); }
+.tr.on .tr-ic { background: var(--key); color: var(--key); }
+.tr.on .tr-ic::before { background: var(--void); }
+.tr-tx { gap: 3px; }
+.tr-tx b { font: italic 900 16px / 1.1 var(--f-display); font-stretch: 110%; letter-spacing: .005em; overflow-wrap: anywhere; }
+.tr-tx small { font-size: 12.5px; line-height: 1.32; color: color-mix(in srgb, var(--ink) 80%, transparent); }
+.tr-tx em { margin-top: 2px; font: 800 10px / 1 var(--f-body); letter-spacing: .14em; color: color-mix(in srgb, var(--ink) 66%, transparent); }
+.tr-tx em::before { content: "Sbloccato il "; }
+.tr:not(.on) .tr-tx b { color: color-mix(in srgb, var(--ink) 80%, transparent); }
+.tr.secret .tr-tx b { letter-spacing: .08em; }
+
+/* nell'Esito: il conto accanto al titolo, il timbro «Nuovo» su ogni riga, una stella in contorno dietro */
+.tr-new h2 span, .rematch h2 span { flex: none; align-self: center; margin-left: .3em; padding: .2em .55em .16em .4em; background: var(--key); color: var(--key-ink); font: italic 900 max(13px, .34em) / 1 var(--f-display); letter-spacing: .08em;
+  clip-path: polygon(0 0, 100% 0, calc(100% - .4em) 100%, 0 100%); }
+.tr-new h2 span::before { content: "\00d7"; margin-right: .08em; }
+#resBody .tr-new { position: relative; isolation: isolate; overflow: hidden; }
+#resBody .tr-new::after { content: "\2605"; position: absolute; z-index: -1; right: 10px; top: -.24em; font: 900 230px / 1 var(--f-display); color: transparent; -webkit-text-stroke: 2px color-mix(in srgb, var(--ink) 13%, transparent); rotate: 14deg; pointer-events: none; }
+.tr-new .trlist { grid-template-columns: repeat(auto-fill, minmax(390px, 1fr)); max-width: 1240px; }
+.tr-new .tr { --bz: 54px; min-height: 76px; }
+.tr-new .tr-tx b { font-size: 19px; }
+.tr-new .tr-tx small { font-size: 13.5px; }
+.tr-new .tr::after { content: "Nuovo"; align-self: center; padding: 6px 10px 5px; background: var(--key); color: var(--key-ink); font: italic 900 12px / 1 var(--f-display); letter-spacing: .14em; text-transform: uppercase; rotate: -7deg;
+  clip-path: polygon(5px 0, 100% 0, calc(100% - 5px) 100%, 0 100%); }
+.tr-new .tr.tr-slam::after { animation: trSlam .44s var(--ease-kick) backwards; }
+.tr-new .tr.tr-slam .tr-ic { animation: trBadge .5s var(--ease-kick) backwards; }
+@keyframes trSlam { from { transform: scale(2.4) rotate(16deg); } }
+@keyframes trBadge { from { transform: scale(.3) rotate(-120deg); } }
+
+/* ---------- 1b · lo stacco «Trofeo sbloccato» ---------- */
+.tr-cut { position: fixed; z-index: 95; right: 0; top: 76px; width: min(540px, 100vw); padding: 6px 0 14px 18px; overflow: hidden; pointer-events: none; }
+/* le lame: la tinta attraversa, la carta la segue (stanno dietro la lastra) */
+.tr-cut::before, .tr-cut::after { content: ""; position: absolute; top: 0; bottom: 8px; pointer-events: none; transform: translateX(-130%) skewX(-18deg); }
+.tr-cut::before { left: 0; width: 100%; background: var(--key); animation: tcBlade .56s var(--look-out) backwards; }
+.tr-cut::after { left: 30%; width: 7%; background: var(--paper); animation: tcBlade .66s var(--look-out) 50ms backwards; }
+.tc-card { position: relative; z-index: 1; isolation: isolate; display: grid; grid-template-columns: 68px minmax(0, 1fr); gap: 16px; align-items: center; padding: 15px 24px 19px 38px; color: var(--paper); cursor: pointer; pointer-events: auto;
+  filter: drop-shadow(-7px 7px 0 var(--key)); animation: tcIn .44s var(--look-out) 90ms backwards; }
+.tc-card::before { content: ""; position: absolute; inset: 0; z-index: -1; background-color: var(--void); background-image: radial-gradient(circle, color-mix(in srgb, var(--key) 34%, transparent) 1.3px, transparent 1.7px); background-size: 13px 13px;
+  clip-path: polygon(24px 0, 100% 0, 100% 100%, 0 100%); }
+.tc-card .tr-ic { --bz: 68px; background: var(--key); color: var(--key); animation: tcBadge .56s var(--ease-kick) .26s backwards; }
+.tc-card .tr-ic::before { inset: 4px; background: var(--void); }
+.tc-tx { display: grid; gap: 5px; min-width: 0; }
+.tc-k { justify-self: start; display: flex; gap: 10px; align-items: center; padding: 5px 14px 4px 9px; background: var(--key); color: var(--key-ink); font: italic 900 11.5px / 1 var(--f-display); font-stretch: 112%; letter-spacing: .14em; text-transform: uppercase;
+  clip-path: polygon(0 0, 100% 0, calc(100% - 7px) 100%, 0 100%); }
+.tc-k i { font-style: inherit; letter-spacing: .04em; font-variant-numeric: tabular-nums; }
+.tc-tx b { font: italic 900 clamp(24px, 6.4vw, 34px) / .96 var(--f-display); font-stretch: 116%; letter-spacing: -.015em; text-transform: uppercase; text-shadow: .055em .055em 0 var(--key); overflow-wrap: anywhere; text-wrap: balance; }
+.tc-tx small { font: 600 13.5px / 1.3 var(--f-body); color: color-mix(in srgb, var(--paper) 88%, var(--void)); }
+/* il tempo che resta: un filo sotto la lastra */
+.tc-bar { position: absolute; left: 24px; right: 0; bottom: 0; height: 4px; background: var(--key); transform-origin: 0 50%; animation: tcBar var(--tc-hold, 3000ms) linear .3s both; }
+.tr-cut.out .tc-card { animation: tcOut .24s cubic-bezier(.6, 0, .9, .4) both; }
+@keyframes tcBlade { from { transform: translateX(130%) skewX(-18deg); } to { transform: translateX(-130%) skewX(-18deg); } }
+@keyframes tcIn { from { transform: translateX(105%) skewX(-12deg); } }
+@keyframes tcOut { to { transform: translateX(110%) skewX(10deg); } }
+@keyframes tcBadge { from { transform: scale(.2) rotate(-160deg); } 70% { transform: scale(1.14) rotate(8deg); } }
+@keyframes tcBar { from { transform: scaleX(1); } to { transform: scaleX(0); } }
+
+/* ---------- 2 · l'album: carte da collezione ---------- */
+.album { grid-template-columns: repeat(auto-fill, minmax(178px, 1fr)); gap: 20px 16px; padding: 10px 10px 12px 2px; }
+/* la cornice (::before) e il fondo (::after) sono strati; la carta è sempre scura, il colore dice la rarità */
+.acard { --rc: #b9b6ae; --rc-frame: linear-gradient(160deg, #cfccc4, #8f8c85); --rc-t: var(--paper);
+  position: relative; isolation: isolate; grid-template-rows: auto auto auto 1fr auto auto; justify-items: stretch; align-content: start; gap: 9px; padding: 11px 12px 14px; text-align: left; color: var(--paper); background: none; box-shadow: none;
+  transition: transform .24s var(--ease-kick); }
+.acard.r-rara { --rc: #5db8f2; --rc-frame: linear-gradient(160deg, #8fd4ff, #2f86c9); --rc-t: #8fd4ff; box-shadow: none; }
+.acard.r-epica { --rc: #b784f5; --rc-frame: linear-gradient(160deg, #dcbcff, #8a4be0 55%, #c79bff); --rc-t: #d3adff; box-shadow: none; }
+.acard.r-leggendaria { --rc: #f0c453; --rc-frame: linear-gradient(135deg, #a8741a, #ffe08a 26%, #c9922e 48%, #fff0b8 66%, #b07c1e 86%, #ffe08a); --rc-t: #ffd978; box-shadow: none; }
+.acard::before, .acard::after { content: ""; position: absolute; pointer-events: none; }
+.acard::before { inset: 0; z-index: -2; background: var(--rc-frame); clip-path: polygon(0 0, calc(100% - 18px) 0, 100% 18px, 100% 100%, 18px 100%, 0 calc(100% - 18px)); }
+.acard::after { inset: 4px; z-index: -1; clip-path: polygon(0 0, calc(100% - 16px) 0, 100% 16px, 100% 100%, 16px 100%, 0 calc(100% - 16px));
+  background: radial-gradient(circle, color-mix(in srgb, var(--rc) 24%, transparent) 1.2px, transparent 1.6px) 0 0 / 12px 12px, linear-gradient(180deg, color-mix(in srgb, var(--rc) 26%, #0a0a0c), #0a0a0c 52%); }
+/* leggendaria: un riflesso attraversa il fondo, dietro a testo e ritratto */
+.acard.r-leggendaria::after { background: linear-gradient(112deg, transparent 42%, hsl(46 100% 80% / .34) 50%, transparent 58%) 130% 0 / 260% 100% no-repeat, radial-gradient(circle, color-mix(in srgb, var(--rc) 26%, transparent) 1.2px, transparent 1.6px) 0 0 / 12px 12px, linear-gradient(180deg, color-mix(in srgb, var(--rc) 30%, #0a0a0c), #0a0a0c 52%);
+  animation: acFoil 4.2s ease-in-out infinite; }
+@keyframes acFoil { 0%, 38% { background-position: 130% 0, 0 0, 0 0; } 78%, 100% { background-position: -30% 0, 0 0, 0 0; } }
+.ac-r { justify-self: start; margin: -11px 0 0 -12px; padding: 8px 18px 6px 13px; background: var(--rc); color: #0a0a0c; font: italic 900 11px / 1 var(--f-display); letter-spacing: .16em; clip-path: polygon(0 0, 100% 0, calc(100% - 9px) 100%, 0 100%); }
+.ac-r::after { margin-left: .5em; letter-spacing: .1em; font-style: normal; font-size: 8px; vertical-align: 1px; }
+.acard.r-rara .ac-r::after { content: "\25C6"; } .acard.r-epica .ac-r::after { content: "\25C6\25C6"; } .acard.r-leggendaria .ac-r::after { content: "\25C6\25C6\25C6"; }
+.acard .av { --s: 150px; width: 100%; height: auto; aspect-ratio: 1 / 1; border-radius: 0 !important; box-shadow: none; clip-path: polygon(0 0, 100% 0, 100% 100%, 0 calc(100% - 14px)); }
+.acard .av img { object-position: 50% 22%; }
+.acard .av.has-volto { background: var(--rc); }
+.acard .av .sil { inset: 8% 6% 0; }
+.acard .av .ini { right: 0; bottom: 0; padding: 5px 9px 4px; border-radius: 0; background: var(--rc); color: #0a0a0c; font: italic 900 13px / 1 var(--f-display); letter-spacing: .06em; text-shadow: none; }
+.acard .av.has-volto .ini { display: block; }
+.ac-n { font: italic 900 20px / 1 var(--f-display); font-stretch: 112%; letter-spacing: -.01em; overflow-wrap: anywhere; }
+.ac-st { gap: 0; font: 800 10.5px / 1 var(--f-body); letter-spacing: .1em; text-transform: uppercase; color: color-mix(in srgb, var(--paper) 84%, #0a0a0c); }
+.ac-st > span { display: flex; flex-direction: row-reverse; justify-content: space-between; align-items: baseline; gap: 8px; padding: 4px 0 3px; box-shadow: inset 0 -1px 0 color-mix(in srgb, var(--paper) 20%, transparent); }
+.ac-st b { font: italic 900 17px / 1 var(--f-display); letter-spacing: 0; color: var(--rc-t); font-variant-numeric: tabular-nums; }
+.ac-best { font: 800 10.5px / 1.2 var(--f-body); letter-spacing: .08em; text-transform: uppercase; color: color-mix(in srgb, var(--paper) 84%, #0a0a0c); }
+.ac-best::before { content: "\2605\00a0"; color: var(--rc-t); }
+.acard .btn { justify-self: center; width: calc(100% - 10px); margin-top: 2px; border: 2px solid var(--rc); background: var(--rc); color: #0a0a0c; font-style: italic; font-weight: 800; box-shadow: none; transition: transform .2s var(--ease-kick); }
+.acard .btn:disabled { background: none; border-style: dashed; border-color: color-mix(in srgb, var(--paper) 40%, transparent); color: color-mix(in srgb, var(--paper) 78%, #0a0a0c); opacity: 1; cursor: default; }
+.acard .btn:focus-visible { outline: 3px solid var(--paper); outline-offset: 2px; }
+@media (hover: hover) {
+  /* solo la carta toccata: si alza e si inclina verso il puntatore (--tx e --ty li aggiorna 62-bacheca.js) */
+  .acard:hover { z-index: 2; transform: perspective(900px) rotateY(calc(var(--tx, -.35) * 9deg)) rotateX(calc(var(--ty, .2) * -9deg)) translateY(-8px) scale(1.025); filter: drop-shadow(8px 10px 0 color-mix(in srgb, var(--rc) 55%, transparent)); }
+  .acard .btn:hover:not(:disabled) { background: var(--paper); border-color: var(--paper); color: #0a0a0c; }
+}
+.acard:focus-within { z-index: 2; transform: translateY(-6px); }
+
+/* ---------- 3 · la finestra della bacheca ---------- */
+#bachecaDlg { width: min(1060px, calc(100% - 24px)); }
+#bachecaDlg .db { padding: 0 0 28px; gap: 0; }
+/* la testata: nera, tagliata in diagonale, come il cartello delle scelte */
+.bacheca-dialog > .row.between { position: relative; isolation: isolate; align-items: center; padding: 20px 20px 46px 26px; color: var(--paper); overflow: hidden; }
+.bacheca-dialog > .row.between::before, .bacheca-dialog > .row.between::after { content: ""; position: absolute; inset: 0; pointer-events: none; }
+.bacheca-dialog > .row.between::before { z-index: -2; background: var(--key); clip-path: polygon(0 0, 100% 0, 100% calc(100% - 22px), 0 100%); }
+.bacheca-dialog > .row.between::after { z-index: -1; background-color: var(--void); background-image: radial-gradient(circle, color-mix(in srgb, var(--key) 30%, transparent) 1.3px, transparent 1.7px); background-size: 14px 14px;
+  clip-path: polygon(0 0, 100% 0, 100% calc(100% - 29px), 0 calc(100% - 7px)); }
+#h-bacheca { margin: 0; font: italic 900 clamp(30px, 5vw, 50px) / .94 var(--f-display); font-stretch: 118%; letter-spacing: -.025em; text-transform: uppercase; color: var(--paper); text-shadow: .055em .055em 0 var(--key); }
+.bacheca-dialog > .row.between .iconbtn { background: transparent; color: var(--paper); border-color: color-mix(in srgb, var(--paper) 45%, transparent); }
+@media (hover: hover) { .bacheca-dialog > .row.between .iconbtn:hover { background: var(--key); color: var(--key-ink); border-color: var(--key); } }
+.bacheca-dialog > .row.between .iconbtn:focus-visible { outline: 3px solid var(--key); outline-offset: 2px; }
+/* le linguette: lastre inclinate a cavallo del taglio; quella scelta prende la tinta di colpo */
+.bc-tabs { position: relative; z-index: 1; gap: 8px; margin: -24px 26px 18px 30px; }
+.bc-tabs button { position: relative; isolation: isolate; padding: 12px 24px 11px; border: 0; background: none; color: var(--ink); font: italic 900 16px / 1 var(--f-display); font-stretch: 110%; letter-spacing: .05em; outline: none; transition: none; -webkit-tap-highlight-color: transparent; }
+.bc-tabs button::before { content: ""; position: absolute; inset: 0; z-index: -1; background: color-mix(in srgb, var(--ink) 14%, var(--panel-solid, var(--panel))); transform: skewX(-12deg); }
+.bc-tabs button[aria-selected="true"] { background: none; color: var(--key-ink); }
+.bc-tabs button[aria-selected="true"]::before { background: var(--key); box-shadow: 4px 4px 0 var(--hard); animation: bcTab .24s var(--ease-kick); }
+@media (hover: hover) {
+  .bc-tabs button[aria-selected="false"]:hover { color: var(--bg); }
+  .bc-tabs button[aria-selected="false"]:hover::before { background: var(--ink); }
+}
+.bc-tabs button:focus-visible::before { outline: 3px solid var(--ink); outline-offset: 3px; }
+.bc-tabs button:active::before { transform: skewX(-12deg) scale(.95); }
+@keyframes bcTab { from { transform: skewX(-12deg) scale(1.16, 1.3); } }
+#bachecaBody { padding: 0 26px; min-height: 240px; }
+#bachecaBody > .help { max-width: 60ch; font-size: 15px; }
+/* il conto grande; per i trofei 62-bacheca.js aggiunge la barra di quanto manca */
+.bc-count { display: flex; align-items: flex-end; flex-wrap: wrap; gap: 4px 14px; margin: 4px 0 6px; font: 800 12px / 1.2 var(--f-body); letter-spacing: .16em; text-transform: uppercase; color: color-mix(in srgb, var(--ink) 80%, transparent); }
+.bc-count b { font: italic 900 clamp(60px, 9vw, 92px) / .8 var(--f-display); font-stretch: 120%; letter-spacing: -.05em; padding-right: .08em; color: var(--key); text-shadow: .045em .045em 0 var(--ink); font-variant-numeric: tabular-nums; }
+.bc-bar { flex: 1 1 100%; height: 12px; margin-top: 10px; background: color-mix(in srgb, var(--ink) 12%, transparent); clip-path: polygon(6px 0, 100% 0, calc(100% - 6px) 100%, 0 100%); }
+.bc-bar b { display: block; width: calc(var(--p, 0) * 100%); min-width: 0; height: 100%; padding: 0; background: var(--key); transform-origin: 0 50%; text-shadow: none; }
+.bc-cat h3 { display: flex; align-items: center; gap: 10px; margin: 24px 0 11px; font: italic 900 21px / 1 var(--f-display); font-stretch: 112%; letter-spacing: -.005em; }
+.bc-cat h3::before { content: ""; flex: none; width: 15px; height: 15px; background: var(--key); clip-path: polygon(5px 0, 100% 0, calc(100% - 5px) 100%, 0 100%); }
+.bc-cat h3::after { content: ""; flex: 1 1 20px; order: 3; height: 3px; background: color-mix(in srgb, var(--ink) 16%, transparent); }
+.bc-cat h3 .bc-n { order: 2; padding: 4px 8px 3px; background: var(--ink); color: var(--bg); font: 800 11px / 1 var(--f-body); font-stretch: 100%; letter-spacing: .1em; font-variant-numeric: tabular-nums; }
+.bc-cat h3 .bc-n.full { background: var(--key); color: var(--key-ink); }
+/* i record: tessere con l'angolo tagliato */
+.bc-rec { grid-template-columns: repeat(auto-fill, minmax(224px, 1fr)); gap: 10px 12px; padding: 8px 4px 0 0; }
+.bc-rec div { position: relative; isolation: isolate; display: grid; align-content: space-between; gap: 12px; min-height: 108px; padding: 15px 22px 13px 20px; background: none; }
+.bc-rec div::before { content: ""; position: absolute; inset: 0; z-index: -1; background: linear-gradient(90deg, var(--key) 0 6px, color-mix(in srgb, var(--ink) 9%, transparent) 6px); clip-path: polygon(0 0, calc(100% - 18px) 0, 100% 18px, 100% 100%, 0 100%); }
+.bc-rec dt { color: color-mix(in srgb, var(--ink) 80%, transparent); }
+.bc-rec dd { margin: 0; font: italic 900 clamp(30px, 3.4vw, 36px) / .9 var(--f-display); font-stretch: 114%; letter-spacing: -.03em; font-variant-numeric: tabular-nums; }
+/* cambio di scheda: il contenuto appena scritto entra a cascata, in fretta (la classe la mette 62-bacheca.js) */
+#bachecaBody.bc-swap .bc-count b { animation: bcNum .34s var(--ease-kick) backwards; transform-origin: 10% 90%; }
+#bachecaBody.bc-swap .bc-bar b { animation: bcFill .6s var(--look-out) .1s backwards; }
+#bachecaBody.bc-swap :is(.tr, .acard, .bc-rec > div) { animation: bcIn .3s var(--look-out) backwards; animation-delay: calc(40ms + var(--k, 0) * 20ms); }
+#bachecaBody.bc-swap .acard { animation-name: bcCard; animation-duration: .36s; animation-delay: calc(40ms + var(--k, 0) * 34ms); }
+@keyframes bcNum { from { transform: scale(1.4) rotate(-8deg); } }
+@keyframes bcFill { from { transform: scaleX(0); } }
+@keyframes bcIn { from { transform: translateX(-20px) skewX(-10deg); } }
+@keyframes bcCard { from { transform: translateY(22px) rotate(-5deg); } }
+
+/* ---------- 4 · le interviste: il salotto del dopo partita ---------- */
+#resBody .ivbox { position: relative; isolation: isolate; overflow: hidden; }
+#resBody .ivbox::after { content: "\00bb"; position: absolute; z-index: -1; right: 16px; top: -.3em; font: italic 900 300px / 1 var(--f-display); color: transparent; -webkit-text-stroke: 2px color-mix(in srgb, var(--ink) 12%, transparent); pointer-events: none; }
+.ivbox .iv { position: relative; grid-template-columns: clamp(118px, 15vw, 176px) minmax(0, 1fr); gap: 0 clamp(18px, 2.6vw, 34px); max-width: 1040px; padding: 16px 0 22px; }
+.ivbox .iv + .iv { border-top: 0; margin-top: 8px; padding-top: 26px; box-shadow: inset 0 3px 0 color-mix(in srgb, var(--ink) 12%, transparent); }
+/* il ritratto: una lastra tagliata; al primo ingresso scatta un lampo (uno strato sopra la foto, mai sul testo) */
+.ivbox .iv > .av { --s: 150px; width: 100%; height: auto; aspect-ratio: 4 / 5; border-radius: 0 !important; box-shadow: none; clip-path: polygon(0 0, 100% 0, 100% calc(100% - 20px), 0 100%); }
+.ivbox .iv > .av img { object-position: 50% 22%; }
+.ivbox .iv > .av::before { content: ""; position: absolute; inset: 0; z-index: 3; background: #fff; opacity: 0; pointer-events: none; }
+.ivbox .iv > .av .sil { inset: 8% 2% 0; }
+.ivbox .iv > .av .ini { right: auto; left: 0; bottom: 18px; padding: 5px 10px 4px; border-radius: 0; background: var(--key); color: var(--key-ink); font: italic 900 14px / 1 var(--f-display); letter-spacing: .06em; text-shadow: none; }
+.ivbox .iv > .av.has-volto .ini { display: block; }
+.iv-in { display: grid; justify-items: start; align-content: start; min-width: 0; }
+/* «in onda»: la targhetta con il rombo che lampeggia, come nell'intervista di prima della partita */
+.iv-k { position: relative; padding: 6px 16px 5px 28px; background: var(--key); color: var(--key-ink); font: italic 900 12px / 1 var(--f-display); font-stretch: 112%; letter-spacing: .14em; clip-path: polygon(0 0, 100% 0, calc(100% - 8px) 100%, 0 100%); }
+.iv-k::before { content: ""; position: absolute; left: 11px; top: 50%; width: 9px; height: 9px; margin-top: -5px; background: var(--key-ink); clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%); animation: scOnAir 1.1s steps(2, jump-none) infinite; }
+.iv h3 { margin: 10px 0 4px; font: italic 900 clamp(30px, 4.4vw, 56px) / .92 var(--f-display); font-stretch: 118%; letter-spacing: -.025em; text-shadow: .05em .05em 0 var(--key); overflow-wrap: anywhere; }
+.iv dl { gap: 0; justify-items: start; width: 100%; }
+/* la domanda: il microfono; la risposta: una nuvoletta con la punta verso chi parla */
+.iv dt { display: flex; align-items: center; gap: 8px; margin-top: 14px; font: 800 12px / 1.25 var(--f-body); letter-spacing: .1em; text-transform: uppercase; color: color-mix(in srgb, var(--ink) 80%, transparent); }
+.iv dt::before { content: ""; flex: none; width: 15px; height: 15px; background: var(--key);
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 1.5a4 4 0 0 0-4 4v6a4 4 0 0 0 8 0v-6a4 4 0 0 0-4-4zM4.5 11h2.2a5.3 5.3 0 0 0 10.6 0h2.2a7.5 7.5 0 0 1-6.4 7.4V21H16v2H8v-2h2.9v-2.6A7.5 7.5 0 0 1 4.5 11z'/%3E%3C/svg%3E") center / contain no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 1.5a4 4 0 0 0-4 4v6a4 4 0 0 0 8 0v-6a4 4 0 0 0-4-4zM4.5 11h2.2a5.3 5.3 0 0 0 10.6 0h2.2a7.5 7.5 0 0 1-6.4 7.4V21H16v2H8v-2h2.9v-2.6A7.5 7.5 0 0 1 4.5 11z'/%3E%3C/svg%3E") center / contain no-repeat; }
+.iv dd { position: relative; isolation: isolate; max-width: 62ch; margin: 7px 0 0; padding: 11px 22px 12px 30px; font: italic 800 clamp(17px, 1.9vw, 21px) / 1.28 var(--f-display); transform-origin: 0 20%; }
+.iv dd::before { content: ""; position: absolute; inset: 0; z-index: -1; background: color-mix(in srgb, var(--ink) 10%, transparent); clip-path: polygon(14px 0, 100% 0, 100% 100%, 14px 100%, 14px 27px, 0 13px, 14px 9px); }
+/* la prima risposta è il titolo dell'intervista: nella tinta */
+.iv dd:first-of-type { color: var(--key-ink); font-size: clamp(19px, 2.3vw, 26px); }
+.iv dd:first-of-type::before { background: var(--key); }
+.iv.iv-go > .av::before { animation: ivFlash .52s ease-out backwards; }
+.iv.iv-go .iv-k { animation: scKick .34s var(--ease-kick) backwards; }
+.iv.iv-go dd { animation: ivPop .36s var(--ease-kick) backwards; animation-delay: calc(140ms + var(--q, 0) * 110ms); }
+@keyframes ivFlash { 0% { opacity: 0; } 10% { opacity: .92; } 100% { opacity: 0; } }
+@keyframes ivPop { from { transform: scale(.8) rotate(-3deg); } }
+@media (min-width: 601px) {
+  /* il secondo ospite siede dall'altra parte: ritratto a destra, nuvolette con la punta a destra */
+  .ivbox .iv:nth-of-type(even) { grid-template-columns: minmax(0, 1fr) clamp(118px, 15vw, 176px); }
+  .ivbox .iv:nth-of-type(even) > .av { order: 2; clip-path: polygon(0 0, 100% 0, 100% 100%, 0 calc(100% - 20px)); }
+  .ivbox .iv:nth-of-type(even) > .av .ini { left: auto; right: 0; }
+  .ivbox .iv:nth-of-type(even) .iv-in, .ivbox .iv:nth-of-type(even) dl { justify-items: end; }
+  .ivbox .iv:nth-of-type(even) h3 { text-align: right; }
+  .ivbox .iv:nth-of-type(even) dd { padding: 11px 30px 12px 22px; transform-origin: 100% 20%; }
+  .ivbox .iv:nth-of-type(even) dd::before { clip-path: polygon(0 0, calc(100% - 14px) 0, calc(100% - 14px) 9px, 100% 13px, calc(100% - 14px) 27px, calc(100% - 14px) 100%, 0 100%); }
+}
+
+/* ---------- 5 · la rivincita: il lancio della prossima edizione ---------- */
+#resBody .rematch { position: relative; isolation: isolate; overflow: hidden; background: var(--void); color: var(--paper); padding-bottom: 62px; }
+#resBody.es-on .rematch { background: none; padding-bottom: 66px; }
+#resBody.es-on .rematch::before { background-color: var(--void); background-image: radial-gradient(circle, color-mix(in srgb, var(--key) 32%, transparent) 1.3px, transparent 1.7px); background-size: 14px 14px;
+  clip-path: polygon(0 0, calc(100% - 30px) 0, 100% 30px, 100% 100%, 0 100%); }
+/* un «VS» enorme in contorno, dietro, che spinge in avanti */
+#resBody .rematch::after { content: "VS"; position: absolute; z-index: -1; right: 8px; top: 50%; margin-top: -.56em; font: italic 900 clamp(170px, 24vw, 320px) / 1 var(--f-display); font-stretch: 122%; letter-spacing: -.06em; color: transparent; -webkit-text-stroke: 2px color-mix(in srgb, var(--key) 60%, transparent); pointer-events: none;
+  animation: rmPush 1.5s var(--look-out) infinite alternate; }
+@keyframes rmPush { from { transform: translateX(-26px); } }
+#resBody .rematch > h2 { color: var(--paper); text-shadow: .045em .045em 0 var(--key); }
+#resBody .rematch h2 span { text-shadow: none; }
+#resBody .rematch p { max-width: 58ch; margin: 0 0 18px; font-size: 16px; line-height: 1.5; color: color-mix(in srgb, var(--paper) 90%, var(--void)); }
+#resBody .rematch .row { gap: 14px 16px; align-items: center; }
+#rRematch { padding: 15px 30px 14px; font: italic 900 20px / 1 var(--f-display); font-stretch: 112%; letter-spacing: .04em; text-transform: uppercase; box-shadow: 5px 5px 0 var(--paper); }
+/* (::after del pulsante primario è già il riflesso di look.css: la freccia sta in ::before, messa in coda) */
+#rRematch::before { content: "\00bb"; order: 2; display: inline-block; margin-left: -.1em; font-size: 1.15em; line-height: 1; animation: rmNudge .9s steps(2, jump-none) infinite; }
+@keyframes rmNudge { to { transform: translateX(5px); } }
+#rRematch:focus-visible, .rematch .btn:focus-visible { outline: 3px solid var(--paper); outline-offset: 4px; }
+.rematch .btn:not(.primary) { background: transparent; border: 2px solid color-mix(in srgb, var(--paper) 55%, transparent); color: var(--paper); transition: transform .2s var(--ease-kick); }
+@media (hover: hover) { .rematch .btn:not(.primary):hover { background: var(--paper); border-color: var(--paper); color: var(--void); } }
+/* il nastro che scorre in fondo: solo decorazione (testo vuoto per i lettori di schermo dove si può) */
+.rematch .row::after { content: "PROSSIMA EDIZIONE \2726\00a0 STESSO CAST \2726\00a0 NUOVE CICATRICI \2726\00a0 CONTI IN SOSPESO \2726\00a0 PROSSIMA EDIZIONE \2726\00a0 STESSO CAST \2726\00a0 NUOVE CICATRICI \2726\00a0 CONTI IN SOSPESO \2726\00a0 PROSSIMA EDIZIONE \2726\00a0 STESSO CAST \2726\00a0 NUOVE CICATRICI \2726\00a0 CONTI IN SOSPESO \2726\00a0 PROSSIMA EDIZIONE \2726\00a0 STESSO CAST \2726\00a0 NUOVE CICATRICI \2726\00a0 CONTI IN SOSPESO \2726\00a0 ";
+  content: "PROSSIMA EDIZIONE \2726\00a0 STESSO CAST \2726\00a0 NUOVE CICATRICI \2726\00a0 CONTI IN SOSPESO \2726\00a0 PROSSIMA EDIZIONE \2726\00a0 STESSO CAST \2726\00a0 NUOVE CICATRICI \2726\00a0 CONTI IN SOSPESO \2726\00a0 PROSSIMA EDIZIONE \2726\00a0 STESSO CAST \2726\00a0 NUOVE CICATRICI \2726\00a0 CONTI IN SOSPESO \2726\00a0 PROSSIMA EDIZIONE \2726\00a0 STESSO CAST \2726\00a0 NUOVE CICATRICI \2726\00a0 CONTI IN SOSPESO \2726\00a0 " / "";
+  position: absolute; left: 0; bottom: 0; width: max-content; padding: 9px 0 7px; background: var(--key); color: var(--key-ink); font: italic 900 12.5px / 1 var(--f-display); font-stretch: 112%; letter-spacing: .18em; white-space: pre; pointer-events: none;
+  animation: rmTick 36s linear infinite; }
+@keyframes rmTick { to { transform: translateX(-50%); } }
+
+/* ---------- 6 · home: il pulsante della bacheca ---------- */
+#v-home .hh-bacheca { position: relative; margin-top: 14px; padding: 9px 16px 8px 13px; gap: 10px; font: italic 800 14px / 1 var(--f-display); letter-spacing: .03em; }
+/* la coppa */
+.hh-bacheca::before { content: ""; flex: none; width: 17px; height: 17px; background: var(--key);
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M6 2h12v2h4v3a5 5 0 0 1-4.6 5A6 6 0 0 1 13 15.9V19h4v3H7v-3h4v-3.1A6 6 0 0 1 6.6 12 5 5 0 0 1 2 7V4h4zm0 4H4v1a3 3 0 0 0 2 2.8zm12 0v3.8A3 3 0 0 0 20 7V6z'/%3E%3C/svg%3E") center / contain no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M6 2h12v2h4v3a5 5 0 0 1-4.6 5A6 6 0 0 1 13 15.9V19h4v3H7v-3h4v-3.1A6 6 0 0 1 6.6 12 5 5 0 0 1 2 7V4h4zm0 4H4v1a3 3 0 0 0 2 2.8zm12 0v3.8A3 3 0 0 0 20 7V6z'/%3E%3C/svg%3E") center / contain no-repeat; }
+.hh-bacheca .hb-n { padding: 4px 8px 3px; background: var(--key); color: var(--key-ink); font: italic 900 12px / 1 var(--f-display); letter-spacing: .04em; font-variant-numeric: tabular-nums; }
+@media (hover: hover) { #v-home .hh-bacheca:hover::before { background: currentColor; } }
+#v-home .hh-bacheca:focus-visible { outline: 3px solid var(--key); outline-offset: 3px; }
+
+/* ---------- telefono ---------- */
+@media (max-width: 600px) {
+  .trlist, .tr-new .trlist { grid-template-columns: minmax(0, 1fr); padding-right: 2px; }
+  .tr { padding: 9px 16px 9px 12px; gap: 10px; }
+  .tr-new .tr { --bz: 46px; min-height: 68px; }
+  .tr-new .tr-tx b { font-size: 16.5px; }
+  .tr-new .tr-tx small { font-size: 12.5px; }
+  .tr-new .tr::after { padding: 5px 8px 4px; font-size: 10.5px; }
+  #resBody .tr-new::after { font-size: 150px; right: -14px; }
+  .tr-cut { width: 100vw; padding-left: 10px; }
+  .tc-card { grid-template-columns: 54px minmax(0, 1fr); gap: 12px; padding: 13px 14px 17px 30px; }
+  .tc-card .tr-ic { --bz: 54px; }
+  .tc-tx small { font-size: 12.5px; }
+  .album { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px 10px; padding: 8px 2px 10px 0; }
+  .acard { padding: 9px 9px 12px; gap: 8px; }
+  .ac-r { margin: -9px 0 0 -9px; padding: 7px 14px 5px 10px; font-size: 10px; letter-spacing: .12em; }
+  .ac-n { font-size: 17px; }
+  .ac-st { font-size: 9.5px; letter-spacing: .06em; }
+  .ac-st b { font-size: 15px; }
+  .ac-best { font-size: 9.5px; letter-spacing: .04em; }
+  .acard .btn { width: 100%; padding-inline: 4px; font-size: 12.5px; }
+  #bachecaDlg { width: calc(100% - 12px); }
+  .bacheca-dialog > .row.between { padding: 16px 12px 42px 16px; }
+  .bc-tabs { gap: 6px; margin: -22px 12px 14px 18px; }
+  .bc-tabs button { padding: 11px 15px 10px; font-size: 14px; letter-spacing: .03em; }
+  #bachecaBody { padding: 0 14px; }
+  .bc-cat h3 { font-size: 18px; margin-top: 20px; }
+  .bc-rec { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+  .bc-rec div { min-height: 96px; padding: 12px 14px 11px 16px; }
+  .bc-rec dt { font-size: 10px; letter-spacing: .08em; }
+  .bc-rec dd { font-size: 27px; }
+  .ivbox .iv { grid-template-columns: 84px minmax(0, 1fr); gap: 0 14px; }
+  .ivbox .iv > .av { --s: 84px; clip-path: polygon(0 0, 100% 0, 100% calc(100% - 12px), 0 100%); }
+  .ivbox .iv > .av .ini { bottom: 12px; font-size: 11px; padding: 4px 6px 3px; }
+  .iv h3 { margin-top: 8px; }
+  .iv dt { font-size: 11px; letter-spacing: .06em; align-items: flex-start; }
+  .iv dd { padding: 9px 14px 10px 26px; }
+  /* il «VS» scende sotto il testo e si fa più tenue */
+  #resBody .rematch::after { top: auto; bottom: 34px; margin-top: 0; right: -6px; font-size: 150px; -webkit-text-stroke-color: color-mix(in srgb, var(--key) 38%, transparent); }
+  #resBody .ivbox::after { font-size: 190px; right: 0; }
+  #resBody .rematch p { font-size: 15px; }
+  #rRematch { padding: 14px 22px 13px; font-size: 18px; }
+}
+
+/* ---------- movimento ridotto: niente si muove, gli stati sono immediati ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .tr-cut::before, .tr-cut::after, .tc-bar { display: none; }
+  .tc-card, .tc-card .tr-ic, .tr-cut.out .tc-card, .tr-new .tr.tr-slam::after, .tr-new .tr.tr-slam .tr-ic, .acard.r-leggendaria::after, .bc-tabs button[aria-selected="true"]::before,
+  #bachecaBody.bc-swap .bc-count b, #bachecaBody.bc-swap .bc-bar b, #bachecaBody.bc-swap :is(.tr, .acard, .bc-rec > div), .iv-k::before, .iv.iv-go > .av::before, .iv.iv-go .iv-k, .iv.iv-go dd,
+  #resBody .rematch::after, #rRematch::before, .rematch .row::after { animation: none !important; }
+  .acard, .acard .btn, .rematch .btn { transition: none !important; }
+  .acard:hover, .acard:focus-within { transform: none; }
+}
+[data-reduced-motion] .tr-cut::before, [data-reduced-motion] .tr-cut::after, [data-reduced-motion] .tc-bar { display: none; }
+[data-reduced-motion] :is(.tc-card, .tc-card .tr-ic, .tr-cut.out .tc-card, .tr-new .tr.tr-slam .tr-ic, #bachecaBody.bc-swap .bc-count b, #bachecaBody.bc-swap .bc-bar b, #bachecaBody.bc-swap .tr, #bachecaBody.bc-swap .acard, #bachecaBody.bc-swap .bc-rec > div, .iv.iv-go .iv-k, .iv.iv-go dd),
+[data-reduced-motion] .tr-new .tr.tr-slam::after, [data-reduced-motion] .acard.r-leggendaria::after, [data-reduced-motion] .bc-tabs button[aria-selected="true"]::before, [data-reduced-motion] .iv-k::before, [data-reduced-motion] .iv.iv-go > .av::before,
+[data-reduced-motion] #resBody .rematch::after, [data-reduced-motion] #rRematch::before, [data-reduced-motion] .rematch .row::after { animation: none !important; }
+[data-reduced-motion] :is(.acard, .acard .btn, .rematch .btn) { transition: none !important; }
+[data-reduced-motion] .acard:hover, [data-reduced-motion] .acard:focus-within { transform: none; }
